@@ -1,0 +1,9 @@
+pytz==2019.1  # https://github.com/stub42/pytz
+Pillow==6.1.0  # https://github.com/python-pillow/Pillow
+
+# Django
+# ------------------------------------------------------------------------------
+django==2.2.3  # pyup: < 3.0  # https://www.djangoproject.com/
+
+# Django REST Framework
+djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
