@@ -29,6 +29,7 @@ RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
 
 COPY ./requirements /requirements
+RUN pip install --upgrade pip
 RUN pip install -r /requirements/dev.txt
 
 COPY --chown=app:app . $APP_DIR

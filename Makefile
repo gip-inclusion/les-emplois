@@ -46,3 +46,9 @@ dbshell_dev_root:
 
 dump_db:
 	docker exec -ti -e PGPASSWORD=password itou_django pg_dump -p 5432 -h postgres -U itou itou > ~/Desktop/itou.sql
+
+# docker-compose -f docker-compose-dev.yml up --no-deps postgres
+# make shell_on_postgres_container
+# psql -h postgres -U postgres
+# DROP DATABASE itou;
+# CREATE DATABASE itou OWNER itou;

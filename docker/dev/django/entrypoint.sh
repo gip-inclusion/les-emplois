@@ -8,6 +8,10 @@ done
 
 >&2 echo "Postgres is up - continuing"
 
+# # https://github.com/docker/compose/issues/1926#issuecomment-422351028
+# trap : TERM INT
+# tail -f /dev/null & wait
+
 django-admin migrate
 django-admin runserver_plus 0.0.0.0:8000
 

@@ -1,9 +1,16 @@
 from django.contrib import admin
 
-from itou.siae.models import Siae
+from itou.siae import models
 
 
-@admin.register(Siae)
+class MembersInline(admin.TabularInline):
+    model = models.Siae.members.through
+    extra = 1
+    raw_id_fields = ('user',)
+
+
+@admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
     list_display = ('siret', 'kind', 'name',)
     search_fields = ('siret', 'name',)
+    inlines = (MembersInline,)
