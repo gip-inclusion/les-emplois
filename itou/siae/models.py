@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
+from itou.utils.validators import validate_siret
 
 
 class Siae(AddressMixin):
@@ -25,7 +26,7 @@ class Siae(AddressMixin):
         (KIND_RQ, _("Régies de quartier")),
     )
 
-    siret = models.CharField(verbose_name=_("Siret"), max_length=14, primary_key=True)
+    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], primary_key=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
     name = models.CharField(verbose_name=_("Nom"), max_length=256)
     activities = models.CharField(verbose_name=_("Secteur d'activités"), max_length=256)

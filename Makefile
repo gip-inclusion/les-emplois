@@ -52,3 +52,5 @@ dump_db:
 # psql -h postgres -U postgres
 # DROP DATABASE itou;
 # CREATE DATABASE itou OWNER itou;
+# \c itou;
+# CREATE EXTENSION postgis;
