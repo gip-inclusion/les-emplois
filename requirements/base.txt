@@ -1,5 +1,6 @@
 pytz==2019.1  # https://github.com/stub42/pytz
 Pillow==6.1.0  # https://github.com/python-pillow/Pillow
+requests==2.22.0  # https://github.com/psf/requests
 
 # Django
 # ------------------------------------------------------------------------------
