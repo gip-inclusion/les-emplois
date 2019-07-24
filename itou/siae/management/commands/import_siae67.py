@@ -80,6 +80,7 @@ class Command(BaseCommand):
                 self.stdout.write(email)
 
                 if not dry_run:
+
                     siae = Siae()
                     siae.siret = siret
                     siae.kind = kind
@@ -91,6 +92,8 @@ class Command(BaseCommand):
                     siae.phone = phone
                     siae.email = email
                     siae.save()
+
+                    siae.set_coords()
 
         self.stdout.write('-' * 80)
         self.stdout.write("Done.")
