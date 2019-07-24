@@ -35,6 +35,7 @@ DJANGO_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'django.contrib.gis',
 ]
 
 THIRD_PARTY_APPS = [
@@ -102,7 +103,7 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'HOST': os.environ.get('POSTGRES_HOST', '127.0.0.1'),
         'PORT': os.environ.get('POSTGRES_PORT', '5432'),
         'NAME': os.environ.get('ITOU_POSTGRES_DATABASE_NAME', 'jepostule'),
@@ -194,3 +195,9 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = False
+
+# Geospatial.
+# ------------------------------------------------------------------------------
+
+GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so.20'
+GEOS_LIBRARY_PATH = '/usr/lib/libgeos_c.so.1'

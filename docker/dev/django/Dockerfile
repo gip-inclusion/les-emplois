@@ -20,6 +20,9 @@ RUN apk update \
     && apk add libffi-dev py-cffi \
     # Translations dependencies
     && apk add gettext \
+    # Geospatial library
+    # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/geolibs
+    && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos=3.7.2-r0 proj=6.1.0-r4 gdal=2.4.0-r3 \
     # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
     && apk add postgresql-client=11.4-r0 \
     # Time zone and daylight-saving time data

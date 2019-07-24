@@ -1,8 +1,11 @@
 #!/bin/bash
 set -e
 
+# https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/#creating-a-spatial-database
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
   CREATE USER $ITOU_POSTGRES_USER WITH ENCRYPTED PASSWORD '$ITOU_POSTGRES_PASSWORD';
   CREATE DATABASE $ITOU_POSTGRES_DATABASE_NAME OWNER $ITOU_POSTGRES_USER;
   ALTER USER $ITOU_POSTGRES_USER CREATEDB;
+  \c $ITOU_POSTGRES_DATABASE_NAME;
+  CREATE EXTENSION postgis;
 EOSQL

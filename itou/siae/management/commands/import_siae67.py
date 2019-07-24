@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
                 self.stdout.write('-' * 80)
 
-                siret = row[6].strip().replace(' ', '')
+                siret = row[8].strip().replace(' ', '')
                 siret = ' '.join(siret.split())
                 self.stdout.write(siret)
                 assert len(siret) == 14
@@ -64,16 +64,19 @@ class Command(BaseCommand):
                 activities = ' '.join(activities.split())
                 self.stdout.write(activities)
 
-                address = row[3].strip().replace('-', ' - ').replace('\n ', ' - ')
-                address = ' '.join(address.split())
-                self.stdout.write(address)
+                address_line_1 = row[3].strip().replace('-', ' - ').replace('\n ', ' - ')
+                zipcode = row[4].strip()
+                city = row[5].strip()
+                self.stdout.write(address_line_1)
+                self.stdout.write(zipcode)
+                self.stdout.write(city)
 
-                phone = row[4].strip()
+                phone = row[6].strip()
                 phone = ' '.join(phone.split())
                 self.stdout.write(phone)
                 assert len(phone) == 14
 
-                email = row[5].strip()
+                email = row[7].strip()
                 self.stdout.write(email)
 
                 if not dry_run:
@@ -82,7 +85,9 @@ class Command(BaseCommand):
                     siae.kind = kind
                     siae.name = name
                     siae.activities = activities
-                    siae.address = address
+                    siae.address_line_1 = address_line_1
+                    siae.zipcode = zipcode
+                    siae.city = city
                     siae.phone = phone
                     siae.email = email
                     siae.save()

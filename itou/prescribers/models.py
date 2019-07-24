@@ -3,8 +3,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from itou.utils.address.models import AddressMixin
 
-class Prescriber(models.Model):
+
+class Prescriber(AddressMixin):
     """
     Prescripteurs-orienteurs (Pôle emploi, missions locales, Cap emploi, PJJ,
     SPIP, ASE, PLIE, voire structures d’hébergement, etc.).
@@ -12,7 +14,6 @@ class Prescriber(models.Model):
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=256)
-    address = models.CharField(verbose_name=_("Adresse"), max_length=256)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=14)
     email = models.EmailField(verbose_name=_("E-mail"))
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),

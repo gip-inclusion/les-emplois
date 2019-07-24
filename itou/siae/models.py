@@ -3,8 +3,10 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from itou.utils.address.models import AddressMixin
 
-class Siae(models.Model):
+
+class Siae(AddressMixin):
     """Structures d'insertion par l'activité économique."""
 
     KIND_EI = 'EI'
@@ -27,7 +29,6 @@ class Siae(models.Model):
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
     name = models.CharField(verbose_name=_("Nom"), max_length=256)
     activities = models.CharField(verbose_name=_("Secteur d'activités"), max_length=256)
-    address = models.CharField(verbose_name=_("Adresse"), max_length=256)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=14)
     email = models.EmailField(verbose_name=_("E-mail"))
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
