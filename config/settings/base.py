@@ -195,3 +195,9 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = False
+
+# APIs.
+# ------------------------------------------------------------------------------
+
+# https://adresse.data.gouv.fr/faq
+API_BAN_BASE_URL = 'https://api-adresse.data.gouv.fr'

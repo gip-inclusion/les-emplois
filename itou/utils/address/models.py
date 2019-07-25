@@ -1,9 +1,10 @@
 import requests
-import urllib.parse
 
+from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import models
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
 
@@ -49,18 +50,22 @@ class AddressMixin(models.Model):
 
     def set_coords(self):
         """
-        Convert address to latitude/longitude using adresse.data.gouv.fr:
+        Transform a French physical address description to longitude/latitude coordinates.
         https://adresse.data.gouv.fr/api
-        https://adresse.data.gouv.fr/faq/
+        https://adresse.data.gouv.fr/faq
         """
         full_address = f"{self.address_line_1} {self.address_line_2} {self.zipcode} {self.city}"
         full_address = ' '.join(full_address.split())
-        full_address = urllib.parse.quote_plus(full_address)
-        r = requests.get(f"https://api-adresse.data.gouv.fr/search/?q={full_address}&limit=1")
-        if r.status_code == 200:
-            result = r.json()['features'][0]
-            longitude = result['geometry']['coordinates'][0]
-            latitude = result['geometry']['coordinates'][1]
-            self.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
-            self.save()
-        # TODO: handle errors.
+
+        api_url = f"{settings.API_BAN_BASE_URL}/search/"
+        query_string = urlencode({'q': full_address, 'limit': 1})
+
+        r = requests.get(f"{api_url}?{query_string}")
+        r.raise_for_status()
+
+        result = r.json()['features'][0]
+        longitude = result['geometry']['coordinates'][0]
+        latitude = result['geometry']['coordinates'][1]
+
+        self.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
+        self.save()
