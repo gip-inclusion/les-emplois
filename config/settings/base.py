@@ -195,9 +195,3 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = False
-
-# Geospatial.
-# ------------------------------------------------------------------------------
-
-GDAL_LIBRARY_PATH = '/usr/lib/libgdal.so.20'
-GEOS_LIBRARY_PATH = '/usr/lib/libgeos_c.so.1'

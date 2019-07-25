@@ -37,7 +37,7 @@ cdsitepackages:
 .PHONY: dbshell_dev_itou dbshell_dev_root dump_db
 
 # Connect to the `itou` database as the `itou` user.
-dbshell_dev:
+dbshell_dev_itou:
 	docker exec -ti -e PGPASSWORD=password itou_django psql -p 5432 -h postgres -U itou itou
 
 # Connect to postgres client as the `root` user.

@@ -20,13 +20,21 @@ RUN apk update \
     && apk add libffi-dev py-cffi \
     # Translations dependencies
     && apk add gettext \
-    # Geospatial library
+    # GeoDjango
+    # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#install-binutils
+    && apk add binutils \
+    # Geospatial dependencies
     # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/geolibs
-    && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos=3.7.2-r0 proj=6.1.0-r4 gdal=2.4.0-r3 \
+    && apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos=3.7.2-r0 proj=6.1.0-r4 gdal=2.4.0-r3 \
     # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
     && apk add postgresql-client=11.4-r0 \
     # Time zone and daylight-saving time data
     && apk add tzdata
+
+# Fix geospatial libraries paths issues.
+RUN ln -s /usr/lib/libgdal.so.20 /usr/lib/libgdal.so
+RUN ln -s /usr/lib/libgeos_c.so.1 /usr/lib/libgeos_c.so
+RUN ln -s /usr/lib/libproj.so.15 /usr/lib/libproj.so
 
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
