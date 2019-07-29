@@ -17,9 +17,10 @@ Au besoin, vous pouvez créer [un fichier `.env`](https://docs.docker.com/compos
     DJANGO_PORT_ON_DOCKER_HOST=8000
     POSTGRES_PORT_ON_DOCKER_HOST=5433
 
-### Créer un administrateur
+### Peupler la base de données
 
     make django_admin COMMAND=createsuperuser
+    make django_admin COMMAND=import_siae
 
 ### Importer les données des SIAE du département 67
 

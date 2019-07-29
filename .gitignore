@@ -1,6 +1,9 @@
 # Project specific
 itou/static_collected/
 
+# This file resides outside the repository until approval for public release has been given.
+2019_07_liste_siae.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

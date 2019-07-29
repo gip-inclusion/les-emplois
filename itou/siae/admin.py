@@ -11,6 +11,7 @@ class MembersInline(admin.TabularInline):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
-    list_display = ('siret', 'kind', 'name',)
+    list_display = ('siret', 'kind', 'name', 'geocoding_score',)
+    list_filter = ('kind', 'department',)
     search_fields = ('siret', 'name',)
     inlines = (MembersInline,)

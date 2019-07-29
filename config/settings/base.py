@@ -199,5 +199,6 @@ ACCOUNT_USERNAME_REQUIRED = False
 # APIs.
 # ------------------------------------------------------------------------------
 
+# Base Adresse Nationale (BAN).
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = 'https://api-adresse.data.gouv.fr'
