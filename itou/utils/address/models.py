@@ -74,7 +74,7 @@ class AddressMixin(models.Model):
         return None
 
     @property
-    def full_address_on_one_line(self):
+    def address_on_one_line(self):
         if not all([self.address_line_1, self.zipcode, self.city]):
             return None
         fields = [
@@ -84,23 +84,40 @@ class AddressMixin(models.Model):
         ]
         return ', '.join([field for field in fields if field])
 
-    def set_coords(self):
+    @staticmethod
+    def geocode(address, zipcode):
         """
-        Transform a French physical address description to longitude/latitude coordinates.
+        Geocode a French physical address.
         https://adresse.data.gouv.fr/api
         https://adresse.data.gouv.fr/faq
         """
         api_url = f"{settings.API_BAN_BASE_URL}/search/"
-        query_string = urlencode({'q': self.full_address_on_one_line, 'limit': 1})
+        query_string = urlencode({
+            'q': address,
+            'postcode': zipcode,
+            'limit': 1,
+        })
 
-        r = requests.get(f"{api_url}?{query_string}")
-        r.raise_for_status()
+        try:
+            r = requests.get(f"{api_url}?{query_string}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error while fetching `{api_url}?{query_string}`: {e}")
+            return None
 
         try:
             result = r.json()['features'][0]
-            longitude = result['geometry']['coordinates'][0]
-            latitude = result['geometry']['coordinates'][1]
-            self.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
-            self.save()
         except IndexError:
-            logger.error(f"Geocoding error, no result for SIRET {self.siret}")
+            logger.error(f"Geocoding error, no result found for `{address}` - `{zipcode}`")
+            return None
+
+        longitude = result['geometry']['coordinates'][0]
+        latitude = result['geometry']['coordinates'][1]
+
+        return {
+            'score': result['properties']['score'],
+            'address_line_1': result['properties']['name'],
+            'city': result['properties']['city'],
+            'longitude': longitude,
+            'latitude': latitude,
+            'coords': GEOSGeometry(f"POINT({longitude} {latitude})"),
+        }

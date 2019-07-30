@@ -14,6 +14,7 @@ clean:
 # make django_admin
 # make django_admin COMMAND=dbshell
 # make django_admin COMMAND=createsuperuser
+# make django_admin COMMAND="dumpdata siae.Siae" > ~/Desktop/siae.json
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 

@@ -14,9 +14,9 @@ class Prescriber(AddressMixin):
     """
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], primary_key=True)
-    name = models.CharField(verbose_name=_("Nom"), max_length=256)
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=14)
-    email = models.EmailField(verbose_name=_("E-mail"))
+    name = models.CharField(verbose_name=_("Nom"), max_length=256, blank=True)
+    phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
+    email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
         through='PrescriberMembership', blank=True)
 

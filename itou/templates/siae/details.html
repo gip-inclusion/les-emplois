@@ -1,12 +1,10 @@
+{% extends "layout/base.html" %}
 {% load static %}
-<!DOCTYPE HTML>
-<html lang="fr">
-<head>
-    <meta charset="utf-8">
-    <title>Hello</title>
-</head>
-<body>
-    <h1>Hello World</h1>
-    <img src="{% static "img/gouv.svg" %}" alt="" width="80">
-</body>
-</html>
+
+{# {% block meta_description %}<meta name="description" content="">{% endblock %} #}
+{% block title %}Hello{{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>Hello World</h1>
+<img src="{% static "img/gouv.svg" %}" alt="" width="80">
+{% endblock %}

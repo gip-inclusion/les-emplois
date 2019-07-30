@@ -48,6 +48,7 @@ LOCAL_APPS = [
     'itou.siae',
     'itou.prescribers',
     'itou.users',
+    'itou.accounts',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -111,6 +112,8 @@ DATABASES = {
         'PASSWORD': os.environ.get('ITOU_POSTGRES_PASSWORD', 'mdp'),
     }
 }
+
+ATOMIC_REQUESTS = True
 
 # Password validation.
 # ------------------------------------------------------------------------------
@@ -187,6 +190,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+LOGIN_REDIRECT_URL = '/'
 # LOGIN_URL
 
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
@@ -202,3 +206,11 @@ ACCOUNT_USERNAME_REQUIRED = False
 # Base Adresse Nationale (BAN).
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = 'https://api-adresse.data.gouv.fr'
+
+# Sirene - V3
+# https://api.insee.fr/catalogue/
+# https://github.com/sne3ks/api_insee
+# > Autorise 30 requêtes par minute pour chaque application des utilisateurs.
+# > Quota par défaut pour tout nouveau compte.
+API_INSEE_KEY = os.environ['API_INSEE_KEY']
+API_INSEE_SECRET = os.environ['API_INSEE_SECRET']

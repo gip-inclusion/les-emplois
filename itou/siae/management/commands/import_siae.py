@@ -1,13 +1,8 @@
 import csv
 import os
 
-import requests
-
 from django.conf import settings
-from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
-from django.utils.http import urlencode
-from django.utils.text import slugify
 
 from itou.siae.models import Siae
 from itou.utils.address.departments import DEPARTMENTS
@@ -56,31 +51,32 @@ class Command(BaseCommand):
                 self.stdout.write('-' * 80)
 
                 siret = row[7]
-                assert len(siret) == 14
                 self.stdout.write(siret)
+                assert len(siret) == 14
 
                 naf = row[5]
+                self.stdout.write(naf)
                 assert len(naf) == 5
-                # self.stdout.write(naf)
 
                 kind = row[0]
+                self.stdout.write(kind)
                 assert kind in KINDS
-                # self.stdout.write(kind)
 
                 # Max length of `name` is 50 chars in the source file, some are truncated.
                 # Also `name` is in upper case.
                 name = row[8].strip()
                 name = ' '.join(name.split())  # Replace multiple spaces by a single space.
-                # self.stdout.write(name)
+                self.stdout.write(name)
 
                 phone = row[13].strip().replace(' ', '')
                 if phone and len(phone) != 10:
                     phone = ''
-                # self.stdout.write(phone)
+                if phone:
+                    self.stdout.write(phone)
 
                 email = row[14].strip()
+                self.stdout.write(email)
                 assert ' ' not in email
-                # self.stdout.write(email)
 
                 street_num = row[9].strip().replace(' ', '')
                 street_name = row[10].strip().lower()
@@ -92,27 +88,29 @@ class Command(BaseCommand):
                     addresses = address_line_1.split(' - ')
                     address_line_1 = addresses[0]
                     address_line_2 = addresses[1]
-                # self.stdout.write(address_line_1)
+                self.stdout.write(address_line_1)
+                if address_line_2:
+                    self.stdout.write(address_line_2)
 
                 # Fields are identical, we can use one or another.
                 zipcode = row[3].strip()
                 post_code = row[11].strip()
+                self.stdout.write(zipcode)
                 assert post_code == zipcode
-                # self.stdout.write(zipcode)
 
                 # Fields are identical, we can use one or another.
                 city = row[4].strip()
                 city_name = row[12].strip()
+                self.stdout.write(city)
                 assert city_name == city
-                # self.stdout.write(city)
 
                 department = row[1]
                 if department[0] == '0':
                     department = department[1:]
                 if department in ['59L', '59V']:
                     department = '59'
+                self.stdout.write(department)
                 assert department in DEPARTMENTS
-                # self.stdout.write(department)
 
                 if not dry_run:
 
@@ -129,40 +127,29 @@ class Command(BaseCommand):
                     siae.city = city
                     siae.department = department
 
-                    if siae.full_address_on_one_line:
+                    if siae.address_on_one_line:
 
-                        api_url = f"{settings.API_BAN_BASE_URL}/search/"
-                        query_string = urlencode({
-                            'q': siae.full_address_on_one_line,
-                            'postcode': siae.zipcode,
-                            'limit': 1,
-                        })
-                        r = requests.get(f"{api_url}?{query_string}")
-                        r.raise_for_status()
+                        geocoding_data = siae.geocode(siae.address_on_one_line, siae.zipcode)
 
-                        try:
-                            result = r.json()['features'][0]
-                        except IndexError:
-                            self.stdout.write('*' * 80)
-                            self.stdout.write(f"Geocoding error, no result for SIRET {siae.siret}")
+                        if not geocoding_data:
                             siae.save()
                             continue
 
-                        siae.geocoding_score = result['properties']['score']
-
+                        siae.geocoding_score = geocoding_data['score']
                         # If the score is high enough, use the address name returned by the BAN API
                         # because it's better written using accents etc. VS source data in all caps.
                         # Otherwise keep the old address (which is probably wrong or incomplete).
                         if siae.geocoding_score >= siae.API_BAN_RELIABLE_MIN_SCORE:
-                            siae.address_line_1 = result['properties']['name']
-
+                            siae.address_line_1 = geocoding_data['address_line_1']
                         # City is always good due to `postcode` passed in query.
                         # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens
-                        siae.city = result['properties']['city']
+                        siae.city = geocoding_data['city']
 
-                        longitude = result['geometry']['coordinates'][0]
-                        latitude = result['geometry']['coordinates'][1]
-                        siae.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
+                        self.stdout.write('-' * 40)
+                        self.stdout.write(siae.address_line_1)
+                        self.stdout.write(siae.city)
+
+                        siae.coords = geocoding_data['coords']
 
                     siae.save()
 

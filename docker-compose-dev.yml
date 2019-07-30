@@ -19,6 +19,7 @@ services:
     container_name: itou_django
     env_file:
       - ./envs/dev.env
+      - ./envs/secrets.env
     depends_on:
       - postgres
     build:

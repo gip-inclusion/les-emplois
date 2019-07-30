@@ -5,9 +5,16 @@ from django.views import defaults as default_views
 
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
-    path('siae/', include('itou.siae.urls')),
+
+    # Order is important! Some `itou.accounts.urls` override `allauth.urls`
+    # and the first match listed will have priority.
+    path('accounts/', include('itou.accounts.urls')),
     path('accounts/', include('allauth.urls')),
+
+    path('siae/', include('itou.siae.urls')),
+
 ]
 
 if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:

@@ -1,8 +1,10 @@
 # Project specific
 itou/static_collected/
+secrets.env
 
-# This file resides outside the repository until approval for public release has been given.
+# Those files reside outside the repository until approval for public release has been given.
 2019_07_liste_siae.csv
+siae.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

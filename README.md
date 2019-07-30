@@ -2,6 +2,13 @@
 
 > Plate-forme numérique permettant de simplifier la vie des acteurs de l'inclusion, de renforcer les capacités de coopération, d'innovation et d'accompagnement social et professionnel du secteur et de mieux évaluer l'impact social et les moyens affectés.
 
+## Créer un fichier `envs/secrets.env`
+
+```
+API_INSEE_KEY=set_it
+API_INSEE_SECRET=set_it
+```
+
 ## Lancer le serveur de développement
 
     $ docker-compose -f docker-compose-dev.yml up
@@ -19,9 +26,10 @@ Au besoin, vous pouvez créer [un fichier `.env`](https://docs.docker.com/compos
 
 ### Peupler la base de données
 
-    make django_admin COMMAND=createsuperuser
-    make django_admin COMMAND=import_siae
+    make shell_on_django_container
+    django-admin createsuperuser
+    django-admin loaddata itou/fixtures/siae.json
 
-### Importer les données des SIAE du département 67
+### Front-end style guide
 
-    make django_admin COMMAND=import_siae67
+> https://turretcss.com/demo/
