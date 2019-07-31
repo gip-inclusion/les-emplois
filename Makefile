@@ -1,12 +1,15 @@
-# Global tasks
+# Global tasks.
 # =============================================================================
 
-.PHONY: clean
+.PHONY: clean cdsitepackages
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
-# Django
+cdsitepackages:
+	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/sh
+
+# Django.
 # =============================================================================
 
 .PHONY: django_admin
@@ -18,10 +21,18 @@ clean:
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 
-# Docker shell
+# Tests.
 # =============================================================================
 
-.PHONY: shell_on_django_container shell_on_postgres_container cdsitepackages
+.PHONY: test
+
+test:
+	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput
+
+# Docker shell.
+# =============================================================================
+
+.PHONY: shell_on_django_container shell_on_postgres_container
 
 shell_on_postgres_container:
 	docker exec -ti itou_postgres /bin/sh
@@ -29,10 +40,7 @@ shell_on_postgres_container:
 shell_on_django_container:
 	docker exec -ti itou_django /bin/sh
 
-cdsitepackages:
-	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/sh
-
-# Postgres (dev)
+# Postgres (dev).
 # =============================================================================
 
 .PHONY: dbshell_dev_itou dbshell_dev_root dump_db

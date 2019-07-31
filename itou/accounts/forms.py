@@ -5,7 +5,8 @@ from django.utils.translation import gettext_lazy as _
 from allauth.account.forms import SignupForm
 
 from itou.prescribers.models import Prescriber, PrescriberMembership
-from itou.utils.siret import get_data_for_siret
+from itou.utils.geocoding import get_geocoding_data
+from itou.utils.siret import get_siret_data
 from itou.utils.validators import validate_siret
 
 
@@ -52,14 +53,14 @@ class PrescriberSignupForm(SignupForm):
 
         # Try to automatically gather information for the given SIRET.
         # The user will have the possibility to modify the information later.
-        data_for_siret = get_data_for_siret(self.cleaned_data['siret'])
-        if data_for_siret:
-            prescriber.name = data_for_siret['name']
+        siret_data = get_siret_data(self.cleaned_data['siret'])
+        if siret_data:
+            prescriber.name = siret_data['name']
 
-            geocoding_data = Prescriber.geocode(data_for_siret['address'], data_for_siret['zipcode'])
+            geocoding_data = get_geocoding_data(siret_data['address'], zipcode=siret_data['zipcode'])
             if geocoding_data:
                 prescriber.address_line_1 = geocoding_data['address_line_1']
-                prescriber.zipcode = data_for_siret['zipcode']
+                prescriber.zipcode = siret_data['zipcode']
                 prescriber.city = geocoding_data['city']
                 prescriber.coords = geocoding_data['coords']
                 prescriber.geocoding_score = geocoding_data['score']

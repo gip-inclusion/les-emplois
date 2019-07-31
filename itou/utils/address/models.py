@@ -1,16 +1,14 @@
 import logging
 
-import requests
-
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import GEOSGeometry
 from django.db import models
-from django.utils.http import urlencode
 
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
+from itou.utils.geocoding import get_geocoding_data
 
 
 logger = logging.getLogger(__name__)
@@ -83,41 +81,3 @@ class AddressMixin(models.Model):
             f"{self.zipcode} {self.city}",
         ]
         return ', '.join([field for field in fields if field])
-
-    @staticmethod
-    def geocode(address, zipcode):
-        """
-        Geocode a French physical address.
-        https://adresse.data.gouv.fr/api
-        https://adresse.data.gouv.fr/faq
-        """
-        api_url = f"{settings.API_BAN_BASE_URL}/search/"
-        query_string = urlencode({
-            'q': address,
-            'postcode': zipcode,
-            'limit': 1,
-        })
-
-        try:
-            r = requests.get(f"{api_url}?{query_string}")
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Error while fetching `{api_url}?{query_string}`: {e}")
-            return None
-
-        try:
-            result = r.json()['features'][0]
-        except IndexError:
-            logger.error(f"Geocoding error, no result found for `{address}` - `{zipcode}`")
-            return None
-
-        longitude = result['geometry']['coordinates'][0]
-        latitude = result['geometry']['coordinates'][1]
-
-        return {
-            'score': result['properties']['score'],
-            'address_line_1': result['properties']['name'],
-            'city': result['properties']['city'],
-            'longitude': longitude,
-            'latitude': latitude,
-            'coords': GEOSGeometry(f"POINT({longitude} {latitude})"),
-        }

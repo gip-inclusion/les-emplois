@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 
 from itou.siae.models import Siae
 from itou.utils.address.departments import DEPARTMENTS
+from itou.utils.geocoding import get_geocoding_data
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -129,7 +130,7 @@ class Command(BaseCommand):
 
                     if siae.address_on_one_line:
 
-                        geocoding_data = siae.geocode(siae.address_on_one_line, siae.zipcode)
+                        geocoding_data = get_geocoding_data(siae.address_on_one_line, zipcode=siae.zipcode)
 
                         if not geocoding_data:
                             siae.save()
