@@ -20,6 +20,7 @@ KINDS = dict(Siae.KIND_CHOICES).keys()
 class Command(BaseCommand):
     """
     Import SIAEs data into the database.
+    This command is meant to be used before any fixture is available.
 
     To debug:
         django-admin import_siae --dry-run
@@ -117,7 +118,7 @@ class Command(BaseCommand):
 
                     siae = Siae()
                     siae.siret = siret
-                    siae.kind = naf
+                    siae.naf = naf
                     siae.kind = kind
                     siae.name = name
                     siae.phone = phone

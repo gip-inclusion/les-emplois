@@ -81,3 +81,14 @@ class AddressMixin(models.Model):
             f"{self.zipcode} {self.city}",
         ]
         return ', '.join([field for field in fields if field])
+
+    def geocode(self, new_address, new_zipcode):
+        geocoding_data = get_geocoding_data(new_address, zipcode=new_zipcode)
+        if not geocoding_data:
+            logger.error(f"No geocoding data could be found for `{new_address} - {new_zipcode}`")
+            return
+        self.geocoding_score = geocoding_data['score']
+        self.address_line_1 = geocoding_data['address_line_1']
+        self.city = geocoding_data['city']
+        self.coords = geocoding_data['coords']
+        self.save()
