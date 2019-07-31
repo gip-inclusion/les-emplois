@@ -9,7 +9,9 @@ app_name = 'accounts'
 
 urlpatterns = [
 
-    # Override the allauth `signup` url.
+    # Override allauth signup URL.
+    # We don't want any user to be able to signup using the default allauth `signup` url
+    # because we have multiple specific signup processes for different kind of users.
     re_path(r'^signup/$', RedirectView.as_view(pattern_name='accounts:prescriber_signup', permanent=False)),
 
     path('signup/prescriber', views.PrescriberSignupView.as_view(), name='prescriber_signup'),

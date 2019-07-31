@@ -11,15 +11,15 @@ from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 
 class SignupTest(TestCase):
 
-    def test_signup(self):
+    def test_allauth_signup_url_override(self):
         """
-        Ensure that the default allauth `/accounts/signup/` URL is unreachable
-        because we need multiple signup processes for different kind of users.
+        Ensure that the default allauth signup URL is unreachable.
         """
-        url = '/accounts/signup/'
-        response = self.client.get(url)
+        ALLAUTH_SIGNUP_URL = reverse('account_signup')
+        self.assertEqual(ALLAUTH_SIGNUP_URL, '/accounts/signup/')
+        response = self.client.get(ALLAUTH_SIGNUP_URL)
         self.assertEqual(response.status_code, 302)
-        response = self.client.post(url, data={'foo': 'bar'})
+        response = self.client.post(ALLAUTH_SIGNUP_URL, data={'foo': 'bar'})
         self.assertEqual(response.status_code, 302)
 
     @mock.patch('itou.utils.siret.call_insee_api', return_value=API_INSEE_SIRET_RESULT_MOCK)

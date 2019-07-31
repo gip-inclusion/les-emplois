@@ -8,8 +8,8 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
 
-    # Order is important! Some `itou.accounts.urls` override `allauth.urls`
-    # and the first match listed will have priority.
+    # Allauth signup URL is overridden in `itou.accounts.urls`.
+    # So order is important: the first match listed will have priority.
     path('accounts/', include('itou.accounts.urls')),
     path('accounts/', include('allauth.urls')),
 
