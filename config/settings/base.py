@@ -216,7 +216,10 @@ ANYMAIL = {
 
 MAILJET_API_URL = 'https://api.mailjet.com/v3'
 
+DEFAULT_FROM_EMAIL = 'noreply@itou.beta.gouv.fr'
+
 # Auth.
+# https://django-allauth.readthedocs.io/en/latest/configuration.html
 # ------------------------------------------------------------------------------
 
 AUTH_USER_MODEL = 'users.User'
@@ -231,12 +234,11 @@ AUTHENTICATION_BACKENDS = (
 LOGIN_REDIRECT_URL = '/'
 # LOGIN_URL
 
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_USER_DISPLAY = 'itou.users.models.get_allauth_account_user_display'
 
 # APIs.
 # ------------------------------------------------------------------------------

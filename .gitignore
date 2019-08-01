@@ -1,7 +1,8 @@
 # Project specific
+config/settings/dev.py
+envs/dev.env
+envs/secrets.env
 itou/static_collected/
-dev.env
-secrets.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

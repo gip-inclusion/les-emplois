@@ -2,21 +2,20 @@
 
 > Plate-forme numérique permettant de simplifier la vie des acteurs de l'inclusion, de renforcer les capacités de coopération, d'innovation et d'accompagnement social et professionnel du secteur et de mieux évaluer l'impact social et les moyens affectés.
 
-## Paramétrez les variables d'environnement
+## Environnement de développement
 
-```
-cp envs/dev.env.template envs/dev.env
-cp envs/secrets.env.template envs/secrets.env
-```
+### Configuration de l'environnement
 
-### Modifier la configuration Compose de développement
+    cp config/settings/dev.py.template config/settings/dev.py
+    cp envs/dev.env.template envs/dev.env
+    cp envs/secrets.env.template envs/secrets.env
 
-Au besoin, vous pouvez créer [un fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le fichier `README.md`, puis y configurer les variables d'environnement suivantes :
+Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le fichier `README.md`, puis y configurer les variables d'environnement suivantes :
 
     DJANGO_PORT_ON_DOCKER_HOST=8000
     POSTGRES_PORT_ON_DOCKER_HOST=5433
 
-## Lancer le serveur de développement
+### Lancer le serveur de développement
 
     $ docker-compose -f docker-compose-dev.yml up
 
@@ -30,6 +29,6 @@ Au besoin, vous pouvez créer [un fichier `.env`](https://docs.docker.com/compos
     django-admin createsuperuser
     django-admin loaddata itou/fixtures/siae.json
 
-### Front-end style guide
+## Front-end style guide
 
 > https://turretcss.com/demo/

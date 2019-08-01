@@ -11,7 +11,7 @@ NAF_CODES = ['9522Z', '7820Z', '6312Z', '8130Z', '1071A', '5510Z']
 
 
 class SiaeFactory(factory.django.DjangoModelFactory):
-    """Generates Siae() objects."""
+    """Generates Siae() objects for unit tests."""
 
     class Meta:
         model = models.Siae
