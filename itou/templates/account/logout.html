@@ -1,0 +1,27 @@
+{# django-allauth template override. #}
+{% extends "layout/base.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Se déconnecter" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Se déconnecter" %}</h1>
+
+<p>{% trans "Voulez-vous vraiment vous déconnecter ?" %}</p>
+
+<form method="post" action="{% url 'account_logout' %}">
+
+    {% csrf_token %}
+
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+    {% endif %}
+
+    <div class="field">
+        <button class="button button-xxl" type="submit">{% trans "Se déconnecter" %}</button>
+    </div>
+
+</form>
+
+{% endblock %}

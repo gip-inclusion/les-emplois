@@ -1,0 +1,34 @@
+{# django-allauth template override. #}
+{% extends "layout/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Se connecter" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Se connecter" %}</h1>
+
+<form class="login" method="POST" action="{% url 'account_login' %}">
+
+    {% csrf_token %}
+
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+    {% endif %}
+
+    {% include "includes/form/field.html" with field=form.login %}
+    {% include "includes/form/field.html" with field=form.password %}
+
+    <div class="field">
+      <button class="button button-xxl" type="submit">{% trans "Se connecter" %}</button>
+    </div>
+
+</form>
+
+<hr>
+
+<p>
+    <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+</p>
+
+{% endblock %}
