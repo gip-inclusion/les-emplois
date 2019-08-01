@@ -107,3 +107,18 @@ class SiaeSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
         membership.save()
 
         return user
+
+
+class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
+
+
+    def save(self, request):
+
+        user = super().save(request)
+
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        user.is_job_seeker = True
+        user.save()
+
+        return user

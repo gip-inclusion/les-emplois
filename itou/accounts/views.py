@@ -29,3 +29,14 @@ class SiaeSignupView(SignupView):
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
         return super().post(request, *args, **kwargs)
+
+
+class JobSeekerSignupView(SignupView):
+
+    form_class = forms.JobSeekerSignupForm
+    template_name = 'accounts/signup_job_seeker.html'
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)

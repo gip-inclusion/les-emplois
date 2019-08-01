@@ -16,5 +16,6 @@ urlpatterns = [
 
     path('signup/prescriber', views.PrescriberSignupView.as_view(), name='prescriber_signup'),
     path('signup/siae', views.SiaeSignupView.as_view(), name='siae_signup'),
+    path('signup/job_seeker', views.JobSeekerSignupView.as_view(), name='job_seeker_signup'),
 
 ]

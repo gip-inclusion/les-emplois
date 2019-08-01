@@ -90,3 +90,25 @@ class SignupTest(TestCase):
 
         membership = user.siaemembership_set.get(siae=siae)
         self.assertTrue(membership.is_siae_admin)
+
+    def test_job_seeker_signup(self):
+        """Job-seeker signup."""
+
+        url = reverse('accounts:job_seeker_signup')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            'first_name': "John",
+            'last_name': "Doe",
+            'email': "john.doe@siae.com",
+            'password1': '!*p4ssw0rd123-',
+            'password2': '!*p4ssw0rd123-',
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data['email'])
+        self.assertTrue(user.is_job_seeker)
+        self.assertFalse(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
