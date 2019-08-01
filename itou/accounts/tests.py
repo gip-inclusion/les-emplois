@@ -24,7 +24,7 @@ class SignupTest(TestCase):
 
     @mock.patch('itou.utils.siret.call_insee_api', return_value=API_INSEE_SIRET_RESULT_MOCK)
     @mock.patch('itou.utils.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_prescriber_signup(self, mock_call_insee_api, mock_call_ban_geocoding_api):
+    def test_prescriber_signup(self, mock_call_ban_geocoding_api, mock_call_insee_api):
         """Prescriber signup."""
 
         url = reverse('accounts:prescriber_signup')
@@ -41,13 +41,17 @@ class SignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        mock_call_insee_api.assert_called()
-        mock_call_ban_geocoding_api.assert_called()
+        mock_call_insee_api.assert_called_once_with(post_data['siret'])
+        mock_call_ban_geocoding_api.assert_called_once()
 
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(email=post_data['email'])
         prescriber = Prescriber.objects.get(siret=post_data['siret'])
+
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
 
         self.assertIn(user, prescriber.members.all())
         self.assertEqual(1, prescriber.members.count())

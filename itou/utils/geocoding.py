@@ -45,6 +45,7 @@ def process_geocoding_data(data):
     return {
         'score': data['properties']['score'],
         'address_line_1': data['properties']['name'],
+        'zipcode': data['properties']['postcode'],
         'city': data['properties']['city'],
         'longitude': longitude,
         'latitude': latitude,

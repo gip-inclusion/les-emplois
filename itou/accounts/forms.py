@@ -39,9 +39,16 @@ class PrescriberSignupForm(SignupForm):
 
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
+        user.is_prescriber = True
         user.save()
 
         prescriber, is_new = Prescriber.objects.get_or_create(siret=self.cleaned_data['siret'])
+        # Try to automatically gather information for the given SIRET.
+        # The user will have the possibility to modify or complete information later.
+        siret_data = get_siret_data(self.cleaned_data['siret'])
+        if siret_data:
+            prescriber.name = siret_data['name']
+            prescriber.geocode(siret_data['address'], siret_data['zipcode'], save=False)
         prescriber.save()
 
         membership = PrescriberMembership()
@@ -50,21 +57,5 @@ class PrescriberSignupForm(SignupForm):
         # The first `user` who creates a `prescriber` becomes an admin.
         membership.is_prescriber_admin = is_new
         membership.save()
-
-        # Try to automatically gather information for the given SIRET.
-        # The user will have the possibility to modify the information later.
-        siret_data = get_siret_data(self.cleaned_data['siret'])
-        if siret_data:
-            prescriber.name = siret_data['name']
-
-            geocoding_data = get_geocoding_data(siret_data['address'], zipcode=siret_data['zipcode'])
-            if geocoding_data:
-                prescriber.address_line_1 = geocoding_data['address_line_1']
-                prescriber.zipcode = siret_data['zipcode']
-                prescriber.city = geocoding_data['city']
-                prescriber.coords = geocoding_data['coords']
-                prescriber.geocoding_score = geocoding_data['score']
-
-            prescriber.save()
 
         return user

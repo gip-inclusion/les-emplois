@@ -16,6 +16,10 @@ CSV_FILE = f"{CURRENT_DIR}/data/2019_07_liste_siae.csv"
 
 KINDS = dict(Siae.KIND_CHOICES).keys()
 
+# Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
+# This score is arbitrarily set based on general observation.
+API_BAN_RELIABLE_MIN_SCORE = 0.6
+
 
 class Command(BaseCommand):
     """
@@ -138,10 +142,11 @@ class Command(BaseCommand):
                             continue
 
                         siae.geocoding_score = geocoding_data['score']
-                        # If the score is high enough, use the address name returned by the BAN API
-                        # because it's better written using accents etc. VS source data in all caps.
+                        # If the score is greater than API_BAN_RELIABLE_MIN_SCORE, coords are reliable:
+                        # use data returned by the BAN API because it's better written using accents etc.
+                        # while the source data is in all caps etc.
                         # Otherwise keep the old address (which is probably wrong or incomplete).
-                        if siae.geocoding_score >= siae.API_BAN_RELIABLE_MIN_SCORE:
+                        if siae.geocoding_score >= API_BAN_RELIABLE_MIN_SCORE:
                             siae.address_line_1 = geocoding_data['address_line_1']
                         # City is always good due to `postcode` passed in query.
                         # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens

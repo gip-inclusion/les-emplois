@@ -29,10 +29,6 @@ class AddressMixin(models.Model):
     Assume that all addresses are in France. This is unlikely to change.
     """
 
-    # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
-    # This score is arbitrarily set based on general observation in the `import_siae` command.
-    API_BAN_RELIABLE_MIN_SCORE = 0.6
-
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     address_line_1 = models.CharField(verbose_name=_("Adresse postale, bôite postale"), max_length=256, blank=True)
@@ -44,8 +40,7 @@ class AddressMixin(models.Model):
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, null=True, blank=True)
-    # Score between 0 and 1 indicating the relevance of the geocoding result.
-    # If greater than API_BAN_RELIABLE_MIN_SCORE, coords are reliable.
+    # BAN API score between 0 and 1 indicating the relevance of the geocoding result.
     geocoding_score = models.FloatField(verbose_name=_("Score du geocoding"), blank=True, null=True)
 
     class Meta:
@@ -82,13 +77,15 @@ class AddressMixin(models.Model):
         ]
         return ', '.join([field for field in fields if field])
 
-    def geocode(self, new_address, new_zipcode):
-        geocoding_data = get_geocoding_data(new_address, zipcode=new_zipcode)
+    def geocode(self, address, zipcode, save=True):
+        geocoding_data = get_geocoding_data(address, zipcode=zipcode)
         if not geocoding_data:
-            logger.error(f"No geocoding data could be found for `{new_address} - {new_zipcode}`")
+            logger.error(f"No geocoding data could be found for `{address} - {zipcode}`")
             return
-        self.geocoding_score = geocoding_data['score']
         self.address_line_1 = geocoding_data['address_line_1']
+        self.zipcode = geocoding_data['zipcode']
         self.city = geocoding_data['city']
         self.coords = geocoding_data['coords']
-        self.save()
+        self.geocoding_score = geocoding_data['score']
+        if save:
+            self.save()
