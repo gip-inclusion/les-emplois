@@ -12,7 +12,18 @@ from itou.accounts import forms
 class PrescriberSignupView(SignupView):
 
     form_class = forms.PrescriberSignupForm
-    template_name = 'accounts/prescriber/signup.html'
+    template_name = 'accounts/signup_prescriber.html'
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)
+
+
+class SiaeSignupView(SignupView):
+
+    form_class = forms.SiaeSignupForm
+    template_name = 'accounts/signup_siae.html'
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):

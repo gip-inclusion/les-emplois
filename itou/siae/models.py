@@ -7,6 +7,12 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_naf, validate_siret
 
 
+class ActiveSiaeManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+
+
 class Siae(AddressMixin):
     """Structures d'insertion par l'activité économique."""
 
@@ -34,6 +40,9 @@ class Siae(AddressMixin):
     email = models.EmailField(verbose_name=_("E-mail"))
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
         through='SiaeMembership', blank=True)
+
+    objects = models.Manager()  # The default manager.
+    active_objects = ActiveSiaeManager()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")

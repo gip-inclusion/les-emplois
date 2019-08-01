@@ -1,0 +1,33 @@
+{% extends "layout/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "S'inscrire" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+<h1>{% trans "S'inscrire" %}</h1>
+
+{# <p>{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p> #}
+
+<form method="post" action="{% url 'accounts:siae_signup' %}" role="form">
+
+    {% csrf_token %}
+
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+    {% endif %}
+
+    {% include "includes/form/field.html" with field=form.first_name %}
+    {% include "includes/form/field.html" with field=form.last_name %}
+    {% include "includes/form/field.html" with field=form.email %}
+    {% include "includes/form/field.html" with field=form.siret %}
+    {% include "includes/form/field.html" with field=form.password1 %}
+    {% include "includes/form/field.html" with field=form.password2 %}
+
+    <div class="field">
+      <button class="button button-xxl" type="submit">{% trans "S'inscrire" %} &raquo;</button>
+    </div>
+
+</form>
+
+{% endblock %}

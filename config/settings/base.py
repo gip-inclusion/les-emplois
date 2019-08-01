@@ -238,3 +238,12 @@ API_BAN_BASE_URL = 'https://api-adresse.data.gouv.fr'
 # > Quota par défaut pour tout nouveau compte.
 API_INSEE_KEY = os.environ['API_INSEE_KEY']
 API_INSEE_SECRET = os.environ['API_INSEE_SECRET']
+
+# Itou.
+# ------------------------------------------------------------------------------
+
+ITOU_EMAIL_CONTACT = 'contact@itou.beta.gouv.fr'
+
+# Départements d'expérimentation :
+# Pas-de-Calais (62), Bas-Rhin (67), Seine Saint Denis (93).
+ITOU_TEST_DEPARTMENTS = ['62', '67', '93']

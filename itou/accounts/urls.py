@@ -15,5 +15,6 @@ urlpatterns = [
     re_path(r'^signup/$', RedirectView.as_view(pattern_name='accounts:prescriber_signup', permanent=False)),
 
     path('signup/prescriber', views.PrescriberSignupView.as_view(), name='prescriber_signup'),
+    path('signup/siae', views.SiaeSignupView.as_view(), name='siae_signup'),
 
 ]
