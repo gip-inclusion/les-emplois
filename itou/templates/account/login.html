@@ -1,5 +1,6 @@
 {# django-allauth template override. #}
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
 {% load i18n %}
 
 {% block title %}{% trans "Se connecter" %}{{ block.super }}{% endblock %}
@@ -8,7 +9,7 @@
 
 <h1>{% trans "Se connecter" %}</h1>
 
-<form class="login" method="post" action="{% url 'account_login' %}">
+<form method="post" action="{% url 'account_login' %}">
 
     {% csrf_token %}
 
@@ -16,12 +17,12 @@
     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
     {% endif %}
 
-    {% include "includes/form/field.html" with field=form.login %}
-    {% include "includes/form/field.html" with field=form.password %}
+    {% bootstrap_field form.login %}
+    {% bootstrap_field form.password %}
 
-    <div class="field">
-      <button class="button button-xxl" type="submit">{% trans "Se connecter" %}</button>
-    </div>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% trans "Se connecter" %}</button>
+    {% endbuttons %}
 
 </form>
 

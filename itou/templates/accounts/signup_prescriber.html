@@ -1,4 +1,5 @@
-{% extends "layout/base.html" %}
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
 {% load i18n %}
 
 {% block title %}{% trans "S'inscrire" %}{{ block.super }}{% endblock %}
@@ -17,16 +18,16 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
     {% endif %}
 
-    {% include "includes/form/field.html" with field=form.first_name %}
-    {% include "includes/form/field.html" with field=form.last_name %}
-    {% include "includes/form/field.html" with field=form.email %}
-    {% include "includes/form/field.html" with field=form.siret %}
-    {% include "includes/form/field.html" with field=form.password1 %}
-    {% include "includes/form/field.html" with field=form.password2 %}
+    {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.last_name %}
+    {% bootstrap_field form.email %}
+    {% bootstrap_field form.siret %}
+    {% bootstrap_field form.password1 %}
+    {% bootstrap_field form.password2 %}
 
-    <div class="field">
-      <button class="button button-xxl" type="submit">{% trans "S'inscrire" %}</button>
-    </div>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% trans "S'inscrire" %}</button>
+    {% endbuttons %}
 
 </form>
 

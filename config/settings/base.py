@@ -43,6 +43,7 @@ THIRD_PARTY_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'anymail',
+    'bootstrap4',
 ]
 
 LOCAL_APPS = [

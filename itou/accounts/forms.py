@@ -38,7 +38,7 @@ class SiretFormMixin(forms.Form):
         validators=[validate_siret],
         required=True,
         strip=True,
-        help_text=_("Le numéro SIRET doit être composé de 14 chiffres."),
+        help_text=_("Un numéro SIRET est composé de 14 chiffres."),
     )
 
 

@@ -1,0 +1,31 @@
+{% extends "layout/base.html" %}
+{% comment %}
+
+    Extend this template when you need multiple `layout-section`s for the content,
+    allowing `layout-section` elements to fill the full viewport width from within
+    a fixed-width container.
+
+    Usage:
+        > {% extends "layout/content_full_viewport.html" %}
+        > {% block content %}
+        >     <main class="layout-section layout-section-white">
+        >         <div>
+        >             <h1>Hello World</h1>
+        >         </div>
+        >     </main>
+        >     <div class="layout-section layout-section-dark">
+        >         <div>
+        >             <h1>Hello World</h1>
+        >         </div>
+        >     </div>
+        >     <div class="layout-section layout-section-white">
+        >         <div>
+        >             <h1>Hello World</h1>
+        >         </div>
+        >     </div>
+        > {% endblock %}
+
+{% endcomment %}
+{% block content_full_viewport %}
+    {% block content %}{% endblock %}
+{% endblock %}

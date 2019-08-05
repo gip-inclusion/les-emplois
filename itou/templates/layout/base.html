@@ -1,4 +1,5 @@
 {% load static %}
+{% load bootstrap4 %}
 <!DOCTYPE HTML>
 <html lang="fr">
 <head>
@@ -7,13 +8,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block meta_description %}{% endblock %}
     {# <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico"> #}
-    <link rel="stylesheet" href="{% static "css/turretcss.v5.1.3.min.css" %}" type="text/css">
-    <link rel="stylesheet" href="{% static "css/turretcss-extension.css" %}" type="text/css">
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
+    {% bootstrap_javascript jquery='full' %}
     {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-    {% block content %}{% endblock %}
+    <div class="layout">
+
+        <header class="layout-section layout-section-white">
+            <div class="header-main">
+                <a href="/">
+                    <img src="{% static "img/gouv.svg" %}" alt="" width="80">
+                    <img src="{% static "img/itou_beta_gouv_fr.svg" %}" alt="itou.beta.gouv.fr" width="200">
+                </a>
+                <nav>
+                    <ul>
+                        <li><a href="{% url 'account_signup' %}">S'inscrire | Se connecter</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+
+        {% if messages %}
+            <div class="layout-section layout-section-no-padding layout-section-white">
+                <div>
+                    {% bootstrap_messages %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% block content_full_viewport %}{% endblock %}
+
+        <footer class="layout-section layout-section-dark">
+            <div class="footer-main">
+                <p>Footer</p>
+            </div>
+        </footer>
+
+    </div>
 
 </body>
 </html>

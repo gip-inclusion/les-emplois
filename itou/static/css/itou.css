@@ -1,0 +1,82 @@
+/* Layout.
+--------------------------------------------------------------------------- */
+
+body {
+    background: #1c1c1c;
+}
+
+.layout {
+    /*
+    3 columns.
+    The first and last are our gutters, with a minimum size but the ability
+    to stretch to fill one unit of available space.
+    Between them is our main content column the ability to stretch.
+    https://cloudfour.com/thinks/breaking-out-with-css-grid-layout/
+    https://rachelandrew.co.uk/archives/2017/06/01/breaking-out-with-css-grid-explained/
+    */
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(1em, 1fr)
+      [main-start] minmax(0, 1280px) [main-end]
+      minmax(1em, 1fr) [full-end];
+}
+
+.layout > * {
+    grid-column: main;
+}
+
+.layout-section {
+    grid-column: full;
+    display: inherit;
+    grid-template-columns: inherit;
+    padding: 1em;
+}
+
+.layout-section-no-padding {
+    padding: 0;
+}
+
+.layout-section > * {
+    grid-column: main;
+}
+
+.layout-section-white {
+    background: #fff;
+    color: #1c1c1c;
+}
+
+.layout-section-dark {
+    background: #1c1c1c;
+    color: #fff;
+}
+
+/* Header.
+--------------------------------------------------------------------------- */
+
+.header-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-main > a {
+    text-decoration: none;
+}
+
+.header-main > a > img {
+    margin-right: 10px;
+}
+
+/* Nav. */
+
+.header-main > nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.header-main > nav ul li:not(:first-child) {
+    margin: 0 0 0 20px;
+    padding: 0;
+}

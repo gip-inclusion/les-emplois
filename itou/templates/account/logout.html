@@ -1,6 +1,6 @@
 {# django-allauth template override. #}
-{% extends "layout/base.html" %}
-
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
 {% load i18n %}
 
 {% block title %}{% trans "Se déconnecter" %}{{ block.super }}{% endblock %}
@@ -18,9 +18,9 @@
     <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
     {% endif %}
 
-    <div class="field">
-        <button class="button button-xxl" type="submit">{% trans "Se déconnecter" %}</button>
-    </div>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% trans "Se déconnecter" %}</button>
+    {% endbuttons %}
 
 </form>
 

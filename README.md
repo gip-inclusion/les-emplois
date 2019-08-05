@@ -29,6 +29,8 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
     django-admin createsuperuser
     django-admin loaddata itou/fixtures/siae.json
 
-## Front-end style guide
+## Front-end
 
-> https://turretcss.com/demo/
+> https://getbootstrap.com/docs/4.3/getting-started/introduction/
+
+> https://django-bootstrap4.readthedocs.io/en/latest/index.html
