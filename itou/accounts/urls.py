@@ -2,7 +2,8 @@ from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 
-from itou.accounts import views
+from itou.accounts.views import signup as signup_views
+from itou.accounts.views import dashboard as dashboard_views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -27,14 +28,19 @@ urlpatterns = [
     # /accounts/social/login/cancelled/                 socialaccount_login_cancelled
     # /accounts/social/login/error/                     socialaccount_login_error
 
-    # Override allauth signup URL.
+    # Override allauth account_signup URL.
     # /accounts/signup/                                 account_signup
     # We don't want any user to be able to signup using the default allauth `signup` url
     # because we have multiple specific signup processes for different kind of users.
-    re_path(r'^signup/$', TemplateView.as_view(template_name='account_itou/signup.html'), name='account_signup'),
+    re_path(r'^signup/$', TemplateView.as_view(template_name='account_itou/signup.html')),
 
-    path('signup/prescriber', views.PrescriberSignupView.as_view(), name='prescriber_signup'),
-    path('signup/siae', views.SiaeSignupView.as_view(), name='siae_signup'),
-    path('signup/job_seeker', views.JobSeekerSignupView.as_view(), name='job_seeker_signup'),
+    # Override allauth account_change_password URL.
+    re_path(r'^password/change/$', dashboard_views.password_change),
+
+    path('signup/prescriber', signup_views.PrescriberSignupView.as_view(), name='prescriber_signup'),
+    path('signup/siae', signup_views.SiaeSignupView.as_view(), name='siae_signup'),
+    path('signup/job_seeker', signup_views.JobSeekerSignupView.as_view(), name='job_seeker_signup'),
+
+    path('dashboard', dashboard_views.dashboard, name='dashboard'),
 
 ]

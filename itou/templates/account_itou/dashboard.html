@@ -1,0 +1,16 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dashboard" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{{ user.email }}</h1>
+
+    <div class="list-group">
+        <a href="{% url 'account_change_password' %}?next={{ request.path }}" class="list-group-item list-group-item-action">
+            {% trans "Modifier mon mot de passe" %}
+        </a>
+    </div>
+
+{% endblock %}

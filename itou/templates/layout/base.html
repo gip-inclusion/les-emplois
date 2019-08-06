@@ -26,8 +26,14 @@
                 <nav class="header-main-nav">
                     <ul>
                         {% if user.is_authenticated %}
+
                             <li>
-                                <a href="{% url 'account_logout' %}">
+                                <a href="{% url 'accounts:dashboard' %}">
+                                    {% trans "Mon profil" %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'account_logout' %}" class="text-danger">
                                     {% include "includes/icon.html" with icon="log-out" %}{% trans "Déconnexion" %}
                                 </a>
                             </li>

@@ -14,7 +14,7 @@ from itou.siae.factories import SiaeFactory
 from itou.siae.models import Siae
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
-from itou.users.factories import JobSeekerFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
 class SignupTest(TestCase):
@@ -160,5 +160,35 @@ class PasswordResetTest(TestCase):
         self.assertRedirects(response, reverse('account_reset_password_from_key_done'))
 
         # User can log in with his new password.
+        self.assertTrue(self.client.login(username=user.email, password='mlkjhgfdsq2'))
+        self.client.logout()
+
+
+class PasswordChangeTest(TestCase):
+
+    def test_password_change_flow(self):
+        """
+        Ensure that the default allauth account_change_password URL is overridden
+        and redirects to the right place.
+        """
+
+        user = JobSeekerFactory()
+        self.assertTrue(self.client.login(username=user.email, password=DEFAULT_PASSWORD))
+
+        # Change password.
+        url = reverse('account_change_password')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            'oldpassword': DEFAULT_PASSWORD,
+            'password1': 'mlkjhgfdsq2',
+            'password2': 'mlkjhgfdsq2',
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('accounts:dashboard'))
+
+        # User can log in with his new password.
+        self.client.logout()
         self.assertTrue(self.client.login(username=user.email, password='mlkjhgfdsq2'))
         self.client.logout()

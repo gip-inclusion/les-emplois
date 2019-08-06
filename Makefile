@@ -27,7 +27,7 @@ django_admin:
 .PHONY: test
 
 test:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput
+	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel=2
 
 # Docker shell.
 # =============================================================================
