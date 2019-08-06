@@ -1,0 +1,60 @@
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Inscription | Connexion" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+
+    <div class="card-deck">
+
+        <div class="card border-success">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Demandeur d'emploi" %}</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" href="{% url 'accounts:job_seeker_signup' %}">
+                    {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
+                </a>
+                <a class="list-group-item list-group-item-action" href="{% url 'account_login' %}">
+                    {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
+                </a>
+            </div>
+            <img src="{% static 'photos/job_seeker.jpg' %}" class="card-img-bottom" alt="">
+        </div>
+
+        <div class="card border-warning">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Prescripteur" %}</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" href="{% url 'accounts:prescriber_signup' %}">
+                    {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
+                </a>
+                <a class="list-group-item list-group-item-action" href="{% url 'account_login' %}">
+                    {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
+                </a>
+            </div>
+            <img src="{% static 'photos/prescriber.jpg' %}" class="card-img-bottom" alt="">
+        </div>
+
+        <div class="card border-primary">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "SIAE" %}</h5>
+            </div>
+            <div class="list-group list-group-flush">
+                <a class="list-group-item list-group-item-action" href="{% url 'accounts:siae_signup' %}">
+                    {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
+                </a>
+                <a class="list-group-item list-group-item-action" href="{% url 'account_login' %}">
+                    {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
+                </a>
+            </div>
+            <img src="{% static 'photos/employer.jpg' %}" class="card-img-bottom" alt="">
+        </div>
+
+    </div>
+
+{% endblock %}

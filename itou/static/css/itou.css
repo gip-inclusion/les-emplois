@@ -7,10 +7,9 @@ body {
 
 .layout {
     /*
-    3 columns.
-    The first and last are our gutters, with a minimum size but the ability
+    First and last columns are gutters, with a minimum size but the ability
     to stretch to fill one unit of available space.
-    Between them is our main content column the ability to stretch.
+    Between them is the main content column with the ability to stretch.
     https://cloudfour.com/thinks/breaking-out-with-css-grid-layout/
     https://rachelandrew.co.uk/archives/2017/06/01/breaking-out-with-css-grid-explained/
     */
@@ -29,11 +28,6 @@ body {
     grid-column: full;
     display: inherit;
     grid-template-columns: inherit;
-    padding: 1em;
-}
-
-.layout-section-no-padding {
-    padding: 0;
 }
 
 .layout-section > * {
@@ -55,28 +49,88 @@ body {
 
 .header-main {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
     align-items: center;
 }
 
-.header-main > a {
-    text-decoration: none;
-}
-
-.header-main > a > img {
+.header-main-logo {
     margin-right: 10px;
 }
 
-/* Nav. */
-
-.header-main > nav ul {
-    display: flex;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.header-main-logo:focus,
+.header-main-logo:active,
+.header-main-logo:hover {
+    background: #e5e5e5;
 }
 
-.header-main > nav ul li:not(:first-child) {
-    margin: 0 0 0 20px;
+.header-main-nav {
+    /* Align last flex item to right. */
+    margin-left: auto;
+}
+
+.header-main-nav ul {
+    display: flex;
+    list-style: none;
+    margin: 0;
     padding: 0;
+}
+
+.header-main-nav ul li:not(:first-child) {
+    margin-left: 20px;
+}
+
+@media (max-width: 700px) {/* For any browser < max-width. */
+
+    .header-main {
+        display: block;
+    }
+
+    .header-main-nav {
+        margin-left: 0;
+    }
+
+    .header-main-nav ul {
+        margin-top: 20px;
+    }
+
+}
+
+/* Footer.
+--------------------------------------------------------------------------- */
+
+.footer-main a,
+.footer-main a:link,
+.footer-main a:visited {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.footer-main a:focus,
+.footer-main a:hover,
+.footer-main a:active {
+    text-decoration: none;
+}
+
+/* Spacing.
+--------------------------------------------------------------------------- */
+
+.header-main {
+    padding: 2rem 1rem;
+}
+
+.content-main {
+    padding: 1rem 1rem 2rem 1rem;
+}
+
+.content-small {
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+.footer-main {
+    padding: 2rem 1rem;
+}
+
+.alert:last-child {
+    margin-bottom: 0;
 }

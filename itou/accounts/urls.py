@@ -1,5 +1,6 @@
 from django.urls import path, re_path
 from django.views.generic import RedirectView
+from django.views.generic import TemplateView
 
 from itou.accounts import views
 
@@ -30,7 +31,7 @@ urlpatterns = [
     # /accounts/signup/                                 account_signup
     # We don't want any user to be able to signup using the default allauth `signup` url
     # because we have multiple specific signup processes for different kind of users.
-    re_path(r'^signup/$', RedirectView.as_view(pattern_name='accounts:prescriber_signup', permanent=False)),
+    re_path(r'^signup/$', TemplateView.as_view(template_name='account_itou/signup.html'), name='account_signup'),
 
     path('signup/prescriber', views.PrescriberSignupView.as_view(), name='prescriber_signup'),
     path('signup/siae', views.SiaeSignupView.as_view(), name='siae_signup'),

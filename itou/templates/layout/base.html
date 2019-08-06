@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load static %}
 {% load bootstrap4 %}
 <!DOCTYPE HTML>
@@ -19,20 +20,31 @@
 
         <header class="layout-section layout-section-white">
             <div class="header-main">
-                <a href="/">
-                    <img src="{% static "img/gouv.svg" %}" alt="" width="80">
-                    <img src="{% static "img/itou_beta_gouv_fr.svg" %}" alt="itou.beta.gouv.fr" width="200">
+                <a href="/" class="header-main-logo">
+                    <img src="{% static "img/logo_itou_gouv.svg" %}" alt="itou.beta.gouv.fr" width="300">
                 </a>
-                <nav>
+                <nav class="header-main-nav">
                     <ul>
-                        <li><a href="{% url 'account_signup' %}">S'inscrire | Se connecter</a></li>
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a href="{% url 'account_logout' %}">
+                                    {% include "includes/icon.html" with icon="log-out" %}{% trans "Déconnexion" %}
+                                </a>
+                            </li>
+                        {% else %}
+                            <li>
+                                <a href="{% url 'account_signup' %}">
+                                    {% trans "Inscription | Connexion" %}
+                                </a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>
         </header>
 
         {% if messages %}
-            <div class="layout-section layout-section-no-padding layout-section-white">
+            <div class="layout-section layout-section-white">
                 <div>
                     {% bootstrap_messages %}
                 </div>
@@ -43,7 +55,7 @@
 
         <footer class="layout-section layout-section-dark">
             <div class="footer-main">
-                <p>Footer</p>
+                <p><a href="mailto:contact@itou.beta.gouv.fr">{% trans "Contact" %}</a></p>
             </div>
         </footer>
 

@@ -34,3 +34,5 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 > https://getbootstrap.com/docs/4.3/getting-started/introduction/
 
 > https://django-bootstrap4.readthedocs.io/en/latest/index.html
+
+> https://feathericons.com

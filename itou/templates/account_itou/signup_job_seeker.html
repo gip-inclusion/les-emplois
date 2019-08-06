@@ -1,0 +1,39 @@
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Demandeur d'emploi - Inscription" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+<div class="content-small">
+
+    <h1>
+        {% trans "Demandeur d'emploi" %}
+        <small class="text-muted">{% trans "Inscription" %}</small>
+    </h1>
+
+    <form method="post" action="{% url 'accounts:job_seeker_signup' %}" role="form">
+
+        {% csrf_token %}
+
+        {% bootstrap_form_errors form %}
+
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
+
+        {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.last_name %}
+        {% bootstrap_field form.email %}
+        {% bootstrap_field form.password1 %}
+        {% bootstrap_field form.password2 %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% trans "Inscription" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+</div>
+{% endblock %}

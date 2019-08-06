@@ -1,10 +1,11 @@
 {% extends "layout/content.html" %}
+{% load i18n %}
 
 {# {% block meta_description %}<meta name="description" content="">{% endblock %} #}
-{% block title %}Hello{{ block.super }}{% endblock %}
+{% block title %}{% trans "Plate-forme numérique de l'inclusion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>Home</h1>
+    <h1>{% trans "Plate-forme numérique de l'inclusion" %}</h1>
 
 {% endblock %}

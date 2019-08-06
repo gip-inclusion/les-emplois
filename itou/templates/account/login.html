@@ -3,33 +3,37 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Se connecter" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Connexion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
+<div class="content-small">
 
-<h1>{% trans "Se connecter" %}</h1>
+    <h1>{% trans "Connexion" %}</h1>
 
-<form method="post" action="{% url 'account_login' %}">
+    <form method="post" action="{% url 'account_login' %}">
 
-    {% csrf_token %}
+        {% csrf_token %}
 
-    {% if redirect_field_value %}
-    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-    {% endif %}
+        {% bootstrap_form_errors form %}
 
-    {% bootstrap_field form.login %}
-    {% bootstrap_field form.password %}
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
 
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">{% trans "Se connecter" %}</button>
-    {% endbuttons %}
+        {% bootstrap_field form.login %}
+        {% bootstrap_field form.password %}
 
-</form>
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% trans "Connexion" %}</button>
+        {% endbuttons %}
 
-<hr>
+    </form>
 
-<p>
-    <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
-</p>
+    <hr>
 
+    <p>
+        <a href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+    </p>
+
+</div>
 {% endblock %}

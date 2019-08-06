@@ -3,25 +3,30 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Se déconnecter" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Déconnexion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Se déconnecter" %}</h1>
 
-<p>{% trans "Voulez-vous vraiment vous déconnecter ?" %}</p>
+<div class="alert alert-warning" role="alert">
 
-<form method="post" action="{% url 'account_logout' %}">
+    <h1>{% trans "Déconnexion" %}</h1>
 
-    {% csrf_token %}
+    <p>{% trans "Voulez-vous vraiment vous déconnecter ?" %}</p>
 
-    {% if redirect_field_value %}
-    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-    {% endif %}
+    <form method="post" action="{% url 'account_logout' %}">
 
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">{% trans "Se déconnecter" %}</button>
-    {% endbuttons %}
+        {% csrf_token %}
 
-</form>
+        {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+        {% endif %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% trans "Se déconnecter" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+</div>
 
 {% endblock %}

@@ -1,0 +1,24 @@
+{% load static %}
+{% comment %}
+
+    https://github.com/feathericons/feather#svg-sprite
+    https://developer.mozilla.org/fr/docs/Web/SVG/Attribute
+
+    Usage:
+        {% include "includes/icon.html" with icon="user-plus" %}
+
+{% endcomment %}
+<svg
+    class="{{ class|default:'icon' }}"
+    width="{{ size|default:'18' }}"
+    height="{{ size|default:'18' }}"
+    alignment-baseline="center"
+    fill="{{ fill|default:'none' }}"
+    stroke="{{ stroke|default:'currentColor' }}"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    style="line-height: 0; vertical-align: middle;"
+>
+      <use xlink:href="{% static 'icons/feather-sprite.svg#' %}{{ icon }}"></use>
+</svg>
