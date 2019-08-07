@@ -1,16 +1,17 @@
-import csv
+import json
 import os
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
+from django.template.defaultfilters import slugify
 
+from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.cities.models import City
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-# https://sql.sh/736-base-donnees-villes-francaises
-CSV_FILE = f"{CURRENT_DIR}/data/villes_france.csv"
+CITIES_JSON_FILE = f"{CURRENT_DIR}/data/cities.json"
 
 
 class Command(BaseCommand):
@@ -36,29 +37,45 @@ class Command(BaseCommand):
 
     def handle(self, dry_run=False, **options):
 
-        with open(CSV_FILE) as csvfile:
+        with open(CITIES_JSON_FILE, 'r') as raw_json_data:
 
-            reader = csv.reader(csvfile, delimiter=',')
+            json_data = json.load(raw_json_data)
+            total_len = len(json_data)
+            last_progress = 0
 
-            for i, row in enumerate(reader):
+            for i, item in enumerate(json_data):
 
-                name = row[5]
-                department = row[1]
-                post_codes = row[8].split('-')
-                code_insee = row[10]
-                longitude = row[19]
-                latitude = row[20]
+                progress = int((100 * i) / total_len)
+                if progress > last_progress + 5:
+                    self.stdout.write(f"Creating cities… {progress}%")
+                    last_progress = progress
+
+                name = item['nom']
+                department = item.get('codeDepartement')
+                if department:
+                    assert department in DEPARTMENTS
+                post_codes = item['codesPostaux']
+                code_insee = item['code']
+                centre = item.get('centre')
+                if not centre:
+                    self.stderr.write(f"No coordinates for {name}. Skipping…")
+                    continue
+                longitude = centre['coordinates'][0]
+                latitude = centre['coordinates'][1]
 
                 if dry_run:
-                    self.stdout.write('-' * 80)
-                    self.stdout.write(name)
-                    self.stdout.write(department)
-                    self.stdout.write(str(post_codes))
-                    self.stdout.write(code_insee)
+                    print('-' * 80)
+                    print(name)
+                    print(department)
+                    print(post_codes)
+                    print(code_insee)
+                    print(longitude)
+                    print(latitude)
 
                 if not dry_run:
                     city = City()
                     city.name = name
+                    city.slug = slugify(name)
                     city.department = department
                     city.post_codes = post_codes
                     city.code_insee = code_insee

@@ -248,6 +248,9 @@ ACCOUNT_USER_DISPLAY = 'itou.users.models.get_allauth_account_user_display'
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = 'https://api-adresse.data.gouv.fr'
 
+# https://api.gouv.fr/api/api-geo.html#doc_tech
+API_GEO_BASE_URL = 'https://geo.api.gouv.fr'
+
 # Sirene - V3
 # https://api.insee.fr/catalogue/
 # https://github.com/sne3ks/api_insee
