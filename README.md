@@ -27,6 +27,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 
     make shell_on_django_container
     django-admin createsuperuser
+    django-admin loaddata itou/fixtures/french_cities.json
     django-admin loaddata itou/fixtures/siae.json
 
 ## Front-end

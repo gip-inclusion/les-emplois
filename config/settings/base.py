@@ -47,6 +47,7 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
+    'itou.utils.cities',
     'itou.siae',
     'itou.prescribers',
     'itou.users',

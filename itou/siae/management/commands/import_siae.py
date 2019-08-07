@@ -11,7 +11,6 @@ from itou.utils.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-# This file resides outside the repository until approval for public release has been given.
 CSV_FILE = f"{CURRENT_DIR}/data/2019_07_liste_siae.csv"
 
 KINDS = dict(Siae.KIND_CHOICES).keys()

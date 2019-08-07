@@ -14,7 +14,9 @@ def dashboard(request, template_name='account_itou/dashboard.html'):
 
 
 class ItouPasswordChangeView(PasswordChangeView):
-
+    """
+    https://github.com/pennersr/django-allauth/issues/468
+    """
     success_url = reverse_lazy('accounts:dashboard')
 
 
