@@ -34,7 +34,7 @@ class AddressMixin(models.Model):
     address_line_1 = models.CharField(verbose_name=_("Adresse postale, bôite postale"), max_length=256, blank=True)
     address_line_2 = models.CharField(verbose_name=_("Appartement, suite, bloc, bâtiment, etc."),
         max_length=256, blank=True)
-    zipcode = models.CharField(verbose_name=_("Code Postal"), max_length=10, blank=True)
+    post_code = models.CharField(verbose_name=_("Code Postal"), max_length=10, blank=True)
     city = models.CharField(verbose_name=_("Ville"), max_length=256, blank=True)
     department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True)
     # Latitude and longitude coordinates.
@@ -68,22 +68,22 @@ class AddressMixin(models.Model):
 
     @property
     def address_on_one_line(self):
-        if not all([self.address_line_1, self.zipcode, self.city]):
+        if not all([self.address_line_1, self.post_code, self.city]):
             return None
         fields = [
             self.address_line_1,
             self.address_line_2,
-            f"{self.zipcode} {self.city}",
+            f"{self.post_code} {self.city}",
         ]
         return ', '.join([field for field in fields if field])
 
-    def geocode(self, address, zipcode, save=True):
-        geocoding_data = get_geocoding_data(address, zipcode=zipcode)
+    def geocode(self, address, post_code, save=True):
+        geocoding_data = get_geocoding_data(address, post_code=post_code)
         if not geocoding_data:
-            logger.error(f"No geocoding data could be found for `{address} - {zipcode}`")
+            logger.error(f"No geocoding data could be found for `{address} - {post_code}`")
             return
         self.address_line_1 = geocoding_data['address_line_1']
-        self.zipcode = geocoding_data['zipcode']
+        self.post_code = geocoding_data['post_code']
         self.city = geocoding_data['city']
         self.coords = geocoding_data['coords']
         self.geocoding_score = geocoding_data['score']

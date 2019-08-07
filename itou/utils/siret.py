@@ -36,7 +36,7 @@ def process_siret_data(data):
         return {
             'name': data['etablissement']['uniteLegale']['denominationUniteLegale'],
             'address': ' '.join(item for item in address if item),
-            'zipcode': data['etablissement']['adresseEtablissement']['codePostalEtablissement'],
+            'post_code': data['etablissement']['adresseEtablissement']['codePostalEtablissement'],
         }
     except KeyError:
         logger.error(f"Unable to process the result of Sirene V3 API: {data}")

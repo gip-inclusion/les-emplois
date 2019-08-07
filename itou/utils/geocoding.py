@@ -10,13 +10,13 @@ from django.utils.http import urlencode
 logger = logging.getLogger(__name__)
 
 
-def call_ban_geocoding_api(address, zipcode=None, limit=1):
+def call_ban_geocoding_api(address, post_code=None, limit=1):
 
     api_url = f"{settings.API_BAN_BASE_URL}/search/"
 
     args = {'q': address, 'limit': limit}
-    if zipcode:
-        args['postcode'] = zipcode
+    if post_code:
+        args['postcode'] = post_code
 
     query_string = urlencode(args)
     url = f"{api_url}?{query_string}"
@@ -45,7 +45,7 @@ def process_geocoding_data(data):
     return {
         'score': data['properties']['score'],
         'address_line_1': data['properties']['name'],
-        'zipcode': data['properties']['postcode'],
+        'post_code': data['properties']['postcode'],
         'city': data['properties']['city'],
         'longitude': longitude,
         'latitude': latitude,
@@ -53,8 +53,8 @@ def process_geocoding_data(data):
     }
 
 
-def get_geocoding_data(address, zipcode=None, limit=1):
+def get_geocoding_data(address, post_code=None, limit=1):
 
-    geocoding_data = call_ban_geocoding_api(address, zipcode=zipcode, limit=limit)
+    geocoding_data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
     return process_geocoding_data(geocoding_data)

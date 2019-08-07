@@ -2,8 +2,10 @@ from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
+from itou.siae.models import Siae
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
 
 
@@ -53,3 +55,14 @@ class City(models.Model):
                 if self.department in departments:
                     return region
         return None
+
+
+def find_suspicious_siae_city():
+    siaes = Siae.objects.order_by('city').distinct('city')
+    for siae in siaes:
+        slug = slugify(siae.city)
+        try:
+            City.objects.get(slug=slug, department=siae.department)
+        except:
+            print('-' * 80)
+            print(f"No entry in City() for SIAE {siae.siret} - {siae.name} in {siae.city} - {siae.department}")

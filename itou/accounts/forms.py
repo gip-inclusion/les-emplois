@@ -59,7 +59,7 @@ class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
         siret_data = get_siret_data(self.cleaned_data['siret'])
         if siret_data:
             prescriber.name = siret_data['name']
-            prescriber.geocode(siret_data['address'], siret_data['zipcode'], save=False)
+            prescriber.geocode(siret_data['address'], siret_data['post_code'], save=False)
         prescriber.save()
 
         membership = PrescriberMembership()

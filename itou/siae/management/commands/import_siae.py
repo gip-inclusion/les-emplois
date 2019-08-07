@@ -19,6 +19,7 @@ KINDS = dict(Siae.KIND_CHOICES).keys()
 # This score is arbitrarily set based on general observation.
 API_BAN_RELIABLE_MIN_SCORE = 0.6
 
+SEEN_SIRET = set()
 
 class Command(BaseCommand):
     """
@@ -45,7 +46,12 @@ class Command(BaseCommand):
 
         with open(CSV_FILE) as csvfile:
 
+            # Count lines in CSV.
             reader = csv.reader(csvfile, delimiter=';')
+            row_count = sum(1 for row in reader)
+            last_progress = 0
+            # Reset the iterator to iterate through the reader again.
+            csvfile.seek(0)
 
             for i, row in enumerate(reader):
 
@@ -53,35 +59,52 @@ class Command(BaseCommand):
                     # Skip CSV header.
                     continue
 
-                self.stdout.write('-' * 80)
+                progress = int((100 * i) / row_count)
+                if progress > last_progress + 5:
+                    self.stdout.write(f"Creating SIAEs… {progress}%")
+                    last_progress = progress
+
+                if dry_run:
+                    self.stdout.write('-' * 80)
 
                 siret = row[7]
-                self.stdout.write(siret)
-                assert len(siret) == 14
+                if dry_run:
+                    self.stdout.write(siret)
+                    assert len(siret) == 14
+
+                if siret in SEEN_SIRET:
+                    # First come, first served.
+                    self.stderr.write(f"{siret} already seen. Skipping…")
+                    continue
+                SEEN_SIRET.add(siret)
 
                 naf = row[5]
-                self.stdout.write(naf)
-                assert len(naf) == 5
+                if dry_run:
+                    self.stdout.write(naf)
+                    assert len(naf) == 5
 
                 kind = row[0]
-                self.stdout.write(kind)
-                assert kind in KINDS
+                if dry_run:
+                    self.stdout.write(kind)
+                    assert kind in KINDS
 
                 # Max length of `name` is 50 chars in the source file, some are truncated.
                 # Also `name` is in upper case.
                 name = row[8].strip()
                 name = ' '.join(name.split())  # Replace multiple spaces by a single space.
-                self.stdout.write(name)
+                if dry_run:
+                    self.stdout.write(name)
 
                 phone = row[13].strip().replace(' ', '')
                 if phone and len(phone) != 10:
                     phone = ''
-                if phone:
+                if phone and dry_run:
                     self.stdout.write(phone)
 
                 email = row[14].strip()
-                self.stdout.write(email)
-                assert ' ' not in email
+                if dry_run:
+                    self.stdout.write(email)
+                    assert ' ' not in email
 
                 street_num = row[9].strip().replace(' ', '')
                 street_name = row[10].strip().lower()
@@ -93,29 +116,33 @@ class Command(BaseCommand):
                     addresses = address_line_1.split(' - ')
                     address_line_1 = addresses[0]
                     address_line_2 = addresses[1]
-                self.stdout.write(address_line_1)
-                if address_line_2:
+                if dry_run:
+                    self.stdout.write(address_line_1)
+                if address_line_2 and dry_run:
                     self.stdout.write(address_line_2)
 
                 # Fields are identical, we can use one or another.
-                zipcode = row[3].strip()
+                post_code = row[3].strip()
                 post_code = row[11].strip()
-                self.stdout.write(zipcode)
-                assert post_code == zipcode
+                if dry_run:
+                    self.stdout.write(post_code)
+                    assert post_code == post_code
 
                 # Fields are identical, we can use one or another.
                 city = row[4].strip()
                 city_name = row[12].strip()
-                self.stdout.write(city)
-                assert city_name == city
+                if dry_run:
+                    self.stdout.write(city)
+                    assert city_name == city
 
                 department = row[1]
                 if department[0] == '0':
                     department = department[1:]
                 if department in ['59L', '59V']:
                     department = '59'
-                self.stdout.write(department)
-                assert department in DEPARTMENTS
+                if dry_run:
+                    self.stdout.write(department)
+                    assert department in DEPARTMENTS
 
                 if not dry_run:
 
@@ -128,13 +155,13 @@ class Command(BaseCommand):
                     siae.email = email
                     siae.address_line_1 = address_line_1
                     siae.address_line_2 = address_line_2
-                    siae.zipcode = zipcode
+                    siae.post_code = post_code
                     siae.city = city
                     siae.department = department
 
                     if siae.address_on_one_line:
 
-                        geocoding_data = get_geocoding_data(siae.address_on_one_line, zipcode=siae.zipcode)
+                        geocoding_data = get_geocoding_data(siae.address_on_one_line, post_code=siae.post_code)
 
                         if not geocoding_data:
                             siae.save()
@@ -151,9 +178,10 @@ class Command(BaseCommand):
                         # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens
                         siae.city = geocoding_data['city']
 
-                        self.stdout.write('-' * 40)
-                        self.stdout.write(siae.address_line_1)
-                        self.stdout.write(siae.city)
+                        if dry_run:
+                            self.stdout.write('-' * 40)
+                            self.stdout.write(siae.address_line_1)
+                            self.stdout.write(siae.city)
 
                         siae.coords = geocoding_data['coords']
 

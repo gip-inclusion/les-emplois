@@ -25,7 +25,7 @@ class UtilsAddressMixinTest(TestCase):
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
         expected_address_line_1 = "10 Pl des Cinq Martyrs du Lycee Buffon"
-        expected_zipcode = "75015"
+        expected_post_code = "75015"
         expected_city = "Paris"
         expected_coords = "SRID=4326;POINT (2.316754 48.838411)"
         expected_latitude = 48.838411
@@ -33,7 +33,7 @@ class UtilsAddressMixinTest(TestCase):
         expected_geocoding_score = 0.587663373207207
 
         self.assertEqual(prescriber.address_line_1, expected_address_line_1)
-        self.assertEqual(prescriber.zipcode, expected_zipcode)
+        self.assertEqual(prescriber.post_code, expected_post_code)
         self.assertEqual(prescriber.city, expected_city)
         self.assertEqual(prescriber.coords, expected_coords)
         self.assertEqual(prescriber.geocoding_score, expected_geocoding_score)
@@ -51,7 +51,7 @@ class UtilsGeocodingTest(TestCase):
         expected = {
             'score': 0.587663373207207,
             'address_line_1': '10 Pl des Cinq Martyrs du Lycee Buffon',
-            'zipcode': '75015',
+            'post_code': '75015',
             'city': 'Paris',
             'longitude': 2.316754,
             'latitude': 48.838411,
@@ -70,7 +70,7 @@ class UtilsSiretTest(TestCase):
         expected = {
             'name': "DELEGATION GENERALE A L'EMPLOI ET A LA FORMATION PROFESSIONNELLE",
             'address': '10 PL 5 MARTYRS LYCEE BUFFON',
-            'zipcode': '75015',
+            'post_code': '75015',
         }
         self.assertEqual(result, expected)
 
