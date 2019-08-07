@@ -12,7 +12,7 @@ from itou.utils.address.departments import DEPARTMENTS, REGIONS
 class City(models.Model):
     """
     French cities with geocoding data.
-    Raw data is generated via `django-admin generate_cities_file`
+    Raw data is generated via `django-admin generate_cities`
     and then imported into DB via `django-admin import_cities`.
     """
 
@@ -60,9 +60,8 @@ class City(models.Model):
 def find_suspicious_siae_city():
     siaes = Siae.objects.order_by('city').distinct('city')
     for siae in siaes:
-        slug = slugify(siae.city)
         try:
-            City.objects.get(slug=slug, department=siae.department)
+            City.objects.get(slug=slugify(siae.city), department=siae.department)
         except:
             print('-' * 80)
             print(f"No entry in City() for SIAE {siae.siret} - {siae.name} in {siae.city} - {siae.department}")

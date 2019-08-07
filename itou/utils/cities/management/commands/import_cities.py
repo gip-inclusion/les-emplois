@@ -73,14 +73,18 @@ class Command(BaseCommand):
                     print(latitude)
 
                 if not dry_run:
-                    city = City()
-                    city.name = name
-                    city.slug = slugify(name)
-                    city.department = department
-                    city.post_codes = post_codes
-                    city.code_insee = code_insee
-                    city.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
-                    city.save()
+                    _, created = City.objects.update_or_create(
+                        slug=slugify(name),
+                        department=department,
+                        defaults={
+                            'name': name,
+                            'post_codes': post_codes,
+                            'code_insee': code_insee,
+                            'coords': GEOSGeometry(f"POINT({longitude} {latitude})"),
+                        },
+                    )
+                    if created:
+                        print(created)
 
         self.stdout.write('-' * 80)
         self.stdout.write("Done.")
