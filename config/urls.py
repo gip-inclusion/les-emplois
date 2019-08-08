@@ -16,7 +16,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
 
     path('', home, name='home'),
-    path('city/', include('itou.utils.cities.urls')),
+    path('city/', include('itou.cities.urls')),
     path('siae/', include('itou.siae.urls')),
 
 ]

@@ -3,7 +3,7 @@ import json
 from django.conf import settings
 from django.http import HttpResponse
 
-from itou.utils.cities.models import City
+from itou.cities.models import City
 
 
 def autocomplete(request, template_name='siae/details.html'):
@@ -17,9 +17,9 @@ def autocomplete(request, template_name='siae/details.html'):
     cities = cities[:10]
     cities = [
         {
-            "label": str(city),
-            "value": str(city),
-            "slug": f"{city.slug}-{city.department}",
+            "label": f"{city.name} ({city.department})",
+            "value": f"{city.name} ({city.department})",
+            "slug": f"{city.slug}-{city.department}" if city.department else {city.slug},
         }
         for city in cities
     ]

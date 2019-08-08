@@ -1,6 +1,6 @@
 from django.urls import path
 
-from itou.utils.cities import views
+from itou.cities import views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs

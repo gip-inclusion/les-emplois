@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from itou.utils.cities import models
+from itou.cities import models
 
 
 @admin.register(models.City)

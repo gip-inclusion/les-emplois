@@ -9,18 +9,30 @@
 
     <h1>{% trans "Plate-forme numérique de l'inclusion" %}</h1>
 
-    {# TODO: add msg for active departments. #}
+    {# TODO: add msg for active departments #}
 
-    <form class="form-inline">
+    {# TODO: create a Form class? #}
+    <form class="form-inline" method="get">
         <input type="hidden" class="city-hidden-value" name="city" value="">
         <input
             type="text"
-            class="city-autocomplete form-control mr-sm-2"
+            class="city-autocomplete form-control mr-sm-2 mb-2 col"
             data-autocomplete-source="{% url 'city:autocomplete' %}"
             placeholder="{% trans "Autour de (Arras, Bobigny, Strasbourg…)" %}"
         >
-        {# TODO: within n Km <select> #}
-        <button type="submit" class="btn btn-primary" title="{% trans "Chercher" %}">
+        <select name="distance" class="form-control mr-sm-2 mb-2 col-auto">
+            <option value="100" selected>{% trans "dans un rayon de" %} 100 Km</option>
+            {% with "75 50 25 15 10 5" as list %}
+            {% for item in list.split %}
+                <option value="{{ item }}">{% trans "dans un rayon de" %} {{ item }} Km</option>
+            {% endfor %}
+            {% endwith %}
+        </select>
+        <button
+            type="submit"
+            class="btn btn-primary mb-2 form-control col-auto"
+            title="{% trans "Chercher" %}"
+        >
             {% include "includes/icon.html" with icon="search" %}
         </button>
     </form>
