@@ -1,4 +1,5 @@
 import csv
+import logging
 import os
 
 from django.conf import settings
@@ -21,6 +22,7 @@ API_BAN_RELIABLE_MIN_SCORE = 0.6
 
 SEEN_SIRET = set()
 
+
 class Command(BaseCommand):
     """
     Import SIAEs data into the database.
@@ -28,6 +30,7 @@ class Command(BaseCommand):
 
     To debug:
         django-admin import_siae --dry-run
+        django-admin import_siae --dry-run --verbosity=2
 
     To populate the database:
         django-admin import_siae
@@ -42,7 +45,23 @@ class Command(BaseCommand):
             help='Only print data to import',
         )
 
+    def set_logger(self, verbosity):
+        """
+        Set logger level based on the verbosity option.
+        """
+        handler = logging.StreamHandler(self.stdout)
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.propagate = False
+        self.logger.addHandler(handler)
+
+        self.logger.setLevel(logging.INFO)
+        if verbosity > 1:
+            self.logger.setLevel(logging.DEBUG)
+
     def handle(self, dry_run=False, **options):
+
+        self.set_logger(options.get('verbosity'))
 
         with open(CSV_FILE) as csvfile:
 
@@ -64,47 +83,29 @@ class Command(BaseCommand):
                     self.stdout.write(f"Creating SIAEs… {progress}%")
                     last_progress = progress
 
-                if dry_run:
-                    self.stdout.write('-' * 80)
+                self.logger.debug('-' * 80)
 
                 siret = row[7]
-                if dry_run:
-                    self.stdout.write(siret)
-                    assert len(siret) == 14
-
-                if siret in SEEN_SIRET:
-                    # First come, first served.
-                    self.stderr.write(f"{siret} already seen. Skipping…")
-                    continue
-                SEEN_SIRET.add(siret)
+                self.logger.debug(siret)
+                assert len(siret) == 14
 
                 naf = row[5]
-                if dry_run:
-                    self.stdout.write(naf)
-                    assert len(naf) == 5
+                self.logger.debug(naf)
+                assert len(naf) == 5
 
                 kind = row[0]
-                if dry_run:
-                    self.stdout.write(kind)
-                    assert kind in KINDS
+                self.logger.debug(kind)
+                assert kind in KINDS
 
                 # Max length of `name` is 50 chars in the source file, some are truncated.
                 # Also `name` is in upper case.
                 name = row[8].strip()
                 name = ' '.join(name.split())  # Replace multiple spaces by a single space.
-                if dry_run:
-                    self.stdout.write(name)
-
-                phone = row[13].strip().replace(' ', '')
-                if phone and len(phone) != 10:
-                    phone = ''
-                if phone and dry_run:
-                    self.stdout.write(phone)
+                self.logger.debug(name)
 
                 email = row[14].strip()
-                if dry_run:
-                    self.stdout.write(email)
-                    assert ' ' not in email
+                self.logger.debug(email)
+                assert ' ' not in email
 
                 street_num = row[9].strip().replace(' ', '')
                 street_name = row[10].strip().lower()
@@ -116,33 +117,46 @@ class Command(BaseCommand):
                     addresses = address_line_1.split(' - ')
                     address_line_1 = addresses[0]
                     address_line_2 = addresses[1]
-                if dry_run:
-                    self.stdout.write(address_line_1)
-                if address_line_2 and dry_run:
-                    self.stdout.write(address_line_2)
+                self.logger.debug(address_line_1)
+                self.logger.debug(address_line_2)
 
                 # Fields are identical, we can use one or another.
                 post_code = row[3].strip()
                 post_code = row[11].strip()
-                if dry_run:
-                    self.stdout.write(post_code)
-                    assert post_code == post_code
+                self.logger.debug(post_code)
+                assert post_code == post_code
 
                 # Fields are identical, we can use one or another.
                 city = row[4].strip()
                 city_name = row[12].strip()
-                if dry_run:
-                    self.stdout.write(city)
-                    assert city_name == city
+                self.logger.debug(city)
+                assert city_name == city
 
                 department = row[1]
                 if department[0] == '0':
                     department = department[1:]
                 if department in ['59L', '59V']:
                     department = '59'
-                if dry_run:
-                    self.stdout.write(department)
-                    assert department in DEPARTMENTS
+                if department not in ['2A', '2B'] and not post_code.startswith(department):
+                    # Fix wrong departments using the post code.
+                    department = post_code[:len(department)]
+                self.logger.debug(department)
+                assert department in DEPARTMENTS
+
+                siae_info = f"{siret} {name} - {address_line_1} - {post_code} {city}."
+
+                phone = row[13].strip().replace(' ', '')
+                if phone and len(phone) != 10:
+                    self.stderr.write(f"Wrong phone `{phone}`. {siae_info}.")
+                    phone = ''
+                self.logger.debug(phone)
+
+                if siret in SEEN_SIRET:
+                    # First come, first served.
+                    error = f"Siret already seen. Skipping {siae_info}."
+                    self.stderr.write(error)
+                    continue
+                SEEN_SIRET.add(siret)
 
                 if not dry_run:
 
@@ -164,6 +178,7 @@ class Command(BaseCommand):
                         geocoding_data = get_geocoding_data(siae.address_on_one_line, post_code=siae.post_code)
 
                         if not geocoding_data:
+                            self.stderr.write(f"No geocoding data found for {siae_info}")
                             siae.save()
                             continue
 
@@ -174,14 +189,15 @@ class Command(BaseCommand):
                         # Otherwise keep the old address (which is probably wrong or incomplete).
                         if siae.geocoding_score >= API_BAN_RELIABLE_MIN_SCORE:
                             siae.address_line_1 = geocoding_data['address_line_1']
+                        else:
+                            self.stderr.write(f"Geocoding not reliable for {siae_info}")
                         # City is always good due to `postcode` passed in query.
                         # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens
                         siae.city = geocoding_data['city']
 
-                        if dry_run:
-                            self.stdout.write('-' * 40)
-                            self.stdout.write(siae.address_line_1)
-                            self.stdout.write(siae.city)
+                        self.logger.debug('-' * 40)
+                        self.logger.debug(siae.address_line_1)
+                        self.logger.debug(siae.city)
 
                         siae.coords = geocoding_data['coords']
 

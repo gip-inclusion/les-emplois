@@ -57,7 +57,13 @@ class City(models.Model):
         return None
 
 
-def find_suspicious_siae_city():
+def find_suspicious_siae_cities():
+    """
+    Find Siae() objects with a city name that does not exist in City().
+    This could mean that:
+        - the data in Siae() is wrong
+        - the data in City() is wrong or not up to date
+    """
     siaes = Siae.objects.order_by('city').distinct('city')
     for siae in siaes:
         try:
