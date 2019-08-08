@@ -1,5 +1,6 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
+{% load bootstrap4 %}
 
 {# {% block meta_description %}<meta name="description" content="">{% endblock %} #}
 {% block title %}{% trans "Plate-forme numérique de l'inclusion" %}{{ block.super }}{% endblock %}
@@ -8,4 +9,47 @@
 
     <h1>{% trans "Plate-forme numérique de l'inclusion" %}</h1>
 
+    {# TODO: add msg for active departments. #}
+
+    <form class="form-inline">
+        <input type="hidden" class="city-hidden-value" name="city" value="">
+        <input
+            type="text"
+            class="city-autocomplete form-control mr-sm-2"
+            data-autocomplete-source="{% url 'city:autocomplete' %}"
+            placeholder="{% trans "Autour de (Arras, Bobigny, Strasbourg…)" %}"
+        >
+        {# TODO: within n Km <select> #}
+        <button type="submit" class="btn btn-primary" title="{% trans "Chercher" %}">
+            {% include "includes/icon.html" with icon="search" %}
+        </button>
+    </form>
+
+{% endblock %}
+
+{# TODO: make it external, wait for document loaded. #}
+{% block script %}
+    {{ block.super }}
+    <script>
+
+    let citySearchInput = $('.city-autocomplete')
+    let hiddenCityInput = $('.city-hidden-value')
+
+    citySearchInput.autocomplete({
+      delay: 100,
+      minLength: 1,
+      position: {my: "left top", at: "left bottom"},
+      source: citySearchInput.data('autocomplete-source'),
+      response: function (event, ui) {
+        if (ui.content.length) {
+          // Auto-set the first result in case the user does not click on an autocomplete suggestion.
+          hiddenCityInput.val(ui.content[0].slug)
+        }
+      },
+      select: function (event, ui) {
+         hiddenCityInput.val(ui.item.slug)
+      },
+    })
+
+    </script>
 {% endblock %}

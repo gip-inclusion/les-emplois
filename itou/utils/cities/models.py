@@ -34,7 +34,7 @@ class City(models.Model):
         verbose_name_plural = _("Villes françaises")
 
     def __str__(self):
-        return f"{self.name}"
+        return f"{self.name} ({self.department})"
 
     @property
     def latitude(self):
