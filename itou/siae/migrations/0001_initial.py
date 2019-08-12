@@ -29,8 +29,8 @@ class Migration(migrations.Migration):
                 ('naf', models.CharField(max_length=5, validators=[itou.utils.validators.validate_naf], verbose_name='Naf')),
                 ('kind', models.CharField(choices=[('EI', "Entreprises d'insertion"), ('AI', 'Associations intermédiaires'), ('ACI', "Ateliers chantiers d'insertion"), ('ETTI', "Entreprises de travail temporaire d'insertion"), ('GEIQ', "Groupements d'employeurs pour l'insertion et la qualification"), ('RQ', 'Régies de quartier')], default='EI', max_length=4, verbose_name='Type')),
                 ('name', models.CharField(max_length=256, verbose_name='Nom')),
-                ('phone', models.CharField(max_length=10, verbose_name='Téléphone')),
-                ('email', models.EmailField(max_length=254, verbose_name='E-mail')),
+                ('phone', models.CharField(blank=True, max_length=10, verbose_name='Téléphone')),
+                ('email', models.EmailField(blank=True, max_length=254, verbose_name='E-mail')),
             ],
             options={
                 'verbose_name': "Structure d'insertion par l'activité économique",

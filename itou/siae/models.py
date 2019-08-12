@@ -36,8 +36,8 @@ class Siae(AddressMixin):
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf])
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
     name = models.CharField(verbose_name=_("Nom"), max_length=256)
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=10)
-    email = models.EmailField(verbose_name=_("E-mail"))
+    phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
+    email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
         through='SiaeMembership', blank=True)
 
