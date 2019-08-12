@@ -1,26 +1,26 @@
 import json
 
-from django.conf import settings
 from django.http import HttpResponse
 
 from itou.cities.models import City
 
 
-def autocomplete(request, template_name='siae/details.html'):
+def autocomplete(request):
     """
-    Returns JSON data for the city autocomplete form field.
+    Returns JSON compliant with the jQuery UI Autocomplete Widget:
+    https://api.jqueryui.com/autocomplete/#option-source
     """
-    term = request.GET.get('term')
-    cities = City.objects.filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+    term = request.GET.get('term', '').strip()
+    cities = []
     if term:
-        cities = cities.filter(name__istartswith=term)
-    cities = cities[:10]
-    cities = [
-        {
-            "label": f"{city.name} ({city.department})",
-            "value": f"{city.name} ({city.department})",
-            "slug": f"{city.slug}-{city.department}" if city.department else {city.slug},
-        }
-        for city in cities
-    ]
+        cities = City.active_objects.filter(name__istartswith=term)
+        cities = cities[:10]
+        cities = [
+            {
+                "label": city.display_name,
+                "value": city.display_name,
+                "slug": city.slug,
+            }
+            for city in cities
+        ]
     return HttpResponse(json.dumps(cities), 'application/json')
