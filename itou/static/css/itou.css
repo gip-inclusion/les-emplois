@@ -51,49 +51,49 @@ header.layout-section {
     border-bottom: 1px solid #c9d3df;
 }
 
-.header-main {
+.layout-header {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
 }
 
-.header-main-logo {
+.layout-header-logo {
     margin-right: 10px;
 }
 
-.header-main-logo:focus,
-.header-main-logo:active,
-.header-main-logo:hover {
+.layout-header-logo:focus,
+.layout-header-logo:active,
+.layout-header-logo:hover {
     background: #e5e5e5;
 }
 
-.header-main-nav {
+.layout-header-nav {
     /* Align last flex item to right. */
     margin-left: auto;
 }
 
-.header-main-nav ul {
+.layout-header-nav ul {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.header-main-nav ul li:not(:first-child) {
+.layout-header-nav ul li:not(:first-child) {
     margin-left: 20px;
 }
 
-@media (max-width: 700px) {/* For any browser < max-width. */
+@media (max-width: 700px) {  /* For any browser < max-width. */
 
-    .header-main {
+    .layout-header {
         display: block;
     }
 
-    .header-main-nav {
+    .layout-header-nav {
         margin-left: 0;
     }
 
-    .header-main-nav ul {
+    .layout-header-nav ul {
         margin-top: 20px;
     }
 
@@ -102,39 +102,45 @@ header.layout-section {
 /* Footer.
 --------------------------------------------------------------------------- */
 
-.footer-main a,
-.footer-main a:link,
-.footer-main a:visited {
+.layout-footer a,
+.layout-footer a:link,
+.layout-footer a:visited {
     color: #fff;
     text-decoration: underline;
 }
 
-.footer-main a:focus,
-.footer-main a:hover,
-.footer-main a:active {
+.layout-footer a:focus,
+.layout-footer a:hover,
+.layout-footer a:active {
     text-decoration: none;
 }
 
 /* Spacing.
 --------------------------------------------------------------------------- */
 
-.header-main {
+.layout-header {
     padding: 1.4rem 1rem;
 }
 
-.content-main {
+.layout-content {
     padding: 2rem 1rem;
 }
 
-.content-small {
+.layout-content > .content-small {
     margin: 0 auto;
     max-width: 600px;
 }
 
-.footer-main {
+.layout-footer {
     padding: 1.4rem 1rem;
 }
 
-.alert:last-child {
+/* Messages. */
+
+.layout-messages .alert {
+    margin: 1.4rem 0;
+}
+
+.layout-messages .alert:last-child {
     margin-bottom: 0;
 }

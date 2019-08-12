@@ -19,11 +19,11 @@
     <div class="layout">
 
         <header class="layout-section layout-section-white">
-            <div class="header-main">
-                <a href="/" class="header-main-logo">
+            <div class="layout-header">
+                <a href="/" class="layout-header-logo">
                     <img src="{% static "img/logo_itou_gouv.svg" %}" alt="itou.beta.gouv.fr" width="300">
                 </a>
-                <nav class="header-main-nav">
+                <nav class="layout-header-nav">
                     <ul>
                         {% if user.is_authenticated %}
 
@@ -51,7 +51,7 @@
 
         {% if messages %}
             <div class="layout-section layout-section-white">
-                <div>
+                <div class="layout-messages">
                     {% bootstrap_messages %}
                 </div>
             </div>
@@ -60,7 +60,7 @@
         {% block content_full_viewport %}{% endblock %}
 
         <footer class="layout-section layout-section-dark">
-            <div class="footer-main">
+            <div class="layout-footer">
                 <p><a href="mailto:contact@itou.beta.gouv.fr">{% trans "Contact" %}</a></p>
             </div>
         </footer>
