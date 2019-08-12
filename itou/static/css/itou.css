@@ -47,6 +47,10 @@ body {
 /* Header.
 --------------------------------------------------------------------------- */
 
+header.layout-section {
+    border-bottom: 1px solid #c9d3df;
+}
+
 .header-main {
     display: flex;
     flex-wrap: wrap;
@@ -115,11 +119,11 @@ body {
 --------------------------------------------------------------------------- */
 
 .header-main {
-    padding: 2rem 1rem;
+    padding: 1.4rem 1rem;
 }
 
 .content-main {
-    padding: 1rem 1rem 2rem 1rem;
+    padding: 2rem 1rem;
 }
 
 .content-small {
@@ -128,7 +132,7 @@ body {
 }
 
 .footer-main {
-    padding: 2rem 1rem;
+    padding: 1.4rem 1rem;
 }
 
 .alert:last-child {

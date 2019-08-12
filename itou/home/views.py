@@ -1,7 +1,10 @@
-from django.conf import settings
 from django.shortcuts import render
+
+from itou.siae.forms import SiaeSearchForm
 
 
 def home(request, template_name='home.html'):
-    context = {}
+    context = {
+        "siae_search_form": SiaeSearchForm(),
+    }
     return render(request, template_name, context)

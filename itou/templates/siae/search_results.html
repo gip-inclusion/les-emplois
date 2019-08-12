@@ -1,0 +1,56 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% with request.GET.city_autocomplete as city and request.GET.distance as distance %}{% blocktrans %}SIAE à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <form method="get" action="" class="d-block mb-3">
+        {% include "siae/includes/search_form.html" with form=form %}
+    </form>
+
+    <h1 class="font-weight-normal">
+        {% with request.GET.city_autocomplete as city and request.GET.distance as distance %}
+            {% blocktrans %}<abbr title="Structures d'insertion par l'activité économique">SIAE</abbr> à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
+        {% endwith %}
+    </h1>
+
+    {% if not siaes_page %}
+
+        <h2 class="font-weight-normal text-muted">
+            {% trans "Aucun résultat." %}
+        </h2>
+
+    {% else %}
+
+        <h2 class="font-weight-normal text-muted">
+            {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages %}
+                {% blocktrans count counter=siaes_page.paginator.count %}
+                    <b>1</b> résultat
+                {% plural %}
+                    <b>{{ counter }}</b> résultats
+                {% endblocktrans %}
+                {% if siaes_page.paginator.num_pages > 1 %}
+                    {% blocktrans %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktrans %}
+                {% endif %}
+            {% endwith %}
+        </h1>
+
+        {% for siae in siaes_page %}
+            <div class="card d-block my-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ siae.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
+                    <div>
+                        <span class="badge badge-dark">{{ siae.distance.km|floatformat:1 }} Km</span>
+                        de votre lieu de recherche
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {% include "includes/pagination.html" with page=siaes_page %}
+
+    {% endif %}
+
+{% endblock %}

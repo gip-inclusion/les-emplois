@@ -6,6 +6,9 @@
 
     Usage:
         {% include "includes/icon.html" with icon="user-plus" %}
+    Use a title if the icon convey meaning:
+        {% trans "Search" as title %}
+        {% include "includes/icon.html" with icon="user-plus" title=title %}
 
 {% endcomment %}
 <svg
@@ -20,5 +23,6 @@
     stroke-linejoin="round"
     style="line-height: 0; vertical-align: middle;"
 >
-      <use xlink:href="{% static 'icons/feather-sprite.svg#' %}{{ icon }}"></use>
+    {% if title %}<title>{{ title }}</title>{% endif %}
+    <use xlink:href="{% static 'icons/feather-sprite.svg#' %}{{ icon }}"></use>
 </svg>

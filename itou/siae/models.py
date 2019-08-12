@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +9,17 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_naf, validate_siret
 
 
-class ActiveSiaeManager(models.Manager):
+class SiaeDefaultManager(models.Manager):
+
+    def within(self, point, distance_km):
+        return (self
+            .filter(coords__distance_lte=(point, D(km=distance_km)))
+            .annotate(distance=Distance('coords', point))
+            .order_by('distance')
+        )
+
+
+class SiaeActiveManager(SiaeDefaultManager):
 
     def get_queryset(self):
         return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
@@ -41,8 +53,8 @@ class Siae(AddressMixin):
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
         through='SiaeMembership', blank=True)
 
-    objects = models.Manager()  # The default manager.
-    active_objects = ActiveSiaeManager()
+    objects = SiaeDefaultManager()
+    active_objects = SiaeActiveManager()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")

@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="rounded p-3 bg-light">
+    <div class="row no-gutters">
+        {# Apply bottom margins only on `sm` sizes: https://stackoverflow.com/a/50879258 #}
+        <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
+            {{ form.distance }}
+        </div>
+        <div class="col-sm mr-1 mb-1 mb-sm-0">
+            {{ form.city }}
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        {% include "includes/icon.html" with icon="map-pin" %}
+                    </span>
+                </div>
+                {{ form.city_autocomplete }}
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <button type="submit" class="btn btn-primary form-control" title="{% trans "Chercher" %}">
+                {% trans "Rechercher" as icon_search_title %}
+                {% include "includes/icon.html" with icon="search" title=icon_search_title %}
+            </button>
+        </div>
+    </div>
+    <p class="text-center mt-1 mb-0"><small><i>{% trans "En version beta, la recherche ne fonctionne que pour les départements du Bas-Rhin (67), du Pas-de-Calais (62) et de la Seine Saint Denis (93)." %}</i></small></p>
+</div>
