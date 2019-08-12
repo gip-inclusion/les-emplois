@@ -1,0 +1,56 @@
+{% load i18n %}
+{% load url_add_query %}
+{% comment %}
+
+    Usage:
+        {% include "includes/pagination.html" with page=siaes_page %}
+
+{% endcomment %}
+{% if page.display_pager %}
+    {% with request.get_full_path as url %}
+        <nav aria-label="{% trans "Pagination" %}">
+            {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}
+            <ul class="pagination flex-wrap">
+
+                {# First page. #}
+                {% if page.number == 1 %}
+                    <li class="page-item disabled">
+                        <span class="page-link">{% trans "Premier" %}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url_add_query url page=1 %}">{% trans "Premier" %}</a>
+                    </li>
+                {% endif %}
+
+                {# Pages. #}
+                {% for i in page.pages_to_display %}
+                    {% if page.number == i %}
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">
+                                {{ page.number }}
+                                <span class="sr-only">{% trans "(actuel)" %}</span>
+                            </span>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="{% url_add_query url page=i %}">{{ i }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {# Last page. #}
+                {% if page.number == page.paginator.num_pages %}
+                    <li class="page-item disabled">
+                        <span class="page-link">{% trans "Dernier" %}</span>
+                    </li>
+                {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="{% url_add_query url page=page.paginator.num_pages %}">{% trans "Dernier" %}</a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+    {% endwith %}
+{% endif %}

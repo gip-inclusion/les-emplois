@@ -26,8 +26,11 @@ django_admin:
 
 .PHONY: test
 
+# make test
+# make test TARGET=itou.utils
+# make test TARGET=itou.utils.tests.UtilsTemplateTagsTestCase.test_url_add_query
 test:
-	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel=2
+	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel=2 $(TARGET)
 
 # Docker shell.
 # =============================================================================

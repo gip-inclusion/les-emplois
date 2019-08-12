@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
+from django.template import Context, Template
 from django.test import TestCase
 
 from itou.prescribers.models import Prescriber
@@ -90,3 +91,45 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_siret, '1200001530001a')
         self.assertRaises(ValidationError, validate_siret, 'azertyqwerty')
         validate_siret('12000015300011')
+
+
+class UtilsTemplateTagsTestCase(TestCase):
+
+    def test_url_add_query(self):
+        """Test `url_add_query` template tag."""
+
+        # Full URL.
+        context = {
+            'url': 'https://itou.beta.gouv.fr/siae/search?distance=100&city=aubervilliers-93&page=55&page=1',
+        }
+        template = Template(
+            "{% load url_add_query %}"
+            "{% url_add_query url page=2 %}"
+        )
+        out = template.render(Context(context))
+        expected = 'https://itou.beta.gouv.fr/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2'
+        self.assertEqual(out, expected)
+
+        # Relative URL.
+        context = {
+            'url': '/siae/search?distance=50&city=metz-57',
+        }
+        template = Template(
+            "{% load url_add_query %}"
+            "{% url_add_query url page=22 %}"
+        )
+        out = template.render(Context(context))
+        expected = '/siae/search?distance=50&amp;city=metz-57&amp;page=22'
+        self.assertEqual(out, expected)
+
+        # Empty URL.
+        context = {
+            'url': '',
+        }
+        template = Template(
+            "{% load url_add_query %}"
+            "{% url_add_query url page=1 %}"
+        )
+        out = template.render(Context(context))
+        expected = '?page=1'
+        self.assertEqual(out, expected)
