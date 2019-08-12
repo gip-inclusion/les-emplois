@@ -1,39 +1,35 @@
 {# django-allauth template override. #}
-{% extends "layout/content.html" %}
+{% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
 
 {% block title %}{% trans "Connexion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="content-small">
+<h1>{% trans "Connexion" %}</h1>
 
-    <h1>{% trans "Connexion" %}</h1>
+<form method="post" action="{% url 'account_login' %}">
 
-    <form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
 
-        {% csrf_token %}
+    {% bootstrap_form_errors form %}
 
-        {% bootstrap_form_errors form %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+    {% endif %}
 
-        {% if redirect_field_value %}
-        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-        {% endif %}
+    {% bootstrap_field form.login %}
+    {% bootstrap_field form.password %}
 
-        {% bootstrap_field form.login %}
-        {% bootstrap_field form.password %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% trans "Connexion" %}</button>
+    {% endbuttons %}
 
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Connexion" %}</button>
-        {% endbuttons %}
+</form>
 
-    </form>
+<hr>
 
-    <hr>
-
-    <p>
-        <a href="{% url 'account_reset_password' %}">{% trans "Mot de passe oublié ?" %}</a>
-    </p>
-
-</div>
+<p>
+    <a href="{% url 'account_reset_password' %}">{% trans "Mot de passe oublié ?" %}</a>
+</p>
 {% endblock %}

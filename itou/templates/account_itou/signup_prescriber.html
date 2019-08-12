@@ -1,4 +1,4 @@
-{% extends "layout/content.html" %}
+{% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
 
@@ -6,41 +6,37 @@
 
 
 {% block content %}
-<div class="content-small">
+<h1>
+    {% trans "Prescripteur" %}
+    <small class="text-muted">{% trans "Inscription" %}</small>
+</h1>
 
-    <h1>
-        {% trans "Prescripteur" %}
-        <small class="text-muted">{% trans "Inscription" %}</small>
-    </h1>
+<form method="post" action="{% url 'accounts:prescriber_signup' %}" role="form">
 
-    <form method="post" action="{% url 'accounts:prescriber_signup' %}" role="form">
+    {% csrf_token %}
 
-        {% csrf_token %}
+    {% bootstrap_form_errors form %}
 
-        {% bootstrap_form_errors form %}
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+    {% endif %}
 
-        {% if redirect_field_value %}
-            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
-        {% endif %}
+    {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.last_name %}
+    {% bootstrap_field form.email %}
+    {% bootstrap_field form.siret %}
+    {% bootstrap_field form.password1 %}
+    {% bootstrap_field form.password2 %}
 
-        {% bootstrap_field form.first_name %}
-        {% bootstrap_field form.last_name %}
-        {% bootstrap_field form.email %}
-        {% bootstrap_field form.siret %}
-        {% bootstrap_field form.password1 %}
-        {% bootstrap_field form.password2 %}
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% trans "Inscription" %}</button>
+    {% endbuttons %}
 
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Inscription" %}</button>
-        {% endbuttons %}
+</form>
 
-    </form>
+<hr>
 
-    <hr>
-
-    <p>
-        <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
-    </p>
-
-</div>
+<p>
+    <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
+</p>
 {% endblock %}
