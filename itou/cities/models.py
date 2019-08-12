@@ -9,6 +9,12 @@ from itou.siae.models import Siae
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
 
 
+class ActiveCityManager(models.Manager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+
+
 class City(models.Model):
     """
     French cities with geocoding data.
@@ -19,21 +25,26 @@ class City(models.Model):
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     name = models.CharField(verbose_name=_("Ville"), max_length=256, db_index=True)
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=256, db_index=True)
-    # Can be empty.
-    # https://fr.wikipedia.org/wiki/Saint-Pierre-et-Miquelon#Statut
-    department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=256, unique=True, db_index=True)
+    department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3)
     post_codes = ArrayField(models.CharField(max_length=5), verbose_name=_("Codes postaux"), blank=True)
-    code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=5)
+    code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=5, unique=True)
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
+
+    objects = models.Manager()  # The default manager.
+    active_objects = ActiveCityManager()
 
     class Meta:
         verbose_name = _("Ville française")
         verbose_name_plural = _("Villes françaises")
 
     def __str__(self):
+        return self.display_name
+
+    @property
+    def display_name(self):
         return f"{self.name} ({self.department})"
 
     @property
