@@ -15,7 +15,8 @@ $(document).ready(function () {
       },
     })
     .focus(function() {
-      $(this).val('')
+      citySearchInput.val('')
+      hiddenCityInput.val('')
     })
 
 })

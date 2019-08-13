@@ -28,11 +28,9 @@ class ViewsTest(TestCase):
         response = self.client.get(url, {'term': 'alte'})
         self.assertEqual(response.status_code, 200)
         expected = [{
-          'label': 'Alteckendorf (67)',
           'value': 'Alteckendorf (67)',
           'slug': 'alteckendorf-67'
         }, {
-          'label': 'Altenheim (67)',
           'value': 'Altenheim (67)',
           'slug': 'altenheim-67'
         }]

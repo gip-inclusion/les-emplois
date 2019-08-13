@@ -1,10 +1,44 @@
-{% extends "layout/content.html" %}
+{% extends "layout/content_small.html" %}
 {% load i18n %}
+{% load format_filters %}
 
-{% block title %}{% trans "Fiche" %}{{ block.super }}{% endblock %}
+{% block title %}{{ siae.name }}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Fiche" %}</h1>
+    <p><i>{{ siae.get_kind_display }}</i></p>
+
+    <hr>
+
+    <h1>{{ siae.name }}</h1>
+
+    <h2 class="text-muted">
+        {{ siae.address_line_1 }}<br>
+        {% if siae.address_line_2 %}{{ siae.address_line_2 }}<br>{% endif %}
+        {{ siae.post_code }} {{ siae.city }}
+    </h2>
+
+    {% if siae.email %}
+        <p>
+            {% trans "E-mail" as email_label %}
+            {% include "includes/icon.html" with icon="mail" title=email_label %}
+            <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
+        </p>
+    {% endif %}
+
+    {% if siae.phone %}
+        <p>
+            {% trans "Téléphone" as phone_label %}
+            {% include "includes/icon.html" with icon="phone" title=phone_label %}
+            <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
+        </p>
+    {% endif %}
+
+    {% if next %}
+        <hr>
+        <p>
+            <a href="{{ next }}">{% trans "Retour" %}</a>
+        </p>
+    {% endif %}
 
 {% endblock %}

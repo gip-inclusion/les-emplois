@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from itou.siae import views
 
@@ -8,7 +8,7 @@ app_name = 'siae'
 
 urlpatterns = [
 
-    path('card', views.card, name='card'),
+    re_path(r'^card/(?P<siret>\d{14})$', views.card, name='card'),
     path('search', views.search, name='search'),
 
 ]

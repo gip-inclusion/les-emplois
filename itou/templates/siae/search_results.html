@@ -1,7 +1,7 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% with request.GET.city_autocomplete as city and request.GET.distance as distance %}{% blocktrans %}SIAE à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
+{% block title %}{% with request.GET.city_name as city and request.GET.distance as distance %}{% blocktrans %}SIAE à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
     </form>
 
     <h1 class="font-weight-normal">
-        {% with request.GET.city_autocomplete as city and request.GET.distance as distance %}
+        {% with request.GET.city_name as city and request.GET.distance as distance %}
             {% blocktrans %}<abbr title="Structures d'insertion par l'activité économique">SIAE</abbr> à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
         {% endwith %}
     </h1>
@@ -41,10 +41,11 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ siae.name }}</h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
-                    <div>
+                    <p class="card-text">
                         <span class="badge badge-dark">{{ siae.distance.km|floatformat:1 }} Km</span>
                         de votre lieu de recherche
-                    </div>
+                    </p>
+                    <a href="{{ siae.get_card_url }}?next={{ request.get_full_path|urlencode }}" class="card-link">{% trans "Voir la fiche" %}</a>
                 </div>
             </div>
         {% endfor %}

@@ -17,7 +17,6 @@ def autocomplete(request):
         cities = cities[:10]
         cities = [
             {
-                "label": city.display_name,
                 "value": city.display_name,
                 "slug": city.slug,
             }

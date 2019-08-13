@@ -25,7 +25,7 @@ class SiaeSearchForm(forms.Form):
             'class': 'js-city-autocomplete-hidden',
         }),
     )
-    city_autocomplete = forms.CharField(
+    city_name = forms.CharField(
         widget=forms.TextInput(attrs={
             'class': 'js-city-autocomplete-input form-control',
             'data-autocomplete-source-url': CITY_AUTOCOMPLETE_SOURCE_URL,

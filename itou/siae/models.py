@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -36,12 +37,12 @@ class Siae(AddressMixin):
     KIND_RQ = 'RQ'
 
     KIND_CHOICES = (
-        (KIND_EI, _("Entreprises d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
-        (KIND_AI, _("Associations intermédiaires")),
-        (KIND_ACI, _("Ateliers chantiers d'insertion")),
+        (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
+        (KIND_AI, _("Association intermédiaire")),
+        (KIND_ACI, _("Atelier chantier d'insertion")),
         (KIND_ETTI, _("Entreprises de travail temporaire d'insertion")),
-        (KIND_GEIQ, _("Groupements d'employeurs pour l'insertion et la qualification")),
-        (KIND_RQ, _("Régies de quartier")),
+        (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
+        (KIND_RQ, _("Régie de quartier")),
     )
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], primary_key=True)
@@ -62,6 +63,9 @@ class Siae(AddressMixin):
 
     def __str__(self):
         return f"{self.siret} {self.name}"
+
+    def get_card_url(self):
+        return reverse('siae:card', kwargs={'siret': self.siret})
 
 
 class SiaeMembership(models.Model):

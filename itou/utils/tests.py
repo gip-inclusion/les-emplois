@@ -10,6 +10,7 @@ from itou.utils.geocoding import process_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.siret import process_siret_data
+from itou.utils.templatetags import format_filters
 from itou.utils.validators import validate_naf, validate_siret
 
 
@@ -133,3 +134,11 @@ class UtilsTemplateTagsTestCase(TestCase):
         out = template.render(Context(context))
         expected = '?page=1'
         self.assertEqual(out, expected)
+
+
+class UtilsTemplateFiltersTestCase(TestCase):
+
+    def test_format_phone(self):
+        """Test `format_phone` template filter."""
+        self.assertEqual(format_filters.format_phone(''), '')
+        self.assertEqual(format_filters.format_phone('0102030405'), '01 02 03 04 05')
