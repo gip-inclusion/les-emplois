@@ -261,6 +261,11 @@ API_GEO_BASE_URL = 'https://geo.api.gouv.fr'
 API_INSEE_KEY = os.environ['API_INSEE_KEY']
 API_INSEE_SECRET = os.environ['API_INSEE_SECRET']
 
+# Pôle emploi.
+# https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
+API_EMPLOI_STORE_KEY = os.environ['API_EMPLOI_STORE_KEY']
+API_EMPLOI_STORE_SECRET = os.environ['API_EMPLOI_STORE_SECRET']
+
 # Itou.
 # ------------------------------------------------------------------------------
 

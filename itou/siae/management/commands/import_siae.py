@@ -153,8 +153,7 @@ class Command(BaseCommand):
 
                 if siret in SEEN_SIRET:
                     # First come, first served.
-                    error = f"Siret already seen. Skipping {siae_info}."
-                    self.stderr.write(error)
+                    self.stderr.write(f"Siret already seen. Skipping {siae_info}.")
                     continue
                 SEEN_SIRET.add(siret)
 

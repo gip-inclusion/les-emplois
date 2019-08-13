@@ -7,3 +7,5 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 API_BAN_BASE_URL = None
 API_INSEE_KEY = None
 API_INSEE_SECRET = None
+API_EMPLOI_STORE_KEY = None
+API_EMPLOI_STORE_SECRET = None
