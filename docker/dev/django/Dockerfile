@@ -1,4 +1,4 @@
-FROM python:3.7-alpine
+FROM python:3.7.4-alpine3.9
 
 ENV PYTHONIOENCODING="UTF-8"
 ENV PYTHONUNBUFFERED=1
@@ -13,7 +13,7 @@ RUN addgroup -S app \
 RUN apk update \
     # psycopg2 dependencies
     && apk add --virtual build-deps gcc python3-dev musl-dev \
-    && apk add postgresql-dev=11.4-r0 \
+    && apk add postgresql-dev=11.5-r0 \
     # Pillow dependencies
     && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
     # CFFI dependencies
@@ -27,7 +27,7 @@ RUN apk update \
     # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/geolibs
     && apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos=3.7.2-r0 proj=6.1.0-r4 gdal=2.4.0-r3 \
     # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
-    && apk add postgresql-client=11.4-r0 \
+    && apk add postgresql-client=11.5-r0 \
     # Time zone and daylight-saving time data
     && apk add tzdata
 
