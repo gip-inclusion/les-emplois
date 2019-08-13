@@ -9,7 +9,7 @@ from allauth.account.forms import SignupForm
 from itou.prescribers.models import Prescriber, PrescriberMembership
 from itou.siae.models import Siae, SiaeMembership
 from itou.utils.apis.geocoding import get_geocoding_data
-from itou.utils.siret import get_siret_data
+from itou.utils.apis.siret import get_siret_data
 from itou.utils.validators import validate_siret
 
 

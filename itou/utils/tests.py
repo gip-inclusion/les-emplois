@@ -7,9 +7,9 @@ from django.test import TestCase
 
 from itou.prescribers.models import Prescriber
 from itou.utils.apis.geocoding import process_geocoding_data
+from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
-from itou.utils.siret import process_siret_data
 from itou.utils.templatetags import format_filters
 from itou.utils.validators import validate_naf, validate_siret
 
@@ -64,7 +64,7 @@ class UtilsGeocodingTest(TestCase):
 
 class UtilsSiretTest(TestCase):
 
-    @mock.patch('itou.utils.siret.call_insee_api', return_value=API_INSEE_SIRET_RESULT_MOCK)
+    @mock.patch('itou.utils.apis.siret.call_insee_api', return_value=API_INSEE_SIRET_RESULT_MOCK)
     def test_process_siret_data(self, mock_call_insee_api):
         siret_data = mock_call_insee_api()
         result = process_siret_data(siret_data)
