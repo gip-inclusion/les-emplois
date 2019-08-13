@@ -40,7 +40,7 @@ class Siae(AddressMixin):
         (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
         (KIND_AI, _("Association intermédiaire")),
         (KIND_ACI, _("Atelier chantier d'insertion")),
-        (KIND_ETTI, _("Entreprises de travail temporaire d'insertion")),
+        (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
         (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
         (KIND_RQ, _("Régie de quartier")),
     )
