@@ -8,7 +8,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
-from itou.utils.geocoding import get_geocoding_data
+from itou.utils.apis.geocoding import get_geocoding_data
 
 
 logger = logging.getLogger(__name__)

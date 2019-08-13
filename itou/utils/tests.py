@@ -6,7 +6,7 @@ from django.template import Context, Template
 from django.test import TestCase
 
 from itou.prescribers.models import Prescriber
-from itou.utils.geocoding import process_geocoding_data
+from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.siret import process_siret_data
@@ -16,7 +16,7 @@ from itou.utils.validators import validate_naf, validate_siret
 
 class UtilsAddressMixinTest(TestCase):
 
-    @mock.patch('itou.utils.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @mock.patch('itou.utils.apis.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_geocode(self, mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.geocode()`.
@@ -45,7 +45,7 @@ class UtilsAddressMixinTest(TestCase):
 
 class UtilsGeocodingTest(TestCase):
 
-    @mock.patch('itou.utils.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @mock.patch('itou.utils.apis.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_process_geocoding_data(self, mock_call_ban_geocoding_api):
         geocoding_data = mock_call_ban_geocoding_api()
         result = process_geocoding_data(geocoding_data)

@@ -30,7 +30,7 @@ class SignupTest(TestCase):
         self.assertEqual(response.status_code, 405)
 
     @mock.patch('itou.utils.siret.call_insee_api', return_value=API_INSEE_SIRET_RESULT_MOCK)
-    @mock.patch('itou.utils.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @mock.patch('itou.utils.apis.geocoding.call_ban_geocoding_api', return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_prescriber_signup(self, mock_call_ban_geocoding_api, mock_call_insee_api):
         """Prescriber signup."""
 

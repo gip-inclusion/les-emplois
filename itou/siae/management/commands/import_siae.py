@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 
 from itou.siae.models import Siae
 from itou.utils.address.departments import DEPARTMENTS
-from itou.utils.geocoding import get_geocoding_data
+from itou.utils.apis.geocoding import get_geocoding_data
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
