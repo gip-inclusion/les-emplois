@@ -49,6 +49,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'itou.utils',
     'itou.cities',
+    'itou.jobs',
     'itou.siae',
     'itou.prescribers',
     'itou.users',
@@ -265,6 +266,8 @@ API_INSEE_SECRET = os.environ['API_INSEE_SECRET']
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
 API_EMPLOI_STORE_KEY = os.environ['API_EMPLOI_STORE_KEY']
 API_EMPLOI_STORE_SECRET = os.environ['API_EMPLOI_STORE_SECRET']
+API_EMPLOI_STORE_AUTH_BASE_URL = 'https://entreprise.pole-emploi.fr'
+API_EMPLOI_STORE_BASE_URL = 'https://api.emploi-store.fr/partenaire'
 
 # Itou.
 # ------------------------------------------------------------------------------

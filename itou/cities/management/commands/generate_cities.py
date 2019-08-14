@@ -11,7 +11,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class Command(BaseCommand):
     """
-    This command will create a JSON file with all cities of France.
+    Creates a JSON file with all cities of France.
     The data source is a JSON file that comes from api.gouv.fr's GeoAPI.
 
     It can be run from time to time (every year) to get updated data that

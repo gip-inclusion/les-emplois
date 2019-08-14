@@ -29,6 +29,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
     django-admin createsuperuser
     django-admin import_cities
     django-admin loaddata itou/fixtures/siae.json
+    django-admin loaddata itou/fixtures/jobs.json
 
 ## Front-end
 

@@ -96,7 +96,7 @@ class Command(BaseCommand):
                 self.logger.debug(coords)
 
                 if not dry_run:
-                    _, created = City.objects.update_or_create(
+                    City.objects.update_or_create(
                         slug=slug,
                         defaults={
                             'department': department,
