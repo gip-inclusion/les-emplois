@@ -52,6 +52,7 @@ class Appellation(models.Model):
     class Meta:
         verbose_name = _("Appellation")
         verbose_name_plural = _("Appellations")
+        ordering = ['short_name', 'name']
 
     def __str__(self):
         return self.name

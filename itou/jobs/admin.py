@@ -11,6 +11,6 @@ class JobAdmin(admin.ModelAdmin):
 
 @admin.register(models.Appellation)
 class AppellationAdmin(admin.ModelAdmin):
-    list_display = ('code', 'short_name',)
-    search_fields = ('code', 'short_name',)
+    list_display = ('code', 'name', 'short_name',)
+    search_fields = ('code', 'name', 'short_name',)
     raw_id_fields = ('job',)

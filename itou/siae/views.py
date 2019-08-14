@@ -16,7 +16,7 @@ def search(request, template_name='siae/search_results.html'):
     if form.is_valid():
         city = form.cleaned_data['city']
         distance_km = form.cleaned_data['distance']
-        siaes = Siae.active_objects.within(city.coords, distance_km)
+        siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_related('job_appellations')
         siaes_page = pager(siaes, request.GET.get('page'), items_per_page=10)
 
     context = {

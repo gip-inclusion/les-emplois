@@ -39,13 +39,26 @@
         {% for siae in siaes_page %}
             <div class="card d-block my-4">
                 <div class="card-body">
-                    <h5 class="card-title">{{ siae.name }}</h5>
+                    <h5 class="card-title">
+                        <a href="{{ siae.get_card_url }}?next={{ request.get_full_path|urlencode }}">
+                            {{ siae.name|title }}
+                        </a>
+                    </h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
                     <p class="card-text">
                         <span class="badge badge-dark">{{ siae.distance.km|floatformat:1 }} Km</span>
                         de votre lieu de recherche
                     </p>
-                    <a href="{{ siae.get_card_url }}?next={{ request.get_full_path|urlencode }}" class="card-link">{% trans "Voir la fiche" %}</a>
+                    {% if siae.job_appellations.exists %}
+                        <hr>
+                        <ul class="mb-0">
+                        {% for job in siae.job_appellations.all %}
+                            <li>
+                                {{ job.short_name }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
