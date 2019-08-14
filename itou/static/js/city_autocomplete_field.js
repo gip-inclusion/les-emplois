@@ -11,7 +11,11 @@ $(document).ready(function () {
       source: citySearchInput.data('autocomplete-source-url'),
       autoFocus: true,
       select: function (event, ui) {
-         hiddenCityInput.val(ui.item.slug)
+        hiddenCityInput.val(ui.item.slug)
+        if (event.keyCode === 13) {
+          citySearchInput.val(ui.item.value)
+          citySearchInput.parents('form:first').submit()
+        }
       },
     })
     .focus(function() {
