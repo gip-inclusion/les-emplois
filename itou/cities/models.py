@@ -5,7 +5,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
-from itou.siae.models import Siae
+from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
 
 
@@ -24,8 +24,8 @@ class City(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    name = models.CharField(verbose_name=_("Ville"), max_length=256, db_index=True)
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=256, unique=True)
+    name = models.CharField(verbose_name=_("Ville"), max_length=255, db_index=True)
+    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, unique=True)
     department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3)
     post_codes = ArrayField(models.CharField(max_length=5), verbose_name=_("Codes postaux"), blank=True)
     code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=5, unique=True)

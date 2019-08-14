@@ -5,7 +5,7 @@ import os
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from itou.siae.models import Siae
+from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.geocoding import get_geocoding_data
 

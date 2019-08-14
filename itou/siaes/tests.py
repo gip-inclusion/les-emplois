@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.siae.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory
 
 
 class ViewsTest(TestCase):

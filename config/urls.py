@@ -17,7 +17,7 @@ urlpatterns = [
 
     path('', home, name='home'),
     path('city/', include('itou.cities.urls')),
-    path('siae/', include('itou.siae.urls')),
+    path('siae/', include('itou.siaes.urls')),
 
 ]
 

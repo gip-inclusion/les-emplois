@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from itou.siae import models
+from itou.siaes import models
 
 
 class MembersInline(admin.TabularInline):

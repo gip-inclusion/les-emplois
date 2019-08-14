@@ -24,7 +24,7 @@ class Job(models.Model):
     )
 
     code_rome = models.CharField(verbose_name=_("Code ROME"), max_length=5, primary_key=True)
-    name = models.CharField(verbose_name=_("Nom"), max_length=256, db_index=True)
+    name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
     riasec_major = models.CharField(verbose_name=_("RIASEC Majeur"), max_length=1, choices=RIASEC_CHOICES,
         default=RIASEC_REALISTIC)
     riasec_minor = models.CharField(verbose_name=_("RIASEC Mineur"), max_length=1, choices=RIASEC_CHOICES,
@@ -45,8 +45,8 @@ class Appellation(models.Model):
     """
 
     code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
-    name = models.CharField(verbose_name=_("Nom"), max_length=256, db_index=True)
-    short_name = models.CharField(verbose_name=_("Nom court"), max_length=256, db_index=True)
+    name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
+    short_name = models.CharField(verbose_name=_("Nom court"), max_length=255, db_index=True)
     job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True, related_name="appellations")
 
     class Meta:

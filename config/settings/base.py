@@ -50,7 +50,7 @@ LOCAL_APPS = [
     'itou.utils',
     'itou.cities',
     'itou.jobs',
-    'itou.siae',
+    'itou.siaes',
     'itou.prescribers',
     'itou.users',
     'itou.accounts',

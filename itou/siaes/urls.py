@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from itou.siae import views
+from itou.siaes import views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs

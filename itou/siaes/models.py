@@ -48,9 +48,9 @@ class Siae(AddressMixin):
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], primary_key=True)
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf])
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
-    name = models.CharField(verbose_name=_("Nom"), max_length=256)
+    name = models.CharField(verbose_name=_("Nom"), max_length=255)
     # `brand` (`enseigne` in French) is used to override `name` if needed.
-    brand = models.CharField(verbose_name=_("Enseigne"), max_length=256, blank=True)
+    brand = models.CharField(verbose_name=_("Enseigne"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)

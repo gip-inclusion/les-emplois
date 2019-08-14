@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.http import is_safe_url
 
 from itou.cities.models import City
-from itou.siae.forms import SiaeSearchForm
-from itou.siae.models import Siae
+from itou.siaes.forms import SiaeSearchForm
+from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 
 

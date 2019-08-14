@@ -10,8 +10,8 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.prescribers.models import Prescriber
-from itou.siae.factories import SiaeFactory
-from itou.siae.models import Siae
+from itou.siaes.factories import SiaeFactory
+from itou.siaes.models import Siae
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory

@@ -31,11 +31,11 @@ class AddressMixin(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    address_line_1 = models.CharField(verbose_name=_("Adresse postale, bôite postale"), max_length=256, blank=True)
+    address_line_1 = models.CharField(verbose_name=_("Adresse postale, bôite postale"), max_length=255, blank=True)
     address_line_2 = models.CharField(verbose_name=_("Appartement, suite, bloc, bâtiment, etc."),
-        max_length=256, blank=True)
+        max_length=255, blank=True)
     post_code = models.CharField(verbose_name=_("Code Postal"), max_length=10, blank=True)
-    city = models.CharField(verbose_name=_("Ville"), max_length=256, blank=True)
+    city = models.CharField(verbose_name=_("Ville"), max_length=255, blank=True)
     department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True)
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from itou.siae.forms import SiaeSearchForm
+from itou.siaes.forms import SiaeSearchForm
 
 
 def home(request, template_name='home.html'):
