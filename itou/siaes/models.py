@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -10,7 +11,7 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_naf, validate_siret
 
 
-class SiaeDefaultManager(models.Manager):
+class SiaeQuerySet(models.QuerySet):
 
     def within(self, point, distance_km):
         return (self
@@ -19,8 +20,20 @@ class SiaeDefaultManager(models.Manager):
             .order_by('distance')
         )
 
+    def prefetch_jobs(self):
+        jobs = Prefetch(
+            'jobs',
+            queryset=(
+                SiaeJobs.objects
+                .filter(is_active=True)
+                .select_related('appellation')
+                .order_by('rank', 'appellation__short_name')
+            ),
+        )
+        return self.prefetch_related(jobs)
 
-class SiaeActiveManager(SiaeDefaultManager):
+
+class SiaeActiveManager(models.Manager):
 
     def get_queryset(self):
         return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
@@ -49,17 +62,18 @@ class Siae(AddressMixin):
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf])
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
-    # `brand` (`enseigne` in French) is used to override `name` if needed.
+    # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name=_("Enseigne"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
-    job_appellations = models.ManyToManyField('jobs.Appellation', verbose_name=_("Métiers"), blank=True)
+    jobs = models.ManyToManyField('jobs.Appellation', verbose_name=_("Métiers"),
+        through='SiaeJobs', blank=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
         through='SiaeMembership', blank=True)
 
-    objects = SiaeDefaultManager()
-    active_objects = SiaeActiveManager()
+    objects = models.Manager.from_queryset(SiaeQuerySet)()
+    active_objects = SiaeActiveManager.from_queryset(SiaeQuerySet)()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")
@@ -79,3 +93,16 @@ class SiaeMembership(models.Model):
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
+
+
+class SiaeJobs(models.Model):
+    """Intermediary model between `jobs.Appellation` and `Siae`."""
+
+    appellation = models.ForeignKey('jobs.Appellation', on_delete=models.CASCADE)
+    siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    rank = models.PositiveSmallIntegerField(default=32767)
+    is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
+
+    class Meta:
+        ordering = ['rank']

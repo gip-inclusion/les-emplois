@@ -9,8 +9,8 @@ class MembersInline(admin.TabularInline):
     raw_id_fields = ('user',)
 
 
-class JobAppellationsInline(admin.TabularInline):
-    model = models.Siae.job_appellations.through
+class JobsInline(admin.TabularInline):
+    model = models.Siae.jobs.through
     extra = 1
     raw_id_fields = ('appellation',)
 
@@ -20,5 +20,4 @@ class SiaeAdmin(admin.ModelAdmin):
     list_display = ('siret', 'kind', 'name', 'department', 'geocoding_score',)
     list_filter = ('kind', 'department',)
     search_fields = ('siret', 'name',)
-    exclude = ('job_appellations',)
-    inlines = (MembersInline, JobAppellationsInline,)
+    inlines = (MembersInline, JobsInline,)

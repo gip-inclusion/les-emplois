@@ -49,12 +49,12 @@
                         <span class="badge badge-dark">{{ siae.distance.km|floatformat:1 }} Km</span>
                         de votre lieu de recherche
                     </p>
-                    {% if siae.job_appellations.exists %}
+                    {% if siae.jobs.exists %}
                         <hr>
                         <ul class="mb-0">
-                        {% for job in siae.job_appellations.all %}
+                        {% for job in siae.jobs.all %}
                             <li>
-                                {{ job.short_name }}
+                                {{ job.appellation.short_name }}
                             </li>
                         {% endfor %}
                         </ul>

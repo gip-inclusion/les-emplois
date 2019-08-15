@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.http import is_safe_url
 
 from itou.cities.models import City
+from itou.jobs.models import Appellation
 from itou.siaes.forms import SiaeSearchForm
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
@@ -16,7 +17,7 @@ def search(request, template_name='siae/search_results.html'):
     if form.is_valid():
         city = form.cleaned_data['city']
         distance_km = form.cleaned_data['distance']
-        siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_related('job_appellations')
+        siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_jobs()
         siaes_page = pager(siaes, request.GET.get('page'), items_per_page=10)
 
     context = {
