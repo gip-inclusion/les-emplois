@@ -4,7 +4,9 @@ from django.utils.translation import gettext_lazy as _
 
 class Job(models.Model):
     """
-    Data is provided via provided via `django-admin import_jobs`.
+    A job.
+
+    See `django-admin import_jobs` for information on the data source.
     """
 
     RIASEC_REALISTIC = 'R'
@@ -41,7 +43,21 @@ class Job(models.Model):
 
 class Appellation(models.Model):
     """
-    Data is provided via `django-admin import_appellations_for_jobs`.
+    A job is characterized by a ROME code and a name, but it can have many different appellations.
+
+    For example, the job M1805 - "Études et développement informatique" can be called:
+
+    - "Analyste d'étude informatique"
+    - "Analyste en cybersécurité"
+    - "Analyste réseau informatique"
+    - "Développeur / Développeuse full-stack"
+    - "Développeur / Développeuse - jeux vidéo"
+    - "Développeur / Développeuse web"
+    - "Ingénieur / Ingénieure analyste en système d'information"
+    - "Paramétreur / Paramétreuse logiciel ERP"
+    - etc.
+
+    See `django-admin import_appellations_for_jobs` for information on the data source.
     """
 
     code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
