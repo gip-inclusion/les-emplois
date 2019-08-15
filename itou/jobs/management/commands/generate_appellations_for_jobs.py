@@ -54,7 +54,9 @@ class Command(BaseCommand):
                 result[rome_code] = r.json()
 
                 # Rate limiting is killing me.
-                time.sleep(10)
+                # We can't go down below 4 seconds without getting an error 429 "Too Many Requests".
+                # Fetching this data is slow and can take between 35 to 40 min.
+                time.sleep(4)
 
         file_path = f"{CURRENT_DIR}/data/appellations_for_rome.json"
         with open(file_path, 'w') as f:
