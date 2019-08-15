@@ -1,0 +1,12 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Erreur 403" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Erreur 403" %}</h1>
+    <p class="lead">{% trans "Accès refusé." %}</p>
+    <p>{% trans "Vous n'avez pas la permission d'accéder à cette page." %}</p>
+
+{% endblock %}
