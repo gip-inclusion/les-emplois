@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
-from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
 from itou.home.views import home
@@ -18,6 +17,10 @@ urlpatterns = [
     path('', home, name='home'),
     path('city/', include('itou.cities.urls')),
     path('siae/', include('itou.siaes.urls')),
+
+    # Errors pages.
+    path('404/', TemplateView.as_view(template_name='404.html'), name='404'),
+    path('500/', TemplateView.as_view(template_name='500.html'), name='500'),
 
 ]
 
