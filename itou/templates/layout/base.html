@@ -7,6 +7,8 @@
     <meta charset="utf-8">
     <title>{% block title %} - Itou{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {# Use this to get the value of the CSRF token in JavaScript. #}
+    <meta name="csrf-token" content="{{ csrf_token }}">
     {% block meta_description %}{% endblock %}
     <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
     <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
@@ -26,21 +28,20 @@
                 <nav class="layout-header-nav">
                     <ul>
                         {% if user.is_authenticated %}
-
                             <li>
                                 <a href="{% url 'accounts:dashboard' %}">
                                     {% trans "Mon profil" %}
                                 </a>
                             </li>
                             <li>
-                                <a href="{% url 'account_logout' %}">
+                                <a id="js-logout" href="{% url 'account_logout' %}">
                                     {% trans "Déconnexion" %}
                                 </a>
                             </li>
                         {% else %}
                             <li>
                                 <a href="{% url 'account_signup' %}">
-                                    {% trans "Inscription | Connexion" %}
+                                    {% trans "Inscription / Connexion" %}
                                 </a>
                             </li>
                         {% endif %}
@@ -71,6 +72,7 @@
     <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
     {% block script %}
+    <script src="{% static "js/logout.js" %}"></script>
     <script src="{% static "js/city_autocomplete_field.js" %}"></script>
     {% endblock %}
 
