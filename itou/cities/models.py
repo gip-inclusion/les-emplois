@@ -71,14 +71,21 @@ class City(models.Model):
 def find_suspicious_siae_cities():
     """
     Find Siae() objects with a city name that does not exist in City().
+
     This could mean that:
-        - the data in Siae() is wrong
+        - the data in Siae() is wrong or too recent
         - the data in City() is wrong or not up to date
+
+    For example, "Herblay-sur-Seine - 95" or "Saint-Père-Marc-en-Poulet - 35"
+    are too recent to exist in City().
+
+    Since data can be out of sync between Siae() and City(), there is no
+    foreign key between them.
     """
     siaes = Siae.objects.order_by('city').distinct('city')
     for siae in siaes:
         try:
-            City.objects.get(slug=slugify(siae.city), department=siae.department)
+            City.objects.get(slug=slugify(f"{siae.city}-{siae.department}"), department=siae.department)
         except:
             print('-' * 80)
             print(f"No entry in City() for SIAE {siae.siret} - {siae.name} in {siae.city} - {siae.department}")
