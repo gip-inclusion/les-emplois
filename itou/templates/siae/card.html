@@ -13,10 +13,12 @@
     <h1>{{ siae.name|title }}</h1>
 
     <h2 class="text-muted">
-        {{ siae.address_line_1 }}<br>
-        {% if siae.address_line_2 %}{{ siae.address_line_2 }}<br>{% endif %}
+        {{ siae.address_line_1 }},
+        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
         {{ siae.post_code }} {{ siae.city }}
     </h2>
+
+    <hr>
 
     {% if siae.email %}
         <p>
@@ -32,6 +34,28 @@
             {% include "includes/icon.html" with icon="phone" title=phone_label %}
             <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
         </p>
+    {% endif %}
+
+    {% if siae.website %}
+        <p>
+            {% trans "Site Internet" as website_label %}
+            {% include "includes/icon.html" with icon="external-link" title=website_label %}
+            <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
+        </p>
+    {% endif %}
+
+    {% if siae.jobs.exists %}
+        <p class="mb-2">
+            {% include "includes/icon.html" with icon="briefcase" %}
+            {% trans "Métiers proposés" %}
+        </p>
+        <ul>
+        {% for job in siae.jobs.all %}
+            <li>
+                {{ job.appellation.short_name }}
+            </li>
+        {% endfor %}
+        </ul>
     {% endif %}
 
     {% if next %}

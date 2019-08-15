@@ -20,14 +20,14 @@ class SiaeQuerySet(models.QuerySet):
             .order_by('distance')
         )
 
-    def prefetch_jobs(self):
+    def prefetch_active_jobs(self):
         jobs = Prefetch(
             'jobs',
             queryset=(
                 SiaeJobs.objects
                 .filter(is_active=True)
                 .select_related('appellation')
-                .order_by('rank', 'appellation__short_name')
+                .order_by('ui_rank', 'appellation__short_name')
             ),
         )
         return self.prefetch_related(jobs)
@@ -98,11 +98,14 @@ class SiaeMembership(models.Model):
 class SiaeJobs(models.Model):
     """Intermediary model between `jobs.Appellation` and `Siae`."""
 
+    MAX_UI_RANK = 32767
+
     appellation = models.ForeignKey('jobs.Appellation', on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    rank = models.PositiveSmallIntegerField(default=32767)
     is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
+    ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
     class Meta:
-        ordering = ['rank']
+        unique_together = ('appellation', 'siae')
+        ordering = ['ui_rank']

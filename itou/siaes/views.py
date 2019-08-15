@@ -2,8 +2,6 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404, render
 from django.utils.http import is_safe_url
 
-from itou.cities.models import City
-from itou.jobs.models import Appellation
 from itou.siaes.forms import SiaeSearchForm
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
@@ -17,7 +15,7 @@ def search(request, template_name='siae/search_results.html'):
     if form.is_valid():
         city = form.cleaned_data['city']
         distance_km = form.cleaned_data['distance']
-        siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_jobs()
+        siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_active_jobs()
         siaes_page = pager(siaes, request.GET.get('page'), items_per_page=10)
 
     context = {
@@ -29,9 +27,9 @@ def search(request, template_name='siae/search_results.html'):
 
 def card(request, siret, template_name='siae/card.html'):
     """
-    SIAE's card, or "Fiche" in French.
+    SIAE's card (or "Fiche" in French).
     """
-    siae = get_object_or_404(Siae.active_objects, siret=siret)
+    siae = get_object_or_404(Siae.active_objects.prefetch_active_jobs(), siret=siret)
 
     next_url = request.GET.get('next')
     url_is_safe = is_safe_url(url=next_url, allowed_hosts=settings.ALLOWED_HOSTS, require_https=request.is_secure())

@@ -50,7 +50,7 @@
                         de votre lieu de recherche
                     </p>
                     {% if siae.jobs.exists %}
-                        <hr>
+                        <h6 class="border-bottom border-gray pb-2">{% trans "Métiers proposés" %}</h6>
                         <ul class="mb-0">
                         {% for job in siae.jobs.all %}
                             <li>
