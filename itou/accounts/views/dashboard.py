@@ -5,11 +5,8 @@ from django.urls import reverse_lazy
 
 from allauth.account.views import PasswordChangeView
 
-from itou.users.decorators import perm_required
-
 
 @login_required
-@perm_required('job_seeker', 'prescriber', 'siae_staff')
 def dashboard(request, template_name='account_itou/dashboard.html'):
 
     context = {}

@@ -62,7 +62,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # Middleware.
 # ------------------------------------------------------------------------------
 
-MIDDLEWARE = [
+DJANGO_MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,6 +71,12 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ITOU_MIDDLEWARE = [
+    'itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware',
+]
+
+MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
 
 # URLs.
 # ------------------------------------------------------------------------------
@@ -100,6 +106,8 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
+                # Itou.
+                'itou.utils.perms.context_processors.get_current_organization',
             ],
         },
     },
@@ -277,3 +285,6 @@ ITOU_EMAIL_CONTACT = 'contact@itou.beta.gouv.fr'
 # Départements d'expérimentation :
 # Pas-de-Calais (62), Bas-Rhin (67), Seine Saint Denis (93).
 ITOU_TEST_DEPARTMENTS = ['62', '67', '93']
+
+ITOU_SESSION_CURRENT_SIAE_KEY = 'current_siae'
+ITOU_SESSION_CURRENT_PRESCRIBER_KEY = 'current_prescriber'
