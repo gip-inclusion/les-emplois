@@ -2,11 +2,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class Job(models.Model):
+class Rome(models.Model):
     """
-    A job.
+    A ROME.
 
-    See `django-admin import_jobs` for information on the data source.
+    See `django-admin import_romes` for information on the data source.
     """
 
     RIASEC_REALISTIC = 'R'
@@ -25,7 +25,7 @@ class Job(models.Model):
         (RIASEC_CONVENTIONAL, _("Conventionnel")),
     )
 
-    code_rome = models.CharField(verbose_name=_("Code ROME"), max_length=5, primary_key=True)
+    code = models.CharField(verbose_name=_("Code ROME"), max_length=5, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
     riasec_major = models.CharField(verbose_name=_("RIASEC Majeur"), max_length=1, choices=RIASEC_CHOICES,
         default=RIASEC_REALISTIC)
@@ -34,11 +34,11 @@ class Job(models.Model):
     code_isco = models.CharField(verbose_name=_("Code ROME"), max_length=4)
 
     class Meta:
-        verbose_name = _("Métier")
-        verbose_name_plural = _("Métiers")
+        verbose_name = _("ROME")
+        verbose_name_plural = _("ROMEs")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.code})"
 
 
 class Appellation(models.Model):
@@ -57,13 +57,13 @@ class Appellation(models.Model):
     - "Paramétreur / Paramétreuse logiciel ERP"
     - etc.
 
-    See `django-admin import_appellations_for_jobs` for information on the data source.
+    See `django-admin import_appellations_for_romes` for information on the data source.
     """
 
     code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
     short_name = models.CharField(verbose_name=_("Nom court"), max_length=255, db_index=True)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE, null=True, related_name="appellations")
+    rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
 
     class Meta:
         verbose_name = _("Appellation")

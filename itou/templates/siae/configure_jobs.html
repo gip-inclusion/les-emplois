@@ -18,7 +18,7 @@
                 <tr>
                     <th scope="col">Actif</th>
                     <th scope="col">Appellation</th>
-                    <th scope="col">Code ROME</th>
+                    <th scope="col">ROME associé</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,7 +26,7 @@
                     <tr>
                         <td scope="row">{{ job.is_active }}</td>
                         <td>{{ job.appellation.short_name }}</td>
-                        <td>{{ job.appellation.job.code_rome }}</td>
+                        <td>{{ job.appellation.rome.code }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

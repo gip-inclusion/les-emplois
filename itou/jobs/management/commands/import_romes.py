@@ -5,26 +5,26 @@ import os
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
-from itou.jobs.models import Job
+from itou.jobs.models import Rome
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-JSON_FILE = f"{CURRENT_DIR}/data/jobs.json"
+JSON_FILE = f"{CURRENT_DIR}/data/romes.json"
 
 
 class Command(BaseCommand):
     """
-    Import ROME jobs into the database.
+    Import ROMEs into the database.
 
     To debug:
-        django-admin import_jobs --dry-run
-        django-admin import_jobs --dry-run --verbosity=2
+        django-admin import_romes --dry-run
+        django-admin import_romes --dry-run --verbosity=2
 
     To populate the database:
-        django-admin import_jobs
+        django-admin import_romes
     """
-    help = "Import the content of the ROME jobs JSON file into the database."
+    help = "Import the content of the ROMEs JSON file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -58,7 +58,7 @@ class Command(BaseCommand):
             total_len = len(json_data)
             last_progress = 0
 
-            RIASEC_DICT = dict(Job.RIASEC_CHOICES)
+            RIASEC_DICT = dict(Rome.RIASEC_CHOICES)
 
             for i, item in enumerate(json_data):
 
@@ -67,7 +67,7 @@ class Command(BaseCommand):
                     self.stdout.write(f"Creating ROME appellations… {progress}%")
                     last_progress = progress
 
-                code_rome = item['code']
+                code = item['code']
                 name = item['libelle']
                 riasec_major = item['riasecMajeur']
                 riasec_minor = item['riasecMineur']
@@ -80,15 +80,15 @@ class Command(BaseCommand):
                 broad_domain_code = item['domaineProfessionnel']['grandDomaine']['code']
 
                 self.logger.debug('-' * 80)
-                self.logger.debug(code_rome)
+                self.logger.debug(code)
                 self.logger.debug(name)
                 self.logger.debug(RIASEC_DICT[riasec_major])
                 self.logger.debug(RIASEC_DICT[riasec_minor])
                 self.logger.debug(code_isco)
 
                 if not dry_run:
-                    Job.objects.update_or_create(
-                        code_rome=code_rome,
+                    Rome.objects.update_or_create(
+                        code=code,
                         defaults={
                             'name': name,
                             'riasec_major': riasec_major,

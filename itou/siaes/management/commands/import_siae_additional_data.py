@@ -166,7 +166,7 @@ class Command(BaseCommand):
                         try:
                             appellation = (
                                 Appellation.objects
-                                .filter(job__pk=code_rome)
+                                .filter(rome__pk=code_rome)
                                 .filter(
                                     Q(name__icontains=appellation_name)
                                     | Q(short_name__icontains=appellation_name)

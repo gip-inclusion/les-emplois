@@ -13,13 +13,13 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 class Command(BaseCommand):
     """
-    Creates a JSON file with all ROME jobs.
+    Creates a JSON file with all ROMEs.
     The data source is a JSON file that comes from Pôle emploi's ROME API.
 
     To generate the file:
-        django-admin generate_jobs
+        django-admin generate_romes
     """
-    help = "Create a JSON file with all ROME jobs."
+    help = "Create a JSON file with all ROMEs."
 
     def handle(self, **options):
 
@@ -28,7 +28,7 @@ class Command(BaseCommand):
         r = requests.get(url, headers={'Authorization': token})
         r.raise_for_status()
 
-        file_path = f"{CURRENT_DIR}/data/jobs.json"
+        file_path = f"{CURRENT_DIR}/data/romes.json"
         with open(file_path, 'wb') as f:
             f.write(r.content)
 

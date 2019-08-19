@@ -4,26 +4,26 @@ import os
 
 from django.core.management.base import BaseCommand
 
-from itou.jobs.models import Appellation, Job
+from itou.jobs.models import Appellation, Rome
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-JSON_FILE = f"{CURRENT_DIR}/data/appellations_for_rome.json"
+JSON_FILE = f"{CURRENT_DIR}/data/appellations_for_romes.json"
 
 
 class Command(BaseCommand):
     """
-    Import job's appellations into the database.
+    Import ROMEs appellations into the database.
 
     To debug:
-        django-admin import_appellations_for_jobs --dry-run
-        django-admin import_appellations_for_jobs --dry-run --verbosity=2
+        django-admin import_appellations_for_romes --dry-run
+        django-admin import_appellations_for_romes --dry-run --verbosity=2
 
     To populate the database:
-        django-admin import_appellations_for_jobs
+        django-admin import_appellations_for_romes
     """
-    help = "Import the content of the job's appellations JSON file into the database."
+    help = "Import the content of the ROMEs appellations JSON file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -66,7 +66,7 @@ class Command(BaseCommand):
 
                 code_rome = item
 
-                job = Job.objects.get(code_rome=code_rome)
+                rome = Rome.objects.get(code=code_rome)
 
                 appellations_for_rome = json_data[code_rome]
 
@@ -89,7 +89,7 @@ class Command(BaseCommand):
                             defaults={
                                 'name': name,
                                 'short_name': short_name,
-                                'job': job,
+                                'rome': rome,
                             },
                         )
 
