@@ -1,0 +1,41 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+{% load format_filters %}
+
+{% block title %}{{ siae.name }}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Modifier les métiers" %}</h1>
+
+    <h2 class="text-muted">{{ siae.name|title }}</h2>
+
+    {# TODO: <form> d-block mt-3 #}
+
+    {% if siae.jobs.exists %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Actif</th>
+                    <th scope="col">Appellation</th>
+                    <th scope="col">Code ROME</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in siae.jobs.all %}
+                    <tr>
+                        <td scope="row">{{ job.is_active }}</td>
+                        <td>{{ job.appellation.short_name }}</td>
+                        <td>{{ job.appellation.job.code_rome }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <hr>
+    <p>
+        <a href="{% url 'accounts:dashboard' %}">{% trans "Retour" %}</a>
+    </p>
+
+{% endblock %}

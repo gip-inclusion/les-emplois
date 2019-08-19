@@ -20,6 +20,17 @@ class SiaeQuerySet(models.QuerySet):
             .order_by('distance')
         )
 
+    def prefetch_all_jobs(self):
+        jobs = Prefetch(
+            'jobs',
+            queryset=(
+                SiaeJobs.objects
+                .select_related('appellation')
+                .order_by('ui_rank', 'appellation__short_name')
+            ),
+        )
+        return self.prefetch_related(jobs)
+
     def prefetch_active_jobs(self):
         jobs = Prefetch(
             'jobs',
@@ -31,6 +42,11 @@ class SiaeQuerySet(models.QuerySet):
             ),
         )
         return self.prefetch_related(jobs)
+
+    def member_required(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(members=user, members__is_active=True)
 
 
 class SiaeActiveManager(models.Manager):

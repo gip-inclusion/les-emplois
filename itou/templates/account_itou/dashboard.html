@@ -8,9 +8,17 @@
     <h1>{{ user.email }}</h1>
 
     <div class="list-group">
-        <a href="{% url 'account_change_password' %}?next={{ request.path }}" class="list-group-item list-group-item-action">
+        <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">
             {% trans "Modifier mon mot de passe" %}
         </a>
     </div>
+
+    {% if user.is_siae_staff and current_siae %}
+        <div class="list-group">
+            <a href="{% url 'siae:configure_jobs' siret=current_siae.siret %}" class="list-group-item list-group-item-action">
+                {% trans "Modifier les métiers" %}
+            </a>
+        </div>
+    {% endif %}
 
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
 from django.utils.http import is_safe_url
 
@@ -36,6 +37,17 @@ def card(request, siret, template_name='siae/card.html'):
 
     context = {
         'next': next_url if url_is_safe else None,
+        'siae': siae,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def configure_jobs(request, siret, template_name='siae/configure_jobs.html'):
+
+    siae = get_object_or_404(Siae.active_objects.prefetch_all_jobs().member_required(request.user), siret=siret)
+
+    context = {
         'siae': siae,
     }
     return render(request, template_name, context)

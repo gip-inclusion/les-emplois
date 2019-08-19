@@ -8,7 +8,8 @@ app_name = 'siae'
 
 urlpatterns = [
 
-    re_path(r'^card/(?P<siret>\d{14})$', views.card, name='card'),
+    re_path(r'^(?P<siret>\d{14})/card$', views.card, name='card'),
     path('search', views.search, name='search'),
+    re_path(r'^(?P<siret>\d{14})/configure_jobs$', views.configure_jobs, name='configure_jobs'),
 
 ]
