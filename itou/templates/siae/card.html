@@ -44,13 +44,13 @@
         </p>
     {% endif %}
 
-    {% if siae.jobs.exists %}
+    {% if siae.jobs_through.exists %}
         <p class="mb-2">
             {% include "includes/icon.html" with icon="briefcase" %}
             {% trans "Métiers proposés" %}
         </p>
         <ul>
-        {% for job in siae.jobs.all %}
+        {% for job in siae.jobs_through.all %}
             <li>
                 {{ job.appellation.short_name }}
             </li>

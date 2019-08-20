@@ -1,37 +1,73 @@
 {% extends "layout/content.html" %}
+{% load bootstrap4 %}
 {% load i18n %}
-{% load format_filters %}
 
-{% block title %}{{ siae.name }}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Configurez vos offres d'emploi" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Modifier les métiers" %}</h1>
+    <h1>{% trans "Configurez vos offres d'emploi" %}</h1>
 
     <h2 class="text-muted">{{ siae.name|title }}</h2>
 
-    {# TODO: <form> d-block mt-3 #}
+    <form method="post" action="" class="d-block mt-3">
 
-    {% if siae.jobs.exists %}
-        <table class="table table-striped">
+        {% csrf_token %}
+
+        <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not siae.jobs_through.exists %} d-none{% endif %}">
             <thead>
                 <tr>
-                    <th scope="col">Actif</th>
-                    <th scope="col">Appellation</th>
-                    <th scope="col">ROME associé</th>
+                    <th scope="col">{% trans "Recevoir<br>des<br>candidatures" %}</th>
+                    <th scope="col" class="text-left">{% trans "Métier" %}</th>
+                    <th scope="col">{% trans "ROME" %}</th>
+                    <th scope="col">{% include "includes/icon.html" with icon="trash-2" %}</th>
                 </tr>
             </thead>
-            <tbody>
-                {% for job in siae.jobs.all %}
-                    <tr>
-                        <td scope="row">{{ job.is_active }}</td>
-                        <td>{{ job.appellation.short_name }}</td>
-                        <td>{{ job.appellation.rome.code }}</td>
-                    </tr>
+            <tbody class="js-jobs-tbody">
+                {% for job in siae.jobs_through.all %}
+                {# Note: don't forget to keep the JavaScript template in sync if you edit the row markup. #}
+                <tr>
+                    <td scope="row">
+                        <input type="hidden" name="code" value="{{ job.appellation.code }}">
+                        <input
+                            type="checkbox"
+                            name="is_active-{{ job.appellation.code }}"
+                            {% if job.is_active %}checked{% endif %}>
+                    </td>
+                    <td class="text-left">{{ job.appellation.short_name }}</td>
+                    <td>{{ job.appellation.rome.code }}</td>
+                    <td><a href="#" role="button" class="js-job-delete">{% trans "Supprimer" %}</a></td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
-    {% endif %}
+
+        <label for="job-autocomplete-input">{% trans "Ajouter un métier :" %}</label>
+        <div class="input-group mb-4">
+            <div class="input-group-prepend">
+                {# Loading #}
+                <span class="input-group-text js-job-autocomplete-loading d-none">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="sr-only">{% trans "Chargement..." %}</span>
+                </span>
+                {# No loading #}
+                <span class="input-group-text js-job-autocomplete-no-loading">
+                    {% include "includes/icon.html" with icon="plus" %}
+                </span>
+            </div>
+            <input
+                type="text"
+                id="job-autocomplete-input"
+                class="form-control js-job-autocomplete-input"
+                aria-label="{% trans "Ajouter un métier" %}"
+                data-autocomplete-source-url="{% url 'jobs:autocomplete' %}">
+        </div>
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% trans "Enregistrer les modifications" %}</button>
+        {% endbuttons %}
+
+    </form>
 
     <hr>
     <p>

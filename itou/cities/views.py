@@ -7,7 +7,7 @@ from itou.cities.models import City
 
 def autocomplete(request):
     """
-    Returns JSON compliant with the jQuery UI Autocomplete Widget:
+    Returns JSON data compliant with the jQuery UI Autocomplete Widget:
     https://api.jqueryui.com/autocomplete/#option-source
     """
     term = request.GET.get('term', '').strip()

@@ -9,7 +9,13 @@
             {{ form.city }}
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text">
+                    {# Loading #}
+                    <span class="input-group-text js-city-autocomplete-loading d-none">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        <span class="sr-only">{% trans "Chargement..." %}</span>
+                    </span>
+                    {# No loading #}
+                    <span class="input-group-text js-city-autocomplete-no-loading">
                         {% include "includes/icon.html" with icon="map-pin" %}
                     </span>
                 </div>

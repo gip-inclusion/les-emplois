@@ -20,28 +20,17 @@ class SiaeQuerySet(models.QuerySet):
             .order_by('distance')
         )
 
-    def prefetch_all_jobs(self):
-        jobs = Prefetch(
-            'jobs',
+    def prefetch_jobs_through(self, **kwargs):
+        jobs_through = Prefetch(
+            'jobs_through',
             queryset=(
                 SiaeJobs.objects
-                .select_related('appellation')
+                .filter(**kwargs)
+                .select_related('appellation__rome')
                 .order_by('ui_rank', 'appellation__short_name')
             ),
         )
-        return self.prefetch_related(jobs)
-
-    def prefetch_active_jobs(self):
-        jobs = Prefetch(
-            'jobs',
-            queryset=(
-                SiaeJobs.objects
-                .filter(is_active=True)
-                .select_related('appellation')
-                .order_by('ui_rank', 'appellation__short_name')
-            ),
-        )
-        return self.prefetch_related(jobs)
+        return self.prefetch_related(jobs_through)
 
     def member_required(self, user):
         if user.is_superuser:
@@ -56,7 +45,13 @@ class SiaeActiveManager(models.Manager):
 
 
 class Siae(AddressMixin):
-    """Structures d'insertion par l'activité économique."""
+    """
+    Structures d'insertion par l'activité économique.
+
+    To retrieve jobs of an SIAE:
+        self.jobs.all()             <QuerySet [<Appellation>, ...]>
+        self.jobs_through.all()     <QuerySet [<SiaeJobs>, ...]>
+    """
 
     KIND_EI = 'EI'
     KIND_AI = 'AI'
@@ -112,12 +107,15 @@ class SiaeMembership(models.Model):
 
 
 class SiaeJobs(models.Model):
-    """Intermediary model between `jobs.Appellation` and `Siae`."""
+    """
+    Intermediary model between `jobs.Appellation` and `Siae`.
+    https://docs.djangoproject.com/en/dev/ref/models/relations/
+    """
 
     MAX_UI_RANK = 32767
 
     appellation = models.ForeignKey('jobs.Appellation', on_delete=models.CASCADE)
-    siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
+    siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name='jobs_through')
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
