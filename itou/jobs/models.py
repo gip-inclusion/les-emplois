@@ -1,12 +1,12 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
 class Rome(models.Model):
     """
     A ROME.
-
-    See `django-admin import_romes` for information on the data source.
+    Data provided by `django-admin import_romes`.
     """
 
     RIASEC_REALISTIC = 'R'
@@ -41,8 +41,29 @@ class Rome(models.Model):
         return f"{self.name} ({self.code})"
 
 
+class AppellationQuerySet(models.QuerySet):
+
+    def autocomplete(self, term, codes_to_exclude=None, limit=10):
+
+        terms = term.split()
+
+        q_query = Q()
+        for term in terms:
+            q_query &= Q(short_name__icontains=term) | Q(rome__code__icontains=term)
+
+        queryset = self.filter(q_query).select_related('rome')
+
+        if codes_to_exclude:
+            queryset = queryset.exclude(code__in=codes_to_exclude)
+
+        return queryset[:limit]
+
+
 class Appellation(models.Model):
     """
+    A ROME's appellation.
+    Data provided by `django-admin import_appellations_for_romes`.
+
     A job is characterized by a ROME code and a name, but it can have many different appellations.
 
     For example, the job M1805 - "Études et développement informatique" can be called:
@@ -56,14 +77,14 @@ class Appellation(models.Model):
     - "Ingénieur / Ingénieure analyste en système d'information"
     - "Paramétreur / Paramétreuse logiciel ERP"
     - etc.
-
-    See `django-admin import_appellations_for_romes` for information on the data source.
     """
 
     code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
     short_name = models.CharField(verbose_name=_("Nom court"), max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
+
+    objects = models.Manager.from_queryset(AppellationQuerySet)()
 
     class Meta:
         verbose_name = _("Appellation")

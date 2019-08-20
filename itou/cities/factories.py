@@ -37,12 +37,6 @@ def create_test_cities(selected_departments, num_per_department=None):
             coords = item.get('centre')
             if not coords:
                 continue
-            coords = GEOSGeometry(f"{coords}")  # Feed `GEOSGeometry` with GeoJSON.
-
-            name = item['nom']
-            post_codes = item['codesPostaux']
-            code_insee = item['code']
-            slug = slugify(f"{name}-{department}")
 
             departments_counter[department] += 1
             if num_per_department and departments_counter[department] > num_per_department:
@@ -51,10 +45,10 @@ def create_test_cities(selected_departments, num_per_department=None):
                 continue
 
             City.objects.create(
-                slug=slug,
+                slug=slugify(f"{item['nom']}-{department}"),
                 department=department,
-                name=name,
-                post_codes=post_codes,
-                code_insee=code_insee,
-                coords=coords,
+                name=item['nom'],
+                post_codes=item['codesPostaux'],
+                code_insee=item['code'],
+                coords=GEOSGeometry(f"{coords}"),  # Feed `GEOSGeometry` with GeoJSON.
             )
