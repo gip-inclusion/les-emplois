@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 class Rome(models.Model):
     """
     A ROME.
-    Data provided by `django-admin import_romes`.
+    Data is provided by django-admin commands `generate_romes` and `import_romes`.
     """
 
     RIASEC_REALISTIC = 'R'
@@ -43,9 +43,8 @@ class Rome(models.Model):
 
 class AppellationQuerySet(models.QuerySet):
 
-    def autocomplete(self, term, codes_to_exclude=None, limit=10):
-
-        terms = term.split()
+    def autocomplete(self, search_string, codes_to_exclude=None, limit=10):
+        terms = search_string.split()
 
         q_query = Q()
         for term in terms:
@@ -62,7 +61,7 @@ class AppellationQuerySet(models.QuerySet):
 class Appellation(models.Model):
     """
     A ROME's appellation.
-    Data provided by `django-admin import_appellations_for_romes`.
+    Data is provided by django-admin commands `generate_appellations_for_romes` and `import_appellations_for_romes`.
 
     A job is characterized by a ROME code and a name, but it can have many different appellations.
 

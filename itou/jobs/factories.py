@@ -11,7 +11,7 @@ ROMES_JSON_FILE = f"{CURRENT_DIR}/management/commands/data/romes.json"
 APPELLATIONS_JSON_FILE = f"{CURRENT_DIR}/management/commands/data/appellations_for_romes.json"
 
 
-def create_test_romes_and_appellations(rome_codes, max_appellations_per_rome=150):
+def create_test_romes_and_appellations(rome_codes, appellations_per_rome=30):
     """
     Not a factory strictly speaking, but it's sitting here for discoverability.
 
@@ -19,7 +19,7 @@ def create_test_romes_and_appellations(rome_codes, max_appellations_per_rome=150
         create_test_romes_and_appellations(['M1805'])
 
     The number of appellations per ROME can be limited:
-        create_test_romes_and_appellations(['M1805', 'N1101'], max_appellations_per_rome=10)
+        create_test_romes_and_appellations(['M1805', 'N1101'], appellations_per_rome=10)
     """
 
     done = 0
@@ -46,6 +46,9 @@ def create_test_romes_and_appellations(rome_codes, max_appellations_per_rome=150
             if done == len(rome_codes):
                 break
 
+    if not appellations_per_rome:
+        return
+
     appellations_counter = {code: 0 for code in rome_codes}
     done = 0
 
@@ -63,16 +66,16 @@ def create_test_romes_and_appellations(rome_codes, max_appellations_per_rome=150
 
             for app in appellations_for_rome:
 
-                appellations_counter[code] += 1
-                if appellations_counter[code] > max_appellations_per_rome:
-                    break
-
                 appellation = Appellation()
                 appellation.code = app['code']
                 appellation.name = app['libelle']
                 appellation.short_name = app['libelleCourt']
                 appellation.rome_id = code
                 appellation.save()
+
+                appellations_counter[code] += 1
+                if appellations_counter[code] == appellations_per_rome:
+                    break
 
             done += 1
             if done == len(rome_codes):

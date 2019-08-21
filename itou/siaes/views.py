@@ -62,20 +62,25 @@ def configure_jobs(request, siret, template_name='siae/configure_jobs.html'):
         submitted_codes = set(request.POST.getlist('code'))
 
         codes_to_create = submitted_codes - current_codes
+        # It is assumed that the codes to delete are not submitted (they must
+        # be removed from the DOM via JavaScript). Instead, they are deducted.
         codes_to_delete = current_codes - submitted_codes
         codes_to_update = current_codes - codes_to_delete
 
         if codes_to_create or codes_to_delete or codes_to_update:
 
+            # Create.
             for code in codes_to_create:
                 appellation = Appellation.objects.get(code=code)
                 through_defaults = {'is_active': bool(request.POST.get(f'is_active-{code}'))}
                 siae.jobs.add(appellation, through_defaults=through_defaults)
 
+            # Delete.
             if codes_to_delete:
                 appellations = Appellation.objects.filter(code__in=codes_to_delete)
                 siae.jobs.remove(*appellations)
 
+            # Update.
             for job_through in siae.jobs_through.filter(appellation__code__in=codes_to_update):
                 is_active = bool(request.POST.get(f'is_active-{job_through.appellation.code}'))
                 if job_through.is_active != is_active:

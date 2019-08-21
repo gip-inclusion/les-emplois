@@ -44,7 +44,7 @@ class SiaeActiveManager(models.Manager):
         return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
 
 
-class Siae(AddressMixin):
+class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
 

@@ -7,7 +7,7 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_siret
 
 
-class Prescriber(AddressMixin):
+class Prescriber(AddressMixin):  # Do not forget the mixin!
     """
     Prescripteurs-orienteurs (Pôle emploi, missions locales, Cap emploi, PJJ,
     SPIP, ASE, PLIE, voire structures d’hébergement, etc.).
