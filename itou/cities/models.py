@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
@@ -26,7 +27,8 @@ class City(models.Model):
 
     name = models.CharField(verbose_name=_("Ville"), max_length=255, db_index=True)
     slug = models.SlugField(verbose_name=_("Slug"), max_length=255, unique=True)
-    department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3)
+    department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3,
+        db_index=True)
     post_codes = ArrayField(models.CharField(max_length=5), verbose_name=_("Codes postaux"), blank=True)
     code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=5, unique=True)
     # Latitude and longitude coordinates.
@@ -39,6 +41,12 @@ class City(models.Model):
     class Meta:
         verbose_name = _("Ville française")
         verbose_name_plural = _("Villes françaises")
+        indexes = [
+            # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/search/#trigram-similarity
+            # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/indexes/#ginindex
+            # https://www.postgresql.org/docs/11/pgtrgm.html#id-1.11.7.40.7
+            GinIndex(fields=['name'], name='cities_city_name_gin_trgm', opclasses=['gin_trgm_ops']),
+        ]
 
     def __str__(self):
         return self.display_name

@@ -36,6 +36,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.gis',
+    'django.contrib.postgres',
 ]
 
 THIRD_PARTY_APPS = [
