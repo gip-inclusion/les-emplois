@@ -84,7 +84,6 @@ class Appellation(models.Model):
 
     code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
-    short_name = models.CharField(verbose_name=_("Nom court"), max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
     # A PostgreSQL trigger (defined in migrations) updates this field automatically.
     full_text = SearchVectorField(null=True)
@@ -94,7 +93,7 @@ class Appellation(models.Model):
     class Meta:
         verbose_name = _("Appellation")
         verbose_name_plural = _("Appellations")
-        ordering = ['short_name', 'name']
+        ordering = ['name']
         indexes = [
             GinIndex(fields=['full_text']),
         ]

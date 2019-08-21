@@ -76,19 +76,19 @@ class Command(BaseCommand):
                 for item in appellations_for_rome:
 
                     code = item['code']
-                    name = item['libelle']
-                    short_name = item['libelleCourt']
+                    # There are 2 names: item['libelle'] and item['libelleCourt'].
+                    # The difference is unclear and the data seems to be about the same.
+                    # We keep only item['libelleCourt'] to stay as simple as possible.
+                    name = item['libelleCourt']
 
                     self.logger.debug(code)
                     self.logger.debug(name)
-                    self.logger.debug(short_name)
 
                     if not dry_run:
                         Appellation.objects.update_or_create(
                             code=code,
                             defaults={
                                 'name': name,
-                                'short_name': short_name,
                                 'rome': rome,
                             },
                         )

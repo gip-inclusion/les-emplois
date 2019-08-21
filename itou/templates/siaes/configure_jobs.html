@@ -34,7 +34,7 @@
                             name="is_active-{{ job.appellation.code }}"
                             {% if job.is_active %}checked{% endif %}>
                     </td>
-                    <td class="text-left">{{ job.appellation.short_name }}</td>
+                    <td class="text-left">{{ job.appellation.name }}</td>
                     <td>{{ job.appellation.rome.code }}</td>
                     <td><a href="#" role="button" class="js-job-delete">{% trans "Supprimer" %}</a></td>
                 </tr>

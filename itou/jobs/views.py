@@ -18,10 +18,10 @@ def autocomplete(request):
         codes_to_exclude = request.GET.getlist('code', [])
         appellations = [
             {
-                "value": f"{appellation.short_name} ({appellation.rome.code})",
+                "value": f"{appellation.name} ({appellation.rome.code})",
                 "code": appellation.code,
                 "rome": appellation.rome.code,
-                "short_name": appellation.short_name,
+                "name": appellation.name,
             }
             for appellation in Appellation.objects.autocomplete(term, codes_to_exclude, limit=10)
         ]

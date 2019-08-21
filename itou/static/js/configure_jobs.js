@@ -39,7 +39,7 @@ $(document).ready(() => {
             <input type="hidden" name="code" value="${appellation.code}">
             <input type="checkbox" name="is_active-${appellation.code}" checked>
         </td>
-        <td class="text-left">${appellation.short_name}</td>
+        <td class="text-left">${appellation.name}</td>
         <td>${appellation.rome}</td>
         <td><a href="#" role="button" class="js-job-delete">Supprimer</a></td>
     </tr>`)

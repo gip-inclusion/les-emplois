@@ -3,7 +3,6 @@ import logging
 import os
 
 from django.core.management.base import BaseCommand
-from django.db.models import Q
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae
@@ -167,10 +166,7 @@ class Command(BaseCommand):
                             appellation = (
                                 Appellation.objects
                                 .filter(rome__pk=code_rome)
-                                .filter(
-                                    Q(name__icontains=appellation_name)
-                                    | Q(short_name__icontains=appellation_name)
-                                )
+                                .filter(name__icontains=appellation_name)
                             )[0]
                         except IndexError:
                             self.stderr.write(f"Unknown appellation: `{appellation_name}`")

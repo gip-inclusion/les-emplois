@@ -5,7 +5,7 @@ from itou.jobs import models
 
 class AppellationsInline(admin.TabularInline):
     model = models.Appellation
-    readonly_fields = ('code', 'name', 'short_name',)
+    readonly_fields = ('code', 'name',)
     can_delete = False
 
     def has_add_permission(self, request):
@@ -22,6 +22,6 @@ class RomeAdmin(admin.ModelAdmin):
 
 @admin.register(models.Appellation)
 class AppellationAdmin(admin.ModelAdmin):
-    list_display = ('code', 'name', 'short_name',)
-    search_fields = ('code', 'name', 'short_name',)
+    list_display = ('code', 'name',)
+    search_fields = ('code', 'name',)
     raw_id_fields = ('rome',)

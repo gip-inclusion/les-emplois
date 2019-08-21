@@ -31,7 +31,7 @@ class ConfigureJobsViewTest(TestCase):
         siae = membership.siae
 
         create_test_romes_and_appellations(['N1101', 'N1105', 'N1103', 'N4105'])
-        appellations = Appellation.objects.filter(short_name__in=[
+        appellations = Appellation.objects.filter(name__in=[
             "Agent / Agente cariste de livraison ferroviaire",
             "Agent / Agente de quai manutentionnaire",
             "Agent magasinier / Agente magasinière gestionnaire de stocks",

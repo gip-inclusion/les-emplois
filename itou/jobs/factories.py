@@ -68,8 +68,7 @@ def create_test_romes_and_appellations(rome_codes, appellations_per_rome=30):
 
                 appellation = Appellation()
                 appellation.code = app['code']
-                appellation.name = app['libelle']
-                appellation.short_name = app['libelleCourt']
+                appellation.name = app['libelleCourt']
                 appellation.rome_id = code
                 appellation.save()
 

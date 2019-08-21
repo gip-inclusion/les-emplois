@@ -27,7 +27,7 @@ class SiaeQuerySet(models.QuerySet):
                 SiaeJobs.objects
                 .filter(**kwargs)
                 .select_related('appellation__rome')
-                .order_by('ui_rank', 'appellation__short_name')
+                .order_by('ui_rank', 'appellation__name')
             ),
         )
         return self.prefetch_related(jobs_through)

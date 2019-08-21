@@ -52,7 +52,7 @@
         <ul>
         {% for job in siae.jobs_through.all %}
             <li>
-                {{ job.appellation.short_name }}
+                {{ job.appellation.name }}
             </li>
         {% endfor %}
         </ul>

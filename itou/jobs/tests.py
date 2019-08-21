@@ -33,7 +33,7 @@ class AutocompleteViewTest(TestCase):
                 'value': 'Agent / Agente cariste de livraison ferroviaire (N1101)',
                 'code': '10357',
                 'rome': 'N1101',
-                'short_name': 'Agent / Agente cariste de livraison ferroviaire',
+                'name': 'Agent / Agente cariste de livraison ferroviaire',
             }
         ]
         self.assertEqual(json.loads(response.content), expected)
@@ -52,7 +52,7 @@ class AutocompleteViewTest(TestCase):
                 'value': 'Chauffeur-livreur / Chauffeuse-livreuse (N4105)',
                 'code': '11999',
                 'rome': 'N4105',
-                'short_name': 'Chauffeur-livreur / Chauffeuse-livreuse',
+                'name': 'Chauffeur-livreur / Chauffeuse-livreuse',
             }
         ]
         self.assertEqual(json.loads(response.content), expected)
