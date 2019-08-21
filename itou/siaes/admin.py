@@ -32,6 +32,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     'phone',
                     'email',
                     'website',
+                    'description',
                 )
             }
         ),

@@ -78,6 +78,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
+    description = models.TextField(verbose_name=_("Description"), blank=True)
     jobs = models.ManyToManyField('jobs.Appellation', verbose_name=_("Métiers"),
         through='SiaeJobs', blank=True)
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
