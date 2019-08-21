@@ -13,7 +13,7 @@ from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 
 
-def search(request, template_name='siae/search_results.html'):
+def search(request, template_name='siaes/search_results.html'):
 
     form = SiaeSearchForm(data=request.GET)
     siaes_page = None
@@ -31,7 +31,7 @@ def search(request, template_name='siae/search_results.html'):
     return render(request, template_name, context)
 
 
-def card(request, siret, template_name='siae/card.html'):
+def card(request, siret, template_name='siaes/card.html'):
     """
     SIAE's card (or "Fiche" in French).
     """
@@ -49,7 +49,7 @@ def card(request, siret, template_name='siae/card.html'):
 
 
 @login_required
-def configure_jobs(request, siret, template_name='siae/configure_jobs.html'):
+def configure_jobs(request, siret, template_name='siaes/configure_jobs.html'):
     """
     Configure an SIAE's jobs.
     """
