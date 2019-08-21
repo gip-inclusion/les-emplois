@@ -1,3 +1,5 @@
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
@@ -44,17 +46,19 @@ class Rome(models.Model):
 class AppellationQuerySet(models.QuerySet):
 
     def autocomplete(self, search_string, codes_to_exclude=None, limit=10):
+        """
+        The given `search_string` is transformed into a pattern suitable for `to_tsquery`
+        where `:*` is attached to each word to specify prefix matching.
+        A search for `foo:* & bar:*` will match all tokens beginning with `foo` and `bar`.
+        https://www.postgresql.org/docs/11/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+        """
         terms = search_string.split()
-
-        q_query = Q()
-        for term in terms:
-            q_query &= Q(short_name__icontains=term) | Q(rome__code__icontains=term)
-
-        queryset = self.filter(q_query).select_related('rome')
-
+        terms = [f"{term}:*" for term in terms]
+        tsquery = " & ".join(terms)
+        queryset = self.extra(where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery])
+        queryset = queryset.select_related('rome')
         if codes_to_exclude:
             queryset = queryset.exclude(code__in=codes_to_exclude)
-
         return queryset[:limit]
 
 
@@ -82,6 +86,8 @@ class Appellation(models.Model):
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
     short_name = models.CharField(verbose_name=_("Nom court"), max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
+    # A PostgreSQL trigger (defined in migrations) updates this field automatically.
+    full_text = SearchVectorField(null=True)
 
     objects = models.Manager.from_queryset(AppellationQuerySet)()
 
@@ -89,6 +95,9 @@ class Appellation(models.Model):
         verbose_name = _("Appellation")
         verbose_name_plural = _("Appellations")
         ordering = ['short_name', 'name']
+        indexes = [
+            GinIndex(fields=['full_text']),
+        ]
 
     def __str__(self):
         return self.name
