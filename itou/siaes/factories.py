@@ -1,8 +1,9 @@
-import factory
-import factory.fuzzy
 import string
 
 from django.conf import settings
+
+import factory
+import factory.fuzzy
 
 from itou.siaes import models
 from itou.users.factories import SiaeStaffFactory

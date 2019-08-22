@@ -2,7 +2,6 @@ import csv
 import logging
 import os
 
-from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from itou.siaes.models import Siae
@@ -122,9 +121,9 @@ class Command(BaseCommand):
 
                 # Fields are identical, we can use one or another.
                 post_code = row[3].strip()
-                post_code = row[11].strip()
+                post_code2 = row[11].strip()
                 self.logger.debug(post_code)
-                assert post_code == post_code
+                assert post_code == post_code2
 
                 # Fields are identical, we can use one or another.
                 city = row[4].strip()

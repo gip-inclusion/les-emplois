@@ -8,7 +8,6 @@ from allauth.account.forms import SignupForm
 
 from itou.prescribers.models import Prescriber, PrescriberMembership
 from itou.siaes.models import Siae, SiaeMembership
-from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.apis.siret import get_siret_data
 from itou.utils.validators import validate_siret
 
@@ -77,7 +76,7 @@ class SiaeSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
     def clean_siret(self):
         siret = self.cleaned_data['siret']
         try:
-            siae = Siae.active_objects.get(siret=siret)
+            Siae.active_objects.get(siret=siret)
         except Siae.DoesNotExist:
             error = _(
                 "Ce SIRET ne figure pas dans notre base de données ou ne fait pas partie des "

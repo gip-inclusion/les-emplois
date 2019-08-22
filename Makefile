@@ -1,13 +1,16 @@
 # Global tasks.
 # =============================================================================
 
-.PHONY: clean cdsitepackages
+.PHONY: clean cdsitepackages pylint
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
 cdsitepackages:
 	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/sh
+
+pylint:
+	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou';
 
 # Django.
 # =============================================================================

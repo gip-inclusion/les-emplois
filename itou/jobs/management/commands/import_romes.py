@@ -3,7 +3,6 @@ import logging
 import os
 
 from django.core.management.base import BaseCommand
-from django.utils.translation import gettext_lazy as _
 
 from itou.jobs.models import Rome
 
@@ -74,10 +73,10 @@ class Command(BaseCommand):
                 code_isco = item['codeIsco']
 
                 # Skipping domain for now.
-                domaine_name = item['domaineProfessionnel']['libelle']
-                domaine_code = item['domaineProfessionnel']['code']
-                broad_domain_name = item['domaineProfessionnel']['grandDomaine']['libelle']
-                broad_domain_code = item['domaineProfessionnel']['grandDomaine']['code']
+                # domaine_name = item['domaineProfessionnel']['libelle']
+                # domaine_code = item['domaineProfessionnel']['code']
+                # broad_domain_name = item['domaineProfessionnel']['grandDomaine']['libelle']
+                # broad_domain_code = item['domaineProfessionnel']['grandDomaine']['code']
 
                 self.logger.debug('-' * 80)
                 self.logger.debug(code)

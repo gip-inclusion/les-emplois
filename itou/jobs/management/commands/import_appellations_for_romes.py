@@ -73,13 +73,13 @@ class Command(BaseCommand):
                 self.logger.debug('-' * 80)
                 self.logger.debug(code_rome)
 
-                for item in appellations_for_rome:
+                for appellation in appellations_for_rome:
 
-                    code = item['code']
+                    code = appellation['code']
                     # There are 2 names: item['libelle'] and item['libelleCourt'].
                     # The difference is unclear and the data seems to be about the same.
                     # We keep only item['libelleCourt'] to stay as simple as possible.
-                    name = item['libelleCourt']
+                    name = appellation['libelleCourt']
 
                     self.logger.debug(code)
                     self.logger.debug(name)

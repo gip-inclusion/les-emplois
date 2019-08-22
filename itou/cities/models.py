@@ -94,6 +94,6 @@ def find_suspicious_siae_cities():
     for siae in siaes:
         try:
             City.objects.get(slug=slugify(f"{siae.city}-{siae.department}"), department=siae.department)
-        except:
+        except City.DoesNotExist:
             print('-' * 80)
             print(f"No entry in City() for SIAE {siae.siret} - {siae.name} in {siae.city} - {siae.department}")

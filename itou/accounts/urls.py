@@ -1,5 +1,4 @@
 from django.urls import path, re_path
-from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 
 from itou.accounts.views import signup as signup_views

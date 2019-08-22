@@ -73,8 +73,6 @@ WEBSITES_FIX = {
   "www.horizonamitie.fr": "http://www.horizonamitie.fr",
   "www.vetis.org": "http://vetis.org",
   "www.emmaus-scherwiller.fr": "https://www.emmaus-scherwiller.fr",
-  "http://lepoles.org/": "http://lepoles.org",
-  "http://www.baluchon.fr": "http://baluchon.fr",
   "http://www.lerelaisrestauration.com": "http://lerelaisrestauration.com",
   "http://www.groupeares.fr": "https://www.groupeares.fr",
   "http://www.ressourcerie-2mains.fr/": "http://www.ressourcerie-2mains.fr",
@@ -157,10 +155,10 @@ class Command(BaseCommand):
                 self.logger.debug(website)
 
                 appellations = []
-                for i in range(10, 28, 2):
-                    code_rome = row[i].strip()
+                for j in range(10, 28, 2):
+                    code_rome = row[j].strip()
                     if code_rome:
-                        appellation_name = row[i + 1].strip()
+                        appellation_name = row[j + 1].strip()
                         self.logger.debug(appellation_name)
                         try:
                             appellation = (
