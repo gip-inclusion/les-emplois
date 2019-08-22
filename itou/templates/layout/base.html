@@ -28,15 +28,16 @@
                 <div class="layout-header-content">
                     {% if user.is_authenticated %}
                         <div class="dropdown">
+                            {% include "includes/icon.html" with icon="user" %}
                             <a href="#" class="dropdown-toggle" id="itou-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,8">
                                 {{ user.email }}
                             </a>
                             <div class="dropdown-menu" aria-labelledby="itou-menu">
-                                <a class="dropdown-item" href="{% url 'accounts:dashboard' %}">
+                                <a class="dropdown-item text-primary" href="{% url 'accounts:dashboard' %}">
                                     {% trans "Tableau de bord" %}
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a  class="dropdown-item" id="js-logout" href="{% url 'account_logout' %}">
+                                <a  class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
                                     <i>{% trans "Déconnexion" %}</i>
                                 </a>
                             </div>

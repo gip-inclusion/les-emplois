@@ -1,24 +1,40 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Dashboard" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Tableau de bord" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>{% trans "Tableau de bord" %}</h1>
 
-    <div class="list-group">
-        <a href="{% url 'account_change_password' %}" class="list-group-item list-group-item-action">
-            {% trans "Modifier mon mot de passe" %}
-        </a>
-    </div>
+    <div class="card-deck mt-3">
 
-    {% if user.is_siae_staff and current_siae %}
-        <div class="list-group">
-            <a href="{% url 'siae:configure_jobs' siret=current_siae.siret %}" class="list-group-item list-group-item-action">
-                {% trans "Configurez vos offres d'emploi" %}
-            </a>
+        <div class="card">
+            <h5 class="card-header">{% trans "Informations" %}</h5>
+            <div class="card-body">
+                <p class="card-text">
+                    {% include "includes/icon.html" with icon="lock" %}
+                    <a href="{% url 'account_change_password' %}">
+                        {% trans "Modifier mon mot de passe" %}
+                    </a>
+                </p>
+            </div>
         </div>
-    {% endif %}
+
+        {% if user.is_siae_staff and current_siae %}
+            <div class="card">
+                <h5 class="card-header">{% trans "Offres d'emploi" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="briefcase" %}
+                        <a href="{% url 'siae:configure_jobs' siret=current_siae.siret %}">
+                            {% trans "Configurez vos offres d'emploi" %}
+                        </a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
 
 {% endblock %}

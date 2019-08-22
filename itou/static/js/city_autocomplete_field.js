@@ -29,6 +29,11 @@ $(document).ready(() => {
           noLoading.removeClass('d-none')
       },
     })
+    .keypress(e => {
+      if (e.keyCode === 27) {
+        citySearchInput.val('')
+      }
+    })
     .focus(() => {
       citySearchInput.val('')
       hiddenCityInput.val('')
