@@ -19,9 +19,14 @@ def search(request, template_name='siaes/search_results.html'):
     siaes_page = None
 
     if form.is_valid():
+
         city = form.cleaned_data['city']
         distance_km = form.cleaned_data['distance']
+        kind = form.cleaned_data['kind']
+
         siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_jobs_through(is_active=True)
+        if kind:
+            siaes = siaes.filter(kind=kind)
         siaes_page = pager(siaes, request.GET.get('page'), items_per_page=10)
 
     context = {

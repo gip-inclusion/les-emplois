@@ -57,8 +57,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_AI = 'AI'
     KIND_ACI = 'ACI'
     KIND_ETTI = 'ETTI'
-    KIND_GEIQ = 'GEIQ'
-    KIND_RQ = 'RQ'
+    KIND_GEIQ = 'GEIQ'  # Seems unused in our SIAE data.
+    KIND_RQ = 'RQ'  # Seems unused in our SIAE data.
 
     KIND_CHOICES = (
         (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
