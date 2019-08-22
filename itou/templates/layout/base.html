@@ -25,28 +25,28 @@
                 <a href="/" class="layout-header-logo">
                     <img src="{% static "img/logo_itou_gouv.svg" %}" alt="itou.beta.gouv.fr" width="300">
                 </a>
-                <nav class="layout-header-nav">
-                    <ul>
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'accounts:dashboard' %}">
-                                    {% trans "Mon profil" %}
+                <div class="layout-header-content">
+                    {% if user.is_authenticated %}
+                        <div class="dropdown">
+                            <a href="#" class="dropdown-toggle" id="itou-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,8">
+                                {{ user.email }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="itou-menu">
+                                <a class="dropdown-item" href="{% url 'accounts:dashboard' %}">
+                                    {% trans "Tableau de bord" %}
                                 </a>
-                            </li>
-                            <li>
-                                <a id="js-logout" href="{% url 'account_logout' %}">
-                                    {% trans "Déconnexion" %}
+                                <div class="dropdown-divider"></div>
+                                <a  class="dropdown-item" id="js-logout" href="{% url 'account_logout' %}">
+                                    <i>{% trans "Déconnexion" %}</i>
                                 </a>
-                            </li>
-                        {% else %}
-                            <li>
-                                <a href="{% url 'account_signup' %}">
-                                    {% trans "Inscription / Connexion" %}
-                                </a>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </nav>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'account_signup' %}">
+                            {% trans "Inscription / Connexion" %}
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </header>
 
@@ -70,6 +70,7 @@
 
     <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
     <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
+    <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
     {% block script %}
     <script src="{% static "js/logout.js" %}"></script>

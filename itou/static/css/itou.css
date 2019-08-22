@@ -67,20 +67,9 @@ header.layout-section {
     background: #e5e5e5;
 }
 
-.layout-header-nav {
+.layout-header-content {
     /* Align last flex item to right. */
     margin-left: auto;
-}
-
-.layout-header-nav ul {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.layout-header-nav ul li:not(:first-child) {
-    margin-left: 20px;
 }
 
 @media (max-width: 700px) {  /* For any browser < max-width. */
@@ -89,12 +78,8 @@ header.layout-section {
         display: block;
     }
 
-    .layout-header-nav {
-        margin-left: 0;
-    }
-
-    .layout-header-nav ul {
-        margin-top: 20px;
+    .layout-header-content {
+        margin-top: 10px;
     }
 
 }
