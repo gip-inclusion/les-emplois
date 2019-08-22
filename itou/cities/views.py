@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
-from itou.utils.swear_words import CITY_SWEAR_WORDS_SLUGIFIED
+from itou.utils.swear_words import get_city_swear_words_slugs
 
 
 def autocomplete(request):
@@ -17,7 +17,7 @@ def autocomplete(request):
     term = request.GET.get('term', '').strip()
     cities = []
 
-    if term and slugify(term) not in CITY_SWEAR_WORDS_SLUGIFIED:
+    if term and slugify(term) not in get_city_swear_words_slugs():
 
         cities = (
             City.active_objects

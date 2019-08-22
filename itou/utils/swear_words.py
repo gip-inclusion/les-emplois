@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 from django.template.defaultfilters import slugify
 
 
@@ -398,7 +400,6 @@ FRENCH_SWEAR_WORDS = {
 #         if City.objects.filter(slug__contains=slugify(word)):
 #             print(word)
 
-
 FRENCH_SWEAR_WORDS_CONTAINED_IN_CITY_NAMES = {
     "andouille",
     "baleine",
@@ -458,6 +459,11 @@ FRENCH_SWEAR_WORDS_CONTAINED_IN_CITY_NAMES = {
 }
 
 
-CITY_SWEAR_WORDS = FRENCH_SWEAR_WORDS - FRENCH_SWEAR_WORDS_CONTAINED_IN_CITY_NAMES
+@lru_cache(maxsize=None)
+def get_city_swear_words():
+    return FRENCH_SWEAR_WORDS - FRENCH_SWEAR_WORDS_CONTAINED_IN_CITY_NAMES
 
-CITY_SWEAR_WORDS_SLUGIFIED = {slugify(word) for word in CITY_SWEAR_WORDS}
+
+@lru_cache(maxsize=None)
+def get_city_swear_words_slugs():
+    return {slugify(word) for word in get_city_swear_words()}
