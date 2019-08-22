@@ -6,7 +6,11 @@
 
 {% block content %}
 
-    <p><i>{{ siae.get_kind_display }}</i></p>
+    <p>
+        <b>{{ siae.kind }}</b>
+        -
+        <i>{{ siae.get_kind_display }}</i>
+    </p>
 
     <hr>
 
