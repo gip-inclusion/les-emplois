@@ -49,18 +49,21 @@ shell_on_django_container:
 # Postgres (dev).
 # =============================================================================
 
-.PHONY: dbshell_dev_itou dbshell_dev_root dump_db
+.PHONY: dbshell_dev_itou dbshell_dev_root dump_db restore_db
 
 # Connect to the `itou` database as the `itou` user.
 dbshell_dev_itou:
-	docker exec -ti -e PGPASSWORD=password itou_django psql -p 5432 -h postgres -U itou itou
+	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou
 
 # Connect to postgres client as the `root` user.
 dbshell_dev_root:
-	docker exec -ti -e PGPASSWORD=password itou_django psql -p 5432 -h postgres -U postgres
+	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U postgres
 
 dump_db:
-	docker exec -ti -e PGPASSWORD=password itou_django pg_dump -p 5432 -h postgres -U itou itou > ~/Desktop/itou.sql
+	docker exec -i -e PGPASSWORD=password itou_postgres pg_dump -U itou -d itou > ~/Desktop/itou.sql
+
+restore_db:
+	docker exec -i -e PGPASSWORD=password itou_postgres psql -U itou -d itou < ~/Desktop/itou.sql
 
 # docker-compose -f docker-compose-dev.yml up --no-deps postgres
 # make shell_on_postgres_container
