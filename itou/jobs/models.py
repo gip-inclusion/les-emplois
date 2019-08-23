@@ -1,6 +1,7 @@
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
 
@@ -52,8 +53,11 @@ class AppellationQuerySet(models.QuerySet):
         https://www.postgresql.org/docs/11/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
         """
         terms = search_string.split()
-        terms = [f"{term}:*" for term in terms]
-        tsquery = " & ".join(terms)
+        # Use slugify to avoid crazy characters in terms.
+        # https://stackoverflow.com/a/16020565
+        terms = [slugify(term) for term in terms]
+        terms = [f"{term}:*" for term in terms if term]
+        tsquery = " & ".join([term for term in terms if term])
         queryset = self.extra(where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery])
         queryset = queryset.select_related('rome')
         if codes_to_exclude:
