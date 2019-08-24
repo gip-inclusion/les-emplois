@@ -12,11 +12,11 @@ class UserFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.User
 
-    username = factory.Faker('user_name')
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
-    email = factory.Faker('email')
-    password = factory.PostGenerationMethodCall('set_password', DEFAULT_PASSWORD)
+    username = factory.Faker("user_name")
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
+    email = factory.Faker("email")
+    password = factory.PostGenerationMethodCall("set_password", DEFAULT_PASSWORD)
 
 
 class JobSeekerFactory(UserFactory):

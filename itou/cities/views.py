@@ -14,25 +14,18 @@ def autocomplete(request):
     https://api.jqueryui.com/autocomplete/#option-source
     """
 
-    term = request.GET.get('term', '').strip()
+    term = request.GET.get("term", "").strip()
     cities = []
 
     if term and slugify(term) not in get_city_swear_words_slugs():
 
         cities = (
-            City.active_objects
-            .annotate(similarity=TrigramSimilarity('name', term))
+            City.active_objects.annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
-            .order_by('-similarity')
+            .order_by("-similarity")
         )
         cities = cities[:10]
 
-        cities = [
-            {
-                "value": city.display_name,
-                "slug": city.slug,
-            }
-            for city in cities
-        ]
+        cities = [{"value": city.display_name, "slug": city.slug} for city in cities]
 
-    return HttpResponse(json.dumps(cities), 'application/json')
+    return HttpResponse(json.dumps(cities), "application/json")

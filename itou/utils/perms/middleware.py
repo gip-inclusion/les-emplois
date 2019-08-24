@@ -24,7 +24,9 @@ class ItouCurrentOrganizationMiddleware:
             elif request.user.is_prescriber:
                 session_key = settings.ITOU_SESSION_CURRENT_PRESCRIBER_KEY
                 if not request.session.get(session_key):
-                    request.session[session_key] = request.user.prescriber_set.first().siret
+                    request.session[
+                        session_key
+                    ] = request.user.prescriber_set.first().siret
 
         response = self.get_response(request)
 

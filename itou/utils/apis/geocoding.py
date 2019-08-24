@@ -14,9 +14,9 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
 
     api_url = f"{settings.API_BAN_BASE_URL}/search/"
 
-    args = {'q': address, 'limit': limit}
+    args = {"q": address, "limit": limit}
     if post_code:
-        args['postcode'] = post_code
+        args["postcode"] = post_code
 
     query_string = urlencode(args)
     url = f"{api_url}?{query_string}"
@@ -28,7 +28,7 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
         return None
 
     try:
-        return r.json()['features'][0]
+        return r.json()["features"][0]
     except IndexError:
         logger.error(f"Geocoding error, no result found for `{url}`")
         return None
@@ -39,17 +39,17 @@ def process_geocoding_data(data):
     if not data:
         return None
 
-    longitude = data['geometry']['coordinates'][0]
-    latitude = data['geometry']['coordinates'][1]
+    longitude = data["geometry"]["coordinates"][0]
+    latitude = data["geometry"]["coordinates"][1]
 
     return {
-        'score': data['properties']['score'],
-        'address_line_1': data['properties']['name'],
-        'post_code': data['properties']['postcode'],
-        'city': data['properties']['city'],
-        'longitude': longitude,
-        'latitude': latitude,
-        'coords': GEOSGeometry(f"POINT({longitude} {latitude})"),
+        "score": data["properties"]["score"],
+        "address_line_1": data["properties"]["name"],
+        "post_code": data["properties"]["postcode"],
+        "city": data["properties"]["city"],
+        "longitude": longitude,
+        "latitude": latitude,
+        "coords": GEOSGeometry(f"POINT({longitude} {latitude})"),
     }
 
 

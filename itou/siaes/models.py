@@ -12,22 +12,20 @@ from itou.utils.validators import validate_naf, validate_siret
 
 
 class SiaeQuerySet(models.QuerySet):
-
     def within(self, point, distance_km):
-        return (self
-            .filter(coords__distance_lte=(point, D(km=distance_km)))
-            .annotate(distance=Distance('coords', point))
-            .order_by('distance')
+        return (
+            self.filter(coords__distance_lte=(point, D(km=distance_km)))
+            .annotate(distance=Distance("coords", point))
+            .order_by("distance")
         )
 
     def prefetch_jobs_through(self, **kwargs):
         jobs_through = Prefetch(
-            'jobs_through',
+            "jobs_through",
             queryset=(
-                SiaeJobs.objects
-                .filter(**kwargs)
-                .select_related('appellation__rome')
-                .order_by('ui_rank', 'appellation__name')
+                SiaeJobs.objects.filter(**kwargs)
+                .select_related("appellation__rome")
+                .order_by("ui_rank", "appellation__name")
             ),
         )
         return self.prefetch_related(jobs_through)
@@ -39,9 +37,10 @@ class SiaeQuerySet(models.QuerySet):
 
 
 class SiaeActiveManager(models.Manager):
-
     def get_queryset(self):
-        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+        return (
+            super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+        )
 
 
 class Siae(AddressMixin):  # Do not forget the mixin!
@@ -53,15 +52,18 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         self.jobs_through.all()     <QuerySet [<SiaeJobs>, ...]>
     """
 
-    KIND_EI = 'EI'
-    KIND_AI = 'AI'
-    KIND_ACI = 'ACI'
-    KIND_ETTI = 'ETTI'
-    KIND_GEIQ = 'GEIQ'  # Seems unused in our SIAE data.
-    KIND_RQ = 'RQ'  # Seems unused in our SIAE data.
+    KIND_EI = "EI"
+    KIND_AI = "AI"
+    KIND_ACI = "ACI"
+    KIND_ETTI = "ETTI"
+    KIND_GEIQ = "GEIQ"  # Seems unused in our SIAE data.
+    KIND_RQ = "RQ"  # Seems unused in our SIAE data.
 
     KIND_CHOICES = (
-        (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
+        (
+            KIND_EI,
+            _("Entreprise d'insertion"),
+        ),  # Regroupées au sein de la fédération des entreprises d'insertion.
         (KIND_AI, _("Association intermédiaire")),
         (KIND_ACI, _("Atelier chantier d'insertion")),
         (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
@@ -69,9 +71,18 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_RQ, _("Régie de quartier")),
     )
 
-    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], primary_key=True)
-    naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf])
-    kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
+    siret = models.CharField(
+        verbose_name=_("Siret"),
+        max_length=14,
+        validators=[validate_siret],
+        primary_key=True,
+    )
+    naf = models.CharField(
+        verbose_name=_("Naf"), max_length=5, validators=[validate_naf]
+    )
+    kind = models.CharField(
+        verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI
+    )
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name=_("Enseigne"), max_length=255, blank=True)
@@ -79,10 +90,15 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
-    jobs = models.ManyToManyField('jobs.Appellation', verbose_name=_("Métiers"),
-        through='SiaeJobs', blank=True)
-    members = models.ManyToManyField(settings.AUTH_USER_MODEL, verbose_name=_("Membres"),
-        through='SiaeMembership', blank=True)
+    jobs = models.ManyToManyField(
+        "jobs.Appellation", verbose_name=_("Métiers"), through="SiaeJobs", blank=True
+    )
+    members = models.ManyToManyField(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Membres"),
+        through="SiaeMembership",
+        blank=True,
+    )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
     active_objects = SiaeActiveManager.from_queryset(SiaeQuerySet)()
@@ -95,7 +111,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return f"{self.siret} {self.name}"
 
     def get_card_url(self):
-        return reverse('siae:card', kwargs={'siret': self.siret})
+        return reverse("siae:card", kwargs={"siret": self.siret})
 
 
 class SiaeMembership(models.Model):
@@ -103,8 +119,12 @@ class SiaeMembership(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
-    is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
+    joined_at = models.DateTimeField(
+        verbose_name=_("Date d'adhésion"), default=timezone.now
+    )
+    is_siae_admin = models.BooleanField(
+        verbose_name=_("Administrateur de la SIAE"), default=False
+    )
 
 
 class SiaeJobs(models.Model):
@@ -115,12 +135,16 @@ class SiaeJobs(models.Model):
 
     MAX_UI_RANK = 32767
 
-    appellation = models.ForeignKey('jobs.Appellation', on_delete=models.CASCADE)
-    siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name='jobs_through')
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
+    siae = models.ForeignKey(
+        Siae, on_delete=models.CASCADE, related_name="jobs_through"
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_("Date de création"), default=timezone.now
+    )
     is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
     class Meta:
-        unique_together = ('appellation', 'siae')
-        ordering = ['ui_rank']
+        unique_together = ("appellation", "siae")
+        ordering = ["ui_rank"]

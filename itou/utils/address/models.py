@@ -29,17 +29,31 @@ class AddressMixin(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    address_line_1 = models.CharField(verbose_name=_("Adresse postale, bôite postale"), max_length=255, blank=True)
-    address_line_2 = models.CharField(verbose_name=_("Appartement, suite, bloc, bâtiment, etc."),
-        max_length=255, blank=True)
-    post_code = models.CharField(verbose_name=_("Code Postal"), max_length=10, blank=True)
+    address_line_1 = models.CharField(
+        verbose_name=_("Adresse postale, bôite postale"), max_length=255, blank=True
+    )
+    address_line_2 = models.CharField(
+        verbose_name=_("Appartement, suite, bloc, bâtiment, etc."),
+        max_length=255,
+        blank=True,
+    )
+    post_code = models.CharField(
+        verbose_name=_("Code Postal"), max_length=10, blank=True
+    )
     city = models.CharField(verbose_name=_("Ville"), max_length=255, blank=True)
-    department = models.CharField(verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True)
+    department = models.CharField(
+        verbose_name=_("Département"),
+        choices=DEPARTMENT_CHOICES,
+        max_length=3,
+        blank=True,
+    )
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, null=True, blank=True)
     # BAN API score between 0 and 1 indicating the relevance of the geocoding result.
-    geocoding_score = models.FloatField(verbose_name=_("Score du geocoding"), blank=True, null=True)
+    geocoding_score = models.FloatField(
+        verbose_name=_("Score du geocoding"), blank=True, null=True
+    )
 
     class Meta:
         abstract = True
@@ -73,17 +87,19 @@ class AddressMixin(models.Model):
             self.address_line_2,
             f"{self.post_code} {self.city}",
         ]
-        return ', '.join([field for field in fields if field])
+        return ", ".join([field for field in fields if field])
 
     def geocode(self, address, post_code, save=True):
         geocoding_data = get_geocoding_data(address, post_code=post_code)
         if not geocoding_data:
-            logger.error(f"No geocoding data could be found for `{address} - {post_code}`")
+            logger.error(
+                f"No geocoding data could be found for `{address} - {post_code}`"
+            )
             return
-        self.address_line_1 = geocoding_data['address_line_1']
-        self.post_code = geocoding_data['post_code']
-        self.city = geocoding_data['city']
-        self.coords = geocoding_data['coords']
-        self.geocoding_score = geocoding_data['score']
+        self.address_line_1 = geocoding_data["address_line_1"]
+        self.post_code = geocoding_data["post_code"]
+        self.city = geocoding_data["city"]
+        self.coords = geocoding_data["coords"]
+        self.geocoding_score = geocoding_data["score"]
         if save:
             self.save()

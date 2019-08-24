@@ -23,13 +23,14 @@ class Command(BaseCommand):
     To generate the file:
         django-admin generate_appellations_for_romes
     """
+
     help = "Create a JSON file with all appellations for ROME codes."
 
     def handle(self, **options):
 
         result = {}
 
-        with open(JSON_FILE, 'r') as raw_json_data:
+        with open(JSON_FILE, "r") as raw_json_data:
 
             json_data = json.load(raw_json_data)
             total_len = len(json_data)
@@ -39,16 +40,18 @@ class Command(BaseCommand):
 
                 progress = int((100 * i) / total_len)
                 if progress > last_progress + 5:
-                    self.stdout.write(f"Creating appellations for ROME codes… {progress}%")
+                    self.stdout.write(
+                        f"Creating appellations for ROME codes… {progress}%"
+                    )
                     last_progress = progress
 
-                rome_code = item['code']
+                rome_code = item["code"]
 
                 self.stdout.write(f"Processing {rome_code}")
 
-                token = get_access_token('api_romev1 nomenclatureRome')
+                token = get_access_token("api_romev1 nomenclatureRome")
                 url = f"{settings.API_EMPLOI_STORE_BASE_URL}/rome/v1/metier/{rome_code}/appellation"
-                r = requests.get(url, headers={'Authorization': token})
+                r = requests.get(url, headers={"Authorization": token})
                 r.raise_for_status()
 
                 result[rome_code] = r.json()
@@ -59,9 +62,9 @@ class Command(BaseCommand):
                 time.sleep(4)
 
         file_path = f"{CURRENT_DIR}/data/appellations_for_rome.json"
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             json.dump(result, f)
 
-        self.stdout.write('-' * 80)
+        self.stdout.write("-" * 80)
         self.stdout.write(f"File available at `{file_path}`.")
         self.stdout.write("Done.")

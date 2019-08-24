@@ -31,6 +31,11 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
     django-admin loaddata itou/fixtures/jobs.json
     django-admin loaddata itou/fixtures/siaes.json
 
+### Avant un commit
+
+    make black
+    make pylint
+
 ## Front-end
 
 > https://getbootstrap.com/docs/4.3/getting-started/introduction/

@@ -27,14 +27,15 @@ class Command(BaseCommand):
     To populate the database:
         django-admin import_cities
     """
+
     help = "Import the content of the French cities csv file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--dry-run',
-            dest='dry_run',
-            action='store_true',
-            help='Only print data to import',
+            "--dry-run",
+            dest="dry_run",
+            action="store_true",
+            help="Only print data to import",
         )
 
     def set_logger(self, verbosity):
@@ -53,9 +54,9 @@ class Command(BaseCommand):
 
     def handle(self, dry_run=False, **options):
 
-        self.set_logger(options.get('verbosity'))
+        self.set_logger(options.get("verbosity"))
 
-        with open(CITIES_JSON_FILE, 'r') as raw_json_data:
+        with open(CITIES_JSON_FILE, "r") as raw_json_data:
 
             json_data = json.load(raw_json_data)
             total_len = len(json_data)
@@ -68,26 +69,28 @@ class Command(BaseCommand):
                     self.stdout.write(f"Creating cities… {progress}%")
                     last_progress = progress
 
-                name = item['nom']
+                name = item["nom"]
 
-                department = item.get('codeDepartement')
+                department = item.get("codeDepartement")
                 if not department:
                     self.stderr.write(f"No department for {name}. Skipping…")
                     continue
                 assert department in DEPARTMENTS
 
-                coords = item.get('centre')
+                coords = item.get("centre")
                 if coords:
-                    coords = GEOSGeometry(f"{coords}")  # Feed `GEOSGeometry` with GeoJSON.
+                    coords = GEOSGeometry(
+                        f"{coords}"
+                    )  # Feed `GEOSGeometry` with GeoJSON.
                 else:
                     self.stderr.write(f"No coordinates for {name}. Skipping…")
                     continue
 
-                post_codes = item['codesPostaux']
-                code_insee = item['code']
+                post_codes = item["codesPostaux"]
+                code_insee = item["code"]
                 slug = slugify(f"{name}-{department}")
 
-                self.logger.debug('-' * 80)
+                self.logger.debug("-" * 80)
                 self.logger.debug(name)
                 self.logger.debug(slug)
                 self.logger.debug(post_codes)
@@ -99,13 +102,13 @@ class Command(BaseCommand):
                     City.objects.update_or_create(
                         slug=slug,
                         defaults={
-                            'department': department,
-                            'name': name,
-                            'post_codes': post_codes,
-                            'code_insee': code_insee,
-                            'coords': coords,
+                            "department": department,
+                            "name": name,
+                            "post_codes": post_codes,
+                            "code_insee": code_insee,
+                            "coords": coords,
                         },
                     )
 
-        self.stdout.write('-' * 80)
+        self.stdout.write("-" * 80)
         self.stdout.write("Done.")

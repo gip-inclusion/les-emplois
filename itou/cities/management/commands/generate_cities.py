@@ -20,6 +20,7 @@ class Command(BaseCommand):
     To generate the file:
         django-admin generate_cities
     """
+
     help = "Create a JSON file with all cities of France."
 
     def handle(self, **options):
@@ -32,9 +33,9 @@ class Command(BaseCommand):
         r = requests.get(url)
 
         file_path = f"{CURRENT_DIR}/data/cities.json"
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             f.write(r.content)
 
-        self.stdout.write('-' * 80)
+        self.stdout.write("-" * 80)
         self.stdout.write(f"File available at `{file_path}`.")
         self.stdout.write("Done.")

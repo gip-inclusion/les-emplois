@@ -10,40 +10,101 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Rome',
+            name="Rome",
             fields=[
-                ('code', models.CharField(max_length=5, primary_key=True, serialize=False, verbose_name='Code ROME')),
-                ('name', models.CharField(db_index=True, max_length=255, verbose_name='Nom')),
-                ('riasec_major', models.CharField(choices=[('R', 'Réaliste'), ('I', 'Investigateur'), ('A', 'Artistique'), ('S', 'Social'), ('E', 'Entreprenant'), ('C', 'Conventionnel')], default='R', max_length=1, verbose_name='RIASEC Majeur')),
-                ('riasec_minor', models.CharField(choices=[('R', 'Réaliste'), ('I', 'Investigateur'), ('A', 'Artistique'), ('S', 'Social'), ('E', 'Entreprenant'), ('C', 'Conventionnel')], default='R', max_length=1, verbose_name='RIASEC Mineur')),
-                ('code_isco', models.CharField(max_length=4, verbose_name='Code ROME')),
+                (
+                    "code",
+                    models.CharField(
+                        max_length=5,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="Code ROME",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(db_index=True, max_length=255, verbose_name="Nom"),
+                ),
+                (
+                    "riasec_major",
+                    models.CharField(
+                        choices=[
+                            ("R", "Réaliste"),
+                            ("I", "Investigateur"),
+                            ("A", "Artistique"),
+                            ("S", "Social"),
+                            ("E", "Entreprenant"),
+                            ("C", "Conventionnel"),
+                        ],
+                        default="R",
+                        max_length=1,
+                        verbose_name="RIASEC Majeur",
+                    ),
+                ),
+                (
+                    "riasec_minor",
+                    models.CharField(
+                        choices=[
+                            ("R", "Réaliste"),
+                            ("I", "Investigateur"),
+                            ("A", "Artistique"),
+                            ("S", "Social"),
+                            ("E", "Entreprenant"),
+                            ("C", "Conventionnel"),
+                        ],
+                        default="R",
+                        max_length=1,
+                        verbose_name="RIASEC Mineur",
+                    ),
+                ),
+                ("code_isco", models.CharField(max_length=4, verbose_name="Code ROME")),
             ],
-            options={
-                'verbose_name': 'ROME',
-                'verbose_name_plural': 'ROMEs',
-            },
+            options={"verbose_name": "ROME", "verbose_name_plural": "ROMEs"},
         ),
         migrations.CreateModel(
-            name='Appellation',
+            name="Appellation",
             fields=[
-                ('code', models.CharField(max_length=6, primary_key=True, serialize=False, verbose_name='Code')),
-                ('name', models.CharField(db_index=True, max_length=255, verbose_name='Nom')),
-                ('full_text', django.contrib.postgres.search.SearchVectorField(null=True)),
-                ('rome', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='appellations', to='jobs.Rome')),
+                (
+                    "code",
+                    models.CharField(
+                        max_length=6,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="Code",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(db_index=True, max_length=255, verbose_name="Nom"),
+                ),
+                (
+                    "full_text",
+                    django.contrib.postgres.search.SearchVectorField(null=True),
+                ),
+                (
+                    "rome",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="appellations",
+                        to="jobs.Rome",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Appellation',
-                'verbose_name_plural': 'Appellations',
-                'ordering': ['name'],
+                "verbose_name": "Appellation",
+                "verbose_name_plural": "Appellations",
+                "ordering": ["name"],
             },
         ),
         migrations.AddIndex(
-            model_name='appellation',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['full_text'], name='jobs_appell_full_te_e6b6af_gin'),
+            model_name="appellation",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["full_text"], name="jobs_appell_full_te_e6b6af_gin"
+            ),
         ),
     ]

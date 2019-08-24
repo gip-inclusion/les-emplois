@@ -11,18 +11,25 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('prescribers', '0001_initial'),
+        ("prescribers", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='prescribermembership',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="prescribermembership",
+            name="user",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddField(
-            model_name='prescriber',
-            name='members',
-            field=models.ManyToManyField(blank=True, through='prescribers.PrescriberMembership', to=settings.AUTH_USER_MODEL, verbose_name='Membres'),
+            model_name="prescriber",
+            name="members",
+            field=models.ManyToManyField(
+                blank=True,
+                through="prescribers.PrescriberMembership",
+                to=settings.AUTH_USER_MODEL,
+                verbose_name="Membres",
+            ),
         ),
     ]

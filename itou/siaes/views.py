@@ -13,58 +13,60 @@ from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 
 
-def search(request, template_name='siaes/search_results.html'):
+def search(request, template_name="siaes/search_results.html"):
 
     form = SiaeSearchForm(data=request.GET)
     siaes_page = None
 
     if form.is_valid():
 
-        city = form.cleaned_data['city']
-        distance_km = form.cleaned_data['distance']
-        kind = form.cleaned_data['kind']
+        city = form.cleaned_data["city"]
+        distance_km = form.cleaned_data["distance"]
+        kind = form.cleaned_data["kind"]
 
-        siaes = Siae.active_objects.within(city.coords, distance_km).prefetch_jobs_through(is_active=True)
+        siaes = Siae.active_objects.within(
+            city.coords, distance_km
+        ).prefetch_jobs_through(is_active=True)
         if kind:
             siaes = siaes.filter(kind=kind)
-        siaes_page = pager(siaes, request.GET.get('page'), items_per_page=10)
+        siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
-    context = {
-        'form': form,
-        'siaes_page': siaes_page,
-    }
+    context = {"form": form, "siaes_page": siaes_page}
     return render(request, template_name, context)
 
 
-def card(request, siret, template_name='siaes/card.html'):
+def card(request, siret, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
     """
     queryset = Siae.active_objects.prefetch_jobs_through(is_active=True)
     siae = get_object_or_404(queryset, siret=siret)
 
-    next_url = request.GET.get('next')
-    url_is_safe = is_safe_url(url=next_url, allowed_hosts=settings.ALLOWED_HOSTS, require_https=request.is_secure())
+    next_url = request.GET.get("next")
+    url_is_safe = is_safe_url(
+        url=next_url,
+        allowed_hosts=settings.ALLOWED_HOSTS,
+        require_https=request.is_secure(),
+    )
 
-    context = {
-        'next': next_url if url_is_safe else None,
-        'siae': siae,
-    }
+    context = {"next": next_url if url_is_safe else None, "siae": siae}
     return render(request, template_name, context)
 
 
 @login_required
-def configure_jobs(request, siret, template_name='siaes/configure_jobs.html'):
+def configure_jobs(request, siret, template_name="siaes/configure_jobs.html"):
     """
     Configure an SIAE's jobs.
     """
     queryset = Siae.active_objects.prefetch_jobs_through().member_required(request.user)
     siae = get_object_or_404(queryset, siret=siret)
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        current_codes = set(siae.jobs_through.values_list('appellation__code', flat=True))
-        submitted_codes = set(request.POST.getlist('code'))
+        current_codes = set(
+            siae.jobs_through.values_list("appellation__code", flat=True)
+        )
+        submitted_codes = set(request.POST.getlist("code"))
 
         codes_to_create = submitted_codes - current_codes
         # It is assumed that the codes to delete are not submitted (they must
@@ -77,7 +79,9 @@ def configure_jobs(request, siret, template_name='siaes/configure_jobs.html'):
             # Create.
             for code in codes_to_create:
                 appellation = Appellation.objects.get(code=code)
-                through_defaults = {'is_active': bool(request.POST.get(f'is_active-{code}'))}
+                through_defaults = {
+                    "is_active": bool(request.POST.get(f"is_active-{code}"))
+                }
                 siae.jobs.add(appellation, through_defaults=through_defaults)
 
             # Delete.
@@ -86,16 +90,20 @@ def configure_jobs(request, siret, template_name='siaes/configure_jobs.html'):
                 siae.jobs.remove(*appellations)
 
             # Update.
-            for job_through in siae.jobs_through.filter(appellation__code__in=codes_to_update):
-                is_active = bool(request.POST.get(f'is_active-{job_through.appellation.code}'))
+            for job_through in siae.jobs_through.filter(
+                appellation__code__in=codes_to_update
+            ):
+                is_active = bool(
+                    request.POST.get(f"is_active-{job_through.appellation.code}")
+                )
                 if job_through.is_active != is_active:
                     job_through.is_active = is_active
                     job_through.save()
 
             messages.success(request, _("Mise à jour effectuée !"))
-            return HttpResponseRedirect(reverse('siae:configure_jobs', kwargs={'siret': siae.siret}))
+            return HttpResponseRedirect(
+                reverse("siae:configure_jobs", kwargs={"siret": siae.siret})
+            )
 
-    context = {
-        'siae': siae,
-    }
+    context = {"siae": siae}
     return render(request, template_name, context)

@@ -45,7 +45,7 @@ def pager(queryset, page, items_per_page=10, pages_num=10):
             first = last - pages_num
         pages_to_display = range(first, last + 1)
 
-    setattr(custom_pager, 'pages_to_display', pages_to_display)
-    setattr(custom_pager, 'display_pager', total_pages > 1)
+    setattr(custom_pager, "pages_to_display", pages_to_display)
+    setattr(custom_pager, "display_pager", total_pages > 1)
 
     return custom_pager

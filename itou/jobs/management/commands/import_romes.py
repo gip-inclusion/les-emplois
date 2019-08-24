@@ -23,14 +23,15 @@ class Command(BaseCommand):
     To populate the database:
         django-admin import_romes
     """
+
     help = "Import the content of the ROMEs JSON file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--dry-run',
-            dest='dry_run',
-            action='store_true',
-            help='Only print data to import',
+            "--dry-run",
+            dest="dry_run",
+            action="store_true",
+            help="Only print data to import",
         )
 
     def set_logger(self, verbosity):
@@ -49,9 +50,9 @@ class Command(BaseCommand):
 
     def handle(self, dry_run=False, **options):
 
-        self.set_logger(options.get('verbosity'))
+        self.set_logger(options.get("verbosity"))
 
-        with open(JSON_FILE, 'r') as raw_json_data:
+        with open(JSON_FILE, "r") as raw_json_data:
 
             json_data = json.load(raw_json_data)
             total_len = len(json_data)
@@ -66,11 +67,11 @@ class Command(BaseCommand):
                     self.stdout.write(f"Creating ROME appellations… {progress}%")
                     last_progress = progress
 
-                code = item['code']
-                name = item['libelle']
-                riasec_major = item['riasecMajeur']
-                riasec_minor = item['riasecMineur']
-                code_isco = item['codeIsco']
+                code = item["code"]
+                name = item["libelle"]
+                riasec_major = item["riasecMajeur"]
+                riasec_minor = item["riasecMineur"]
+                code_isco = item["codeIsco"]
 
                 # Skipping domain for now.
                 # domaine_name = item['domaineProfessionnel']['libelle']
@@ -78,7 +79,7 @@ class Command(BaseCommand):
                 # broad_domain_name = item['domaineProfessionnel']['grandDomaine']['libelle']
                 # broad_domain_code = item['domaineProfessionnel']['grandDomaine']['code']
 
-                self.logger.debug('-' * 80)
+                self.logger.debug("-" * 80)
                 self.logger.debug(code)
                 self.logger.debug(name)
                 self.logger.debug(RIASEC_DICT[riasec_major])
@@ -89,12 +90,12 @@ class Command(BaseCommand):
                     Rome.objects.update_or_create(
                         code=code,
                         defaults={
-                            'name': name,
-                            'riasec_major': riasec_major,
-                            'riasec_minor': riasec_minor,
-                            'code_isco': code_isco,
+                            "name": name,
+                            "riasec_major": riasec_major,
+                            "riasec_minor": riasec_minor,
+                            "code_isco": code_isco,
                         },
                     )
 
-        self.stdout.write('-' * 80)
+        self.stdout.write("-" * 80)
         self.stdout.write("Done.")

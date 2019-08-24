@@ -5,19 +5,18 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('jobs', '0001_initial'),
-    ]
+    dependencies = [("jobs", "0001_initial")]
 
     operations = [
         migrations.RunSQL(
-            sql='''
+            sql="""
                 CREATE TRIGGER jobs_appellation_full_text_trigger
                     BEFORE INSERT OR UPDATE OF name, rome_id, full_text ON jobs_appellation
                     FOR EACH ROW
                     EXECUTE PROCEDURE tsvector_update_trigger(full_text, 'public.french_unaccent', name, rome_id);
-            ''',
-            reverse_sql='''
+            """,
+            reverse_sql="""
                 DROP TRIGGER IF EXISTS jobs_appellation_full_text_trigger ON jobs_appellation;
-            '''),
+            """,
+        )
     ]

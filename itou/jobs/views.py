@@ -11,11 +11,11 @@ def autocomplete(request):
     https://api.jqueryui.com/autocomplete/#option-source
     """
 
-    term = request.GET.get('term', '').strip()
+    term = request.GET.get("term", "").strip()
     appellations = []
 
     if term:
-        codes_to_exclude = request.GET.getlist('code', [])
+        codes_to_exclude = request.GET.getlist("code", [])
         appellations = [
             {
                 "value": f"{appellation.name} ({appellation.rome.code})",
@@ -23,7 +23,9 @@ def autocomplete(request):
                 "rome": appellation.rome.code,
                 "name": appellation.name,
             }
-            for appellation in Appellation.objects.autocomplete(term, codes_to_exclude, limit=10)
+            for appellation in Appellation.objects.autocomplete(
+                term, codes_to_exclude, limit=10
+            )
         ]
 
-    return HttpResponse(json.dumps(appellations), 'application/json')
+    return HttpResponse(json.dumps(appellations), "application/json")

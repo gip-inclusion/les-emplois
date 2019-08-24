@@ -23,14 +23,15 @@ class Command(BaseCommand):
     To populate the database:
         django-admin import_appellations_for_romes
     """
+
     help = "Import the content of the ROMEs appellations JSON file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--dry-run',
-            dest='dry_run',
-            action='store_true',
-            help='Only print data to import',
+            "--dry-run",
+            dest="dry_run",
+            action="store_true",
+            help="Only print data to import",
         )
 
     def set_logger(self, verbosity):
@@ -49,9 +50,9 @@ class Command(BaseCommand):
 
     def handle(self, dry_run=False, **options):
 
-        self.set_logger(options.get('verbosity'))
+        self.set_logger(options.get("verbosity"))
 
-        with open(JSON_FILE, 'r') as raw_json_data:
+        with open(JSON_FILE, "r") as raw_json_data:
 
             json_data = json.load(raw_json_data)
             total_len = len(json_data)
@@ -70,28 +71,24 @@ class Command(BaseCommand):
 
                 appellations_for_rome = json_data[code_rome]
 
-                self.logger.debug('-' * 80)
+                self.logger.debug("-" * 80)
                 self.logger.debug(code_rome)
 
                 for appellation in appellations_for_rome:
 
-                    code = appellation['code']
+                    code = appellation["code"]
                     # There are 2 names: item['libelle'] and item['libelleCourt'].
                     # The difference is unclear and the data seems to be about the same.
                     # We keep only item['libelleCourt'] to stay as simple as possible.
-                    name = appellation['libelleCourt']
+                    name = appellation["libelleCourt"]
 
                     self.logger.debug(code)
                     self.logger.debug(name)
 
                     if not dry_run:
                         Appellation.objects.update_or_create(
-                            code=code,
-                            defaults={
-                                'name': name,
-                                'rome': rome,
-                            },
+                            code=code, defaults={"name": name, "rome": rome}
                         )
 
-        self.stdout.write('-' * 80)
+        self.stdout.write("-" * 80)
         self.stdout.write("Done.")

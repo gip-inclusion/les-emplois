@@ -16,7 +16,9 @@ def call_insee_api(siret):
     try:
         data = api_insee.siret(siret).get()
     except urllib.error.HTTPError as err:
-        logger.error(f"HTTP Error `{err.code}` while calling Sirene - V3 API for SIRET {siret}")
+        logger.error(
+            f"HTTP Error `{err.code}` while calling Sirene - V3 API for SIRET {siret}"
+        )
         return None
 
     return data
@@ -29,14 +31,16 @@ def process_siret_data(data):
 
     try:
         address = [
-            data['etablissement']['adresseEtablissement']['numeroVoieEtablissement'],
-            data['etablissement']['adresseEtablissement']['typeVoieEtablissement'],
-            data['etablissement']['adresseEtablissement']['libelleVoieEtablissement'],
+            data["etablissement"]["adresseEtablissement"]["numeroVoieEtablissement"],
+            data["etablissement"]["adresseEtablissement"]["typeVoieEtablissement"],
+            data["etablissement"]["adresseEtablissement"]["libelleVoieEtablissement"],
         ]
         return {
-            'name': data['etablissement']['uniteLegale']['denominationUniteLegale'],
-            'address': ' '.join(item for item in address if item),
-            'post_code': data['etablissement']['adresseEtablissement']['codePostalEtablissement'],
+            "name": data["etablissement"]["uniteLegale"]["denominationUniteLegale"],
+            "address": " ".join(item for item in address if item),
+            "post_code": data["etablissement"]["adresseEtablissement"][
+                "codePostalEtablissement"
+            ],
         }
     except KeyError:
         logger.error(f"Unable to process the result of Sirene V3 API: {data}")

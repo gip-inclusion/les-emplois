@@ -9,6 +9,7 @@ from django.http import QueryDict
 
 register = template.Library()
 
+
 @register.simple_tag
 def url_add_query(url, **kwargs):
     """

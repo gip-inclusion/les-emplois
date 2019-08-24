@@ -11,7 +11,7 @@ from itou.accounts import forms
 class PrescriberSignupView(SignupView):
 
     form_class = forms.PrescriberSignupForm
-    template_name = 'account_itou/signup_prescriber.html'
+    template_name = "account_itou/signup_prescriber.html"
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -22,7 +22,7 @@ class PrescriberSignupView(SignupView):
 class SiaeSignupView(SignupView):
 
     form_class = forms.SiaeSignupForm
-    template_name = 'account_itou/signup_siae.html'
+    template_name = "account_itou/signup_siae.html"
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -33,7 +33,7 @@ class SiaeSignupView(SignupView):
 class JobSeekerSignupView(SignupView):
 
     form_class = forms.JobSeekerSignupForm
-    template_name = 'account_itou/signup_job_seeker.html'
+    template_name = "account_itou/signup_job_seeker.html"
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):

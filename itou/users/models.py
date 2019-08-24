@@ -21,9 +21,13 @@ class User(AbstractUser):
         self.prescribermembership_set.all()
     """
 
-    is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)
+    is_job_seeker = models.BooleanField(
+        verbose_name=_("Demandeur d'emploi"), default=False
+    )
     is_prescriber = models.BooleanField(verbose_name=_("Prescripteur"), default=False)
-    is_siae_staff = models.BooleanField(verbose_name=_("Employeur (SIAE)"), default=False)
+    is_siae_staff = models.BooleanField(
+        verbose_name=_("Employeur (SIAE)"), default=False
+    )
 
 
 def get_allauth_account_user_display(user):

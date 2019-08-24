@@ -1,7 +1,10 @@
 # Global tasks.
 # =============================================================================
 
-.PHONY: clean cdsitepackages pylint
+.PHONY: black clean cdsitepackages pylint
+
+black:
+	docker exec -ti itou_django black itou/
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
