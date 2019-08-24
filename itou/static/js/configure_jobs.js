@@ -51,9 +51,10 @@ $(document).ready(() => {
       delay: 300,
       minLength: 1,
       source: (request, response) => {
+        let term = encodeURIComponent(request.term)
         $.getJSON(
           jobSearchInput.data('autocomplete-source-url'),
-          `term=${request.term}&${codesToExclude}`,
+          `term=${term}&${codesToExclude}`,
           response
         )
       },

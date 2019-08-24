@@ -1,7 +1,9 @@
+import re
+import string
+
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
-from django.template.defaultfilters import slugify
 from django.utils.translation import gettext_lazy as _
 
 
@@ -47,17 +49,14 @@ class AppellationQuerySet(models.QuerySet):
 
     def autocomplete(self, search_string, codes_to_exclude=None, limit=10):
         """
-        The given `search_string` is transformed into a pattern suitable for `to_tsquery`
-        where `:*` is attached to each word to specify prefix matching.
-        A search for `foo:* & bar:*` will match all tokens beginning with `foo` and `bar`.
+        A `search_string` equals to `foo bar` will match all results beginning with `foo` and `bar`.
+        This is achieved via `to_tsquery` and prefix matching:
         https://www.postgresql.org/docs/11/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
         """
-        terms = search_string.split()
-        # Use slugify to avoid crazy characters in terms.
-        # https://stackoverflow.com/a/16020565
-        terms = [slugify(term) for term in terms]
-        terms = [f"{term}:*" for term in terms if term]
-        tsquery = " & ".join([term for term in terms if term])
+        # Keep only words since `to_tsquery` only takes tokens as input.
+        words = re.sub(f"[{string.punctuation}]", " ", search_string).split()
+        words = [word + ':*' for word in words]
+        tsquery = " & ".join([word for word in words])
         queryset = self.extra(where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery])
         queryset = queryset.select_related('rome')
         if codes_to_exclude:

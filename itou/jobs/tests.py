@@ -25,7 +25,7 @@ class AutocompleteViewTest(TestCase):
         create_test_romes_and_appellations(['N1101', 'N4105'])
         cls.url = reverse('jobs:autocomplete')
 
-    def test_multi_words(self):
+    def test_search_multi_words(self):
         response = self.client.get(self.url, {'term': 'cariste ferroviaire'})
         self.assertEqual(response.status_code, 200)
         expected = [
@@ -34,18 +34,18 @@ class AutocompleteViewTest(TestCase):
                 'code': '10357',
                 'rome': 'N1101',
                 'name': 'Agent / Agente cariste de livraison ferroviaire',
-            }
+            },
         ]
         self.assertEqual(json.loads(response.content), expected)
 
-    def test_multi_words_with_exclusion(self):
+    def test_search_multi_words_with_exclusion(self):
         response = self.client.get(self.url, {'term': 'cariste ferroviaire', 'code': '10357'})
         self.assertEqual(response.status_code, 200)
         expected = b'[]'
         self.assertEqual(response.content, expected)
 
-    def test_case_insensitive_and_explicit_rome_code(self):
-        response = self.client.get(self.url, {'term': 'CHAUFFEUR livreuse N4105'})
+    def test_search_case_insensitive_and_explicit_rome_code(self):
+        response = self.client.get(self.url, {'term': 'CHAUFFEUR livreuse n4105'})
         self.assertEqual(response.status_code, 200)
         expected = [
             {
@@ -53,12 +53,44 @@ class AutocompleteViewTest(TestCase):
                 'code': '11999',
                 'rome': 'N4105',
                 'name': 'Chauffeur-livreur / Chauffeuse-livreuse',
-            }
+            },
         ]
         self.assertEqual(json.loads(response.content), expected)
 
-    def test_empty_chars(self):
+    def test_search_empty_chars(self):
         response = self.client.get(self.url, {'term': '    '})
         self.assertEqual(response.status_code, 200)
         expected = b'[]'
         self.assertEqual(response.content, expected)
+
+    def test_search_full_label(self):
+        response = self.client.get(
+            self.url,
+            {'term': "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)"},
+        )
+        self.assertEqual(response.status_code, 200)
+        expected = [
+            {
+                'value': 'Conducteur / Conductrice de chariot élévateur de l\'armée (N1101)',
+                'code': '12918',
+                'rome': 'N1101',
+                'name': 'Conducteur / Conductrice de chariot élévateur de l\'armée',
+            },
+        ]
+        self.assertEqual(json.loads(response.content), expected)
+
+    def test_search_special_chars(self):
+        response = self.client.get(
+            self.url,
+            {'term': "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*"},
+        )
+        self.assertEqual(response.status_code, 200)
+        expected = [
+            {
+                'value': 'Conducteur / Conductrice de chariot élévateur de l\'armée (N1101)',
+                'code': '12918',
+                'rome': 'N1101',
+                'name': 'Conducteur / Conductrice de chariot élévateur de l\'armée',
+            },
+        ]
+        self.assertEqual(json.loads(response.content), expected)
