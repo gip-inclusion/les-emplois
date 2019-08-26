@@ -25,7 +25,7 @@ RUN apk update \
     && apk add binutils \
     # Geospatial dependencies
     # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/geolibs
-    && apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos=3.7.2-r0 proj=6.1.0-r4 gdal=2.4.0-r3 \
+    && apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos proj gdal \
     # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
     && apk add postgresql-client=11.5-r0 \
     # Time zone and daylight-saving time data
@@ -39,15 +39,18 @@ RUN ln -s /usr/lib/libproj.so.15 /usr/lib/libproj.so
 RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && echo "Europe/Paris" > /etc/timezone
 
+# Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip install --upgrade pip
-RUN pip install -r /requirements/dev.txt
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r /requirements/dev.txt \
+    && rm -rf /requirements
 
 COPY --chown=app:app . $APP_DIR
 
-COPY ./docker/dev/django/entrypoint.sh /
-RUN chmod +x /entrypoint.sh
+RUN chmod +x $APP_DIR/docker/dev/django/entrypoint.sh
+
+USER app
 
 WORKDIR $APP_DIR
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["./docker/dev/django/entrypoint.sh"]

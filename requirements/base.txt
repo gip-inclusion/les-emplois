@@ -1,5 +1,6 @@
-pytz==2019.1  # https://github.com/stub42/pytz
 Pillow==6.1.0  # https://github.com/python-pillow/Pillow
+psycopg2==2.8.3 --no-binary psycopg2  # https://github.com/psycopg/psycopg2
+pytz==2019.2  # https://github.com/stub42/pytz
 requests==2.22.0  # https://github.com/psf/requests
 
 # Django

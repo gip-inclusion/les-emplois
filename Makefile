@@ -41,13 +41,16 @@ test:
 # Docker shell.
 # =============================================================================
 
-.PHONY: shell_on_django_container shell_on_postgres_container
-
-shell_on_postgres_container:
-	docker exec -ti itou_postgres /bin/sh
+.PHONY: shell_on_django_container shell_on_django_container_as_root shell_on_postgres_container
 
 shell_on_django_container:
 	docker exec -ti itou_django /bin/sh
+
+shell_on_django_container_as_root:
+	docker exec -ti --user root itou_django /bin/sh
+
+shell_on_postgres_container:
+	docker exec -ti itou_postgres /bin/sh
 
 # Postgres (dev).
 # =============================================================================

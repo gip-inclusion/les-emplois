@@ -4,6 +4,9 @@ envs/dev.env
 envs/secrets.env
 itou/static_collected/
 
+# Alpine
+.ash_history
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
