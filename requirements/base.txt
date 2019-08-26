@@ -21,3 +21,6 @@ api-insee==1.0.1  # https://github.com/sne3ks/api_insee
 
 # Bootstrap 4 for Django
 django-bootstrap4==0.0.8  # https://github.com/zostera/django-bootstrap4
+
+# Django-XWorkflows
+django-xworkflows==0.12.3  # https://github.com/rbarrois/django_xworkflows

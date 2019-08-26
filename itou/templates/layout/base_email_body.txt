@@ -1,0 +1,4 @@
+{% load i18n %}
+{% block body %}{% endblock %}
+
+{% blocktrans %}L'équipe Itou{% endblocktrans %}

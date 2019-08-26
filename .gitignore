@@ -112,5 +112,12 @@ ENV/
 # mypy
 .mypy_cache/
 
+# IPython
+.ipython
+
+# Pylint
+.pylint.d
+
+
 # Editors
 .tm_properties

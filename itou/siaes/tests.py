@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory, SiaeMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
 
 
@@ -24,9 +24,8 @@ class ConfigureJobsViewTest(TestCase):
     def setUpTestData(cls):
         # Set up data for the whole TestCase.
 
-        membership = SiaeMembershipFactory()
-        user = membership.user
-        siae = membership.siae
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
 
         create_test_romes_and_appellations(["N1101", "N1105", "N1103", "N4105"])
         appellations = Appellation.objects.filter(
@@ -39,9 +38,8 @@ class ConfigureJobsViewTest(TestCase):
         )
         siae.jobs.add(*appellations)
 
-        cls.membership = membership
-        cls.user = user
         cls.siae = siae
+        cls.user = user
 
         cls.url = reverse("siae:configure_jobs", kwargs={"siret": siae.siret})
 
