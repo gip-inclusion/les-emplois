@@ -10,6 +10,7 @@ app_name = "accounts"
 
 urlpatterns = [
     # allauth URLs.
+    # --------------------------------------------------------------------------------------
     # /accounts/confirm-email/                          account_email_verification_sent
     # /accounts/confirm-email/<key>/                    account_confirm_email
     # /accounts/email/                                  account_email
@@ -24,6 +25,7 @@ urlpatterns = [
     # /accounts/social/connections/                     socialaccount_connections
     # /accounts/social/login/cancelled/                 socialaccount_login_cancelled
     # /accounts/social/login/error/                     socialaccount_login_error
+    # --------------------------------------------------------------------------------------
     # Override allauth `account_signup` URL.
     # /accounts/signup/                                 account_signup
     # We don't want any user to be able to signup using the default allauth `signup` url
@@ -35,6 +37,8 @@ urlpatterns = [
     # /accounts/password/change/                        account_change_password
     # https://github.com/pennersr/django-allauth/issues/468
     re_path(r"^password/change/$", dashboard_views.password_change),
+    # --------------------------------------------------------------------------------------
+    # itou URLs.
     path(
         "signup/prescriber",
         signup_views.PrescriberSignupView.as_view(),
