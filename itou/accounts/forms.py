@@ -60,7 +60,7 @@ class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
         if siret_data:
             prescriber.name = siret_data["name"]
             prescriber.geocode(
-                siret_data["address"], siret_data["post_code"], save=False
+                siret_data["address"], post_code=siret_data["post_code"], save=False
             )
         prescriber.save()
 

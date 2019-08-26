@@ -25,7 +25,7 @@ class UtilsAddressMixinTest(TestCase):
         Use `Prescriber` which inherits from abstract `AddressMixin`.
         """
         prescriber = Prescriber.objects.create(siret="12000015300011")
-        prescriber.geocode("10 PL 5 MARTYRS LYCEE BUFFON", "75015")
+        prescriber.geocode("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
         expected_address_line_1 = "10 Pl des Cinq Martyrs du Lycee Buffon"

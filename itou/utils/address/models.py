@@ -89,11 +89,11 @@ class AddressMixin(models.Model):
         ]
         return ", ".join([field for field in fields if field])
 
-    def geocode(self, address, post_code, save=True):
-        geocoding_data = get_geocoding_data(address, post_code=post_code)
+    def geocode(self, address_on_one_line, post_code=None, save=True):
+        geocoding_data = get_geocoding_data(address_on_one_line, post_code=post_code)
         if not geocoding_data:
             logger.error(
-                f"No geocoding data could be found for `{address} - {post_code}`"
+                f"No geocoding data could be found for `{address_on_one_line} - {post_code}`"
             )
             return
         self.address_line_1 = geocoding_data["address_line_1"]

@@ -15,6 +15,8 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
     api_url = f"{settings.API_BAN_BASE_URL}/search/"
 
     args = {"q": address, "limit": limit}
+
+    # `post_code` can be used to restrict the scope of the search.
     if post_code:
         args["postcode"] = post_code
 
