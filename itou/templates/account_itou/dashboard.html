@@ -23,12 +23,12 @@
 
         {% if user.is_siae_staff and current_siae %}
             <div class="card">
-                <h5 class="card-header">{% trans "Offres d'emploi" %}</h5>
+                <h5 class="card-header">{% trans "Métiers" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'siae:configure_jobs' siret=current_siae.siret %}">
-                            {% trans "Configurez vos offres d'emploi" %}
+                            {% trans "Configurez vos métiers" %}
                         </a>
                     </p>
                 </div>
