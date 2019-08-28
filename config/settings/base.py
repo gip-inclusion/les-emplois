@@ -231,8 +231,6 @@ ANYMAIL = {
 
 MAILJET_API_URL = 'https://api.mailjet.com/v3'
 
-DEFAULT_FROM_EMAIL = 'noreply@itou.beta.gouv.fr'
-
 # Auth.
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 # ------------------------------------------------------------------------------
@@ -282,7 +280,10 @@ API_EMPLOI_STORE_BASE_URL = 'https://api.emploi-store.fr/partenaire'
 # Itou.
 # ------------------------------------------------------------------------------
 
+ITOU_PROTOCOL = 'https'
+ITOU_FQDN = 'itou.beta.gouv.fr'
 ITOU_EMAIL_CONTACT = 'contact@itou.beta.gouv.fr'
+DEFAULT_FROM_EMAIL = 'noreply@itou.beta.gouv.fr'
 
 # Départements d'expérimentation :
 # Pas-de-Calais (62), Bas-Rhin (67), Seine Saint Denis (93).

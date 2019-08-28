@@ -1,5 +1,8 @@
 import re
 
+from django.conf import settings
+from django.template.loader import get_template
+
 
 def remove_extra_line_breaks(text):
     """
@@ -9,3 +12,10 @@ def remove_extra_line_breaks(text):
     in emails text templates.
     """
     return re.sub(r"\n{3,}", "\n\n", text)
+
+
+def get_email_text_template(template, context):
+    context.update(
+        {"itou_protocol": settings.ITOU_PROTOCOL, "itou_fqdn": settings.ITOU_FQDN}
+    )
+    return remove_extra_line_breaks(get_template(template).render(context).strip())

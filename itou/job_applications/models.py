@@ -1,17 +1,21 @@
+import logging
 import uuid
 
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.template.loader import get_template
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from anymail.exceptions import AnymailRequestsAPIError
 from django_xworkflows import models as xwf_models
 
 from itou.prescribers.models import Prescriber
 from itou.siaes.models import Siae
-from itou.utils.emails import remove_extra_line_breaks
+from itou.utils.emails import get_email_text_template
+
+
+logger = logging.getLogger(__name__)
 
 
 class JobRequestWorkflow(xwf_models.Workflow):
@@ -27,7 +31,7 @@ class JobRequestWorkflow(xwf_models.Workflow):
         (STATE_PENDING_ANSWER, _("En attente de réponse")),
         (STATE_ACCEPTED, _("Candidature acceptée")),
         (STATE_REJECTED, _("Candidature rejetée")),
-        (STATE_OBSOLETE, _("Obsolète")),  # The job seeker already fond a job.
+        (STATE_OBSOLETE, _("Obsolète")),  # The job seeker found another job.
     )
 
     states = STATE_CHOICES
@@ -89,7 +93,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
         on_delete=models.SET_NULL,
         related_name="job_requests_prescribed",
     )
-    # The prescriber can have a membership in multiple organizations.
+    # The prescriber can be a member of multiple organizations.
     # Keep track of the current one.
     prescriber = models.ForeignKey(
         Prescriber,
@@ -103,7 +107,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
         JobRequestWorkflow, verbose_name=_("État"), db_index=True
     )
 
-    # Jobs in which job seekers are interested (optional).
+    # Jobs in which the job seeker is interested (optional).
     jobs = models.ManyToManyField(
         "jobs.Appellation", verbose_name=_("Métiers recherchés"), blank=True
     )
@@ -127,18 +131,38 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
         verbose_name = _("Candidature")
         verbose_name_plural = _("Candidatures")
 
+    def __init__(self, *args, **kwargs):
+        self.notifications = JobRequestNotifications(self)
+        super().__init__(*args, **kwargs)
+
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
     @xwf_models.transition()
     def send(self, *args, **kwargs):
-        self.notify_new()
-        # raise xwf_models.AbortTransition()
+        try:
+            email = self.notifications.new_for_siae()
+            email.send()
+        except AnymailRequestsAPIError:
+            logger.error(
+                f"Email couldn't be sent during `send` transition for JobRequest `{self.id}`"
+            )
+            raise xwf_models.AbortTransition()
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
-        pass
+        try:
+            connection = mail.get_connection()
+            emails = [self.notifications.accept_for_job_seeker()]
+            if self.prescriber_user:
+                emails.append(self.notifications.accept_for_prescriber())
+            connection.send_messages(emails)
+        except AnymailRequestsAPIError:
+            logger.error(
+                f"Email couldn't be sent during `accept` transition for JobRequest `{self.id}`"
+            )
+            raise xwf_models.AbortTransition()
 
     @xwf_models.transition()
     def reject(self, *args, **kwargs):
@@ -148,37 +172,67 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     def render_obsolete(self, *args, **kwargs):
         pass
 
+
+class JobRequestNotifications:
+    """
+    The purpose of this class is purely organisational.
+    """
+
+    def __init__(self, job_request):
+        self.job_request = job_request
+
     def get_siae_recipents_email_list(self):
         return list(
-            self.siae.members.filter(is_active=True).values_list("email", flat=True)
+            self.job_request.siae.members.filter(is_active=True).values_list(
+                "email", flat=True
+            )
         )
 
-    def notify_new(self):
-        """Send notifications of a new request for a job."""
-        connection = mail.get_connection()
-        emails = [self.get_notification_new_to_siae_email()]
-        connection.send_messages(emails)
+    def get_email_message(self, from_email, to, context, subject, body):
+        return mail.EmailMessage(
+            from_email=from_email,
+            to=to,
+            subject=get_email_text_template(subject, context),
+            body=get_email_text_template(body, context),
+        )
 
-    def get_notification_new_to_siae_email(self):
+    def new_for_siae(self):
         from_email = settings.DEFAULT_FROM_EMAIL
-        to_email_list = self.get_siae_recipents_email_list()
+        to = self.get_siae_recipents_email_list()
         context = {
-            "jobs": self.jobs.all(),
-            "job_seeker_first_name": self.job_seeker.first_name,
-            "job_seeker_last_name": self.job_seeker.last_name,
-            "motivation_message": self.motivation_message,
+            "jobs": self.job_request.jobs.all(),
+            "job_seeker": self.job_request.job_seeker,
+            "motivation_message": self.job_request.motivation_message,
+            "prescriber": self.job_request.prescriber,
+            "prescriber_user": self.job_request.prescriber_user,
         }
-        subject = remove_extra_line_breaks(
-            get_template("job_applications/email/notification_new_to_siae_subject.txt")
-            .render(context)
-            .strip()
-        )
-        body = remove_extra_line_breaks(
-            get_template("job_applications/email/notification_new_to_siae_body.txt")
-            .render(context)
-            .strip()
-        )
-        return mail.EmailMessage(subject, body, from_email, to_email_list)
+        subject = "job_applications/email/new_for_siae_subject.txt"
+        body = "job_applications/email/new_for_siae_body.txt"
+        return self.get_email_message(from_email, to, context, subject, body)
+
+    def accept_for_job_seeker(self):
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to = [self.job_request.job_seeker.email]
+        context = {
+            "job_seeker": self.job_request.job_seeker,
+            "acceptance_message": self.job_request.acceptance_message,
+            "siae": self.job_request.siae,
+        }
+        subject = "job_applications/email/accept_for_job_seeker_subject.txt"
+        body = "job_applications/email/accept_for_job_seeker_body.txt"
+        return self.get_email_message(from_email, to, context, subject, body)
+
+    def accept_for_prescriber(self):
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to = [self.job_request.prescriber_user.email]
+        context = {
+            "job_seeker": self.job_request.job_seeker,
+            "acceptance_message": self.job_request.acceptance_message,
+            "siae": self.job_request.siae,
+        }
+        subject = "job_applications/email/accept_for_prescriber_subject.txt"
+        body = "job_applications/email/accept_for_prescriber_body.txt"
+        return self.get_email_message(from_email, to, context, subject, body)
 
 
 class JobRequestTransitionLog(xwf_models.BaseTransitionLog):
@@ -186,7 +240,9 @@ class JobRequestTransitionLog(xwf_models.BaseTransitionLog):
     https://django-xworkflows.readthedocs.io/en/latest/internals.html#django_xworkflows.models.BaseTransitionLog
     """
 
-    job_request = models.ForeignKey(JobRequest, on_delete=models.CASCADE)
+    job_request = models.ForeignKey(
+        JobRequest, related_name="logs", on_delete=models.CASCADE
+    )
 
     # Extra data to keep about transitions.
     user = models.ForeignKey(
