@@ -6,11 +6,11 @@
 {# ------------------------------------------------------------------------------------------------ #}
 
 
-{% blocktrans with job_seeker_first_name=job_seeker.first_name siae_name_=siae.name %}
+{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.name %}
 
-Félicitations {{ job_seeker_first_name }},
+Félicitations {{ first_name }},
 
-Votre candidature a été acceptée par {{ siae_name_ }}.
+Votre candidature a été acceptée par {{ siae }}.
 {% endblocktrans %}
 
 
@@ -19,7 +19,7 @@ Votre candidature a été acceptée par {{ siae_name_ }}.
 
 {% trans "*Message de l'entreprise* :" %}
 
-{{ acceptance_message }}
+{{ job_request.acceptance_message }}
 
 
 {# ------------------------------------------------------------------------------------------------ #}
@@ -35,7 +35,7 @@ Votre candidature a été acceptée par {{ siae_name_ }}.
 
 {% trans "*Voir la fiche de l'entreprise* :" %}
 
-{{ itou_protocol }}://{{ itou_fqdn }}{{ siae.get_card_url }}
+{{ itou_protocol }}://{{ itou_fqdn }}{{ job_request.siae.get_card_url }}
 
 
 {# ------------------------------------------------------------------------------------------------ #}

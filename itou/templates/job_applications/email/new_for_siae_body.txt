@@ -4,47 +4,47 @@
 
 {# ------------------------------------------------------------------------------------------------ #}
 
-{% blocktrans with job_seeker_first_name=job_seeker.first_name job_seeker_last_name=job_seeker.last_name job_seeker_email=job_seeker.email %}
+{% blocktrans with first_name=job_request.job_seeker.first_name last_name=job_request.job_seeker.last_name email=job_request.job_seeker.email %}
 
 Vous avez reçu une nouvelle candidature !
 
 *Candidat* :
 
-- Nom : {{ job_seeker_last_name }}
-- Prénom : {{ job_seeker_first_name }}
-- Email : {{ job_seeker_email }}
+- Nom : {{ last_name }}
+- Prénom : {{ first_name }}
+- Email : {{ email }}
 
 {% endblocktrans %}
 
 {# ------------------------------------------------------------------------------------------------ #}
 
-{% if motivation_message %}
+{% if job_request.motivation_message %}
 
 {% trans "*Message du candidat* :" %}
 
-{{ motivation_message }}
+{{ job_request.motivation_message }}
 
 {% endif %}
 
 {# ------------------------------------------------------------------------------------------------ #}
 
-{% if jobs %}
+{% if job_request.jobs.exists %}
 
 {% trans "*Métier(s) recherché(s)* :" %}
 
-{% for job in jobs %}
+{% for job in job_request.jobs.all %}
 - {{ job.name }}{% endfor %}
 
 {% endif %}
 
 {# ------------------------------------------------------------------------------------------------ #}
 
-{% if prescriber_user %}
+{% if job_request.prescriber_user %}
 
 {% trans "*Prescripteur* :" %}
 
-- {{ prescriber_user.get_full_name }}{% if prescriber.name %} ({{ prescriber.name }}){% endif %}
-- {{ prescriber_user.email }}
+- {{ job_request.prescriber_user.get_full_name }}{% if job_request.prescriber.name %} ({{ job_request.prescriber.name }}){% endif %}
+- {{ job_request.prescriber_user.email }}
 
 {% endif %}
 
