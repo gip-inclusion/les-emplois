@@ -3,7 +3,7 @@ from unittest import mock
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.template import Context, Template
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
 from itou.prescribers.models import Prescriber
 from itou.utils.apis.geocoding import process_geocoding_data
@@ -11,6 +11,7 @@ from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.templatetags import format_filters
+from itou.utils.urls import get_safe_url
 from itou.utils.validators import validate_naf, validate_siret
 
 
@@ -133,3 +134,32 @@ class UtilsTemplateFiltersTestCase(TestCase):
         """Test `format_phone` template filter."""
         self.assertEqual(format_filters.format_phone(""), "")
         self.assertEqual(format_filters.format_phone("0102030405"), "01 02 03 04 05")
+
+
+class UtilsEmailsTestCase(TestCase):
+    def test_get_safe_url(self):
+        """Test `urls.get_safe_url()`."""
+
+        request = RequestFactory().get(
+            "/?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67"
+        )
+        url = get_safe_url(request, "next")
+        expected = "/siae/search?distance=100&city=strasbourg-67"
+        self.assertEqual(url, expected)
+
+        request = RequestFactory().post(
+            "/", data={"next": "/siae/search?distance=100&city=strasbourg-67"}
+        )
+        url = get_safe_url(request, "next")
+        expected = "/siae/search?distance=100&city=strasbourg-67"
+        self.assertEqual(url, expected)
+
+        request = RequestFactory().get("/?next=https://evil.com/siae/search")
+        url = get_safe_url(request, "next")
+        expected = None
+        self.assertEqual(url, expected)
+
+        request = RequestFactory().post("/", data={"next": "https://evil.com"})
+        url = get_safe_url(request, "next", fallback_url="/fallback")
+        expected = "/fallback"
+        self.assertEqual(url, expected)

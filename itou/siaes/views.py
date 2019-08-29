@@ -40,7 +40,7 @@ def card(request, siret, template_name="siaes/card.html"):
     """
     queryset = Siae.active_objects.prefetch_jobs_through(is_active=True)
     siae = get_object_or_404(queryset, siret=siret)
-    next_url = get_safe_url(request, "next", default=None)
+    next_url = get_safe_url(request, "next")
     context = {"next": next_url, "siae": siae}
     return render(request, template_name, context)
 

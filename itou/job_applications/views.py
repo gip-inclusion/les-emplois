@@ -17,7 +17,7 @@ def send_job_request(request, siret, template_name="job_applications/job_request
     Submit a job request.
     """
 
-    next_url = get_safe_url(request, "next")
+    next_url = get_safe_url(request, "next", fallback_url="/")
 
     # if not request.user.can_postulate():
     #     current_url = request.build_absolute_uri()
