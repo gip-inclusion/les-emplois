@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with full_name=job_request.job_seeker.get_full_name siae=job_request.siae.name %}
+{% blocktrans with full_name=job_request.job_seeker.get_full_name siae=job_request.siae.display_name %}
 
 La candidature de {{ full_name }} chez {{ siae }} n'a malheureusement pas pu aboutir.
 {% endblocktrans %}

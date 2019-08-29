@@ -45,7 +45,7 @@ class JobRequestEmailTest(TestCase):
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_request.job_seeker.first_name, email.body)
-        self.assertIn(job_request.siae.name, email.body)
+        self.assertIn(job_request.siae.display_name, email.body)
         self.assertIn(job_request.acceptance_message, email.body)
         self.assertIn(job_request.siae.get_card_url(), email.body)
 
@@ -56,7 +56,7 @@ class JobRequestEmailTest(TestCase):
         self.assertIn(job_request.prescriber_user.email, email.to)
         self.assertEqual(len(email.to), 1)
         # Body.
-        self.assertIn(job_request.siae.name, email.body)
+        self.assertIn(job_request.siae.display_name, email.body)
         self.assertIn(job_request.job_seeker.get_full_name(), email.body)
         self.assertIn(job_request.acceptance_message, email.body)
         self.assertIn(job_request.siae.get_card_url(), email.body)
@@ -69,7 +69,7 @@ class JobRequestEmailTest(TestCase):
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_request.job_seeker.first_name, email.body)
-        self.assertIn(job_request.siae.name, email.body)
+        self.assertIn(job_request.siae.display_name, email.body)
         self.assertIn(job_request.rejection_message, email.body)
 
     def test_reject_for_prescriber(self):
@@ -80,7 +80,7 @@ class JobRequestEmailTest(TestCase):
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_request.job_seeker.first_name, email.body)
-        self.assertIn(job_request.siae.name, email.body)
+        self.assertIn(job_request.siae.display_name, email.body)
         self.assertIn(job_request.rejection_message, email.body)
 
 

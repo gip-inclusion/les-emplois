@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.name %}
+{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.display_name %}
 Félicitations {{ first_name }},
 
 Votre candidature a été acceptée par {{ siae }}.

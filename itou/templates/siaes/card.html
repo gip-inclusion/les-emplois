@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load format_filters %}
 
-{% block title %}{{ siae.name }}{{ block.super }}{% endblock %}
+{% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -14,7 +14,7 @@
 
     <hr>
 
-    <h1>{{ siae.name|title }}</h1>
+    <h1>{{ siae.display_name }}</h1>
 
     <h2 class="text-muted">
         {{ siae.address_line_1 }},

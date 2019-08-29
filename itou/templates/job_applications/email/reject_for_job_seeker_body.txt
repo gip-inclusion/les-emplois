@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.name %}
+{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.display_name %}
 {{ first_name }},
 
 Votre candidature chez {{ siae }} n'a malheureusement pas pu aboutir.

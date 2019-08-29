@@ -7,5 +7,7 @@ from itou.job_applications import views
 app_name = "job_applications"
 
 urlpatterns = [
-    re_path(r"^(?P<siret>\d{14})/job_request$", views.send_job_request, name="job_request")
+    re_path(
+        r"^(?P<siret>\d{14})/job_request$", views.send_job_request, name="job_request"
+    )
 ]

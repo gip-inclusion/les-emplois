@@ -108,7 +108,13 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         verbose_name_plural = _("Structures d'insertion par l'activité économique")
 
     def __str__(self):
-        return f"{self.siret} {self.name}"
+        return f"{self.siret} {self.display_name}"
+
+    @property
+    def display_name(self):
+        if self.brand:
+            return self.brand
+        return self.name.title()
 
     def get_card_url(self):
         return reverse("siae:card", kwargs={"siret": self.siret})
