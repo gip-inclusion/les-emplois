@@ -10,8 +10,6 @@ from django.utils.translation import gettext_lazy as _
 from anymail.exceptions import AnymailRequestsAPIError
 from django_xworkflows import models as xwf_models
 
-from itou.prescribers.models import Prescriber
-from itou.siaes.models import Siae
 from itou.utils.emails import get_email_text_template
 
 
@@ -79,7 +77,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     )
 
     siae = models.ForeignKey(
-        Siae,
+        "siaes.Siae",
         verbose_name=_("SIAE"),
         on_delete=models.CASCADE,
         related_name="job_requests_received",
@@ -96,7 +94,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     # The prescriber can be a member of multiple organizations.
     # Keep track of the current one.
     prescriber = models.ForeignKey(
-        Prescriber,
+        "prescribers.Prescriber",
         verbose_name=_("Organisation du prescripteur"),
         on_delete=models.SET_NULL,
         null=True,
@@ -130,6 +128,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     class Meta:
         verbose_name = _("Candidature")
         verbose_name_plural = _("Candidatures")
+        ordering = ["-created_at"]
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
