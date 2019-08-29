@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
@@ -9,6 +9,7 @@ from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 
 
+@login_required
 @user_passes_test(
     lambda user: user.is_job_seeker, login_url="/", redirect_field_name=None
 )
