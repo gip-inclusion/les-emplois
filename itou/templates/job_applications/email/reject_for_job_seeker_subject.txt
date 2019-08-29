@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% blocktrans %}Votre candidature n'a pas abouti{% endblocktrans %}
+{% endautoescape %}

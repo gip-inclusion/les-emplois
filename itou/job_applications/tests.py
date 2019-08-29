@@ -61,6 +61,28 @@ class JobRequestEmailTest(TestCase):
         self.assertIn(job_request.acceptance_message, email.body)
         self.assertIn(job_request.siae.get_card_url(), email.body)
 
+    def test_reject_for_job_seeker(self):
+        job_request = JobRequestWithPrescriberFactory(jobs=Appellation.objects.all())
+        email = job_request.email_reject_for_job_seeker
+        # To.
+        self.assertIn(job_request.job_seeker.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_request.job_seeker.first_name, email.body)
+        self.assertIn(job_request.siae.name, email.body)
+        self.assertIn(job_request.rejection_message, email.body)
+
+    def test_reject_for_prescriber(self):
+        job_request = JobRequestWithPrescriberFactory(jobs=Appellation.objects.all())
+        email = job_request.email_reject_for_prescriber
+        # To.
+        self.assertIn(job_request.prescriber_user.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_request.job_seeker.first_name, email.body)
+        self.assertIn(job_request.siae.name, email.body)
+        self.assertIn(job_request.rejection_message, email.body)
+
 
 class JobRequestWorkflowTest(TestCase):
     """Test JobRequest workflow."""
@@ -72,13 +94,9 @@ class JobRequestWorkflowTest(TestCase):
 
     def test_send(self):
         job_request = JobRequestWithPrescriberFactory(jobs=Appellation.objects.all())
-        # Current status.
         self.assertTrue(job_request.state.is_new)
-        # Trigger transition.
         job_request.send()
-        # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
-        # New status.
         self.assertTrue(job_request.state.is_pending_answer)
 
     def test_send_fail(self):
@@ -94,20 +112,17 @@ class JobRequestWorkflowTest(TestCase):
             jobs=Appellation.objects.all(),
             state=JobRequestWorkflow.STATE_PENDING_ANSWER,
         )
-        # Current status.
         self.assertTrue(job_request.state.is_pending_answer)
-        # Trigger transition.
         job_request.accept()
-        # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
-        # New status.
         self.assertTrue(job_request.state.is_accepted)
 
-        # print('-' * 80)
-        # print(mail.outbox[0].subject)
-        # print('-' * 10)
-        # print(mail.outbox[0].body)
-        # print('-' * 80)
-        # print(mail.outbox[1].subject)
-        # print('-' * 10)
-        # print(mail.outbox[1].body)
+    def test_reject(self):
+        job_request = JobRequestWithPrescriberFactory(
+            jobs=Appellation.objects.all(),
+            state=JobRequestWorkflow.STATE_PENDING_ANSWER,
+        )
+        self.assertTrue(job_request.state.is_pending_answer)
+        job_request.reject()
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue(job_request.state.is_rejected)

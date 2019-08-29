@@ -149,6 +149,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
+        # TODO: mark other related job request as obsolete.
         try:
             connection = mail.get_connection()
             emails = [self.email_accept_for_job_seeker]
@@ -163,7 +164,17 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def reject(self, *args, **kwargs):
-        pass
+        try:
+            connection = mail.get_connection()
+            emails = [self.email_reject_for_job_seeker]
+            if self.prescriber_user:
+                emails += [self.email_reject_for_prescriber]
+            connection.send_messages(emails)
+        except AnymailRequestsAPIError:
+            logger.error(
+                f"Email couldn't be sent during `reject` transition for JobRequest `{self.id}`"
+            )
+            raise xwf_models.AbortTransition()
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
@@ -208,6 +219,22 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_request": self}
         subject = "job_applications/email/accept_for_prescriber_subject.txt"
         body = "job_applications/email/accept_for_prescriber_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
+    def email_reject_for_job_seeker(self):
+        to = [self.job_seeker.email]
+        context = {"job_request": self}
+        subject = "job_applications/email/reject_for_job_seeker_subject.txt"
+        body = "job_applications/email/reject_for_job_seeker_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
+    def email_reject_for_prescriber(self):
+        to = [self.prescriber_user.email]
+        context = {"job_request": self}
+        subject = "job_applications/email/reject_for_prescriber_subject.txt"
+        body = "job_applications/email/reject_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
 
 
