@@ -48,7 +48,7 @@ class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
 
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
+        user.is_prescriber_staff = True
         user.save()
 
         prescriber, is_new = Prescriber.objects.get_or_create(

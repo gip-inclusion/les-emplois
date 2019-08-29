@@ -57,7 +57,7 @@ class SignupTest(TestCase):
 
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
+        self.assertTrue(user.is_prescriber_staff)
         self.assertFalse(user.is_siae_staff)
 
         prescriber = Prescriber.objects.get(siret=post_data["siret"])
@@ -92,7 +92,7 @@ class SignupTest(TestCase):
 
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(user.is_job_seeker)
-        self.assertFalse(user.is_prescriber)
+        self.assertFalse(user.is_prescriber_staff)
         self.assertTrue(user.is_siae_staff)
 
         siae = Siae.active_objects.get(siret=post_data["siret"])
@@ -121,7 +121,7 @@ class SignupTest(TestCase):
 
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertTrue(user.is_job_seeker)
-        self.assertFalse(user.is_prescriber)
+        self.assertFalse(user.is_prescriber_staff)
         self.assertFalse(user.is_siae_staff)
 
 

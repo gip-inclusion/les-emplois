@@ -21,6 +21,20 @@
             </div>
         </div>
 
+        {% if user.is_staff %}
+            <div class="card">
+                <h5 class="card-header">{% trans "Admin" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="key" %}
+                        <a href="{% url 'admin:index' %}">
+                            {% trans "Admin" %}
+                        </a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
         {% if user.is_siae_staff and current_siae %}
             <div class="card">
                 <h5 class="card-header">{% trans "Métiers" %}</h5>
