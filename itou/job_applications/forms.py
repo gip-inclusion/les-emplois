@@ -2,10 +2,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
-from itou.job_applications.models import JobRequest
+from itou.job_applications.models import JobApplication
 
 
-class JobRequestForm(forms.ModelForm):
+class JobApplicationForm(forms.ModelForm):
     """
     Submit a job request to an SIAE.
     """
@@ -23,7 +23,7 @@ class JobRequestForm(forms.ModelForm):
     )
 
     class Meta:
-        model = JobRequest
+        model = JobApplication
         fields = ["prescriber_user_email", "jobs", "motivation_message"]
         widgets = {"jobs": forms.CheckboxSelectMultiple()}
         labels = {"jobs": _("Métiers recherchés (optionnel)")}
@@ -46,16 +46,18 @@ class JobRequestForm(forms.ModelForm):
         return prescriber_user_email
 
     def save(self, commit=True):
-        job_request = super().save(commit=False)
-        job_request.job_seeker = self.user
-        job_request.siae = self.siae
+        job_application = super().save(commit=False)
+        job_application.job_seeker = self.user
+        job_application.siae = self.siae
         if self.prescriber_user:
-            job_request.prescriber_user = self.prescriber_user
+            job_application.prescriber_user = self.prescriber_user
             # Assume we have only one organization per prescriber staff at the moment
-            job_request.prescriber = job_request.prescriber_user.prescriber_set.first()
+            job_application.prescriber = (
+                job_application.prescriber_user.prescriber_set.first()
+            )
         if commit:
-            job_request.save()
+            job_application.save()
             # Handle many to many.
             for job in self.cleaned_data["jobs"]:
-                job_request.jobs.add(job)
-        return job_request
+                job_application.jobs.add(job)
+        return job_application

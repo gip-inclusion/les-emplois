@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.display_name %}
+{% blocktrans with first_name=job_application.job_seeker.first_name siae=job_application.siae.display_name %}
 {{ first_name }},
 
 Votre candidature chez {{ siae }} n'a malheureusement pas pu aboutir.
@@ -10,6 +10,6 @@ Votre candidature chez {{ siae }} n'a malheureusement pas pu aboutir.
 
 {% trans "*Message de l'entreprise* :" %}
 
-{{ job_request.rejection_message }}
+{{ job_application.rejection_message }}
 
 {% endblock body %}

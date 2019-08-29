@@ -4,13 +4,13 @@ from itou.job_applications import models
 
 
 class JobsInline(admin.TabularInline):
-    model = models.JobRequest.jobs.through
+    model = models.JobApplication.jobs.through
     extra = 1
     raw_id_fields = ("appellation",)
 
 
-@admin.register(models.JobRequest)
-class JobRequestAdmin(admin.ModelAdmin):
+@admin.register(models.JobApplication)
+class JobApplicationAdmin(admin.ModelAdmin):
     list_display = ("id", "job_seeker", "prescriber_user", "siae", "created_at")
     raw_id_fields = ("job_seeker", "siae", "prescriber_user", "prescriber", "jobs")
     list_filter = ("state",)
@@ -18,12 +18,12 @@ class JobRequestAdmin(admin.ModelAdmin):
     inlines = (JobsInline,)
 
 
-@admin.register(models.JobRequestTransitionLog)
-class JobRequestTransitionLogAdmin(admin.ModelAdmin):
+@admin.register(models.JobApplicationTransitionLog)
+class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
     actions = None
     date_hierarchy = "timestamp"
     list_display = (
-        "job_request",
+        "job_application",
         "transition",
         "from_state",
         "to_state",
@@ -31,7 +31,7 @@ class JobRequestTransitionLogAdmin(admin.ModelAdmin):
         "timestamp",
     )
     list_filter = ("transition",)
-    raw_id_fields = ("job_request", "user")
+    raw_id_fields = ("job_application", "user")
     read_only_fields = (
         "user",
         "modified_object",

@@ -16,7 +16,7 @@ from itou.utils.emails import get_email_text_template
 logger = logging.getLogger(__name__)
 
 
-class JobRequestWorkflow(xwf_models.Workflow):
+class JobApplicationWorkflow(xwf_models.Workflow):
 
     STATE_NEW = "new"
     STATE_PENDING_ANSWER = "pending_answer"
@@ -55,12 +55,12 @@ class JobRequestWorkflow(xwf_models.Workflow):
 
     initial_state = STATE_NEW
 
-    log_model = "job_applications.JobRequestTransitionLog"
+    log_model = "job_applications.JobApplicationTransitionLog"
 
 
-class JobRequest(xwf_models.WorkflowEnabled, models.Model):
+class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """
-    An "unsolicited" Job application request.
+    An "unsolicited" job application.
 
     It inherits from `xwf_models.WorkflowEnabled` to add a workflow to its `state` field:
         - https://github.com/rbarrois/django_xworkflows
@@ -73,14 +73,14 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
         on_delete=models.CASCADE,
-        related_name="job_requests_sent",
+        related_name="job_applications_sent",
     )
 
     siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name=_("SIAE"),
         on_delete=models.CASCADE,
-        related_name="job_requests_received",
+        related_name="job_applications_received",
     )
 
     prescriber_user = models.ForeignKey(
@@ -89,7 +89,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="job_requests_prescribed",
+        related_name="job_applications_prescribed",
     )
     # The prescriber can be a member of multiple organizations.
     # Keep track of the current one.
@@ -102,7 +102,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     )
 
     state = xwf_models.StateField(
-        JobRequestWorkflow, verbose_name=_("État"), db_index=True
+        JobApplicationWorkflow, verbose_name=_("État"), db_index=True
     )
 
     # Jobs in which the job seeker is interested (optional).
@@ -142,13 +142,13 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
             self.email_new_for_siae.send()
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `send` transition for JobRequest `{self.id}`"
+                f"Email couldn't be sent during `send` transition for JobApplication `{self.id}`"
             )
             raise xwf_models.AbortTransition()
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
-        # TODO: mark other related job request as obsolete.
+        # TODO: mark other related job applications as obsolete.
         try:
             connection = mail.get_connection()
             emails = [self.email_accept_for_job_seeker]
@@ -157,7 +157,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `accept` transition for JobRequest `{self.id}`"
+                f"Email couldn't be sent during `accept` transition for JobApplication `{self.id}`"
             )
             raise xwf_models.AbortTransition()
 
@@ -171,7 +171,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `reject` transition for JobRequest `{self.id}`"
+                f"Email couldn't be sent during `reject` transition for JobApplication `{self.id}`"
             )
             raise xwf_models.AbortTransition()
 
@@ -199,7 +199,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_new_for_siae(self):
         to = self.get_siae_recipents_email_list()
-        context = {"job_request": self}
+        context = {"job_application": self}
         subject = "job_applications/email/new_for_siae_subject.txt"
         body = "job_applications/email/new_for_siae_body.txt"
         return self.get_email_message(to, context, subject, body)
@@ -207,7 +207,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_accept_for_job_seeker(self):
         to = [self.job_seeker.email]
-        context = {"job_request": self}
+        context = {"job_application": self}
         subject = "job_applications/email/accept_for_job_seeker_subject.txt"
         body = "job_applications/email/accept_for_job_seeker_body.txt"
         return self.get_email_message(to, context, subject, body)
@@ -215,7 +215,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_accept_for_prescriber(self):
         to = [self.prescriber_user.email]
-        context = {"job_request": self}
+        context = {"job_application": self}
         subject = "job_applications/email/accept_for_prescriber_subject.txt"
         body = "job_applications/email/accept_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
@@ -223,7 +223,7 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_reject_for_job_seeker(self):
         to = [self.job_seeker.email]
-        context = {"job_request": self}
+        context = {"job_application": self}
         subject = "job_applications/email/reject_for_job_seeker_subject.txt"
         body = "job_applications/email/reject_for_job_seeker_body.txt"
         return self.get_email_message(to, context, subject, body)
@@ -231,22 +231,22 @@ class JobRequest(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_reject_for_prescriber(self):
         to = [self.prescriber_user.email]
-        context = {"job_request": self}
+        context = {"job_application": self}
         subject = "job_applications/email/reject_for_prescriber_subject.txt"
         body = "job_applications/email/reject_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
 
 
-class JobRequestTransitionLog(xwf_models.BaseTransitionLog):
+class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     """
-    JobRequest's transition logs are stored in this table.
+    JobApplication's transition logs are stored in this table.
     https://django-xworkflows.readthedocs.io/en/latest/internals.html#django_xworkflows.models.BaseTransitionLog
     """
 
-    MODIFIED_OBJECT_FIELD = "job_request"
+    MODIFIED_OBJECT_FIELD = "job_application"
     EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
-    job_request = models.ForeignKey(
-        JobRequest, related_name="logs", on_delete=models.CASCADE
+    job_application = models.ForeignKey(
+        JobApplication, related_name="logs", on_delete=models.CASCADE
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL

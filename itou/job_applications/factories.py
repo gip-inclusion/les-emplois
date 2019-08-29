@@ -7,11 +7,11 @@ from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
 
 
-class JobRequestFactory(factory.django.DjangoModelFactory):
-    """Generates a JobRequest() object for unit tests."""
+class JobApplicationFactory(factory.django.DjangoModelFactory):
+    """Generates a JobApplication() object for unit tests."""
 
     class Meta:
-        model = models.JobRequest
+        model = models.JobApplication
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
     siae = factory.SubFactory(SiaeWithMembershipFactory)
@@ -28,7 +28,7 @@ class JobRequestFactory(factory.django.DjangoModelFactory):
         Usage:
             job1 = Appellation.objects.filter(code='10933')
             job2 = Appellation.objects.filter(code='10934')
-            JobRequestFactory(jobs=(job1, job2))
+            JobApplicationFactory(jobs=(job1, job2))
         """
         if not create:
             # Simple build, do nothing.
@@ -40,8 +40,8 @@ class JobRequestFactory(factory.django.DjangoModelFactory):
                 self.jobs.add(job)
 
 
-class JobRequestWithPrescriberFactory(JobRequestFactory):
-    """Generates a JobRequest() object with a Prescriber() and its user for unit tests."""
+class JobApplicationWithPrescriberFactory(JobApplicationFactory):
+    """Generates a JobApplication() object with a Prescriber() and its user for unit tests."""
 
     prescriber = factory.SubFactory(PrescriberWithMembershipFactory)
     prescriber_user = factory.LazyAttribute(lambda o: o.prescriber.members.first())

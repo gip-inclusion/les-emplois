@@ -2,7 +2,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.display_name %}
+{% blocktrans with first_name=job_application.job_seeker.first_name siae=job_application.siae.display_name %}
 Félicitations {{ first_name }},
 
 Votre candidature a été acceptée par {{ siae }}.
@@ -10,7 +10,7 @@ Votre candidature a été acceptée par {{ siae }}.
 
 {% trans "*Message de l'entreprise* :" %}
 
-{{ job_request.acceptance_message }}
+{{ job_application.acceptance_message }}
 
 {% trans "*Et maintenant ?*" %}
 
@@ -18,6 +18,6 @@ Votre candidature a été acceptée par {{ siae }}.
 
 {% trans "*Voir la fiche de l'entreprise* :" %}
 
-{{ itou_protocol }}://{{ itou_fqdn }}{{ job_request.siae.get_card_url }}
+{{ itou_protocol }}://{{ itou_fqdn }}{{ job_application.siae.get_card_url }}
 
 {% endblock body %}

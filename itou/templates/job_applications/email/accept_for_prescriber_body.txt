@@ -2,13 +2,13 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with full_name=job_request.job_seeker.get_full_name siae=job_request.siae.display_name %}
+{% blocktrans with full_name=job_application.job_seeker.get_full_name siae=job_application.siae.display_name %}
 La candidature de {{ full_name }} a été acceptée par {{ siae }}.
 {% endblocktrans %}
 
 {% trans "*Message de l'entreprise* :" %}
 
-{{ job_request.acceptance_message }}
+{{ job_application.acceptance_message }}
 
 {% trans "*Et maintenant ?*" %}
 
@@ -16,6 +16,6 @@ La candidature de {{ full_name }} a été acceptée par {{ siae }}.
 
 {% trans "*Voir la fiche de l'entreprise* :" %}
 
-{{ itou_protocol }}://{{ itou_fqdn }}{{ job_request.siae.get_card_url }}
+{{ itou_protocol }}://{{ itou_fqdn }}{{ job_application.siae.get_card_url }}
 
 {% endblock body %}
