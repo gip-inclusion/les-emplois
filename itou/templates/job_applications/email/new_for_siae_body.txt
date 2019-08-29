@@ -1,12 +1,8 @@
-{% extends "layout/base_email_body.txt" %}
+{% extends "layout/base_email_text_body.txt" %}
 {% load i18n %}
 {% block body %}
-{% autoescape off %}
-
-{# ------------------------------------------------------------------------------------------------ #}
 
 {% blocktrans with first_name=job_request.job_seeker.first_name last_name=job_request.job_seeker.last_name email=job_request.job_seeker.email %}
-
 Vous avez reçu une nouvelle candidature !
 
 *Candidat* :
@@ -14,10 +10,7 @@ Vous avez reçu une nouvelle candidature !
 - Nom : {{ last_name }}
 - Prénom : {{ first_name }}
 - Email : {{ email }}
-
 {% endblocktrans %}
-
-{# ------------------------------------------------------------------------------------------------ #}
 
 {% if job_request.motivation_message %}
 
@@ -26,8 +19,6 @@ Vous avez reçu une nouvelle candidature !
 {{ job_request.motivation_message }}
 
 {% endif %}
-
-{# ------------------------------------------------------------------------------------------------ #}
 
 {% if job_request.jobs.exists %}
 
@@ -38,8 +29,6 @@ Vous avez reçu une nouvelle candidature !
 
 {% endif %}
 
-{# ------------------------------------------------------------------------------------------------ #}
-
 {% if job_request.prescriber_user %}
 
 {% trans "*Prescripteur* :" %}
@@ -49,11 +38,6 @@ Vous avez reçu une nouvelle candidature !
 
 {% endif %}
 
-{# ------------------------------------------------------------------------------------------------ #}
-
 {% trans "Répondre à la candidature" %}
 
-{# ------------------------------------------------------------------------------------------------ #}
-
-{% endautoescape %}
 {% endblock body %}

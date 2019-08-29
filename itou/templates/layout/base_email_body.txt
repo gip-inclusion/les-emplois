@@ -1,5 +1,0 @@
-{% load i18n %}
-{% block body %}{% endblock %}
-
-{% blocktrans %}L'équipe Itou
-La plate-forme numérique de l'inclusion{% endblocktrans %}

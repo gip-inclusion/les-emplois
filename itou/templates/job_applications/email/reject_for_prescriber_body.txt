@@ -1,28 +1,14 @@
-{% extends "layout/base_email_body.txt" %}
+{% extends "layout/base_email_text_body.txt" %}
 {% load i18n %}
 {% block body %}
-{% autoescape off %}
-
-
-{# ------------------------------------------------------------------------------------------------ #}
-
 
 {% blocktrans with full_name=job_request.job_seeker.get_full_name siae=job_request.siae.name %}
 
 La candidature de {{ full_name }} chez {{ siae }} n'a malheureusement pas pu aboutir.
 {% endblocktrans %}
 
-
-{# ------------------------------------------------------------------------------------------------ #}
-
-
 {% trans "*Message de l'entreprise* :" %}
 
 {{ job_request.rejection_message }}
 
-
-{# ------------------------------------------------------------------------------------------------ #}
-
-
-{% endautoescape %}
 {% endblock body %}

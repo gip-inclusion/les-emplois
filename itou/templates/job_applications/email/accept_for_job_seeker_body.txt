@@ -1,45 +1,23 @@
-{% extends "layout/base_email_body.txt" %}
+{% extends "layout/base_email_text_body.txt" %}
 {% load i18n %}
 {% block body %}
-{% autoescape off %}
-
-{# ------------------------------------------------------------------------------------------------ #}
-
 
 {% blocktrans with first_name=job_request.job_seeker.first_name siae=job_request.siae.name %}
-
 Félicitations {{ first_name }},
 
 Votre candidature a été acceptée par {{ siae }}.
 {% endblocktrans %}
 
-
-{# ------------------------------------------------------------------------------------------------ #}
-
-
 {% trans "*Message de l'entreprise* :" %}
 
 {{ job_request.acceptance_message }}
-
-
-{# ------------------------------------------------------------------------------------------------ #}
-
 
 {% trans "*Et maintenant ?*" %}
 
 {% trans "L'entreprise va vous contacter rapidement." %}
 
-
-{# ------------------------------------------------------------------------------------------------ #}
-
-
 {% trans "*Voir la fiche de l'entreprise* :" %}
 
 {{ itou_protocol }}://{{ itou_fqdn }}{{ job_request.siae.get_card_url }}
 
-
-{# ------------------------------------------------------------------------------------------------ #}
-
-
-{% endautoescape %}
 {% endblock body %}

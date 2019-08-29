@@ -1,4 +1,5 @@
+{% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
-{% autoescape off %}
+{% block subject %}
 {% blocktrans %}Votre candidature n'a pas abouti{% endblocktrans %}
-{% endautoescape %}
+{% endblock %}

@@ -1,0 +1,11 @@
+{% load i18n %}
+{% autoescape off %}
+
+{% block body %}{% endblock %}
+
+{% blocktrans %}
+L'équipe Itou
+La plate-forme numérique de l'inclusion
+{% endblocktrans %}
+
+{% endautoescape %}
