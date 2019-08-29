@@ -1,6 +1,7 @@
 {% extends "layout/base_email_body.txt" %}
 {% load i18n %}
 {% block body %}
+{% autoescape off %}
 
 {# ------------------------------------------------------------------------------------------------ #}
 
@@ -54,4 +55,5 @@ Vous avez reçu une nouvelle candidature !
 
 {# ------------------------------------------------------------------------------------------------ #}
 
+{% endautoescape %}
 {% endblock body %}

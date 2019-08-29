@@ -1,8 +1,7 @@
 from unittest import mock
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 from django.core import mail
-from django.utils.html import escape
 
 from anymail.exceptions import AnymailRequestsAPIError
 from django_xworkflows import models as xwf_models
@@ -31,9 +30,9 @@ class JobRequestEmailTest(TestCase):
         self.assertIn(job_request.job_seeker.first_name, email.body)
         self.assertIn(job_request.job_seeker.last_name, email.body)
         self.assertIn(job_request.job_seeker.email, email.body)
-        self.assertIn(escape(job_request.motivation_message), email.body)
+        self.assertIn(job_request.motivation_message, email.body)
         for job in job_request.jobs.all():
-            self.assertIn(escape(job.name), email.body)
+            self.assertIn(job.name, email.body)
         self.assertIn(job_request.prescriber_user.get_full_name(), email.body)
         self.assertIn(job_request.prescriber_user.email, email.body)
         self.assertIn(job_request.prescriber.name, email.body)

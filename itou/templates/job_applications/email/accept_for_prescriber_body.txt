@@ -1,6 +1,7 @@
 {% extends "layout/base_email_body.txt" %}
 {% load i18n %}
 {% block body %}
+{% autoescape off %}
 
 
 {# ------------------------------------------------------------------------------------------------ #}
@@ -39,4 +40,5 @@ La candidature de {{ full_name }} a été acceptée par {{ siae }}.
 {# ------------------------------------------------------------------------------------------------ #}
 
 
+{% endautoescape %}
 {% endblock body %}
