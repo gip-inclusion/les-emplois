@@ -21,6 +21,11 @@ class User(AbstractUser):
         self.prescribermembership_set.all()
     """
 
+    birthdate = models.DateField(
+        verbose_name=_("Date de naissance"), null=True, blank=True
+    )
+    phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
+
     is_job_seeker = models.BooleanField(
         verbose_name=_("Demandeur d'emploi"), default=False
     )
@@ -28,6 +33,9 @@ class User(AbstractUser):
     is_siae_staff = models.BooleanField(
         verbose_name=_("Employeur (SIAE)"), default=False
     )
+
+    def can_postulate(self):
+        return self.birthdate and self.phone
 
 
 def get_allauth_account_user_display(user):

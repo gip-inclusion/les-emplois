@@ -51,10 +51,10 @@ LOCAL_APPS = [
     'itou.utils',
     'itou.cities',
     'itou.jobs',
-    'itou.siaes',
-    'itou.prescribers',
     'itou.users',
     'itou.accounts',
+    'itou.siaes',
+    'itou.prescribers',
     'itou.home',
     'itou.job_applications',
 ]

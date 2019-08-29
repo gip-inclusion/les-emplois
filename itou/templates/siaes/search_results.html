@@ -62,6 +62,11 @@
                         </ul>
                     {% endif %}
                 </div>
+                {% if user.is_authenticated and user.is_job_seeker and siae.jobs_through.exists %}
+                    <div class="card-footer">
+                        <a href="{% url 'job_applications:job_request' siret=siae.siret %}?next={{ request.get_full_path|urlencode }}">{% trans "Postuler" %}</a>
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
 

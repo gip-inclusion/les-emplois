@@ -3,12 +3,19 @@ from django.contrib import admin
 from itou.job_applications import models
 
 
+class JobsInline(admin.TabularInline):
+    model = models.JobRequest.jobs.through
+    extra = 1
+    raw_id_fields = ("appellation",)
+
+
 @admin.register(models.JobRequest)
 class JobRequestAdmin(admin.ModelAdmin):
     list_display = ("id", "job_seeker", "prescriber_user", "siae", "created_at")
     raw_id_fields = ("job_seeker", "siae", "prescriber_user", "prescriber", "jobs")
     list_filter = ("state",)
     read_only_fields = ("created_at", "updated_at")
+    inlines = (JobsInline,)
 
 
 @admin.register(models.JobRequestTransitionLog)

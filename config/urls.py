@@ -17,6 +17,7 @@ urlpatterns = [
     path('', home, name='home'),
     path('city/', include('itou.cities.urls')),
     path('jobs/', include('itou.jobs.urls')),
+    path('job_applications/', include('itou.job_applications.urls')),
     path('siae/', include('itou.siaes.urls')),
 
     # Errors pages.

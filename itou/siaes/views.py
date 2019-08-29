@@ -1,16 +1,15 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.http import is_safe_url
 from django.utils.translation import ugettext as _
 
 from itou.jobs.models import Appellation
 from itou.siaes.forms import SiaeSearchForm
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
+from itou.utils.urls import get_safe_url
 
 
 def search(request, template_name="siaes/search_results.html"):
@@ -41,15 +40,8 @@ def card(request, siret, template_name="siaes/card.html"):
     """
     queryset = Siae.active_objects.prefetch_jobs_through(is_active=True)
     siae = get_object_or_404(queryset, siret=siret)
-
-    next_url = request.GET.get("next")
-    url_is_safe = is_safe_url(
-        url=next_url,
-        allowed_hosts=settings.ALLOWED_HOSTS,
-        require_https=request.is_secure(),
-    )
-
-    context = {"next": next_url if url_is_safe else None, "siae": siae}
+    next_url = get_safe_url(request, "next", default=None)
+    context = {"next": next_url, "siae": siae}
     return render(request, template_name, context)
 
 
