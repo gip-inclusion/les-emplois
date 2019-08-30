@@ -8,8 +8,8 @@
 
     <h1 class="text-center">{% blocktrans %}Trouvez des <abbr title="Structures d'insertion par l'activité économique">SIAE</abbr> à{% endblocktrans %}</h1>
 
-    <form method="get" action="{% url 'siaes_views:search' %}" class="d-block my-3">
-        {% include "siaes/includes/search_form.html" with form=siae_search_form %}
+    <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
+        {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
     </form>
 
 {% endblock %}
