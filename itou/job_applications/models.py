@@ -200,40 +200,40 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def email_new_for_siae(self):
         to = self.get_siae_recipents_email_list()
         context = {"job_application": self}
-        subject = "job_applications/email/new_for_siae_subject.txt"
-        body = "job_applications/email/new_for_siae_body.txt"
+        subject = "apply/email/new_for_siae_subject.txt"
+        body = "apply/email/new_for_siae_body.txt"
         return self.get_email_message(to, context, subject, body)
 
     @property
     def email_accept_for_job_seeker(self):
         to = [self.job_seeker.email]
         context = {"job_application": self}
-        subject = "job_applications/email/accept_for_job_seeker_subject.txt"
-        body = "job_applications/email/accept_for_job_seeker_body.txt"
+        subject = "apply/email/accept_for_job_seeker_subject.txt"
+        body = "apply/email/accept_for_job_seeker_body.txt"
         return self.get_email_message(to, context, subject, body)
 
     @property
     def email_accept_for_prescriber(self):
         to = [self.prescriber_user.email]
         context = {"job_application": self}
-        subject = "job_applications/email/accept_for_prescriber_subject.txt"
-        body = "job_applications/email/accept_for_prescriber_body.txt"
+        subject = "apply/email/accept_for_prescriber_subject.txt"
+        body = "apply/email/accept_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
 
     @property
     def email_reject_for_job_seeker(self):
         to = [self.job_seeker.email]
         context = {"job_application": self}
-        subject = "job_applications/email/reject_for_job_seeker_subject.txt"
-        body = "job_applications/email/reject_for_job_seeker_body.txt"
+        subject = "apply/email/reject_for_job_seeker_subject.txt"
+        body = "apply/email/reject_for_job_seeker_body.txt"
         return self.get_email_message(to, context, subject, body)
 
     @property
     def email_reject_for_prescriber(self):
         to = [self.prescriber_user.email]
         context = {"job_application": self}
-        subject = "job_applications/email/reject_for_prescriber_subject.txt"
-        body = "job_applications/email/reject_for_prescriber_body.txt"
+        subject = "apply/email/reject_for_prescriber_subject.txt"
+        body = "apply/email/reject_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
 
 

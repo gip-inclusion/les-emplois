@@ -10,7 +10,7 @@ from itou.users.factories import DEFAULT_PASSWORD
 class CardViewTest(TestCase):
     def test_card(self):
         siae = SiaeFactory()
-        url = reverse("siae:card", kwargs={"siret": siae.siret})
+        url = reverse("siaes_views:card", kwargs={"siret": siae.siret})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         response_content = str(response.content)
@@ -41,7 +41,7 @@ class ConfigureJobsViewTest(TestCase):
         cls.siae = siae
         cls.user = user
 
-        cls.url = reverse("siae:configure_jobs", kwargs={"siret": siae.siret})
+        cls.url = reverse("siaes_views:configure_jobs", kwargs={"siret": siae.siret})
 
     def test_access(self):
 

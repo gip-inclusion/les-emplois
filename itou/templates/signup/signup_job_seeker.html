@@ -2,16 +2,16 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Prescripteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Demandeur d'emploi - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Prescripteur" %}
+    {% trans "Demandeur d'emploi" %}
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
 
-<form method="post" action="{% url 'accounts:prescriber_signup' %}" role="form">
+<form method="post" action="{% url 'signup:job_seeker' %}" role="form">
 
     {% csrf_token %}
 
@@ -24,7 +24,6 @@
     {% bootstrap_field form.first_name %}
     {% bootstrap_field form.last_name %}
     {% bootstrap_field form.email %}
-    {% bootstrap_field form.siret %}
     {% bootstrap_field form.password1 %}
     {% bootstrap_field form.password2 %}
 

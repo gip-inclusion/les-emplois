@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from itou.jobs.models import Appellation
-from itou.siaes.forms import SiaeSearchForm
+from itou.www.siaes_views.forms import SiaeSearchForm
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
@@ -94,7 +94,7 @@ def configure_jobs(request, siret, template_name="siaes/configure_jobs.html"):
 
             messages.success(request, _("Mise à jour effectuée !"))
             return HttpResponseRedirect(
-                reverse("siae:configure_jobs", kwargs={"siret": siae.siret})
+                reverse("siaes_views:configure_jobs", kwargs={"siret": siae.siret})
             )
 
     context = {"siae": siae}

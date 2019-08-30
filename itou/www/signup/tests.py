@@ -24,7 +24,7 @@ class SignupTest(TestCase):
         self.assertEqual(ALLAUTH_SIGNUP_URL, "/accounts/signup/")
         response = self.client.get(ALLAUTH_SIGNUP_URL)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "account_itou/signup.html")
+        self.assertTemplateUsed(response, "signup/signup.html")
         response = self.client.post(ALLAUTH_SIGNUP_URL, data={"foo": "bar"})
         self.assertEqual(response.status_code, 405)
 
@@ -38,7 +38,7 @@ class SignupTest(TestCase):
     def test_prescriber_signup(self, mock_call_ban_geocoding_api, mock_call_insee_api):
         """Prescriber signup."""
 
-        url = reverse("accounts:prescriber_signup")
+        url = reverse("signup:prescriber")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -75,7 +75,7 @@ class SignupTest(TestCase):
 
         siae = SiaeFactory()
 
-        url = reverse("accounts:siae_signup")
+        url = reverse("signup:siae")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -105,7 +105,7 @@ class SignupTest(TestCase):
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
 
-        url = reverse("accounts:job_seeker_signup")
+        url = reverse("signup:job_seeker")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -189,7 +189,7 @@ class PasswordChangeTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("accounts:dashboard"))
+        self.assertRedirects(response, reverse("dashboard:index"))
 
         # User can log in with his new password.
         self.client.logout()

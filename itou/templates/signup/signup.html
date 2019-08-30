@@ -15,7 +15,7 @@
                 <h5 class="card-title">{% trans "Demandeur d'emploi" %}</h5>
             </div>
             <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action" href="{% url 'accounts:job_seeker_signup' %}">
+                <a class="list-group-item list-group-item-action" href="{% url 'signup:job_seeker' %}">
                     {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
                 </a>
                 <a class="list-group-item list-group-item-action" href="{% url 'account_login' %}">
@@ -30,7 +30,7 @@
                 <h5 class="card-title">{% trans "Prescripteur" %}</h5>
             </div>
             <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action" href="{% url 'accounts:prescriber_signup' %}">
+                <a class="list-group-item list-group-item-action" href="{% url 'signup:prescriber' %}">
                     {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
                 </a>
                 <a class="list-group-item list-group-item-action" href="{% url 'account_login' %}">
@@ -45,7 +45,7 @@
                 <h5 class="card-title">{% trans "SIAE" %}</h5>
             </div>
             <div class="list-group list-group-flush">
-                <a class="list-group-item list-group-item-action" href="{% url 'accounts:siae_signup' %}">
+                <a class="list-group-item list-group-item-action" href="{% url 'signup:siae' %}">
                     {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
                 </a>
                 <a class="list-group-item list-group-item-action" href="{% url 'account_login' %}">

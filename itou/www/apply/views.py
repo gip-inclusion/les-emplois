@@ -4,18 +4,18 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext as _
 
-from itou.job_applications.forms import JobApplicationForm
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
+from itou.www.apply.forms import JobApplicationForm
 
 
 @login_required
 @user_passes_test(
     lambda user: user.is_job_seeker, login_url="/", redirect_field_name=None
 )
-def postulate(request, siret, template_name="job_applications/postulate.html"):
+def apply(request, siret, template_name="apply/apply.html"):
     """
-    Submit a job request.
+    Apply for a job.
     """
 
     next_url = get_safe_url(request, "next", fallback_url="/")

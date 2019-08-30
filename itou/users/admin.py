@@ -19,11 +19,11 @@ class KindFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == "is_job_seeker":
-            return queryset.filter(is_job_seeker=True)
+            queryset = queryset.filter(is_job_seeker=True)
         elif value == "is_prescriber_staff":
-            return queryset.filter(is_prescriber_staff=True)
+            queryset = queryset.filter(is_prescriber_staff=True)
         elif value == "is_siae_staff":
-            return queryset.filter(is_siae_staff=True)
+            queryset = queryset.filter(is_siae_staff=True)
         return queryset
 
 

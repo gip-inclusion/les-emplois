@@ -6,7 +6,7 @@ from allauth.account.views import PasswordChangeView
 
 
 @login_required
-def dashboard(request, template_name="account_itou/dashboard.html"):
+def dashboard(request, template_name="dashboard/dashboard.html"):
 
     context = {}
     return render(request, template_name, context)
@@ -17,7 +17,7 @@ class ItouPasswordChangeView(PasswordChangeView):
     https://github.com/pennersr/django-allauth/issues/468
     """
 
-    success_url = reverse_lazy("accounts:dashboard")
+    success_url = reverse_lazy("dashboard:index")
 
 
 password_change = login_required(ItouPasswordChangeView.as_view())

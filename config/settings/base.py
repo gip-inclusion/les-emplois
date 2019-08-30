@@ -52,11 +52,15 @@ LOCAL_APPS = [
     'itou.cities',
     'itou.jobs',
     'itou.users',
-    'itou.accounts',
     'itou.siaes',
     'itou.prescribers',
-    'itou.home',
     'itou.job_applications',
+    # www.
+    'itou.www.home',
+    'itou.www.dashboard',
+    'itou.www.signup',
+    'itou.www.siaes_views',
+    'itou.www.apply',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -244,7 +248,7 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-LOGIN_REDIRECT_URL = '/accounts/dashboard'
+LOGIN_REDIRECT_URL = '/dashboard'
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True

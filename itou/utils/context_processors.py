@@ -7,7 +7,7 @@ from django.conf import settings
 def get_current_organization(request):
     """
     Every RequestContext will contain these two variables:
-        - current_siae: an itou.siaes.Siae instance
+        - current_siaes_views: an itou.siaes.Siae instance
         - current_prescriber: an itou.prescribers.Prescriber instance
     """
 
