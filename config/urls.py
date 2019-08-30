@@ -31,12 +31,10 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
 
-    path("city/", include("itou.cities.urls")),
-    path("jobs/", include("itou.jobs.urls")),
-
     # www.
     path("", home, name="home"),
     path("apply/", include("itou.www.apply.urls")),
+    path("autocomplete/", include("itou.www.autocomplete.urls")),
     path("dashboard/", include("itou.www.dashboard.urls")),
     path("search/", include("itou.www.search.urls")),
     path("siae/", include("itou.www.siaes_views.urls")),

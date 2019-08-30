@@ -11,7 +11,7 @@ class SiaeSearchForm(forms.Form):
     DISTANCES = [100, 75, 50, 25, 15, 10, 5]
     DISTANCE_CHOICES = [(i, _(f"{i} Km")) for i in DISTANCES]
 
-    CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("city:autocomplete")
+    CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
     KINDS = [Siae.KIND_EI, Siae.KIND_AI, Siae.KIND_ACI, Siae.KIND_ETTI]
     KIND_CHOICES = [("", "---")] + [(k, k) for k in KINDS]
