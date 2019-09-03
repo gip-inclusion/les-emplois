@@ -58,6 +58,13 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     log_model = "job_applications.JobApplicationTransitionLog"
 
 
+class JobApplicationQuerySet(models.QuerySet):
+    def siae_member_required(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(siae__members=user, siae__members__is_active=True)
+
+
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """
     An "unsolicited" job application.
@@ -125,10 +132,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name=_("Updated at"), blank=True, null=True, db_index=True
     )
 
+    objects = models.Manager.from_queryset(JobApplicationQuerySet)()
+
     class Meta:
         verbose_name = _("Candidature")
         verbose_name_plural = _("Candidatures")
         ordering = ["-created_at"]
+
+    def __str__(self):
+        return str(self.id)
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
@@ -149,6 +161,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
         # TODO: mark other related job applications as obsolete.
+        self.acceptance_message = kwargs["acceptance_message"]
         try:
             connection = mail.get_connection()
             emails = [self.email_accept_for_job_seeker]
@@ -163,6 +176,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def reject(self, *args, **kwargs):
+        self.rejection_message = kwargs["rejection_message"]
         try:
             connection = mail.get_connection()
             emails = [self.email_reject_for_job_seeker]
@@ -256,3 +270,6 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
         verbose_name = _("Log des transitions de la candidature")
         verbose_name_plural = _("Log des transitions des candidatures")
         ordering = ["-timestamp"]
+
+    def __str__(self):
+        return str(self.id)

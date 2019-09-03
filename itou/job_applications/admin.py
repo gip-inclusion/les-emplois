@@ -3,6 +3,17 @@ from django.contrib import admin
 from itou.job_applications import models
 
 
+class TransitionLogInline(admin.TabularInline):
+    model = models.JobApplicationTransitionLog
+    extra = 0
+    raw_id_fields = ("user",)
+    can_delete = False
+    readonly_fields = ("transition", "from_state", "to_state", "user", "timestamp")
+
+    def has_add_permission(self, request):
+        return False
+
+
 class JobsInline(admin.TabularInline):
     model = models.JobApplication.jobs.through
     extra = 1
@@ -15,7 +26,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     raw_id_fields = ("job_seeker", "siae", "prescriber_user", "prescriber", "jobs")
     list_filter = ("state",)
     read_only_fields = ("created_at", "updated_at")
-    inlines = (JobsInline,)
+    inlines = (JobsInline, TransitionLogInline)
 
 
 @admin.register(models.JobApplicationTransitionLog)

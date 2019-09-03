@@ -1,0 +1,156 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}
+    {% trans "Candidature" %}
+    -
+    {{ job_application.job_seeker.get_full_name }}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Candidature" %}</h1>
+
+    <h2 class="text-muted">{{ job_application.job_seeker.get_full_name }}</h2>
+
+    <h3>
+        {% include "apply/includes/state_badge.html" with job_application=job_application %}
+    </h3>
+
+    {# Job seeker -------------------------------------------------------------------------------- #}
+
+    <hr>
+
+    <h3 class="font-weight-normal text-muted">{% trans "Candidat" %}</h3>
+
+    <ul>
+
+        <li>{% trans "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
+
+        <li>{% trans "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>
+
+        <li>{% trans "Nom :" %} <b>{{ job_application.job_seeker.last_name }}</b></li>
+
+        <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a></li>
+
+        {% if job_application.job_seeker.phone %}
+        <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone }}</a></li>
+        {% endif %}
+
+        {% if job_application.jobs.exists %}
+            <li>
+                {% trans "Métier(s) recherché(s) :" %}
+                <ul>
+                    {% for job in job_application.jobs.all %}
+                        <li><b>{{ job.name }}</b> ({{ job.rome_id }})</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+
+    </ul>
+
+    <div class="alert alert-secondary">
+        <p><b>{% trans "Message :" %}</b></p>
+        {{ job_application.motivation_message|linebreaks }}
+    </div>
+
+    {# Prescriber -------------------------------------------------------------------------------- #}
+
+    {% if job_application.prescriber_user %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">{% trans "Prescripteur" %}</h3>
+
+        <ul>
+
+            <li>{% trans "Contact :" %} <b>{{ job_application.prescriber_user.get_full_name }}</b> {% if job_application.prescriber %}({{ job_application.prescriber.display_name }}){% endif %}</li>
+
+            <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.prescriber_user.email }}">{{ job_application.prescriber_user.email }}</a></li>
+
+            {% if job_application.prescriber_user.phone %}
+            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.prescriber_user.phone }}">{{ job_application.prescriber_user.phone }}</a></li>
+            {% endif %}
+
+        </ul>
+
+    {% endif %}
+
+    {# Answer -------------------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_pending_answer %}
+
+        <hr>
+
+        <form method="post" action="">
+
+            {% csrf_token %}
+
+            <input type="hidden" name="next" value="{{ next_url }}">
+
+            {% bootstrap_form answer_form %}
+
+            {% buttons %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <button
+                            type="submit"
+                            class="btn btn-danger btn-block"
+                            name="{{ answer_form.answer.name }}"
+                            value="{{ answer_form.ANSWER_REJECT }}"
+                        >{% trans "Refuser" %}</button>
+                    </div>
+                    <div class="col-md-6">
+                        <button
+                            type="submit"
+                            class="btn btn-success btn-block"
+                            name="{{ answer_form.answer.name }}"
+                            value="{{ answer_form.ANSWER_ACCEPT }}"
+                        >{% trans "Accepter" %}</button>
+                    </div>
+                </div>
+            {% endbuttons %}
+
+        </form>
+
+    {% endif %}
+
+    {# Accepted / Rejected -------------------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_accepted or job_application.state.is_rejected %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">{{ job_application.get_state_display }}</h3>
+
+        <ul>
+            <li>{% trans "Date :" %} <b>{{ last_log.timestamp|date:"d F Y à H:i" }}</b></li>
+            <li>{% trans "Prénom :" %} <b>{{ last_log.user.first_name }}</b></li>
+            <li>{% trans "Nom :" %} <b>{{ last_log.user.last_name }}</b></li>
+            <li>{% trans "E-mail :" %} <a href="mailto:{{ last_log.user.email }}">{{ last_log.user.email }}</a></li>
+        </ul>
+
+        <div class="alert alert-secondary">
+            <p><b>{% trans "Message :" %}</b></p>
+            {% if job_application.state.is_accepted %}
+                {{ job_application.acceptance_message|linebreaks }}
+            {% elif job_application.state.is_rejected %}
+                {{ job_application.rejection_message|linebreaks }}
+            {% endif %}
+        </div>
+
+    {% endif %}
+
+    {# Next URL -------------------------------------------------------------------------------- #}
+
+    {% if next_url %}
+        <hr>
+        <p>
+            <a href="{{ next_url }}">{% trans "Retour" %}</a>
+        </p>
+    {% endif %}
+
+{% endblock %}

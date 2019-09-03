@@ -127,9 +127,11 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PENDING_ANSWER,
         )
         self.assertTrue(job_application.state.is_pending_answer)
-        job_application.accept()
+        acceptance_message = "Lorem ipsum dolor sit amet"
+        job_application.accept(acceptance_message=acceptance_message)
         self.assertEqual(len(mail.outbox), 2)
         self.assertTrue(job_application.state.is_accepted)
+        self.assertEqual(job_application.acceptance_message, acceptance_message)
 
     def test_reject(self):
         job_application = JobApplicationWithPrescriberFactory(
@@ -137,6 +139,8 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PENDING_ANSWER,
         )
         self.assertTrue(job_application.state.is_pending_answer)
-        job_application.reject()
+        rejection_message = "Lorem ipsum dolor sit amet"
+        job_application.reject(rejection_message=rejection_message)
         self.assertEqual(len(mail.outbox), 2)
         self.assertTrue(job_application.state.is_rejected)
+        self.assertEqual(job_application.rejection_message, rejection_message)

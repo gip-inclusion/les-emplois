@@ -36,6 +36,9 @@ class User(AbstractUser):
         verbose_name=_("Employeur (SIAE)"), default=False
     )
 
+    def __str__(self):
+        return self.email
+
     def can_postulate(self):
         return self.birthdate and self.phone
 

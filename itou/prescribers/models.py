@@ -36,6 +36,10 @@ class Prescriber(AddressMixin):  # Do not forget the mixin!
     def __str__(self):
         return f"{self.siret} {self.name}"
 
+    @property
+    def display_name(self):
+        return self.name.title()
+
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `Prescriber`."""

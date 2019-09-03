@@ -1,0 +1,10 @@
+<span class="badge
+    {% if job_application.state.is_pending_answer %}
+        badge-primary
+    {% elif job_application.state.is_accepted %}
+        badge-success
+    {% elif job_application.state.is_rejected %}
+        badge-danger
+    {% elif job_application.state.is_obsolete %}
+        badge-dark
+    {% endif %}">{{ job_application.get_state_display }}</span>

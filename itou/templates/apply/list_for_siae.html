@@ -1,0 +1,72 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Candidatures" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Candidatures" %}</h1>
+
+    <h2 class="text-muted">{{ siae.display_name }}</h2>
+
+    <br>
+
+    {% for job_application in job_applications_page %}
+
+        <div class="card mb-3">
+
+            <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}?next={{ request.get_full_path|urlencode }}">
+                <div class="card-header">
+                    <b>{{ job_application.job_seeker.get_full_name }}</b>
+                    <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+                </div>
+            </a>
+
+            <div class="row no-gutters">
+
+                <div class="col-md-5">
+                    {% if job_application.jobs.exists %}
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-muted">{% trans "Métier(s) recherché(s) :" %}</h6>
+                            <ul class="card-text">
+                                {% for job in job_application.jobs.all %}
+                                    <li>{{ job.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    {% if job_application.prescriber_user %}
+                        <div class="card-body">
+                            <h6 class="card-subtitle text-muted">{% trans "Prescripteur :" %}</h6>
+                            <p class="card-text">
+                                {{ job_application.prescriber_user.get_full_name }}
+                                {% if job_application.prescriber %}
+                                    ({{ job_application.prescriber.display_name }})
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-3">
+                    <div class="card-body">
+                        <h6 class="card-subtitle text-muted">{% trans "Statut :" %}</h6>
+                        <p class="card-text">
+                            {% include "apply/includes/state_badge.html" with job_application=job_application %}
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>{# END .row #}
+
+        </div>{# END .card #}
+
+    {% endfor %}
+
+    {% include "includes/pagination.html" with page=job_applications_page %}
+
+{% endblock %}

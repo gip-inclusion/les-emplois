@@ -47,6 +47,15 @@
                     </p>
                 </div>
             </div>
+            <div class="card">
+                <h5 class="card-header">{% trans "Candidatures" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="message-square" %}
+                        <a href="{% url 'apply:list_for_siae' %}">{% trans "Répondre aux candidatures" %}</a>
+                    </p>
+                </div>
+            </div>
         {% endif %}
 
     </div>

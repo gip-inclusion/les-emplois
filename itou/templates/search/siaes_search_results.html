@@ -63,7 +63,7 @@
                     {% endif %}
                 </div>
                 <div class="card-footer">
-                    <a href="{% url 'apply:form' siret=siae.siret %}?next={{ request.get_full_path|urlencode }}">{% trans "Postuler" %}</a>
+                    <a href="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}?next={{ request.get_full_path|urlencode }}">{% trans "Postuler" %}</a>
                 </div>
             </div>
         {% endfor %}

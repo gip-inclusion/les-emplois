@@ -2,12 +2,12 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth import get_user_model
 
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 
 
 class JobApplicationForm(forms.ModelForm):
     """
-    Submit a job request to an SIAE.
+    Submit a job application to an SIAE.
     """
 
     def __init__(self, user, siae, *args, **kwargs):
@@ -61,3 +61,20 @@ class JobApplicationForm(forms.ModelForm):
             for job in self.cleaned_data["jobs"]:
                 job_application.jobs.add(job)
         return job_application
+
+
+class JobApplicationAnswerForm(forms.Form):
+    """
+    Let an SIAE answer to a job application.
+    """
+
+    ANSWER_ACCEPT = JobApplicationWorkflow.TRANSITION_ACCEPT
+    ANSWER_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
+    ANSWER_CHOICES = [(ANSWER_ACCEPT, ANSWER_ACCEPT), (ANSWER_REJECT, ANSWER_REJECT)]
+
+    answer_message = forms.CharField(
+        label=_("Votre réponse"),
+        widget=forms.Textarea(),
+        help_text="Votre réponse est obligatoire.",
+    )
+    answer = forms.ChoiceField(choices=ANSWER_CHOICES, widget=forms.HiddenInput())
