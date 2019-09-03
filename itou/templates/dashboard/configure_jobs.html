@@ -64,14 +64,10 @@
         </div>
 
         {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
             <button type="submit" class="btn btn-primary">{% trans "Enregistrer les modifications" %}</button>
         {% endbuttons %}
 
     </form>
-
-    <hr>
-    <p>
-        <a href="{% url 'dashboard:index' %}">{% trans "Retour" %}</a>
-    </p>
 
 {% endblock %}

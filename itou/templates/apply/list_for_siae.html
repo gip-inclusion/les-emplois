@@ -21,12 +21,10 @@
 
         <div class="card mb-3">
 
-            <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}">
-                <div class="card-header">
-                    <b>{{ job_application.job_seeker.get_full_name }}</b>
-                    <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-                </div>
-            </a>
+            <div class="card-header">
+                <b>{{ job_application.job_seeker.get_full_name }}</b>
+                <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+            </div>
 
             <div class="row no-gutters">
 
@@ -67,6 +65,12 @@
                 </div>
 
             </div>{# END .row #}
+
+                <div class="card-footer">
+                    <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}">
+                        {% trans "Détails de la candidature" %}
+                    </a>
+                </div>
 
         </div>{# END .card #}
 
