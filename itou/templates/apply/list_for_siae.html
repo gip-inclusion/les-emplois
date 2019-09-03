@@ -64,15 +64,15 @@
                     </div>
                 </div>
 
-            </div>{# END .row #}
+            </div>
 
-                <div class="card-footer">
-                    <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}">
-                        {% trans "Détails de la candidature" %}
-                    </a>
-                </div>
+            <div class="card-footer">
+                <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}">
+                    {% trans "Détails de la candidature" %}
+                </a>
+            </div>
 
-        </div>{# END .card #}
+        </div>
 
     {% endfor %}
 

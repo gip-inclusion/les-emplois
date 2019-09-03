@@ -20,12 +20,8 @@
         <div class="card mb-3">
 
             <div class="card-header">
-                {% blocktrans with card_url=job_application.siae.get_card_url siae_name=job_application.siae.display_name date_sent=job_application.created_at|date:"d F Y à H:i" %}
-                    Chez
-                    <a href="{{ card_url }}"><b>{{ siae_name }}</b></a>
-                    le
-                    <b>{{ date_sent }}</b>
-                {% endblocktrans %}
+                <b>{{ job_application.siae.display_name }}</b>
+                <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
             </div>
 
             <div class="row no-gutters">
@@ -66,7 +62,7 @@
                     </div>
                 </div>
 
-            </div>{# END .row #}
+            </div>
 
             {% if job_application.is_answered %}
                 <div class="card-footer">
@@ -83,8 +79,7 @@
                 </div>
             {% endif %}
 
-
-        </div>{# END .card #}
+        </div>
 
     {% endfor %}
 
