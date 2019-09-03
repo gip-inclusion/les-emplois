@@ -8,7 +8,6 @@ from django.utils.translation import ugettext as _
 from itou.job_applications.models import JobApplication
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
-from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import JobApplicationForm, JobApplicationAnswerForm
 
 
@@ -23,8 +22,6 @@ def submit_for_job_seeker(
     Submit a job application as a job seeker.
     """
 
-    next_url = get_safe_url(request, "next", fallback_url="/")
-
     # TODO: ensure the use can apply.
 
     queryset = Siae.active_objects.prefetch_jobs_through()
@@ -36,9 +33,9 @@ def submit_for_job_seeker(
         job_application = form.save()
         job_application.send(user=request.user)
         messages.success(request, _("Votre candidature a bien été envoyée !"))
-        return HttpResponseRedirect(next_url)
+        return HttpResponseRedirect("/")
 
-    context = {"siae": siae, "form": form, "next_url": next_url}
+    context = {"siae": siae, "form": form}
     return render(request, template_name, context)
 
 
@@ -101,8 +98,6 @@ def detail_for_siae(
         .last()
     )
 
-    next_url = get_safe_url(request, "next", fallback_url="/")
-
     form = JobApplicationAnswerForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -123,6 +118,5 @@ def detail_for_siae(
         "answer_form": form,
         "job_application": job_application,
         "last_log": last_log,
-        "next_url": next_url,
     }
     return render(request, template_name, context)

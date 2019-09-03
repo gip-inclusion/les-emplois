@@ -42,7 +42,7 @@
                     <h5 class="card-title">
                         <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
                         -
-                        <a href="{{ siae.get_card_url }}?next={{ request.get_full_path|urlencode }}">
+                        <a href="{{ siae.get_card_url }}">
                             {{ siae.display_name }}
                         </a>
                     </h5>
@@ -63,7 +63,7 @@
                     {% endif %}
                 </div>
                 <div class="card-footer">
-                    <a href="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}?next={{ request.get_full_path|urlencode }}">{% trans "Postuler" %}</a>
+                    <a href="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}">{% trans "Postuler" %}</a>
                 </div>
             </div>
         {% endfor %}

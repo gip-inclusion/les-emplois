@@ -20,9 +20,9 @@
         <div class="card mb-3">
 
             <div class="card-header">
-                {% blocktrans with card_url=job_application.siae.get_card_url next=request.get_full_path|urlencode siae_name=job_application.siae.display_name date_sent=job_application.created_at|date:"d F Y à H:i" %}
+                {% blocktrans with card_url=job_application.siae.get_card_url siae_name=job_application.siae.display_name date_sent=job_application.created_at|date:"d F Y à H:i" %}
                     Chez
-                    <a href="{{ card_url }}?next={{ next }}"><b>{{ siae_name }}</b></a>
+                    <a href="{{ card_url }}"><b>{{ siae_name }}</b></a>
                     le
                     <b>{{ date_sent }}</b>
                 {% endblocktrans %}

@@ -21,7 +21,7 @@
 
         <div class="card mb-3">
 
-            <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}?next={{ request.get_full_path|urlencode }}">
+            <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}">
                 <div class="card-header">
                     <b>{{ job_application.job_seeker.get_full_name }}</b>
                     <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>

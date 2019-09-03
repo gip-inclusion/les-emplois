@@ -18,8 +18,6 @@
 
         {% csrf_token %}
 
-        <input type="hidden" name="next" value="{{ next_url }}">
-
         <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_user_email.auto_id %}</i>
         {% bootstrap_field form.prescriber_user_email show_label=False %}
 
@@ -34,12 +32,5 @@
         {% endbuttons %}
 
     </form>
-
-    {% if next_url %}
-        <hr>
-        <p>
-            <a href="{{ next_url }}">{% trans "Retour" %}</a>
-        </p>
-    {% endif %}
 
 {% endblock %}

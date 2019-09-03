@@ -90,8 +90,6 @@
 
             {% csrf_token %}
 
-            <input type="hidden" name="next" value="{{ next_url }}">
-
             {% bootstrap_form answer_form %}
 
             {% buttons %}
@@ -138,15 +136,6 @@
             {{ job_application.answer|linebreaks }}
         </div>
 
-    {% endif %}
-
-    {# Next URL -------------------------------------------------------------------------------- #}
-
-    {% if next_url %}
-        <hr>
-        <p>
-            <a href="{{ next_url }}">{% trans "Retour" %}</a>
-        </p>
     {% endif %}
 
 {% endblock %}
