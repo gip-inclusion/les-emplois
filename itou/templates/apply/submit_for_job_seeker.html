@@ -6,20 +6,22 @@
 
 {% block content %}
 
-    <h1>{% trans "Postuler" %}</h1>
-
-    <div class="alert alert-secondary" role="alert">
-        {% trans "Votre demande sera envoyée à :" %}
-        <br>
-        <b>{{ siae.display_name }}</b>
-    </div>
+    <h1>
+        {% blocktrans with siae_name=siae.display_name %}
+            Postuler chez
+            <br>
+            <small class="text-muted">{{ siae_name }}</small>
+        {% endblocktrans %}
+    </h1>
 
     <form method="post" action="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}">
 
         {% csrf_token %}
 
-        <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_user_email.auto_id %}</i>
-        {% bootstrap_field form.prescriber_user_email show_label=False %}
+        <div class="alert alert-secondary" role="alert">
+            <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_user_email.auto_id %}</i>
+            {% bootstrap_field form.prescriber_user_email show_label=False %}
+        </div>
 
         {% if siae.jobs.exists %}
             {% bootstrap_field form.jobs %}
@@ -28,7 +30,7 @@
         {% bootstrap_field form.message %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Postuler" %}</button>
+            <button type="submit" class="btn btn-primary">{% trans "Envoyer votre candidature" %}</button>
         {% endbuttons %}
 
     </form>
