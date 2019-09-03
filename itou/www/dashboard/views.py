@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
@@ -29,10 +30,11 @@ password_change = login_required(ItouPasswordChangeView.as_view())
 
 
 @login_required
-def configure_jobs(request, siret, template_name="dashboard/configure_jobs.html"):
+def configure_jobs(request, template_name="dashboard/configure_jobs.html"):
     """
     Configure an SIAE's jobs.
     """
+    siret = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
     queryset = Siae.active_objects.prefetch_jobs_through().member_required(request.user)
     siae = get_object_or_404(queryset, siret=siret)
 
@@ -76,9 +78,7 @@ def configure_jobs(request, siret, template_name="dashboard/configure_jobs.html"
                     job_through.save()
 
             messages.success(request, _("Mise à jour effectuée !"))
-            return HttpResponseRedirect(
-                reverse_lazy("dashboard:configure_jobs", kwargs={"siret": siae.siret})
-            )
+            return HttpResponseRedirect(reverse_lazy("dashboard:configure_jobs"))
 
     context = {"siae": siae}
     return render(request, template_name, context)

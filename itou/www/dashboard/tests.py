@@ -29,7 +29,7 @@ class ConfigureJobsViewTest(TestCase):
         cls.siae = siae
         cls.user = user
 
-        cls.url = reverse("dashboard:configure_jobs", kwargs={"siret": siae.siret})
+        cls.url = reverse("dashboard:configure_jobs")
 
     def test_access(self):
 

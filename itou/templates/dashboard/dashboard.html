@@ -41,7 +41,7 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="{% url 'dashboard:configure_jobs' siret=current_siae.siret %}">
+                        <a href="{% url 'dashboard:configure_jobs' %}">
                             {% trans "Configurez vos métiers" %}
                         </a>
                     </p>

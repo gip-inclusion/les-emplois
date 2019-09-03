@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from itou.www.apply import views
 
@@ -7,11 +7,7 @@ from itou.www.apply import views
 app_name = "apply"
 
 urlpatterns = [
-    re_path(
-        r"^(?P<siret>\d{14})$",
-        views.submit_for_job_seeker,
-        name="submit_for_job_seeker",
-    ),
+    path("<siret:siret>", views.submit_for_job_seeker, name="submit_for_job_seeker"),
     path("list", views.list_for_siae, name="list_for_siae"),
     path(
         "detail/<uuid:job_application_id>",

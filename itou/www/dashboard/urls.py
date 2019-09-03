@@ -1,4 +1,4 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from itou.www.dashboard import views
 
@@ -8,9 +8,5 @@ app_name = "dashboard"
 
 urlpatterns = [
     path("", views.dashboard, name="index"),
-    re_path(
-        r"^(?P<siret>\d{14})/configure_jobs$",
-        views.configure_jobs,
-        name="configure_jobs",
-    ),
+    path("configure_jobs", views.configure_jobs, name="configure_jobs"),
 ]

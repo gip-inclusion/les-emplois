@@ -1,11 +1,16 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include, path, re_path
+from django.urls import include, path, re_path, register_converter
 from django.views.generic import TemplateView
 
+from itou.utils.urls import SiretConverter
+from itou.www.dashboard import views as dashboard_views
 from itou.www.home.views import home
 from itou.www.signup import views as signup_views
-from itou.www.dashboard import views as dashboard_views
+
+
+register_converter(SiretConverter, 'siret')
+
 
 urlpatterns = [
 
