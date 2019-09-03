@@ -39,9 +39,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
-    def can_postulate(self):
-        return self.birthdate and self.phone
-
 
 def get_allauth_account_user_display(user):
     return user.email

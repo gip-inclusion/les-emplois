@@ -12,11 +12,11 @@ Vous avez reçu une nouvelle candidature !
 - Email : {{ email }}
 {% endblocktrans %}
 
-{% if job_application.motivation_message %}
+{% if job_application.message %}
 
 {% trans "*Message du candidat* :" %}
 
-{{ job_application.motivation_message }}
+{{ job_application.message }}
 
 {% endif %}
 

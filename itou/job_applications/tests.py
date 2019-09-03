@@ -32,7 +32,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.job_seeker.last_name, email.body)
         self.assertIn(job_application.job_seeker.email, email.body)
-        self.assertIn(job_application.motivation_message, email.body)
+        self.assertIn(job_application.message, email.body)
         for job in job_application.jobs.all():
             self.assertIn(job.name, email.body)
         self.assertIn(job_application.prescriber_user.get_full_name(), email.body)
@@ -50,7 +50,7 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.siae.display_name, email.body)
-        self.assertIn(job_application.acceptance_message, email.body)
+        self.assertIn(job_application.answer, email.body)
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_accept_for_prescriber(self):
@@ -64,7 +64,7 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.siae.display_name, email.body)
         self.assertIn(job_application.job_seeker.get_full_name(), email.body)
-        self.assertIn(job_application.acceptance_message, email.body)
+        self.assertIn(job_application.answer, email.body)
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_reject_for_job_seeker(self):
@@ -78,7 +78,7 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.siae.display_name, email.body)
-        self.assertIn(job_application.rejection_message, email.body)
+        self.assertIn(job_application.answer, email.body)
 
     def test_reject_for_prescriber(self):
         job_application = JobApplicationWithPrescriberFactory(
@@ -91,7 +91,7 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.siae.display_name, email.body)
-        self.assertIn(job_application.rejection_message, email.body)
+        self.assertIn(job_application.answer, email.body)
 
 
 class JobApplicationWorkflowTest(TestCase):
@@ -127,11 +127,11 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PENDING_ANSWER,
         )
         self.assertTrue(job_application.state.is_pending_answer)
-        acceptance_message = "Lorem ipsum dolor sit amet"
-        job_application.accept(acceptance_message=acceptance_message)
+        answer = "Lorem ipsum dolor sit amet"
+        job_application.accept(answer=answer)
         self.assertEqual(len(mail.outbox), 2)
         self.assertTrue(job_application.state.is_accepted)
-        self.assertEqual(job_application.acceptance_message, acceptance_message)
+        self.assertEqual(job_application.answer, answer)
 
     def test_reject(self):
         job_application = JobApplicationWithPrescriberFactory(
@@ -139,8 +139,8 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PENDING_ANSWER,
         )
         self.assertTrue(job_application.state.is_pending_answer)
-        rejection_message = "Lorem ipsum dolor sit amet"
-        job_application.reject(rejection_message=rejection_message)
+        answer = "Lorem ipsum dolor sit amet"
+        job_application.reject(answer=answer)
         self.assertEqual(len(mail.outbox), 2)
         self.assertTrue(job_application.state.is_rejected)
-        self.assertEqual(job_application.rejection_message, rejection_message)
+        self.assertEqual(job_application.answer, answer)

@@ -23,9 +23,11 @@
         <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_user_email.auto_id %}</i>
         {% bootstrap_field form.prescriber_user_email show_label=False %}
 
-        {% bootstrap_field form.jobs %}
+        {% if siae.jobs.exists %}
+            {% bootstrap_field form.jobs %}
+        {% endif %}
 
-        {% bootstrap_field form.motivation_message %}
+        {% bootstrap_field form.message %}
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">{% trans "Postuler" %}</button>

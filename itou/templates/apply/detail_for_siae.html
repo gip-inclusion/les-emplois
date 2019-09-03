@@ -11,13 +11,14 @@
 
 {% block content %}
 
-    <h1>{% trans "Candidature" %}</h1>
+    <h1>
+        {% trans "Candidature de" %}
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
+    </h1>
 
-    <h2 class="text-muted">{{ job_application.job_seeker.get_full_name }}</h2>
-
-    <h3>
+    <h2>
         {% include "apply/includes/state_badge.html" with job_application=job_application %}
-    </h3>
+    </h2>
 
     {# Job seeker -------------------------------------------------------------------------------- #}
 
@@ -54,7 +55,7 @@
 
     <div class="alert alert-secondary">
         <p><b>{% trans "Message :" %}</b></p>
-        {{ job_application.motivation_message|linebreaks }}
+        {{ job_application.message|linebreaks }}
     </div>
 
     {# Prescriber -------------------------------------------------------------------------------- #}
@@ -95,20 +96,20 @@
 
             {% buttons %}
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
                         <button
                             type="submit"
                             class="btn btn-danger btn-block"
-                            name="{{ answer_form.answer.name }}"
-                            value="{{ answer_form.ANSWER_REJECT }}"
+                            name="{{ answer_form.answer_kind.name }}"
+                            value="{{ answer_form.ANSWER_KIND_REJECT }}"
                         >{% trans "Refuser" %}</button>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
                         <button
                             type="submit"
                             class="btn btn-success btn-block"
-                            name="{{ answer_form.answer.name }}"
-                            value="{{ answer_form.ANSWER_ACCEPT }}"
+                            name="{{ answer_form.answer_kind.name }}"
+                            value="{{ answer_form.ANSWER_KIND_ACCEPT }}"
                         >{% trans "Accepter" %}</button>
                     </div>
                 </div>
@@ -118,28 +119,23 @@
 
     {% endif %}
 
-    {# Accepted / Rejected -------------------------------------------------------------------------------- #}
+    {# Answered -------------------------------------------------------------------------------- #}
 
-    {% if job_application.state.is_accepted or job_application.state.is_rejected %}
+    {% if job_application.is_answered %}
 
         <hr>
 
         <h3 class="font-weight-normal text-muted">{{ job_application.get_state_display }}</h3>
 
         <ul>
-            <li>{% trans "Date :" %} <b>{{ last_log.timestamp|date:"d F Y à H:i" }}</b></li>
-            <li>{% trans "Prénom :" %} <b>{{ last_log.user.first_name }}</b></li>
-            <li>{% trans "Nom :" %} <b>{{ last_log.user.last_name }}</b></li>
+            <li>{% trans "Le :" %} <b>{{ last_log.timestamp|date:"d F Y à H:i" }}</b></li>
+            <li>{% trans "Par :" %} <b>{{ last_log.user.get_full_name }}</b></li>
             <li>{% trans "E-mail :" %} <a href="mailto:{{ last_log.user.email }}">{{ last_log.user.email }}</a></li>
         </ul>
 
         <div class="alert alert-secondary">
-            <p><b>{% trans "Message :" %}</b></p>
-            {% if job_application.state.is_accepted %}
-                {{ job_application.acceptance_message|linebreaks }}
-            {% elif job_application.state.is_rejected %}
-                {{ job_application.rejection_message|linebreaks }}
-            {% endif %}
+            <p><b>{% trans "Réponse :" %}</b></p>
+            {{ job_application.answer|linebreaks }}
         </div>
 
     {% endif %}

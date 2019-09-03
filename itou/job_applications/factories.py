@@ -15,9 +15,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
     siae = factory.SubFactory(SiaeWithMembershipFactory)
-    motivation_message = factory.Faker("sentence", nb_words=40)
-    acceptance_message = factory.Faker("sentence", nb_words=40)
-    rejection_message = factory.Faker("sentence", nb_words=40)
+    message = factory.Faker("sentence", nb_words=40)
+    answer = factory.Faker("sentence", nb_words=40)
 
     @factory.post_generation
     def jobs(self, create, extracted, **kwargs):

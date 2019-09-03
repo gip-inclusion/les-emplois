@@ -10,7 +10,7 @@ Votre candidature a été acceptée par {{ siae }}.
 
 {% trans "*Message de l'entreprise* :" %}
 
-{{ job_application.acceptance_message }}
+{{ job_application.answer }}
 
 {% trans "*Et maintenant ?*" %}
 

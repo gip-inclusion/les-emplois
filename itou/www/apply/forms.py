@@ -16,7 +16,7 @@ class JobApplicationForm(forms.ModelForm):
         self.user = user
         super().__init__(*args, **kwargs)
         self.fields["jobs"].queryset = siae.jobs.filter(siaejobs__is_active=True)
-        self.fields["motivation_message"].required = True
+        self.fields["message"].required = True
 
     prescriber_user_email = forms.EmailField(
         required=False, label=_("E-mail de votre accompagnateur (optionnel)")
@@ -24,7 +24,7 @@ class JobApplicationForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ["prescriber_user_email", "jobs", "motivation_message"]
+        fields = ["prescriber_user_email", "jobs", "message"]
         widgets = {"jobs": forms.CheckboxSelectMultiple()}
         labels = {"jobs": _("Métiers recherchés (optionnel)")}
 
@@ -68,13 +68,18 @@ class JobApplicationAnswerForm(forms.Form):
     Let an SIAE answer to a job application.
     """
 
-    ANSWER_ACCEPT = JobApplicationWorkflow.TRANSITION_ACCEPT
-    ANSWER_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
-    ANSWER_CHOICES = [(ANSWER_ACCEPT, ANSWER_ACCEPT), (ANSWER_REJECT, ANSWER_REJECT)]
+    ANSWER_KIND_ACCEPT = JobApplicationWorkflow.TRANSITION_ACCEPT
+    ANSWER_KIND_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
+    ANSWER_KIND_CHOICES = [
+        (ANSWER_KIND_ACCEPT, ANSWER_KIND_ACCEPT),
+        (ANSWER_KIND_REJECT, ANSWER_KIND_REJECT),
+    ]
 
-    answer_message = forms.CharField(
-        label=_("Votre réponse"),
+    answer_kind = forms.ChoiceField(
+        choices=ANSWER_KIND_CHOICES, widget=forms.HiddenInput()
+    )
+    answer = forms.CharField(
+        label=_("Réponse"),
         widget=forms.Textarea(),
         help_text="Votre réponse est obligatoire.",
     )
-    answer = forms.ChoiceField(choices=ANSWER_CHOICES, widget=forms.HiddenInput())

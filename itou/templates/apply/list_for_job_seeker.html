@@ -1,13 +1,11 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Candidatures reçues" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Candidatures envoyées" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Candidatures reçues" %}</h1>
-
-    <h2 class="text-muted">{{ siae.display_name }}</h2>
+    <h1>{% trans "Candidatures envoyées" %}</h1>
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
@@ -21,12 +19,14 @@
 
         <div class="card mb-3">
 
-            <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}?next={{ request.get_full_path|urlencode }}">
-                <div class="card-header">
-                    <b>{{ job_application.job_seeker.get_full_name }}</b>
-                    <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-                </div>
-            </a>
+            <div class="card-header">
+                {% blocktrans with card_url=job_application.siae.get_card_url next=request.get_full_path|urlencode siae_name=job_application.siae.display_name date_sent=job_application.created_at|date:"d F Y à H:i" %}
+                    Chez
+                    <a href="{{ card_url }}?next={{ next }}"><b>{{ siae_name }}</b></a>
+                    le
+                    <b>{{ date_sent }}</b>
+                {% endblocktrans %}
+            </div>
 
             <div class="row no-gutters">
 
@@ -67,6 +67,22 @@
                 </div>
 
             </div>{# END .row #}
+
+            {% if job_application.is_answered %}
+                <div class="card-footer">
+                    <a
+                        href="#"
+                        data-toggle="collapse"
+                        data-target="#answer{{ forloop.counter0 }}"
+                        aria-expanded="false"
+                        aria-controls="answer{{ forloop.counter0 }}"
+                    >{% trans "Réponse" %}</a>
+                    <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
+                        {{ job_application.answer|linebreaks }}
+                    </div>
+                </div>
+            {% endif %}
+
 
         </div>{# END .card #}
 

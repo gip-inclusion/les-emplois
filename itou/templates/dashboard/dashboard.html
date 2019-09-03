@@ -15,7 +15,7 @@
                 <p class="card-text">
                     {% include "includes/icon.html" with icon="lock" %}
                     <a href="{% url 'account_change_password' %}">
-                        {% trans "Modifier mon mot de passe" %}
+                        {% trans "Modifier votre mot de passe" %}
                     </a>
                 </p>
             </div>
@@ -30,6 +30,18 @@
                         <a href="{% url 'admin:index' %}">
                             {% trans "Admin" %}
                         </a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if user.is_job_seeker %}
+            <div class="card">
+                <h5 class="card-header">{% trans "Candidatures" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="message-square" %}
+                        <a href="{% url 'apply:list_for_job_seeker' %}">{% trans "Vos candidatures" %}</a>
                     </p>
                 </div>
             </div>

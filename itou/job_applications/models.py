@@ -117,13 +117,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         "jobs.Appellation", verbose_name=_("Métiers recherchés"), blank=True
     )
 
-    motivation_message = models.TextField(
-        verbose_name=_("Message de candidature"), blank=True
-    )
-    acceptance_message = models.TextField(
-        verbose_name=_("Message d'acceptation"), blank=True
-    )
-    rejection_message = models.TextField(verbose_name=_("Message de rejet"), blank=True)
+    message = models.TextField(verbose_name=_("Message de candidature"), blank=True)
+    answer = models.TextField(verbose_name=_("Message de réponse"), blank=True)
 
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
@@ -146,6 +141,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    @property
+    def is_answered(self):
+        return self.state in [
+            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationWorkflow.STATE_REJECTED,
+        ]
+
     # Workflow transitions.
 
     @xwf_models.transition()
@@ -161,7 +163,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
         # TODO: mark other related job applications as obsolete.
-        self.acceptance_message = kwargs["acceptance_message"]
+        self.answer = kwargs["answer"]
         try:
             connection = mail.get_connection()
             emails = [self.email_accept_for_job_seeker]
@@ -176,7 +178,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def reject(self, *args, **kwargs):
-        self.rejection_message = kwargs["rejection_message"]
+        self.answer = kwargs["answer"]
         try:
             connection = mail.get_connection()
             emails = [self.email_reject_for_job_seeker]

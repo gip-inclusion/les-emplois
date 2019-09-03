@@ -62,6 +62,10 @@
         </ul>
     {% endif %}
 
+    <p>
+        <a href="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}?next={{ request.get_full_path|urlencode }}">{% trans "Postuler" %}</a>
+    </p>
+
     {% if next %}
         <hr>
         <p>

@@ -10,6 +10,6 @@ Votre candidature chez {{ siae }} n'a malheureusement pas pu aboutir.
 
 {% trans "*Message de l'entreprise* :" %}
 
-{{ job_application.rejection_message }}
+{{ job_application.answer }}
 
 {% endblock body %}
