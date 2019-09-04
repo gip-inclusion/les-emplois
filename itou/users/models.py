@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from itou.utils.validators import validate_phone
+
 
 class User(AbstractUser):
     """
@@ -24,7 +26,12 @@ class User(AbstractUser):
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True
     )
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
+    phone = models.CharField(
+        verbose_name=_("Téléphone"),
+        max_length=10,
+        blank=True,
+        validators=[validate_phone],
+    )
 
     is_job_seeker = models.BooleanField(
         verbose_name=_("Demandeur d'emploi"), default=False

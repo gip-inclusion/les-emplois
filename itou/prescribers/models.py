@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
-from itou.utils.validators import validate_siret
+from itou.utils.validators import validate_phone, validate_siret
 
 
 class Prescriber(AddressMixin):  # Do not forget the mixin!
@@ -20,7 +20,12 @@ class Prescriber(AddressMixin):  # Do not forget the mixin!
         primary_key=True,
     )
     name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=10, blank=True)
+    phone = models.CharField(
+        verbose_name=_("Téléphone"),
+        max_length=10,
+        blank=True,
+        validators=[validate_phone],
+    )
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,

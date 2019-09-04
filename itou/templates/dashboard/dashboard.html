@@ -18,6 +18,12 @@
                         {% trans "Modifier votre mot de passe" %}
                     </a>
                 </p>
+                <p class="card-text">
+                    {% include "includes/icon.html" with icon="edit-2" %}
+                    <a href="{% url 'dashboard:edit_user_info' %}">
+                        {% trans "Modifier votre profil" %}
+                    </a>
+                </p>
             </div>
         </div>
 

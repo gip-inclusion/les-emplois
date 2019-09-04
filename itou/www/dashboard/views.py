@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from allauth.account.views import PasswordChangeView
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae
+from itou.www.dashboard.forms import EditUserInfoForm
 
 
 @login_required
@@ -27,6 +28,23 @@ class ItouPasswordChangeView(PasswordChangeView):
 
 
 password_change = login_required(ItouPasswordChangeView.as_view())
+
+
+@login_required
+def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
+    """
+    Edit a user.
+    """
+
+    form = EditUserInfoForm(instance=request.user, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("Mise à jour effectuée !"))
+        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+
+    context = {"form": form}
+    return render(request, template_name, context)
 
 
 @login_required

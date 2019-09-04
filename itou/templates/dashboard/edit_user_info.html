@@ -1,0 +1,22 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Modifier votre profil" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Modifier votre profil" %}</h1>
+
+<form method="post" action="">
+
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+
+    {% buttons %}
+        <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
+        <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+    {% endbuttons %}
+
+</form>
+{% endblock %}

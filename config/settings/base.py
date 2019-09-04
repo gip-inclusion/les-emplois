@@ -159,6 +159,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+DATE_INPUT_FORMATS = ["%d/%m/%Y", "%d-%m-%Y", "%d %m %Y"]
+
 # Static files (CSS, JavaScript, Images).
 # ------------------------------------------------------------------------------
 
