@@ -1,8 +1,11 @@
+import urllib.parse
+
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils.translation import ugettext as _
 
 from itou.job_applications.models import JobApplication
@@ -12,9 +15,6 @@ from itou.www.apply.forms import JobApplicationForm, JobApplicationAnswerForm
 
 
 @login_required
-@user_passes_test(
-    lambda user: user.is_job_seeker, login_url="/", redirect_field_name=None
-)
 def submit_for_job_seeker(
     request, siret, template_name="apply/submit_for_job_seeker.html"
 ):
@@ -22,7 +22,26 @@ def submit_for_job_seeker(
     Submit a job application as a job seeker.
     """
 
-    # TODO: ensure the use can apply.
+    prev_url = request.META.get("HTTP_REFERER", "/")
+
+    if not request.user.is_job_seeker:
+        messages.error(
+            request, _("Le dépôt de candidatures est réservé aux demandeurs d'emploi.")
+        )
+        return HttpResponseRedirect(prev_url)
+
+    if not request.user.is_eligible_for_iae:
+        messages.warning(
+            request,
+            _("Vous devez compléter vos informations avant de pouvoir postuler !"),
+        )
+        current_url = request.build_absolute_uri()
+        redirect_to = reverse("dashboard:edit_user_info")
+        return HttpResponseRedirect(
+            f"{redirect_to}"
+            f"?success_url={urllib.parse.quote(current_url)}"
+            f"&prev_url={urllib.parse.quote(prev_url)}"
+        )
 
     queryset = Siae.active_objects.prefetch_jobs_through()
     siae = get_object_or_404(queryset, siret=siret)
@@ -33,7 +52,7 @@ def submit_for_job_seeker(
         job_application = form.save()
         job_application.send(user=request.user)
         messages.success(request, _("Votre candidature a bien été envoyée !"))
-        return HttpResponseRedirect("/")
+        return HttpResponseRedirect(reverse("apply:list_for_job_seeker"))
 
     context = {"siae": siae, "form": form}
     return render(request, template_name, context)

@@ -1,6 +1,7 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
+{% load format_filters %}
 
 {% block title %}
     {% trans "Candidature" %}
@@ -34,10 +35,12 @@
 
         <li>{% trans "Nom :" %} <b>{{ job_application.job_seeker.last_name }}</b></li>
 
+        <li>{% trans "Date de naissance :" %} <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b></li>
+
         <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a></li>
 
         {% if job_application.job_seeker.phone %}
-        <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone }}</a></li>
+            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a></li>
         {% endif %}
 
         {% if job_application.jobs.exists %}
@@ -73,7 +76,7 @@
             <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.prescriber_user.email }}">{{ job_application.prescriber_user.email }}</a></li>
 
             {% if job_application.prescriber_user.phone %}
-            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.prescriber_user.phone }}">{{ job_application.prescriber_user.phone }}</a></li>
+            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.prescriber_user.phone }}">{{ job_application.prescriber_user.phone|format_phone }}</a></li>
             {% endif %}
 
         </ul>

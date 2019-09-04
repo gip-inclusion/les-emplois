@@ -7,8 +7,10 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 
 from allauth.account.views import PasswordChangeView
+
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae
+from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
 
 
@@ -36,14 +38,17 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     Edit a user.
     """
 
+    dashboard_url = reverse_lazy("dashboard:index")
+    prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
     form = EditUserInfoForm(instance=request.user, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Mise à jour effectuée !"))
-        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+        messages.success(request, _("Mise à jour de vos informations effectuée !"))
+        success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
+        return HttpResponseRedirect(success_url)
 
-    context = {"form": form}
+    context = {"form": form, "prev_url": prev_url}
     return render(request, template_name, context)
 
 

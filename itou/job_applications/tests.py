@@ -10,6 +10,7 @@ from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.job_applications.factories import JobApplicationWithPrescriberFactory
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.utils.templatetags import format_filters
 
 
 class JobApplicationEmailTest(TestCase):
@@ -31,12 +32,22 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(
+            job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body
+        )
         self.assertIn(job_application.job_seeker.email, email.body)
+        self.assertIn(
+            format_filters.format_phone(job_application.job_seeker.phone), email.body
+        )
         self.assertIn(job_application.message, email.body)
         for job in job_application.jobs.all():
             self.assertIn(job.name, email.body)
         self.assertIn(job_application.prescriber_user.get_full_name(), email.body)
         self.assertIn(job_application.prescriber_user.email, email.body)
+        self.assertIn(
+            format_filters.format_phone(job_application.prescriber_user.phone),
+            email.body,
+        )
         self.assertIn(job_application.prescriber.name, email.body)
 
     def test_accept_for_job_seeker(self):

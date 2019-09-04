@@ -46,6 +46,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+    @property
+    def is_eligible_for_iae(self):
+        return self.is_job_seeker and self.phone and self.birthdate
+
 
 def get_allauth_account_user_display(user):
     return user.email

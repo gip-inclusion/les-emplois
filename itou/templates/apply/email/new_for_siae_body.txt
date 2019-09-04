@@ -1,15 +1,18 @@
 {% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=job_application.job_seeker.first_name last_name=job_application.job_seeker.last_name email=job_application.job_seeker.email %}
+{% blocktrans with first_name=job_application.job_seeker.first_name last_name=job_application.job_seeker.last_name email=job_application.job_seeker.email phone=job_application.job_seeker.phone|format_phone birthdate=job_application.job_seeker.birthdate|date:"d/m/Y" %}
 Vous avez reçu une nouvelle candidature !
 
 *Candidat* :
 
 - Nom : {{ last_name }}
 - Prénom : {{ first_name }}
+- Date de naissance : {{ birthdate }}
 - Email : {{ email }}
+- Téléphone : {{ phone }}
 {% endblocktrans %}
 
 {% if job_application.message %}
@@ -35,6 +38,7 @@ Vous avez reçu une nouvelle candidature !
 
 - {{ job_application.prescriber_user.get_full_name }}{% if job_application.prescriber.name %} ({{ job_application.prescriber.name }}){% endif %}
 - {{ job_application.prescriber_user.email }}
+{% if job_application.prescriber_user.phone %}- {{ job_application.prescriber_user.phone|format_phone }}{% endif %}
 
 {% endif %}
 
