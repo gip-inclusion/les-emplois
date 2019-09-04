@@ -1,0 +1,42 @@
+{% load i18n %}
+<div class="row no-gutters">
+
+    <div class="col-md-5">
+        <div class="card-body">
+            <h6 class="card-subtitle text-muted">{% trans "Métier(s) recherché(s) :" %}</h6>
+            {% if not job_application.jobs.exists %}
+                <p class="card-text"><i>{% trans "Non spécifié" %}</i></p>
+            {% else %}
+                <ul class="card-text">
+                    {% for job in job_application.jobs.all %}
+                        <li>{{ job.name }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        {% if job_application.prescriber_user %}
+            <div class="card-body">
+                <h6 class="card-subtitle text-muted">{% trans "Prescripteur :" %}</h6>
+                <p class="card-text">
+                    {{ job_application.prescriber_user.get_full_name }}
+                    {% if job_application.prescriber %}
+                        ({{ job_application.prescriber.display_name }})
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-3">
+        <div class="card-body">
+            <h6 class="card-subtitle text-muted">{% trans "Statut :" %}</h6>
+            <p class="card-text">
+                {% include "apply/includes/state_badge.html" with job_application=job_application %}
+            </p>
+        </div>
+    </div>
+
+</div>

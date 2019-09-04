@@ -1,11 +1,11 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Candidatures envoyées" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Suivi des candidatures" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Candidatures envoyées" %}</h1>
+    <h1>{% trans "Suivi des candidatures" %}</h1>
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
@@ -20,6 +20,8 @@
         <div class="card mb-3">
 
             <div class="card-header">
+                <b>{{ job_application.job_seeker.get_full_name }}</b>
+                chez
                 <b>{{ job_application.siae.display_name }}</b>
                 <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
             </div>

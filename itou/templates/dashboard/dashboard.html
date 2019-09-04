@@ -47,7 +47,19 @@
             </div>
         {% endif %}
 
-        {% if user.is_siae_staff and current_siae %}
+        {% if user.is_prescriber_staff %}
+            <div class="card">
+                <h5 class="card-header">{% trans "Candidatures" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="message-square" %}
+                        <a href="{% url 'apply:list_for_prescriber' %}">{% trans "Suivi des candidatures" %}</a>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if user.is_siae_staff %}
             <div class="card">
                 <h5 class="card-header">{% trans "Métiers" %}</h5>
                 <div class="card-body">
