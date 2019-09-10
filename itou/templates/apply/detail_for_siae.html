@@ -21,7 +21,7 @@
         {% include "apply/includes/state_badge.html" with job_application=job_application %}
     </h2>
 
-    {# Job seeker -------------------------------------------------------------------------------- #}
+    {# Job seeker info ------------------------------------------------------------------------- #}
 
     <hr>
 
@@ -61,7 +61,7 @@
         {{ job_application.message|linebreaks }}
     </div>
 
-    {# Prescriber -------------------------------------------------------------------------------- #}
+    {# Prescriber info ------------------------------------------------------------------------- #}
 
     {% if job_application.prescriber_user %}
 
@@ -83,46 +83,83 @@
 
     {% endif %}
 
-    {# Answer -------------------------------------------------------------------------------- #}
+    {# Choose between rejecting or processing -------------------------------------------------- #}
 
-    {% if job_application.state.is_pending_answer %}
+    {% if job_application.state.is_pending_processing %}
 
-        <hr>
+        {% with process_form as form %}
 
-        <form method="post" action="">
+            <hr>
 
-            {% csrf_token %}
+            <form method="post" action="">
 
-            {% bootstrap_form answer_form %}
+                {% csrf_token %}
 
-            {% buttons %}
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <button
-                            type="submit"
-                            class="btn btn-danger btn-block"
-                            name="{{ answer_form.answer_kind.name }}"
-                            value="{{ answer_form.ANSWER_KIND_REJECT }}"
-                        >{% trans "Refuser" %}</button>
+                {% bootstrap_form_errors form %}
+
+                {% bootstrap_field form.answer %}
+
+                {% buttons %}
+                    <div class="row">
+                        {% for choice in form.action.field.choices %}
+                            <div class="col-md-6 mb-2">
+                                <button
+                                    type="submit"
+                                    class="btn btn-{% if choice.0 == answer_form.ACTION_REJECT %}danger{% else %}warning{% endif %} btn-block"
+                                    name="{{ form.action.name }}"
+                                    value="{{ choice.0 }}"
+                                >{{ choice.1 }}</button>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <div class="col-md-6 mb-2">
-                        <button
-                            type="submit"
-                            class="btn btn-success btn-block"
-                            name="{{ answer_form.answer_kind.name }}"
-                            value="{{ answer_form.ANSWER_KIND_ACCEPT }}"
-                        >{% trans "Accepter" %}</button>
-                    </div>
-                </div>
-            {% endbuttons %}
+                {% endbuttons %}
 
-        </form>
+            </form>
+
+        {% endwith %}
 
     {% endif %}
 
-    {# Answered -------------------------------------------------------------------------------- #}
+    {# Give a definitive answer ---------------------------------------------------------------- #}
 
-    {% if job_application.is_answered %}
+    {% if job_application.state.is_processing %}
+
+        {% with answer_form as form %}
+
+            <hr>
+
+            <form method="post" action="">
+
+                {% csrf_token %}
+
+                {% bootstrap_form_errors form %}
+
+                {% bootstrap_field form.answer %}
+
+                {% buttons %}
+                    <div class="row">
+                        {% for choice in form.action.field.choices %}
+                            <div class="col-md-6 mb-2">
+                                <button
+                                    type="submit"
+                                    class="btn btn-{% if choice.0 == form.ACTION_REJECT %}danger{% else %}success{% endif %} btn-block"
+                                    name="{{ form.action.name }}"
+                                    value="{{ choice.0 }}"
+                                >{{ choice.1 }}</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endbuttons %}
+
+            </form>
+
+        {% endwith %}
+
+    {% endif %}
+
+    {# Processed -------------------------------------------------------------------------------- #}
+
+    {% if job_application.has_been_processed %}
 
         <hr>
 

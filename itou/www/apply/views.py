@@ -11,7 +11,11 @@ from django.utils.translation import ugettext as _
 from itou.job_applications.models import JobApplication
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
-from itou.www.apply.forms import JobApplicationForm, JobApplicationAnswerForm
+from itou.www.apply.forms import (
+    JobApplicationForm,
+    JobApplicationAnswerForm,
+    JobApplicationProcessForm,
+)
 
 
 @login_required
@@ -137,25 +141,36 @@ def detail_for_siae(
         .last()
     )
 
-    form = JobApplicationAnswerForm(data=request.POST or None)
+    process_form = JobApplicationProcessForm(data=request.POST or None)
+    answer_form = JobApplicationAnswerForm(data=request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
+    if request.method == "POST":
 
-        answer_kind = form.cleaned_data["answer_kind"]
-        answer = form.cleaned_data["answer"]
+        if process_form.is_valid():
+            action = process_form.cleaned_data["action"]
+            answer = process_form.cleaned_data["answer"]
+            if action == process_form.ACTION_PROCESS:
+                job_application.process(user=request.user)
+                messages.success(request, _("Modification effectuée !"))
+            elif action == process_form.ACTION_REJECT:
+                job_application.reject(user=request.user, answer=answer)
+                messages.success(request, _("Votre réponse a bien été envoyée !"))
 
-        if answer_kind == form.ANSWER_KIND_ACCEPT:
-            job_application.accept(user=request.user, answer=answer)
+        elif answer_form.is_valid():
+            action = answer_form.cleaned_data["action"]
+            answer = answer_form.cleaned_data["answer"]
+            if action == answer_form.ACTION_ACCEPT:
+                job_application.accept(user=request.user, answer=answer)
+            elif action == answer_form.ACTION_REJECT:
+                job_application.reject(user=request.user, answer=answer)
+            messages.success(request, _("Votre réponse a bien été envoyée !"))
 
-        elif answer_kind == form.ANSWER_KIND_REJECT:
-            job_application.reject(user=request.user, answer=answer)
-
-        messages.success(request, _("Votre réponse a bien été envoyée !"))
         return HttpResponseRedirect(request.get_full_path())
 
     context = {
-        "answer_form": form,
+        "answer_form": answer_form,
         "job_application": job_application,
         "last_log": last_log,
+        "process_form": process_form,
     }
     return render(request, template_name, context)

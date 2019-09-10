@@ -50,6 +50,32 @@ class JobApplicationEmailTest(TestCase):
         )
         self.assertIn(job_application.prescriber.name, email.body)
 
+    def test_process_for_job_seeker(self):
+        job_application = JobApplicationWithPrescriberFactory(
+            jobs=Appellation.objects.all()
+        )
+        email = job_application.email_process_for_job_seeker
+        # To.
+        self.assertIn(job_application.job_seeker.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.siae.display_name, email.body)
+        self.assertIn(job_application.siae.get_card_url(), email.body)
+
+    def test_process_for_prescriber(self):
+        job_application = JobApplicationWithPrescriberFactory(
+            jobs=Appellation.objects.all()
+        )
+        email = job_application.email_process_for_prescriber
+        # To.
+        self.assertIn(job_application.prescriber_user.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.job_seeker.get_full_name(), email.body)
+        self.assertIn(job_application.siae.display_name, email.body)
+        self.assertIn(job_application.siae.get_card_url(), email.body)
+
     def test_accept_for_job_seeker(self):
         job_application = JobApplicationWithPrescriberFactory(
             jobs=Appellation.objects.all()
@@ -61,7 +87,6 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.siae.display_name, email.body)
-        self.assertIn(job_application.answer, email.body)
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_accept_for_prescriber(self):
@@ -120,7 +145,7 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertTrue(job_application.state.is_new)
         job_application.send()
         self.assertEqual(len(mail.outbox), 1)
-        self.assertTrue(job_application.state.is_pending_answer)
+        self.assertTrue(job_application.state.is_pending_processing)
 
     def test_send_fail(self):
         job_application = JobApplicationWithPrescriberFactory(
@@ -132,12 +157,22 @@ class JobApplicationWorkflowTest(TestCase):
                 job_application.send()
             self.assertTrue(job_application.state.is_new)
 
+    def test_process(self):
+        job_application = JobApplicationWithPrescriberFactory(
+            jobs=Appellation.objects.all(),
+            state=JobApplicationWorkflow.STATE_PENDING_PROCESSING,
+        )
+        self.assertTrue(job_application.state.is_pending_processing)
+        job_application.process()
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertTrue(job_application.state.is_processing)
+
     def test_accept(self):
         job_application = JobApplicationWithPrescriberFactory(
             jobs=Appellation.objects.all(),
-            state=JobApplicationWorkflow.STATE_PENDING_ANSWER,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
         )
-        self.assertTrue(job_application.state.is_pending_answer)
+        self.assertTrue(job_application.state.is_processing)
         answer = "Lorem ipsum dolor sit amet"
         job_application.accept(answer=answer)
         self.assertEqual(len(mail.outbox), 2)
@@ -147,9 +182,9 @@ class JobApplicationWorkflowTest(TestCase):
     def test_reject(self):
         job_application = JobApplicationWithPrescriberFactory(
             jobs=Appellation.objects.all(),
-            state=JobApplicationWorkflow.STATE_PENDING_ANSWER,
+            state=JobApplicationWorkflow.STATE_PENDING_PROCESSING,
         )
-        self.assertTrue(job_application.state.is_pending_answer)
+        self.assertTrue(job_application.state.is_pending_processing)
         answer = "Lorem ipsum dolor sit amet"
         job_application.reject(answer=answer)
         self.assertEqual(len(mail.outbox), 2)

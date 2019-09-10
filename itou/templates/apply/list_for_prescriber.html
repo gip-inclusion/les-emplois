@@ -28,7 +28,7 @@
 
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
-            {% if job_application.is_answered %}
+            {% if job_application.has_been_processed %}
                 <div class="card-footer">
                     <a
                         href="#"

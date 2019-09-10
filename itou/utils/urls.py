@@ -4,12 +4,12 @@ from django.utils.http import is_safe_url
 
 def get_safe_url(request, param_name, fallback_url=None):
 
-    next_url = request.GET.get(param_name) or request.POST.get(param_name)
+    url = request.GET.get(param_name) or request.POST.get(param_name)
 
     allowed_hosts = settings.ALLOWED_HOSTS
     require_https = request.is_secure()
 
-    if next_url:
+    if url:
 
         if settings.DEBUG:
             # In DEBUG mode the network location part `127.0.0.1:8000` contains
@@ -19,7 +19,7 @@ def get_safe_url(request, param_name, fallback_url=None):
             # As a quick fix, we build a new URL without the port.
             from urllib.parse import urlparse, ParseResult
 
-            url_info = urlparse(next_url)
+            url_info = urlparse(url)
             url_without_port = ParseResult(
                 scheme=url_info.scheme,
                 netloc=url_info.hostname,
@@ -29,11 +29,11 @@ def get_safe_url(request, param_name, fallback_url=None):
                 fragment=url_info.fragment,
             ).geturl()
             if is_safe_url(url_without_port, allowed_hosts, require_https):
-                return next_url
+                return url
 
         else:
-            if is_safe_url(next_url, allowed_hosts, require_https):
-                return next_url
+            if is_safe_url(url, allowed_hosts, require_https):
+                return url
 
     return fallback_url
 

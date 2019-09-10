@@ -17,40 +17,57 @@ logger = logging.getLogger(__name__)
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):
+    """
+    The JobApplication workflow.
+    https://django-xworkflows.readthedocs.io/
+    """
 
     STATE_NEW = "new"
-    STATE_PENDING_ANSWER = "pending_answer"
+    STATE_PENDING_PROCESSING = "pending_processing"
+    STATE_PROCESSING = "processing"
     STATE_ACCEPTED = "accepted"
     STATE_REJECTED = "rejected"
     STATE_OBSOLETE = "obsolete"
 
     STATE_CHOICES = (
         (STATE_NEW, _("Nouvelle candidature")),
-        (STATE_PENDING_ANSWER, _("En attente de réponse")),
-        (STATE_ACCEPTED, _("Candidature acceptée")),
-        (STATE_REJECTED, _("Candidature rejetée")),
+        (STATE_PENDING_PROCESSING, _("En attente de traitement")),
+        (STATE_PROCESSING, _("En cours de traitement")),
+        (STATE_ACCEPTED, _("Embauche confirmée")),
+        (STATE_REJECTED, _("Candidature déclinée")),
         (STATE_OBSOLETE, _("Obsolète")),  # The job seeker found another job.
     )
 
     states = STATE_CHOICES
 
     TRANSITION_SEND = "send"
+    TRANSITION_PROCESS = "process"
     TRANSITION_ACCEPT = "accept"
     TRANSITION_REJECT = "reject"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
 
     TRANSITION_CHOICES = (
-        (TRANSITION_SEND, _("Envoyer")),
-        (TRANSITION_ACCEPT, _("Accepter")),
-        (TRANSITION_REJECT, _("Refuser")),
-        (TRANSITION_RENDER_OBSOLETE, _("Rendre obsolete")),
+        (TRANSITION_SEND, _("Envoyer la candidature à la SIAE")),
+        (TRANSITION_PROCESS, _("Étudier la candidature")),
+        (TRANSITION_ACCEPT, _("Accepter l'embauche")),
+        (TRANSITION_REJECT, _("Décliner la candidature")),
+        (TRANSITION_RENDER_OBSOLETE, _("Rendre obsolete la candidature")),
     )
 
     transitions = (
-        (TRANSITION_SEND, STATE_NEW, STATE_PENDING_ANSWER),
-        (TRANSITION_ACCEPT, STATE_PENDING_ANSWER, STATE_ACCEPTED),
-        (TRANSITION_REJECT, STATE_PENDING_ANSWER, STATE_REJECTED),
-        (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PENDING_ANSWER], STATE_OBSOLETE),
+        (TRANSITION_SEND, STATE_NEW, STATE_PENDING_PROCESSING),
+        (TRANSITION_PROCESS, STATE_PENDING_PROCESSING, STATE_PROCESSING),
+        (TRANSITION_ACCEPT, STATE_PROCESSING, STATE_ACCEPTED),
+        (
+            TRANSITION_REJECT,
+            [STATE_PENDING_PROCESSING, STATE_PROCESSING],
+            STATE_REJECTED,
+        ),
+        (
+            TRANSITION_RENDER_OBSOLETE,
+            [STATE_NEW, STATE_PENDING_PROCESSING, STATE_PROCESSING],
+            STATE_OBSOLETE,
+        ),
     )
 
     initial_state = STATE_NEW
@@ -142,7 +159,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return super().save(*args, **kwargs)
 
     @property
-    def is_answered(self):
+    def has_been_processed(self):
         return self.state in [
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_REJECTED,
@@ -157,6 +174,20 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         except AnymailRequestsAPIError:
             logger.error(
                 f"Email couldn't be sent during `send` transition for JobApplication `{self.id}`"
+            )
+            raise xwf_models.AbortTransition()
+
+    @xwf_models.transition()
+    def process(self, *args, **kwargs):
+        try:
+            connection = mail.get_connection()
+            emails = [self.email_process_for_job_seeker]
+            if self.prescriber_user:
+                emails += [self.email_process_for_prescriber]
+            connection.send_messages(emails)
+        except AnymailRequestsAPIError:
+            logger.error(
+                f"Email couldn't be sent during `process` transition for JobApplication `{self.id}`"
             )
             raise xwf_models.AbortTransition()
 
@@ -193,6 +224,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
+        # TODO.
         pass
 
     # Emails.
@@ -218,6 +250,22 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/new_for_siae_subject.txt"
         body = "apply/email/new_for_siae_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
+    def email_process_for_job_seeker(self):
+        to = [self.job_seeker.email]
+        context = {"job_application": self}
+        subject = "apply/email/process_for_job_seeker_subject.txt"
+        body = "apply/email/process_for_job_seeker_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
+    def email_process_for_prescriber(self):
+        to = [self.prescriber_user.email]
+        context = {"job_application": self}
+        subject = "apply/email/process_for_prescriber_subject.txt"
+        body = "apply/email/process_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
 
     @property

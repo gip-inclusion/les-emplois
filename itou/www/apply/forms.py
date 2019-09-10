@@ -63,23 +63,54 @@ class JobApplicationForm(forms.ModelForm):
         return job_application
 
 
-class JobApplicationAnswerForm(forms.Form):
+class JobApplicationProcessForm(forms.Form):
     """
-    Let an SIAE answer to a job application.
+    Allow an SIAE to choose between rejecting or processing a job application.
     """
 
-    ANSWER_KIND_ACCEPT = JobApplicationWorkflow.TRANSITION_ACCEPT
-    ANSWER_KIND_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
-    ANSWER_KIND_CHOICES = [
-        (ANSWER_KIND_ACCEPT, ANSWER_KIND_ACCEPT),
-        (ANSWER_KIND_REJECT, ANSWER_KIND_REJECT),
+    TRANSITION_CHOICES = dict(JobApplicationWorkflow.TRANSITION_CHOICES)
+
+    ACTION_PROCESS = JobApplicationWorkflow.TRANSITION_PROCESS
+    ACTION_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
+
+    ACTION_CHOICES = [
+        (ACTION_REJECT, TRANSITION_CHOICES[ACTION_REJECT]),
+        (ACTION_PROCESS, TRANSITION_CHOICES[ACTION_PROCESS]),
     ]
 
-    answer_kind = forms.ChoiceField(
-        choices=ANSWER_KIND_CHOICES, widget=forms.HiddenInput()
+    action = forms.ChoiceField(choices=ACTION_CHOICES, widget=forms.HiddenInput())
+    answer = forms.CharField(
+        label=_("Réponse"), widget=forms.Textarea(), required=False, strip=True
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        action = cleaned_data.get("action")
+        answer = cleaned_data.get("answer")
+        if action == self.ACTION_REJECT and not answer:
+            error = _("Une réponse est obligatoire pour décliner une candidature.")
+            raise forms.ValidationError(error)
+
+
+class JobApplicationAnswerForm(forms.Form):
+    """
+    Let an SIAE give a definitive answer to a job application.
+    """
+
+    TRANSITION_CHOICES = dict(JobApplicationWorkflow.TRANSITION_CHOICES)
+
+    ACTION_ACCEPT = JobApplicationWorkflow.TRANSITION_ACCEPT
+    ACTION_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
+
+    ACTION_CHOICES = [
+        (ACTION_REJECT, TRANSITION_CHOICES[ACTION_REJECT]),
+        (ACTION_ACCEPT, TRANSITION_CHOICES[ACTION_ACCEPT]),
+    ]
+
+    action = forms.ChoiceField(choices=ACTION_CHOICES, widget=forms.HiddenInput())
     answer = forms.CharField(
         label=_("Réponse"),
         widget=forms.Textarea(),
         help_text="Votre réponse est obligatoire.",
+        strip=True,
     )
