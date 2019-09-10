@@ -13,7 +13,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.templatetags import format_filters
 from itou.utils.urls import get_safe_url
-from itou.utils.validators import validate_phone, validate_naf, validate_siret
+from itou.utils.validators import validate_naf, validate_siret
 
 
 class UtilsAddressMixinTest(TestCase):
@@ -98,13 +98,6 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_siret, "1200001530001a")
         self.assertRaises(ValidationError, validate_siret, "azertyqwerty")
         validate_siret("12000015300011")
-
-    def test_validate_phone(self):
-        self.assertRaises(ValidationError, validate_phone, "06102030")
-        self.assertRaises(ValidationError, validate_phone, "aaaaa")
-        self.assertRaises(ValidationError, validate_phone, "-")
-        self.assertRaises(ValidationError, validate_phone, "azertyqwerty")
-        validate_phone("0610203040")
 
 
 class UtilsTemplateTagsTestCase(TestCase):

@@ -12,10 +12,3 @@ def validate_naf(naf):
         raise ValidationError(
             _("Le code NAF doit être composé de de 4 chiffres et d'une lettre.")
         )
-
-
-def validate_phone(phone):
-    if not phone.isdigit() or len(phone) != 10:
-        raise ValidationError(
-            _("Le numéro de téléphone doit être composé de 10 chiffres.")
-        )
