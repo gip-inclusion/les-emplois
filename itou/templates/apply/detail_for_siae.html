@@ -27,6 +27,9 @@
 
     <h3 class="font-weight-normal text-muted">{% trans "Candidat" %}</h3>
 
+    {# Tmp fake button #}
+    <p><button type="button" class="btn btn-warning">Vérifier l'éligibilité</button></p>
+
     <ul>
 
         <li>{% trans "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
