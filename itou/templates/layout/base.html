@@ -43,9 +43,11 @@
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'account_signup' %}">
-                            {% trans "Inscription / Connexion" %}
-                        </a>
+                        <h5>
+                            <a href="/" class="text-dark">
+                                {% trans "La plate-forme de l'inclusion" %}
+                            </a>
+                        </h5>
                     {% endif %}
                 </div>
             </div>

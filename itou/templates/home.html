@@ -1,12 +1,18 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
+{% load static %}
 
 {# {% block meta_description %}<meta name="description" content="">{% endblock %} #}
 {% block title %}{% trans "La plate-forme numérique de l'inclusion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1 class="text-center">{% blocktrans %}Trouvez des <abbr title="Structures d'insertion par l'activité économique">SIAE</abbr> à{% endblocktrans %}</h1>
+    {% include "includes/connect.html" %}
+
+    <br>
+    <hr>
+
+    <h4 class="text-center">{% blocktrans %}Trouvez une structure d'insertion à{% endblocktrans %}</h4>
 
     <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
         {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
