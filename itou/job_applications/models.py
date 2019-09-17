@@ -119,7 +119,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # The prescriber can be a member of multiple organizations or none.
     # Keep track of the current one (if any).
     prescriber = models.ForeignKey(
-        "prescribers.Prescriber",
+        "prescribers.PrescriberOrganization",
         verbose_name=_("Organisation du prescripteur"),
         on_delete=models.SET_NULL,
         null=True,

@@ -6,7 +6,7 @@ from django.template import Context, Template
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from itou.prescribers.models import Prescriber
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -24,9 +24,9 @@ class UtilsAddressMixinTest(TestCase):
     def test_geocode(self, mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.geocode()`.
-        Use `Prescriber` which inherits from abstract `AddressMixin`.
+        Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
         """
-        prescriber = Prescriber.objects.create(siret="12000015300011")
+        prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
         prescriber.geocode("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.

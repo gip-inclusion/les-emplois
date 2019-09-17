@@ -7,10 +7,11 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_siret
 
 
-class Prescriber(AddressMixin):  # Do not forget the mixin!
+class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
-    Prescripteurs-orienteurs (Pôle emploi, missions locales, Cap emploi, PJJ,
-    SPIP, ASE, PLIE, voire structures d’hébergement, etc.).
+    The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
+
+    Note: it is not required for a prescriber to be a member of an organization!
     """
 
     siret = models.CharField(
@@ -42,13 +43,13 @@ class Prescriber(AddressMixin):  # Do not forget the mixin!
 
 
 class PrescriberMembership(models.Model):
-    """Intermediary model between `User` and `Prescriber`."""
+    """Intermediary model between `User` and `PrescriberOrganization`."""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    prescriber = models.ForeignKey(Prescriber, on_delete=models.CASCADE)
+    organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(
         verbose_name=_("Date d'adhésion"), default=timezone.now
     )
-    is_prescriber_admin = models.BooleanField(
+    is_admin = models.BooleanField(
         verbose_name=_("Administrateur de la structure d'accompagnement"), default=False
     )

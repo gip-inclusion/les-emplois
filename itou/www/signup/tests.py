@@ -9,7 +9,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.prescribers.models import Prescriber
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -60,15 +60,15 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        prescriber = Prescriber.objects.get(siret=post_data["siret"])
-        self.assertIn(user, prescriber.members.all())
-        self.assertEqual(1, prescriber.members.count())
+        organization = PrescriberOrganization.objects.get(siret=post_data["siret"])
+        self.assertIn(user, organization.members.all())
+        self.assertEqual(1, organization.members.count())
 
-        self.assertIn(prescriber, user.prescriber_set.all())
-        self.assertEqual(1, user.prescriber_set.count())
+        self.assertIn(organization, user.prescriberorganization_set.all())
+        self.assertEqual(1, user.prescriberorganization_set.count())
 
-        membership = user.prescribermembership_set.get(prescriber=prescriber)
-        self.assertTrue(membership.is_prescriber_admin)
+        membership = user.prescribermembership_set.get(organization=organization)
+        self.assertTrue(membership.is_admin)
 
     def test_prescriber_signup_without_siret(self):
         """Prescriber signup without siret."""
@@ -92,7 +92,7 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        self.assertEqual(0, user.prescriber_set.count())
+        self.assertEqual(0, user.prescriberorganization_set.count())
 
     def test_siae_signup(self):
         """SIAE signup."""

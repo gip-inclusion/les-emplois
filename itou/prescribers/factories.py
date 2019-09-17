@@ -7,11 +7,11 @@ from itou.prescribers import models
 from itou.users.factories import PrescriberStaffFactory
 
 
-class PrescriberFactory(factory.django.DjangoModelFactory):
-    """Generate an Prescriber() object for unit tests."""
+class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
+    """Generate a PrescriberOrganization() object for unit tests."""
 
     class Meta:
-        model = models.Prescriber
+        model = models.PrescriberOrganization
 
     siret = factory.fuzzy.FuzzyText(length=14, chars=string.digits)
     name = factory.Sequence(lambda n: f"prescriber{n}")
@@ -21,7 +21,11 @@ class PrescriberFactory(factory.django.DjangoModelFactory):
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     """
-    Generate an PrescriberMembership() object (with its related Prescriber() and User() objects) for unit tests.
+    Generates:
+    - a PrescriberMembership()
+    - its related PrescriberOrganization()
+    - its related User()
+
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
@@ -29,14 +33,15 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
         model = models.PrescriberMembership
 
     user = factory.SubFactory(PrescriberStaffFactory)
-    prescriber = factory.SubFactory(PrescriberFactory)
-    is_prescriber_admin = True
+    organization = factory.SubFactory(PrescriberOrganizationFactory)
+    is_admin = True
 
 
-class PrescriberWithMembershipFactory(PrescriberFactory):
+class PrescriberWithMembershipFactory(PrescriberOrganizationFactory):
     """
-    Generates an Prescriber() object with a member for unit tests.
+    Generates a PrescriberOrganization() object with a member for unit tests.
+
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
-    membership = factory.RelatedFactory(PrescriberMembershipFactory, "prescriber")
+    membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")

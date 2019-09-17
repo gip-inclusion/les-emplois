@@ -5,13 +5,13 @@ from itou.prescribers import models
 
 
 class MembersInline(admin.TabularInline):
-    model = models.Prescriber.members.through
+    model = models.PrescriberOrganization.members.through
     extra = 1
     raw_id_fields = ("user",)
 
 
-@admin.register(models.Prescriber)
-class PrescriberAdmin(admin.ModelAdmin):
+@admin.register(models.PrescriberOrganization)
+class PrescriberOrganizationAdmin(admin.ModelAdmin):
     list_display = ("siret", "name")
     fieldsets = (
         (_("Structure"), {"fields": ("siret", "name", "phone", "email")}),

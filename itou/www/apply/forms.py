@@ -53,7 +53,7 @@ class JobApplicationForm(forms.ModelForm):
             job_application.prescriber_user = self.prescriber_user
             # Assume we have only one organization per prescriber staff at the moment
             job_application.prescriber = (
-                job_application.prescriber_user.prescriber_set.first()
+                job_application.prescriber_user.prescriberorganization_set.first()
             )
         if commit:
             job_application.save()

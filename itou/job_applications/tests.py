@@ -8,7 +8,9 @@ from django_xworkflows import models as xwf_models
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.job_applications.factories import JobApplicationWithPrescriberFactory
+from itou.job_applications.factories import (
+    JobApplicationWithPrescriberOrganizationFactory,
+)
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.templatetags import format_filters
 
@@ -22,7 +24,7 @@ class JobApplicationEmailTest(TestCase):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
 
     def test_new_for_siae(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_new_for_siae
@@ -51,7 +53,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.prescriber.name, email.body)
 
     def test_process_for_job_seeker(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_process_for_job_seeker
@@ -64,7 +66,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_process_for_prescriber(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_process_for_prescriber
@@ -77,7 +79,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_accept_for_job_seeker(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_accept_for_job_seeker
@@ -90,7 +92,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_accept_for_prescriber(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_accept_for_prescriber
@@ -104,7 +106,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.siae.get_card_url(), email.body)
 
     def test_reject_for_job_seeker(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_reject_for_job_seeker
@@ -117,7 +119,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.answer, email.body)
 
     def test_reject_for_prescriber(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         email = job_application.email_reject_for_prescriber
@@ -139,7 +141,7 @@ class JobApplicationWorkflowTest(TestCase):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
 
     def test_send(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         self.assertTrue(job_application.state.is_new)
@@ -148,7 +150,7 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertTrue(job_application.state.is_pending_processing)
 
     def test_send_fail(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all()
         )
         with mock.patch("django.core.mail.message.EmailMessage.send") as send:
@@ -158,7 +160,7 @@ class JobApplicationWorkflowTest(TestCase):
             self.assertTrue(job_application.state.is_new)
 
     def test_process(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all(),
             state=JobApplicationWorkflow.STATE_PENDING_PROCESSING,
         )
@@ -168,7 +170,7 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertTrue(job_application.state.is_processing)
 
     def test_accept(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all(),
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
@@ -180,7 +182,7 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(job_application.answer, answer)
 
     def test_reject(self):
-        job_application = JobApplicationWithPrescriberFactory(
+        job_application = JobApplicationWithPrescriberOrganizationFactory(
             jobs=Appellation.objects.all(),
             state=JobApplicationWorkflow.STATE_PENDING_PROCESSING,
         )

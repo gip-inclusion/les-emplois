@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from allauth.account.forms import SignupForm
 
-from itou.prescribers.models import Prescriber, PrescriberMembership
+from itou.prescribers.models import PrescriberOrganization, PrescriberMembership
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.apis.siret import get_siret_data
 from itou.utils.validators import validate_siret
@@ -61,22 +61,22 @@ class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
         siret = self.cleaned_data.get("siret")
         if siret:
             # If a siret is given, create the organization and membership.
-            prescriber, is_new = Prescriber.objects.get_or_create(
+            organization, is_new = PrescriberOrganization.objects.get_or_create(
                 siret=self.cleaned_data["siret"]
             )
             # Try to automatically gather information for the given SIRET.
             siret_data = get_siret_data(siret)
             if siret_data:
-                prescriber.name = siret_data["name"]
-                prescriber.geocode(
+                organization.name = siret_data["name"]
+                organization.geocode(
                     siret_data["address"], post_code=siret_data["post_code"], save=False
                 )
-            prescriber.save()
+            organization.save()
             membership = PrescriberMembership()
             membership.user = user
-            membership.prescriber = prescriber
+            membership.organization = organization
             # The first member becomes an admin.
-            membership.is_prescriber_admin = is_new
+            membership.is_admin = is_new
             membership.save()
 
         return user

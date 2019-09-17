@@ -39,8 +39,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
                 self.jobs.add(job)
 
 
-class JobApplicationWithPrescriberFactory(JobApplicationFactory):
-    """Generates a JobApplication() object with a Prescriber() and its user for unit tests."""
+class JobApplicationWithPrescriberOrganizationFactory(JobApplicationFactory):
+    """Generates a JobApplication() object with a PrescriberOrganization() and its user for unit tests."""
 
     prescriber = factory.SubFactory(PrescriberWithMembershipFactory)
     prescriber_user = factory.LazyAttribute(lambda o: o.prescriber.members.first())

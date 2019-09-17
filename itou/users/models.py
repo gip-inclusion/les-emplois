@@ -17,7 +17,7 @@ class User(AbstractUser):
         self.siaemembership_set.all()
 
     To retrieve prescribers this user belongs to:
-        self.prescriber_set.all()
+        self.prescriberorganization_set.all()
         self.prescribermembership_set.all()
     """
 
