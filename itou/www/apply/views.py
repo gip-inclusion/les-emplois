@@ -85,12 +85,9 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     List of applications for a prescriber.
     """
 
-    siret = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_KEY]
-    job_applications = (
-        request.user.job_applications_prescribed.filter(prescriber_id=siret)
-        .select_related("job_seeker", "prescriber_user", "prescriber")
-        .prefetch_related("jobs")
-    )
+    job_applications = request.user.job_applications_prescribed.select_related(
+        "job_seeker", "prescriber_user", "prescriber"
+    ).prefetch_related("jobs")
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
     )

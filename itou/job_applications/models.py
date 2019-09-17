@@ -115,8 +115,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         on_delete=models.SET_NULL,
         related_name="job_applications_prescribed",
     )
-    # The prescriber can be a member of multiple organizations.
-    # Keep track of the current one.
+
+    # The prescriber can be a member of multiple organizations or none.
+    # Keep track of the current one (if any).
     prescriber = models.ForeignKey(
         "prescribers.Prescriber",
         verbose_name=_("Organisation du prescripteur"),

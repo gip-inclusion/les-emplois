@@ -31,7 +31,7 @@ class JobSeekerFactory(UserFactory):
 
 
 class PrescriberStaffFactory(UserFactory):
-    is_prescriber_staff = True
+    is_prescriber = True
 
 
 class SiaeStaffFactory(UserFactory):

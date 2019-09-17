@@ -36,7 +36,7 @@ class JobApplicationForm(forms.ModelForm):
         if prescriber_user_email:
             try:
                 self.prescriber_user = get_user_model().objects.get(
-                    email=prescriber_user_email, is_prescriber_staff=True
+                    email=prescriber_user_email, is_prescriber=True
                 )
             except get_user_model().DoesNotExist:
                 error = _(

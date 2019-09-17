@@ -12,7 +12,7 @@ class KindFilter(admin.SimpleListFilter):
     def lookups(self, request, model_admin):
         return (
             ("is_job_seeker", _("Demandeur d'emploi")),
-            ("is_prescriber_staff", _("Prescripteur")),
+            ("is_prescriber", _("Prescripteur")),
             ("is_siae_staff", _("SIAE")),
         )
 
@@ -20,8 +20,8 @@ class KindFilter(admin.SimpleListFilter):
         value = self.value()
         if value == "is_job_seeker":
             queryset = queryset.filter(is_job_seeker=True)
-        elif value == "is_prescriber_staff":
-            queryset = queryset.filter(is_prescriber_staff=True)
+        elif value == "is_prescriber":
+            queryset = queryset.filter(is_prescriber=True)
         elif value == "is_siae_staff":
             queryset = queryset.filter(is_siae_staff=True)
         return queryset
@@ -40,7 +40,7 @@ class ItouUserAdmin(UserAdmin):
                     "birthdate",
                     "phone",
                     "is_job_seeker",
-                    "is_prescriber_staff",
+                    "is_prescriber",
                     "is_siae_staff",
                 )
             },

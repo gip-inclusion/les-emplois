@@ -1,18 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf import settings
 
 
 def get_current_organization(request):
     """
-    Every RequestContext will contain these two variables:
-        - current_siae: an itou.siaes.Siae instance
-        - current_prescriber: an itou.prescribers.Prescriber instance
+    Put things into the context.
+    https://docs.djangoproject.com/en/2.1/ref/templates/api/#using-requestcontext
     """
 
     siae = None
-    prescriber = None
 
     if request.user.is_authenticated:
 
@@ -20,10 +15,4 @@ def get_current_organization(request):
         if siae_siret:
             siae = request.user.siae_set.get(siret=siae_siret)
 
-        prescriber_siret = request.session.get(
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_KEY
-        )
-        if prescriber_siret:
-            prescriber = request.user.prescriber_set.get(siret=prescriber_siret)
-
-    return {"current_siae": siae, "current_prescriber": prescriber}
+    return {"current_siae": siae}
