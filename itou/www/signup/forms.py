@@ -42,6 +42,13 @@ class SiretFormMixin(forms.Form):
 
 
 class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # SIRET number is optional for a prescriber, e.g.:
+        # a volunteer will not have a SIRET number.
+        self.fields["siret"].required = False
+        self.fields["siret"].label = _("Numéro SIRET de votre organisation (optionnel)")
+
     def save(self, request):
 
         user = super().save(request)
@@ -51,25 +58,26 @@ class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
         user.is_prescriber_staff = True
         user.save()
 
-        prescriber, is_new = Prescriber.objects.get_or_create(
-            siret=self.cleaned_data["siret"]
-        )
-        # Try to automatically gather information for the given SIRET.
-        # The user will have the possibility to modify or complete information later.
-        siret_data = get_siret_data(self.cleaned_data["siret"])
-        if siret_data:
-            prescriber.name = siret_data["name"]
-            prescriber.geocode(
-                siret_data["address"], post_code=siret_data["post_code"], save=False
+        siret = self.cleaned_data.get("siret")
+        if siret:
+            # If a siret is given, create the organization and membership.
+            prescriber, is_new = Prescriber.objects.get_or_create(
+                siret=self.cleaned_data["siret"]
             )
-        prescriber.save()
-
-        membership = PrescriberMembership()
-        membership.user = user
-        membership.prescriber = prescriber
-        # The first member becomes an admin.
-        membership.is_prescriber_admin = is_new
-        membership.save()
+            # Try to automatically gather information for the given SIRET.
+            siret_data = get_siret_data(siret)
+            if siret_data:
+                prescriber.name = siret_data["name"]
+                prescriber.geocode(
+                    siret_data["address"], post_code=siret_data["post_code"], save=False
+                )
+            prescriber.save()
+            membership = PrescriberMembership()
+            membership.user = user
+            membership.prescriber = prescriber
+            # The first member becomes an admin.
+            membership.is_prescriber_admin = is_new
+            membership.save()
 
         return user
 

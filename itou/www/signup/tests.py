@@ -70,6 +70,30 @@ class SignupTest(TestCase):
         membership = user.prescribermembership_set.get(prescriber=prescriber)
         self.assertTrue(membership.is_prescriber_admin)
 
+    def test_prescriber_signup_without_siret(self):
+        """Prescriber signup without siret."""
+
+        url = reverse("signup:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@prescriber.com",
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber_staff)
+        self.assertFalse(user.is_siae_staff)
+
+        self.assertEqual(0, user.prescriber_set.count())
+
     def test_siae_signup(self):
         """SIAE signup."""
 
