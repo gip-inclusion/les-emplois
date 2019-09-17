@@ -11,49 +11,49 @@ class JobApplicationForm(forms.ModelForm):
     """
 
     def __init__(self, user, siae, *args, **kwargs):
-        self.prescriber_user = None
+        self.prescriber = None
         self.siae = siae
         self.user = user
         super().__init__(*args, **kwargs)
         self.fields["jobs"].queryset = siae.jobs.filter(siaejobs__is_active=True)
         self.fields["message"].required = True
 
-    prescriber_user_email = forms.EmailField(
+    prescriber_email = forms.EmailField(
         required=False, label=_("E-mail de votre accompagnateur (optionnel)")
     )
 
     class Meta:
         model = JobApplication
-        fields = ["prescriber_user_email", "jobs", "message"]
+        fields = ["prescriber_email", "jobs", "message"]
         widgets = {"jobs": forms.CheckboxSelectMultiple()}
         labels = {"jobs": _("Métiers recherchés (optionnel)")}
 
-    def clean_prescriber_user_email(self):
+    def clean_prescriber_email(self):
         """
-        Retrieve a user instance from the `prescriber_user_email` field.
+        Retrieve a user instance from the `prescriber_email` field.
         """
-        prescriber_user_email = self.cleaned_data["prescriber_user_email"]
-        if prescriber_user_email:
+        prescriber_email = self.cleaned_data["prescriber_email"]
+        if prescriber_email:
             try:
-                self.prescriber_user = get_user_model().objects.get(
-                    email=prescriber_user_email, is_prescriber=True
+                self.prescriber = get_user_model().objects.get(
+                    email=prescriber_email, is_prescriber=True
                 )
             except get_user_model().DoesNotExist:
                 error = _(
                     "Cet accompagnateur ne figure pas dans notre base de données."
                 )
                 raise forms.ValidationError(error)
-        return prescriber_user_email
+        return prescriber_email
 
     def save(self, commit=True):
         job_application = super().save(commit=False)
         job_application.job_seeker = self.user
         job_application.siae = self.siae
-        if self.prescriber_user:
-            job_application.prescriber_user = self.prescriber_user
-            # Assume we have only one organization per prescriber staff at the moment
-            job_application.prescriber = (
-                job_application.prescriber_user.prescriberorganization_set.first()
+        if self.prescriber:
+            job_application.prescriber = self.prescriber
+            # Assume we have 0 or 1 organization per prescriber at the moment.
+            job_application.prescriber_organization = (
+                job_application.prescriber.prescriberorganization_set.first()
             )
         if commit:
             job_application.save()

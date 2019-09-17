@@ -44,13 +44,12 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.message, email.body)
         for job in job_application.jobs.all():
             self.assertIn(job.name, email.body)
-        self.assertIn(job_application.prescriber_user.get_full_name(), email.body)
-        self.assertIn(job_application.prescriber_user.email, email.body)
+        self.assertIn(job_application.prescriber.get_full_name(), email.body)
+        self.assertIn(job_application.prescriber.email, email.body)
         self.assertIn(
-            format_filters.format_phone(job_application.prescriber_user.phone),
-            email.body,
+            format_filters.format_phone(job_application.prescriber.phone), email.body
         )
-        self.assertIn(job_application.prescriber.name, email.body)
+        self.assertIn(job_application.prescriber_organization.display_name, email.body)
 
     def test_process_for_job_seeker(self):
         job_application = JobApplicationWithPrescriberOrganizationFactory(
@@ -71,7 +70,7 @@ class JobApplicationEmailTest(TestCase):
         )
         email = job_application.email_process_for_prescriber
         # To.
-        self.assertIn(job_application.prescriber_user.email, email.to)
+        self.assertIn(job_application.prescriber.email, email.to)
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_application.job_seeker.get_full_name(), email.body)
@@ -97,7 +96,7 @@ class JobApplicationEmailTest(TestCase):
         )
         email = job_application.email_accept_for_prescriber
         # To.
-        self.assertIn(job_application.prescriber_user.email, email.to)
+        self.assertIn(job_application.prescriber.email, email.to)
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_application.siae.display_name, email.body)
@@ -124,7 +123,7 @@ class JobApplicationEmailTest(TestCase):
         )
         email = job_application.email_reject_for_prescriber
         # To.
-        self.assertIn(job_application.prescriber_user.email, email.to)
+        self.assertIn(job_application.prescriber.email, email.to)
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)

@@ -19,8 +19,8 @@
         {% csrf_token %}
 
         <div class="alert alert-secondary" role="alert">
-            <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_user_email.auto_id %}</i>
-            {% bootstrap_field form.prescriber_user_email show_label=False %}
+            <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_email.auto_id %}</i>
+            {% bootstrap_field form.prescriber_email show_label=False %}
         </div>
 
         {% if siae.jobs.exists %}

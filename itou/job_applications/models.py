@@ -107,7 +107,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_applications_received",
     )
 
-    prescriber_user = models.ForeignKey(
+    prescriber = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Prescripteur"),
         null=True,
@@ -116,9 +116,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_applications_prescribed",
     )
 
-    # The prescriber can be a member of multiple organizations or none.
-    # Keep track of the current one (if any).
-    prescriber = models.ForeignKey(
+    # Keep track of the prescriber organization (if any).
+    prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
         verbose_name=_("Organisation du prescripteur"),
         on_delete=models.SET_NULL,
@@ -183,7 +182,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         try:
             connection = mail.get_connection()
             emails = [self.email_process_for_job_seeker]
-            if self.prescriber_user:
+            if self.prescriber:
                 emails += [self.email_process_for_prescriber]
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
@@ -199,7 +198,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         try:
             connection = mail.get_connection()
             emails = [self.email_accept_for_job_seeker]
-            if self.prescriber_user:
+            if self.prescriber:
                 emails += [self.email_accept_for_prescriber]
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
@@ -214,7 +213,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         try:
             connection = mail.get_connection()
             emails = [self.email_reject_for_job_seeker]
-            if self.prescriber_user:
+            if self.prescriber:
                 emails += [self.email_reject_for_prescriber]
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
@@ -263,7 +262,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def email_process_for_prescriber(self):
-        to = [self.prescriber_user.email]
+        to = [self.prescriber.email]
         context = {"job_application": self}
         subject = "apply/email/process_for_prescriber_subject.txt"
         body = "apply/email/process_for_prescriber_body.txt"
@@ -279,7 +278,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def email_accept_for_prescriber(self):
-        to = [self.prescriber_user.email]
+        to = [self.prescriber.email]
         context = {"job_application": self}
         subject = "apply/email/accept_for_prescriber_subject.txt"
         body = "apply/email/accept_for_prescriber_body.txt"
@@ -295,7 +294,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def email_reject_for_prescriber(self):
-        to = [self.prescriber_user.email]
+        to = [self.prescriber.email]
         context = {"job_application": self}
         subject = "apply/email/reject_for_prescriber_subject.txt"
         body = "apply/email/reject_for_prescriber_body.txt"

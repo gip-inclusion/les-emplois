@@ -32,13 +32,13 @@ Vous avez reçu une nouvelle candidature !
 
 {% endif %}
 
-{% if job_application.prescriber_user %}
+{% if job_application.prescriber %}
 
 {% trans "*Prescripteur* :" %}
 
-- {{ job_application.prescriber_user.get_full_name }}{% if job_application.prescriber.name %} ({{ job_application.prescriber.name }}){% endif %}
-- {{ job_application.prescriber_user.email }}
-{% if job_application.prescriber_user.phone %}- {{ job_application.prescriber_user.phone|format_phone }}{% endif %}
+- {{ job_application.prescriber.get_full_name }}{% if job_application.prescriber_organization %} ({{ job_application.prescriber_organization.display_name }}){% endif %}
+- {{ job_application.prescriber.email }}
+{% if job_application.prescriber.phone %}- {{ job_application.prescriber.phone|format_phone }}{% endif %}
 
 {% endif %}
 

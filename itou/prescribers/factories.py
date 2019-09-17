@@ -8,7 +8,7 @@ from itou.users.factories import PrescriberStaffFactory
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
-    """Generate a PrescriberOrganization() object for unit tests."""
+    """Returns a PrescriberOrganization() object."""
 
     class Meta:
         model = models.PrescriberOrganization
@@ -21,8 +21,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     """
-    Generates:
-    - a PrescriberMembership()
+    Returns a PrescriberMembership() object with:
     - its related PrescriberOrganization()
     - its related User()
 
@@ -37,9 +36,9 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     is_admin = True
 
 
-class PrescriberWithMembershipFactory(PrescriberOrganizationFactory):
+class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory):
     """
-    Generates a PrescriberOrganization() object with a member for unit tests.
+    Returns a PrescriberOrganization() object with a related PrescriberMembership() object.
 
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """

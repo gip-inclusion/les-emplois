@@ -8,7 +8,9 @@
 <h1>{% trans "Modifier votre profil" %}</h1>
 
 {# Tmp fake button #}
+{% if user.is_job_seeker %}
 <p><button type="button" class="btn btn-warning">Vérifier mon éligibilité</button></p>
+{% endif %}
 
 <form method="post" action="">
 

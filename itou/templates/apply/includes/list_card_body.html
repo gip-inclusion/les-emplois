@@ -17,13 +17,13 @@
     </div>
 
     <div class="col-md-4">
-        {% if job_application.prescriber_user %}
+        {% if job_application.prescriber %}
             <div class="card-body">
                 <h6 class="card-subtitle text-muted">{% trans "Prescripteur :" %}</h6>
                 <p class="card-text">
-                    {{ job_application.prescriber_user.get_full_name }}
-                    {% if job_application.prescriber %}
-                        ({{ job_application.prescriber.display_name }})
+                    {{ job_application.prescriber.get_full_name }}
+                    {% if job_application.prescriber_organization %}
+                        ({{ job_application.prescriber_organization.display_name }})
                     {% endif %}
                 </p>
             </div>

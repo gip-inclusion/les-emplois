@@ -2,7 +2,7 @@ import factory
 import factory.fuzzy
 
 from itou.job_applications import models
-from itou.prescribers.factories import PrescriberWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
 
@@ -40,7 +40,14 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
 
 class JobApplicationWithPrescriberOrganizationFactory(JobApplicationFactory):
-    """Generates a JobApplication() object with a PrescriberOrganization() and its user for unit tests."""
+    """
+    Generates a JobApplication() object with a PrescriberOrganization()
+    and its User() for unit tests.
+    """
 
-    prescriber = factory.SubFactory(PrescriberWithMembershipFactory)
-    prescriber_user = factory.LazyAttribute(lambda o: o.prescriber.members.first())
+    prescriber_organization = factory.SubFactory(
+        PrescriberOrganizationWithMembershipFactory
+    )
+    prescriber = factory.LazyAttribute(
+        lambda o: o.prescriber_organization.members.first()
+    )

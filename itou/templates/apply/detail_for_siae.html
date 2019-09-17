@@ -66,7 +66,7 @@
 
     {# Prescriber info ------------------------------------------------------------------------- #}
 
-    {% if job_application.prescriber_user %}
+    {% if job_application.prescriber %}
 
         <hr>
 
@@ -74,12 +74,12 @@
 
         <ul>
 
-            <li>{% trans "Contact :" %} <b>{{ job_application.prescriber_user.get_full_name }}</b> {% if job_application.prescriber %}({{ job_application.prescriber.display_name }}){% endif %}</li>
+            <li>{% trans "Contact :" %} <b>{{ job_application.prescriber.get_full_name }}</b> {% if job_application.prescriber_organization %}({{ job_application.prescriber_organization.display_name }}){% endif %}</li>
 
-            <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.prescriber_user.email }}">{{ job_application.prescriber_user.email }}</a></li>
+            <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.prescriber.email }}">{{ job_application.prescriber.email }}</a></li>
 
-            {% if job_application.prescriber_user.phone %}
-            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.prescriber_user.phone }}">{{ job_application.prescriber_user.phone|format_phone }}</a></li>
+            {% if job_application.prescriber.phone %}
+            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.prescriber.phone }}">{{ job_application.prescriber.phone|format_phone }}</a></li>
             {% endif %}
 
         </ul>

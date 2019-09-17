@@ -69,7 +69,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     """
 
     job_applications = request.user.job_applications_sent.select_related(
-        "job_seeker", "prescriber_user", "prescriber"
+        "job_seeker", "prescriber", "prescriber"
     ).prefetch_related("jobs")
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
@@ -86,7 +86,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     """
 
     job_applications = request.user.job_applications_prescribed.select_related(
-        "job_seeker", "prescriber_user", "prescriber"
+        "job_seeker", "prescriber", "prescriber"
     ).prefetch_related("jobs")
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
@@ -107,7 +107,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     siae = get_object_or_404(queryset, siret=siret)
 
     job_applications = siae.job_applications_received.select_related(
-        "job_seeker", "prescriber_user", "prescriber"
+        "job_seeker", "prescriber", "prescriber"
     ).prefetch_related("jobs")
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
@@ -127,7 +127,7 @@ def detail_for_siae(
 
     queryset = (
         JobApplication.objects.siae_member_required(request.user)
-        .select_related("job_seeker", "prescriber_user", "prescriber")
+        .select_related("job_seeker", "prescriber", "prescriber")
         .prefetch_related("jobs")
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
