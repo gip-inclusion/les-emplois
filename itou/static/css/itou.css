@@ -133,3 +133,20 @@ header.layout-section {
 .layout-messages .alert:last-child {
     margin-bottom: 0;
 }
+
+/* BETA banner.
+--------------------------------------------------------------------------- */
+
+body:after{
+    content: "BETA";
+    color: #fff;
+    background: #d63626;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 0.2rem 1.9rem;
+    position: fixed;
+    top: 0.3rem;
+    left: -1.8rem;
+    transform: rotate(-45deg);
+}
