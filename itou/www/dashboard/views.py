@@ -11,7 +11,7 @@ from allauth.account.views import PasswordChangeView
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
-from itou.www.dashboard.forms import EditUserInfoForm
+from itou.www.dashboard.forms import EditUserInfoForm, EditSiaeForm
 
 
 @login_required
@@ -104,4 +104,24 @@ def configure_jobs(request, template_name="dashboard/configure_jobs.html"):
             return HttpResponseRedirect(reverse_lazy("dashboard:configure_jobs"))
 
     context = {"siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+def edit_siae(request, template_name="dashboard/edit_siae.html"):
+    """
+    Edit an SIAE's card (or "Fiche" in French).
+    """
+    siret = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+    queryset = Siae.active_objects.member_required(request.user)
+    siae = get_object_or_404(queryset, siret=siret)
+
+    form = EditSiaeForm(instance=siae, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("Mise à jour effectuée !"))
+        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+
+    context = {"form": form, "siae": siae}
     return render(request, template_name, context)

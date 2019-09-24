@@ -1,0 +1,30 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Modifier la fiche de votre SIAE" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Modifier la fiche de votre SIAE" %}</h1>
+
+<h2 class="text-muted">
+    {{ siae.display_name }}
+    {# Display non-user-edited name too. #}
+    {% if siae.brand %}<small>({{ siae.name|title }})</small>{% endif %}
+</h2>
+
+<form method="post" action="">
+
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+
+    {% buttons %}
+        <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
+        <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+    {% endbuttons %}
+
+</form>
+
+{% endblock %}

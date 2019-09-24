@@ -67,12 +67,18 @@
 
         {% if user.is_siae_staff %}
             <div class="card">
-                <h5 class="card-header">{% trans "Métiers" %}</h5>
+                <h5 class="card-header">{% trans "SIAE" %}</h5>
                 <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="box" %}
+                        <a href="{% url 'dashboard:edit_siae' %}">
+                            {% trans "Modifier la fiche de votre SIAE" %}
+                        </a>
+                    </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'dashboard:configure_jobs' %}">
-                            {% trans "Configurez vos métiers" %}
+                            {% trans "Configurer les métiers" %}
                         </a>
                     </p>
                 </div>

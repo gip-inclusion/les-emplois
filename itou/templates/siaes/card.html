@@ -14,13 +14,22 @@
 
     <hr>
 
-    <h1>{{ siae.display_name }}</h1>
+    <h1>
+        {{ siae.display_name }}
+        {# Display non-user-edited name too. #}
+        {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
+    </h1>
 
     <h2 class="text-muted">
         {{ siae.address_line_1 }},
         {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
         {{ siae.post_code }} {{ siae.city }}
     </h2>
+
+    {% if siae.description %}
+        <hr>
+        <p>{{ siae.description|linebreaks }}</p>
+    {% endif %}
 
     <hr>
 

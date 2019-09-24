@@ -5,6 +5,7 @@ from django.urls import reverse
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
@@ -116,3 +117,34 @@ class ConfigureJobsViewTest(TestCase):
         self.assertTrue(
             self.siae.jobs_through.get(appellation_id=16361, is_active=False)
         )
+
+
+class EditSiaeViewTest(TestCase):
+    def test_edit(self):
+
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:edit_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae = Siae.objects.get(siret=siae.siret)
+
+        self.assertEqual(siae.brand, post_data["brand"])
+        self.assertEqual(siae.description, post_data["description"])
+        self.assertEqual(siae.email, post_data["email"])
+        self.assertEqual(siae.phone, post_data["phone"])
+        self.assertEqual(siae.website, post_data["website"])
