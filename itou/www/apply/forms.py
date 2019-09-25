@@ -15,7 +15,9 @@ class JobApplicationForm(forms.ModelForm):
         self.siae = siae
         self.user = user
         super().__init__(*args, **kwargs)
-        self.fields["jobs"].queryset = siae.jobs.filter(siaejobs__is_active=True)
+        self.fields["jobs"].queryset = siae.jobs.filter(
+            siaejobdescription__is_active=True
+        )
         self.fields["message"].required = True
 
     prescriber_email = forms.EmailField(

@@ -23,7 +23,7 @@ class SiaeQuerySet(models.QuerySet):
         jobs_through = Prefetch(
             "jobs_through",
             queryset=(
-                SiaeJobs.objects.filter(**kwargs)
+                SiaeJobDescription.objects.filter(**kwargs)
                 .select_related("appellation__rome")
                 .order_by("ui_rank", "appellation__name")
             ),
@@ -49,7 +49,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     To retrieve jobs of an siaes_views:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
-        self.jobs_through.all()     <QuerySet [<SiaeJobs>, ...]>
+        self.jobs_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
     """
 
     KIND_EI = "EI"
@@ -91,7 +91,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
     jobs = models.ManyToManyField(
-        "jobs.Appellation", verbose_name=_("Métiers"), through="SiaeJobs", blank=True
+        "jobs.Appellation",
+        verbose_name=_("Métiers"),
+        through="SiaeJobDescription",
+        blank=True,
     )
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
@@ -133,8 +136,9 @@ class SiaeMembership(models.Model):
     )
 
 
-class SiaeJobs(models.Model):
+class SiaeJobDescription(models.Model):
     """
+    A job description of a position in an SIAE.
     Intermediary model between `jobs.Appellation` and `Siae`.
     https://docs.djangoproject.com/en/dev/ref/models/relations/
     """
