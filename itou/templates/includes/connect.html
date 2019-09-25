@@ -48,9 +48,12 @@
         </div>
         <div class="card-body">
             <p class="card-text">
+                {% comment %}
+                {# The ability to sign up for SIAE is turned off during the test phase. #}
                 <a class="card-link" href="{% url 'signup:siae' %}">
                     {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
                 </a>
+                {% endcomment %}
                 <a class="card-link" href="{% url 'account_login' %}">
                     {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
                 </a>

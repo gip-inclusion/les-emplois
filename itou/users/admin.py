@@ -46,3 +46,23 @@ class ItouUserAdmin(UserAdmin):
             },
         ),
     )
+
+    def get_queryset(self, request):
+        """
+        Remove superuser. The purpose is to prevent staff users
+        to change the password of a superuser.
+        """
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            qs = qs.exclude(is_superuser=True)
+        return qs
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Staff (not superusers) should not manage perms of Users.
+        https://code.djangoproject.com/ticket/23559
+        """
+        rof = super().get_readonly_fields(request, obj)
+        if not request.user.is_superuser:
+            rof += ("is_staff", "is_superuser", "groups", "user_permissions")
+        return rof
