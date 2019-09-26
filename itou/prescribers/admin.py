@@ -12,14 +12,19 @@ class MembersInline(admin.TabularInline):
 
 @admin.register(models.PrescriberOrganization)
 class PrescriberOrganizationAdmin(admin.ModelAdmin):
-    list_display = ("siret", "name")
-    search_fields = ("siret", "name")
-    inlines = (MembersInline,)
-    readonly_fields = ("secret_code",)
     fieldsets = (
         (
             _("Structure"),
-            {"fields": ("siret", "name", "phone", "email", "secret_code")},
+            {
+                "fields": (
+                    "siret",
+                    "name",
+                    "phone",
+                    "email",
+                    "secret_code",
+                    "is_authorized",
+                )
+            },
         ),
         (
             _("Adresse"),
@@ -36,3 +41,8 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             },
         ),
     )
+    inlines = (MembersInline,)
+    list_display = ("siret", "name")
+    list_filter = ("is_authorized",)
+    readonly_fields = ("secret_code",)
+    search_fields = ("siret", "name")

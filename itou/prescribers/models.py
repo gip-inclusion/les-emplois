@@ -12,7 +12,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 
-    Note: it is not required for a prescriber to be a member of an organization!
+    Note: it is not required for a prescriber to be a member of an organization.
     """
 
     siret = models.CharField(
@@ -36,6 +36,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         max_length=6,
         default=generate_random_token,
         unique=True,
+    )
+    is_authorized = models.BooleanField(
+        verbose_name=_("Habilitation"),
+        default=False,
+        help_text=_("Précise si l'organisation est habilitée par le préfet."),
     )
 
     class Meta:
