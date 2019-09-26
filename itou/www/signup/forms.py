@@ -8,7 +8,6 @@ from allauth.account.forms import SignupForm
 
 from itou.prescribers.models import PrescriberOrganization, PrescriberMembership
 from itou.siaes.models import Siae, SiaeMembership
-from itou.utils.apis.siret import get_siret_data
 from itou.utils.validators import validate_siret
 
 
@@ -29,25 +28,35 @@ class FullnameFormMixin(forms.Form):
     )
 
 
-class SiretFormMixin(forms.Form):
+class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 
-    siret = forms.CharField(
-        label=_("Numéro SIRET de votre organisation"),
-        max_length=14,
-        validators=[validate_siret],
-        required=True,
+    secret_code = forms.CharField(
+        label=_("Code de l'organisation"),
+        max_length=6,
+        required=False,
         strip=True,
-        help_text=_("Saisissez 14 chiffres."),
+        help_text=_("Le code est composé de 6 caractères."),
     )
 
-
-class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # SIRET number is optional for a prescriber, e.g.:
-        # a volunteer will not have a SIRET number.
-        self.fields["siret"].required = False
-        self.fields["siret"].label = _("Numéro SIRET de votre organisation (optionnel)")
+        self.organization = None
+
+    def clean_secret_code(self):
+        """
+        Retrieve a PrescriberOrganization instance from the `secret_code` field.
+        """
+        secret_code = self.cleaned_data["secret_code"]
+        if secret_code:
+            secret_code = secret_code.upper()
+            try:
+                self.organization = PrescriberOrganization.objects.get(
+                    secret_code=secret_code
+                )
+            except PrescriberOrganization.DoesNotExist:
+                error = _("Ce code n'est pas valide.")
+                raise forms.ValidationError(error)
+        return secret_code
 
     def save(self, request):
 
@@ -58,31 +67,28 @@ class PrescriberSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
         user.is_prescriber = True
         user.save()
 
-        siret = self.cleaned_data.get("siret")
-        if siret:
-            # If a siret is given, create the organization and membership.
-            organization, is_new = PrescriberOrganization.objects.get_or_create(
-                siret=self.cleaned_data["siret"]
-            )
-            # Try to automatically gather information for the given SIRET.
-            siret_data = get_siret_data(siret)
-            if siret_data:
-                organization.name = siret_data["name"]
-                organization.geocode(
-                    siret_data["address"], post_code=siret_data["post_code"], save=False
-                )
-            organization.save()
+        # Join organization.
+        secret_code = self.cleaned_data.get("secret_code")
+        if secret_code:
             membership = PrescriberMembership()
             membership.user = user
-            membership.organization = organization
-            # The first member becomes an admin.
-            membership.is_admin = is_new
+            membership.organization = self.organization
             membership.save()
 
         return user
 
 
-class SiaeSignupForm(FullnameFormMixin, SiretFormMixin, SignupForm):
+class SiaeSignupForm(FullnameFormMixin, SignupForm):
+
+    siret = forms.CharField(
+        label=_("Numéro SIRET de votre organisation"),
+        max_length=14,
+        validators=[validate_siret],
+        required=True,
+        strip=True,
+        help_text=_("Saisissez 14 chiffres."),
+    )
+
     def clean_siret(self):
         siret = self.cleaned_data["siret"]
         try:

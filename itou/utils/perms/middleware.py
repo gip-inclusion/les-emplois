@@ -3,7 +3,7 @@ from django.conf import settings
 
 class ItouCurrentOrganizationMiddleware:
     """
-    Store the SIRET of the current SIAE in session.
+    Store the SIRET of the current organization in session.
     https://docs.djangoproject.com/en/dev/topics/http/middleware/#writing-your-own-middleware
     """
 
@@ -22,6 +22,15 @@ class ItouCurrentOrganizationMiddleware:
                 session_key = settings.ITOU_SESSION_CURRENT_SIAE_KEY
                 if not request.session.get(session_key):
                     request.session[session_key] = user.siae_set.first().siret
+
+            elif request.user.is_prescriber:
+                session_key = settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+                if not request.session.get(session_key):
+                    try:
+                        siret = request.user.prescriberorganization_set.first().siret
+                    except AttributeError:
+                        siret = None
+                    request.session[session_key] = siret
 
         response = self.get_response(request)
 

@@ -283,3 +283,4 @@ DEFAULT_FROM_EMAIL = "noreply@itou.beta.gouv.fr"
 ITOU_TEST_DEPARTMENTS = ["62", "67", "93"]
 
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
+ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"

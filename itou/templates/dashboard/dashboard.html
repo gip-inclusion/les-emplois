@@ -7,6 +7,9 @@
 
     <h1>{% trans "Tableau de bord" %}</h1>
 
+    {% if current_siae %}<h2>{{ current_siae.display_name }}</h2>{% endif %}
+    {% if current_prescriber_organization %}<h2>{{ current_prescriber_organization.display_name }}</h2>{% endif %}
+
     <div class="card-deck mt-3">
 
         <div class="card">

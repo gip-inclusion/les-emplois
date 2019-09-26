@@ -1,5 +1,3 @@
-from unittest import mock
-
 from allauth.account.forms import default_token_generator
 from allauth.account.utils import user_pk_to_url_str
 
@@ -9,11 +7,9 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.factories import SiaeFactory
-from itou.siaes.models import Siae
-from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+# from itou.siaes.factories import SiaeFactory
+# from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
@@ -28,15 +24,10 @@ class SignupTest(TestCase):
         response = self.client.post(ALLAUTH_SIGNUP_URL, data={"foo": "bar"})
         self.assertEqual(response.status_code, 405)
 
-    @mock.patch(
-        "itou.utils.apis.siret.call_insee_api", return_value=API_INSEE_SIRET_RESULT_MOCK
-    )
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
-    def test_prescriber_signup(self, mock_call_ban_geocoding_api, mock_call_insee_api):
+    def test_prescriber_signup(self):
         """Prescriber signup."""
+
+        organization = PrescriberOrganizationWithMembershipFactory()
 
         url = reverse("signup:prescriber")
         response = self.client.get(url)
@@ -46,13 +37,11 @@ class SignupTest(TestCase):
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@prescriber.com",
-            "siret": "12000015300011",
             "password1": "!*p4ssw0rd123-",
             "password2": "!*p4ssw0rd123-",
+            "secret_code": organization.secret_code,
         }
         response = self.client.post(url, data=post_data)
-        mock_call_insee_api.assert_called_once_with(post_data["siret"])
-        mock_call_ban_geocoding_api.assert_called_once()
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(email=post_data["email"])
@@ -60,15 +49,14 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
 
-        organization = PrescriberOrganization.objects.get(siret=post_data["siret"])
         self.assertIn(user, organization.members.all())
-        self.assertEqual(1, organization.members.count())
+        self.assertEqual(2, organization.members.count())
 
         self.assertIn(organization, user.prescriberorganization_set.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
 
         membership = user.prescribermembership_set.get(organization=organization)
-        self.assertTrue(membership.is_admin)
+        self.assertFalse(membership.is_admin)
 
     def test_prescriber_signup_without_siret(self):
         """Prescriber signup without siret."""
