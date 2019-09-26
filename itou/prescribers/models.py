@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
+from itou.utils.tokens import generate_random_token
 from itou.utils.validators import validate_siret
 
 
@@ -28,6 +29,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         verbose_name=_("Membres"),
         through="PrescriberMembership",
         blank=True,
+    )
+    secret_code = models.CharField(
+        verbose_name=_("Code secret"),
+        help_text=_("Code permettant à un utilisateur de rejoindre l'organisation."),
+        max_length=6,
+        default=generate_random_token,
+        unique=True,
     )
 
     class Meta:

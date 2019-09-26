@@ -31,7 +31,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "jobs",
     )
     list_filter = ("state",)
-    read_only_fields = ("created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)
 
 
@@ -49,11 +49,12 @@ class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
     )
     list_filter = ("transition",)
     raw_id_fields = ("job_application", "user")
-    read_only_fields = (
-        "user",
-        "modified_object",
+    readonly_fields = (
+        "job_application",
         "transition",
+        "from_state",
+        "to_state",
+        "user",
         "timestamp",
-        "source_ip",
     )
     search_fields = ("transition", "user__username")
