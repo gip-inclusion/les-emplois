@@ -54,6 +54,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def display_name(self):
         return self.name.title()
 
+    @property
+    def admins(self):
+        return self.members.filter(prescribermembership__is_admin=True)
+
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""

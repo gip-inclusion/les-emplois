@@ -66,6 +66,23 @@
                     </p>
                 </div>
             </div>
+
+            {% if current_prescriber_organization and user in current_prescriber_organization.admins %}
+                <div class="card">
+                    <h5 class="card-header">{% trans "Organisation" %}</h5>
+                    <div class="card-body">
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="user-plus" %}
+                            <i>{% trans "Rejoindre votre organisation" %}</i>
+                            <br>
+                            {% trans "Transmettez ce code aux personnes de votre choix, elles pourront alors l'utiliser au moment de leur inscription afin de rejoindre votre organisation :" %}
+                            <br>
+                            <b><code>{{ current_prescriber_organization.secret_code }}</code></b>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+
         {% endif %}
 
         {% if user.is_siae_staff %}
