@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+
 # from itou.siaes.factories import SiaeFactory
 # from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory

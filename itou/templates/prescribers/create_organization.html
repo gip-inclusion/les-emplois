@@ -1,0 +1,28 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Créer une organisation" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Créer une organisation" %}</h1>
+
+    <div class="alert alert-secondary">
+        {% trans "Si vous travaillez au sein d'une organisation comprenant plusieurs personnes, vous pouvez la créer ici afin d'obtenir un code qui permettra à d'autres utilisateurs de la rejoindre au moment de leur inscription." %}
+    </div>
+
+    <form method="post" action="">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}

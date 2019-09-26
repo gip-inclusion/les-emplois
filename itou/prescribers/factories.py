@@ -4,7 +4,7 @@ import factory
 import factory.fuzzy
 
 from itou.prescribers import models
-from itou.users.factories import PrescriberStaffFactory
+from itou.users.factories import PrescriberFactory
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
@@ -31,7 +31,7 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PrescriberMembership
 
-    user = factory.SubFactory(PrescriberStaffFactory)
+    user = factory.SubFactory(PrescriberFactory)
     organization = factory.SubFactory(PrescriberOrganizationFactory)
     is_admin = True
 

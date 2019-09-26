@@ -24,6 +24,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
+    website = models.URLField(verbose_name=_("Site web"), blank=True)
+    description = models.TextField(verbose_name=_("Description"), blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Membres"),
@@ -44,8 +46,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
 
     class Meta:
-        verbose_name = _("Structure d'accompagnement")
-        verbose_name_plural = _("Structures d'accompagnement")
+        verbose_name = _("Organisation")
+        verbose_name_plural = _("Organisations")
 
     def __str__(self):
         return f"{self.siret} {self.name}"

@@ -43,6 +43,7 @@ urlpatterns = [
     path("dashboard/", include("itou.www.dashboard.urls")),
     path("search/", include("itou.www.search.urls")),
     path("siae/", include("itou.www.siaes_views.urls")),
+    path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("signup/", include("itou.www.signup.urls")),
 
     # Errors pages.

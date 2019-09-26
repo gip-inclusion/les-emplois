@@ -2,6 +2,7 @@ import datetime
 import string
 
 import factory
+import factory.fuzzy
 
 from itou.users import models
 
@@ -30,7 +31,7 @@ class JobSeekerFactory(UserFactory):
     is_job_seeker = True
 
 
-class PrescriberStaffFactory(UserFactory):
+class PrescriberFactory(UserFactory):
     is_prescriber = True
 
 

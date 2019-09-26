@@ -62,6 +62,7 @@ LOCAL_APPS = [
     "itou.www.dashboard",
     "itou.www.home",
     "itou.www.search",
+    "itou.www.prescribers_views",
     "itou.www.siaes_views",
     "itou.www.signup",
 ]
