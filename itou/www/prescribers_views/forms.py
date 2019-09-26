@@ -37,3 +37,17 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
             membership.is_admin = True
             membership.save()
         return organization
+
+
+class EditPrescriberOrganizationForm(forms.ModelForm):
+    """
+    Edit a prescriber organization.
+    """
+
+    class Meta:
+        model = PrescriberOrganization
+        fields = ["phone", "email", "website", "description"]
+        help_texts = {
+            "phone": _("Par exemple 0610203040"),
+            "description": _("Texte de présentation de votre SIAE."),
+        }

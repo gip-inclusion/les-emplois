@@ -74,7 +74,9 @@
                     {% else %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
-                            <b>{{ current_prescriber_organization.display_name }}</b>
+                            <a href="{% url 'prescribers_views:edit_organization' %}">
+                                {% trans "Modifier votre organisation" %}
+                            </a>
                         </p>
                         {% if user in current_prescriber_organization.admins %}
                             <p class="card-text">

@@ -8,6 +8,13 @@ from itou.utils.tokens import generate_random_token
 from itou.utils.validators import validate_siret
 
 
+class PrescriberOrganizationQuerySet(models.QuerySet):
+    def member_required(self, user):
+        if user.is_superuser:
+            return self
+        return self.filter(members=user, members__is_active=True)
+
+
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
@@ -44,6 +51,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         default=False,
         help_text=_("Précise si l'organisation est habilitée par le préfet."),
     )
+
+    objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
         verbose_name = _("Organisation")
