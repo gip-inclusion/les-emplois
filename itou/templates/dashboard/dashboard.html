@@ -99,13 +99,13 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
-                        <a href="{% url 'dashboard:edit_siae' %}">
+                        <a href="{% url 'siaes_views:edit_siae' %}">
                             {% trans "Modifier la fiche de votre SIAE" %}
                         </a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="{% url 'dashboard:configure_jobs' %}">
+                        <a href="{% url 'siaes_views:configure_jobs' %}">
                             {% trans "Configurer les fiches de postes" %}
                         </a>
                     </p>
