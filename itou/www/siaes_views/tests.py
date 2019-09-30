@@ -99,13 +99,13 @@ class ConfigureJobsViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         self.assertEqual(self.siae.jobs.count(), 5)
-        self.assertEqual(self.siae.jobs_through.count(), 5)
+        self.assertEqual(self.siae.job_description_through.count(), 5)
 
         self.assertTrue(
-            self.siae.jobs_through.get(appellation_id=10357, is_active=True)
+            self.siae.job_description_through.get(appellation_id=10357, is_active=True)
         )
         self.assertTrue(
-            self.siae.jobs_through.get(
+            self.siae.job_description_through.get(
                 appellation_id=10579,
                 is_active=False,
                 custom_name=post_data["custom-name-10579"],
@@ -113,7 +113,7 @@ class ConfigureJobsViewTest(TestCase):
             )
         )
         self.assertTrue(
-            self.siae.jobs_through.get(
+            self.siae.job_description_through.get(
                 appellation_id=10750,
                 is_active=False,
                 custom_name=post_data["custom-name-10750"],
@@ -121,7 +121,7 @@ class ConfigureJobsViewTest(TestCase):
             )
         )
         self.assertTrue(
-            self.siae.jobs_through.get(
+            self.siae.job_description_through.get(
                 appellation_id=10877,
                 is_active=True,
                 custom_name=post_data["custom-name-10877"],
@@ -129,7 +129,7 @@ class ConfigureJobsViewTest(TestCase):
             )
         )
         self.assertTrue(
-            self.siae.jobs_through.get(appellation_id=16361, is_active=False)
+            self.siae.job_description_through.get(appellation_id=16361, is_active=False)
         )
 
 

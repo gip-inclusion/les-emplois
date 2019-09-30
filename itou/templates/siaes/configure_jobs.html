@@ -14,7 +14,7 @@
 
         {% csrf_token %}
 
-        <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not siae.jobs_through.exists %} d-none{% endif %}">
+        <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not siae.job_description_through.exists %} d-none{% endif %}">
             <thead>
                 <tr>
                     <th scope="col">{% trans "Recevoir<br>des<br>candidatures" %}</th>
@@ -24,7 +24,7 @@
                 </tr>
             </thead>
             <tbody class="js-jobs-tbody">
-                {% for job in siae.jobs_through.all %}
+                {% for job in siae.job_description_through.all %}
                 {# Important: keep the JavaScript template in sync if you edit the row markup. #}
                 <tr>
                     <td scope="row">

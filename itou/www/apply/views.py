@@ -47,7 +47,7 @@ def submit_for_job_seeker(
             f"&prev_url={urllib.parse.quote(prev_url)}"
         )
 
-    queryset = Siae.active_objects.prefetch_jobs_through()
+    queryset = Siae.active_objects.prefetch_job_description_through()
     siae = get_object_or_404(queryset, siret=siret)
 
     form = JobApplicationForm(data=request.POST or None, user=request.user, siae=siae)

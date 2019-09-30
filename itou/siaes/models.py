@@ -19,16 +19,16 @@ class SiaeQuerySet(models.QuerySet):
             .order_by("distance")
         )
 
-    def prefetch_jobs_through(self, **kwargs):
-        jobs_through = Prefetch(
-            "jobs_through",
+    def prefetch_job_description_through(self, **kwargs):
+        job_description_through = Prefetch(
+            "job_description_through",
             queryset=(
-                SiaeJobDescription.objects.filter(**kwargs)
-                .select_related("appellation__rome")
-                .order_by("ui_rank", "appellation__name")
+                SiaeJobDescription.objects.filter(**kwargs).select_related(
+                    "appellation__rome"
+                )
             ),
         )
-        return self.prefetch_related(jobs_through)
+        return self.prefetch_related(job_description_through)
 
     def member_required(self, user):
         if user.is_superuser:
@@ -49,7 +49,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     To retrieve jobs of an siaes_views:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
-        self.jobs_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
+        self.job_description_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
     """
 
     KIND_EI = "EI"
@@ -147,7 +147,7 @@ class SiaeJobDescription(models.Model):
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(
-        Siae, on_delete=models.CASCADE, related_name="jobs_through"
+        Siae, on_delete=models.CASCADE, related_name="job_description_through"
     )
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now
@@ -162,4 +162,4 @@ class SiaeJobDescription(models.Model):
 
     class Meta:
         unique_together = ("appellation", "siae")
-        ordering = ["ui_rank"]
+        ordering = ["appellation__name", "ui_rank"]

@@ -57,15 +57,22 @@
         </p>
     {% endif %}
 
-    {% if siae.jobs_through.exists %}
+    {% if siae.job_description_through.exists %}
         <p class="mb-2">
             {% include "includes/icon.html" with icon="briefcase" %}
             {% trans "Métiers proposés" %}
         </p>
         <ul>
-        {% for job in siae.jobs_through.all %}
+        {% for job in siae.job_description_through.all %}
             <li>
-                {{ job.appellation.name }}
+                {% if job.custom_name %}
+                    {{ job.custom_name }}
+                {% else %}
+                    {{ job.appellation.name }}
+                {% endif %}
+                {% if job.description %}
+                    <div class="alert alert-secondary pb-0">{{ job.description|linebreaks }}</div>
+                {% endif %}
             </li>
         {% endfor %}
         </ul>

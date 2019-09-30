@@ -15,7 +15,7 @@ def card(request, siret, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
     """
-    queryset = Siae.active_objects.prefetch_jobs_through(is_active=True)
+    queryset = Siae.active_objects.prefetch_job_description_through(is_active=True)
     siae = get_object_or_404(queryset, siret=siret)
     context = {"siae": siae}
     return render(request, template_name, context)
@@ -27,13 +27,15 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Configure an SIAE's jobs.
     """
     siret = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.active_objects.prefetch_jobs_through().member_required(request.user)
+    queryset = Siae.active_objects.prefetch_job_description_through().member_required(
+        request.user
+    )
     siae = get_object_or_404(queryset, siret=siret)
 
     if request.method == "POST":
 
         current_codes = set(
-            siae.jobs_through.values_list("appellation__code", flat=True)
+            siae.job_description_through.values_list("appellation__code", flat=True)
         )
         submitted_codes = set(request.POST.getlist("code"))
 
@@ -61,7 +63,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                 siae.jobs.remove(*appellations)
 
             # Update.
-            for job_through in siae.jobs_through.filter(
+            for job_through in siae.job_description_through.filter(
                 appellation__code__in=codes_to_update
             ):
                 code = job_through.appellation.code
