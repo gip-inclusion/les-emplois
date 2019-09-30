@@ -30,6 +30,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
     django-admin import_cities
     django-admin loaddata itou/fixtures/jobs.json
     django-admin loaddata itou/fixtures/siaes.json
+    django-admin loaddata itou/fixtures/test_users.json
 
 ### Avant un commit
 

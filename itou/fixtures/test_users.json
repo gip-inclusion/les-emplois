@@ -1,0 +1,137 @@
+[
+  {
+    "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$150000$hkrMcwvCkpbe$Eek5GGEPBf5QS06HHnie5vQbzWmghDxl1yfHi3rcsaE=",
+      "last_login": "2019-09-30T13:46:21.012Z",
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "",
+      "last_name": "",
+      "email": "admin@test.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2019-09-30T13:30:45.639Z",
+      "birthdate": null,
+      "phone": "",
+      "is_job_seeker": false,
+      "is_prescriber": false,
+      "is_siae_staff": false,
+      "groups": [
+
+      ],
+      "user_permissions": [
+
+      ]
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$150000$yE3xMN7jYQRA$Kr8HTiTLQ0/7uQOAIOav3zHahzw20CZkz1p5oqgpQT0=",
+      "last_login": "2019-09-30T13:47:17.072Z",
+      "is_superuser": false,
+      "username": "itou1",
+      "first_name": "Jacques",
+      "last_name": "Henry",
+      "email": "job@test.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2019-09-30T13:42:09Z",
+      "birthdate": null,
+      "phone": "",
+      "is_job_seeker": true,
+      "is_prescriber": false,
+      "is_siae_staff": false,
+      "groups": [
+
+      ],
+      "user_permissions": [
+
+      ]
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$150000$N41efYhE0i1X$u9ejW8Nx707PtVT/D5T5I50wSVxm87KhyZUA8OQBkrs=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "itou2",
+      "first_name": "André",
+      "last_name": "Dufour",
+      "email": "prescriber@test.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2019-09-30T13:42:57Z",
+      "birthdate": null,
+      "phone": "",
+      "is_job_seeker": false,
+      "is_prescriber": true,
+      "is_siae_staff": false,
+      "groups": [
+
+      ],
+      "user_permissions": [
+
+      ]
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$150000$T1SgAOFd6YgE$UGggvYuk+LFt8fDdRpnEemMtf41UQYiLq4Quh/4aWgE=",
+      "last_login": "2019-09-30T13:47:00.633Z",
+      "is_superuser": false,
+      "username": "itou3",
+      "first_name": "René",
+      "last_name": "Dubreuil",
+      "email": "siae@test.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2019-09-30T13:43:26Z",
+      "birthdate": null,
+      "phone": "",
+      "is_job_seeker": false,
+      "is_prescriber": false,
+      "is_siae_staff": true,
+      "groups": [
+
+      ],
+      "user_permissions": [
+
+      ]
+    }
+  },
+  {
+    "model": "users.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$150000$skjceHBi6WBb$GqyhUAKzyAGyaLbk+HxrrKo2PfF83FegsGQQ9XHYx70=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "itou4",
+      "first_name": "Pascal",
+      "last_name": "Lafrite",
+      "email": "prescriber-solo@test.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2019-09-30T13:44:15Z",
+      "birthdate": null,
+      "phone": "",
+      "is_job_seeker": false,
+      "is_prescriber": true,
+      "is_siae_staff": false,
+      "groups": [
+
+      ],
+      "user_permissions": [
+
+      ]
+    }
+  }
+]
