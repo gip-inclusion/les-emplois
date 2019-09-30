@@ -46,7 +46,8 @@
                                 type="text"
                                 class="form-control form-control-sm"
                                 id="custom-name-{{ job.appellation.code }}"
-                                name="custom-name-{{ job.appellation.code }}">
+                                name="custom-name-{{ job.appellation.code }}"
+                                value="{{ job.custom_name }}">
                             <small class="form-text text-muted">
                                 {% trans "Si ce champ est renseigné, il sera utilisé à la place du nom par ci-dessus." %}
                             </small>
@@ -59,7 +60,7 @@
                                 class="form-control form-control-sm"
                                 id="description-{{ job.appellation.code }}"
                                 name="description-{{ job.appellation.code }}"
-                                rows="3"></textarea>
+                                rows="3">{{ job.description }}</textarea>
                         </div>
                     </td>
                     <td>{{ job.appellation.rome.code }}</td>

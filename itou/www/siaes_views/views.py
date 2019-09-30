@@ -22,7 +22,7 @@ def card(request, siret, template_name="siaes/card.html"):
 
 
 @login_required
-def configure_jobs(request, template_name="dashboard/configure_jobs.html"):
+def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     """
     Configure an SIAE's jobs.
     """
@@ -80,7 +80,7 @@ def configure_jobs(request, template_name="dashboard/configure_jobs.html"):
 
 
 @login_required
-def edit_siae(request, template_name="dashboard/edit_siae.html"):
+def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
     Edit an SIAE's card (or "Fiche" in French).
     """
