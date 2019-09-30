@@ -80,7 +80,9 @@ def configure_jobs(request, template_name="dashboard/configure_jobs.html"):
             for code in codes_to_create:
                 appellation = Appellation.objects.get(code=code)
                 through_defaults = {
-                    "is_active": bool(request.POST.get(f"is_active-{code}"))
+                    "custom_name": request.POST.get(f"custom-name-{code}", ""),
+                    "description": request.POST.get(f"description-{code}", ""),
+                    "is_active": bool(request.POST.get(f"is_active-{code}")),
                 }
                 siae.jobs.add(appellation, through_defaults=through_defaults)
 
@@ -93,12 +95,13 @@ def configure_jobs(request, template_name="dashboard/configure_jobs.html"):
             for job_through in siae.jobs_through.filter(
                 appellation__code__in=codes_to_update
             ):
-                is_active = bool(
-                    request.POST.get(f"is_active-{job_through.appellation.code}")
-                )
+                code = job_through.appellation.code
+                job_through.custom_name = request.POST.get(f"custom-name-{code}", "")
+                job_through.description = request.POST.get(f"description-{code}", "")
+                is_active = bool(request.POST.get(f"is_active-{code}"))
                 if job_through.is_active != is_active:
                     job_through.is_active = is_active
-                    job_through.save()
+                job_through.save()
 
             messages.success(request, _("Mise à jour effectuée !"))
             return HttpResponseRedirect(reverse_lazy("dashboard:configure_jobs"))

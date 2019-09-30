@@ -9,16 +9,14 @@ $(document).ready(() => {
     e.preventDefault()
     let link = $(e.currentTarget)
     let tr = link.parents('tr').first()
-    if (tr.hasClass('text-danger')) {
-      tr.removeClass('text-danger')
-      tr.find('td:eq(1), td:eq(2)').css({'text-decoration': 'none'})
-      tr.find('input').prop('disabled', false)
+    if (tr.find('.job-appellation-name').hasClass('text-danger')) {
+      tr.find('.job-appellation-name').removeClass('text-danger').css({'text-decoration': 'none'})
+      tr.find(':input').prop('disabled', false)
       tr.find('a').text("Supprimer")
     } else {
-      tr.addClass('text-danger')
-      tr.find('td:eq(1), td:eq(2)').css({'text-decoration': 'line-through'})
+      tr.find('.job-appellation-name').addClass('text-danger').css({'text-decoration': 'line-through'})
       // Values of disabled inputs will not be submitted.
-      tr.find('input').prop('disabled', true)
+      tr.find(':input').prop('disabled', true)
       tr.find('a').text("Rétablir")
     }
   })
@@ -34,12 +32,39 @@ $(document).ready(() => {
   let noLoading = $('.js-job-autocomplete-no-loading')
 
   let addJob = appellation => {
-    $('.js-jobs-tbody').append(`<tr class="text-success">
+    $('.js-jobs-tbody').append(`<tr>
         <td scope="row">
             <input type="hidden" name="code" value="${appellation.code}">
             <input type="checkbox" name="is_active-${appellation.code}" checked>
         </td>
-        <td class="text-left">${appellation.name}</td>
+        <td class="text-left">
+            <p class="job-appellation-name text-success">
+              <i>${appellation.name}</i>
+            </p>
+            <div class="form-group">
+                <label for="custom-name-${appellation.code}">
+                    <small>Nom personnalisé</small>
+                </label>
+                <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="custom-name-${appellation.code}"
+                    name="custom-name-${appellation.code}">
+                <small class="form-text text-muted">
+                    Si ce champ est renseigné, il sera utilisé à la place du nom ci-dessus.
+                </small>
+            </div>
+            <div class="form-group">
+                <label for="description-${appellation.code}">
+                    <small>Description</small>
+                </label>
+                <textarea
+                    class="form-control form-control-sm"
+                    id="description-${appellation.code}"
+                    name="description-${appellation.code}"
+                    rows="3"></textarea>
+            </div>
+        </td>
         <td>${appellation.rome}</td>
         <td><a href="#" role="button" class="js-job-delete">Supprimer</a></td>
     </tr>`)

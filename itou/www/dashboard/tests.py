@@ -85,13 +85,19 @@ class ConfigureJobsViewTest(TestCase):
             # Do nothing for "Agent / Agente cariste de livraison ferroviaire"
             "is_active-10357": "on",  # "on" is set when the checkbox is checked.
             # Update "Agent / Agente de quai manutentionnaire"
+            "custom-name-10579": "Agent de quai",
+            "description-10579": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "is_active-10579": "",
             # Update "Agent magasinier / Agente magasinière gestionnaire de stocks"
             "is_active-10750": "",
+            "custom-name-10750": "",
+            "description-10750": "",
             # Delete for "Chauffeur-livreur / Chauffeuse-livreuse"
             # Exclude code `11999` from POST payload.
             # Add "Aide-livreur / Aide-livreuse"
             "is_active-10877": "on",
+            "custom-name-10877": "Aide-livreur hebdomadaire",
+            "description-10877": "Pellentesque ex ex, elementum sed sollicitudin sit amet, dictum vel elit.",
             # Add "Manutentionnaire"
             "is_active-16361": "",
         }
@@ -106,13 +112,28 @@ class ConfigureJobsViewTest(TestCase):
             self.siae.jobs_through.get(appellation_id=10357, is_active=True)
         )
         self.assertTrue(
-            self.siae.jobs_through.get(appellation_id=10579, is_active=False)
+            self.siae.jobs_through.get(
+                appellation_id=10579,
+                is_active=False,
+                custom_name=post_data["custom-name-10579"],
+                description=post_data["description-10579"],
+            )
         )
         self.assertTrue(
-            self.siae.jobs_through.get(appellation_id=10750, is_active=False)
+            self.siae.jobs_through.get(
+                appellation_id=10750,
+                is_active=False,
+                custom_name=post_data["custom-name-10750"],
+                description=post_data["description-10750"],
+            )
         )
         self.assertTrue(
-            self.siae.jobs_through.get(appellation_id=10877, is_active=True)
+            self.siae.jobs_through.get(
+                appellation_id=10877,
+                is_active=True,
+                custom_name=post_data["custom-name-10877"],
+                description=post_data["description-10877"],
+            )
         )
         self.assertTrue(
             self.siae.jobs_through.get(appellation_id=16361, is_active=False)

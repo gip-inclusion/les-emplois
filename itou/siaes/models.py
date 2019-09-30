@@ -153,6 +153,11 @@ class SiaeJobDescription(models.Model):
         verbose_name=_("Date de création"), default=timezone.now
     )
     is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
+    custom_name = models.CharField(
+        verbose_name=_("Nom personnalisé"), blank=True, max_length=255
+    )
+    description = models.TextField(verbose_name=_("Description"), blank=True)
+    # TODO: this will be used to order job description in UI.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
     class Meta:
