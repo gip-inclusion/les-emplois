@@ -1,4 +1,9 @@
-FROM python:3.7.4-alpine3.9
+# Debian Buster slim variant.
+FROM python:3.7.4-slim-buster
+
+# Inspiration
+# https://github.com/azavea/docker-django/blob/1ef366/Dockerfile-slim.template
+# https://github.com/docker-library/postgres/blob/9d8e24/11/Dockerfile
 
 ENV PYTHONIOENCODING="UTF-8"
 ENV PYTHONUNBUFFERED=1
@@ -6,38 +11,52 @@ ENV PYTHONUNBUFFERED=1
 ENV APP_DIR="/app"
 
 # Add new user to run the whole thing as non-root.
-RUN addgroup -S app \
-    && adduser -G app -h $APP_DIR -D app
+RUN set -ex \
+    && addgroup app \
+    && adduser --ingroup app --home $APP_DIR --disabled-password app;
 
-# https://pkgs.alpinelinux.org/packages
-RUN apk update \
-    # psycopg2 dependencies
-    && apk add --virtual build-deps gcc python3-dev musl-dev \
-    && apk add postgresql-dev=11.5-r0 \
-    # Pillow dependencies
-    && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
-    # CFFI dependencies
-    && apk add libffi-dev py-cffi \
-    # Translations dependencies
-    && apk add gettext \
-    # GeoDjango
-    # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/#install-binutils
-    && apk add binutils \
-    # Geospatial dependencies
-    # https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/geolibs
-    && apk add --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing geos proj gdal \
-    # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
-    && apk add postgresql-client=11.5-r0 \
-    # Time zone and daylight-saving time data
-    && apk add tzdata
+RUN set -ex; \
+    if ! command -v gpg > /dev/null; then \
+        apt-get update; \
+        apt-get install -y --no-install-recommends \
+            gnupg \
+            dirmngr \
+        ; \
+        rm -rf /var/lib/apt/lists/*; \
+    fi
 
-# Fix geospatial libraries paths issues.
-RUN ln -s /usr/lib/libgdal.so.20 /usr/lib/libgdal.so
-RUN ln -s /usr/lib/libgeos_c.so.1 /usr/lib/libgeos_c.so
-RUN ln -s /usr/lib/libproj.so.15 /usr/lib/libproj.so
+# Add the PostgreSQL PGP key to verify their Debian packages.
+RUN set -ex; \
+# pub   4096R/ACCC4CF8 2011-10-13 [expires: 2019-07-02]
+#       Key fingerprint = B97B 0AFC AA1A 47F0 44F2  44A0 7FCC 7D46 ACCC 4CF8
+# uid                  PostgreSQL Debian Repository
+    key='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8'; \
+    export GNUPGHOME="$(mktemp -d)"; \
+    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+    gpg --batch --export "$key" > /etc/apt/trusted.gpg.d/postgres.gpg; \
+    command -v gpgconf > /dev/null && gpgconf --kill all; \
+    rm -rf "$GNUPGHOME"; \
+    apt-key list;
 
-RUN cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
-    && echo "Europe/Paris" > /etc/timezone
+ENV PG_MAJOR="11"
+
+# Add PostgreSQL's repository. It contains the most recent stable release.
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main $PG_MAJOR" > /etc/apt/sources.list.d/pgdg.list
+
+RUN set -eux \
+    && buildDeps=" \
+       build-essential \
+       libpq-dev \
+    " \
+    && deps=" \
+       gdal-bin \
+       gettext \
+       postgresql-client-$PG_MAJOR \
+    " \
+    && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends \
+    && apt-get purge -y --auto-remove $buildDeps \
+       $(! command -v gpg > /dev/null || echo 'gnupg dirmngr') \
+    && rm -rf /var/lib/apt/lists/*;
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements

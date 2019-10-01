@@ -10,7 +10,7 @@ clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
 cdsitepackages:
-	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/sh
+	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/bash
 
 pylint:
 	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou';
@@ -44,13 +44,13 @@ test:
 .PHONY: shell_on_django_container shell_on_django_container_as_root shell_on_postgres_container
 
 shell_on_django_container:
-	docker exec -ti itou_django /bin/sh
+	docker exec -ti itou_django /bin/bash
 
 shell_on_django_container_as_root:
-	docker exec -ti --user root itou_django /bin/sh
+	docker exec -ti --user root itou_django /bin/bash
 
 shell_on_postgres_container:
-	docker exec -ti itou_postgres /bin/sh
+	docker exec -ti itou_postgres /bin/bash
 
 # Postgres (dev).
 # =============================================================================

@@ -3,6 +3,7 @@ version: "3.7"
 services:
 
   # https://github.com/appropriate/docker-postgis
+  # https://hub.docker.com/r/mdillon/postgis/tags
   postgres:
     container_name: itou_postgres
     env_file:
