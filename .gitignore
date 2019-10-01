@@ -1,8 +1,12 @@
 # Project specific
 config/settings/dev.py
-envs/dev.env
-envs/secrets.env
 itou/static_collected/
+
+# Environment variables
+envs/dev.env
+envs/prod.env
+envs/secrets.env
+envs/staging.env
 
 # Debian
 .bash_history
