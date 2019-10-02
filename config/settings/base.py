@@ -275,9 +275,9 @@ API_EMPLOI_STORE_BASE_URL = "https://api.emploi-store.fr/partenaire"
 # ------------------------------------------------------------------------------
 
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "itou.beta.gouv.fr"
-ITOU_EMAIL_CONTACT = "contact@itou.beta.gouv.fr"
-DEFAULT_FROM_EMAIL = "noreply@itou.beta.gouv.fr"
+ITOU_FQDN = "inclusion.beta.gouv.fr"
+ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
+DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 # Départements d'expérimentation :
 # Pas-de-Calais (62), Bas-Rhin (67), Seine Saint Denis (93).

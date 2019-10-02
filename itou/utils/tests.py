@@ -106,11 +106,11 @@ class UtilsTemplateTagsTestCase(TestCase):
 
         # Full URL.
         context = {
-            "url": "https://itou.beta.gouv.fr/siae/search?distance=100&city=aubervilliers-93&page=55&page=1"
+            "url": "https://inclusion.beta.gouv.fr/siae/search?distance=100&city=aubervilliers-93&page=55&page=1"
         }
         template = Template("{% load url_add_query %}" "{% url_add_query url page=2 %}")
         out = template.render(Context(context))
-        expected = "https://itou.beta.gouv.fr/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2"
+        expected = "https://inclusion.beta.gouv.fr/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2"
         self.assertEqual(out, expected)
 
         # Relative URL.
