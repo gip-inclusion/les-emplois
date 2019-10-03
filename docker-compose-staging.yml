@@ -28,7 +28,7 @@ services:
       dockerfile: ./docker/staging/django/Dockerfile
     restart: always
     ports:
-      - "${DJANGO_PORT_ON_DOCKER_HOST:-8000}:8000"
+      - "${DJANGO_PORT_ON_DOCKER_HOST:-8001}:8001"
 
 volumes:
   postgres_data_staging:
