@@ -14,7 +14,7 @@ services:
       - ./docker/staging/postgres/psql_init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
     restart: always
     ports:
-      - "${POSTGRES_PORT_ON_DOCKER_HOST:-5433}:5433"
+      - "127.0.0.1:5433:5432"
 
   django:
     container_name: itou_django_staging
@@ -28,7 +28,7 @@ services:
       dockerfile: ./docker/staging/django/Dockerfile
     restart: always
     ports:
-      - "${DJANGO_PORT_ON_DOCKER_HOST:-8001}:8001"
+      - "127.0.0.1:8001:8000"
 
 volumes:
   postgres_data_staging:

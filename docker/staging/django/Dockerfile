@@ -53,6 +53,8 @@ RUN set -eux \
        gdal-bin \
        gcc \
        gettext \
+       libpcre3 \
+       libpcre3-dev \
        postgresql-client-$PG_MAJOR \
     " \
     && apt-get update && apt-get install -y $buildDeps $deps --no-install-recommends \
