@@ -1,12 +1,20 @@
-# Project specific
-config/settings/dev.py
-itou/static_collected/
-
 # Environment variables
 envs/dev.env
 envs/prod.env
 envs/secrets.env
 envs/staging.env
+
+# Config
+config/settings/dev.py
+config/settings/prod.py
+config/settings/staging.py
+docker-compose-prod.yml
+docker-compose-staging.yml
+docker/prod/
+docker/staging/
+
+# Project specific
+itou/static_collected/
 
 # Debian
 .bash_history
