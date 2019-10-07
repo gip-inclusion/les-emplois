@@ -78,11 +78,13 @@
         </ul>
     {% endif %}
 
+    {% comment %}
     <hr>
 
     <p>
         {% include "includes/icon.html" with icon="message-square" %}
         <a href="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}">{% trans "Postuler" %}</a>
     </p>
+    {% endcomment %}
 
 {% endblock %}
