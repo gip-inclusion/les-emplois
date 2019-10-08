@@ -9,4 +9,4 @@ def home(request, template_name="home.html"):
 
 
 def trigger_error(request):
-    division_by_zero = 1 / 0
+    print(1 / 0)  # Should raise a ZeroDivisionError.

@@ -63,7 +63,7 @@ class AppellationQuerySet(models.QuerySet):
         # Keep only words since `to_tsquery` only takes tokens as input.
         words = re.sub(f"[{string.punctuation}]", " ", search_string).split()
         words = [word + ":*" for word in words]
-        tsquery = " & ".join([word for word in words])
+        tsquery = " & ".join(words)
         queryset = self.extra(
             where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery]
         )

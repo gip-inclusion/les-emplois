@@ -8,9 +8,12 @@ services:
     container_name: itou_postgres
     env_file:
       - ./envs/dev.env
-    image: mdillon/postgis:11
+    build:
+      context: .
+      dockerfile: ./docker/dev/postgres/Dockerfile
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - postgres_data_backups:/backups
       - ./docker/dev/postgres/psql_init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
     restart: always
     ports:
@@ -35,3 +38,4 @@ services:
 
 volumes:
   postgres_data:
+  postgres_data_backups:

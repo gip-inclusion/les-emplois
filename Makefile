@@ -52,25 +52,47 @@ shell_on_django_container_as_root:
 shell_on_postgres_container:
 	docker exec -ti itou_postgres /bin/bash
 
-# Postgres (dev).
+# Postgres CLI.
 # =============================================================================
 
-.PHONY: dbshell_dev_itou dbshell_dev_root dump_db restore_db
+.PHONY: psql_itou psql_root
 
 # Connect to the `itou` database as the `itou` user.
-dbshell_dev_itou:
+psql_itou:
 	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou
 
 # Connect to postgres client as the `root` user.
-dbshell_dev_root:
+psql_root:
 	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U postgres
 
-dump_db:
-	docker exec -i -e PGPASSWORD=password itou_postgres pg_dump -U itou -d itou > ~/Desktop/itou.sql
+# Postgres (backup / restore).
+# Inspired by:
+# https://cookiecutter-django.readthedocs.io/en/latest/docker-postgres-backups.html
+# =============================================================================
 
-restore_db:
-	docker exec -i -e PGPASSWORD=password itou_postgres psql -U itou -d itou < ~/Desktop/itou.sql
+.PHONY: postgres_backup postgres_backups_cp_locally postgres_backups_list postgres_backup_restore postgres_backups_clean
 
+postgres_backup:
+	docker-compose -f docker-compose-dev.yml exec postgres backup
+
+postgres_backups_cp_locally:
+	docker cp itou_postgres:/backups ~/Desktop/backups
+
+postgres_backups_list:
+	docker-compose -f docker-compose-dev.yml exec postgres backups
+
+# Note: Django must be stopped to avoid a "database "itou" is being accessed by other users" error.
+# make postgres_backup_restore FILE=backup_2019_10_08T12_33_00.sql.gz
+postgres_backup_restore:
+	docker-compose -f docker-compose-dev.yml up -d --no-deps postgres && \
+	docker-compose -f docker-compose-dev.yml exec postgres restore $(FILE) && \
+	docker-compose -f docker-compose-dev.yml stop
+
+postgres_backups_clean:
+	docker-compose -f docker-compose-dev.yml exec postgres clean
+
+# Delete and recreate the DB manually.
+# =============================================================================
 # docker-compose -f docker-compose-dev.yml up --no-deps postgres
 # make shell_on_postgres_container
 # psql -h postgres -U postgres

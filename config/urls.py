@@ -9,7 +9,7 @@ from itou.www.home.views import home, trigger_error
 from itou.www.signup import views as signup_views
 
 
-register_converter(SiretConverter, 'siret')
+register_converter(SiretConverter, "siret")
 
 
 urlpatterns = [
@@ -52,7 +52,7 @@ urlpatterns = [
     path("500/", TemplateView.as_view(template_name="500.html"), name="500"),
 
     # Sentry debug.
-    path('sentry-debug/', trigger_error)
+    path("sentry-debug/", trigger_error),
 
 ]
 
