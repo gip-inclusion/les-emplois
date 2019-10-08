@@ -21,7 +21,10 @@ def get_access_token(scope):
         now = datetime.datetime.now()
         if now < token.expiration:
             logger.debug(
-                f"Found {token.value} in cache. Expiration = {token.expiration}, now = {now}."
+                "Found %s in cache. Expiration = %s, now = %s.",
+                token.value,
+                token.expiration,
+                now,
             )
             return token.value
 

@@ -173,7 +173,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.email_new_for_siae.send()
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `send` transition for JobApplication `{self.id}`"
+                "Email couldn't be sent during `send` transition for JobApplication `%s`",
+                self.id,
             )
             raise xwf_models.AbortTransition()
 
@@ -187,7 +188,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `process` transition for JobApplication `{self.id}`"
+                "Email couldn't be sent during `process` transition for JobApplication `%s`",
+                self.id,
             )
             raise xwf_models.AbortTransition()
 
@@ -203,7 +205,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `accept` transition for JobApplication `{self.id}`"
+                "Email couldn't be sent during `accept` transition for JobApplication `%s`",
+                self.id,
             )
             raise xwf_models.AbortTransition()
 
@@ -218,7 +221,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             connection.send_messages(emails)
         except AnymailRequestsAPIError:
             logger.error(
-                f"Email couldn't be sent during `reject` transition for JobApplication `{self.id}`"
+                "Email couldn't be sent during `reject` transition for JobApplication `%s`",
+                self.id,
             )
             raise xwf_models.AbortTransition()
 

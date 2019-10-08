@@ -17,7 +17,9 @@ def call_insee_api(siret):
         data = api_insee.siret(siret).get()
     except urllib.error.HTTPError as err:
         logger.error(
-            f"HTTP Error `{err.code}` while calling Sirene - V3 API for SIRET {siret}"
+            "HTTP Error `%s` while calling Sirene - V3 API for SIRET %s",
+            err.code,
+            siret,
         )
         return None
 
@@ -43,7 +45,7 @@ def process_siret_data(data):
             ],
         }
     except KeyError:
-        logger.error(f"Unable to process the result of Sirene V3 API: {data}")
+        logger.error("Unable to process the result of Sirene V3 API: %s", data)
         return None
 
 

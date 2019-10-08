@@ -93,7 +93,9 @@ class AddressMixin(models.Model):
         geocoding_data = get_geocoding_data(address_on_one_line, post_code=post_code)
         if not geocoding_data:
             logger.error(
-                f"No geocoding data could be found for `{address_on_one_line} - {post_code}`"
+                "No geocoding data could be found for `%s - %s`",
+                address_on_one_line,
+                post_code,
             )
             return
         self.address_line_1 = geocoding_data["address_line_1"]
