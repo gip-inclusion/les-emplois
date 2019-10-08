@@ -18,7 +18,7 @@ APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
-DEBUG = os.environ.get("DJANGO_DEBUG", False)
+DEBUG = os.environ["DJANGO_DEBUG"] == "True"
 
 ALLOWED_HOSTS = []
 
