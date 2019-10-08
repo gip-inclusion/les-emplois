@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
-from itou.www.home.views import home
+from itou.www.home.views import home, trigger_error
 from itou.www.signup import views as signup_views
 
 
@@ -50,6 +50,9 @@ urlpatterns = [
     path("403/", TemplateView.as_view(template_name="403.html"), name="403"),
     path("404/", TemplateView.as_view(template_name="404.html"), name="404"),
     path("500/", TemplateView.as_view(template_name="500.html"), name="500"),
+
+    # Sentry debug.
+    path('sentry-debug/', trigger_error)
 
 ]
 
