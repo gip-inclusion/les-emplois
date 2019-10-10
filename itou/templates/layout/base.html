@@ -69,7 +69,39 @@
 
         <footer class="layout-section layout-section-dark">
             <div class="layout-footer">
-                <p><a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{% trans "Contact" %}</a></p>
+                <div class="row">
+                    <div class="col-sm">
+                        <h6>{% trans "À propos" %}</h6>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="mailto:{{ ITOU_EMAIL_CONTACT }}">{% trans "Nous contacter" %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm">
+                        <h6>{% trans "Pourquoi cette plateforme ?" %}</h6>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">{% trans "Faciliter l'embauche en IAE" %}</a></li>
+                            <li><a class="text-muted" href="#">{% trans "Simplifier les procédures" %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm">
+                        <h6>{% trans "En savoir plus" %}</h6>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">{% trans "Le pacte d'ambition IAE" %}</a></li>
+                            <li><a class="text-muted" href="#">{% trans "L'expérimetation" %}</a></li>
+                            <li><a class="text-muted" href="#">{% trans "L'IAE kesako ?" %}</a></li>
+                            <li><a class="text-muted" href="#">{% trans "Qui sommes-nous ?" %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm">
+                        <h6>{% trans "Mentions légales" %}</h6>
+                        <ul class="list-unstyled text-small">
+                            <li><a class="text-muted" href="#">{% trans "Mentions légales" %}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <p class="mt-3 text-muted text-center">
+                    <i>{% trans "La plateforme de l'inclusion est en phase d'expérimentation sur les départements du Bas-Rhin (67), du Pas-de-Calais (62) et de la Seine Saint Denis (93)." %}</i>
+                </p>
             </div>
         </footer>
 
