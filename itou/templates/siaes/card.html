@@ -87,4 +87,11 @@
     </p>
     {% endcomment %}
 
+    {% if back_url %}
+        <hr>
+        <p>
+            <a href="{{ back_url }}">{% trans "Retour" %}</a>
+        </p>
+    {% endif %}
+
 {% endblock %}
