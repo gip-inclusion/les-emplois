@@ -1,7 +1,7 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% with request.GET.city_name as city and request.GET.distance as distance %}{% blocktrans %}SIAE à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
+{% block title %}{% with request.GET.city_name as city and request.GET.distance as distance %}{% blocktrans %}Employeurs solidaires à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -11,7 +11,7 @@
 
     <h1 class="font-weight-normal">
         {% with request.GET.city_name as city and request.GET.distance as distance %}
-            {% blocktrans %}<abbr title="Structures d'insertion par l'activité économique">SIAE</abbr> à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
+            {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
         {% endwith %}
     </h1>
 

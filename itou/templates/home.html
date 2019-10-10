@@ -2,20 +2,30 @@
 {% load i18n %}
 {% load static %}
 
-{# {% block meta_description %}<meta name="description" content="">{% endblock %} #}
+{% block meta_description %}<meta name="description" content="{% trans "La plate-forme numérique de l'inclusion" %}">{% endblock %}
 {% block title %}{% trans "La plate-forme numérique de l'inclusion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    {% include "includes/connect.html" %}
+    <section>
 
-    <br>
-    <hr>
+        <h2 class="text-center mt-3">{% trans "Personne ne me donne ma chance, mais je veux travailler !" %}</h2>
 
-    <h4 class="text-center">{% blocktrans %}Trouvez une structure d'insertion à{% endblocktrans %}</h4>
+        <p class="text-center">
+            <a class="btn btn-outline-primary mr-3" href="{% url 'signup:job_seeker' %}">
+                {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
+            </a>
+            <a class="btn btn-outline-primary" href="{% url 'account_login' %}">
+                {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
+            </a>
+        </p>
 
-    <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
-        {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
-    </form>
+        <h3 class="text-center mt-5">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
+
+        <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
+            {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
+        </form>
+
+    </section>
 
 {% endblock %}

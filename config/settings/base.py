@@ -114,6 +114,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 # Itou.
                 "itou.utils.perms.context_processors.get_current_organization",
+                "itou.utils.settings_context_processors.expose_settings",
             ]
         },
     }
