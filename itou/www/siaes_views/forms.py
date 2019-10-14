@@ -29,4 +29,5 @@ class EditSiaeForm(forms.ModelForm):
             ),
             "phone": _("Par exemple 0610203040"),
             "description": _("Texte de présentation de votre SIAE."),
+            "website": _("Votre site web doit commencer par http:// ou https://"),
         }
