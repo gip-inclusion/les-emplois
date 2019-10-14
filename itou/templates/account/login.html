@@ -29,7 +29,9 @@
 
 <hr>
 
-<p>
+<p class="text-center">
     <a href="{% url 'account_reset_password' %}">{% trans "Mot de passe oublié ?" %}</a>
+    <span class="text-muted px-3">-</span>
+    <a href="{% url 'signup:job_seeker' %}">{% trans "Créer votre compte" %}</a>
 </p>
 {% endblock %}

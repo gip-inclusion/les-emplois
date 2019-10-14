@@ -12,6 +12,7 @@ from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import EditSiaeForm
 
 
+@login_required
 def card(request, siret, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).

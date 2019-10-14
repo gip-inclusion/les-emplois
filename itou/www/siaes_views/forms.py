@@ -9,9 +9,20 @@ class EditSiaeForm(forms.ModelForm):
     Edit an SIAE's card (or "Fiche" in French).
     """
 
+    accept_data_policy = forms.BooleanField(
+        label=_("J'accepte que ces coordonées soient publiques.")
+    )
+
     class Meta:
         model = Siae
-        fields = ["brand", "phone", "email", "website", "description"]
+        fields = [
+            "brand",
+            "phone",
+            "email",
+            "website",
+            "description",
+            "accept_data_policy",
+        ]
         help_texts = {
             "brand": _(
                 "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
