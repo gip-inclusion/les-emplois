@@ -111,11 +111,23 @@
     <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
+
     {% block script %}
     <script src="{% static "js/logout.js" %}"></script>
     <script src="{% static "js/city_autocomplete_field.js" %}"></script>
     <script src="{% static "js/configure_jobs.js" %}"></script>
     {% endblock %}
+
+    {% if "inclusion.beta.gouv.fr" in ALLOWED_HOSTS %}
+    {# Global site tag (gtag.js) - Google Analytics #}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-149969968-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-149969968-1');
+    </script>
+    {% endif %}
 
 </body>
 </html>
