@@ -59,6 +59,7 @@ LOCAL_APPS = [
     # www.
     "itou.www.apply",
     "itou.www.autocomplete",
+    "itou.www.content",
     "itou.www.dashboard",
     "itou.www.home",
     "itou.www.search",

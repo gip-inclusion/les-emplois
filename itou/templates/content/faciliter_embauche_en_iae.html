@@ -1,0 +1,26 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Faciliter l'embauche en IAE" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Faciliter l'embauche en IAE" %}</h1>
+
+    <p>{% blocktrans %}La Plateforme de l'Inclusion a pour première mission de <b>faciliter l'orientation et l'embauche</b> de personnes en situation d'exclusion professionnelle dans les structures de l'Insertion par l'Activité Économique (IAE).{% endblocktrans %}</p>
+
+    <p>{% trans "Ce site est destiné :" %}
+
+    <ul>
+        <li>{% trans "aux personnes en grande difficulté dans leur recherche d'emploi qui peuvent identifier des employeurs solidaires près de chez eux" %}</li>
+        <li>{% trans "aux prescripteurs (Pôle Emploi, CAP Emploi, Missions Locales, services sociaux, SPIP, PJJ, CHRS, associations, etc) qui peuvent orienter des candidats éligibles" %}</li>
+        <li>{% trans "aux structures de l'IAE qui peuvent mettre en avant leurs besoins de recrutement et recevoir des candidatures" %}</li>
+    </ul>
+
+    <h2>{% trans "Quelques mots sur la Plateforme de l'Inclusion" %}</h2>
+
+    <p>{% blocktrans %}Tous les acteurs mobilisés pour l'inclusion doivent pouvoir partager l'information de manière simple, efficace et rapide. C'est l'ambition portée par la Plateforme de l'inclusion. Toutes les informations nécessaires pour lever les différentes contraintes du quotidien – la charge administrative, le recrutement des profils éligibles, etc.  – pourront y être centralisées, à la manière d'un « guichet unique ».{% endblocktrans %}</p>
+
+    <p>{% blocktrans %}L'objectif est de proposer une solution numérique intégrée permettant de lever les freins limitant aujourd'hui l'action de l'IAE : problèmes d'accès en profils éligibles (« sourcing ») et d'accompagnement vers l'emploi durable, lourdeur administrative, et faible accès à des outils mutualisés de professionnalisation et d'accompagnement des parcours.{% endblocktrans %}</p>
+
+{% endblock %}

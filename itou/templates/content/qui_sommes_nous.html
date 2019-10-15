@@ -1,0 +1,33 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Qui sommes-nous ?" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Qui sommes-nous ?" %}</h1>
+
+    <p>{% blocktrans %}Cette initiative est portée par le Conseil de l'Inclusion dans l'Emploi et la DGEFP, en partenariat avec Pôle emploi.{% endblocktrans %}</p>
+
+    <p>{% blocktrans %}La réalisation et le déploiement sont assurés par <a href="https://beta.gouv.fr" rel="noopener" target="_blank">la startup d'Etat Itou</a>.{% endblocktrans %}</p>
+
+    <h2>{% blocktrans %}Le Conseil de l'Inclusion dans l'Emploi{% endblocktrans %}</h2>
+
+    <p>{% blocktrans %}Le Conseil de l'Inclusion dans l'Emploi porte l'ambition de <b>construire une société plus inclusive</b> dans laquelle chacun peut <b>participer à l'échange social et économique</b>.{% endblocktrans %}</p>
+
+    <p>{% blocktrans %}Cela implique à la fois de muscler l'ensemble des solutions disponibles pour permettre aux personnes en situation d'exclusion de retrouver autonomie et dignité par le travail (IAE, handicap, contrats aidés, innovations sociales…), mais également de contribuer à ce que les entreprises deviennent plus inclusives et prennent une part active à la réconciliation des enjeux économiques et sociaux.{% endblocktrans %}</p>
+
+    <p>{% blocktrans %}Placé auprès de la Ministre du Travail, il a été créé en novembre 2018 et a notamment initié la réforme des entreprises adaptées « Cap vers l'entreprise inclusive ».{% endblocktrans %}</p>
+
+    <p>{% blocktrans %}Le Conseil <b>n'est pas un comité d'experts</b> mais regroupe les administrations concernées et des personnalités du terrain nommées <b>en raison de leurs compétences</b> en matière d'inclusion. Il associe l'ensemble des pouvoirs publics, des réseaux associatifs, les partenaires sociaux, les collectivités et les acteurs de l'entreprise à ses travaux en tant que de besoin.{% endblocktrans %}</p>
+
+    <p>{% blocktrans %}Le Conseil est <b>résolument tourné vers l'action et le résultat</b>. Cet action thank de politique publique a <b>4 missions</b> principales :{% endblocktrans %}</p>
+
+    <ol>
+        <li>{% blocktrans %}<b>Formuler des propositions en matière de politiques d'inclusion</b> en s'appuyant sur les expériences de terrain ;{% endblocktrans %}</li>
+        <li>{% blocktrans %}Recenser et diffuser <b>les bonnes pratiques</b> ;{% endblocktrans %}</li>
+        <li>{% blocktrans %}Encourager les entreprises dans leurs <b>démarches de responsabilité</b> ;{% endblocktrans %}</li>
+        <li>{% blocktrans %}<b>Favoriser le dialogue entre toutes les entreprises</b> au sujet de l'inclusion.{% endblocktrans %}</li>
+    </ol>
+
+{% endblock %}
