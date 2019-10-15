@@ -42,7 +42,8 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         ),
     )
     inlines = (MembersInline,)
-    list_display = ("siret", "name")
-    list_filter = ("is_authorized",)
+    list_display = ("id", "name", "post_code", "city", "department")
+    list_display_links = ("id", "name")
+    list_filter = ("is_authorized", "department")
     readonly_fields = ("secret_code",)
     search_fields = ("siret", "name")

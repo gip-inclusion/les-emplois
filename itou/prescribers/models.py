@@ -23,10 +23,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
 
     siret = models.CharField(
-        verbose_name=_("Siret"),
-        max_length=14,
-        validators=[validate_siret],
-        primary_key=True,
+        verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True
     )
     name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
