@@ -48,9 +48,15 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
     Edit a prescriber organization.
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.is_authorized:
+            # Do not edit the name of an authorized prescriber organization.
+            del self.fields["name"]
+
     class Meta:
         model = PrescriberOrganization
-        fields = ["phone", "email", "website", "description"]
+        fields = ["name", "phone", "email", "website", "description"]
         help_texts = {
             "phone": _("Par exemple 0610203040"),
             "description": _("Texte de présentation de votre SIAE."),
