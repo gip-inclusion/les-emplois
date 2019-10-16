@@ -56,7 +56,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         verbose_name_plural = _("Organisations")
 
     def __str__(self):
-        return f"{self.siret} {self.name}"
+        return f"{self.pk} {self.name}"
 
     @property
     def display_name(self):

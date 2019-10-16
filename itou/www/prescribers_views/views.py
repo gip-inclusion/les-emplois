@@ -37,10 +37,10 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     """
     Edit a prescriber organization.
     """
-    siret = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
+    pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
     queryset = PrescriberOrganization.objects.member_required(request.user)
-    organization = get_object_or_404(queryset, siret=siret)
+    organization = get_object_or_404(queryset, pk=pk)
 
     form = EditPrescriberOrganizationForm(
         instance=organization, data=request.POST or None

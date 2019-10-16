@@ -21,7 +21,7 @@ def get_current_organization(request):
         )
         if prescriber_organization_siret:
             prescriber_organization = request.user.prescriberorganization_set.get(
-                siret=prescriber_organization_siret
+                pk=prescriber_organization_siret
             )
 
     return {
