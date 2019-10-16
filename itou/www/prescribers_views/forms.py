@@ -18,6 +18,7 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
             "siret": _("Le numéro SIRET doit être composé de 14 chiffres."),
             "phone": _("Par exemple 0610203040"),
             "description": _("Texte de présentation de votre organisation."),
+            "website": _("Votre site web doit commencer par http:// ou https://"),
         }
 
     def save(self, user, commit=True):
@@ -60,4 +61,5 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         help_texts = {
             "phone": _("Par exemple 0610203040"),
             "description": _("Texte de présentation de votre SIAE."),
+            "website": _("Votre site web doit commencer par http:// ou https://"),
         }
