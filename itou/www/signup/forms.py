@@ -81,7 +81,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
     siret = forms.CharField(
-        label=_("Numéro SIRET de votre organisation"),
+        label=_("Numéro SIRET de votre SIAE"),
         max_length=14,
         validators=[validate_siret],
         required=True,

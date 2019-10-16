@@ -26,11 +26,6 @@
             <p class="card-text">
                 {% trans "Je suis travailleur(se) social, conseiller(ère) emploi, chargé(e) d'accompagnement, bénévole…" %}
             </p>
-            <div class="alert alert-primary" role="alert">
-                <b>{% trans "Habilité par le Préfet ?" %}</b>
-                <br>
-                {% blocktrans %}Si vous êtes habilité par le Préfet, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a> pour créer votre compte sur la plateforme.{% endblocktrans %}
-            </div>
         </div>
         <img src="{% static 'photos/prescriber.jpg' %}" class="card-img-bottom" alt="">
     </div>
@@ -43,12 +38,9 @@
         </div>
         <div class="card-body">
             <p class="card-text">
-                {% comment %}
-                {# The ability to sign up for SIAE is turned off during the test phase. #}
                 <a class="card-link" href="{% url 'signup:siae' %}">
                     {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
                 </a>
-                {% endcomment %}
                 <a class="card-link" href="{% url 'account_login' %}">
                     {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
                 </a>
@@ -56,11 +48,6 @@
             <p class="card-text">
                 {% trans "En entreprise d'insertion, chantier d'insertion, association intermédiaire, entreprise d'insertion de travail temporaire, entreprise adaptée." %}
             </p>
-            <div class="alert alert-primary" role="alert">
-                <b>{% trans "Employeur solidaire ?" %}</b>
-                <br>
-                {% blocktrans %}<a href="mailto:{{ ITOU_EMAIL_CONTACT }}">Contactez-nous</a> pour créer votre compte sur la plateforme.{% endblocktrans %}
-            </div>
         </div>
         <img src="{% static 'photos/employer.jpg' %}" class="card-img-bottom" alt="">
     </div>

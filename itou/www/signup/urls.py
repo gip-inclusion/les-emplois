@@ -8,7 +8,6 @@ app_name = "signup"
 
 urlpatterns = [
     path("prescriber", views.PrescriberSignupView.as_view(), name="prescriber"),
-    # The ability to sign up for SIAE is turned off during the test phase.
-    # path("siae", views.SiaeSignupView.as_view(), name="siae"),
+    path("siae", views.SiaeSignupView.as_view(), name="siae"),
     path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
 ]

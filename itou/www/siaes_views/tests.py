@@ -11,7 +11,9 @@ from itou.users.factories import DEFAULT_PASSWORD
 
 class CardViewTest(TestCase):
     def test_card(self):
-        siae = SiaeFactory()
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:card", kwargs={"siret": siae.siret})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

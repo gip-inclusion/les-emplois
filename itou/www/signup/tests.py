@@ -9,8 +9,8 @@ from django.urls import reverse
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 
-# from itou.siaes.factories import SiaeFactory
-# from itou.siaes.models import Siae
+from itou.siaes.factories import SiaeFactory
+from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
@@ -83,39 +83,37 @@ class SignupTest(TestCase):
 
         self.assertEqual(0, user.prescriberorganization_set.count())
 
-    # The ability to sign up for SIAE is turned off during the test phase.
-    #
-    # def test_siae_signup(self):
-    #     """SIAE signup."""
-    #
-    #     siae = SiaeFactory()
-    #
-    #     url = reverse("signup:siae")
-    #     response = self.client.get(url)
-    #     self.assertEqual(response.status_code, 200)
-    #
-    #     post_data = {
-    #         "first_name": "John",
-    #         "last_name": "Doe",
-    #         "email": "john.doe@siae.com",
-    #         "siret": siae.siret,
-    #         "password1": "!*p4ssw0rd123-",
-    #         "password2": "!*p4ssw0rd123-",
-    #     }
-    #     response = self.client.post(url, data=post_data)
-    #     self.assertEqual(response.status_code, 302)
-    #
-    #     user = get_user_model().objects.get(email=post_data["email"])
-    #     self.assertFalse(user.is_job_seeker)
-    #     self.assertFalse(user.is_prescriber)
-    #     self.assertTrue(user.is_siae_staff)
-    #
-    #     siae = Siae.active_objects.get(siret=post_data["siret"])
-    #     self.assertIn(user, siae.members.all())
-    #     self.assertEqual(1, siae.members.count())
-    #
-    #     membership = user.siaemembership_set.get(siae=siae)
-    #     self.assertTrue(membership.is_siae_admin)
+    def test_siae_signup(self):
+        """SIAE signup."""
+
+        siae = SiaeFactory()
+
+        url = reverse("signup:siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@siae.com",
+            "siret": siae.siret,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertFalse(user.is_prescriber)
+        self.assertTrue(user.is_siae_staff)
+
+        siae = Siae.active_objects.get(siret=post_data["siret"])
+        self.assertIn(user, siae.members.all())
+        self.assertEqual(1, siae.members.count())
+
+        membership = user.siaemembership_set.get(siae=siae)
+        self.assertTrue(membership.is_siae_admin)
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
