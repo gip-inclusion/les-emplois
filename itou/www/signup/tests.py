@@ -7,6 +7,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.prescribers.factories import PrescriberOrganizationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 
 from itou.siaes.factories import SiaeFactory
@@ -24,64 +25,6 @@ class SignupTest(TestCase):
         self.assertTemplateUsed(response, "signup/signup.html")
         response = self.client.post(ALLAUTH_SIGNUP_URL, data={"foo": "bar"})
         self.assertEqual(response.status_code, 405)
-
-    def test_prescriber_signup(self):
-        """Prescriber signup."""
-
-        organization = PrescriberOrganizationWithMembershipFactory()
-
-        url = reverse("signup:prescriber")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@prescriber.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
-            "secret_code": organization.secret_code,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
-
-        self.assertIn(user, organization.members.all())
-        self.assertEqual(2, organization.members.count())
-
-        self.assertIn(organization, user.prescriberorganization_set.all())
-        self.assertEqual(1, user.prescriberorganization_set.count())
-
-        membership = user.prescribermembership_set.get(organization=organization)
-        self.assertFalse(membership.is_admin)
-
-    def test_prescriber_signup_without_siret(self):
-        """Prescriber signup without siret."""
-
-        url = reverse("signup:prescriber")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@prescriber.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
-
-        self.assertEqual(0, user.prescriberorganization_set.count())
 
     def test_siae_signup(self):
         """SIAE signup."""
@@ -136,6 +79,100 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+
+
+class PrescriberSignupTest(TestCase):
+    def test_prescriber_signup_without_code(self):
+        """Prescriber signup without code."""
+
+        url = reverse("signup:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@prescriber.com",
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        self.assertEqual(0, user.prescriberorganization_set.count())
+
+    def test_prescriber_signup_with_code(self):
+        """Prescriber signup with a code to join an organization."""
+
+        organization = PrescriberOrganizationWithMembershipFactory()
+
+        url = reverse("signup:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@prescriber.com",
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+            "secret_code": organization.secret_code,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        self.assertIn(user, organization.members.all())
+        self.assertEqual(2, organization.members.count())
+
+        self.assertIn(organization, user.prescriberorganization_set.all())
+        self.assertEqual(1, user.prescriberorganization_set.count())
+
+        membership = user.prescribermembership_set.get(organization=organization)
+        self.assertFalse(membership.is_admin)
+
+    def test_prescriber_signup_join_authorized_organization(self):
+        """Prescriber signup who joins an authorized_organization."""
+
+        authorized_organization = PrescriberOrganizationFactory(is_authorized=True)
+
+        url = reverse("signup:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@prescriber.com",
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+            "authorized_organization": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        self.assertIn(user, authorized_organization.members.all())
+        self.assertEqual(1, authorized_organization.members.count())
+        self.assertEqual(1, user.prescriberorganization_set.count())
+
+        membership = user.prescribermembership_set.get(
+            organization=authorized_organization
+        )
+        self.assertTrue(membership.is_admin)
 
 
 class PasswordResetTest(TestCase):

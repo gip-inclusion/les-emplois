@@ -38,6 +38,15 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         help_text=_("Le code est composé de 6 caractères."),
     )
 
+    authorized_organization = forms.ModelChoiceField(
+        label=_("Organisation"),
+        queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by(
+            "name"
+        ),
+        required=False,
+        help_text=_("Liste des prescripteurs habilités par le Préfet."),
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = None
@@ -68,11 +77,13 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         user.save()
 
         # Join organization.
-        secret_code = self.cleaned_data.get("secret_code")
-        if secret_code:
+        authorized_organization = self.cleaned_data["authorized_organization"]
+        if authorized_organization or self.organization:
             membership = PrescriberMembership()
             membership.user = user
-            membership.organization = self.organization
+            membership.organization = self.organization or authorized_organization
+            # The first member becomes an admin.
+            membership.is_admin = membership.organization.members.count() == 0
             membership.save()
 
         return user

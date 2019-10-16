@@ -13,8 +13,8 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PrescriberOrganization
 
-    siret = factory.fuzzy.FuzzyText(length=14, chars=string.digits)
     name = factory.Sequence(lambda n: f"prescriber{n}")
+    siret = factory.fuzzy.FuzzyText(length=14, chars=string.digits)
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.LazyAttribute(lambda obj: f"{obj.name}@example.com")
 
