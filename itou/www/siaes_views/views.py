@@ -70,15 +70,21 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                 appellation__code__in=codes_to_update
             ):
                 code = job_through.appellation.code
-                job_through.custom_name = request.POST.get(f"custom-name-{code}", "")
-                job_through.description = request.POST.get(f"description-{code}", "")
-                is_active = bool(request.POST.get(f"is_active-{code}"))
-                if job_through.is_active != is_active:
-                    job_through.is_active = is_active
-                job_through.save()
+                new_custom_name = request.POST.get(f"custom-name-{code}", "")
+                new_description = request.POST.get(f"description-{code}", "")
+                new_is_active = bool(request.POST.get(f"is_active-{code}"))
+                if (
+                    job_through.custom_name != new_custom_name
+                    or job_through.description != new_description
+                    or job_through.is_active != new_is_active
+                ):
+                    job_through.custom_name = new_custom_name
+                    job_through.description = new_description
+                    job_through.is_active = new_is_active
+                    job_through.save()
 
             messages.success(request, _("Mise à jour effectuée !"))
-            return HttpResponseRedirect(reverse_lazy("siaes_views:configure_jobs"))
+            return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae}
     return render(request, template_name, context)

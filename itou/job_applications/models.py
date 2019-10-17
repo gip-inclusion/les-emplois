@@ -141,7 +141,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
     )
     updated_at = models.DateTimeField(
-        verbose_name=_("Updated at"), blank=True, null=True, db_index=True
+        verbose_name=_("Date de modification"), blank=True, null=True, db_index=True
     )
 
     objects = models.Manager.from_queryset(JobApplicationQuerySet)()

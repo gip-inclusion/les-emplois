@@ -152,6 +152,9 @@ class SiaeJobDescription(models.Model):
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now
     )
+    updated_at = models.DateTimeField(
+        verbose_name=_("Date de modification"), blank=True, null=True, db_index=True
+    )
     is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
     custom_name = models.CharField(
         verbose_name=_("Nom personnalisé"), blank=True, max_length=255
@@ -163,3 +166,8 @@ class SiaeJobDescription(models.Model):
     class Meta:
         unique_together = ("appellation", "siae")
         ordering = ["appellation__name", "ui_rank"]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
