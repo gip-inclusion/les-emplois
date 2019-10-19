@@ -12,7 +12,9 @@ $(document).ready(() => {
     .on('click', e => {
       e.preventDefault()
       let input = `<input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}">`
-      $(`<form action="${actionUrl}" method="post">${input}</form>`).submit()
+      let form = $(`<form action="${actionUrl}" method="post">${input}</form>`)
+      $(document.body).append(form)
+      form.submit()
     })
 
 })
