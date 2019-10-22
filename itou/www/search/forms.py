@@ -31,6 +31,7 @@ class SiaeSearchForm(forms.Form):
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": CITY_AUTOCOMPLETE_SOURCE_URL,
                 "placeholder": _("Autour de (Arras, Bobigny, Strasbourg…)"),
+                "autocomplete": "off",
             }
         )
     )

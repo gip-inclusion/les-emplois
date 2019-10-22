@@ -3,7 +3,6 @@ from django.urls import reverse
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
