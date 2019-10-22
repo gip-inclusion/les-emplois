@@ -100,8 +100,11 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
                         <a href="{% url 'siaes_views:edit_siae' %}">
-                            {% trans "Modifier la fiche de votre SIAE" %}
+                            {% trans "Modifier les coordonnées" %}
                         </a>
+                        <small>
+                            (<a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans "voir la fiche" %}</a>)
+                        </small>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
