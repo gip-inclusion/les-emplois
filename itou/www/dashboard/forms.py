@@ -11,10 +11,12 @@ class EditUserInfoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
-        if self.instance.is_job_seeker:
-            self.fields["birthdate"].required = True
+        if not self.instance.is_job_seeker:
+            del self.fields["birthdate"]
+        else:
             self.fields["phone"].required = True
+            self.fields["birthdate"].required = True
+            self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
         model = get_user_model()
