@@ -13,10 +13,25 @@ $(document).ready(() => {
       minLength: 1,
       source: citySearchInput.data('autocomplete-source-url'),
       autoFocus: true,
+      // Make a selection on focus.
+      focus: (event, ui) => {
+        hiddenCityInput.val(ui.item.slug)  // Store city slug.
+        hiddenCityInput.data('title', ui.item.value)  // Store city name.
+      },
+      // When the menu is hidden (usually when the form is submitted)
+      // populate citySearchInput with the city name so that it is part
+      // of the querystring.
+      close: (event, ui) => {
+        let value = hiddenCityInput.data('title')
+        if (value) {
+          citySearchInput.val(value)
+        }
+      },
+      // Allow to submit the parent form when the enter key is pressed.
       select: (event, ui) => {
-        hiddenCityInput.val(ui.item.slug)
         if (event.keyCode === 13) {
-          citySearchInput.val(ui.item.value)
+          let value = hiddenCityInput.data('title')
+          citySearchInput.val(value)
           citySearchInput.parents('form:first').submit()
         }
       },
