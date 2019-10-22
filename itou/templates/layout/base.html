@@ -48,8 +48,11 @@
                         </div>
                     {% else %}
                         <nav>
-                            <a href="{% url 'account_signup' %}">
-                                {% trans "Accès Prescripteur / Employeur" %}
+                            <a class="btn btn-outline-primary" href="{% url 'account_signup' %}">
+                                {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
+                            </a>
+                            <a class="btn btn-outline-primary" href="{% url 'account_login' %}">
+                                {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
                             </a>
                         </nav>
                     {% endif %}

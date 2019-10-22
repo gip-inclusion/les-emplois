@@ -9,48 +9,35 @@
 <div class="card-deck">
 
     <div class="card">
-        <div class="card-header">
-            <b>{% trans "Prescripteurs" %}</b>
-            <br>
-            <cite>{% trans "Je veux trouver un travail à une personne en difficulté" %}</cite>
-        </div>
         <div class="card-body">
-            <p class="card-text">
-                <a class="card-link" href="{% url 'signup:prescriber' %}">
-                    {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
-                </a>
-                <a class="card-link" href="{% url 'account_login' %}">
-                    {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
-                </a>
-            </p>
-            <p class="card-text">
-                {% trans "Je suis travailleur(se) social, conseiller(ère) emploi, chargé(e) d'accompagnement, bénévole…" %}
-            </p>
+            <h5 class="card-title">{% trans "Je suis demandeur d'emploi" %}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{% trans "Personne ne me donne ma chance, mais je veux travailler !" %}</h6>
+            <a class="card-link" href="{% url 'signup:job_seeker' %}">
+                {% trans "Inscription demandeur d'emploi" %}
+            </a>
         </div>
-        <img src="{% static 'photos/prescriber.jpg' %}" class="card-img-bottom" alt="">
     </div>
 
     <div class="card">
-        <div class="card-header">
-            <b>{% trans "Employeurs" %}</b>
-            <br>
-            <cite>{% trans "Je recrute une personne en difficulté" %}</cite>
-        </div>
         <div class="card-body">
-            <p class="card-text">
-                <a class="card-link" href="{% url 'signup:siae' %}">
-                    {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
-                </a>
-                <a class="card-link" href="{% url 'account_login' %}">
-                    {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
-                </a>
-            </p>
-            <p class="card-text">
-                {% trans "En entreprise d'insertion, chantier d'insertion, association intermédiaire, entreprise d'insertion de travail temporaire, entreprise adaptée." %}
-            </p>
+            <h5 class="card-title">{% trans "Je suis prescripteur" %}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{% trans "Je veux trouver un travail à une personne en difficulté" %}</h6>
+            <a class="card-link" href="{% url 'signup:prescriber' %}">
+                {% trans "Inscription prescripteur" %}
+            </a>
         </div>
-        <img src="{% static 'photos/employer.jpg' %}" class="card-img-bottom" alt="">
     </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{% trans "Je suis employeur" %}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{% trans "Je recrute une personne en difficulté" %}</h6>
+            <a class="card-link" href="{% url 'signup:siae' %}">
+                {% trans "Inscription employeur" %}
+            </a>
+        </div>
+    </div>
+
 
 </div>
 {% endblock %}
