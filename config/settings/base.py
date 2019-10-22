@@ -248,6 +248,14 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
+# django-bootstrap4.
+# https://django-bootstrap4.readthedocs.io/en/latest/settings.html
+# ------------------------------------------------------------------------------
+
+BOOTSTRAP4 = {
+    "required_css_class": "form-group-required",
+}
+
 # APIs.
 # ------------------------------------------------------------------------------
 
