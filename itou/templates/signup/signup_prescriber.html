@@ -37,14 +37,14 @@
             </a>
         </div>
     </nav>
-    <div class="tab-content" id="form-tabContent">
-        <div class="tab-pane fade show active" id="form-org" role="tabpanel" aria-labelledby="nav-home-tab">
-            <div class="alert alert-secondary" role="alert">
+    <div class="tab-content mb-3">
+        <div class="tab-pane show active" id="form-org" role="tabpanel" aria-labelledby="nav-home-tab">
+            <div class="p-3 border-right border-bottom border-left">
                 {% bootstrap_field form.authorized_organization %}
             </div>
         </div>
-        <div class="tab-pane fade" id="form-code" role="tabpanel" aria-labelledby="form-code-tab">
-            <div class="alert alert-secondary" role="alert">
+        <div class="tab-pane" id="form-code" role="tabpanel" aria-labelledby="form-code-tab">
+            <div class="p-3 border-right border-bottom border-left">
                 <i>{% bootstrap_label "Entrez le code qui vous a été transmis :" label_for=form.secret_code.auto_id %}</i>
                 {% bootstrap_field form.secret_code show_label=False %}
             </div>

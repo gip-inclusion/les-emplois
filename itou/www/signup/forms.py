@@ -39,7 +39,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
     )
 
     authorized_organization = forms.ModelChoiceField(
-        label=_("Organisation"),
+        label=_("Organisation (seulement si habilitée par le Préfet)"),
         queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by(
             "name"
         ),
