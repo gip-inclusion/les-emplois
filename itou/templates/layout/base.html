@@ -60,6 +60,15 @@
             </div>
         </header>
 
+        {% if user.is_authenticated %}
+        <div class="layout-section layout-section-white border-bottom">
+            <nav class="nav">
+                <a class="nav-link" href="/">{% trans "Accueil" %}</a>
+                <a class="nav-link" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+            </nav>
+        </div>
+        {% endif %}
+
         {% if messages %}
             <div class="layout-section layout-section-white">
                 <div class="layout-messages">
