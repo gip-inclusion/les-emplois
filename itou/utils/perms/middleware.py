@@ -18,19 +18,15 @@ class ItouCurrentOrganizationMiddleware:
 
         if user.is_authenticated:
 
-            if user.is_siae_staff:
-                session_key = settings.ITOU_SESSION_CURRENT_SIAE_KEY
-                if not request.session.get(session_key):
-                    request.session[session_key] = user.siae_set.first().siret
+            if user.is_siae_staff and user.siae_set.exists():
+                request.session[
+                    settings.ITOU_SESSION_CURRENT_SIAE_KEY
+                ] = user.siae_set.first().pk
 
-            elif request.user.is_prescriber:
-                session_key = settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-                if not request.session.get(session_key):
-                    try:
-                        pk = request.user.prescriberorganization_set.first().pk
-                    except AttributeError:
-                        pk = None
-                    request.session[session_key] = pk
+            elif user.is_prescriber and user.prescriberorganization_set.exists():
+                request.session[
+                    settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+                ] = user.prescriberorganization_set.first().pk
 
         response = self.get_response(request)
 

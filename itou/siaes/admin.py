@@ -18,7 +18,7 @@ class JobsInline(admin.TabularInline):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
-    list_display = ("siret", "kind", "name", "department", "geocoding_score")
+    list_display = ("id", "siret", "kind", "name", "department", "geocoding_score")
     list_filter = ("kind", "department")
     fieldsets = (
         (

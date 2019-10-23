@@ -12,16 +12,16 @@ def get_current_organization(request):
 
     if request.user.is_authenticated:
 
-        siae_siret = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-        if siae_siret:
-            siae = request.user.siae_set.get(siret=siae_siret)
+        siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+        if siae_pk:
+            siae = request.user.siae_set.get(pk=siae_pk)
 
-        prescriber_organization_siret = request.session.get(
+        prescriber_org_pk = request.session.get(
             settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
         )
-        if prescriber_organization_siret:
+        if prescriber_org_pk:
             prescriber_organization = request.user.prescriberorganization_set.get(
-                pk=prescriber_organization_siret
+                pk=prescriber_org_pk
             )
 
     return {

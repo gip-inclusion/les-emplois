@@ -102,9 +102,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     List of applications for an SIAE.
     """
 
-    siret = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
     queryset = Siae.active_objects.member_required(request.user)
-    siae = get_object_or_404(queryset, siret=siret)
+    siae = get_object_or_404(queryset, pk=pk)
 
     job_applications = siae.job_applications_received.select_related(
         "job_seeker", "prescriber", "prescriber"

@@ -29,11 +29,11 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     """
     Configure an SIAE's jobs.
     """
-    siret = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
     queryset = Siae.active_objects.prefetch_job_description_through().member_required(
         request.user
     )
-    siae = get_object_or_404(queryset, siret=siret)
+    siae = get_object_or_404(queryset, pk=pk)
 
     if request.method == "POST":
 
@@ -95,9 +95,9 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
     Edit an SIAE's card (or "Fiche" in French).
     """
-    siret = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
     queryset = Siae.active_objects.member_required(request.user)
-    siae = get_object_or_404(queryset, siret=siret)
+    siae = get_object_or_404(queryset, pk=pk)
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)
 
