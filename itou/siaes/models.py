@@ -165,6 +165,8 @@ class SiaeJobDescription(models.Model):
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
     class Meta:
+        verbose_name = _("Fiche de poste")
+        verbose_name_plural = _("Fiches de postes")
         unique_together = ("appellation", "siae")
         ordering = ["appellation__name", "ui_rank"]
 
