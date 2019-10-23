@@ -41,6 +41,7 @@
         <div class="tab-pane show active" id="form-org" role="tabpanel" aria-labelledby="nav-home-tab">
             <div class="p-3 border-right border-bottom border-left">
                 {% bootstrap_field form.authorized_organization %}
+                <small>{% blocktrans %}Si vous faites partie d'une organisation habilitée par le Préfet qui ne figure pas dans cette liste, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a>.{% endblocktrans %}</small>
             </div>
         </div>
         <div class="tab-pane" id="form-code" role="tabpanel" aria-labelledby="form-code-tab">
