@@ -23,7 +23,7 @@ pylint:
 # make django_admin
 # make django_admin COMMAND=dbshell
 # make django_admin COMMAND=createsuperuser
-# make django_admin COMMAND="dumpdata siae.Siae" > ~/Desktop/siae.json
+# make django_admin COMMAND="dumpdata siaes.Siae" > ~/Desktop/siaes.json
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 

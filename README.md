@@ -26,12 +26,19 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 ### Peupler la base de données
 
     make shell_on_django_container
-    django-admin createsuperuser
     django-admin import_cities
     django-admin loaddata itou/fixtures/jobs.json
     django-admin loaddata itou/fixtures/siaes.json
     django-admin loaddata itou/fixtures/prescribers.json
     django-admin loaddata itou/fixtures/test_users.json
+
+The last fixture will create various users that you can use with the password `password` (*sic*):
+
+- `admin@test.com`
+- `job@test.com`
+- `prescriber@test.com`
+- `siae@test.com`
+- `prescriber-solo@test.com`
 
 ### Avant un commit
 
