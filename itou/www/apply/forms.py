@@ -1,118 +1,96 @@
 from django import forms
-from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
 
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication
 
 
-class JobApplicationForm(forms.ModelForm):
+class CheckJobSeekerForm(forms.Form):
+
+    email = forms.EmailField(label=_("E-mail du candidat"))
+
+    def get_job_seeker_from_email(self):
+        email = self.cleaned_data["email"]
+        user = get_user_model().objects.filter(email=email, is_job_seeker=True).first()
+        return user
+
+
+class CreateJobSeekerForm(forms.ModelForm):
+    def __init__(self, proxy_user, *args, **kwargs):
+        self.proxy_user = proxy_user
+        super().__init__(*args, **kwargs)
+        self.fields["email"].required = True
+        self.fields["first_name"].required = True
+        self.fields["last_name"].required = True
+        self.fields["birthdate"].required = True
+        self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
+
+    class Meta:
+        model = get_user_model()
+        fields = ["email", "first_name", "last_name", "birthdate", "phone"]
+        help_texts = {
+            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978"),
+            "phone": _("Par exemple 0610203040"),
+        }
+
+    def save(self, commit=True):
+        if commit:
+            return self._meta.model.create_job_seeker_by_proxy(
+                self.proxy_user, **self.cleaned_data
+            )
+        return super().save(commit=False)
+
+
+class SubmitJobApplicationForm(forms.ModelForm):
     """
     Submit a job application to an SIAE.
     """
 
-    def __init__(self, user, siae, *args, **kwargs):
-        self.prescriber = None
+    def __init__(self, siae, *args, **kwargs):
         self.siae = siae
-        self.user = user
         super().__init__(*args, **kwargs)
         self.fields["jobs"].queryset = siae.jobs.filter(
             siaejobdescription__is_active=True
         )
         self.fields["message"].required = True
 
-    prescriber_email = forms.EmailField(
-        required=False, label=_("E-mail de votre accompagnateur (optionnel)")
-    )
-
     class Meta:
         model = JobApplication
-        fields = ["prescriber_email", "jobs", "message"]
+        fields = ["jobs", "message"]
         widgets = {"jobs": forms.CheckboxSelectMultiple()}
         labels = {"jobs": _("Métiers recherchés (optionnel)")}
 
-    def clean_prescriber_email(self):
-        """
-        Retrieve a user instance from the `prescriber_email` field.
-        """
-        prescriber_email = self.cleaned_data["prescriber_email"]
-        if prescriber_email:
-            try:
-                self.prescriber = get_user_model().objects.get(
-                    email=prescriber_email, is_prescriber=True
-                )
-            except get_user_model().DoesNotExist:
-                error = _(
-                    "Cet accompagnateur ne figure pas dans notre base de données."
-                )
-                raise forms.ValidationError(error)
-        return prescriber_email
 
-    def save(self, commit=True):
-        job_application = super().save(commit=False)
-        job_application.job_seeker = self.user
-        job_application.siae = self.siae
-        if self.prescriber:
-            job_application.prescriber = self.prescriber
-            # Assume we have 0 or 1 organization per prescriber at the moment.
-            job_application.prescriber_organization = (
-                job_application.prescriber.prescriberorganization_set.first()
-            )
-        if commit:
-            job_application.save()
-            # Handle many to many.
-            for job in self.cleaned_data["jobs"]:
-                job_application.jobs.add(job)
-        return job_application
-
-
-class JobApplicationProcessForm(forms.Form):
+class RefusalForm(forms.Form):
     """
-    Allow an SIAE to choose between rejecting or processing a job application.
+    Allow an SIAE to specify a reason for refusal.
     """
 
-    TRANSITION_CHOICES = dict(JobApplicationWorkflow.TRANSITION_CHOICES)
-
-    ACTION_PROCESS = JobApplicationWorkflow.TRANSITION_PROCESS
-    ACTION_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
-
-    ACTION_CHOICES = [
-        (ACTION_REJECT, TRANSITION_CHOICES[ACTION_REJECT]),
-        (ACTION_PROCESS, TRANSITION_CHOICES[ACTION_PROCESS]),
-    ]
-
-    action = forms.ChoiceField(choices=ACTION_CHOICES, widget=forms.HiddenInput())
+    refusal_reason = forms.ChoiceField(
+        label=_("Motif du refus"),
+        widget=forms.RadioSelect,
+        choices=JobApplication.REFUSAL_REASON_CHOICES,
+        required=False,
+    )
     answer = forms.CharField(
         label=_("Réponse"), widget=forms.Textarea(), required=False, strip=True
     )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        action = cleaned_data.get("action")
-        answer = cleaned_data.get("answer")
-        if action == self.ACTION_REJECT and not answer:
-            error = _("Une réponse est obligatoire pour décliner une candidature.")
+    def clean_answer(self):
+        answer = self.cleaned_data["answer"]
+        refusal_reason = self.cleaned_data["refusal_reason"]
+        if refusal_reason == JobApplication.REFUSAL_REASON_OTHER and not answer:
+            error = _("Vous devez préciser votre motif de refus.")
             raise forms.ValidationError(error)
+        return answer
 
 
-class JobApplicationAnswerForm(forms.Form):
+class AnswerForm(forms.Form):
     """
-    Let an SIAE give a definitive answer to a job application.
+    Allow an SIAE to add an answer message when postponing or accepting.
     """
 
-    TRANSITION_CHOICES = dict(JobApplicationWorkflow.TRANSITION_CHOICES)
-
-    ACTION_ACCEPT = JobApplicationWorkflow.TRANSITION_ACCEPT
-    ACTION_REJECT = JobApplicationWorkflow.TRANSITION_REJECT
-
-    ACTION_CHOICES = [
-        (ACTION_REJECT, TRANSITION_CHOICES[ACTION_REJECT]),
-        (ACTION_ACCEPT, TRANSITION_CHOICES[ACTION_ACCEPT]),
-    ]
-
-    action = forms.ChoiceField(choices=ACTION_CHOICES, widget=forms.HiddenInput())
     answer = forms.CharField(
-        label=_("Réponse"),
-        widget=forms.Textarea(),
-        help_text="Votre réponse est obligatoire.",
-        strip=True,
+        label=_("Réponse"), widget=forms.Textarea(), required=False, strip=True
     )

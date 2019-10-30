@@ -94,6 +94,11 @@ ROOT_URLCONF = "config.urls"
 
 WSGI_APPLICATION = "config.wsgi.application"
 
+# Session.
+# ------------------------------------------------------------------------------
+
+SESSION_SAVE_EVERY_REQUEST = True
+
 # Templates.
 # ------------------------------------------------------------------------------
 
@@ -293,5 +298,6 @@ DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 # Pas-de-Calais (62), Bas-Rhin (67), Seine Saint Denis (93).
 ITOU_TEST_DEPARTMENTS = ["62", "67", "93"]
 
-ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
+ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
+ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"

@@ -1,0 +1,187 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+{% load format_filters %}
+
+{% block title %}
+    {% trans "Candidature" %}
+    -
+    {{ job_application.job_seeker.get_full_name }}
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% trans "Candidature de" %}
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
+    </h1>
+
+    <h2>
+        {% include "apply/includes/state_badge.html" with job_application=job_application %}
+    </h2>
+
+    {# Job seeker info ------------------------------------------------------------------------- #}
+
+    <hr>
+
+    <h3 class="font-weight-normal text-muted">{% trans "Candidat" %}</h3>
+
+    <ul>
+
+        <li>{% trans "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
+
+        <li>{% trans "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>
+
+        <li>{% trans "Nom :" %} <b>{{ job_application.job_seeker.last_name }}</b></li>
+
+        <li>{% trans "Date de naissance :" %} <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b></li>
+
+        <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a></li>
+
+        {% if job_application.job_seeker.phone %}
+            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a></li>
+        {% endif %}
+
+        {% if job_application.jobs.exists %}
+            <li>
+                {% trans "Métier(s) recherché(s) :" %}
+                <ul>
+                    {% for job in job_application.jobs.all %}
+                        <li><b>{{ job.name }}</b> ({{ job.rome_id }})</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endif %}
+
+    </ul>
+
+    <div class="alert alert-secondary">
+        <p><b>{% trans "Message :" %}</b></p>
+        {{ job_application.message|linebreaks }}
+    </div>
+
+    {# Sender info ------------------------------------------------------------------------- #}
+
+    <hr>
+
+    <h3 class="font-weight-normal text-muted">{% trans "Candidature envoyée par" %}</h3>
+
+    <ul>
+
+        <li>{% trans "Prénom :" %} <b>{{ job_application.sender.first_name }}</b></li>
+
+        <li>{% trans "Nom :" %} <b>{{ job_application.sender.last_name }}</b></li>
+
+        <li>{% trans "Type :" %} <b>{{ job_application.get_sender_kind_display }}</b></li>
+
+        <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
+
+        {% if job_application.sender_prescriber_organization %}
+            <li>
+                {% trans "Structure :" %}
+                <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+                {% if job_application.sender_prescriber_organization.is_authorized %}
+                    <span class="badge badge-warning">{% trans "Prescripteur habilité par le Préfet" %}</span>
+                {% endif %}
+            </li>
+        {% endif %}
+
+        {% if job_application.sender.phone %}
+            <li>
+                {% trans "Téléphone :" %}
+                <a href="tel:{{ job_application.sender.phone }}">{{ job_application.sender.phone|format_phone }}</a>
+            </li>
+        {% endif %}
+
+    </ul>
+
+    {# Process ------------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_new %}
+
+        <hr>
+
+        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-warning">{% trans "J'étudie cette candidature" %}</button>
+            {% endbuttons %}
+        </form>
+
+    {% endif %}
+
+    {# Answer ------------------------------------------------------------------------- #}
+
+    {% if job_application.refusal_reason or job_application.answer %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">{% trans "Réponse" %}</h3>
+
+        {% if job_application.refusal_reason %}
+        <p>
+            <b>{% trans "Motif du refus :" %}</b><br>
+            {{ job_application.get_refusal_reason_display }}
+        </p>
+        {% endif %}
+
+        {% if job_application.answer %}
+        <div class="alert alert-secondary">
+            <p><b>{% trans "Message :" %}</b></p>
+            {{ job_application.answer|linebreaks }}
+        </div>
+        {% endif %}
+
+    {% endif %}
+
+    {# Choose next state ------------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_processing %}
+
+        <hr>
+
+        <p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
+                {% trans "Je ne veux pas l'embaucher" %}
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+        <p>
+            <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+                {% trans "Je veux l'embaucher plus tard" %}
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+        <p>
+            <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+                {% trans "Je l'embauche" %}
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+    {% endif %}
+
+    {% if transition_logs %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">{% trans "Historique des modifications" %}</h3>
+
+        <ul>
+            {% for log in transition_logs %}
+                <li>
+                    {% blocktrans with pretty_to_state=log.pretty_to_state %}Passé en "<b>{{ pretty_to_state }}</b>"{% endblocktrans %}
+                    <ul>
+                        <li>{% trans "Par" %} {{ log.user.get_full_name }}</li>
+                        <li>{% trans "Le" %} {{ log.timestamp|date:"d F Y à H:i" }}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+
+{% endblock %}

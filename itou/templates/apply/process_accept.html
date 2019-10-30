@@ -1,0 +1,31 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Je l'embauche" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% trans "Candidature de" %}
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
+    </h1>
+
+    <div class="alert alert-warning" role="alert">
+        {% trans "Confirmez votre choix." %}
+    </div>
+
+    <form method="post" action="">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn btn-success">{% trans "Je l'embauche" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}

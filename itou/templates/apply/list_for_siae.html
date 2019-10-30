@@ -29,7 +29,7 @@
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
             <div class="card-footer">
-                <a href="{% url 'apply:detail_for_siae' job_application_id=job_application.id %}">
+                <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">
                     {% trans "Détails de la candidature" %}
                 </a>
             </div>

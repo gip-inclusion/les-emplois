@@ -154,7 +154,7 @@ body:after {
 /* Forms.
 --------------------------------------------------------------------------- */
 
-.form-group-required label:after {
+.form-group-required > label:first-of-type:after {
     content: " *";
     color: #d63626;
 }

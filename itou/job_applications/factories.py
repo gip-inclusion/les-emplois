@@ -2,21 +2,24 @@ import factory
 import factory.fuzzy
 
 from itou.job_applications import models
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from itou.siaes.factories import SiaeWithMembershipFactory
-from itou.users.factories import JobSeekerFactory
+from itou.users.factories import PrescriberFactory, JobSeekerFactory
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
-    """Generates a JobApplication() object for unit tests."""
+    """Generates a JobApplication() object."""
 
     class Meta:
         model = models.JobApplication
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    siae = factory.SubFactory(SiaeWithMembershipFactory)
+    to_siae = factory.SubFactory(SiaeWithMembershipFactory)
     message = factory.Faker("sentence", nb_words=40)
-    answer = factory.Faker("sentence", nb_words=40)
+    # answer = factory.Faker("sentence", nb_words=40)
 
     @factory.post_generation
     def jobs(self, create, extracted, **kwargs):
@@ -39,15 +42,51 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
                 self.jobs.add(job)
 
 
-class JobApplicationWithPrescriberOrganizationFactory(JobApplicationFactory):
-    """
-    Generates a JobApplication() object with a PrescriberOrganization()
-    and its User() for unit tests.
-    """
+class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
+    """Generates a JobApplication() object sent by a job seeker."""
 
-    prescriber_organization = factory.SubFactory(
+    sender = factory.SelfAttribute("job_seeker")
+    sender_kind = models.JobApplication.SENDER_KIND_JOB_SEEKER
+
+
+class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
+    """Generates a JobApplication() object sent by a prescriber."""
+
+    sender = factory.SubFactory(PrescriberFactory)
+    sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
+
+
+class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
+    """Generates a JobApplication() object sent by a prescriber member of an organization."""
+
+    sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
+    sender_prescriber_organization = factory.SubFactory(
         PrescriberOrganizationWithMembershipFactory
     )
-    prescriber = factory.LazyAttribute(
-        lambda o: o.prescriber_organization.members.first()
+
+    @factory.post_generation
+    def set_sender(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        self.sender = self.sender_prescriber_organization.members.first()
+        self.save()
+
+
+class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+    JobApplicationFactory
+):
+    """Generates a JobApplication() object sent by a prescriber member of an authorized organization."""
+
+    sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
+    sender_prescriber_organization = factory.SubFactory(
+        AuthorizedPrescriberOrganizationWithMembershipFactory
     )
+
+    @factory.post_generation
+    def set_sender(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        self.sender = self.sender_prescriber_organization.members.first()
+        self.save()

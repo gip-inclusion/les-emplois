@@ -8,20 +8,13 @@
 
     <h1>
         {% blocktrans with siae_name=siae.display_name %}
-            Postuler chez
-            <br>
-            <small class="text-muted">{{ siae_name }}</small>
+            Postuler chez <span class="text-muted">{{ siae_name }}</span>
         {% endblocktrans %}
     </h1>
 
-    <form method="post" action="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}">
+    <form method="post" action="">
 
         {% csrf_token %}
-
-        <div class="alert alert-secondary" role="alert">
-            <i>{% bootstrap_label "Vous êtes accompagné ?" label_for=form.prescriber_email.auto_id %}</i>
-            {% bootstrap_field form.prescriber_email show_label=False %}
-        </div>
 
         {% if siae.jobs.exists %}
             {% bootstrap_field form.jobs %}

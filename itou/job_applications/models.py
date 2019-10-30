@@ -7,7 +7,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from anymail.exceptions import AnymailRequestsAPIError
 from django_xworkflows import models as xwf_models
 
 from itou.utils.emails import get_email_text_template
@@ -23,49 +22,45 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     """
 
     STATE_NEW = "new"
-    STATE_PENDING_PROCESSING = "pending_processing"
     STATE_PROCESSING = "processing"
+    STATE_POSTPONED = "postponed"
     STATE_ACCEPTED = "accepted"
-    STATE_REJECTED = "rejected"
+    STATE_REFUSED = "refused"
     STATE_OBSOLETE = "obsolete"
 
     STATE_CHOICES = (
         (STATE_NEW, _("Nouvelle candidature")),
-        (STATE_PENDING_PROCESSING, _("En attente de traitement")),
-        (STATE_PROCESSING, _("En cours de traitement")),
-        (STATE_ACCEPTED, _("Embauche confirmée")),
-        (STATE_REJECTED, _("Candidature déclinée")),
-        (STATE_OBSOLETE, _("Obsolète")),  # The job seeker found another job.
+        (STATE_PROCESSING, _("Candidature à l'étude")),
+        (STATE_POSTPONED, _("Embauche pour plus tard")),
+        (STATE_ACCEPTED, _("Embauche acceptée")),
+        (STATE_REFUSED, _("Embauche déclinée")),
+        (STATE_OBSOLETE, _("Embauché ailleurs")),
     )
 
     states = STATE_CHOICES
 
-    TRANSITION_SEND = "send"
     TRANSITION_PROCESS = "process"
+    TRANSITION_POSTPONE = "postpone"
     TRANSITION_ACCEPT = "accept"
-    TRANSITION_REJECT = "reject"
+    TRANSITION_REFUSE = "refuse"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
 
     TRANSITION_CHOICES = (
-        (TRANSITION_SEND, _("Envoyer la candidature à la SIAE")),
         (TRANSITION_PROCESS, _("Étudier la candidature")),
+        (TRANSITION_POSTPONE, _("Reporter la candidature")),
         (TRANSITION_ACCEPT, _("Accepter l'embauche")),
-        (TRANSITION_REJECT, _("Décliner la candidature")),
+        (TRANSITION_REFUSE, _("Décliner la candidature")),
         (TRANSITION_RENDER_OBSOLETE, _("Rendre obsolete la candidature")),
     )
 
     transitions = (
-        (TRANSITION_SEND, STATE_NEW, STATE_PENDING_PROCESSING),
-        (TRANSITION_PROCESS, STATE_PENDING_PROCESSING, STATE_PROCESSING),
-        (TRANSITION_ACCEPT, STATE_PROCESSING, STATE_ACCEPTED),
-        (
-            TRANSITION_REJECT,
-            [STATE_PENDING_PROCESSING, STATE_PROCESSING],
-            STATE_REJECTED,
-        ),
+        (TRANSITION_PROCESS, STATE_NEW, STATE_PROCESSING),
+        (TRANSITION_POSTPONE, STATE_PROCESSING, STATE_POSTPONED),
+        (TRANSITION_ACCEPT, [STATE_PROCESSING, STATE_POSTPONED], STATE_ACCEPTED),
+        (TRANSITION_REFUSE, STATE_PROCESSING, STATE_REFUSED),
         (
             TRANSITION_RENDER_OBSOLETE,
-            [STATE_NEW, STATE_PENDING_PROCESSING, STATE_PROCESSING],
+            [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED],
             STATE_OBSOLETE,
         ),
     )
@@ -79,7 +74,16 @@ class JobApplicationQuerySet(models.QuerySet):
     def siae_member_required(self, user):
         if user.is_superuser:
             return self
-        return self.filter(siae__members=user, siae__members__is_active=True)
+        return self.filter(to_siae__members=user, to_siae__members__is_active=True)
+
+    def pendind(self):
+        return self.filter(
+            state__in=[
+                JobApplicationWorkflow.STATE_NEW,
+                JobApplicationWorkflow.STATE_PROCESSING,
+                JobApplicationWorkflow.STATE_POSTPONED,
+            ]
+        )
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
@@ -91,38 +95,104 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         - https://github.com/rbarrois/xworkflows
     """
 
+    SENDER_KIND_JOB_SEEKER = "job_seeker"
+    SENDER_KIND_PRESCRIBER = "prescriber"
+    SENDER_KIND_SIAE_STAFF = "siae_staff"
+
+    SENDER_KIND_CHOICES = (
+        (SENDER_KIND_JOB_SEEKER, _("Demandeur d'emploi")),
+        (SENDER_KIND_PRESCRIBER, _("Prescripteur")),
+        (SENDER_KIND_SIAE_STAFF, _("Employeur (SIAE)")),
+    )
+
+    REFUSAL_REASON_DID_NOT_COME = "did_not_come"
+    REFUSAL_REASON_UNAVAILABLE = "unavailable"
+    REFUSAL_REASON_NON_ELIGIBLE = "non_eligible"
+    REFUSAL_REASON_ELIGIBILITY_DOUBT = "eligibility_doubt"
+    REFUSAL_REASON_INCOMPATIBLE = "incompatible"
+    REFUSAL_REASON_PREVENT_OBJECTIVES = "prevent_objectives"
+    REFUSAL_REASON_NO_POSITION = "no_position"
+    REFUSAL_REASON_OTHER = "other"
+
+    REFUSAL_REASON_CHOICES = (
+        (REFUSAL_REASON_DID_NOT_COME, _("Candidat non venu ou non joignable")),
+        (
+            REFUSAL_REASON_UNAVAILABLE,
+            _("Candidat indisponible ou non intéressé par le poste"),
+        ),
+        (REFUSAL_REASON_NON_ELIGIBLE, _("Candidat non éligible")),
+        (
+            REFUSAL_REASON_ELIGIBILITY_DOUBT,
+            _(
+                "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)"
+            ),
+        ),
+        (
+            REFUSAL_REASON_INCOMPATIBLE,
+            _(
+                "Un des freins à l'emploi du candidat est incompatible avec le poste proposé"
+            ),
+        ),
+        (
+            REFUSAL_REASON_PREVENT_OBJECTIVES,
+            _(
+                "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion"
+            ),
+        ),
+        (REFUSAL_REASON_NO_POSITION, _("Pas de poste ouvert en ce moment")),
+        (REFUSAL_REASON_OTHER, _("Autre")),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
         on_delete=models.CASCADE,
+        related_name="job_applications",
+    )
+
+    # Who send the job application. It can be the same user as `job_seeker`
+    sender = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Émetteur"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="job_applications_sent",
     )
 
-    siae = models.ForeignKey(
+    sender_kind = models.CharField(
+        verbose_name=_("Type de l'émetteur"),
+        max_length=10,
+        choices=SENDER_KIND_CHOICES,
+        default=SENDER_KIND_PRESCRIBER,
+    )
+
+    # When the sender is an SIAE staff member, keep a track of his current SIAE.
+    # Not implemented yet, but this could allow an SIAE to apply to itself.
+    sender_siae = models.ForeignKey(
         "siaes.Siae",
-        verbose_name=_("SIAE"),
+        verbose_name=_("SIAE émettrice"),
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+    )
+
+    # When the sender is a prescriber, keep a track of his current organization (if any).
+    sender_prescriber_organization = models.ForeignKey(
+        "prescribers.PrescriberOrganization",
+        verbose_name=_("Organisation du prescripteur émettrice"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    to_siae = models.ForeignKey(
+        "siaes.Siae",
+        verbose_name=_("SIAE destinataire"),
         on_delete=models.CASCADE,
         related_name="job_applications_received",
-    )
-
-    prescriber = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Prescripteur"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="job_applications_prescribed",
-    )
-
-    # Keep track of the prescriber organization (if any).
-    prescriber_organization = models.ForeignKey(
-        "prescribers.PrescriberOrganization",
-        verbose_name=_("Organisation du prescripteur"),
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
     )
 
     state = xwf_models.StateField(
@@ -136,6 +206,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     message = models.TextField(verbose_name=_("Message de candidature"), blank=True)
     answer = models.TextField(verbose_name=_("Message de réponse"), blank=True)
+    refusal_reason = models.CharField(
+        verbose_name=_("Motifs de refus"),
+        max_length=30,
+        choices=REFUSAL_REASON_CHOICES,
+        blank=True,
+    )
 
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
@@ -158,84 +234,33 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
-    @property
-    def has_been_processed(self):
-        return self.state in [
-            JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_REJECTED,
-        ]
-
     # Workflow transitions.
 
     @xwf_models.transition()
-    def send(self, *args, **kwargs):
-        try:
-            self.email_new_for_siae.send()
-        except AnymailRequestsAPIError:
-            logger.error(
-                "Email couldn't be sent during `send` transition for JobApplication `%s`",
-                self.id,
-            )
-            raise xwf_models.AbortTransition()
-
-    @xwf_models.transition()
     def process(self, *args, **kwargs):
-        try:
-            connection = mail.get_connection()
-            emails = [self.email_process_for_job_seeker]
-            if self.prescriber:
-                emails += [self.email_process_for_prescriber]
-            connection.send_messages(emails)
-        except AnymailRequestsAPIError:
-            logger.error(
-                "Email couldn't be sent during `process` transition for JobApplication `%s`",
-                self.id,
-            )
-            raise xwf_models.AbortTransition()
+        pass
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
-        # TODO: mark other related job applications as obsolete.
-        self.answer = kwargs["answer"]
-        try:
-            connection = mail.get_connection()
-            emails = [self.email_accept_for_job_seeker]
-            if self.prescriber:
-                emails += [self.email_accept_for_prescriber]
-            connection.send_messages(emails)
-        except AnymailRequestsAPIError:
-            logger.error(
-                "Email couldn't be sent during `accept` transition for JobApplication `%s`",
-                self.id,
-            )
-            raise xwf_models.AbortTransition()
+        # Mark other related job applications as obsolete.
+        for job_application in self.job_seeker.job_applications.exclude(
+            pk=self.pk
+        ).pendind():
+            job_application.render_obsolete(*args, **kwargs)
 
     @xwf_models.transition()
-    def reject(self, *args, **kwargs):
-        self.answer = kwargs["answer"]
-        try:
-            connection = mail.get_connection()
-            emails = [self.email_reject_for_job_seeker]
-            if self.prescriber:
-                emails += [self.email_reject_for_prescriber]
-            connection.send_messages(emails)
-        except AnymailRequestsAPIError:
-            logger.error(
-                "Email couldn't be sent during `reject` transition for JobApplication `%s`",
-                self.id,
-            )
-            raise xwf_models.AbortTransition()
+    def refuse(self, *args, **kwargs):
+        pass
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
-        # TODO.
         pass
 
     # Emails.
 
     def get_siae_recipents_email_list(self):
         return list(
-            self.siae.members.filter(is_active=True).values_list("email", flat=True)
+            self.to_siae.members.filter(is_active=True).values_list("email", flat=True)
         )
 
     def get_email_message(
@@ -254,54 +279,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/new_for_siae_subject.txt"
         body = "apply/email/new_for_siae_body.txt"
-        return self.get_email_message(to, context, subject, body)
-
-    @property
-    def email_process_for_job_seeker(self):
-        to = [self.job_seeker.email]
-        context = {"job_application": self}
-        subject = "apply/email/process_for_job_seeker_subject.txt"
-        body = "apply/email/process_for_job_seeker_body.txt"
-        return self.get_email_message(to, context, subject, body)
-
-    @property
-    def email_process_for_prescriber(self):
-        to = [self.prescriber.email]
-        context = {"job_application": self}
-        subject = "apply/email/process_for_prescriber_subject.txt"
-        body = "apply/email/process_for_prescriber_body.txt"
-        return self.get_email_message(to, context, subject, body)
-
-    @property
-    def email_accept_for_job_seeker(self):
-        to = [self.job_seeker.email]
-        context = {"job_application": self}
-        subject = "apply/email/accept_for_job_seeker_subject.txt"
-        body = "apply/email/accept_for_job_seeker_body.txt"
-        return self.get_email_message(to, context, subject, body)
-
-    @property
-    def email_accept_for_prescriber(self):
-        to = [self.prescriber.email]
-        context = {"job_application": self}
-        subject = "apply/email/accept_for_prescriber_subject.txt"
-        body = "apply/email/accept_for_prescriber_body.txt"
-        return self.get_email_message(to, context, subject, body)
-
-    @property
-    def email_reject_for_job_seeker(self):
-        to = [self.job_seeker.email]
-        context = {"job_application": self}
-        subject = "apply/email/reject_for_job_seeker_subject.txt"
-        body = "apply/email/reject_for_job_seeker_body.txt"
-        return self.get_email_message(to, context, subject, body)
-
-    @property
-    def email_reject_for_prescriber(self):
-        to = [self.prescriber.email]
-        context = {"job_application": self}
-        subject = "apply/email/reject_for_prescriber_subject.txt"
-        body = "apply/email/reject_for_prescriber_body.txt"
         return self.get_email_message(to, context, subject, body)
 
 
@@ -327,3 +304,8 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
 
     def __str__(self):
         return str(self.id)
+
+    @property
+    def pretty_to_state(self):
+        choices = dict(JobApplicationWorkflow.STATE_CHOICES)
+        return choices[self.to_state]

@@ -1,11 +1,13 @@
 <span class="badge
-    {% if job_application.state.is_pending_processing %}
+    {% if job_application.state.is_new %}
         badge-secondary
     {% elif job_application.state.is_processing %}
         badge-warning
+    {% elif job_application.state.is_postponed %}
+        badge-success
     {% elif job_application.state.is_accepted %}
         badge-success
-    {% elif job_application.state.is_rejected %}
+    {% elif job_application.state.is_refused %}
         badge-danger
     {% elif job_application.state.is_obsolete %}
         badge-dark

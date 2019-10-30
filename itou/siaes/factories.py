@@ -5,6 +5,8 @@ from django.conf import settings
 import factory
 import factory.fuzzy
 
+from itou.jobs.factories import create_test_romes_and_appellations
+from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.users.factories import SiaeStaffFactory
 
@@ -47,3 +49,24 @@ class SiaeWithMembershipFactory(SiaeFactory):
     """
 
     membership = factory.RelatedFactory(SiaeMembershipFactory, "siae")
+
+
+class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
+    @factory.post_generation
+    def romes(self, create, extracted, **kwargs):
+        """
+        Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.
+        https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
+
+        Usage:
+            SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+        """
+        if not create:
+            # Simple build, do nothing.
+            return
+
+        romes = extracted or ("N1101", "N1105", "N1103", "N4105")
+        create_test_romes_and_appellations(romes)
+        # Pick 4 random results.
+        appellations = Appellation.objects.order_by("?")[:4]
+        self.jobs.add(*appellations)

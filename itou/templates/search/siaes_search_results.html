@@ -68,12 +68,11 @@
                         </ul>
                     {% endif %}
                 </div>
-                {% comment %}
                 <div class="card-footer">
-                    {% include "includes/icon.html" with icon="message-square" %}
-                    <a href="{% url 'apply:submit_for_job_seeker' siret=siae.siret %}">{% trans "Postuler" %}</a>
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siret=siae.siret %}">
+                        {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                    </a>
                 </div>
-                {% endcomment %}
             </div>
         {% endfor %}
 

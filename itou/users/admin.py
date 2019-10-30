@@ -32,6 +32,20 @@ class ItouUserAdmin(UserAdmin):
 
     list_filter = UserAdmin.list_filter + (KindFilter,)
 
+    list_display = (
+        "id",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_created_by_a_proxy",
+        "last_login",
+    )
+
+    list_display_links = ("id", "email")
+
+    raw_id_fields = ("created_by",)
+
     fieldsets = UserAdmin.fieldsets + (
         (
             _("Informations"),
@@ -42,10 +56,16 @@ class ItouUserAdmin(UserAdmin):
                     "is_job_seeker",
                     "is_prescriber",
                     "is_siae_staff",
+                    "created_by",
                 )
             },
         ),
     )
+
+    def is_created_by_a_proxy(self, obj):
+        return obj.created_by is not None
+
+    is_created_by_a_proxy.boolean = True
 
     def get_queryset(self, request):
         """

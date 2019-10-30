@@ -22,14 +22,15 @@ class JobsInline(admin.TabularInline):
 
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
-    list_display = ("id", "job_seeker", "prescriber", "siae", "created_at")
+    list_display = ("id", "job_seeker", "sender", "sender_kind", "created_at")
     raw_id_fields = (
         "job_seeker",
-        "siae",
-        "prescriber",
-        "prescriber_organization",
-        "jobs",
+        "sender",
+        "sender_siae",
+        "sender_prescriber_organization",
+        "to_siae",
     )
+    exclude = ("jobs",)
     list_filter = ("state",)
     readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)

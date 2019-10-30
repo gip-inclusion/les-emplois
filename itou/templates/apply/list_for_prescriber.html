@@ -28,20 +28,7 @@
 
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
-            {% if job_application.has_been_processed %}
-                <div class="card-footer">
-                    <a
-                        href="#"
-                        data-toggle="collapse"
-                        data-target="#answer{{ forloop.counter0 }}"
-                        aria-expanded="false"
-                        aria-controls="answer{{ forloop.counter0 }}"
-                    >{% trans "Réponse" %}</a>
-                    <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
-                        {{ job_application.answer|linebreaks }}
-                    </div>
-                </div>
-            {% endif %}
+            {% include "apply/includes/list_card_footer_refusal.html" with job_application=job_application %}
 
         </div>
 

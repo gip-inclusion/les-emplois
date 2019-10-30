@@ -44,3 +44,15 @@ class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory)
     """
 
     membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
+
+
+class AuthorizedPrescriberOrganizationWithMembershipFactory(
+    PrescriberOrganizationWithMembershipFactory
+):
+    """
+    Returns a PrescriberOrganization() object with a related PrescriberMembership() object.
+
+    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
+    """
+
+    is_authorized = True

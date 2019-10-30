@@ -1,0 +1,47 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Je ne veux pas l'embaucher" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% trans "Candidature de" %}
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
+    </h1>
+
+    <div class="alert alert-warning" role="alert">
+        {% trans "Confirmez votre choix." %}
+    </div>
+
+    <form method="post" action="">
+
+        {% csrf_token %}
+
+        {% bootstrap_form_errors form %}
+
+        {# TODO: Fix incorrect rendering of form with radio buttons #}
+        {# and remove hardcoded `form-group-required` CSS class. #}
+        {# https://github.com/zostera/django-bootstrap4/issues/126 #}
+        <div class="form-group form-group-required">
+            {% bootstrap_label "Motif du refus" %}
+            <ul class="list-unstyled">
+                {% for radio in form.refusal_reason %}
+                    <li>
+                        <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        {% bootstrap_field form.answer %}
+
+        {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn btn-danger">{% trans "Je ne veux pas l'embaucher" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}
