@@ -17,22 +17,13 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 
 ### Lancer le serveur de développement
 
-    $ docker-compose -f docker-compose-dev.yml up
-
-    # Ou :
-    $ export COMPOSE_FILE=docker-compose-dev.yml
-    $ docker-compose up
+    $ make run
 
 ### Peupler la base de données
 
-    make shell_on_django_container
-    django-admin import_cities
-    django-admin loaddata itou/fixtures/jobs.json
-    django-admin loaddata itou/fixtures/siaes.json
-    django-admin loaddata itou/fixtures/prescribers.json
-    django-admin loaddata itou/fixtures/test_users.json
+    $ make populate-db
 
-The last fixture will create various users that you can use with the password `password` (*sic*):
+The following users will be created with the password `password` (*sic*):
 
 - `admin@test.com`
 - `job@test.com`
@@ -42,8 +33,7 @@ The last fixture will create various users that you can use with the password `p
 
 ### Avant un commit
 
-    make black
-    make pylint
+    $ make check-code-quality  ## will run black and pylint
 
 ## Front-end
 
