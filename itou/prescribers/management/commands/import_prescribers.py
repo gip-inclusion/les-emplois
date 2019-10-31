@@ -139,7 +139,11 @@ class Command(BaseCommand):
                     prescriber_organization.department = department
 
                     geocoding_data = get_geocoding_data(
-                        f"{prescriber_organization.address_line_1}, {prescriber_organization.post_code} {prescriber_organization.city}"
+                        "{}, {} {}".format(
+                            prescriber_organization.address_line_1,
+                            prescriber_organization.post_code,
+                            prescriber_organization.city,
+                        )
                     )
                     prescriber_organization.coords = geocoding_data["coords"]
 
