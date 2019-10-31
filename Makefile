@@ -1,7 +1,7 @@
 # Global tasks.
 # =============================================================================
 
-.PHONY: run black clean cdsitepackages pylint
+.PHONY: run black clean cdsitepackages pylint check_code_quality
 
 # Run a local server.
 run: 
@@ -19,12 +19,12 @@ black:
 pylint:
 	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou';
 
-check-code-quality: black pylint
+check_code_quality: black pylint
 
 # Django.
 # =============================================================================
 
-.PHONY: django_admin populate-db
+.PHONY: django_admin populate_db
 
 # make django_admin
 # make django_admin COMMAND=dbshell
@@ -33,12 +33,14 @@ check-code-quality: black pylint
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 
-populate-db:
+populate_db:
 	make django_admin COMMAND="import_cities"
 	make django_admin COMMAND="loaddata itou/fixtures/jobs.json"
 	make django_admin COMMAND="loaddata itou/fixtures/siaes.json"
 	make django_admin COMMAND="loaddata itou/fixtures/prescribers.json"
 	make django_admin COMMAND="loaddata itou/fixtures/test_users.json"
+	make django_admin COMMAND="loaddata itou/fixtures/prescriber_memberships.json"
+	make django_admin COMMAND="loaddata itou/fixtures/siae_memberships.json"
 
 # Tests.
 # =============================================================================

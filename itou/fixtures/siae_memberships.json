@@ -1,0 +1,12 @@
+[
+   {
+      "model" : "siaes.siaemembership",
+      "pk" : 1,
+      "fields" : {
+         "user" : 4,
+         "joined_at" : "2019-10-31T14:56:50Z",
+         "is_siae_admin" : true,
+         "siae" : 2653
+      }
+   }
+]
