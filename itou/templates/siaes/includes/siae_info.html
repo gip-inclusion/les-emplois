@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load format_filters %}
+
+    {% if siae.description %}
+        <hr>
+        <p>{{ siae.description|linebreaks }}</p>
+    {% endif %}
+
+    <hr>
+
+    <div class="alert alert-info" role="alert">
+        {% blocktrans %}
+        Pour vérifier votre éligibilité à l'insertion par l'activité économique, merci de vous adresser à votre <a href="https://travail-emploi.gouv.fr/demarches-ressources-documentaires/annuaire" target="_blank" rel="noopener">mission locale, CAP emploi ou agence Pole emploi</a> la plus proche.
+        {% endblocktrans %}
+    </div>
+
+    <hr>
+
+    {% if siae.email %}
+        <p>
+            {% trans "E-mail" as email_label %}
+            {% include "includes/icon.html" with icon="mail" title=email_label %}
+            <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
+        </p>
+    {% endif %}
+
+    {% if siae.phone %}
+        <p>
+            {% trans "Téléphone" as phone_label %}
+            {% include "includes/icon.html" with icon="phone" title=phone_label %}
+            <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
+        </p>
+    {% endif %}
+
+    {% if siae.website %}
+        <p>
+            {% trans "Site Internet" as website_label %}
+            {% include "includes/icon.html" with icon="external-link" title=website_label %}
+            <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
+        </p>
+    {% endif %}

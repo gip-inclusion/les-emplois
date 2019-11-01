@@ -22,6 +22,26 @@ class CardViewTest(TestCase):
         self.assertIn(siae.email, response_content)
 
 
+class JobDescriptionCardViewTest(TestCase):
+    def test_job_description_card(self):
+        siae = SiaeWithMembershipFactory()
+        job_description = siae.job_description_through.first()
+        # FIXME test breaks here because there is no job_description in db
+        # WIP WIP WIP
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse(
+            "siaes_views:job_description_card",
+            kwargs={"job_description": job_description.pk},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_content = str(response.content)
+        self.assertIn(siae.display_name, response_content)
+        self.assertIn(siae.phone, response_content)
+        self.assertIn(siae.email, response_content)
+
+
 class ConfigureJobsViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):

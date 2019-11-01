@@ -1,0 +1,53 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load format_filters %}
+
+{% block title %}{{ job.display_name }}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {{ job.display_name }}
+    </h1>
+
+    {% if job.description %}
+        <div class="alert alert-secondary pb-0">{{ job.description|linebreaks }}</div>
+    {% endif %}
+
+    <hr>
+
+    <p>
+        <b>{{ siae.kind }}</b>
+        -
+        <i>{{ siae.get_kind_display }}</i>
+    </p>
+
+    <hr>
+
+    <p>
+        <b>{{ siae.display_name }}</b>
+        {# Display non-user-edited name too. #}
+        {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
+    </p>
+    
+    <p>    
+        {{ siae.address_line_1 }},
+        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+        {{ siae.post_code }} {{ siae.city }}
+    </p>
+
+    {% include "siaes/includes/siae_info.html" %}
+
+    <p class="mb-2">
+        {% include "includes/icon.html" with icon="briefcase" %}
+        <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans "Voir tous les métiers proposés par cette SIAE" %}</a>
+    </p>
+
+    {% if back_url %}
+        <hr>
+        <p>
+            <a href="{{ back_url }}">{% trans "Retour" %}</a>
+        </p>
+    {% endif %}
+
+{% endblock %}
