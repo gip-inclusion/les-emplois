@@ -59,6 +59,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_GEIQ = "GEIQ"  # Seems unused in our SIAE data.
     KIND_RQ = "RQ"  # Seems unused in our SIAE data.
 
+    # get_kind_display magically extracts data from here
     KIND_CHOICES = (
         (
             KIND_EI,
