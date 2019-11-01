@@ -1,0 +1,12 @@
+[
+   {
+      "model" : "prescribers.prescribermembership",
+      "fields" : {
+         "is_admin" : true,
+         "user" : 3,
+         "joined_at" : "2019-10-31T15:01:06Z",
+         "organization" : 41
+      },
+      "pk" : 1
+   }
+]
