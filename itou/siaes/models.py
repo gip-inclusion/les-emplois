@@ -179,12 +179,13 @@ class SiaeJobDescription(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    @property
     def display_name(self):
         if self.custom_name:
             return self.custom_name
         return self.appellation.name
 
-    def get_card_url(self):
+    def get_absolute_url(self):
         return reverse(
             "siaes_views:job_description_card", kwargs={"job_description_id": self.pk}
         )
