@@ -120,6 +120,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             return self.brand
         return self.name.title()
 
+    @property
+    def has_members(self):
+        return self.members.exists()
+
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siret": self.siret})
 

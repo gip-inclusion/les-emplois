@@ -68,11 +68,13 @@
                         </ul>
                     {% endif %}
                 </div>
-                <div class="card-footer">
-                    <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siret=siae.siret %}">
-                        {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                    </a>
-                </div>
+                {% if siae.has_members %}
+                    <div class="card-footer">
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siret=siae.siret %}">
+                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         {% endfor %}
 

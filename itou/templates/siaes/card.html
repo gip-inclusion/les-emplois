@@ -86,13 +86,14 @@
         </ul>
     {% endif %}
 
-    <hr>
-
-    <p>
-        <a class="btn btn-outline-primary" href="{% url 'apply:start' siret=siae.siret %}">
-            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-        </a>
-    </p>
+    {% if siae.has_members %}
+        <hr>
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siret=siae.siret %}">
+                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+            </a>
+        </p>
+    {% endif %}
 
     {% if back_url %}
         <hr>
