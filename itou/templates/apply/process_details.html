@@ -175,7 +175,9 @@
                 <li>
                     {% blocktrans with pretty_to_state=log.pretty_to_state %}Passé en "<b>{{ pretty_to_state }}</b>"{% endblocktrans %}
                     <ul>
-                        <li>{% trans "Par" %} {{ log.user.get_full_name }}</li>
+                        {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
+                            <li>{% trans "Par" %} {{ log.user.get_full_name }}</li>
+                        {% endif %}
                         <li>{% trans "Le" %} {{ log.timestamp|date:"d F Y à H:i" }}</li>
                     </ul>
                 </li>
