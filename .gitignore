@@ -18,6 +18,7 @@ itou/static_collected/
 
 # Debian
 .bash_history
+.python_history
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

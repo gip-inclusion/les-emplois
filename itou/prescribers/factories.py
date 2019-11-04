@@ -50,7 +50,7 @@ class AuthorizedPrescriberOrganizationWithMembershipFactory(
     PrescriberOrganizationWithMembershipFactory
 ):
     """
-    Returns a PrescriberOrganization() object with a related PrescriberMembership() object.
+    Returns a PrescriberOrganization() object with a related authorized PrescriberMembership() object.
 
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """

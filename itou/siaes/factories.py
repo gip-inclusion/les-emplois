@@ -52,15 +52,15 @@ class SiaeWithMembershipFactory(SiaeFactory):
 
 
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
+    """
+    Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.
+    https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
+
+    Usage:
+        SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+    """
     @factory.post_generation
     def romes(self, create, extracted, **kwargs):
-        """
-        Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.
-        https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
-
-        Usage:
-            SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
-        """
         if not create:
             # Simple build, do nothing.
             return
