@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404, render
 
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 
@@ -36,13 +37,26 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     List of applications for a prescriber.
     """
 
-    job_applications = request.user.job_applications_sent.select_related(
+    prescriber_organization = None
+    pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+    if pk:
+        queryset = PrescriberOrganization.objects.member_required(request.user)
+        prescriber_organization = get_object_or_404(queryset, pk=pk)
+
+    if prescriber_organization:
+        # Show all applications organization-wide.
+        job_applications = prescriber_organization.jobapplication_set.all()
+    else:
+        job_applications = request.user.job_applications_sent.all()
+
+    job_applications = job_applications.select_related(
         "job_seeker",
         "sender",
         "sender_siae",
         "sender_prescriber_organization",
         "to_siae",
     ).prefetch_related("jobs")
+
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
     )
