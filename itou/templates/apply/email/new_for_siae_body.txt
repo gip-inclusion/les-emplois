@@ -8,10 +8,10 @@
 {% trans "*Candidat* :" %}
 
 - Nom : {{ job_application.job_seeker.last_name }}
-- Prénom : {{ job_application.job_seeker.first_name }}
-{% if job_application.job_seeker.email %}- Email : {{ job_application.job_seeker.email }}{% endif %}
-{% if job_application.job_seeker.phone %}- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}
-{% if job_application.job_seeker.birthdate %}- Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}{% endif %}
+- Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
+- Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
+- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.birthdate %}
+- Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}{% endif %}
 
 {% if job_application.message %}
 
@@ -40,10 +40,10 @@
 
 {% trans "*Prescripteur* :" %}
 
-- {{ job_application.sender.get_full_name }}
-{% if job_application.sender_prescriber_organization %}- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
-- {{ job_application.sender.email }}
-{% if job_application.sender.phone %}- {{ job_application.sender.phone|format_phone }}{% endif %}
+- {{ job_application.sender.get_full_name }}{% if job_application.sender_prescriber_organization %}
+- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
+- {{ job_application.sender.email }}{% if job_application.sender.phone %}
+- {{ job_application.sender.phone|format_phone }}{% endif %}
 
 {% endif %}
 

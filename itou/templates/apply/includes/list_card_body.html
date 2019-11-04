@@ -5,7 +5,7 @@
         <div class="card-body">
             <h6 class="card-subtitle text-muted">{% trans "Métier(s) recherché(s) :" %}</h6>
             {% if not job_application.jobs.exists %}
-                <p class="card-text"><i>{% trans "Non spécifié" %}</i></p>
+                <p class="card-text">{% trans "Candidature spontanée" %}</p>
             {% else %}
                 <ul class="card-text">
                     {% for job in job_application.jobs.all %}
@@ -28,7 +28,13 @@
                     {{ job_application.sender.get_full_name }}
                 {% endif %}
                 {% if job_application.sender_prescriber_organization %}
-                    - <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+                    <br>
+                    <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+                    {% if job_application.sender_prescriber_organization.is_authorized %}
+                        <br>
+                        <span class="badge badge-warning">{% trans "Prescripteur habilité par le Préfet" %}</span>
+                    {% endif %}
+
                 {% endif %}
             </p>
         </div>
