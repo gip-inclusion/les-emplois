@@ -158,6 +158,8 @@ def step_application(
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae)
 
+    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker"])
+
     if request.method == "POST" and form.is_valid():
 
         sender_prescriber_organization = session_data.get(
@@ -169,9 +171,7 @@ def step_application(
             )
 
         job_application = form.save(commit=False)
-        job_application.job_seeker = get_user_model().objects.get(
-            pk=session_data["job_seeker"]
-        )
+        job_application.job_seeker = job_seeker
         job_application.sender = get_user_model().objects.get(pk=session_data["sender"])
         job_application.sender_kind = session_data["sender_kind"]
         job_application.sender_prescriber_organization = sender_prescriber_organization
@@ -193,5 +193,5 @@ def step_application(
         #     next_url = reverse("apply:list_for_siae")
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "form": form}
+    context = {"siae": siae, "form": form, "job_seeker": job_seeker}
     return render(request, template_name, context)
