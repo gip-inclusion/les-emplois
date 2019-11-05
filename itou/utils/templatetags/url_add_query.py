@@ -18,6 +18,7 @@ def url_add_query(url, **kwargs):
     otherwise it will be appended.
 
     Usage:
+        {% load url_add_query %}
         {% url_add_query request.get_full_path page=2 %}
     """
     parsed = urlsplit(url)

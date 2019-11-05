@@ -13,6 +13,11 @@ register = template.Library()
 @register.filter
 @stringfilter
 def format_phone(phone_number):
+    """
+    Usage:
+        {% load format_filters %}
+        {{ user.phone|format_phone }}
+    """
     if not phone_number:
         return ""
     return " ".join(wrap(phone_number, 2))

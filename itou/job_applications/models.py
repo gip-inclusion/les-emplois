@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
 from itou.utils.emails import get_email_text_template
+from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
 logger = logging.getLogger(__name__)
@@ -95,9 +96,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         - https://github.com/rbarrois/xworkflows
     """
 
-    SENDER_KIND_JOB_SEEKER = "job_seeker"
-    SENDER_KIND_PRESCRIBER = "prescriber"
-    SENDER_KIND_SIAE_STAFF = "siae_staff"
+    SENDER_KIND_JOB_SEEKER = KIND_JOB_SEEKER
+    SENDER_KIND_PRESCRIBER = KIND_PRESCRIBER
+    SENDER_KIND_SIAE_STAFF = KIND_SIAE_STAFF
 
     SENDER_KIND_CHOICES = (
         (SENDER_KIND_JOB_SEEKER, _("Demandeur d'emploi")),

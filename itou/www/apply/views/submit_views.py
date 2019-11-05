@@ -9,9 +9,9 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
-from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import (
     CheckJobSeekerForm,
     CreateJobSeekerForm,
@@ -56,24 +56,16 @@ def step_sender(request, siret):
     """
     Determine the sender.
     """
-
-    sender = request.user.pk
-    sender_kind = JobApplication.SENDER_KIND_JOB_SEEKER
-    prescriber_organization = None
-
-    if request.user.is_prescriber:
-        sender_kind = JobApplication.SENDER_KIND_PRESCRIBER
-        pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
-        if pk:
-            queryset = PrescriberOrganization.objects.member_required(request.user)
-            prescriber_organization = get_object_or_404(queryset, pk=pk)
+    user_info = get_user_info(request)
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    session_data["sender"] = sender
-    session_data["sender_kind"] = sender_kind
-    session_data["sender_prescriber_organization"] = (
-        prescriber_organization.pk if prescriber_organization else None
-    )
+    session_data["sender"] = user_info.user.pk
+    session_data["sender_kind"] = user_info.kind
+    session_data["sender_prescriber_organization"] = None
+    if user_info.prescriber_organization:
+        session_data[
+            "sender_prescriber_organization"
+        ] = user_info.prescriber_organization.pk
 
     next_url = reverse("apply:step_job_seeker", kwargs={"siret": siret})
     return HttpResponseRedirect(next_url)

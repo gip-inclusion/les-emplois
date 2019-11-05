@@ -1,16 +1,22 @@
 from unittest import mock
 
+from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.template import Context, Template
-from django.test import TestCase
-from django.test.client import RequestFactory
+from django.test import RequestFactory, TestCase
 
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
+from itou.utils.perms.user import get_user_info
+from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.templatetags import format_filters
 from itou.utils.urls import get_safe_url
 from itou.utils.validators import validate_naf, validate_siret
@@ -164,3 +170,105 @@ class UtilsEmailsTestCase(TestCase):
         url = get_safe_url(request, "next", fallback_url="/fallback")
         expected = "/fallback"
         self.assertEqual(url, expected)
+
+
+class PermsUserTest(TestCase):
+    def test_get_user_info_for_siae_staff(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        # Simulate ItouCurrentOrganizationMiddleware.
+        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        request.session.save()
+
+        user_info = get_user_info(request)
+        self.assertEqual(user_info.user, user)
+        self.assertEqual(user_info.kind, KIND_SIAE_STAFF)
+        self.assertEqual(user_info.prescriber_organization, None)
+        self.assertEqual(user_info.is_authorized_prescriber, False)
+        self.assertEqual(user_info.siae, siae)
+
+    def test_get_user_info_for_prescriber(self):
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory()
+        user = prescriber_organization.members.first()
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        # Simulate ItouCurrentOrganizationMiddleware.
+        request.session[
+            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+        ] = prescriber_organization.pk
+        request.session.save()
+
+        user_info = get_user_info(request)
+        self.assertEqual(user_info.user, user)
+        self.assertEqual(user_info.kind, KIND_PRESCRIBER)
+        self.assertEqual(user_info.prescriber_organization, prescriber_organization)
+        self.assertEqual(user_info.is_authorized_prescriber, False)
+        self.assertEqual(user_info.siae, None)
+
+    def test_get_user_info_for_authorized_prescriber(self):
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
+            is_authorized=True
+        )
+        user = prescriber_organization.members.first()
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        # Simulate ItouCurrentOrganizationMiddleware.
+        request.session[
+            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+        ] = prescriber_organization.pk
+        request.session.save()
+
+        user_info = get_user_info(request)
+        self.assertEqual(user_info.user, user)
+        self.assertEqual(user_info.kind, KIND_PRESCRIBER)
+        self.assertEqual(user_info.prescriber_organization, prescriber_organization)
+        self.assertEqual(user_info.is_authorized_prescriber, True)
+        self.assertEqual(user_info.siae, None)
+
+    def test_get_user_info_for_prescriber_without_organisation(self):
+        user = PrescriberFactory()
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session.save()
+
+        user_info = get_user_info(request)
+        self.assertEqual(user_info.user, user)
+        self.assertEqual(user_info.kind, KIND_PRESCRIBER)
+        self.assertEqual(user_info.prescriber_organization, None)
+        self.assertEqual(user_info.is_authorized_prescriber, False)
+        self.assertEqual(user_info.siae, None)
+
+    def test_get_user_info_for_job_seeker(self):
+        user = JobSeekerFactory()
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session.save()
+
+        user_info = get_user_info(request)
+        self.assertEqual(user_info.user, user)
+        self.assertEqual(user_info.kind, KIND_JOB_SEEKER)
+        self.assertEqual(user_info.prescriber_organization, None)
+        self.assertEqual(user_info.is_authorized_prescriber, False)
+        self.assertEqual(user_info.siae, None)

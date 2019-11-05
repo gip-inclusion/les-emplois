@@ -48,7 +48,12 @@ class SiaeWithMembershipFactory(SiaeFactory):
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
-    membership = factory.RelatedFactory(SiaeMembershipFactory, "siae")
+    @factory.post_generation
+    def membership(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        SiaeMembershipFactory(siae=self)
 
 
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
@@ -59,6 +64,7 @@ class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
     Usage:
         SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
     """
+
     @factory.post_generation
     def romes(self, create, extracted, **kwargs):
         if not create:
