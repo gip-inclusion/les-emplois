@@ -47,6 +47,22 @@
         {{ job_application.message|linebreaks }}
     </div>
 
+    {# Eligibility ------------------------------------------------------------------------- #}
+
+    {% with job_application.job_seeker.get_eligibility_diagnosis as eligibility_diagnosis %}
+
+        {% if eligibility_diagnosis %}
+
+            <hr>
+
+            <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
+
+            {{ eligibility_diagnosis.data_as_html }}
+
+        {% endif %}
+
+    {% endwith %}
+
     {# Sender info ------------------------------------------------------------------------- #}
 
     <hr>

@@ -1,9 +1,11 @@
+import json
 import logging
 
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -66,6 +68,7 @@ class EligibilityDiagnosis(models.Model):
         verbose_name=_("Version du formulaire"), max_length=10
     )
     form_cleaned_data = JSONField(verbose_name=_("Données du formulaire"))
+
     # Stores the diagnosis as a human readable dict structure.
     data = JSONField(verbose_name=_("Résultat du formulaire"))
 
@@ -87,3 +90,27 @@ class EligibilityDiagnosis(models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def data_as_dict(self):
+        if self.data:
+            return json.loads(self.data)
+        return {}
+
+    @property
+    def data_as_html(self):
+        html = "<ul>"
+        for category, choices in self.data_as_dict.items():
+            html += f"<li><b>{category}</b>"
+            for item in choices:
+                html += "<ul>"
+                html += f"<li>{item[0]}"
+                html += "<ul>"
+                for sub_item in item[1]:
+                    html += f"<li>{sub_item}</li>"
+                html += "</ul>"
+                html += "</li>"
+                html += "</ul>"
+            html += f"</li>"
+        html += "</ul>"
+        return mark_safe(html)

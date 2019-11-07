@@ -3,6 +3,7 @@ import json
 from django.forms import ValidationError
 from django.test import TestCase
 
+from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
@@ -13,7 +14,40 @@ from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.perms.user import UserInfo
 
 
-class FormCleanSiaeTest(TestCase):
+class ModelTest(TestCase):
+    def test_data_as_html(self):
+
+        data = json.dumps(
+            {
+                "Freins périphériques": [
+                    [
+                        "Faire face à des difficultés administratives ou juridiques",
+                        ["Prendre en compte une problématique judiciaire"],
+                    ]
+                ],
+                "Critères administratifs": [
+                    [
+                        "Critères administratifs de niveau 2",
+                        ["Senior (+50 ans)", "Primo arrivant"],
+                    ]
+                ],
+            }
+        )
+        diagnosis = EligibilityDiagnosisFactory(data=data)
+
+        expected_markup = (
+            "<ul><li><b>Freins périphériques</b><ul>"
+            "<li>Faire face à des difficultés administratives ou juridiques<ul>"
+            "<li>Prendre en compte une problématique judiciaire</li></ul>"
+            "</li></ul></li><li><b>Critères administratifs</b><ul>"
+            "<li>Critères administratifs de niveau 2<ul><li>Senior (+50 ans)</li>"
+            "<li>Primo arrivant</li></ul></li></ul></li></ul>"
+        )
+
+        self.assertEqual(diagnosis.data_as_html, expected_markup)
+
+
+class FormCleanForSiaeTest(TestCase):
     """
     Test the clean algorithm for an SIAE staff member.
     """
@@ -111,7 +145,7 @@ class FormCleanSiaeTest(TestCase):
         self.assertTrue(form.is_valid())
 
 
-class FormCleanAuthorizedPrescriberTest(TestCase):
+class FormCleanForAuthorizedPrescriberTest(TestCase):
     """
     Test the clean algorithm for an authorized prescriber.
     """
@@ -170,7 +204,8 @@ class FormGetHumanReadableDataTest(TestCase):
 
         data = {
             "faire_face_a_des_difficultes_administratives_ou_juridiques": [
-                "prendre_en_compte_une_problematique_judiciaire"
+                "connaitre_les_voies_de_recours_face_a_une_discrimination",
+                "prendre_en_compte_une_problematique_judiciaire",
             ],
             "criteres_administratifs_de_niveau_2": [
                 "senior_50_ans",
@@ -183,20 +218,19 @@ class FormGetHumanReadableDataTest(TestCase):
 
         expected_data = {
             "Freins périphériques": [
-                {
-                    "Faire face à des difficultés administratives ou juridiques": [
-                        "Prendre en compte une problématique judiciaire"
-                    ]
-                }
+                [
+                    "Faire face à des difficultés administratives ou juridiques",
+                    [
+                        "Connaitre les voies de recours face à une discrimination",
+                        "Prendre en compte une problématique judiciaire",
+                    ],
+                ]
             ],
             "Critères administratifs": [
-                {
-                    "Critères administratifs de niveau 2": [
-                        "Senior (+50 ans)",
-                        "Travailleur handicapé",
-                        "Primo arrivant",
-                    ]
-                }
+                [
+                    "Critères administratifs de niveau 2",
+                    ["Senior (+50 ans)", "Travailleur handicapé", "Primo arrivant"],
+                ]
             ],
         }
         self.assertEqual(form.get_human_readable_data(), expected_data)

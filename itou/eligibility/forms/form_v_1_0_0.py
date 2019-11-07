@@ -397,15 +397,11 @@ class EligibilityForm(forms.Form):
     )
 
     def __init__(self, user_info, job_seeker, *args, **kwargs):
-
         self.user_info = user_info
         self.job_seeker = job_seeker
-
         super().__init__(*args, **kwargs)
 
         for category in self.CHOICES.values():
-            # TODO: find an elegant way to display the category label in template.
-            # category_label = category["label"]
             sub_categories = category["items"]
             for k, v in sub_categories.items():
                 self.fields[k] = forms.MultipleChoiceField(
@@ -419,8 +415,9 @@ class EligibilityForm(forms.Form):
     @lru_cache(maxsize=None)
     def extra_info(self):
         """
-        Return self.CHOICES as a flat dict where each key is an input value
-        to be used in the HTML template, e.g.:
+        Return self.CHOICES as a flat dict where each key is an input value.
+        It's purpose is to be used in the HTML template.
+        E.g.:
             {
                 'deld_12_mois': {
                     'value': 'deld_12_mois',
@@ -501,55 +498,43 @@ class EligibilityForm(forms.Form):
         Return the checked items as a human readable structure, e.g.:
             {
                 "Freins périphériques": [
-                    {
-                        "Faire face à des difficultés administratives ou juridiques": [
+                    [
+                        "Faire face à des difficultés administratives ou juridiques",
+                        [
                             "Connaitre les voies de recours face à une discrimination",
                             "Prendre en compte une problématique judiciaire",
                         ],
-                    },
+                    ]
                 ],
                 "Critères administratifs": [
-                    {
-                        "Critères administratifs de niveau 2": [
-                            "Travailleur handicapé",
-                            "Primo arrivant",
-                            "Résident QPV",
-                        ],
-                    },
+                    [
+                        "Critères administratifs de niveau 2",
+                        ["Senior (+50 ans)", "Travailleur handicapé", "Primo arrivant"],
+                    ]
                 ],
             }
         """
         data = {}
-
-        peripheral_barrier_label = str(self.CHOICES["peripheral_barriers"]["label"])
-        administrative_criteria_label = str(
-            self.CHOICES["administrative_criteria"]["label"]
-        )
 
         for key, choices in self.cleaned_data.items():
 
             if choices:
 
                 field = self.fields[key]
-                label = field.label
 
-                sub_data = {}
-                sub_data[label] = []
-
+                choices_labels = []
                 for choice in choices:
                     choice_label = dict(field.choices)[choice]
-                    sub_data[label].append(choice_label)
+                    choices_labels.append(choice_label)
 
-                is_peripheral_barrier = (
-                    key in self.CHOICES["peripheral_barriers"]["items"]
-                )
+                labels = [field.label, choices_labels]
+
                 category_label = (
-                    peripheral_barrier_label
-                    if is_peripheral_barrier
-                    else administrative_criteria_label
+                    self.CHOICES["peripheral_barriers"]["label"]
+                    if key in self.CHOICES["peripheral_barriers"]["items"]
+                    else self.CHOICES["administrative_criteria"]["label"]
                 )
-
-                data.setdefault(category_label, []).append(sub_data)
+                data.setdefault(category_label, []).append(labels)
 
         return data
 

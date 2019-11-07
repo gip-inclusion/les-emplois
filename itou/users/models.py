@@ -49,7 +49,12 @@ class User(AbstractUser):
 
     @property
     def has_eligibility_diagnosis(self):
-        return self.eligibility_diagnoses.exists()
+        return self.is_job_seeker and self.eligibility_diagnoses.exists()
+
+    def get_eligibility_diagnosis(self):
+        if not self.is_job_seeker:
+            return None
+        return self.eligibility_diagnoses.latest("-created_at")
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):
