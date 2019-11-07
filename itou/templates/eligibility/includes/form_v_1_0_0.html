@@ -5,6 +5,8 @@
 
 {% for field in form %}
 
+    {# TODO: find an elegant way to display the category titles in template. #}
+
     {% if field.name == "faire_face_a_des_difficultes_administratives_ou_juridiques" %}
         <hr>
         <h2><span class="badge badge-secondary">{% trans "Freins périphériques" %}</span></h2>

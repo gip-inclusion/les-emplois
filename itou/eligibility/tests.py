@@ -3,7 +3,7 @@ import json
 from django.forms import ValidationError
 from django.test import TestCase
 
-from itou.eligibility_requirements.forms.form_v_1_0_0 import EligibilityRequirementsForm
+from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
 )
@@ -39,7 +39,7 @@ class FormCleanSiaeTest(TestCase):
                 "primo_arrivant",
             ]
         }
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         form.is_valid()
@@ -53,7 +53,7 @@ class FormCleanSiaeTest(TestCase):
                 "prendre_en_compte_une_problematique_judiciaire",
             ]
         }
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         form.is_valid()
@@ -73,7 +73,7 @@ class FormCleanSiaeTest(TestCase):
                 "primo_arrivant",
             ],
         }
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         form.is_valid()
@@ -89,7 +89,7 @@ class FormCleanSiaeTest(TestCase):
             ],
             "criteres_administratifs_de_niveau_1": ["beneficiaire_du_rsa"],
         }
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         self.assertTrue(form.is_valid())
@@ -105,7 +105,7 @@ class FormCleanSiaeTest(TestCase):
                 "primo_arrivant",
             ],
         }
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         self.assertTrue(form.is_valid())
@@ -134,7 +134,7 @@ class FormCleanAuthorizedPrescriberTest(TestCase):
 
     def test_clean_authorized_prescriber_without_peripheral_barriers(self):
         data = {}
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         form.is_valid()
@@ -148,7 +148,7 @@ class FormCleanAuthorizedPrescriberTest(TestCase):
                 "prendre_en_compte_une_problematique_judiciaire",
             ]
         }
-        form = EligibilityRequirementsForm(
+        form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         self.assertTrue(form.is_valid())
@@ -178,9 +178,7 @@ class FormGetHumanReadableDataTest(TestCase):
                 "primo_arrivant",
             ],
         }
-        form = EligibilityRequirementsForm(
-            user_info=user_info, job_seeker=job_seeker, data=data
-        )
+        form = EligibilityForm(user_info=user_info, job_seeker=job_seeker, data=data)
         self.assertTrue(form.is_valid())
 
         expected_data = {
@@ -217,7 +215,7 @@ class FormExtraInfoTest(TestCase):
                 "primo_arrivant",
             ],
         }
-        form = EligibilityRequirementsForm(user_info=None, job_seeker=None, data=data)
+        form = EligibilityForm(user_info=None, job_seeker=None, data=data)
 
         expected_data = {
             "value": "resident_zrr",
@@ -230,7 +228,7 @@ class FormExtraInfoTest(TestCase):
 
 
 class FormSaveTest(TestCase):
-    def test_save(self):
+    def test_save_diagnosis(self):
 
         job_seeker = JobSeekerFactory()
         siae = SiaeWithMembershipFactory()
@@ -253,22 +251,15 @@ class FormSaveTest(TestCase):
                 "primo_arrivant",
             ],
         }
-        form = EligibilityRequirementsForm(
-            user_info=user_info, job_seeker=job_seeker, data=data
-        )
+        form = EligibilityForm(user_info=user_info, job_seeker=job_seeker, data=data)
         self.assertTrue(form.is_valid())
 
-        eligibility_requirements = form.save()
-        self.assertEqual(eligibility_requirements.job_seeker, job_seeker)
-        self.assertEqual(eligibility_requirements.author, user)
-        self.assertEqual(eligibility_requirements.author_kind, KIND_SIAE_STAFF)
-        self.assertEqual(eligibility_requirements.author_siae, siae)
-        self.assertEqual(eligibility_requirements.author_prescriber_organization, None)
-        self.assertEqual(eligibility_requirements.form_version, form.VERSION)
-        self.assertEqual(
-            eligibility_requirements.form_cleaned_data, json.dumps(form.cleaned_data)
-        )
-        self.assertEqual(
-            eligibility_requirements.form_human_readable_data,
-            json.dumps(form.get_human_readable_data()),
-        )
+        eligibility = form.save_diagnosis()
+        self.assertEqual(eligibility.job_seeker, job_seeker)
+        self.assertEqual(eligibility.author, user)
+        self.assertEqual(eligibility.author_kind, KIND_SIAE_STAFF)
+        self.assertEqual(eligibility.author_siae, siae)
+        self.assertEqual(eligibility.author_prescriber_organization, None)
+        self.assertEqual(eligibility.form_version, form.VERSION)
+        self.assertEqual(eligibility.form_cleaned_data, json.dumps(form.cleaned_data))
+        self.assertEqual(eligibility.data, json.dumps(form.get_human_readable_data()))

@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
-from itou.eligibility_requirements.forms.form_v_1_0_0 import EligibilityRequirementsForm
+from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
@@ -83,9 +83,7 @@ def step_job_seeker(
     """
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    next_url = reverse(
-        "apply:step_eligibility_requirements", kwargs={"siae_pk": siae_pk}
-    )
+    next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae_pk})
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
@@ -135,9 +133,7 @@ def step_create_job_seeker(
     if request.method == "POST" and form.is_valid():
         job_seeker = form.save()
         session_data["job_seeker_pk"] = job_seeker.pk
-        next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
-        )
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form}
@@ -146,17 +142,17 @@ def step_create_job_seeker(
 
 @login_required
 @valid_session_required
-def step_eligibility_requirements(
-    request, siae_pk, template_name="apply/submit_step_eligibility_requirements.html"
+def step_eligibility(
+    request, siae_pk, template_name="apply/submit_step_eligibility.html"
 ):
     """
-    Check eligibility requirements.
+    Check eligibility.
     """
 
     user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
-    # This step is currently only required for an authorized prescriber.
+    # This step is only required for an authorized prescriber.
     if not user_info.is_authorized_prescriber:
         return HttpResponseRedirect(next_url)
 
@@ -164,16 +160,16 @@ def step_eligibility_requirements(
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 
-    # This step is currently only required if the job seeker hasn't already
-    # an existing entry in EligibilityRequirements.
-    if job_seeker.eligibility_requirements.exists():
+    # This step is only required if the job seeker hasn't already
+    # an eligibility diagnosis.
+    if job_seeker.has_eligibility_diagnosis:
         return HttpResponseRedirect(next_url)
 
-    form = EligibilityRequirementsForm(
+    form = EligibilityForm(
         user_info=user_info, job_seeker=job_seeker, data=request.POST or None
     )
     if request.method == "POST" and form.is_valid():
-        form.save()  # Create an entry in EligibilityRequirements.
+        form.save_diagnosis()
         messages.success(request, _("Critères d'éligibilité enregistrés !"))
         return HttpResponseRedirect(next_url)
 

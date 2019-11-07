@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
-from itou.eligibility_requirements.forms.form_v_1_0_0 import EligibilityRequirementsForm
+from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
 from itou.job_applications.models import JobApplication
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
@@ -149,13 +149,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
 
 @login_required
-def eligibility_requirements(
-    request,
-    job_application_id,
-    template_name="apply/process_eligibility_requirements.html",
+def eligibility(
+    request, job_application_id, template_name="apply/process_eligibility.html"
 ):
     """
-    Check eligibility requirements.
+    Check eligibility.
     """
 
     queryset = JobApplication.objects.siae_member_required(request.user)
@@ -164,15 +162,13 @@ def eligibility_requirements(
     )
 
     user_info = get_user_info(request)
-    form = EligibilityRequirementsForm(
+    form = EligibilityForm(
         user_info=user_info,
         job_seeker=job_application.job_seeker,
         data=request.POST or None,
     )
     if request.method == "POST" and form.is_valid():
-
-        form.save()  # Create an entry in EligibilityRequirements.
-
+        form.save_diagnosis()
         messages.success(request, _("Critères d'éligibilité enregistrés !"))
         next_url = reverse(
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}

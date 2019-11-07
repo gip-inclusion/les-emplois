@@ -5,12 +5,12 @@ from functools import lru_cache
 from django import forms
 from django.utils.translation import gettext as _
 
-from itou.eligibility_requirements.models import EligibilityRequirements
+from itou.eligibility.models import EligibilityDiagnosis
 
 
-class EligibilityRequirementsForm(forms.Form):
+class EligibilityForm(forms.Form):
     """
-    This form works closely with the EligibilityRequirements model
+    This form works closely with the EligibilityDiagnosis model
     (even if it's not a ModelForm).
 
     Its data is stored in DB as JSON because the choices are NOT
@@ -442,7 +442,7 @@ class EligibilityRequirementsForm(forms.Form):
 
     def clean(self):
         """
-        To validate eligibility requirements:
+        To validate eligibility:
             - an authorized prescriber must:
                 - indicate at least one peripheral barrier
             - an SIAE must:
@@ -553,7 +553,7 @@ class EligibilityRequirementsForm(forms.Form):
 
         return data
 
-    def save(self):
+    def save_diagnosis(self):
         """
         Save the result of the form in DB.
         """
@@ -565,8 +565,8 @@ class EligibilityRequirementsForm(forms.Form):
             "author_prescriber_organization": self.user_info.prescriber_organization,
             "form_version": self.VERSION,
             "form_cleaned_data": json.dumps(self.cleaned_data),
-            "form_human_readable_data": json.dumps(self.get_human_readable_data()),
+            "data": json.dumps(self.get_human_readable_data()),
         }
-        eligibility_requirements = EligibilityRequirements(**data)
-        eligibility_requirements.save()
-        return eligibility_requirements
+        diagnosis = EligibilityDiagnosis(**data)
+        diagnosis.save()
+        return diagnosis

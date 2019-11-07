@@ -77,12 +77,10 @@ class ApplyAsJobSeekerTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
-        )
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step eligibility requirements.
+        # Step eligibility.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
@@ -220,18 +218,16 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
-        )
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step eligibility requirements.
+        # Step eligibilitys.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(new_job_seeker.eligibility_requirements.exists())
+        self.assertFalse(new_job_seeker.has_eligibility_diagnosis)
 
         post_data = {
             "faire_face_a_des_difficultes_administratives_ou_juridiques": [
@@ -242,7 +238,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(new_job_seeker.eligibility_requirements.exists())
+        self.assertTrue(new_job_seeker.has_eligibility_diagnosis)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -376,12 +372,10 @@ class ApplyAsPrescriberTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
-        )
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
-        # Step eligibility requirements.
+        # Step eligibility.
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)

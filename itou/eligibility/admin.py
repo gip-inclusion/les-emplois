@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from itou.eligibility_requirements import models
+from itou.eligibility import models
 
 
-@admin.register(models.EligibilityRequirements)
-class EligibilityRequirementsAdmin(admin.ModelAdmin):
+@admin.register(models.EligibilityDiagnosis)
+class EligibilityAdmin(admin.ModelAdmin):
     list_display = ("id", "job_seeker", "author", "author_kind", "created_at")
     list_display_links = ("id", "job_seeker")
     list_filter = ("author_kind",)

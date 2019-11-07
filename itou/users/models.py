@@ -48,8 +48,8 @@ class User(AbstractUser):
         return self.email
 
     @property
-    def is_eligible_for_iae(self):
-        return self.is_job_seeker and self.phone and self.birthdate
+    def has_eligibility_diagnosis(self):
+        return self.eligibility_diagnoses.exists()
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):

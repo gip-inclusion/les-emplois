@@ -12,9 +12,9 @@ from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_ST
 logger = logging.getLogger(__name__)
 
 
-class EligibilityRequirements(models.Model):
+class EligibilityDiagnosis(models.Model):
     """
-    Store the eligibility requirements of a job seeker.
+    Store the eligibility diagnosis of a job seeker.
     """
 
     AUTHOR_KIND_JOB_SEEKER = KIND_JOB_SEEKER
@@ -31,13 +31,13 @@ class EligibilityRequirements(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
         on_delete=models.CASCADE,
-        related_name="eligibility_requirements",
+        related_name="eligibility_diagnoses",
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Auteur"),
         on_delete=models.CASCADE,
-        related_name="eligibility_requirements_done",
+        related_name="eligibility_diagnoses_made",
     )
     author_kind = models.CharField(
         verbose_name=_("Type de l'auteur"),
@@ -66,7 +66,8 @@ class EligibilityRequirements(models.Model):
         verbose_name=_("Version du formulaire"), max_length=10
     )
     form_cleaned_data = JSONField(verbose_name=_("Données du formulaire"))
-    form_human_readable_data = JSONField(verbose_name=_("Résultat du formulaire"))
+    # Stores the diagnosis as a human readable dict structure.
+    data = JSONField(verbose_name=_("Résultat du formulaire"))
 
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
@@ -76,7 +77,8 @@ class EligibilityRequirements(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Critères d'éligibilité")
+        verbose_name = _("Diagnostic d'éligibilité")
+        verbose_name_plural = _("Diagnostics d'éligibilité")
         ordering = ["-created_at"]
 
     def __str__(self):

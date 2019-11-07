@@ -127,10 +127,10 @@
 
         <hr>
 
-        {% if job_application.need_eligibility_requirements %}
+        {% if job_application.eligibility_diagnosis_required %}
 
             <p>
-                <a href="{% url 'apply:eligibility_requirements' job_application_id=job_application %}" class="btn btn-secondary btn-block">
+                <a href="{% url 'apply:eligibility' job_application_id=job_application %}" class="btn btn-secondary btn-block">
                     {% trans "Valider les critères d'éligibilité" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>

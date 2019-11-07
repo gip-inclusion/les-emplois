@@ -141,8 +141,8 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_accepted)
 
-    def test_eligibility_requirements(self):
-        """Test eligibility requirements."""
+    def test_eligibility(self):
+        """Test eligibility."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING
@@ -151,11 +151,10 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        self.assertFalse(job_application.job_seeker.eligibility_requirements.exists())
+        self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
 
         url = reverse(
-            "apply:eligibility_requirements",
-            kwargs={"job_application_id": job_application.pk},
+            "apply:eligibility", kwargs={"job_application_id": job_application.pk}
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -174,10 +173,10 @@ class ProcessViewsTest(TestCase):
         )
         self.assertEqual(response.url, next_url)
 
-        self.assertTrue(job_application.job_seeker.eligibility_requirements.exists())
+        self.assertTrue(job_application.job_seeker.has_eligibility_diagnosis)
 
-    def test_eligibility_requirements_wrong_state_for_job_application(self):
-        """Eligibility requirements page must only be accessible in `STATE_PROCESSING`."""
+    def test_eligibility_wrong_state_for_job_application(self):
+        """The eligibility diagnosis page must only be accessible in `STATE_PROCESSING`."""
         for state in [
             JobApplicationWorkflow.STATE_POSTPONED,
             JobApplicationWorkflow.STATE_ACCEPTED,
@@ -188,8 +187,7 @@ class ProcessViewsTest(TestCase):
             siae_user = job_application.to_siae.members.first()
             self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
             url = reverse(
-                "apply:eligibility_requirements",
-                kwargs={"job_application_id": job_application.pk},
+                "apply:eligibility", kwargs={"job_application_id": job_application.pk}
             )
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)

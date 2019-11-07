@@ -23,9 +23,9 @@ urlpatterns = [
         name="step_create_job_seeker",
     ),
     path(
-        "<int:siae_pk>/step_eligibility_requirements",
-        submit_views.step_eligibility_requirements,
-        name="step_eligibility_requirements",
+        "<int:siae_pk>/step_eligibility",
+        submit_views.step_eligibility,
+        name="step_eligibility",
     ),
     path(
         "<int:siae_pk>/step_application",
@@ -46,9 +46,9 @@ urlpatterns = [
         "<uuid:job_application_id>/siae/process", process_views.process, name="process"
     ),
     path(
-        "<uuid:job_application_id>/siae/eligibility_requirements",
-        process_views.eligibility_requirements,
-        name="eligibility_requirements",
+        "<uuid:job_application_id>/siae/eligibility",
+        process_views.eligibility,
+        name="eligibility",
     ),
     path("<uuid:job_application_id>/siae/refuse", process_views.refuse, name="refuse"),
     path(

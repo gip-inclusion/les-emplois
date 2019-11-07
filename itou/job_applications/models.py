@@ -236,10 +236,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return super().save(*args, **kwargs)
 
     @property
-    def need_eligibility_requirements(self):
+    def eligibility_diagnosis_required(self):
         return (
-            self.state.is_processing
-            and not self.job_seeker.eligibility_requirements.exists()
+            self.state.is_processing and not self.job_seeker.has_eligibility_diagnosis
         )
 
     # Workflow transitions.
