@@ -1,0 +1,13 @@
+{% extends "apply/submit_base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    <h2>{% trans "Critères d'éligibilité" %}</h2>
+
+    {% include "eligibility_requirements/includes/form_v_1_0_0.html" %}
+
+{% endblock %}

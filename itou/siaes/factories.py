@@ -20,7 +20,8 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Siae
 
-    siret = factory.fuzzy.FuzzyText(length=14, chars=string.digits)
+    # Don't start a SIRET with 0.
+    siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
     name = factory.Sequence(lambda n: f"siae{n}")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
@@ -48,12 +49,7 @@ class SiaeWithMembershipFactory(SiaeFactory):
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
-    @factory.post_generation
-    def membership(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        SiaeMembershipFactory(siae=self)
+    membership = factory.RelatedFactory(SiaeMembershipFactory, "siae")
 
 
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):

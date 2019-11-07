@@ -23,6 +23,11 @@ urlpatterns = [
         name="step_create_job_seeker",
     ),
     path(
+        "<siret:siret>/step_eligibility_requirements",
+        submit_views.step_eligibility_requirements,
+        name="step_eligibility_requirements",
+    ),
+    path(
         "<siret:siret>/step_application",
         submit_views.step_application,
         name="step_application",
