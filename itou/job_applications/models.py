@@ -235,6 +235,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    @property
+    def need_eligibility_requirements(self):
+        return (
+            self.state.is_processing
+            and not self.job_seeker.eligibility_requirements.exists()
+        )
+
     # Workflow transitions.
 
     @xwf_models.transition()

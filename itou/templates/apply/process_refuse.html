@@ -1,15 +1,10 @@
-{% extends "layout/content_small.html" %}
+{% extends "apply/process_base.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Je ne veux pas l'embaucher" %}{{ block.super }}{% endblock %}
-
 {% block content %}
 
-    <h1>
-        {% trans "Candidature de" %}
-        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
-    </h1>
+    {{ block.super }}
 
     <div class="alert alert-warning" role="alert">
         {% trans "Confirmez votre choix." %}

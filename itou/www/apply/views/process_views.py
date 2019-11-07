@@ -6,7 +6,10 @@ from django.urls import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
+from itou.eligibility_requirements.forms.form_v_1_0_0 import EligibilityRequirementsForm
 from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplicationWorkflow
+from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import AnswerForm, RefusalForm
 
 
@@ -136,6 +139,41 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         messages.success(request, _("Modification effectuée."))
 
+        next_url = reverse(
+            "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
+        )
+        return HttpResponseRedirect(next_url)
+
+    context = {"job_application": job_application, "form": form}
+    return render(request, template_name, context)
+
+
+@login_required
+def eligibility_requirements(
+    request,
+    job_application_id,
+    template_name="apply/process_eligibility_requirements.html",
+):
+    """
+    Check eligibility requirements.
+    """
+
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(
+        queryset, id=job_application_id, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
+
+    user_info = get_user_info(request)
+    form = EligibilityRequirementsForm(
+        user_info=user_info,
+        job_seeker=job_application.job_seeker,
+        data=request.POST or None,
+    )
+    if request.method == "POST" and form.is_valid():
+
+        form.save()  # Create an entry in EligibilityRequirements.
+
+        messages.success(request, _("Critères d'éligibilité enregistrés !"))
         next_url = reverse(
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
         )

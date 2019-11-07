@@ -45,6 +45,11 @@ urlpatterns = [
     path(
         "<uuid:job_application_id>/siae/process", process_views.process, name="process"
     ),
+    path(
+        "<uuid:job_application_id>/siae/eligibility_requirements",
+        process_views.eligibility_requirements,
+        name="eligibility_requirements",
+    ),
     path("<uuid:job_application_id>/siae/refuse", process_views.refuse, name="refuse"),
     path(
         "<uuid:job_application_id>/siae/postpone",

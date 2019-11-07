@@ -5,10 +5,11 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
+    JobApplicationSentByJobSeekerFactory,
 )
 
 
-class ProcessTest(TestCase):
+class ProcessViewsTest(TestCase):
     def test_details_for_siae(self):
         """Display the details of a job application."""
 
@@ -139,3 +140,57 @@ class ProcessTest(TestCase):
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.state.is_accepted)
+
+    def test_eligibility_requirements(self):
+        """Test eligibility requirements."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        self.assertTrue(job_application.state.is_processing)
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        self.assertFalse(job_application.job_seeker.eligibility_requirements.exists())
+
+        url = reverse(
+            "apply:eligibility_requirements",
+            kwargs={"job_application_id": job_application.pk},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "faire_face_a_des_difficultes_administratives_ou_juridiques": [
+                "prendre_en_compte_une_problematique_judiciaire"
+            ],
+            "criteres_administratifs_de_niveau_1": ["beneficiaire_du_rsa"],
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        next_url = reverse(
+            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+        )
+        self.assertEqual(response.url, next_url)
+
+        self.assertTrue(job_application.job_seeker.eligibility_requirements.exists())
+
+    def test_eligibility_requirements_wrong_state_for_job_application(self):
+        """Eligibility requirements page must only be accessible in `STATE_PROCESSING`."""
+        for state in [
+            JobApplicationWorkflow.STATE_POSTPONED,
+            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]:
+            job_application = JobApplicationSentByJobSeekerFactory(state=state)
+            siae_user = job_application.to_siae.members.first()
+            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+            url = reverse(
+                "apply:eligibility_requirements",
+                kwargs={"job_application_id": job_application.pk},
+            )
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 404)
+            self.client.logout()

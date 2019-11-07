@@ -1,0 +1,35 @@
+{% extends "apply/process_base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    <h2>{% trans "Critères d'éligibilité" %}</h2>
+
+    {% if form.errors %}
+
+        <div class="alert alert-secondary" role="alert">
+            <p>
+                {% trans "Si le candidat n'est pas éligible à l'insertion par l'activité économique, déclinez sa candidature :" %}
+            </p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
+                {% trans "Je ne veux pas l'embaucher" %}
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </div>
+
+    {% endif %}
+
+    <form method="post" action="">
+        {% csrf_token %}
+        {% bootstrap_form_errors form %}
+        {% include "eligibility_requirements/includes/form_v_1_0_0.html" with form=form %}
+        {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
+        {% endbuttons %}
+    </form>
+
+{% endblock %}

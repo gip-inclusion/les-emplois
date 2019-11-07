@@ -149,6 +149,9 @@ def step_create_job_seeker(
 def step_eligibility_requirements(
     request, siae_pk, template_name="apply/submit_step_eligibility_requirements.html"
 ):
+    """
+    Check eligibility requirements.
+    """
 
     user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})

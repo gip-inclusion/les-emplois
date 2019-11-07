@@ -1,29 +1,13 @@
-{% extends "layout/content_small.html" %}
+{% extends "apply/process_base.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
 {% load format_filters %}
 
-{% block title %}
-    {% trans "Candidature" %}
-    -
-    {{ job_application.job_seeker.get_full_name }}
-    {{ block.super }}
-{% endblock %}
-
 {% block content %}
 
-    <h1>
-        {% trans "Candidature de" %}
-        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
-    </h1>
-
-    <h2>
-        {% include "apply/includes/state_badge.html" with job_application=job_application %}
-    </h2>
+    {{ block.super }}
 
     {# Job seeker info ------------------------------------------------------------------------- #}
-
-    <hr>
 
     <h3 class="font-weight-normal text-muted">{% trans "Candidat" %}</h3>
 
@@ -143,26 +127,39 @@
 
         <hr>
 
-        <p>
-            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
-                {% trans "Je ne veux pas l'embaucher" %}
-                {% include "includes/icon.html" with icon="arrow-right" %}
-            </a>
-        </p>
+        {% if job_application.need_eligibility_requirements %}
 
-        <p>
-            <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
-                {% trans "Je veux l'embaucher plus tard" %}
-                {% include "includes/icon.html" with icon="arrow-right" %}
-            </a>
-        </p>
+            <p>
+                <a href="{% url 'apply:eligibility_requirements' job_application_id=job_application %}" class="btn btn-secondary btn-block">
+                    {% trans "Valider les critères d'éligibilité" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
 
-        <p>
-            <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
-                {% trans "Je l'embauche" %}
-                {% include "includes/icon.html" with icon="arrow-right" %}
-            </a>
-        </p>
+        {% else %}
+
+            <p>
+                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
+                    {% trans "Je ne veux pas l'embaucher" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+            <p>
+                <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+                    {% trans "Je veux l'embaucher plus tard" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+                    {% trans "Je l'embauche" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+        {% endif %}
 
     {% endif %}
 
