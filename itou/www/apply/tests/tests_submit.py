@@ -22,7 +22,7 @@ class ApplyAsJobSeekerTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siret": siae.siret})
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -31,14 +31,13 @@ class ApplyAsJobSeekerTest(TestCase):
         expected_session_data = {
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
-            "to_siae_siret": siae.siret,
             "sender_pk": None,
             "sender_kind": None,
             "sender_prescriber_organization_pk": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_sender", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the sender.
@@ -52,14 +51,13 @@ class ApplyAsJobSeekerTest(TestCase):
         expected_session_data = {
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
-            "to_siae_siret": siae.siret,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
             "sender_prescriber_organization_pk": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker.
@@ -73,7 +71,6 @@ class ApplyAsJobSeekerTest(TestCase):
         expected_session_data = {
             "job_seeker_pk": user.pk,
             "to_siae_pk": siae.pk,
-            "to_siae_siret": siae.siret,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
             "sender_prescriber_organization_pk": None,
@@ -81,7 +78,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertDictEqual(session_data, expected_session_data)
 
         next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siret": siae.siret}
+            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
         )
         self.assertEqual(response.url, next_url)
 
@@ -91,7 +88,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:step_application", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step application.
@@ -142,7 +139,7 @@ class ApplyAsPrescriberTest(TestCase):
         # Entry point.
         # ----------------------------------------------------------------------
 
-        url = reverse("apply:start", kwargs={"siret": siae.siret})
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
 
@@ -151,14 +148,13 @@ class ApplyAsPrescriberTest(TestCase):
         expected_session_data = {
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
-            "to_siae_siret": siae.siret,
             "sender_pk": None,
             "sender_kind": None,
             "sender_prescriber_organization_pk": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_sender", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the sender.
@@ -172,14 +168,13 @@ class ApplyAsPrescriberTest(TestCase):
         expected_session_data = {
             "job_seeker_pk": None,
             "to_siae_pk": siae.pk,
-            "to_siae_siret": siae.siret,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse("apply:step_job_seeker", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step determine the job seeker.
@@ -192,7 +187,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse("apply:step_create_job_seeker", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
         args = urlencode({"email": post_data["email"]})
         self.assertEqual(response.url, f"{next_url}?{args}")
 
@@ -219,7 +214,6 @@ class ApplyAsPrescriberTest(TestCase):
         expected_session_data = {
             "job_seeker_pk": new_job_seeker.pk,
             "to_siae_pk": siae.pk,
-            "to_siae_siret": siae.siret,
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
@@ -227,7 +221,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertDictEqual(session_data, expected_session_data)
 
         next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siret": siae.siret}
+            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
         )
         self.assertEqual(response.url, next_url)
 
@@ -250,7 +244,7 @@ class ApplyAsPrescriberTest(TestCase):
 
         self.assertTrue(new_job_seeker.eligibility_requirements.exists())
 
-        next_url = reverse("apply:step_application", kwargs={"siret": siae.siret})
+        next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step application.

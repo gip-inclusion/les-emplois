@@ -21,7 +21,7 @@ from itou.www.apply.forms import SubmitJobApplicationForm
 def valid_session_required(function=None):
     def decorated(request, *args, **kwargs):
         session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)
-        if not session_data or (session_data["to_siae_siret"] != str(kwargs["siret"])):
+        if not session_data or (session_data["to_siae_pk"] != kwargs["siae_pk"]):
             raise PermissionDenied
         return function(request, *args, **kwargs)
 
@@ -29,7 +29,7 @@ def valid_session_required(function=None):
 
 
 @login_required
-def start(request, siret):
+def start(request, siae_pk):
     """
     Entry point.
     """
@@ -37,25 +37,24 @@ def start(request, siret):
     if request.user.is_siae_staff:
         raise PermissionDenied
 
-    siae = get_object_or_404(Siae.active_objects, siret=siret)
+    siae = get_object_or_404(Siae.active_objects, pk=siae_pk)
 
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
         "job_seeker_pk": None,
         "to_siae_pk": siae.pk,
-        "to_siae_siret": siae.siret,
         "sender_pk": None,
         "sender_kind": None,
         "sender_prescriber_organization_pk": None,
     }
 
-    next_url = reverse("apply:step_sender", kwargs={"siret": siae.siret})
+    next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
     return HttpResponseRedirect(next_url)
 
 
 @login_required
 @valid_session_required
-def step_sender(request, siret):
+def step_sender(request, siae_pk):
     """
     Determine the sender.
     """
@@ -70,19 +69,23 @@ def step_sender(request, siret):
             "sender_prescriber_organization_pk"
         ] = user_info.prescriber_organization.pk
 
-    next_url = reverse("apply:step_job_seeker", kwargs={"siret": siret})
+    next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
     return HttpResponseRedirect(next_url)
 
 
 @login_required
 @valid_session_required
-def step_job_seeker(request, siret, template_name="apply/submit_step_job_seeker.html"):
+def step_job_seeker(
+    request, siae_pk, template_name="apply/submit_step_job_seeker.html"
+):
     """
     Determine the job seeker.
     """
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    next_url = reverse("apply:step_eligibility_requirements", kwargs={"siret": siret})
+    next_url = reverse(
+        "apply:step_eligibility_requirements", kwargs={"siae_pk": siae_pk}
+    )
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
@@ -99,7 +102,9 @@ def step_job_seeker(request, siret, template_name="apply/submit_step_job_seeker.
 
         if not job_seeker:
             args = urlencode({"email": form.cleaned_data["email"]})
-            next_url = reverse("apply:step_create_job_seeker", kwargs={"siret": siret})
+            next_url = reverse(
+                "apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk}
+            )
             return HttpResponseRedirect(f"{next_url}?{args}")
 
         session_data["job_seeker_pk"] = job_seeker.pk
@@ -112,7 +117,7 @@ def step_job_seeker(request, siret, template_name="apply/submit_step_job_seeker.
 @login_required
 @valid_session_required
 def step_create_job_seeker(
-    request, siret, template_name="apply/submit_step_create_job_seeker.html"
+    request, siae_pk, template_name="apply/submit_step_create_job_seeker.html"
 ):
     """
     Create a job seeker.
@@ -131,7 +136,7 @@ def step_create_job_seeker(
         job_seeker = form.save()
         session_data["job_seeker_pk"] = job_seeker.pk
         next_url = reverse(
-            "apply:step_eligibility_requirements", kwargs={"siret": siret}
+            "apply:step_eligibility_requirements", kwargs={"siae_pk": siae.pk}
         )
         return HttpResponseRedirect(next_url)
 
@@ -142,11 +147,11 @@ def step_create_job_seeker(
 @login_required
 @valid_session_required
 def step_eligibility_requirements(
-    request, siret, template_name="apply/submit_step_eligibility_requirements.html"
+    request, siae_pk, template_name="apply/submit_step_eligibility_requirements.html"
 ):
 
     user_info = get_user_info(request)
-    next_url = reverse("apply:step_application", kwargs={"siret": siret})
+    next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
     # This step is currently only required for an authorized prescriber.
     if not user_info.is_authorized_prescriber:
@@ -176,14 +181,14 @@ def step_eligibility_requirements(
 @login_required
 @valid_session_required
 def step_application(
-    request, siret, template_name="apply/submit_step_application.html"
+    request, siae_pk, template_name="apply/submit_step_application.html"
 ):
     """
     Submit a job application.
     """
 
     queryset = Siae.active_objects.prefetch_job_description_through()
-    siae = get_object_or_404(queryset, siret=siret)
+    siae = get_object_or_404(queryset, pk=siae_pk)
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae)

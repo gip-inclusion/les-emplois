@@ -10,25 +10,25 @@ app_name = "apply"
 
 urlpatterns = [
     # Submit.
-    path("<siret:siret>/start", submit_views.start, name="start"),
-    path("<siret:siret>/step_sender", submit_views.step_sender, name="step_sender"),
+    path("<int:siae_pk>/start", submit_views.start, name="start"),
+    path("<int:siae_pk>/step_sender", submit_views.step_sender, name="step_sender"),
     path(
-        "<siret:siret>/step_job_seeker",
+        "<int:siae_pk>/step_job_seeker",
         submit_views.step_job_seeker,
         name="step_job_seeker",
     ),
     path(
-        "<siret:siret>/step_create_job_seeker",
+        "<int:siae_pk>/step_create_job_seeker",
         submit_views.step_create_job_seeker,
         name="step_create_job_seeker",
     ),
     path(
-        "<siret:siret>/step_eligibility_requirements",
+        "<int:siae_pk>/step_eligibility_requirements",
         submit_views.step_eligibility_requirements,
         name="step_eligibility_requirements",
     ),
     path(
-        "<siret:siret>/step_application",
+        "<int:siae_pk>/step_application",
         submit_views.step_application,
         name="step_application",
     ),

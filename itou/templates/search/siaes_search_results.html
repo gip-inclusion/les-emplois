@@ -70,7 +70,7 @@
                 </div>
                 {% if siae.has_members %}
                     <div class="card-footer">
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siret=siae.siret %}">
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                         </a>
                     </div>
