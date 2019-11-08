@@ -1,0 +1,29 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+
+{% if job_application.is_sent_by_proxy %}
+
+{% blocktrans with full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
+La candidature de {{ full_name }} chez {{ to_siae }} n'a malheureusement pas pu aboutir.
+{% endblocktrans %}
+
+{% else %}
+
+{% blocktrans with to_siae=job_application.to_siae.display_name %}
+Votre candidature chez {{ to_siae }} n'a malheureusement pas pu aboutir.
+{% endblocktrans %}
+
+{% endif %}
+
+{% if job_application.refusal_reason %}
+{% trans "*Motif du refus* :" %}
+{{ job_application.get_refusal_reason_display }}
+{% endif %}
+
+{% if job_application.answer %}
+{% trans "*Message de l'entreprise* :" %}
+{{ job_application.answer }}
+{% endif %}
+
+{% endblock body %}

@@ -240,6 +240,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return super().save(*args, **kwargs)
 
     @property
+    def is_sent_by_proxy(self):
+        return self.sender != self.job_seeker
+
+    @property
     def eligibility_diagnosis_required(self):
         return (
             self.state.is_processing and not self.job_seeker.has_eligibility_diagnosis
@@ -261,7 +265,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
-        pass
+        connection = mail.get_connection()
+        emails = [self.email_refuse]
+        connection.send_messages(emails)
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
@@ -290,6 +296,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/new_for_siae_subject.txt"
         body = "apply/email/new_for_siae_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
+    def email_refuse(self):
+        to = [self.sender.email]
+        context = {"job_application": self}
+        subject = "apply/email/refuse_subject.txt"
+        body = "apply/email/refuse_body.txt"
         return self.get_email_message(to, context, subject, body)
 
 

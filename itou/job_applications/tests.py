@@ -89,6 +89,37 @@ class JobApplicationEmailTest(TestCase):
             format_filters.format_phone(job_application.sender.phone), email.body
         )
 
+    def test_refuse(self):
+
+        # When sent by authorized prescriber.
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME
+        )
+        email = job_application.email_refuse
+        # To.
+        self.assertIn(job_application.sender.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.get_refusal_reason_display(), email.body)
+        self.assertIn(job_application.answer, email.body)
+
+        # When sent by jobseeker.
+        job_application = JobApplicationSentByJobSeekerFactory(
+            refusal_reason=JobApplication.REFUSAL_REASON_DID_NOT_COME
+        )
+        email = job_application.email_refuse
+        # To.
+        self.assertEqual(job_application.job_seeker.email, job_application.sender.email)
+        self.assertIn(job_application.job_seeker.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.get_refusal_reason_display(), email.body)
+        self.assertIn(job_application.answer, email.body)
+
 
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""

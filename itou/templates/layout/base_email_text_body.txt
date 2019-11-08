@@ -4,8 +4,7 @@
 {% block body %}{% endblock %}
 
 {% blocktrans %}
-L'équipe Itou
-La plate-forme numérique de l'inclusion
+L'équipe de la Plateforme de l'Inclusion
 {% endblocktrans %}
 
 {% endautoescape %}
