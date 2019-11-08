@@ -119,7 +119,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
 
-    def test_accept(self):
+    def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             date_of_hiring=datetime.date.today(),
