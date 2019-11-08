@@ -3,8 +3,8 @@
 
 {% block body %}{% endblock %}
 
-{% blocktrans %}
-L'équipe de la Plateforme de l'Inclusion
-{% endblocktrans %}
+---
+{% blocktrans %}Plateforme de l'Inclusion{% endblocktrans %}
+{{ itou_protocol }}://{{ itou_fqdn }}
 
 {% endautoescape %}

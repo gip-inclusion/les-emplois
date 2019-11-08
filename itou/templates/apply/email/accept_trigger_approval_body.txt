@@ -1,0 +1,27 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+Nouvelle embauche sur Itou.
+
+Informations pour l'obtention d'un numéro d'agrément.
+
+{% trans "*Candidat* :" %}
+
+- Nom : {{ job_application.job_seeker.last_name }}
+- Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
+- Email : {{ job_application.job_seeker.email }}{% endif %}
+- Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}
+
+{% trans "*SIAE* :" %}
+
+- Siret : {{ job_application.to_siae.siret }}
+- Nom : {{ job_application.to_siae.display_name }}
+- Date de l'embauche : {{ job_application.date_of_hiring|date:"d/m/Y" }}
+
+Voir la candidature dans l'admin :
+{{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:job_applications_jobapplication_change" job_application.id %}
+
+Ajouter un numéro d'agrément dans l'admin :
+{{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:approvals_approval_add" %}
+
+{% endblock body %}

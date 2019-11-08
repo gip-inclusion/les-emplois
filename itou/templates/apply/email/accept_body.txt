@@ -1,0 +1,25 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+
+{% if job_application.is_sent_by_proxy %}
+
+{% blocktrans with full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
+La candidature de {{ full_name }} a été acceptée par {{ to_siae }}.
+{% endblocktrans %}
+
+{% else %}
+
+{% blocktrans with to_siae=job_application.to_siae.display_name %}
+Votre candidature a été acceptée par {{ to_siae }}.
+{% endblocktrans %}
+
+{% endif %}
+
+{% if job_application.answer %}
+{% trans "*Message de l'entreprise* :" %}
+
+{{ job_application.answer }}
+{% endif %}
+
+{% endblock body %}

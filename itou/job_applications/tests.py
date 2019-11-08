@@ -1,4 +1,9 @@
+import datetime
+
+from django.conf import settings
+from django.core import mail
 from django.test import TestCase
+from django.urls import reverse
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -89,6 +94,59 @@ class JobApplicationEmailTest(TestCase):
             format_filters.format_phone(job_application.sender.phone), email.body
         )
 
+    def test_accept(self):
+
+        # When sent by authorized prescriber.
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        email = job_application.email_accept
+        # To.
+        self.assertIn(job_application.sender.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.answer, email.body)
+
+        # When sent by jobseeker.
+        job_application = JobApplicationSentByJobSeekerFactory()
+        email = job_application.email_accept
+        # To.
+        self.assertEqual(job_application.job_seeker.email, job_application.sender.email)
+        self.assertIn(job_application.job_seeker.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.answer, email.body)
+
+    def test_accept(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            date_of_hiring=datetime.date.today(),
+        )
+        email = job_application.email_accept_trigger_manual_approval
+        # To.
+        self.assertIn(settings.ITOU_EMAIL_CONTACT, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.email, email.body)
+        self.assertIn(
+            job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body
+        )
+        self.assertIn(job_application.to_siae.siret, email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.date_of_hiring.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(
+            reverse(
+                "admin:job_applications_jobapplication_change",
+                args=[job_application.id],
+            ),
+            email.body,
+        )
+        self.assertIn(reverse("admin:approvals_approval_add"), email.body)
+
     def test_refuse(self):
 
         # When sent by authorized prescriber.
@@ -125,7 +183,6 @@ class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
 
     def test_accept(self):
-
         user = JobSeekerFactory()
         kwargs = {
             "job_seeker": user,
@@ -157,3 +214,24 @@ class JobApplicationWorkflowTest(TestCase):
             ).count(),
             3,
         )
+
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("Numéro d'agrément requis sur Itou", mail.outbox[1].subject)
+
+    def test_refuse(self):
+        user = JobSeekerFactory()
+        kwargs = {
+            "job_seeker": user,
+            "sender": user,
+            "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
+        }
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs
+        )
+        job_application.refuse()
+
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Candidature déclinée", mail.outbox[0].subject)

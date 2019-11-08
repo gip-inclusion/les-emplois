@@ -262,9 +262,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             pk=self.pk
         ).pendind():
             job_application.render_obsolete(*args, **kwargs)
+        # Send notification.
+        connection = mail.get_connection()
+        emails = [self.email_accept, self.email_accept_trigger_manual_approval]
+        connection.send_messages(emails)
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
+        # Send notification.
         connection = mail.get_connection()
         emails = [self.email_refuse]
         connection.send_messages(emails)
@@ -299,11 +304,27 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return self.get_email_message(to, context, subject, body)
 
     @property
+    def email_accept(self):
+        to = [self.sender.email]
+        context = {"job_application": self}
+        subject = "apply/email/accept_subject.txt"
+        body = "apply/email/accept_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
     def email_refuse(self):
         to = [self.sender.email]
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
         body = "apply/email/refuse_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    @property
+    def email_accept_trigger_manual_approval(self):
+        to = [settings.ITOU_EMAIL_CONTACT]
+        context = {"job_application": self}
+        subject = "apply/email/accept_trigger_approval_subject.txt"
+        body = "apply/email/accept_trigger_approval_body.txt"
         return self.get_email_message(to, context, subject, body)
 
 
