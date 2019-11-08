@@ -1,3 +1,5 @@
+import datetime
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -109,3 +111,29 @@ class AnswerForm(forms.Form):
     answer = forms.CharField(
         label=_("Réponse"), widget=forms.Textarea(), required=False, strip=True
     )
+
+
+class AcceptForm(forms.ModelForm):
+    """
+    Allow an SIAE to add an answer message when postponing or accepting.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["date_of_hiring"].required = True
+        self.fields["date_of_hiring"].input_formats = settings.DATE_INPUT_FORMATS
+
+    class Meta:
+        model = JobApplication
+        fields = ["date_of_hiring", "answer"]
+        help_texts = {
+            "date_of_hiring": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            % {"date": datetime.date.today().strftime("%d/%m/%Y")}
+        }
+
+    def clean_date_of_hiring(self):
+        date_of_hiring = self.cleaned_data["date_of_hiring"]
+        if date_of_hiring and date_of_hiring < datetime.date.today():
+            error = _("La date d'embauche ne doit pas être dans le passé.")
+            raise forms.ValidationError(error)
+        return date_of_hiring

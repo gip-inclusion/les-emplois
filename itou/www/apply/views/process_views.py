@@ -10,7 +10,7 @@ from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
 from itou.job_applications.models import JobApplication
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import AnswerForm, RefusalForm
+from itou.www.apply.forms import AcceptForm, AnswerForm, RefusalForm
 
 
 @login_required
@@ -128,15 +128,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
-    form = AnswerForm(data=request.POST or None)
+    form = AcceptForm(instance=job_application, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
-        job_application.answer = form.cleaned_data["answer"]
-        job_application.save()
-
+        job_application = form.save()
         job_application.accept(user=request.user)
-
         messages.success(request, _("Modification effectuée."))
 
         next_url = reverse(

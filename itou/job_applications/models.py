@@ -214,6 +214,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         blank=True,
     )
 
+    date_of_hiring = models.DateField(
+        verbose_name=_("Date de l'embauche"), blank=True, null=True
+    )
+
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
     )

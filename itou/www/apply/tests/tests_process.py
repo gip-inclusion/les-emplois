@@ -1,3 +1,5 @@
+import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -101,7 +103,6 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # Answer is optional.
         post_data = {"answer": ""}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -128,8 +129,8 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # Answer is optional.
-        post_data = {"answer": ""}
+        today = datetime.date.today()
+        post_data = {"date_of_hiring": today.strftime("%d/%m/%Y"), "answer": ""}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -139,6 +140,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
+        self.assertEqual(job_application.date_of_hiring, today)
         self.assertTrue(job_application.state.is_accepted)
 
     def test_eligibility(self):
