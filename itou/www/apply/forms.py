@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from itou.job_applications.models import JobApplication
 
 
-class CheckJobSeekerForm(forms.Form):
+class JobSeekerExistsForm(forms.Form):
 
     email = forms.EmailField(label=_("E-mail du candidat"))
 
@@ -14,6 +14,21 @@ class CheckJobSeekerForm(forms.Form):
         email = self.cleaned_data["email"]
         user = get_user_model().objects.filter(email=email, is_job_seeker=True).first()
         return user
+
+
+class CheckJobSeekerInfoForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["birthdate"].required = True
+        self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
+
+    class Meta:
+        model = get_user_model()
+        fields = ["birthdate", "phone"]
+        help_texts = {
+            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978"),
+            "phone": _("Par exemple 0610203040"),
+        }
 
 
 class CreateJobSeekerForm(forms.ModelForm):

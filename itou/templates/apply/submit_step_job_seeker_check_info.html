@@ -1,0 +1,29 @@
+{% extends "apply/submit_base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    <div class="alert alert-warning" role="alert">
+        {% if request.user == job_seeker %}
+            {% trans "Votre date de naissance est obligatoire pour continuer." %}
+        {% else %}
+            {% trans "La date de naissance du candidat est obligatoire pour continuer." %}
+        {% endif %}
+    </div>
+
+    <form method="post" action="">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% trans "Continuer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}

@@ -13,7 +13,8 @@ from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import CheckJobSeekerForm
+from itou.www.apply.forms import JobSeekerExistsForm
+from itou.www.apply.forms import CheckJobSeekerInfoForm
 from itou.www.apply.forms import CreateJobSeekerForm
 from itou.www.apply.forms import SubmitJobApplicationForm
 
@@ -81,9 +82,8 @@ def step_job_seeker(
     """
     Determine the job seeker.
     """
-
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae_pk})
+    next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
 
     # The user submit an application for himself.
     if request.user.is_job_seeker:
@@ -92,21 +92,19 @@ def step_job_seeker(
 
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
 
-    form = CheckJobSeekerForm(data=request.POST or None)
+    form = JobSeekerExistsForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
         job_seeker = form.get_job_seeker_from_email()
 
-        if not job_seeker:
-            args = urlencode({"email": form.cleaned_data["email"]})
-            next_url = reverse(
-                "apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk}
-            )
-            return HttpResponseRedirect(f"{next_url}?{args}")
+        if job_seeker:
+            session_data["job_seeker_pk"] = job_seeker.pk
+            return HttpResponseRedirect(next_url)
 
-        session_data["job_seeker_pk"] = job_seeker.pk
-        return HttpResponseRedirect(next_url)
+        args = urlencode({"email": form.cleaned_data["email"]})
+        next_url = reverse("apply:step_create_job_seeker", kwargs={"siae_pk": siae.pk})
+        return HttpResponseRedirect(f"{next_url}?{args}")
 
     context = {"siae": siae, "form": form}
     return render(request, template_name, context)
@@ -114,13 +112,40 @@ def step_job_seeker(
 
 @login_required
 @valid_session_required
+def step_check_job_seeker_info(
+    request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"
+):
+    """
+    Check job seeker info.
+    """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae_pk})
+
+    # Ensure that the job seeker has a birthdate.
+    if job_seeker.birthdate:
+        return HttpResponseRedirect(next_url)
+
+    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+
+    form = CheckJobSeekerInfoForm(instance=job_seeker, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(next_url)
+
+    context = {"form": form, "siae": siae, "job_seeker": job_seeker}
+    return render(request, template_name, context)
+
+
+@login_required
+@valid_session_required
 def step_create_job_seeker(
-    request, siae_pk, template_name="apply/submit_step_create_job_seeker.html"
+    request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"
 ):
     """
     Create a job seeker.
     """
-
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
 
@@ -148,7 +173,6 @@ def step_eligibility(
     """
     Check eligibility.
     """
-
     user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
@@ -185,7 +209,6 @@ def step_application(
     """
     Submit a job application.
     """
-
     queryset = Siae.active_objects.prefetch_job_description_through()
     siae = get_object_or_404(queryset, pk=siae_pk)
 
