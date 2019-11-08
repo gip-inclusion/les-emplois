@@ -19,10 +19,7 @@
 
         <div class="card mb-3">
 
-            <div class="card-header">
-                <b>{{ job_application.to_siae.display_name }}</b>
-                <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-            </div>
+            {% include "apply/includes/list_card_header.html" with job_application=job_application %}
 
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 

@@ -13,6 +13,12 @@
 
     <ul>
 
+        {% with job_application.job_seeker.get_approval as approval %}
+            {% if approval %}
+                <li>{% trans "Numéro d'agrément :" %} <b class="text-success">{{ approval.number }}</b></li>
+            {% endif %}
+        {% endwith %}
+
         <li>{% trans "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
 
         <li>{% trans "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>

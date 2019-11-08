@@ -51,6 +51,19 @@
                     </p>
                 </div>
             </div>
+            {% with user.get_approval as approval %}
+                {% if approval %}
+                    <div class="card">
+                        <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
+                        <div class="card-body">
+                            <p class="card-text">
+                                {% include "includes/icon.html" with icon="award" %}
+                                <b>{{ approval.number }}</b>
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endwith %}
         {% endif %}
 
         {% if user.is_prescriber %}
