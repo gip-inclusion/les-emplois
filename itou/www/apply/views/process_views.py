@@ -133,7 +133,15 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     if request.method == "POST" and form.is_valid():
         job_application = form.save()
         job_application.accept(user=request.user)
-        messages.success(request, _("Modification effectuée."))
+        messages.success(
+            request,
+            _(
+                "Embauche acceptée. "
+                "Si le candidat n'a pas encore de numéro d'agrément, "
+                "vous sezez prévenu par email dès que ce dernier sera disponible."
+                "Il sera également affiché ici."
+            ),
+        )
 
         next_url = reverse(
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
