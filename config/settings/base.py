@@ -56,6 +56,7 @@ LOCAL_APPS = [
     "itou.siaes",
     "itou.prescribers",
     "itou.job_applications",
+    "itou.approvals",
     "itou.eligibility",
     # www.
     "itou.www.apply",
