@@ -2,6 +2,26 @@
 {% load bootstrap4 %}
 {% load dict_lookup %}
 
+<div class="alert alert-warning" role="alert">
+    {% if request.user.is_prescriber %}
+        {% trans "Pour valider une éligibilité vous devez indiquer au moins un frein périphérique." %}
+    {% endif %}
+    {% if request.user.is_siae_staff %}
+        <p>{% trans "Pour valider une éligibilité vous devez :" %}</p>
+        <ul class="mb-0">
+            <li>{% trans "indiquer au moins un frein périphérique" %}</li>
+            <li><b>{% trans "et" %}</b></li>
+            <li>
+                {% trans "indiquer des critères administratifs :" %}
+                <ul>
+                    <li>{% trans "au moins un critère administratif de niveau 1" %}</li>
+                    <li><b>{% trans "ou" %}</b></li>
+                    <li>{% trans "le cumul d'au moins trois critères de niveau 2" %}</li>
+                </ul>
+            </li>
+        </ul>
+    {% endif %}
+</div>
 
 {% for field in form %}
 
