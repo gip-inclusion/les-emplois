@@ -76,7 +76,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         verbose_name=_("Siret"),
         max_length=14,
         validators=[validate_siret],
-        unique=True,
+        # unique=True,
         db_index=True,
     )
     naf = models.CharField(
@@ -111,6 +111,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")
         verbose_name_plural = _("Structures d'insertion par l'activité économique")
+        unique_together = ("siret", "kind")
 
     def __str__(self):
         return f"{self.siret} {self.display_name}"
