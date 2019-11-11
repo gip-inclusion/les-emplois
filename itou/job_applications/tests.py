@@ -227,11 +227,16 @@ class JobApplicationWorkflowTest(TestCase):
             "sender": user,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
         }
-        job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs
-        )
-        job_application.refuse()
 
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("Candidature déclinée", mail.outbox[0].subject)
+        JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
+        JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
+
+        self.assertEqual(user.job_applications.count(), 2)
+        self.assertEqual(user.job_applications.pendind().count(), 2)
+
+        for job_application in user.job_applications.all():
+            job_application.refuse()
+            # Check sent email.
+            self.assertEqual(len(mail.outbox), 1)
+            self.assertIn("Candidature déclinée", mail.outbox[0].subject)
+            mail.outbox = []

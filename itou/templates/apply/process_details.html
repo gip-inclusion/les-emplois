@@ -143,7 +143,7 @@
 
     {% endif %}
 
-    {# Choose next state ------------------------------------------------------------------------- #}
+    {# Possible next steps when the state is processing ------------------------------------------------------ #}
 
     {% if job_application.state.is_processing %}
 
@@ -184,6 +184,30 @@
         {% endif %}
 
     {% endif %}
+
+    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
+
+    {% if job_application.state.is_postponed %}
+
+        <hr>
+
+        <p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
+                {% trans "Je ne veux pas l'embaucher" %}
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+        <p>
+            <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+                {% trans "Je l'embauche" %}
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+    {% endif %}
+
+    {# History ------------------------------------------------------ #}
 
     {% if transition_logs %}
 

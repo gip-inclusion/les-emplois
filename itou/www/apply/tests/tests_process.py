@@ -194,3 +194,81 @@ class ProcessViewsTest(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
             self.client.logout()
+
+
+class ProcessTemplatesTest(TestCase):
+    """
+    Test actions available in the details template for the different.
+    states of a job application.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        """Set up data for the whole TestCase."""
+        cls.job_application = (
+            JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        )
+        cls.siae_user = cls.job_application.to_siae.members.first()
+
+        kwargs = {"job_application_id": cls.job_application.pk}
+        cls.url_details = reverse("apply:details_for_siae", kwargs=kwargs)
+        cls.url_process = reverse("apply:process", kwargs=kwargs)
+        cls.url_eligibility = reverse("apply:eligibility", kwargs=kwargs)
+        cls.url_refuse = reverse("apply:refuse", kwargs=kwargs)
+        cls.url_postpone = reverse("apply:postpone", kwargs=kwargs)
+        cls.url_accept = reverse("apply:accept", kwargs=kwargs)
+
+    def test_details_template_for_state_new(self):
+        """Test actions available when the state is new."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertIn(self.url_process, str(response.content))
+        self.assertNotIn(self.url_eligibility, str(response.content))
+        self.assertNotIn(self.url_refuse, str(response.content))
+        self.assertNotIn(self.url_postpone, str(response.content))
+        self.assertNotIn(self.url_accept, str(response.content))
+
+    def test_details_template_for_state_processing(self):
+        """Test actions available when the state is processing."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotIn(self.url_process, str(response.content))
+        self.assertIn(self.url_eligibility, str(response.content))
+        self.assertNotIn(self.url_refuse, str(response.content))
+        self.assertNotIn(self.url_postpone, str(response.content))
+        self.assertNotIn(self.url_accept, str(response.content))
+
+    def test_details_template_for_state_postponed(self):
+        """Test actions available when the state is postponed."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotIn(self.url_process, str(response.content))
+        self.assertNotIn(self.url_eligibility, str(response.content))
+        self.assertIn(self.url_refuse, str(response.content))
+        self.assertNotIn(self.url_postpone, str(response.content))
+        self.assertIn(self.url_accept, str(response.content))
+
+    def test_details_template_for_other_states(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        for state in [
+            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]:
+            self.job_application.state = state
+            self.job_application.save()
+            response = self.client.get(self.url_details)
+            # Test template content.
+            self.assertNotIn(self.url_process, str(response.content))
+            self.assertNotIn(self.url_eligibility, str(response.content))
+            self.assertNotIn(self.url_refuse, str(response.content))
+            self.assertNotIn(self.url_postpone, str(response.content))
+            self.assertNotIn(self.url_accept, str(response.content))
