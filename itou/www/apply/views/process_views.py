@@ -138,7 +138,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             _(
                 "Embauche acceptée. "
                 "Si le candidat n'a pas encore de numéro d'agrément, "
-                "vous sezez prévenu par email dès que ce dernier sera disponible."
+                "vous sezez prévenu par email dès que ce dernier sera disponible. "
                 "Il sera également affiché ici."
             ),
         )
