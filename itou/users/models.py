@@ -54,7 +54,9 @@ class User(AbstractUser):
     def get_eligibility_diagnosis(self):
         if not self.is_job_seeker:
             return None
-        return self.eligibility_diagnoses.latest("-created_at")
+        return self.eligibility_diagnoses.select_related(
+            "author", "author_siae", "author_prescriber_organization"
+        ).latest("-created_at")
 
     def get_approval(self):
         if not self.is_job_seeker or not self.approvals.exists():
