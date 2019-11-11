@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeWithMembershipFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 
@@ -20,6 +20,25 @@ class CardViewTest(TestCase):
         self.assertIn(siae.display_name, response_content)
         self.assertIn(siae.phone, response_content)
         self.assertIn(siae.email, response_content)
+
+
+class JobDescriptionCardViewTest(TestCase):
+    def test_job_description_card(self):
+        siae = SiaeWithMembershipAndJobsFactory()
+        user = siae.members.first()
+        job_description = siae.job_description_through.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse(
+            "siaes_views:job_description_card",
+            kwargs={"job_description_id": job_description.pk},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        response_content = str(response.content)
+        self.assertIn(job_description.display_name, response_content)
+        self.assertNotIn(siae.display_name, response_content)
+        self.assertNotIn(siae.phone, response_content)
+        self.assertNotIn(siae.email, response_content)
 
 
 class ConfigureJobsViewTest(TestCase):
