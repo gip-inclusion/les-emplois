@@ -41,12 +41,12 @@
             <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a></li>
         {% endif %}
 
-        {% if job_application.jobs.exists %}
+        {% if job_application.selected_jobs.exists %}
             <li>
                 {% trans "Métier(s) recherché(s) :" %}
                 <ul>
-                    {% for job in job_application.jobs.all %}
-                        <li><b>{{ job.name }}</b> ({{ job.rome_id }})</li>
+                    {% for job in job_application.selected_jobs.all %}
+                        <li><b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})</li>
                     {% endfor %}
                 </ul>
             </li>

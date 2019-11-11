@@ -11,7 +11,7 @@
         {% csrf_token %}
 
         {% if siae.jobs.exists %}
-            {% bootstrap_field form.jobs %}
+            {% bootstrap_field form.selected_jobs %}
         {% endif %}
 
         {% bootstrap_field form.message %}

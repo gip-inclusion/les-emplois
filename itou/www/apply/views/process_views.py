@@ -30,7 +30,7 @@ def details_for_siae(
             "sender_prescriber_organization",
             "to_siae",
         )
-        .prefetch_related("jobs")
+        .prefetch_related("selected_jobs")
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
 

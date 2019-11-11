@@ -114,7 +114,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "jobs": [siae.jobs.first().pk],
+            "selected_jobs": [siae.job_description_through.first().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -136,8 +136,10 @@ class ApplyAsJobSeekerTest(TestCase):
         )
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
-        self.assertEqual(job_application.jobs.count(), 1)
-        self.assertEqual(job_application.jobs.first().pk, post_data["jobs"][0])
+        self.assertEqual(job_application.selected_jobs.count(), 1)
+        self.assertEqual(
+            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
+        )
 
 
 class ApplyAsAuthorizedPrescriberTest(TestCase):
@@ -268,7 +270,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "jobs": [siae.jobs.first().pk, siae.jobs.last().pk],
+            "selected_jobs": [
+                siae.job_description_through.first().pk,
+                siae.job_description_through.last().pk,
+            ],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -292,13 +297,17 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         )
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
-        self.assertEqual(job_application.jobs.count(), 2)
-        self.assertEqual(job_application.jobs.first().pk, post_data["jobs"][0])
-        self.assertEqual(job_application.jobs.last().pk, post_data["jobs"][1])
+        self.assertEqual(job_application.selected_jobs.count(), 2)
+        self.assertEqual(
+            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
+        )
+        self.assertEqual(
+            job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
+        )
 
 
 class ApplyAsPrescriberTest(TestCase):
-    def test_apply_as_authorized_prescriber(self):
+    def test_apply_prescriber(self):
         """Apply as a prescriber."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -409,7 +418,10 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "jobs": [siae.jobs.first().pk, siae.jobs.last().pk],
+            "selected_jobs": [
+                siae.job_description_through.first().pk,
+                siae.job_description_through.last().pk,
+            ],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -431,6 +443,10 @@ class ApplyAsPrescriberTest(TestCase):
         )
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
-        self.assertEqual(job_application.jobs.count(), 2)
-        self.assertEqual(job_application.jobs.first().pk, post_data["jobs"][0])
-        self.assertEqual(job_application.jobs.last().pk, post_data["jobs"][1])
+        self.assertEqual(job_application.selected_jobs.count(), 2)
+        self.assertEqual(
+            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
+        )
+        self.assertEqual(
+            job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
+        )

@@ -141,6 +141,11 @@ class SiaeMembership(models.Model):
     )
 
 
+class SiaeJobDescriptionManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("appellation")
+
+
 class SiaeJobDescription(models.Model):
     """
     A job description of a position in an SIAE.
@@ -168,11 +173,16 @@ class SiaeJobDescription(models.Model):
     # TODO: this will be used to order job description in UI.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
+    objects = SiaeJobDescriptionManager()
+
     class Meta:
         verbose_name = _("Fiche de poste")
         verbose_name_plural = _("Fiches de postes")
         unique_together = ("appellation", "siae")
         ordering = ["appellation__name", "ui_rank"]
+
+    def __str__(self):
+        return self.display_name
 
     def save(self, *args, **kwargs):
         if self.pk:

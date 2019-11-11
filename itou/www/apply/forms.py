@@ -67,16 +67,16 @@ class SubmitJobApplicationForm(forms.ModelForm):
     def __init__(self, siae, *args, **kwargs):
         self.siae = siae
         super().__init__(*args, **kwargs)
-        self.fields["jobs"].queryset = siae.jobs.filter(
-            siaejobdescription__is_active=True
+        self.fields["selected_jobs"].queryset = siae.job_description_through.filter(
+            is_active=True
         )
         self.fields["message"].required = True
 
     class Meta:
         model = JobApplication
-        fields = ["jobs", "message"]
-        widgets = {"jobs": forms.CheckboxSelectMultiple()}
-        labels = {"jobs": _("Métiers recherchés (optionnel)")}
+        fields = ["selected_jobs", "message"]
+        widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
+        labels = {"selected_jobs": _("Métiers recherchés (optionnel)")}
 
 
 class RefusalForm(forms.Form):

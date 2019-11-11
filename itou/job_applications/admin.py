@@ -15,9 +15,9 @@ class TransitionLogInline(admin.TabularInline):
 
 
 class JobsInline(admin.TabularInline):
-    model = models.JobApplication.jobs.through
+    model = models.JobApplication.selected_jobs.through
     extra = 1
-    raw_id_fields = ("appellation",)
+    raw_id_fields = ("siaejobdescription",)
 
 
 @admin.register(models.JobApplication)

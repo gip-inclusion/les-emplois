@@ -6,7 +6,9 @@ from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+
 from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import PrescriberFactory, JobSeekerFactory
 
 
@@ -22,15 +24,15 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     answer = factory.Faker("sentence", nb_words=40)
 
     @factory.post_generation
-    def jobs(self, create, extracted, **kwargs):
+    def selected_jobs(self, create, extracted, **kwargs):
         """
-        Add jobs in which the job seeker is interested.
+        Add selected_jobs in which the job seeker is interested.
         https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
 
         Usage:
-            job1 = Appellation.objects.filter(code='10933')
-            job2 = Appellation.objects.filter(code='10934')
-            JobApplicationFactory(jobs=(job1, job2))
+            appellation1 = Appellation.objects.filter(code='10933')
+            appellation2 = Appellation.objects.filter(code='10934')
+            JobApplicationFactory(selected_jobs=(appellation1, appellation2))
         """
         if not create:
             # Simple build, do nothing.
@@ -38,8 +40,11 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
         if extracted:
             # A list of jobs were passed in, use them.
-            for job in extracted:
-                self.jobs.add(job)
+            for appellation in extracted:
+                siae_job_description = SiaeJobDescription.objects.create(
+                    siae=self.to_siae, appellation=appellation
+                )
+                self.selected_jobs.add(siae_job_description)
 
 
 class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):

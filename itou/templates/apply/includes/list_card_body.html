@@ -4,12 +4,12 @@
     <div class="col-md-5">
         <div class="card-body">
             <h6 class="card-subtitle text-muted">{% trans "Métier(s) recherché(s) :" %}</h6>
-            {% if not job_application.jobs.exists %}
+            {% if not job_application.selected_jobs.exists %}
                 <p class="card-text">{% trans "Candidature spontanée" %}</p>
             {% else %}
                 <ul class="card-text">
-                    {% for job in job_application.jobs.all %}
-                        <li>{{ job.name }}</li>
+                    {% for job in job_application.selected_jobs.all %}
+                        <li>{{ job.display_name }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}

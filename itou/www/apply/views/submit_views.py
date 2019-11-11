@@ -236,8 +236,8 @@ def step_application(
         job_application.to_siae = siae
         job_application.save()
 
-        for job in form.cleaned_data["jobs"]:
-            job_application.jobs.add(job)
+        for job in form.cleaned_data["selected_jobs"]:
+            job_application.selected_jobs.add(job)
 
         job_application.email_new_for_siae.send()
 

@@ -20,6 +20,11 @@ from itou.utils.templatetags import format_filters
 
 
 class JobApplicationFactoriesTest(TestCase):
+    def test_job_application_factory(self):
+        create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
+        job_application = JobApplicationFactory(selected_jobs=Appellation.objects.all())
+        self.assertEqual(job_application.selected_jobs.count(), 2)
+
     def test_job_application_sent_by_job_seeker_factory(self):
         job_application = JobApplicationSentByJobSeekerFactory()
         self.assertEqual(
@@ -68,7 +73,7 @@ class JobApplicationEmailTest(TestCase):
 
     def test_new_for_siae(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            jobs=Appellation.objects.all()
+            selected_jobs=Appellation.objects.all()
         )
         email = job_application.email_new_for_siae
         # To.
@@ -86,8 +91,8 @@ class JobApplicationEmailTest(TestCase):
             format_filters.format_phone(job_application.job_seeker.phone), email.body
         )
         self.assertIn(job_application.message, email.body)
-        for job in job_application.jobs.all():
-            self.assertIn(job.name, email.body)
+        for job in job_application.selected_jobs.all():
+            self.assertIn(job.display_name, email.body)
         self.assertIn(job_application.sender.get_full_name(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(

@@ -201,8 +201,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     # Jobs in which the job seeker is interested (optional).
-    jobs = models.ManyToManyField(
-        "jobs.Appellation", verbose_name=_("Métiers recherchés"), blank=True
+    selected_jobs = models.ManyToManyField(
+        "siaes.SiaeJobDescription", verbose_name=_("Métiers recherchés"), blank=True
     )
 
     message = models.TextField(verbose_name=_("Message de candidature"), blank=True)

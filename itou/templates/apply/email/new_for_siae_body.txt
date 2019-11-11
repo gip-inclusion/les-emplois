@@ -21,12 +21,12 @@
 
 {% endif %}
 
-{% if job_application.jobs.exists %}
+{% if job_application.selected_jobs.exists %}
 
 {% trans "*Métier(s) recherché(s)* :" %}
 
-{% for job in job_application.jobs.all %}
-- {{ job.name }}{% endfor %}
+{% for job in job_application.selected_jobs.all %}
+- {{ job.display_name }}{% endfor %}
 
 {% endif %}
 
