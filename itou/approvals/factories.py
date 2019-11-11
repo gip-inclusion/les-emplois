@@ -15,6 +15,6 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         model = models.Approval
 
     user = factory.SubFactory(JobSeekerFactory)
-    number = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="9")
+    number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
     start_at = datetime.date.today()
     end_at = datetime.date.today() + datetime.timedelta(days=365 * 2)

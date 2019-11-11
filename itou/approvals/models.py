@@ -2,9 +2,11 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from itou.utils.validators import alphanumeric
 
 
 logger = logging.getLogger(__name__)
@@ -17,11 +19,16 @@ class Approval(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Utilisateur"),
+        verbose_name=_("Demandeur d'emploi"),
         on_delete=models.CASCADE,
         related_name="approvals",
     )
-    number = models.CharField(verbose_name=_("Numéro"), max_length=30)
+    number = models.CharField(
+        verbose_name=_("Numéro"),
+        max_length=12,
+        help_text=_("12 caractères alphanumériques."),
+        validators=[alphanumeric, MinLengthValidator(12)],
+    )
     start_at = models.DateField(verbose_name=_("Date de début"), blank=True, null=True)
     end_at = models.DateField(verbose_name=_("Date de fin"), blank=True, null=True)
     created_at = models.DateTimeField(

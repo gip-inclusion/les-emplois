@@ -19,7 +19,7 @@ from itou.utils.perms.user import get_user_info
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.templatetags import format_filters
 from itou.utils.urls import get_safe_url
-from itou.utils.validators import validate_naf, validate_siret
+from itou.utils.validators import alphanumeric, validate_naf, validate_siret
 
 
 class UtilsAddressMixinTest(TestCase):
@@ -91,6 +91,10 @@ class UtilsSiretTest(TestCase):
 
 
 class UtilsValidatorsTest(TestCase):
+    def test_validate_alphanumeric(self):
+        self.assertRaises(ValidationError, alphanumeric, "1245a_89871")
+        alphanumeric("6201Z")
+
     def test_validate_naf(self):
         self.assertRaises(ValidationError, validate_naf, "1")
         self.assertRaises(ValidationError, validate_naf, "12254")
