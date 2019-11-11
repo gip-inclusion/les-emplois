@@ -19,29 +19,30 @@ class CardViewTest(TestCase):
         url = reverse("siaes_views:card", kwargs={"siret": siae.siret})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        response_content = str(response.content)
-        self.assertIn(siae.display_name, response_content)
-        self.assertIn(siae.phone, response_content)
-        self.assertIn(siae.email, response_content)
+        self.assertContains(response, siae.display_name)
+        self.assertContains(response, siae.email)
+        self.assertContains(response, siae.phone)
 
 
 class JobDescriptionCardViewTest(TestCase):
     def test_job_description_card(self):
         siae = SiaeWithMembershipAndJobsFactory()
         user = siae.members.first()
-        job_description = siae.job_description_through.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        job_description = siae.job_description_through.first()
+        job_description.description = (
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        )
+        job_description.save()
         url = reverse(
             "siaes_views:job_description_card",
             kwargs={"job_description_id": job_description.pk},
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        response_content = str(response.content)
-        self.assertIn(job_description.display_name, response_content)
-        self.assertNotIn(siae.display_name, response_content)
-        self.assertNotIn(siae.phone, response_content)
-        self.assertNotIn(siae.email, response_content)
+        self.assertContains(response, job_description.description)
+        self.assertContains(response, job_description.display_name)
+        self.assertContains(response, siae.display_name)
 
 
 class ConfigureJobsViewTest(TestCase):

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load format_filters %}
 
-{% block title %}{{ job.display_name }}{{ block.super }}{% endblock %}
+{% block title %}{{ job.display_name }} - {{ siae.display_name }}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -10,14 +10,44 @@
         {{ job.display_name }}
     </h1>
 
+    <hr>
+
+    <p class="text-muted mb-0">{% trans "Métier proposé par :" %}</p>
+
+    <h2>
+        <a href="{{ siae.get_card_url }}">{{ siae.display_name }}</a>
+        {# Display non-user-edited name too. #}
+        {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
+    </h2>
+
+    <p class="text-muted">
+        {{ siae.address_line_1 }},
+        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+        {{ siae.post_code }} {{ siae.city }}
+    </p>
+
     {% if job.description %}
-        <div class="alert alert-secondary pb-0">{{ job.description|linebreaks }}</div>
+        <hr>
+        <div class="alert alert-secondary">{{ job.description|linebreaks }}</div>
     {% endif %}
 
-    <p class="mb-2">
-        {% include "includes/icon.html" with icon="briefcase" %}
-        <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans "En savoir plus sur la structure proposant cette fiche de poste." %}</a>
-    </p>
+    <hr>
+
+    <div class="form-group">
+        <p>
+            {% trans "Copiez-collez ce lien pour partager cette fiche de poste :" %}
+        </p>
+        <input type="text" class="form-control" value="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{{ job.get_absolute_url }}" onClick="this.select()">
+    </div>
+
+    {% if siae.has_members %}
+        <hr>
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+            </a>
+        </p>
+    {% endif %}
 
     {% if back_url %}
         <hr>

@@ -10,4 +10,6 @@ def expose_settings(request):
     return {
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
+        "ITOU_FQDN": settings.ITOU_FQDN,
+        "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
     }

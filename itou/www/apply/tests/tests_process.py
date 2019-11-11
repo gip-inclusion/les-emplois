@@ -223,11 +223,11 @@ class ProcessTemplatesTest(TestCase):
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(self.url_details)
         # Test template content.
-        self.assertIn(self.url_process, str(response.content))
-        self.assertNotIn(self.url_eligibility, str(response.content))
-        self.assertNotIn(self.url_refuse, str(response.content))
-        self.assertNotIn(self.url_postpone, str(response.content))
-        self.assertNotIn(self.url_accept, str(response.content))
+        self.assertContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_processing(self):
         """Test actions available when the state is processing."""
@@ -236,11 +236,11 @@ class ProcessTemplatesTest(TestCase):
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
-        self.assertNotIn(self.url_process, str(response.content))
-        self.assertIn(self.url_eligibility, str(response.content))
-        self.assertNotIn(self.url_refuse, str(response.content))
-        self.assertNotIn(self.url_postpone, str(response.content))
-        self.assertNotIn(self.url_accept, str(response.content))
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_postponed(self):
         """Test actions available when the state is postponed."""
@@ -249,11 +249,11 @@ class ProcessTemplatesTest(TestCase):
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
-        self.assertNotIn(self.url_process, str(response.content))
-        self.assertNotIn(self.url_eligibility, str(response.content))
-        self.assertIn(self.url_refuse, str(response.content))
-        self.assertNotIn(self.url_postpone, str(response.content))
-        self.assertIn(self.url_accept, str(response.content))
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
 
     def test_details_template_for_other_states(self):
         """Test actions available for other states."""
@@ -267,8 +267,8 @@ class ProcessTemplatesTest(TestCase):
             self.job_application.save()
             response = self.client.get(self.url_details)
             # Test template content.
-            self.assertNotIn(self.url_process, str(response.content))
-            self.assertNotIn(self.url_eligibility, str(response.content))
-            self.assertNotIn(self.url_refuse, str(response.content))
-            self.assertNotIn(self.url_postpone, str(response.content))
-            self.assertNotIn(self.url_accept, str(response.content))
+            self.assertNotContains(response, self.url_process)
+            self.assertNotContains(response, self.url_eligibility)
+            self.assertNotContains(response, self.url_refuse)
+            self.assertNotContains(response, self.url_postpone)
+            self.assertNotContains(response, self.url_accept)

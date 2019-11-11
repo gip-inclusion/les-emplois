@@ -20,44 +20,49 @@
         {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
     </h1>
 
-    <h2 class="text-muted">
+    <p class="text-muted">
         {{ siae.address_line_1 }},
         {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
         {{ siae.post_code }} {{ siae.city }}
-    </h2>
+    </p>
 
     {% if siae.description %}
         <hr>
-        <p>{{ siae.description|linebreaks }}</p>
+        <div>{{ siae.description|linebreaks }}</div>
     {% endif %}
 
-    <hr>
+    {% if siae.email or siae.phone or siae.website %}
 
-    {% if siae.email %}
-        <p>
-            {% trans "E-mail" as email_label %}
-            {% include "includes/icon.html" with icon="mail" title=email_label %}
-            <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
-        </p>
-    {% endif %}
+        <hr>
 
-    {% if siae.phone %}
-        <p>
-            {% trans "Téléphone" as phone_label %}
-            {% include "includes/icon.html" with icon="phone" title=phone_label %}
-            <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
-        </p>
-    {% endif %}
+        {% if siae.email %}
+            <p>
+                {% trans "E-mail" as email_label %}
+                {% include "includes/icon.html" with icon="mail" title=email_label %}
+                <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
+            </p>
+        {% endif %}
 
-    {% if siae.website %}
-        <p>
-            {% trans "Site Internet" as website_label %}
-            {% include "includes/icon.html" with icon="external-link" title=website_label %}
-            <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
-        </p>
+        {% if siae.phone %}
+            <p>
+                {% trans "Téléphone" as phone_label %}
+                {% include "includes/icon.html" with icon="phone" title=phone_label %}
+                <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
+            </p>
+        {% endif %}
+
+        {% if siae.website %}
+            <p>
+                {% trans "Site Internet" as website_label %}
+                {% include "includes/icon.html" with icon="external-link" title=website_label %}
+                <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
+            </p>
+        {% endif %}
+
     {% endif %}
 
     {% if siae.job_description_through.exists %}
+        <hr>
         <p class="mb-2">
             {% include "includes/icon.html" with icon="briefcase" %}
             {% trans "Métiers proposés" %}
@@ -66,9 +71,6 @@
         {% for job in siae.job_description_through.all %}
             <li>
                 <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans job.display_name %}</a>
-                {% if job.description %}
-                    <div class="alert alert-secondary pb-0">{{ job.description|linebreaks }}</div>
-                {% endif %}
             </li>
         {% endfor %}
         </ul>
