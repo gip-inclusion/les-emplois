@@ -30,7 +30,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "sender_prescriber_organization",
         "to_siae",
     )
-    exclude = ("jobs",)
+    exclude = ("selected_jobs",)
     list_filter = ("state",)
     readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)

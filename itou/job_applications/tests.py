@@ -129,7 +129,8 @@ class JobApplicationEmailTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             date_of_hiring=datetime.date.today(),
         )
-        email = job_application.email_accept_trigger_manual_approval
+        accepted_by = job_application.to_siae.members.first()
+        email = job_application.email_accept_trigger_manual_approval(accepted_by)
         # To.
         self.assertIn(settings.ITOU_EMAIL_CONTACT, email.to)
         self.assertEqual(len(email.to), 1)
@@ -143,6 +144,8 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.siret, email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.date_of_hiring.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(accepted_by.get_full_name(), email.body)
+        self.assertIn(accepted_by.email, email.body)
         self.assertIn(
             reverse(
                 "admin:job_applications_jobapplication_change",
@@ -205,7 +208,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = user.job_applications.filter(
             state=JobApplicationWorkflow.STATE_PROCESSING
         ).first()
-        job_application.accept()
+        job_application.accept(user=job_application.to_siae.members.first())
 
         self.assertEqual(
             user.job_applications.filter(

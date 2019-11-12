@@ -16,7 +16,8 @@ Informations pour l'obtention d'un numéro d'agrément.
 
 - Siret : {{ job_application.to_siae.siret }}
 - Nom : {{ job_application.to_siae.display_name }}
-- Date de l'embauche : {{ job_application.date_of_hiring|date:"d/m/Y" }}
+- Date de l'embauche : {{ job_application.date_of_hiring|date:"d/m/Y" }}{% if accepted_by %}
+- Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
 
 Voir la candidature dans l'admin :
 {{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:job_applications_jobapplication_change" job_application.id %}
