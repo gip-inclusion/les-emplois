@@ -24,7 +24,7 @@ def card(request, siret, template_name="siaes/card.html"):
     return render(request, template_name, context)
 
 
-@login_required
+# Public view.
 def job_description_card(
     request, job_description_id, template_name="siaes/job_description_card.html"
 ):

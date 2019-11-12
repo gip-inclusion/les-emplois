@@ -29,8 +29,6 @@ class CardViewTest(TestCase):
 class JobDescriptionCardViewTest(TestCase):
     def test_job_description_card(self):
         siae = SiaeWithMembershipAndJobsFactory()
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         job_description = siae.job_description_through.first()
         job_description.description = (
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit."

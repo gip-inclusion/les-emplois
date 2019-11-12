@@ -37,7 +37,7 @@
         <p>
             {% trans "Copiez-collez ce lien pour partager cette fiche de poste :" %}
         </p>
-        <input type="text" class="form-control" value="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{{ job.get_absolute_url }}" onClick="this.select()">
+        <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
     </div>
 
     {% if siae.has_members %}
