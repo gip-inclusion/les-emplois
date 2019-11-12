@@ -16,10 +16,7 @@
 
         {% include "eligibility/includes/form_v_1_0_0.html" with form=form %}
 
-        {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
-            <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
-        {% endbuttons %}
+        <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
 
         {% if form.errors %}
 

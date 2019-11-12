@@ -39,47 +39,58 @@
         <hr>
     {% endif %}
 
-    <div class="form-group">
-        <h4>{{ field.label }}</h4>
-        <ul class="list-unstyled">
-            {% for radio in field %}
-                <li>
-                    {% with form.extra_info|dict_lookup:radio.data.value as info %}
-                        <div class="clearfix mb-2">
-                            <div class="float-left">
-                                {{ radio.tag }}
-                            </div>
-                            <div class="pl-4">
-                                <label for="{{ radio.id_for_label }}" class="mb-0">
-                                    {{ radio.choice_label }}
-                                    {% if info.help %}
+    {% if field.field.widget.allow_multiple_selected %}
+        <div class="form-group">
+            <h4>{{ field.label }}</h4>
+            <ul class="list-unstyled">
+                {% for radio in field %}
+                    <li>
+                        {% with form.extra_info|dict_lookup:radio.data.value as info %}
+                            <div class="clearfix mb-2">
+                                <div class="float-left">
+                                    {{ radio.tag }}
+                                </div>
+                                <div class="pl-4">
+                                    <label for="{{ radio.id_for_label }}" class="mb-0">
+                                        {{ radio.choice_label }}
+                                        {% if info.help %}
+                                            <br>
+                                            <small class="text-muted">{{ info.help }}</small>
+                                        {% endif %}
+                                    </label>
+                                    {% if info.written_proof %}
                                         <br>
-                                        <small class="text-muted">{{ info.help }}</small>
+                                        <small>
+                                            {% trans "Pièce justificative :" %}
+                                            <i>{{ info.written_proof }}</i>
+                                        </small>
                                     {% endif %}
-                                </label>
-                                {% if info.written_proof %}
-                                    <br>
-                                    <small>
-                                        {% trans "Pièce justificative :" %}
-                                        <i>{{ info.written_proof }}</i>
-                                    </small>
-                                {% endif %}
-                                {% if info.url %}
-                                    <br>
-                                    <small>
-                                        <a href="{{ info.url }}" rel="noopener" target="_blank">
-                                            {{ info.url }}
-                                        </a>
-                                    </small>
-                                {% endif %}
+                                    {% if info.url %}
+                                        <br>
+                                        <small>
+                                            <a href="{{ info.url }}" rel="noopener" target="_blank">
+                                                {{ info.url }}
+                                            </a>
+                                        </small>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                    {% endwith %}
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+                        {% endwith %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
 {% endfor %}
+
 <hr>
 
+<div class="alert alert-warning" role="alert">
+    <p>
+        {% blocktrans %}En cliquant sur "Valider" vous confirmez que la personne concernée a donné son consentement exprès (démarche active, explicite et de préférence écrite, qui doit être libre, spécifique, et informée).{% endblocktrans %}
+    </p>
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
+    {% endbuttons %}
+</div>
