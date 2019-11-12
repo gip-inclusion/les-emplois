@@ -21,7 +21,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         "sender_siae",
         "sender_prescriber_organization",
         "to_siae",
-    ).prefetch_related("selected_jobs")
+    ).prefetch_related("selected_jobs__appellation")
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
     )
@@ -55,7 +55,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         "sender_siae",
         "sender_prescriber_organization",
         "to_siae",
-    ).prefetch_related("selected_jobs")
+    ).prefetch_related("selected_jobs__appellation")
 
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
@@ -81,7 +81,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "sender_siae",
         "sender_prescriber_organization",
         "to_siae",
-    ).prefetch_related("selected_jobs")
+    ).prefetch_related("selected_jobs__appellation")
     job_applications_page = pager(
         job_applications, request.GET.get("page"), items_per_page=10
     )
