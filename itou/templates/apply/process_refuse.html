@@ -25,6 +25,9 @@
                 {% for radio in form.refusal_reason %}
                     <li>
                         <label for="{{ radio.id_for_label }}">{{ radio.tag }} {{ radio.choice_label }}</label>
+                        {% if forloop.last %}
+                            <small class="text-muted">{% trans "(vous devez alors motiver votre refus dans la zone de texte libre \"Réponse\" ci-dessous)" %}</small>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>
