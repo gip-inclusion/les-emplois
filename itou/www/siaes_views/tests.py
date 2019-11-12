@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -19,7 +20,8 @@ class CardViewTest(TestCase):
         url = reverse("siaes_views:card", kwargs={"siret": siae.siret})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, siae.display_name)
+        self.assertEqual(response.context["siae"], siae)
+        self.assertContains(response, escape(siae.display_name))
         self.assertContains(response, siae.email)
         self.assertContains(response, siae.phone)
 
@@ -40,9 +42,11 @@ class JobDescriptionCardViewTest(TestCase):
         )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["job"], job_description)
+        self.assertEqual(response.context["siae"], siae)
         self.assertContains(response, job_description.description)
-        self.assertContains(response, job_description.display_name)
-        self.assertContains(response, siae.display_name)
+        self.assertContains(response, escape(job_description.display_name))
+        self.assertContains(response, escape(siae.display_name))
 
 
 class ConfigureJobsViewTest(TestCase):
