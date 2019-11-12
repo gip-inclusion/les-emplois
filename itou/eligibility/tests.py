@@ -19,7 +19,7 @@ class ModelTest(TestCase):
 
         data = json.dumps(
             {
-                "Freins périphériques": [
+                "Besoins d'accompagnement": [
                     [
                         "Faire face à des difficultés administratives ou juridiques",
                         ["Prendre en compte une problématique judiciaire"],
@@ -36,7 +36,7 @@ class ModelTest(TestCase):
         diagnosis = EligibilityDiagnosisFactory(data=data)
 
         expected_markup = (
-            "<ul><li><b>Freins périphériques</b><ul>"
+            "<ul><li><b>Besoins d'accompagnement</b><ul>"
             "<li>Faire face à des difficultés administratives ou juridiques<ul>"
             "<li>Prendre en compte une problématique judiciaire</li></ul>"
             "</li></ul></li><li><b>Critères administratifs</b><ul>"
@@ -66,7 +66,7 @@ class FormCleanForSiaeTest(TestCase):
             siae=cls.siae,
         )
 
-    def test_clean_siae_without_peripheral_barriers(self):
+    def test_clean_siae_without_barriers(self):
         data = {
             "criteres_administratifs_de_niveau_2": [
                 "travailleur_handicape",
@@ -77,7 +77,7 @@ class FormCleanForSiaeTest(TestCase):
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         form.is_valid()
-        with self.assertRaisesMessage(ValidationError, form.ERROR_PERIPHERAL_BARRIERS):
+        with self.assertRaisesMessage(ValidationError, form.ERROR_BARRIERS):
             form.clean()
 
     def test_clean_siae_without_administrative_criteria(self):
@@ -166,13 +166,13 @@ class FormCleanForAuthorizedPrescriberTest(TestCase):
             siae=None,
         )
 
-    def test_clean_authorized_prescriber_without_peripheral_barriers(self):
+    def test_clean_authorized_prescriber_without_barriers(self):
         data = {}
         form = EligibilityForm(
             user_info=self.user_info, job_seeker=self.job_seeker, data=data
         )
         form.is_valid()
-        with self.assertRaisesMessage(ValidationError, form.ERROR_PERIPHERAL_BARRIERS):
+        with self.assertRaisesMessage(ValidationError, form.ERROR_BARRIERS):
             form.clean()
 
     def test_clean_authorized_prescriber_ok(self):
@@ -217,7 +217,7 @@ class FormGetHumanReadableDataTest(TestCase):
         self.assertTrue(form.is_valid())
 
         expected_data = {
-            "Freins périphériques": [
+            "Besoins d'accompagnement": [
                 [
                     "Faire face à des difficultés administratives ou juridiques",
                     [

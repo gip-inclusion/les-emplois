@@ -31,7 +31,7 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
     )
     data = json.dumps(
         {
-            "Freins périphériques": [
+            "Besoins d'accompagnement": [
                 [
                     "Faire face à des difficultés administratives ou juridiques",
                     ["Prendre en compte une problématique judiciaire"],

@@ -24,8 +24,8 @@ class EligibilityForm(forms.Form):
     VERSION = "1.0.0"
 
     CHOICES = {
-        "peripheral_barriers": {
-            "label": _("Freins périphériques"),
+        "barriers": {
+            "label": _("Besoins d'accompagnement"),  # Was "Freins périphériques".
             # Each element in `items` is transformed into a MultipleChoiceField.
             "items": {
                 "faire_face_a_des_difficultes_administratives_ou_juridiques": {
@@ -385,7 +385,7 @@ class EligibilityForm(forms.Form):
         },
     }
 
-    ERROR_PERIPHERAL_BARRIERS = _("Vous devez indiquer au moins un frein périphérique.")
+    ERROR_BARRIERS = _("Vous devez indiquer au moins un besoin d'accompagnement.")
     ERROR_ADMINISTRATIVE_CRITERIA = _(
         "La personne doit répondre à au moins un critère administratif de "
         "niveau 1 ou au cumul d'au moins trois critères administratifs de "
@@ -460,16 +460,16 @@ class EligibilityForm(forms.Form):
 
         checked_num = {k: len(v) for k, v in cleaned_data.items()}
 
-        peripheral_barriers_num = sum(
+        barriers_num = sum(
             [
                 v
                 for k, v in checked_num.items()
-                if k in self.CHOICES["peripheral_barriers"]["items"].keys()
+                if k in self.CHOICES["barriers"]["items"].keys()
             ]
         )
 
-        if not peripheral_barriers_num:
-            raise forms.ValidationError(self.ERROR_PERIPHERAL_BARRIERS)
+        if not barriers_num:
+            raise forms.ValidationError(self.ERROR_BARRIERS)
 
         if not is_siae:
             return
@@ -497,7 +497,7 @@ class EligibilityForm(forms.Form):
         """
         Return the checked items as a human readable structure, e.g.:
             {
-                "Freins périphériques": [
+                "Besoins d'accompagnement": [
                     [
                         "Faire face à des difficultés administratives ou juridiques",
                         [
@@ -530,8 +530,8 @@ class EligibilityForm(forms.Form):
                 labels = [field.label, choices_labels]
 
                 category_label = (
-                    self.CHOICES["peripheral_barriers"]["label"]
-                    if key in self.CHOICES["peripheral_barriers"]["items"]
+                    self.CHOICES["barriers"]["label"]
+                    if key in self.CHOICES["barriers"]["items"]
                     else self.CHOICES["administrative_criteria"]["label"]
                 )
                 data.setdefault(category_label, []).append(labels)
