@@ -28,7 +28,9 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
         value = self.value()
         if value == "yes":
             return queryset.filter(_member_count__gt=0)
-        return queryset.exclude(_member_count__gt=0)
+        if value == "no":
+            return queryset.exclude(_member_count__gt=0)
+        return queryset
 
 
 @admin.register(models.Siae)
