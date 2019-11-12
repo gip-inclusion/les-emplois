@@ -47,6 +47,7 @@ def start(request, siae_pk):
         "sender_pk": None,
         "sender_kind": None,
         "sender_prescriber_organization_pk": None,
+        "job_description_id": request.GET.get("job_description_id"),
     }
 
     next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
@@ -213,7 +214,10 @@ def step_application(
     siae = get_object_or_404(queryset, pk=siae_pk)
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    form = SubmitJobApplicationForm(data=request.POST or None, siae=siae)
+    initial_data = {"selected_jobs": [session_data["job_description_id"]]}
+    form = SubmitJobApplicationForm(
+        data=request.POST or None, siae=siae, initial=initial_data
+    )
 
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 

@@ -34,6 +34,7 @@ class ApplyAsJobSeekerTest(TestCase):
             "sender_pk": None,
             "sender_kind": None,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -54,6 +55,7 @@ class ApplyAsJobSeekerTest(TestCase):
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -74,6 +76,7 @@ class ApplyAsJobSeekerTest(TestCase):
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -169,6 +172,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "sender_pk": None,
             "sender_kind": None,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -189,6 +193,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -235,6 +240,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
             "sender_prescriber_organization_pk": prescriber_organization.pk,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -330,6 +336,7 @@ class ApplyAsPrescriberTest(TestCase):
             "sender_pk": None,
             "sender_kind": None,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -350,6 +357,7 @@ class ApplyAsPrescriberTest(TestCase):
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 
@@ -396,6 +404,7 @@ class ApplyAsPrescriberTest(TestCase):
             "sender_pk": user.pk,
             "sender_kind": JobApplication.SENDER_KIND_PRESCRIBER,
             "sender_prescriber_organization_pk": None,
+            "job_description_id": None,
         }
         self.assertDictEqual(session_data, expected_session_data)
 

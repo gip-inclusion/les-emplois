@@ -58,11 +58,9 @@
                         <ul class="mb-0">
                         {% for job in siae.job_description_through.all %}
                             <li>
-                                {% if job.custom_name %}
-                                    {{ job.custom_name }}
-                                {% else %}
-                                    {{ job.appellation.name }}
-                                {% endif %}
+                                <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                    {{ job.display_name }}
+                                </a>
                             </li>
                         {% endfor %}
                         </ul>
