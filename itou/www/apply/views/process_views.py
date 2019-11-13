@@ -140,7 +140,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             mark_safe(
                 _(
                     "Embauche acceptée.<br>"
-                    "Il n'est pas nécessaire de demander de numéro d'agrément à votre interlocuteur Pôle emploi.<br>"
+                    "Il n'est pas nécessaire de demander le numéro d'agrément à votre interlocuteur Pôle emploi.<br>"
                     "Le numéro d'agrément sera indiqué sur cette page - "
                     "vous serez prévenu par email dès qu'il sera disponible.<br>"
                     "Ce numéro pourra être utilisé pour la déclaration de la personne dans l'ASP.<br>"
