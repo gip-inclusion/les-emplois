@@ -15,6 +15,13 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
         return self.filter(members=user, members__is_active=True)
 
 
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+        )
+
+
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
@@ -48,8 +55,16 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         default=False,
         help_text=_("Précise si l'organisation est habilitée par le préfet."),
     )
+    code_safir_pole_emploi = models.CharField(
+        verbose_name=_("Code Safir"),
+        help_text=_("Code unique d'une agence Pole emploi."),
+        max_length=5,
+        null=True,
+        unique=True,
+    )
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
+    active_objects = ActiveManager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
         verbose_name = _("Organisation")
@@ -65,6 +80,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     @property
     def admins(self):
         return self.members.filter(prescribermembership__is_admin=True)
+
+    @property
+    def has_members(self):
+        return self.members.exists()
 
 
 class PrescriberMembership(models.Model):

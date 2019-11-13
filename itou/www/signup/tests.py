@@ -143,7 +143,9 @@ class PrescriberSignupTest(TestCase):
     def test_prescriber_signup_join_authorized_organization(self):
         """Prescriber signup who joins an authorized_organization."""
 
-        authorized_organization = PrescriberOrganizationFactory(is_authorized=True)
+        authorized_organization = PrescriberOrganizationFactory(
+            is_authorized=True, department="62"
+        )
 
         url = reverse("signup:prescriber")
         response = self.client.get(url)

@@ -42,9 +42,9 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         label=_(
             "Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"
         ),
-        queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by(
-            "name"
-        ),
+        queryset=PrescriberOrganization.active_objects.filter(
+            is_authorized=True
+        ).order_by("name"),
         required=False,
         help_text=_("Liste des prescripteurs habilités par le Préfet."),
     )
