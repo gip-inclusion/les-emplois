@@ -31,7 +31,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "to_siae",
     )
     exclude = ("selected_jobs",)
-    list_filter = ("state",)
+    list_filter = ("sender_kind", "state",)
     readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)
 

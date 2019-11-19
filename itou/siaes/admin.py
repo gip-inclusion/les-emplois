@@ -44,7 +44,7 @@ class SiaeAdmin(admin.ModelAdmin):
         "geocoding_score",
         "member_count",
     )
-    list_filter = ("kind", "department", SiaeHasMembersFilter)
+    list_filter = (SiaeHasMembersFilter, "kind", "department")
     fieldsets = (
         (
             _("SIAE"),
