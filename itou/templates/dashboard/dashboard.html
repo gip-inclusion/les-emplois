@@ -59,6 +59,7 @@
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
                                 <b>{{ approval.number }}</b>
+                                (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
                             </p>
                         </div>
                     </div>

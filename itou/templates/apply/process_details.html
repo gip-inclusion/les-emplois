@@ -17,7 +17,10 @@
             {% if approval %}
                 <li>
                     {% trans "Numéro d'agrément :" %}
-                    <b class="text-success">{{ approval.number }}</b>
+                    <span class="text-success">
+                        <b>{{ approval.number }}</b>
+                        (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
+                    </span>
                 </li>
             {% elif job_application.state.is_accepted %}
                 <li>
