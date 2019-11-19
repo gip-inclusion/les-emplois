@@ -7,24 +7,20 @@
 
 {% block content %}
 
-    <section class="my-4">
+    <h2 class="text-center">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
 
-        <h2 class="text-center">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
+    <p class="text-center">
+        <a href="{% url 'home:eligibility_criteria' %}" class="btn btn-outline-primary">
+            {% trans "Est-ce fait pour moi ?" %}
+        </a>
+    </p>
 
-        <p class="text-center">
-            <a href="{% url 'home:eligibility_criteria' %}" class="btn btn-outline-primary">
-                {% trans "Est-ce fait pour moi ?" %}
-            </a>
-        </p>
+    <br>
 
-        <br>
+    <h3 class="text-center">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
 
-        <h3 class="text-center">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
-
-        <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
-            {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
-        </form>
-
-    </section>
+    <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
+        {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
+    </form>
 
 {% endblock %}
