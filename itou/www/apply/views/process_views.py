@@ -7,7 +7,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
-from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.eligibility.forms import EligibilityForm
 from itou.job_applications.models import JobApplication
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
@@ -169,15 +170,12 @@ def eligibility(
         queryset, id=job_application_id, state=JobApplicationWorkflow.STATE_PROCESSING
     )
 
-    user_info = get_user_info(request)
-    form = EligibilityForm(
-        user_info=user_info,
-        job_seeker=job_application.job_seeker,
-        data=request.POST or None,
-    )
-    if request.method == "POST" and form.is_valid():
-        form.save_diagnosis()
-        messages.success(request, _("Critères d'éligibilité enregistrés !"))
+    form = EligibilityForm()
+
+    if request.method == "POST":
+        user_info = get_user_info(request)
+        EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
+        messages.success(request, _("Éligibilité confirmée !"))
         next_url = reverse(
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
         )

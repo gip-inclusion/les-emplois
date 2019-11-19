@@ -6,11 +6,7 @@ from django.views.generic import TemplateView
 app_name = "content"
 
 urlpatterns = [
-    path(
-        "faq/",
-        TemplateView.as_view(template_name="content/faq.html"),
-        name="faq",
-    ),
+    path("faq/", TemplateView.as_view(template_name="content/faq.html"), name="faq"),
     path(
         "faciliter_embauche_en_iae/",
         TemplateView.as_view(template_name="content/faciliter_embauche_en_iae.html"),

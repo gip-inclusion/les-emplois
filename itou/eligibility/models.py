@@ -64,14 +64,6 @@ class EligibilityDiagnosis(models.Model):
         on_delete=models.CASCADE,
     )
 
-    form_version = models.CharField(
-        verbose_name=_("Version du formulaire"), max_length=10
-    )
-    form_cleaned_data = JSONField(verbose_name=_("Données du formulaire"))
-
-    # Stores the diagnosis as a human readable dict structure.
-    data = JSONField(verbose_name=_("Résultat du formulaire"))
-
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
     )
@@ -91,26 +83,12 @@ class EligibilityDiagnosis(models.Model):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
-    @property
-    def data_as_dict(self):
-        if self.data:
-            return json.loads(self.data)
-        return {}
-
-    @property
-    def data_as_html(self):
-        html = "<ul>"
-        for category, choices in self.data_as_dict.items():
-            html += f"<li><b>{category}</b>"
-            for item in choices:
-                html += "<ul>"
-                html += f"<li>{item[0]}"
-                html += "<ul>"
-                for sub_item in item[1]:
-                    html += f"<li>{sub_item}</li>"
-                html += "</ul>"
-                html += "</li>"
-                html += "</ul>"
-            html += f"</li>"
-        html += "</ul>"
-        return mark_safe(html)
+    @classmethod
+    def create_diagnosis(cls, job_seeker, user_info, **fields):
+        return cls.objects.create(
+            job_seeker=job_seeker,
+            author=user_info.user,
+            author_kind=user_info.kind,
+            author_siae=user_info.siae,
+            author_prescriber_organization=user_info.prescriber_organization,
+        )

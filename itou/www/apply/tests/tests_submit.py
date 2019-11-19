@@ -255,13 +255,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         self.assertFalse(new_job_seeker.has_eligibility_diagnosis)
 
-        post_data = {
-            "faire_face_a_des_difficultes_administratives_ou_juridiques": [
-                "connaitre_les_voies_de_recours_face_a_une_discrimination",
-                "prendre_en_compte_une_problematique_judiciaire",
-            ]
-        }
-        response = self.client.post(next_url, data=post_data)
+        response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
         self.assertTrue(new_job_seeker.has_eligibility_diagnosis)

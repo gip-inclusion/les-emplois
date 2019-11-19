@@ -9,13 +9,14 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
-from itou.eligibility.forms.form_v_1_0_0 import EligibilityForm
+from itou.eligibility.forms import EligibilityForm
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import JobSeekerExistsForm
 from itou.www.apply.forms import CheckJobSeekerInfoForm
 from itou.www.apply.forms import CreateJobSeekerForm
+from itou.www.apply.forms import JobSeekerExistsForm
 from itou.www.apply.forms import SubmitJobApplicationForm
 
 
@@ -190,12 +191,10 @@ def step_eligibility(
     if job_seeker.has_eligibility_diagnosis:
         return HttpResponseRedirect(next_url)
 
-    form = EligibilityForm(
-        user_info=user_info, job_seeker=job_seeker, data=request.POST or None
-    )
-    if request.method == "POST" and form.is_valid():
-        form.save_diagnosis()
-        messages.success(request, _("Critères d'éligibilité enregistrés !"))
+    form = EligibilityForm()
+    if request.method == "POST":
+        EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
+        messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
     context = {"form": form, "siae": siae, "job_seeker": job_seeker}

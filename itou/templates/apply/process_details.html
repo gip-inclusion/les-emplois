@@ -72,7 +72,7 @@
             <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
 
             <p>
-                {% trans "Auteur :" %}
+                {% trans "Validés par :" %}
                 <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
                 {% if eligibility_diagnosis.author_siae %}
                     ({{ eligibility_diagnosis.author_siae.display_name }})
@@ -81,10 +81,8 @@
                     ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
                 {% endif %}
                 {% trans "le" %}
-                {{ eligibility_diagnosis.created_at|date:"d/m/Y" }}
+                <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
             </p>
-
-            {{ eligibility_diagnosis.data_as_html }}
 
         {% endif %}
 
