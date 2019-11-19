@@ -7,9 +7,17 @@
 
 {% block content %}
 
-    <section>
+    <section class="my-4">
 
         <h2 class="text-center">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
+
+        <p class="text-center">
+            <a href="{% url 'home:eligibility_criteria' %}" class="btn btn-outline-primary">
+                {% trans "Est-ce fait pour moi ?" %}
+            </a>
+        </p>
+
+        <br>
 
         <h3 class="text-center">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
 

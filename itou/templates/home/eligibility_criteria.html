@@ -1,0 +1,21 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Est-ce fait pour moi ?" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h2>{% trans "Est-ce fait pour moi ?" %}</h2>
+
+    <div class="alert alert-warning" role="alert">
+        {% trans "Ce site est destiné aux personnes rencontrant au moins un de ces besoins d'accompagnement" %}
+    </div>
+
+    {% include "eligibility/includes/criteria.html" %}
+
+    <hr>
+    <p>
+        <a href="{% url 'home:hp' %}">{% trans "Retour" %}</a>
+    </p>
+
+{% endblock %}
