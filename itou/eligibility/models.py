@@ -1,11 +1,8 @@
-import json
 import logging
 
 from django.conf import settings
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.utils import timezone
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -85,6 +82,11 @@ class EligibilityDiagnosis(models.Model):
 
     @classmethod
     def create_diagnosis(cls, job_seeker, user_info, **fields):
+        """
+        Keyword arguments:
+            job_seeker: User() object
+            user_info: UserInfo namedtuple (itou.utils.perms.user.get_user_info)
+        """
         return cls.objects.create(
             job_seeker=job_seeker,
             author=user_info.user,

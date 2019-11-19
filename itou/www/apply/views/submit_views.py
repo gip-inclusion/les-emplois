@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
-from itou.eligibility.forms import EligibilityForm
+from itou.eligibility.criteria import CRITERIA
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -191,13 +191,12 @@ def step_eligibility(
     if job_seeker.has_eligibility_diagnosis:
         return HttpResponseRedirect(next_url)
 
-    form = EligibilityForm()
     if request.method == "POST":
         EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "siae": siae, "job_seeker": job_seeker}
+    context = {"siae": siae, "job_seeker": job_seeker, "eligibility_criteria": CRITERIA}
     return render(request, template_name, context)
 
 

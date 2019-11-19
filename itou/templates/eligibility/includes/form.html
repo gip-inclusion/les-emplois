@@ -1,85 +1,61 @@
+{% comment %}
+
+    Usage:
+        {% include "eligibility/includes/form.html" %}
+
+    Or with a `cancel_url` param:
+        {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
+        {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
+
+{% endcomment %}
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% if request.user.is_prescriber %}
+<form method="post" action="">
+
+    {% csrf_token %}
+
+    {% if request.user.is_prescriber %}
+        <div class="alert alert-warning" role="alert">
+            {% trans "Pour valider une éligibilité, la personne doit relever d'au moins un besoin d'accompagnement." %}
+        </div>
+    {% endif %}
+
+    {% if request.user.is_siae_staff %}
+        <div class="alert alert-warning" role="alert">
+            <p>{% trans "Pour valider une éligibilité la personne doit relever :" %}</p>
+            <ul class="mb-0">
+                <li>{% trans "d'au moins un besoin d'accompagnement" %}</li>
+                <li><b>{% trans "et" %}</b></li>
+                <li>
+                    {% trans "de critères administratifs :" %}
+                    <ul>
+                        <li>{% trans "au moins un critère administratif de niveau 1" %}</li>
+                        <li><b>{% trans "ou" %}</b></li>
+                        <li>{% trans "le cumul d'au moins trois critères de niveau 2" %}</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+
+    {% include "eligibility/includes/criteria.html" %}
+
+    <hr>
+
     <div class="alert alert-warning" role="alert">
-        {% trans "Pour valider une éligibilité, la personne doit relever d'au moins un besoin d'accompagnement." %}
+
+        <p>
+            {% blocktrans %}En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.{% endblocktrans %}
+        </p>
+
+        {% buttons %}
+            {% if cancel_url %}
+                <a class="btn btn-secondary" href="{{ cancel_url }}">{% trans "Annuler" %}</a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
+        {% endbuttons %}
+
     </div>
-{% endif %}
 
-{% if request.user.is_siae_staff %}
-    <div class="alert alert-warning" role="alert">
-        <p>{% trans "Pour valider une éligibilité la personne doit relever :" %}</p>
-        <ul class="mb-0">
-            <li>{% trans "d'au moins un besoin d'accompagnement" %}</li>
-            <li><b>{% trans "et" %}</b></li>
-            <li>
-                {% trans "de critères administratifs :" %}
-                <ul>
-                    <li>{% trans "au moins un critère administratif de niveau 1" %}</li>
-                    <li><b>{% trans "ou" %}</b></li>
-                    <li>{% trans "le cumul d'au moins trois critères de niveau 2" %}</li>
-                </ul>
-            </li>
-        </ul>
-    </div>
-{% endif %}
-
-<hr>
-<h2><span class="badge badge-secondary">{% trans "Besoins d'accompagnement" %}</span></h2>
-<hr>
-
-{% for dict in form.BARRIERS %}
-    <h4>{{ dict.label }}</h4>
-    <ul>
-    {% for sub_dict in dict.items %}
-        <li>{{ sub_dict.label }}</li>
-    {% endfor %}
-    </ul>
-{% endfor %}
-
-<hr>
-<h2><span class="badge badge-secondary">{% trans "Critères administratifs" %}</span></h2>
-<hr>
-
-{% for dict in form.ADMINISTRATIVE_CRITERIA %}
-    <h4>{{ dict.label }}</h4>
-    <ul>
-    {% for sub_dict in dict.items %}
-        <li class="mb-2">
-            {{ sub_dict.label }}
-
-            {% if sub_dict.help %}
-                <br>
-                <small class="text-muted">{{ sub_dict.help }}</small>
-            {% endif %}
-            {% if sub_dict.written_proof %}
-                <br>
-                <small>
-                    {% trans "Pièce justificative :" %}
-                    <i>{{ sub_dict.written_proof }}</i>
-                </small>
-            {% endif %}
-            {% if sub_dict.url %}
-                <br>
-                <small>
-                    <a href="{{ sub_dict.url }}" rel="noopener" target="_blank">
-                        {{ sub_dict.url }}
-                    </a>
-                </small>
-            {% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% endfor %}
-
-<hr>
-
-<div class="alert alert-warning" role="alert">
-    <p>
-        {% blocktrans %}En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.{% endblocktrans %}
-    </p>
-    {% buttons %}
-        <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
-    {% endbuttons %}
-</div>
+</form>

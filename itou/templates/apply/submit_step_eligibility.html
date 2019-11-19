@@ -1,5 +1,4 @@
 {% extends "apply/submit_base.html" %}
-{% load bootstrap4 %}
 {% load i18n %}
 
 {% block content %}
@@ -8,14 +7,6 @@
 
     <h2>{% trans "Critères d'éligibilité" %}</h2>
 
-    <form method="post" action="">
-
-        {% csrf_token %}
-
-        {% bootstrap_form_errors form %}
-
-        {% include "eligibility/includes/form.html" with form=form %}
-
-    </form>
+    {% include "eligibility/includes/form.html" %}
 
 {% endblock %}

@@ -1,10 +1,6 @@
-from django import forms
 from django.utils.translation import gettext as _
 
-from itou.eligibility.models import EligibilityDiagnosis
 
-
-# Besoins d'accompagnement.
 BARRIERS = [
     {
         "value": "faire_face_a_des_difficultes_administratives_ou_juridiques",
@@ -169,7 +165,7 @@ BARRIERS = [
     },
 ]
 
-# Critères administratifs.
+
 ADMINISTRATIVE_CRITERIA = [
     {
         "value": "criteres_administratifs_de_niveau_1",
@@ -328,7 +324,7 @@ ADMINISTRATIVE_CRITERIA = [
 ]
 
 
-class EligibilityForm(forms.Form):
-
-    BARRIERS = BARRIERS
-    ADMINISTRATIVE_CRITERIA = ADMINISTRATIVE_CRITERIA
+CRITERIA = [
+    {"label": _("Besoins d'accompagnement"), "items": BARRIERS},
+    {"label": _("Critères administratifs"), "items": ADMINISTRATIVE_CRITERIA},
+]

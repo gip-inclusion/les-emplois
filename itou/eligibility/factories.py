@@ -1,10 +1,7 @@
-import json
-
 import factory
 
 from itou.eligibility import models
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
-from itou.eligibility.forms import EligibilityForm
 
 
 class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):

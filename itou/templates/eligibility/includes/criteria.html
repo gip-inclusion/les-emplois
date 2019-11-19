@@ -1,0 +1,47 @@
+{% load i18n %}
+
+{% for category in eligibility_criteria %}
+
+    <hr>
+    <h2><span class="badge badge-secondary">{{ category.label }}</span></h2>
+    <hr>
+
+    {% for dict in category.items %}
+
+        <h4>{{ dict.label }}</h4>
+
+        <ul>
+        {% for sub_dict in dict.items %}
+
+            <li class="mb-2">
+                {{ sub_dict.label }}
+
+                {% if sub_dict.help %}
+                    <br>
+                    <small class="text-muted">{{ sub_dict.help }}</small>
+                {% endif %}
+
+                {% if sub_dict.written_proof %}
+                    <br>
+                    <small>
+                        {% trans "Pièce justificative :" %}
+                        <i>{{ sub_dict.written_proof }}</i>
+                    </small>
+                {% endif %}
+
+                {% if sub_dict.url %}
+                    <br>
+                    <small>
+                        <a href="{{ sub_dict.url }}" rel="noopener" target="_blank">
+                            {{ sub_dict.url }}
+                        </a>
+                    </small>
+                {% endif %}
+
+            </li>
+        {% endfor %}
+        </ul>
+
+    {% endfor %}
+
+{% endfor %}
