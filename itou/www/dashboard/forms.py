@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from itou.siaes.models import Siae
+
 
 class EditUserInfoForm(forms.ModelForm):
     """
@@ -25,3 +27,21 @@ class EditUserInfoForm(forms.ModelForm):
             "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978"),
             "phone": _("Par exemple 0610203040"),
         }
+
+
+class SwitchSiaeForm(forms.Form):
+    """
+    Allow the current SIAE user to switch to any other SIAE
+    having the same SIREN as the user's SIAE.
+    """
+
+    siae_id = forms.ModelChoiceField(
+        label=_(
+            "SIAE"
+        ),
+        queryset=Siae.active_objects.filter(
+            # TODO same SIREN
+        ).order_by("name"),
+        required=True,
+        help_text=_("Liste de toutes vos SIAE partageant le même SIREN"),
+    )

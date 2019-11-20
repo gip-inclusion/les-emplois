@@ -46,6 +46,9 @@
                                 </a>
                             </div>
                         </div>
+                        {% if user.is_siae_staff %}
+                            TODO if has several SIAE
+                        {% endif %}
                     {% else %}
                         <nav>
                             <a class="btn btn-outline-primary" href="{% url 'account_signup' %}">
