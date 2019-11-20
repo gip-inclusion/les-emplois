@@ -3,7 +3,7 @@ from django.conf import settings
 
 class ItouCurrentOrganizationMiddleware:
     """
-    Store the SIRET of the current organization in session.
+    Store the ID of the current organization in session.
     https://docs.djangoproject.com/en/dev/topics/http/middleware/#writing-your-own-middleware
     """
 
