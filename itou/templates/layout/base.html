@@ -46,6 +46,22 @@
                                 </a>
                             </div>
                         </div>
+                        {% if user.is_siae_staff and user.siae_set.count > 1 %}
+                            <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                                {% csrf_token %}
+                                Je travaille sur 
+                                <select name="siae_id">
+                                    {% for s in user.siae_set.all %}
+                                        <option value="{{ s.pk }}"{% if s.pk == current_siae.pk %} selected{% endif %}>
+                                            {{ s.display_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                {% buttons %}
+                                    <button type="submit" class="btn btn-primary btn-sm">{% trans "OK" %}</button>
+                                {% endbuttons %}
+                            </form>
+                        {% endif %}
                     {% else %}
                         <nav>
                             <a class="btn btn-outline-primary" href="{% url 'account_signup' %}">

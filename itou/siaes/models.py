@@ -47,7 +47,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
 
-    To retrieve jobs of an siaes_views:
+    To retrieve jobs of an siae:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
         self.job_description_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
     """
@@ -128,6 +128,13 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     def has_member(self, user):
         return self.members.filter(siaemembership__user=user).exists()
+
+    def has_active_admin_member(self, user):
+        return self.members.filter(siaemembership__user=user, siaemembership__is_siae_admin=True, members__is_active=True).exists()        
+
+    @property
+    def siren(self):
+        return self.siret[:9]
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siret": self.siret})
