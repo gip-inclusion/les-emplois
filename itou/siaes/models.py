@@ -90,6 +90,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
+    is_from_asp = models.BooleanField(
+        verbose_name=_("Vient des données ASP"), default=True
+    )
     jobs = models.ManyToManyField(
         "jobs.Appellation",
         verbose_name=_("Métiers"),
