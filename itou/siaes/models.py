@@ -75,7 +75,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         verbose_name=_("Siret"),
         max_length=14,
         validators=[validate_siret],
-        unique=True,
         db_index=True,
     )
     naf = models.CharField(
