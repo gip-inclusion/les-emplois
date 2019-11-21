@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.html import escape
 
 from itou.siaes.factories import SiaeWithMembershipFactory, SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory

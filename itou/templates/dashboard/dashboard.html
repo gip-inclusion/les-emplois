@@ -141,6 +141,17 @@
                     </p>
                 </div>
             </div>
+            {% if user_is_admin %}
+                <div class="card">
+                    <h5 class="card-header">{% trans "Admin" %}</h5>
+                    <div class="card-body">
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="plus-square" %}
+                            <a href="{% url 'siaes_views:create_siae' %}">{% trans "Créer une nouvelle structure" %}</a>
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
 
     </div>

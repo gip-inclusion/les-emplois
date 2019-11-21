@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import EditSiaeForm
+from itou.www.siaes_views.forms import CreateSiaeForm, EditSiaeForm
 
 
 @login_required
@@ -104,6 +104,29 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
             return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+def create_siae(request, template_name="siaes/create_siae.html"):
+    """
+    Create a new SIAE (Agence / Etablissement in French).
+    """
+    form = CreateSiaeForm(data=request.POST or None, request=request)
+
+    if request.method == "POST" and form.is_valid():
+        form.save(request)
+        messages.success(
+            request,
+            _(
+                "Nouvelle structure créée avec succès! "
+                + "Vous pouvez maintenant y accéder par le menu déroulant "
+                + "en haut à droite de votre écran."
+            ),
+        )
+        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+
+    context = {"form": form}
     return render(request, template_name, context)
 
 
