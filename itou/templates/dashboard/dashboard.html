@@ -135,6 +135,10 @@
                         {% include "includes/icon.html" with icon="message-square" %}
                         <a href="{% url 'apply:list_for_siae' %}">{% trans "Répondre aux candidatures" %}</a>
                     </p>
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="user-check" %}
+                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">{% trans "Embaucher un candidat" %}</a>
+                    </p>
                 </div>
             </div>
         {% endif %}

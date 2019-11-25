@@ -9,4 +9,8 @@
     <p class="lead">{% trans "Accès refusé." %}</p>
     <p>{% trans "Vous n'avez pas la permission d'accéder à cette page." %}</p>
 
+    {% if exception %}
+        <p>{{ exception }}</p>
+    {% endif %}
+
 {% endblock %}

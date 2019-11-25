@@ -117,6 +117,13 @@
             </li>
         {% endif %}
 
+        {% if job_application.sender_siae %}
+            <li>
+                {% trans "SIAE :" %}
+                <b>{{ job_application.sender_siae.display_name }}</b>
+            </li>
+        {% endif %}
+
         {% if job_application.sender.phone %}
             <li>
                 {% trans "Téléphone :" %}

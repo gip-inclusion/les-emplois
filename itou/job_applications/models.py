@@ -171,7 +171,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     # When the sender is an SIAE staff member, keep a track of his current SIAE.
-    # Not implemented yet, but this could allow an SIAE to apply to itself.
     sender_siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name=_("SIAE émettrice"),

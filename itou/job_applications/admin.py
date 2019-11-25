@@ -22,7 +22,7 @@ class JobsInline(admin.TabularInline):
 
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
-    list_display = ("id", "job_seeker", "sender", "sender_kind", "created_at")
+    list_display = ("id", "state", "job_seeker", "sender", "sender_kind", "created_at")
     raw_id_fields = (
         "job_seeker",
         "sender",

@@ -36,10 +36,12 @@ def start(request, siae_pk):
     Entry point.
     """
 
-    if request.user.is_siae_staff:
-        raise PermissionDenied
-
     siae = get_object_or_404(Siae.active_objects, pk=siae_pk)
+
+    if request.user.is_siae_staff and not siae.has_member(request.user):
+        raise PermissionDenied(
+            _("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+        )
 
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
@@ -47,6 +49,7 @@ def start(request, siae_pk):
         "to_siae_pk": siae.pk,
         "sender_pk": None,
         "sender_kind": None,
+        "sender_siae_pk": None,
         "sender_prescriber_organization_pk": None,
         "job_description_id": request.GET.get("job_description_id"),
     }
@@ -66,11 +69,12 @@ def step_sender(request, siae_pk):
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     session_data["sender_pk"] = user_info.user.pk
     session_data["sender_kind"] = user_info.kind
-    session_data["sender_prescriber_organization_pk"] = None
     if user_info.prescriber_organization:
         session_data[
             "sender_prescriber_organization_pk"
         ] = user_info.prescriber_organization.pk
+    if user_info.siae:
+        session_data["sender_siae_pk"] = user_info.siae.pk
 
     next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
     return HttpResponseRedirect(next_url)
@@ -224,7 +228,7 @@ def step_application(
         sender_prescriber_organization_pk = session_data.get(
             "sender_prescriber_organization_pk"
         )
-
+        sender_siae_pk = session_data.get("sender_siae_pk")
         job_application = form.save(commit=False)
         job_application.job_seeker = job_seeker
         job_application.sender = get_user_model().objects.get(
@@ -235,6 +239,8 @@ def step_application(
             job_application.sender_prescriber_organization = PrescriberOrganization.objects.get(
                 pk=sender_prescriber_organization_pk
             )
+        if sender_siae_pk:
+            job_application.sender_siae = Siae.active_objects.get(pk=sender_siae_pk)
         job_application.to_siae = siae
         job_application.save()
 
@@ -249,8 +255,8 @@ def step_application(
             next_url = reverse("apply:list_for_job_seeker")
         elif request.user.is_prescriber:
             next_url = reverse("apply:list_for_prescriber")
-        # elif request.user.is_siae_staff:
-        #     next_url = reverse("apply:list_for_siae")
+        elif request.user.is_siae_staff:
+            next_url = reverse("apply:list_for_siae")
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form, "job_seeker": job_seeker}

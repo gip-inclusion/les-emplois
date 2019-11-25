@@ -124,6 +124,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     def has_members(self):
         return self.members.exists()
 
+    def has_member(self, user):
+        return self.members.filter(siaemembership__user=user).exists()
+
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siret": self.siret})
 
