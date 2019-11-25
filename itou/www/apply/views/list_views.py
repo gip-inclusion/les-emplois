@@ -15,7 +15,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     List of applications for a job seeker.
     """
 
-    job_applications = request.user.job_applications_sent.select_related(
+    job_applications = request.user.job_applications.select_related(
         "job_seeker",
         "sender",
         "sender_siae",

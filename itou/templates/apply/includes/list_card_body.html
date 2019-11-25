@@ -20,22 +20,31 @@
         <div class="card-body">
             <h6 class="card-subtitle text-muted">{% trans "Envoyée par :" %}</h6>
             <p class="card-text">
+
                 {% if request.user == job_application.sender %}
                     {% trans "Vous" %}
                 {% elif job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
                     {% trans "Le candidat lui même" %}
-                {% elif job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}
+                {% else %}
                     {{ job_application.sender.get_full_name }}
                 {% endif %}
-                {% if job_application.sender_prescriber_organization %}
-                    <br>
-                    <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
-                    {% if job_application.sender_prescriber_organization.is_authorized %}
-                        <br>
-                        <span class="badge badge-warning">{% trans "Prescripteur habilité par le Préfet" %}</span>
-                    {% endif %}
 
+                {% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}
+                    {% if job_application.sender_prescriber_organization %}
+                        <br>
+                        <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+                        {% if job_application.sender_prescriber_organization.is_authorized %}
+                            <br>
+                            <span class="badge badge-warning">{% trans "Prescripteur habilité par le Préfet" %}</span>
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
+
+                {% if job_application.sender_kind == job_application.SENDER_KIND_SIAE_STAFF %}
+                    <br>
+                    <b>{{ job_application.sender_siae.display_name }}</b>
+                {% endif %}
+
             </p>
         </div>
     </div>
