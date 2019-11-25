@@ -94,7 +94,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
     siret = forms.CharField(
-        label=_("Numéro SIRET de votre SIAE tel que connu de l'ASP"),
+        label=_("Numéro SIRET de votre SIAE"),
         max_length=14,
         validators=[validate_siret],
         required=True,
@@ -125,14 +125,15 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         user.is_siae_staff = True
         user.save()
 
-        siae = Siae.active_objects.get(siret=self.cleaned_data["siret"])
+        siaes = Siae.active_objects.filter(siret=self.cleaned_data["siret"]).all()
 
-        membership = SiaeMembership()
-        membership.user = user
-        membership.siae = siae
-        # The first member becomes an admin.
-        membership.is_siae_admin = siae.members.count() == 0
-        membership.save()
+        for siae in siaes:
+            membership = SiaeMembership()
+            membership.user = user
+            membership.siae = siae
+            # The first member becomes an admin.
+            membership.is_siae_admin = siae.members.count() == 0
+            membership.save()
 
         return user
 
