@@ -17,7 +17,13 @@
         {% bootstrap_field form.message %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Envoyer votre candidature" %}</button>
+            <button type="submit" class="btn btn-primary">
+                {% if request.user.is_siae_staff %}
+                    {% trans "Enregistrer la candidature" %}
+                {% else %}
+                    {% trans "Envoyer la candidature" %}
+                {% endif %}
+            </button>
         {% endbuttons %}
 
     </form>
