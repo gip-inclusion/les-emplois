@@ -16,11 +16,6 @@ Votre candidature chez {{ to_siae }} n'a malheureusement pas pu aboutir.
 
 {% endif %}
 
-{% if job_application.refusal_reason %}
-{% trans "*Motif du refus* :" %}
-{{ job_application.get_refusal_reason_display }}
-{% endif %}
-
 {% if job_application.answer %}
 {% trans "*Message de l'entreprise* :" %}
 {{ job_application.answer }}

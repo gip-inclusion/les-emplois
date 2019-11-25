@@ -169,7 +169,6 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.job_seeker.last_name, email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.get_refusal_reason_display(), email.body)
         self.assertIn(job_application.answer, email.body)
 
         # When sent by jobseeker.
@@ -183,7 +182,6 @@ class JobApplicationEmailTest(TestCase):
         self.assertEqual(len(email.to), 1)
         # Body.
         self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.get_refusal_reason_display(), email.body)
         self.assertIn(job_application.answer, email.body)
 
 

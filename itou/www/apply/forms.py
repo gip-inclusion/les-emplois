@@ -84,23 +84,26 @@ class RefusalForm(forms.Form):
     Allow an SIAE to specify a reason for refusal.
     """
 
-    refusal_reason = forms.ChoiceField(
-        label=_("Motif du refus"),
-        widget=forms.RadioSelect,
-        choices=JobApplication.REFUSAL_REASON_CHOICES,
-        required=False,
-    )
-    answer = forms.CharField(
-        label=_("Réponse"), widget=forms.Textarea(), required=False, strip=True
+    ANSWER_INITIAL = _(
+        "Nous avons étudié votre dossier avec la plus grande attention mais "
+        "nous sommes au regret de devoir vous informer que celle-ci n'a pas été retenue.\n\n"
+        "Soyez assuré que cette décision ne met pas en cause vos qualités personnelles. "
+        "Nous sommes très sensibles à l'intérêt que vous portez à notre entreprise, "
+        "et conservons vos coordonnées afin de vous recontacter au besoin.\n\n"
+        "Nous vous souhaitons une pleine réussite dans vos recherches futures."
     )
 
-    def clean_answer(self):
-        answer = self.cleaned_data["answer"]
-        refusal_reason = self.cleaned_data["refusal_reason"]
-        if refusal_reason == JobApplication.REFUSAL_REASON_OTHER and not answer:
-            error = _("Vous devez préciser votre motif de refus.")
-            raise forms.ValidationError(error)
-        return answer
+    refusal_reason = forms.ChoiceField(
+        label=_("Motif du refus (ne sera pas envoyé au candidat)"),
+        widget=forms.RadioSelect,
+        choices=JobApplication.REFUSAL_REASON_CHOICES,
+    )
+    answer = forms.CharField(
+        label=_("Réponse envoyée au candidat"),
+        widget=forms.Textarea(),
+        strip=True,
+        initial=ANSWER_INITIAL,
+    )
 
 
 class AnswerForm(forms.Form):
