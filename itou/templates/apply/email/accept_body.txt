@@ -4,8 +4,8 @@
 
 {% if job_application.is_sent_by_proxy %}
 
-{% blocktrans with full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
-La candidature de {{ full_name }} a été acceptée par {{ to_siae }}.
+{% blocktrans with sender_full_name=job_application.sender.get_full_name job_seeker_full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
+La candidature de {{ job_seeker_full_name }} envoyée par {{ sender_full_name }} a été acceptée par {{ to_siae }}.
 {% endblocktrans %}
 
 {% else %}

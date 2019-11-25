@@ -308,7 +308,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def email_accept(self):
-        to = [self.sender.email]
+        to = [self.job_seeker.email]
+        if self.is_sent_by_proxy:
+            to.append(self.sender.email)
         context = {"job_application": self}
         subject = "apply/email/accept_subject.txt"
         body = "apply/email/accept_body.txt"
@@ -316,7 +318,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def email_refuse(self):
-        to = [self.sender.email]
+        to = [self.job_seeker.email]
+        if self.is_sent_by_proxy:
+            to.append(self.sender.email)
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
         body = "apply/email/refuse_body.txt"
