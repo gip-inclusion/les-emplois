@@ -103,6 +103,7 @@ class RefusalForm(forms.Form):
         widget=forms.Textarea(),
         strip=True,
         initial=ANSWER_INITIAL,
+        help_text=_("Vous pouvez modifier le texte proposé ou l'utiliser tel quel."),
     )
 
 
