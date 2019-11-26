@@ -1,5 +1,11 @@
 {% load i18n %}
 
+<hr>
+
+<div class="alert alert-warning" role="alert">
+    <i>{% trans "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
+</div>
+
 {% for category in eligibility_criteria %}
 
     <hr>
