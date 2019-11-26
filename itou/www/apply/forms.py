@@ -86,7 +86,7 @@ class RefusalForm(forms.Form):
 
     ANSWER_INITIAL = _(
         "Nous avons étudié votre dossier avec la plus grande attention mais "
-        "nous sommes au regret de devoir vous informer que celle-ci n'a pas été retenue.\n\n"
+        "nous sommes au regret de vous informer que celle-ci n'a pas été retenue.\n\n"
         "Soyez assuré que cette décision ne met pas en cause vos qualités personnelles. "
         "Nous sommes très sensibles à l'intérêt que vous portez à notre entreprise, "
         "et conservons vos coordonnées afin de vous recontacter au besoin.\n\n"

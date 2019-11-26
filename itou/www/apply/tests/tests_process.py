@@ -161,9 +161,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "confirm-eligibility": "1",
-        }
+        post_data = {"confirm-eligibility": "1"}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
