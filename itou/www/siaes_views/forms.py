@@ -19,6 +19,12 @@ class CreateSiaeForm(forms.ModelForm):
         test_departments = {d: DEPARTMENTS[d] for d in settings.ITOU_TEST_DEPARTMENTS}
         self.fields.get("department").choices = test_departments.items()
 
+        kind_choices = [
+            (k, dict(Siae.KIND_CHOICES)[k])
+            for k in [Siae.KIND_EI, Siae.KIND_AI, Siae.KIND_ACI, Siae.KIND_ETTI]
+        ]
+        self.fields.get("kind").choices = kind_choices
+
         required_fields = ["address_line_1", "city", "department", "phone"]
         for required_field in required_fields:
             # Make field required without overwriting its other properties.
