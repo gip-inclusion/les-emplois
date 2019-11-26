@@ -171,13 +171,19 @@ def eligibility(
     )
 
     if request.method == "POST":
-        user_info = get_user_info(request)
-        EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
-        messages.success(request, _("Éligibilité confirmée !"))
-        next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
-        )
-        return HttpResponseRedirect(next_url)
+        if not request.POST.get("confirm-eligibility") == "1":
+            messages.error(
+                request, _("Vous devez confirmer l'éligibilité du candidat.")
+            )
+        else:
+            user_info = get_user_info(request)
+            EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
+            messages.success(request, _("Éligibilité confirmée !"))
+            next_url = reverse(
+                "apply:details_for_siae",
+                kwargs={"job_application_id": job_application.id},
+            )
+            return HttpResponseRedirect(next_url)
 
     context = {"job_application": job_application, "eligibility_criteria": CRITERIA}
     return render(request, template_name, context)

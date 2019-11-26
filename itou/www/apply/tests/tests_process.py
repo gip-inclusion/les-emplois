@@ -162,10 +162,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "faire_face_a_des_difficultes_administratives_ou_juridiques": [
-                "prendre_en_compte_une_problematique_judiciaire"
-            ],
-            "criteres_administratifs_de_niveau_1": ["beneficiaire_du_rsa"],
+            "confirm-eligibility": "1",
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
