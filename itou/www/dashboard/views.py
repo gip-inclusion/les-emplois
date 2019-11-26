@@ -2,9 +2,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from allauth.account.views import PasswordChangeView
 
@@ -20,7 +21,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     if request.user.is_siae_staff:
         current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         current_siae = request.user.siae_set.get(pk=current_siae_pk)
-        user_is_admin = current_siae.has_active_admin_member(request.user)
+        user_is_admin = current_siae.has_admin_member(request.user)
     context = {"user_is_admin": user_is_admin}
     return render(request, template_name, context)
 
@@ -57,28 +58,17 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
 
 @login_required
+@require_POST
 def switch_siae(request):
     """
     Switch to the dashboard of another SIAE of the same SIREN
     """
 
     dashboard_url = reverse_lazy("dashboard:index")
-    prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
 
-    if request.method == "POST" and request.user.is_siae_staff:
-        siae = Siae.active_objects.get(pk=request.POST.get("siae_id", ""))
-        if siae in request.user.siae_set.all():
-            request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
-            messages.success(
-                request,
-                _("Je travaille maintenant sur la SIAE {}".format(siae.display_name)),
-            )
-            return HttpResponseRedirect(dashboard_url)
-
-    messages.error(
-        request,
-        _(
-            "Une erreur inattendue s'est produite. Vous pouvez retenter votre dernière action."
-        ),
-    )
-    return HttpResponseRedirect(prev_url)
+    pk = request.POST["siae_id"]
+    queryset = Siae.active_objects.member_required(request.user)
+    siae = get_object_or_404(queryset, pk=pk)
+    request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+    messages.success(request, _(f"Je travaille maintenant sur {siae.display_name}"))
+    return HttpResponseRedirect(dashboard_url)

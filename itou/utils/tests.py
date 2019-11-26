@@ -19,7 +19,12 @@ from itou.utils.perms.user import get_user_info
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.templatetags import format_filters
 from itou.utils.urls import get_safe_url
-from itou.utils.validators import alphanumeric, validate_naf, validate_siret
+from itou.utils.validators import (
+    alphanumeric,
+    validate_naf,
+    validate_siret,
+    validate_post_code,
+)
 
 
 class UtilsAddressMixinTest(TestCase):
@@ -108,6 +113,13 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_siret, "1200001530001a")
         self.assertRaises(ValidationError, validate_siret, "azertyqwerty")
         validate_siret("12000015300011")
+
+    def test_validate_post_code(self):
+        self.assertRaises(ValidationError, validate_post_code, "")
+        self.assertRaises(ValidationError, validate_post_code, "1234")
+        self.assertRaises(ValidationError, validate_post_code, "123456")
+        self.assertRaises(ValidationError, validate_post_code, "1234X")
+        validate_post_code("12345")
 
 
 class UtilsTemplateTagsTestCase(TestCase):

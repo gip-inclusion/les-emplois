@@ -2,7 +2,7 @@
 
 Werkzeug==0.14.1  # pyup: < 0.15 # https://github.com/pallets/werkzeug
 ipdb==0.12  # https://github.com/gotcha/ipdb
-tblib
+tblib  # https://github.com/ionelmc/python-tblib
 
 # Code quality
 # ------------------------------------------------------------------------------

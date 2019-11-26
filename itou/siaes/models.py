@@ -71,6 +71,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_RQ, _("Régie de quartier")),
     )
 
+    SOURCE_ASP = "ASP"
+    SOURCE_USER_CREATED = "USER_CREATED"
+
+    SOURCE_CHOICES = (
+        (SOURCE_ASP, _("Provenant de l'export ASP")),
+        (SOURCE_USER_CREATED, _("Créée par un utilisateur SIAE")),
+    )
+
     siret = models.CharField(
         verbose_name=_("Siret"),
         max_length=14,
@@ -90,9 +98,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
-    is_from_asp = models.BooleanField(
-        verbose_name=_("Vient des données ASP"), default=True
+
+    source = models.CharField(
+        verbose_name=_("Source de données"),
+        max_length=20,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_ASP,
     )
+
     jobs = models.ManyToManyField(
         "jobs.Appellation",
         verbose_name=_("Métiers"),
@@ -124,12 +137,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def has_members(self):
-        return self.members.exists()
+        return self.members.filter(siaemembership__user__is_active=True).exists()
 
     def has_member(self, user):
-        return self.members.filter(siaemembership__user=user).exists()
+        return self.members.filter(
+            siaemembership__user=user, siaemembership__user__is_active=True
+        ).exists()
 
-    def has_active_admin_member(self, user):
+    def has_admin_member(self, user):
         return self.members.filter(
             siaemembership__user=user,
             siaemembership__is_siae_admin=True,

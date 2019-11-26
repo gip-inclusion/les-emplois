@@ -1,16 +1,10 @@
-from functools import partial
-
 from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
-from itou.utils.validators import (
-    validate_siret,
-    validate_siren_matches_siret,
-    validate_post_code,
-)
+from itou.utils.validators import validate_siret, validate_post_code
 
 
 class CreateSiaeForm(forms.ModelForm):
@@ -18,20 +12,9 @@ class CreateSiaeForm(forms.ModelForm):
     Create a new SIAE (Agence / Etablissement in French).
     """
 
-    def __init__(self, *args, **kwargs):
-        self.request = kwargs.pop("request", None)
+    def __init__(self, current_siae, *args, **kwargs):
+        self.current_siae = current_siae
         super(CreateSiaeForm, self).__init__(*args, **kwargs)
-
-        self.fields.get("siret").initial = self.get_current_siae().siret
-
-        validate_siret_matches_current_siren = partial(
-            validate_siren_matches_siret, self.get_current_siae().siren
-        )
-
-        self.fields.get("siret").validators = [
-            validate_siret,
-            validate_siret_matches_current_siren,
-        ]
 
         test_departments = {d: DEPARTMENTS[d] for d in settings.ITOU_TEST_DEPARTMENTS}
         self.fields.get("department").choices = test_departments.items()
@@ -85,6 +68,10 @@ class CreateSiaeForm(forms.ModelForm):
         ),
     )
 
+    source = forms.CharField(
+        widget=forms.HiddenInput(), required=True, initial=Siae.SOURCE_USER_CREATED
+    )
+
     post_code = forms.CharField(
         label=_("Code Postal"),
         min_length=5,
@@ -95,6 +82,18 @@ class CreateSiaeForm(forms.ModelForm):
         help_text=_("Saisissez les 5 chiffres de votre code postal."),
     )
 
+    def clean_siret(self):
+        siret = self.cleaned_data["siret"]
+        if not siret.startswith(self.current_siae.siren):
+            raise forms.ValidationError(
+                _(
+                    "Le numéro SIRET doit avoir le SIREN {}".format(
+                        self.current_siae.siren
+                    )
+                )
+            )
+        return siret
+
     def save(self, request):
 
         siae = super().save(request)
@@ -103,7 +102,7 @@ class CreateSiaeForm(forms.ModelForm):
             post_code=siae.post_code,
             save=False,
         )
-        siae.is_from_asp = False
+        siae.source = Siae.SOURCE_USER_CREATED
         siae.save()
 
         membership = SiaeMembership()
@@ -113,13 +112,6 @@ class CreateSiaeForm(forms.ModelForm):
         membership.save()
 
         return siae
-
-    def get_current_siae(self):
-        current_siae_pk = self.request.session.get(
-            settings.ITOU_SESSION_CURRENT_SIAE_KEY
-        )
-        current_siae = self.request.user.siae_set.get(pk=current_siae_pk)
-        return current_siae
 
 
 class EditSiaeForm(forms.ModelForm):

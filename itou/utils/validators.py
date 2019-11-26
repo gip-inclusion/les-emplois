@@ -18,15 +18,6 @@ def validate_siret(siret):
         raise ValidationError(_("Le numéro SIRET doit être composé de 14 chiffres."))
 
 
-# You'll need to use a partial method of this method to freeze siren.
-def validate_siren_matches_siret(siren, siret):
-    if not siren.isdigit() or len(siren) != 9:
-        ValueError("Invalid SIREN.")
-    validate_siret(siret)
-    if siren != siret[:9]:
-        raise ValidationError(_("Le numéro SIRET doit avoir le SIREN {}".format(siren)))
-
-
 def validate_naf(naf):
     if len(naf) != 5 or not naf[:4].isdigit() or not naf[4].isalpha():
         raise ValidationError(

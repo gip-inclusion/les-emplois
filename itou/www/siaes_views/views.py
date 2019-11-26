@@ -112,18 +112,18 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     """
     Create a new SIAE (Agence / Etablissement in French).
     """
-    form = CreateSiaeForm(data=request.POST or None, request=request)
+    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+    current_siae = request.user.siae_set.get(pk=current_siae_pk)
+    form = CreateSiaeForm(
+        current_siae=current_siae,
+        data=request.POST or None,
+        initial={"siret": current_siae.siret},
+    )
 
     if request.method == "POST" and form.is_valid():
-        form.save(request)
-        messages.success(
-            request,
-            _(
-                "Nouvelle structure créée avec succès! "
-                + "Vous pouvez maintenant y accéder par le menu déroulant "
-                + "en haut à droite de votre écran."
-            ),
-        )
+        siae = form.save(request)
+        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        messages.success(request, _(f"Je travaille maintenant sur {siae.display_name}"))
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"form": form}

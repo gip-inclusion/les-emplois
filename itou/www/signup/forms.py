@@ -104,17 +104,18 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
     def clean_siret(self):
         siret = self.cleaned_data["siret"]
-        try:
-            Siae.active_objects.get(siret=siret)
-        except Siae.DoesNotExist:
-            error = _(
-                "Ce SIRET ne figure pas dans notre base de données ou ne fait pas partie des "
-                "territoires d'expérimentation (Pas-de-Calais, Bas-Rhin et Seine Saint Denis).<br>"
-                "Contactez-nous si vous rencontrez des problèmes pour vous inscrire : "
-                f'<a href="mailto:{settings.ITOU_EMAIL_CONTACT}">{settings.ITOU_EMAIL_CONTACT}</a>'
-            )
-            raise forms.ValidationError(mark_safe(error))
-        return siret
+
+        siret_exists_in_db = Siae.active_objects.filter(siret=siret).exists()
+        if siret_exists_in_db:
+            return siret
+
+        error = _(
+            "Ce SIRET ne figure pas dans notre base de données ou ne fait pas partie des "
+            "territoires d'expérimentation (Pas-de-Calais, Bas-Rhin et Seine Saint Denis).<br>"
+            "Contactez-nous si vous rencontrez des problèmes pour vous inscrire : "
+            f'<a href="mailto:{settings.ITOU_EMAIL_CONTACT}">{settings.ITOU_EMAIL_CONTACT}</a>'
+        )
+        raise forms.ValidationError(mark_safe(error))
 
     def save(self, request):
 

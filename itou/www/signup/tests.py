@@ -52,11 +52,48 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_siae_staff)
 
         siae = Siae.active_objects.get(siret=post_data["siret"])
-        self.assertIn(user, siae.members.all())
+        self.assertTrue(siae.has_admin_member(user))
         self.assertEqual(1, siae.members.count())
 
-        membership = user.siaemembership_set.get(siae=siae)
-        self.assertTrue(membership.is_siae_admin)
+    def test_siae_signup_when_two_siaes_have_the_same_siret(self):
+        """SIAE signup using a SIRET shared by two siaes."""
+
+        siae1 = SiaeFactory()
+        siae1.name = "FIRST SIAE"
+        siae1.save()
+
+        siae2 = SiaeFactory()
+        siae2.name = "SECOND SIAE"
+        siae2.siret = siae1.siret
+        siae2.save()
+
+        url = reverse("signup:siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@siae.com",
+            "siret": siae1.siret,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertFalse(user.is_prescriber)
+        self.assertTrue(user.is_siae_staff)
+
+        siae1 = Siae.active_objects.get(name=siae1.name)
+        self.assertTrue(siae1.has_admin_member(user))
+        self.assertEqual(1, siae1.members.count())
+
+        siae2 = Siae.active_objects.get(name=siae2.name)
+        self.assertTrue(siae2.has_admin_member(user))
+        self.assertEqual(1, siae2.members.count())
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""

@@ -159,6 +159,136 @@ class ConfigureJobsViewTest(TestCase):
         )
 
 
+class CreateSiaeViewTest(TestCase):
+    def test_create_siae_outside_of_siren_fails(self):
+
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:create_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        new_siren = "9876543210"
+        new_siret = f"{new_siren}1234"
+        self.assertNotEqual(siae.siren, new_siren)
+
+        post_data = {
+            "siret": new_siret,
+            "kind": Siae.KIND_ETTI,
+            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "source": Siae.SOURCE_USER_CREATED,
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertFalse(Siae.objects.filter(siret=post_data["siret"]).exists())
+
+    def test_create_siae_with_same_siret_and_same_type(self):
+
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:create_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "siret": siae.siret,
+            "kind": siae.kind,
+            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "source": Siae.SOURCE_USER_CREATED,
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        new_siae = Siae.objects.get(name=post_data["name"])
+
+        self.assertNotEqual(new_siae.pk, siae.pk)
+        self.assertEqual(siae.source, Siae.SOURCE_ASP)
+        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
+        self.assertTrue(new_siae.has_admin_member(user))
+        self.assertEqual(new_siae.siret, post_data["siret"])
+        self.assertEqual(new_siae.kind, post_data["kind"])
+        self.assertEqual(new_siae.name, post_data["name"])
+        self.assertEqual(new_siae.address_line_1, post_data["address_line_1"])
+        self.assertEqual(new_siae.city, post_data["city"])
+        self.assertEqual(new_siae.post_code, post_data["post_code"])
+        self.assertEqual(new_siae.department, post_data["department"])
+        self.assertEqual(new_siae.email, post_data["email"])
+        self.assertEqual(new_siae.phone, post_data["phone"])
+        self.assertEqual(new_siae.website, post_data["website"])
+        self.assertEqual(new_siae.description, post_data["description"])
+
+    def test_create_siae_with_different_siret(self):
+
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:create_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        new_siret = siae.siren + "99999"
+        self.assertNotEqual(siae.siret, new_siret)
+
+        post_data = {
+            "siret": new_siret,
+            "kind": Siae.KIND_ACI,
+            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "source": Siae.SOURCE_USER_CREATED,
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        new_siae = Siae.objects.get(siret=new_siret)
+
+        self.assertTrue(new_siae.has_admin_member(user))
+        self.assertEqual(siae.source, Siae.SOURCE_ASP)
+        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
+        self.assertEqual(new_siae.siret, post_data["siret"])
+        self.assertEqual(new_siae.kind, post_data["kind"])
+        self.assertEqual(new_siae.name, post_data["name"])
+        self.assertEqual(new_siae.address_line_1, post_data["address_line_1"])
+        self.assertEqual(new_siae.city, post_data["city"])
+        self.assertEqual(new_siae.post_code, post_data["post_code"])
+        self.assertEqual(new_siae.department, post_data["department"])
+        self.assertEqual(new_siae.email, post_data["email"])
+        self.assertEqual(new_siae.phone, post_data["phone"])
+        self.assertEqual(new_siae.website, post_data["website"])
+        self.assertEqual(new_siae.description, post_data["description"])
+
+
 class EditSiaeViewTest(TestCase):
     def test_edit(self):
 
