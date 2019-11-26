@@ -1,3 +1,5 @@
+import logging
+
 from .base import *  # noqa
 
 # `CachedStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
@@ -9,3 +11,7 @@ API_INSEE_KEY = None
 API_INSEE_SECRET = None
 API_EMPLOI_STORE_KEY = None
 API_EMPLOI_STORE_SECRET = None
+
+# Disable logging and traceback in unit tests for readability.
+# https://docs.python.org/3/library/logging.html#logging.disable
+logging.disable(logging.CRITICAL)
