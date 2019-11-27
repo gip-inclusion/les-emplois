@@ -55,7 +55,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 @require_POST
 def switch_siae(request):
     """
-    Switch to the dashboard of another SIAE of the same SIREN
+    Switch to the dashboard of another SIAE of the same SIREN.
     """
 
     dashboard_url = reverse_lazy("dashboard:index")
@@ -64,5 +64,5 @@ def switch_siae(request):
     queryset = Siae.active_objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
-    messages.success(request, _(f"Je travaille maintenant sur {siae.display_name}"))
+    messages.success(request, _(f"Vous travaillez sur {siae.display_name}"))
     return HttpResponseRedirect(dashboard_url)

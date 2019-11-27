@@ -31,37 +31,55 @@
                 </a>
                 <div class="layout-header-content">
                     {% if user.is_authenticated %}
+
                         <div class="dropdown">
                             {% include "includes/icon.html" with icon="user" %}
-                            <a href="#" class="dropdown-toggle" id="itou-menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-offset="0,8">
-                                {{ user.email }}
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="itou-menu">
+                            <a
+                                href="#"
+                                class="dropdown-toggle"
+                                data-toggle="dropdown"
+                                data-display="static"
+                                aria-expanded="false">{{ user.email|truncatechars:25 }}</a>
+                            <div class="dropdown-menu dropdown-menu-lg-right">
                                 <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
                                     {% trans "Tableau de bord" %}
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a  class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
+                                <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
                                     <i>{% trans "Déconnexion" %}</i>
                                 </a>
                             </div>
                         </div>
+
                         {% if user.is_siae_staff and user.siae_set.count > 1 %}
-                            <form action="{% url 'dashboard:switch_siae' %}" method="post">
-                                {% csrf_token %}
-                                Je travaille sur 
-                                <select name="siae_id">
-                                    {% for s in user.siae_set.all %}
-                                        <option value="{{ s.pk }}"{% if s.pk == current_siae.pk %} selected{% endif %}>
-                                            {{ s.display_name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                {% buttons %}
-                                    <button type="submit" class="btn btn-primary btn-sm">{% trans "OK" %}</button>
-                                {% endbuttons %}
-                            </form>
+                            <div class="dropdown">
+                                {% include "includes/icon.html" with icon="home" %}
+                                <a
+                                    href="#"
+                                    class="dropdown-toggle"
+                                    data-toggle="dropdown"
+                                    data-display="static"
+                                    aria-expanded="false">{{ current_siae.display_name|truncatechars:25 }}</a>
+                                <div class="dropdown-menu dropdown-menu-lg-right">
+                                    <span class="dropdown-item-text">
+                                        <small>{% trans "Vos structures :" %}</small>
+                                    </span>
+                                    <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                                        {% csrf_token %}
+                                        {% for s in user.siae_set.all %}
+                                            {% if current_siae.id != s.pk %}
+                                                <button
+                                                    class="dropdown-item"
+                                                    type="submit"
+                                                    name="siae_id"
+                                                    value="{{ s.pk }}">{{ s.display_name }}</button>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </form>
+                                </div>
+                            </div>
                         {% endif %}
+
                     {% else %}
                         <nav>
                             <a class="btn btn-outline-primary" href="{% url 'account_signup' %}">
