@@ -227,7 +227,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertNotEqual(new_siae.pk, siae.pk)
         self.assertEqual(siae.source, Siae.SOURCE_ASP)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
-        self.assertTrue(new_siae.has_admin_member(user))
+        self.assertTrue(user.siaemembership_set.get(siae=new_siae).is_siae_admin)
         self.assertEqual(new_siae.siret, post_data["siret"])
         self.assertEqual(new_siae.kind, post_data["kind"])
         self.assertEqual(new_siae.name, post_data["name"])
@@ -272,8 +272,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         new_siae = Siae.objects.get(siret=new_siret)
-
-        self.assertTrue(new_siae.has_admin_member(user))
+        self.assertTrue(user.siaemembership_set.get(siae=new_siae).is_siae_admin)
         self.assertEqual(siae.source, Siae.SOURCE_ASP)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
         self.assertEqual(new_siae.siret, post_data["siret"])

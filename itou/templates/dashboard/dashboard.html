@@ -83,7 +83,7 @@
                                 {% trans "Modifier votre organisation" %}
                             </a>
                         </p>
-                        {% if user in current_prescriber_organization.admins %}
+                        {% if user_is_prescriber_org_admin %}
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="user-plus" %}
                                 <i>{% trans "Inviter des utilisateurs" %}</i>
@@ -126,7 +126,7 @@
                             {% trans "Configurer les fiches de postes" %}
                         </a>
                     </p>
-                    {% if user_is_admin %}
+                    {% if user_is_siae_admin %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
                             <a href="{% url 'siaes_views:create_siae' %}">{% trans "Créer une nouvelle structure" %}</a>

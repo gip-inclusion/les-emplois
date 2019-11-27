@@ -16,13 +16,7 @@ from itou.www.dashboard.forms import EditUserInfoForm
 
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
-
-    user_is_admin = False
-    if request.user.is_siae_staff:
-        current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-        current_siae = request.user.siae_set.get(pk=current_siae_pk)
-        user_is_admin = current_siae.has_admin_member(request.user)
-    context = {"user_is_admin": user_is_admin}
+    context = {}
     return render(request, template_name, context)
 
 

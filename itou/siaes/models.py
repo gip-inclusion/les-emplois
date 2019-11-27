@@ -144,13 +144,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             siaemembership__user=user, siaemembership__user__is_active=True
         ).exists()
 
-    def has_admin_member(self, user):
-        return self.members.filter(
-            siaemembership__user=user,
-            siaemembership__is_siae_admin=True,
-            siaemembership__user__is_active=True,
-        ).exists()
-
     @property
     def siren(self):
         # pylint: disable=E1136

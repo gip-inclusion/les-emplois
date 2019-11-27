@@ -78,10 +78,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         return self.name.title()
 
     @property
-    def admins(self):
-        return self.members.filter(prescribermembership__is_admin=True)
-
-    @property
     def has_members(self):
         return self.members.exists()
 

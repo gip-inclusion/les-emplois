@@ -52,7 +52,7 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_siae_staff)
 
         siae = Siae.active_objects.get(siret=post_data["siret"])
-        self.assertTrue(siae.has_admin_member(user))
+        self.assertTrue(user.siaemembership_set.get(siae=siae).is_siae_admin)
         self.assertEqual(1, siae.members.count())
 
     def test_siae_signup_when_two_siaes_have_the_same_siret(self):
@@ -88,11 +88,11 @@ class SignupTest(TestCase):
         self.assertTrue(user.is_siae_staff)
 
         siae1 = Siae.active_objects.get(name=siae1.name)
-        self.assertTrue(siae1.has_admin_member(user))
+        self.assertTrue(user.siaemembership_set.get(siae=siae1).is_siae_admin)
         self.assertEqual(1, siae1.members.count())
 
         siae2 = Siae.active_objects.get(name=siae2.name)
-        self.assertTrue(siae2.has_admin_member(user))
+        self.assertTrue(user.siaemembership_set.get(siae=siae2).is_siae_admin)
         self.assertEqual(1, siae2.members.count())
 
     def test_job_seeker_signup(self):
