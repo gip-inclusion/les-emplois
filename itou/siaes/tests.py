@@ -2,7 +2,6 @@ from django.test import TestCase
 
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
-from itou.users.factories import SiaeStaffFactory
 
 
 class FactoriesTest(TestCase):

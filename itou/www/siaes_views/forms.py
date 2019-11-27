@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
-from itou.utils.validators import validate_siret, validate_post_code
+from itou.utils.validators import validate_post_code
 
 
 class CreateSiaeForm(forms.ModelForm):
