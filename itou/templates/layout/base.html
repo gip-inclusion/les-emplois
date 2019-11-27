@@ -51,7 +51,7 @@
                             </div>
                         </div>
 
-                        {% if user.is_siae_staff and user.siae_set.count > 1 %}
+                        {% if user.is_siae_staff and user_siae_set|length > 1 %}
                             <div class="dropdown">
                                 {% include "includes/icon.html" with icon="home" %}
                                 <a

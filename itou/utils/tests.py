@@ -9,12 +9,13 @@ from django.test import RequestFactory, TestCase
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
+from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import get_user_info
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.templatetags import format_filters
@@ -25,6 +26,97 @@ from itou.utils.validators import (
     validate_siret,
     validate_post_code,
 )
+
+
+class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
+    """Test `itou.utils.perms.context_processors.get_current_organization_and_perms` processor."""
+
+    def test_siae_one_membership(self):
+
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.assertTrue(user.siaemembership_set.get(siae=siae).is_siae_admin)
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+        request.session.save()
+
+        with self.assertNumQueries(1):
+            result = get_current_organization_and_perms(request)
+            expected = {
+                "current_prescriber_organization": None,
+                "current_siae": siae,
+                "user_is_prescriber_org_admin": False,
+                "user_is_siae_admin": True,
+                "user_siae_set": [siae],
+            }
+            self.assertDictEqual(expected, result)
+
+    def test_siae_multiple_memberships(self):
+
+        siae1 = SiaeWithMembershipFactory()
+        user = siae1.members.first()
+        self.assertTrue(user.siaemembership_set.get(siae=siae1).is_siae_admin)
+
+        siae2 = SiaeFactory()
+        siae2.members.add(user)
+        self.assertFalse(user.siaemembership_set.get(siae=siae2).is_siae_admin)
+
+        siae3 = SiaeFactory()
+        siae3.members.add(user)
+        self.assertFalse(user.siaemembership_set.get(siae=siae3).is_siae_admin)
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae3.pk
+        request.session.save()
+
+        with self.assertNumQueries(1):
+            result = get_current_organization_and_perms(request)
+            expected = {
+                "current_prescriber_organization": None,
+                "current_siae": siae3,
+                "user_is_prescriber_org_admin": False,
+                "user_is_siae_admin": False,
+                "user_siae_set": [siae1, siae2, siae3],
+            }
+            self.assertDictEqual(expected, result)
+
+    def test_prescriber_organization_one_membership(self):
+
+        organization = PrescriberOrganizationWithMembershipFactory()
+        user = organization.members.first()
+        self.assertTrue(
+            user.prescribermembership_set.get(organization=organization).is_admin
+        )
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session[
+            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+        ] = organization.pk
+        request.session.save()
+
+        with self.assertNumQueries(1):
+            result = get_current_organization_and_perms(request)
+            expected = {
+                "current_prescriber_organization": organization,
+                "current_siae": None,
+                "user_is_prescriber_org_admin": True,
+                "user_is_siae_admin": False,
+                "user_siae_set": [],
+            }
+            self.assertDictEqual(expected, result)
 
 
 class UtilsAddressMixinTest(TestCase):
