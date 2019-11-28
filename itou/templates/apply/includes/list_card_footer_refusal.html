@@ -9,9 +9,6 @@
             aria-controls="answer{{ forloop.counter0 }}"
         >{% trans "Réponse" %}</a>
         <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
-            <p>
-                <b>{% trans "Motif du refus :" %}</b> {{ job_application.get_refusal_reason_display }}
-            </p>
             {% if job_application.answer %}
                 <p>
                     <b>{% trans "Message :" %}</b>
