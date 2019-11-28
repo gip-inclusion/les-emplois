@@ -28,6 +28,7 @@ class Approval(models.Model):
         max_length=12,
         help_text=_("12 caractères alphanumériques."),
         validators=[alphanumeric, MinLengthValidator(12)],
+        unique=True,
     )
     start_at = models.DateField(verbose_name=_("Date de début"), blank=True, null=True)
     end_at = models.DateField(verbose_name=_("Date de fin"), blank=True, null=True)
