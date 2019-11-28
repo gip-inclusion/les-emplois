@@ -126,7 +126,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         user.is_siae_staff = True
         user.save()
 
-        siaes = Siae.active_objects.filter(siret=self.cleaned_data["siret"]).all()
+        siaes = Siae.active_objects.filter(siret=self.cleaned_data["siret"])
 
         for siae in siaes:
             membership = SiaeMembership()
