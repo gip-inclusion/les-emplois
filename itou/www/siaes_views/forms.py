@@ -100,22 +100,21 @@ class CreateSiaeForm(forms.ModelForm):
             )
         return siret
 
-    def save(self, request):
+    def save(self, request, commit=True):
 
-        siae = super().save(request)
-        siae.geocode(
-            f"{siae.address_line_1} {siae.address_line_2}",
-            post_code=siae.post_code,
-            save=False,
-        )
-        siae.source = Siae.SOURCE_USER_CREATED
-        siae.save()
+        siae = super().save(commit=commit)
 
-        membership = SiaeMembership()
-        membership.user = request.user
-        membership.siae = siae
-        membership.is_siae_admin = True
-        membership.save()
+        if commit:
+            siae.geocode(siae.address_on_one_line, post_code=siae.post_code, save=False)
+            siae.created_by = request.user
+            siae.source = Siae.SOURCE_USER_CREATED
+            siae.save()
+
+            membership = SiaeMembership()
+            membership.user = request.user
+            membership.siae = siae
+            membership.is_siae_admin = True
+            membership.save()
 
         return siae
 

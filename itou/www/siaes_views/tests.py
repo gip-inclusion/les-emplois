@@ -239,6 +239,8 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.phone, post_data["phone"])
         self.assertEqual(new_siae.website, post_data["website"])
         self.assertEqual(new_siae.description, post_data["description"])
+        self.assertEqual(new_siae.created_by, user)
+        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
 
     def test_create_siae_with_different_siret(self):
 
@@ -286,6 +288,8 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.phone, post_data["phone"])
         self.assertEqual(new_siae.website, post_data["website"])
         self.assertEqual(new_siae.description, post_data["description"])
+        self.assertEqual(new_siae.created_by, user)
+        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
 
 
 class EditSiaeViewTest(TestCase):

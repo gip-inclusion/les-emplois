@@ -73,8 +73,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     SOURCE_USER_CREATED = "USER_CREATED"
 
     SOURCE_CHOICES = (
-        (SOURCE_ASP, _("Provenant de l'export ASP")),
-        (SOURCE_USER_CREATED, _("Créée par un utilisateur SIAE")),
+        (SOURCE_ASP, _("Export ASP")),
+        (SOURCE_USER_CREATED, _("Utilisateur")),
     )
 
     siret = models.CharField(
@@ -117,6 +117,21 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         blank=True,
     )
 
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        related_name="created_siae_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_("Date de création"), default=timezone.now
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=_("Date de modification"), blank=True, null=True
+    )
+
     objects = models.Manager.from_queryset(SiaeQuerySet)()
     active_objects = SiaeActiveManager.from_queryset(SiaeQuerySet)()
 
@@ -126,6 +141,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     def __str__(self):
         return f"{self.siret} {self.display_name}"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
 
     @property
     def display_name(self):
