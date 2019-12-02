@@ -169,7 +169,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return self.siret[:9]
 
     def get_card_url(self):
-        return reverse("siaes_views:card", kwargs={"siret": self.siret})
+        return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
 
 
 class SiaeMembership(models.Model):

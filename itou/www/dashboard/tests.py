@@ -39,7 +39,7 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], siae)
 
-        url = reverse("siaes_views:card", kwargs={"siret": siae.siret})
+        url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], siae)
@@ -54,7 +54,7 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)
 
-        url = reverse("siaes_views:card", kwargs={"siret": related_siae.siret})
+        url = reverse("siaes_views:card", kwargs={"siae_id": related_siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)

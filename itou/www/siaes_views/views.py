@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
@@ -13,15 +13,28 @@ from itou.www.siaes_views.forms import CreateSiaeForm, EditSiaeForm
 
 
 @login_required
-def card(request, siret, template_name="siaes/card.html"):
+def card(request, siae_id, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
     """
     queryset = Siae.active_objects.prefetch_job_description_through(is_active=True)
-    siae = get_object_or_404(queryset, siret=siret)
+    siae = get_object_or_404(queryset, pk=siae_id)
     back_url = get_safe_url(request, "back_url")
     context = {"siae": siae, "back_url": back_url}
     return render(request, template_name, context)
+
+
+@login_required
+def card_legacy(request, siret, template_name="siaes/card.html"):
+    """
+    Legacy route via SIRET for SIAE's card (or "Fiche" in French).
+    """
+    siae = Siae.active_objects.filter(siret=siret).first()
+    if siae:
+        return HttpResponsePermanentRedirect(
+            reverse_lazy("siaes_views:card", kwargs={"siae_id": siae.pk})
+        )
+    raise Http404("Aucune structure trouvée correspondant à ce SIRET.")
 
 
 # Public view.
