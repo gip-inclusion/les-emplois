@@ -6,6 +6,17 @@ from itou.siaes.factories import SiaeWithMembershipFactory, SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
+class DashboardViewTest(TestCase):
+    def test_dashboard(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):
 
