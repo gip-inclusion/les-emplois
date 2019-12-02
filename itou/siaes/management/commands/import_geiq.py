@@ -143,6 +143,7 @@ class Command(BaseCommand):
                     siae.siret = siret
                     siae.naf = naf or "7830Z"  # TODO: drop NAF column.
                     siae.kind = Siae.KIND_GEIQ
+                    siae.source = Siae.SOURCE_GEIQ
                     siae.name = name
                     siae.phone = phone
                     siae.email = email

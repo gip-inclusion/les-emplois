@@ -171,6 +171,7 @@ class Command(BaseCommand):
                     siae.siret = siret
                     siae.naf = naf
                     siae.kind = kind
+                    siae.source = Siae.SOURCE_ASP
                     siae.name = name
                     siae.phone = phone
                     siae.email = email
