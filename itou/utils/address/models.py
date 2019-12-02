@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.gis.db import models as gis_models
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from django.utils.translation import gettext_lazy as _
@@ -30,7 +31,7 @@ class AddressMixin(models.Model):
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     address_line_1 = models.CharField(
-        verbose_name=_("Adresse postale, bôite postale"), max_length=255, blank=True
+        verbose_name=_("Adresse postale, boite postale"), max_length=255, blank=True
     )
     address_line_2 = models.CharField(
         verbose_name=_("Appartement, suite, bloc, bâtiment, etc."),
@@ -103,3 +104,11 @@ class AddressMixin(models.Model):
         self.geocoding_score = geocoding_data["score"]
         if save:
             self.save()
+
+    def clean(self):
+        if self.post_code:
+            if not self.post_code.startswith(self.department):
+                raise ValidationError(
+                    _("Le département doit correspondre au code postal.")
+                )
+        super().clean()

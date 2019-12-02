@@ -44,7 +44,9 @@ class SiaeAdmin(admin.ModelAdmin):
         "geocoding_score",
         "member_count",
     )
-    list_filter = (SiaeHasMembersFilter, "kind", "department")
+    list_filter = (SiaeHasMembersFilter, "kind", "source", "department")
+    raw_id_fields = ("created_by",)
+    readonly_fields = ("created_by", "created_at", "updated_at")
     fieldsets = (
         (
             _("SIAE"),
@@ -59,6 +61,10 @@ class SiaeAdmin(admin.ModelAdmin):
                     "email",
                     "website",
                     "description",
+                    "source",
+                    "created_by",
+                    "created_at",
+                    "updated_at",
                 )
             },
         ),
@@ -89,6 +95,11 @@ class SiaeAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         queryset = queryset.annotate(_member_count=Count("members", distinct=True))
         return queryset
+
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.SiaeJobDescription)

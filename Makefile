@@ -108,8 +108,9 @@ postgres_backups_clean:
 
 # Delete and recreate the DB manually.
 # =============================================================================
+# docker-compose -f docker-compose-dev.yml down
 # docker-compose -f docker-compose-dev.yml up --no-deps postgres
 # make shell_on_postgres_container
-# psql -h postgres -U postgres
+# PGPASSWORD=password psql -h postgres -U postgres
 # DROP DATABASE itou;
 # CREATE DATABASE itou OWNER itou;

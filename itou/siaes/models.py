@@ -47,7 +47,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
 
-    To retrieve jobs of an siaes_views:
+    To retrieve jobs of an siae:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
         self.job_description_through.all()     <QuerySet [<SiaeJobDescription>, ...]>
     """
@@ -56,8 +56,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_AI = "AI"
     KIND_ACI = "ACI"
     KIND_ETTI = "ETTI"
-    KIND_GEIQ = "GEIQ"  # Seems unused in our SIAE data.
-    KIND_RQ = "RQ"  # Seems unused in our SIAE data.
+    # KIND_GEIQ = "GEIQ"
 
     KIND_CHOICES = (
         (
@@ -67,15 +66,21 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_AI, _("Association intermédiaire")),
         (KIND_ACI, _("Atelier chantier d'insertion")),
         (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
-        (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
-        (KIND_RQ, _("Régie de quartier")),
+        # (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
+    )
+
+    SOURCE_ASP = "ASP"
+    SOURCE_USER_CREATED = "USER_CREATED"
+
+    SOURCE_CHOICES = (
+        (SOURCE_ASP, _("Export ASP")),
+        (SOURCE_USER_CREATED, _("Utilisateur")),
     )
 
     siret = models.CharField(
         verbose_name=_("Siret"),
         max_length=14,
         validators=[validate_siret],
-        unique=True,
         db_index=True,
     )
     naf = models.CharField(
@@ -91,6 +96,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
+
+    source = models.CharField(
+        verbose_name=_("Source de données"),
+        max_length=20,
+        choices=SOURCE_CHOICES,
+        default=SOURCE_ASP,
+    )
+
     jobs = models.ManyToManyField(
         "jobs.Appellation",
         verbose_name=_("Métiers"),
@@ -104,15 +117,36 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         blank=True,
     )
 
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        related_name="created_siae_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_("Date de création"), default=timezone.now
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=_("Date de modification"), blank=True, null=True
+    )
+
     objects = models.Manager.from_queryset(SiaeQuerySet)()
     active_objects = SiaeActiveManager.from_queryset(SiaeQuerySet)()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")
         verbose_name_plural = _("Structures d'insertion par l'activité économique")
+        unique_together = ("siret", "kind")
 
     def __str__(self):
         return f"{self.siret} {self.display_name}"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
 
     @property
     def display_name(self):
@@ -122,13 +156,20 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def has_members(self):
-        return self.members.exists()
+        return self.members.filter(siaemembership__user__is_active=True).exists()
 
     def has_member(self, user):
-        return self.members.filter(siaemembership__user=user).exists()
+        return self.members.filter(
+            siaemembership__user=user, siaemembership__user__is_active=True
+        ).exists()
+
+    @property
+    def siren(self):
+        # pylint: disable=E1136
+        return self.siret[:9]
 
     def get_card_url(self):
-        return reverse("siaes_views:card", kwargs={"siret": self.siret})
+        return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
 
 
 class SiaeMembership(models.Model):

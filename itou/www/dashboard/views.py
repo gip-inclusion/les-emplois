@@ -1,19 +1,21 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from allauth.account.views import PasswordChangeView
 
+from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
 
 
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
-
     context = {}
     return render(request, template_name, context)
 
@@ -47,3 +49,20 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
     context = {"form": form, "prev_url": prev_url}
     return render(request, template_name, context)
+
+
+@login_required
+@require_POST
+def switch_siae(request):
+    """
+    Switch to the dashboard of another SIAE of the same SIREN.
+    """
+
+    dashboard_url = reverse_lazy("dashboard:index")
+
+    pk = request.POST["siae_id"]
+    queryset = Siae.active_objects.member_required(request.user)
+    siae = get_object_or_404(queryset, pk=pk)
+    request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+    messages.success(request, _(f"Vous travaillez sur {siae.display_name}"))
+    return HttpResponseRedirect(dashboard_url)

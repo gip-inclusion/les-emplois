@@ -13,8 +13,7 @@ class SiaeSearchForm(forms.Form):
 
     CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
-    KINDS = [Siae.KIND_EI, Siae.KIND_AI, Siae.KIND_ACI, Siae.KIND_ETTI]
-    KIND_CHOICES = [("", "---")] + [(k, k) for k in KINDS]
+    KIND_CHOICES = [("", "---")] + [(k[0], k[0]) for k in Siae.KIND_CHOICES]
 
     distance = forms.ChoiceField(
         choices=DISTANCE_CHOICES, widget=forms.Select(attrs={"class": "form-control"})

@@ -8,6 +8,11 @@ alphanumeric = RegexValidator(
 )
 
 
+def validate_post_code(post_code):
+    if not post_code.isdigit() or len(post_code) != 5:
+        raise ValidationError(_("Le code postal doit être composé de 5 chiffres."))
+
+
 def validate_siret(siret):
     if not siret.isdigit() or len(siret) != 14:
         raise ValidationError(_("Le numéro SIRET doit être composé de 14 chiffres."))

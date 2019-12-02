@@ -1,0 +1,33 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Créer une nouvelle structure" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Créer une nouvelle structure" %}</h1>
+
+<form method="post" action="">
+
+    <div class="alert alert-secondary" role="alert">
+        <i>{% trans "Laisser les champs vides pour ne rien afficher." %}</i>
+    </div>
+
+    {% csrf_token %}
+
+    {% bootstrap_form form %}
+
+    <div class="alert alert-warning" role="alert">
+        <p>
+            {% blocktrans %}En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.{% endblocktrans %}
+        </p>
+        {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+        {% endbuttons %}
+    </div>
+
+</form>
+
+{% endblock %}
