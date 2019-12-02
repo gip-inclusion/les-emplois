@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from django.core.exceptions import NON_FIELD_ERRORS
 from django.utils.translation import gettext_lazy as _
 
 from itou.siaes.models import Siae, SiaeMembership
@@ -61,6 +62,12 @@ class CreateSiaeForm(forms.ModelForm):
             "phone": _("Par exemple 0610203040"),
             "website": _("Votre site web doit commencer par http:// ou https://"),
             "description": _("Texte de présentation de votre SIAE."),
+        }
+        error_messages = {
+            NON_FIELD_ERRORS: {
+                "unique_together": "Il ne peut pas exister plus qu'une %(model_name)s "
+                + "avec ce %(field_labels)s, or il en existe déjà une."
+            }
         }
 
     siret = forms.CharField(

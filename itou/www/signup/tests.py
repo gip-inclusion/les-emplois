@@ -60,10 +60,12 @@ class SignupTest(TestCase):
 
         siae1 = SiaeFactory()
         siae1.name = "FIRST SIAE"
+        siae1.kind = Siae.KIND_ETTI
         siae1.save()
 
         siae2 = SiaeFactory()
         siae2.name = "SECOND SIAE"
+        siae2.kind = Siae.KIND_ACI
         siae2.siret = siae1.siret
         siae2.save()
 

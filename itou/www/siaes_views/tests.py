@@ -194,7 +194,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.assertFalse(Siae.objects.filter(siret=post_data["siret"]).exists())
 
-    def test_create_siae_with_same_siret_and_same_type(self):
+    def test_cannot_create_siae_with_same_siret_and_same_type(self):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -208,6 +208,38 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": siae.siret,
             "kind": siae.kind,
+            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "source": Siae.SOURCE_USER_CREATED,
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
+
+    def test_can_create_siae_with_same_siret_and_different_type(self):
+
+        siae = SiaeWithMembershipFactory()
+        siae.kind = Siae.KIND_ETTI
+        siae.save()
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:create_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "siret": siae.siret,
+            "kind": Siae.KIND_ACI,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Siae.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
