@@ -49,8 +49,8 @@ class CreateSiaeForm(forms.ModelForm):
             "department": _(
                 (
                     "Seulement les départements du Bas-Rhin (67), du Pas-de-Calais (62) "
-                    + "et de la Seine Saint Denis (93) sont disponibles pendant la phase actuelle "
-                    + "d'expérimentation de la plateforme de l'inclusion."
+                    "et de la Seine Saint Denis (93) sont disponibles pendant la phase actuelle "
+                    "d'expérimentation de la plateforme de l'inclusion."
                 )
             ),
             "phone": _("Par exemple 0610203040"),
@@ -60,7 +60,7 @@ class CreateSiaeForm(forms.ModelForm):
         error_messages = {
             NON_FIELD_ERRORS: {
                 "unique_together": "Il ne peut pas exister plus qu'une %(model_name)s "
-                + "avec ce %(field_labels)s, or il en existe déjà une."
+                "avec ce %(field_labels)s, or il en existe déjà une."
             }
         }
 
@@ -72,12 +72,8 @@ class CreateSiaeForm(forms.ModelForm):
         strip=True,
         help_text=_(
             "Saisissez 14 chiffres. "
-            + "Doit être le SIRET de votre structure actuelle ou un SIRET avec le même SIREN."
+            "Doit être le SIRET de votre structure actuelle ou un SIRET avec le même SIREN."
         ),
-    )
-
-    source = forms.CharField(
-        widget=forms.HiddenInput(), required=True, initial=Siae.SOURCE_USER_CREATED
     )
 
     post_code = forms.CharField(
@@ -94,11 +90,7 @@ class CreateSiaeForm(forms.ModelForm):
         siret = self.cleaned_data["siret"]
         if not siret.startswith(self.current_siae.siren):
             raise forms.ValidationError(
-                _(
-                    "Le numéro SIRET doit avoir le SIREN {}".format(
-                        self.current_siae.siren
-                    )
-                )
+                _(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}")
             )
         return siret
 
