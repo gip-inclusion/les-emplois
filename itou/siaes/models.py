@@ -86,7 +86,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         db_index=True,
     )
     naf = models.CharField(
-        verbose_name=_("Naf"), max_length=5, validators=[validate_naf]
+        verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True
     )
     kind = models.CharField(
         verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI

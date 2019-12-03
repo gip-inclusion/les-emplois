@@ -141,7 +141,7 @@ class Command(BaseCommand):
 
                     siae = Siae()
                     siae.siret = siret
-                    siae.naf = naf or "7830Z"  # TODO: drop NAF column.
+                    siae.naf = naf
                     siae.kind = Siae.KIND_GEIQ
                     siae.source = Siae.SOURCE_GEIQ
                     siae.name = name
