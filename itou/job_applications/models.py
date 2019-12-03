@@ -243,9 +243,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return self.sender != self.job_seeker
 
     @property
-    def eligibility_diagnosis_required(self):
+    def eligibility_diagnosis_by_siae_required(self):
+        """
+        Returns True if an eligibility diagnosis must be made by an SIAE
+        when processing an application, False otherwise.
+        """
         return (
-            self.state.is_processing and not self.job_seeker.has_eligibility_diagnosis
+            self.state.is_processing
+            and not self.job_seeker.has_eligibility_diagnosis
+            and self.to_siae.kind
+            in [
+                self.to_siae.KIND_EI,
+                self.to_siae.KIND_AI,
+                self.to_siae.KIND_ACI,
+                self.to_siae.KIND_ETTI,
+            ]
         )
 
     # Workflow transitions.

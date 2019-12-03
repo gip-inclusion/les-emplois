@@ -178,7 +178,7 @@
 
         <hr>
 
-        {% if job_application.eligibility_diagnosis_required %}
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
 
             <p>
                 <a href="{% url 'apply:eligibility' job_application_id=job_application %}" class="btn btn-secondary btn-block">

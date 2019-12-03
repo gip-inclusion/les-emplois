@@ -15,8 +15,24 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory
 from itou.utils.templatetags import format_filters
+
+
+class JobApplicationModelTest(TestCase):
+    def test_eligibility_diagnosis_by_siae_required(self):
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
+        )
+        self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_application.eligibility_diagnosis_by_siae_required)
+
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_EI
+        )
+        self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
+        self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
 
 class JobApplicationFactoriesTest(TestCase):
