@@ -23,6 +23,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
+    kind = models.Siae.KIND_EI
     name = factory.Sequence(lambda n: f"siae{n}")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.LazyAttribute(lambda obj: f"{obj.name}@example.com")

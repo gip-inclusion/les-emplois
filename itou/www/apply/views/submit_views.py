@@ -69,10 +69,12 @@ def step_sender(request, siae_pk):
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     session_data["sender_pk"] = user_info.user.pk
     session_data["sender_kind"] = user_info.kind
+
     if user_info.prescriber_organization:
         session_data[
             "sender_prescriber_organization_pk"
         ] = user_info.prescriber_organization.pk
+
     if user_info.siae:
         session_data["sender_siae_pk"] = user_info.siae.pk
 
@@ -179,15 +181,20 @@ def step_eligibility(
     """
     Check eligibility.
     """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
     user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
-    # This step is only required for an authorized prescriber.
-    if not user_info.is_authorized_prescriber:
+    step_required = user_info.is_authorized_prescriber and siae.kind in [
+        Siae.KIND_EI,
+        Siae.KIND_AI,
+        Siae.KIND_ACI,
+        Siae.KIND_ETTI,
+    ]
+    if not step_required:
         return HttpResponseRedirect(next_url)
 
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 
     # This step is only required if the job seeker hasn't already
