@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -133,21 +133,28 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     form = AcceptForm(instance=job_application, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
+
         job_application = form.save()
         job_application.accept(user=request.user)
-        # TODO: display another message if the user already have an approval number.
-        messages.success(
-            request,
-            mark_safe(
-                _(
-                    "Embauche acceptée.<br>"
-                    "Il n'est pas nécessaire de demander le numéro d'agrément à votre interlocuteur Pôle emploi.<br>"
-                    "Le numéro d'agrément sera indiqué sur cette page - "
-                    "vous serez prévenu par email dès qu'il sera disponible.<br>"
-                    "Ce numéro pourra être utilisé pour la déclaration de la personne dans l'ASP.<br>"
-                )
-            ),
-        )
+
+        messages.success(request, _("Embauche acceptée !"))
+
+        if job_application.to_siae.is_subject_to_eligibility_rules:
+            # TODO: display another message if the user already have an approval number.
+            messages.success(
+                request,
+                mark_safe(
+                    _(
+                        "Embauche acceptée.<br>"
+                        "Il n'est pas nécessaire de demander le numéro d'agrément à votre interlocuteur "
+                        "Pôle emploi.<br>"
+                        "Le numéro d'agrément sera indiqué sur cette page - "
+                        "vous serez prévenu par email dès qu'il sera disponible.<br>"
+                        "Ce numéro pourra être utilisé pour la déclaration de la personne dans l'ASP.<br>"
+                    )
+                ),
+            )
+
         next_url = reverse(
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
         )
@@ -169,6 +176,9 @@ def eligibility(
     job_application = get_object_or_404(
         queryset, id=job_application_id, state=JobApplicationWorkflow.STATE_PROCESSING
     )
+
+    if not job_application.to_siae.is_subject_to_eligibility_rules:
+        raise Http404()
 
     if request.method == "POST":
         if not request.POST.get("confirm-eligibility") == "1":

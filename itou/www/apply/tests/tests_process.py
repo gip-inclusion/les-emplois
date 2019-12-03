@@ -3,12 +3,13 @@ import datetime
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.users.factories import DEFAULT_PASSWORD
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
 )
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.models import Siae
+from itou.users.factories import DEFAULT_PASSWORD
 
 
 class ProcessViewsTest(TestCase):
@@ -116,7 +117,7 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.state.is_postponed)
 
     def test_accept(self):
-        """Ensure that the `accept` transition is triggered."""
+        """Test the `accept` transition."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING
@@ -171,6 +172,21 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         self.assertTrue(job_application.job_seeker.has_eligibility_diagnosis)
+
+    def test_eligibility_for_siae_not_subject_to_eligibility_rules(self):
+        """Test eligibility for an Siae not subject to eligibility rules."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
+        )
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse(
+            "apply:eligibility", kwargs={"job_application_id": job_application.pk}
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     def test_eligibility_wrong_state_for_job_application(self):
         """The eligibility diagnosis page must only be accessible in `STATE_PROCESSING`."""

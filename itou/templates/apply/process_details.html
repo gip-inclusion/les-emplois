@@ -13,22 +13,24 @@
 
     <ul>
 
-        {% with job_application.job_seeker.get_approval as approval %}
-            {% if approval %}
-                <li>
-                    {% trans "Numéro d'agrément :" %}
-                    <span class="text-success">
-                        <b>{{ approval.number }}</b>
-                        (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
-                    </span>
-                </li>
-            {% elif job_application.state.is_accepted %}
-                <li>
-                    {% trans "Numéro d'agrément :" %}
-                    <b>{% trans "en cours de délivrance" %}</b>
-                </li>
-            {% endif %}
-        {% endwith %}
+        {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+            {% with job_application.job_seeker.get_approval as approval %}
+                {% if approval %}
+                    <li>
+                        {% trans "Numéro d'agrément :" %}
+                        <span class="text-success">
+                            <b>{{ approval.number }}</b>
+                            (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
+                        </span>
+                    </li>
+                {% elif job_application.state.is_accepted %}
+                    <li>
+                        {% trans "Numéro d'agrément :" %}
+                        <b>{% trans "en cours de délivrance" %}</b>
+                    </li>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
 
         <li>{% trans "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
 
@@ -66,30 +68,34 @@
 
     {# Eligibility ------------------------------------------------------------------------- #}
 
-    {% with job_application.job_seeker.get_eligibility_diagnosis as eligibility_diagnosis %}
+    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-        {% if eligibility_diagnosis %}
+        {% with job_application.job_seeker.get_eligibility_diagnosis as eligibility_diagnosis %}
 
-            <hr>
+            {% if eligibility_diagnosis %}
 
-            <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
+                <hr>
 
-            <p>
-                {% trans "Validés par :" %}
-                <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
-                {% if eligibility_diagnosis.author_siae %}
-                    ({{ eligibility_diagnosis.author_siae.display_name }})
-                {% endif %}
-                {% if eligibility_diagnosis.author_prescriber_organization %}
-                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
-                {% endif %}
-                {% trans "le" %}
-                <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
-            </p>
+                <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
 
-        {% endif %}
+                <p>
+                    {% trans "Validés par :" %}
+                    <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
+                    {% if eligibility_diagnosis.author_siae %}
+                        ({{ eligibility_diagnosis.author_siae.display_name }})
+                    {% endif %}
+                    {% if eligibility_diagnosis.author_prescriber_organization %}
+                        ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                    {% endif %}
+                    {% trans "le" %}
+                    <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
+                </p>
 
-    {% endwith %}
+            {% endif %}
+
+        {% endwith %}
+
+    {% endif %}
 
     {# Sender info ------------------------------------------------------------------------- #}
 

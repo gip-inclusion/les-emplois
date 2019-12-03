@@ -62,7 +62,7 @@ def start(request, siae_pk):
 @valid_session_required
 def step_sender(request, siae_pk):
     """
-    Determine the sender.
+    Determine info about the sender.
     """
     user_info = get_user_info(request)
 
@@ -88,7 +88,7 @@ def step_job_seeker(
     request, siae_pk, template_name="apply/submit_step_job_seeker.html"
 ):
     """
-    Determine the job seeker.
+    Determine the job seeker, in the cases where the application is sent by a proxy.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae_pk})
@@ -124,7 +124,7 @@ def step_check_job_seeker_info(
     request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"
 ):
     """
-    Check job seeker info.
+    Ensure the job seeker has all required info.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
@@ -152,7 +152,7 @@ def step_create_job_seeker(
     request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"
 ):
     """
-    Create a job seeker.
+    Create a job seeker if he can't be found in the DB.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
@@ -186,12 +186,9 @@ def step_eligibility(
     user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
-    step_required = user_info.is_authorized_prescriber and siae.kind in [
-        Siae.KIND_EI,
-        Siae.KIND_AI,
-        Siae.KIND_ACI,
-        Siae.KIND_ETTI,
-    ]
+    step_required = (
+        user_info.is_authorized_prescriber and siae.is_subject_to_eligibility_rules
+    )
     if not step_required:
         return HttpResponseRedirect(next_url)
 
@@ -217,7 +214,7 @@ def step_application(
     request, siae_pk, template_name="apply/submit_step_application.html"
 ):
     """
-    Submit a job application.
+    Create and submit the job application.
     """
     queryset = Siae.active_objects.prefetch_job_description_through()
     siae = get_object_or_404(queryset, pk=siae_pk)

@@ -250,14 +250,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         return (
             self.state.is_processing
+            and self.to_siae.is_subject_to_eligibility_rules
             and not self.job_seeker.has_eligibility_diagnosis
-            and self.to_siae.kind
-            in [
-                self.to_siae.KIND_EI,
-                self.to_siae.KIND_AI,
-                self.to_siae.KIND_ACI,
-                self.to_siae.KIND_ETTI,
-            ]
         )
 
     # Workflow transitions.
@@ -276,10 +270,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Send notification.
         connection = mail.get_connection()
         accepted_by = kwargs.get("user")
-        emails = [
-            self.email_accept,
-            self.email_accept_trigger_manual_approval(accepted_by),
-        ]
+        emails = [self.email_accept]
+        if self.to_siae.is_subject_to_eligibility_rules:
+            emails.append(self.email_accept_trigger_manual_approval(accepted_by))
         connection.send_messages(emails)
 
     @xwf_models.transition()

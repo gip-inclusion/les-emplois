@@ -248,6 +248,15 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
         self.assertIn("Numéro d'agrément requis sur Itou", mail.outbox[1].subject)
 
+    def test_accept_for_siae_not_subject_to_eligibility_rules(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+
     def test_refuse(self):
         user = JobSeekerFactory()
         kwargs = {

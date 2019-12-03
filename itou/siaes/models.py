@@ -170,6 +170,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         # pylint: disable=E1136
         return self.siret[:9]
 
+    @property
+    def is_subject_to_eligibility_rules(self):
+        return self.kind in [self.KIND_EI, self.KIND_AI, self.KIND_ACI, self.KIND_ETTI]
+
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
 
