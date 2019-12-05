@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
@@ -10,6 +12,7 @@ from itou.siaes.factories import (
 )
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 
 class CardViewTest(TestCase):
@@ -238,8 +241,13 @@ class CreateSiaeViewTest(TestCase):
 
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
-    def test_can_create_siae_with_same_siret_and_different_type(self):
-
+    @mock.patch(
+        "itou.utils.apis.geocoding.call_ban_geocoding_api",
+        return_value=BAN_GEOCODING_API_RESULT_MOCK,
+    )
+    def test_can_create_siae_with_same_siret_and_different_type(
+        self, mock_call_ban_geocoding_api
+    ):
         siae = SiaeWithMembershipFactory()
         siae.kind = Siae.KIND_ETTI
         siae.save()
@@ -278,6 +286,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.kind, post_data["kind"])
         self.assertEqual(new_siae.name, post_data["name"])
         self.assertEqual(new_siae.address_line_1, post_data["address_line_1"])
+        self.assertEqual(new_siae.address_line_2, "")
         self.assertEqual(new_siae.city, post_data["city"])
         self.assertEqual(new_siae.post_code, post_data["post_code"])
         self.assertEqual(new_siae.department, post_data["department"])
@@ -288,8 +297,17 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.created_by, user)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
 
-    def test_create_siae_with_different_siret(self):
+        # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
+        self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
+        self.assertEqual(new_siae.latitude, 48.838411)
+        self.assertEqual(new_siae.longitude, 2.316754)
+        self.assertEqual(new_siae.geocoding_score, 0.587663373207207)
 
+    @mock.patch(
+        "itou.utils.apis.geocoding.call_ban_geocoding_api",
+        return_value=BAN_GEOCODING_API_RESULT_MOCK,
+    )
+    def test_create_siae_with_different_siret(self, mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
 
@@ -337,9 +355,19 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.created_by, user)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
 
+        # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
+        self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
+        self.assertEqual(new_siae.latitude, 48.838411)
+        self.assertEqual(new_siae.longitude, 2.316754)
+        self.assertEqual(new_siae.geocoding_score, 0.587663373207207)
+
 
 class EditSiaeViewTest(TestCase):
-    def test_edit(self):
+    @mock.patch(
+        "itou.utils.apis.geocoding.call_ban_geocoding_api",
+        return_value=BAN_GEOCODING_API_RESULT_MOCK,
+    )
+    def test_edit(self, mock_call_ban_geocoding_api):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -353,9 +381,14 @@ class EditSiaeViewTest(TestCase):
         post_data = {
             "brand": "NEW FAMOUS SIAE BRAND NAME",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-            "email": "",
             "phone": "0610203050",
+            "email": "",
             "website": "https://famous-siae.com",
+            "address_line_1": "1 Rue Jeanne d'Arc",
+            "address_line_2": "",
+            "post_code": "62000",
+            "city": "Arras",
+            "department": "62",
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -367,3 +400,15 @@ class EditSiaeViewTest(TestCase):
         self.assertEqual(siae.email, post_data["email"])
         self.assertEqual(siae.phone, post_data["phone"])
         self.assertEqual(siae.website, post_data["website"])
+
+        self.assertEqual(siae.address_line_1, post_data["address_line_1"])
+        self.assertEqual(siae.address_line_2, post_data["address_line_2"])
+        self.assertEqual(siae.post_code, post_data["post_code"])
+        self.assertEqual(siae.city, post_data["city"])
+        self.assertEqual(siae.department, post_data["department"])
+
+        # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
+        self.assertEqual(siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
+        self.assertEqual(siae.latitude, 48.838411)
+        self.assertEqual(siae.longitude, 2.316754)
+        self.assertEqual(siae.geocoding_score, 0.587663373207207)

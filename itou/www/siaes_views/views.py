@@ -146,7 +146,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
 @login_required
 def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
-    Edit an SIAE's card (or "Fiche" in French).
+    Edit an SIAE.
     """
     pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
     queryset = Siae.active_objects.member_required(request.user)
