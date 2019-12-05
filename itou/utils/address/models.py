@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
 from itou.utils.apis.geocoding import get_geocoding_data
+from itou.utils.validators import validate_post_code
 
 
 logger = logging.getLogger(__name__)
@@ -31,15 +32,19 @@ class AddressMixin(models.Model):
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     address_line_1 = models.CharField(
-        verbose_name=_("Adresse postale, boite postale"), max_length=255, blank=True
+        verbose_name=_("Adresse"), max_length=255, blank=True
     )
     address_line_2 = models.CharField(
-        verbose_name=_("Appartement, suite, bloc, bâtiment, etc."),
+        verbose_name=_("Complément d'adresse"),
         max_length=255,
         blank=True,
+        help_text=_("Appartement, suite, bloc, bâtiment, boite postale, etc."),
     )
     post_code = models.CharField(
-        verbose_name=_("Code Postal"), max_length=10, blank=True
+        verbose_name=_("Code Postal"),
+        validators=[validate_post_code],
+        max_length=5,
+        blank=True,
     )
     city = models.CharField(verbose_name=_("Ville"), max_length=255, blank=True)
     department = models.CharField(
