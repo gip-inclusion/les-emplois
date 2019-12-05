@@ -103,13 +103,13 @@
         </div>
         {% endif %}
 
-        {% if messages %}
-            <div class="layout-section layout-section-white">
-                <div class="layout-messages">
+        <div class="layout-section layout-section-white">
+            <div class="layout-messages">
+                {% block messages %}
                     {% bootstrap_messages %}
-                </div>
+                {% endblock %}
             </div>
-        {% endif %}
+        </div>
 
         {% block content_full_viewport %}{% endblock %}
 

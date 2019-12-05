@@ -28,6 +28,10 @@ class AddressMixin(models.Model):
     Assume that all addresses are in France. This is unlikely to change.
     """
 
+    # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
+    # This score is arbitrarily set based on general observation.
+    API_BAN_RELIABLE_MIN_SCORE = 0.6
+
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     address_line_1 = models.CharField(
@@ -82,6 +86,12 @@ class AddressMixin(models.Model):
                 if self.department in departments:
                     return region
         return None
+
+    @property
+    def has_reliable_coords(self):
+        if not self.geocoding_score:
+            return False
+        return self.geocoding_score >= self.API_BAN_RELIABLE_MIN_SCORE
 
     @property
     def address_on_one_line(self):
