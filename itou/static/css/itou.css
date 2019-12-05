@@ -127,7 +127,7 @@ main.layout-section {
 }
 
 .layout-content {
-    padding: 2rem 1rem;
+    padding: 1rem 1rem 2rem 1rem;
 }
 
 .layout-content > .content-small {
