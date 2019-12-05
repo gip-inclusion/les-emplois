@@ -29,8 +29,8 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
             siret_data = get_siret_data(self.cleaned_data["siret"])
             # Try to automatically gather information for the given SIRET.
             if siret_data:
-                organization.geocode(
-                    siret_data["address"], post_code=siret_data["post_code"], save=False
+                organization.set_coords_and_address(
+                    siret_data["address"], post_code=siret_data["post_code"]
                 )
                 organization.siret = siret
 

@@ -3,7 +3,6 @@ import logging
 from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import ValidationError
 from django.db import models
-
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
@@ -95,20 +94,29 @@ class AddressMixin(models.Model):
         ]
         return ", ".join([field for field in fields if field])
 
-    def geocode(self, address, post_code=None, save=True):
+    def set_coords(self, address, post_code=None):
         geocoding_data = get_geocoding_data(address, post_code=post_code)
         if not geocoding_data:
             logger.error(
                 "No geocoding data could be found for `%s - %s`", address, post_code
             )
             return
-        self.address_line_1 = geocoding_data["address_line_1"]
-        self.post_code = geocoding_data["post_code"]
-        self.city = geocoding_data["city"]
         self.coords = geocoding_data["coords"]
         self.geocoding_score = geocoding_data["score"]
-        if save:
-            self.save()
+
+    def set_coords_and_address(self, address, post_code=None):
+        geocoding_data = get_geocoding_data(address, post_code=post_code)
+        if not geocoding_data:
+            logger.error(
+                "No geocoding data could be found for `%s - %s`", address, post_code
+            )
+            return
+        self.coords = geocoding_data["coords"]
+        self.geocoding_score = geocoding_data["score"]
+        self.address_line_1 = geocoding_data["address_line_1"]
+        self.address_line_2 = ""
+        self.post_code = geocoding_data["post_code"]
+        self.city = geocoding_data["city"]
 
     def clean(self):
         if self.post_code:
