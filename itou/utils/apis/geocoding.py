@@ -23,8 +23,6 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
     query_string = urlencode(args)
     url = f"{api_url}?{query_string}"
 
-    logger.debug("Calling `%s`", url)
-
     try:
         r = requests.get(url)
     except requests.exceptions.RequestException as e:
