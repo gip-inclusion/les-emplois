@@ -7,15 +7,49 @@
 
 {% block content %}
 
-    <h2 class="text-center">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
+    <h2 class="text-center mb-4">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
 
-    <p class="text-center">
-        <a href="{% url 'home:eligibility_criteria' %}" class="btn btn-outline-primary">
-            {% trans "Est-ce fait pour moi ?" %}
-        </a>
-    </p>
+    <div class="card-deck mb-4">
 
-    <br>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {% trans "Accès candidat" %}
+                </h5>
+                <a class="card-link" href="{% url 'signup:job_seeker' %}">
+                    {% trans "Inscription" %}
+                </a>
+                <a class="card-link" href="{% url 'account_login' %}">
+                    {% trans "Connexion" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Accès prescripteur" %}</h5>
+                <a class="card-link" href="{% url 'signup:prescriber' %}">
+                    {% trans "Inscription" %}
+                </a>
+                <a class="card-link" href="{% url 'account_login' %}">
+                    {% trans "Connexion" %}
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{% trans "Accès employeur" %}</h5>
+                <a class="card-link" href="{% url 'signup:siae' %}">
+                    {% trans "Inscription" %}
+                </a>
+                <a class="card-link" href="{% url 'account_login' %}">
+                    {% trans "Connexion" %}
+                </a>
+            </div>
+        </div>
+
+    </div>
 
     <h3 class="text-center">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
 

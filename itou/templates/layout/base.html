@@ -83,10 +83,7 @@
                     {% else %}
                         <nav>
                             <a class="btn btn-outline-primary" href="{% url 'account_signup' %}">
-                                {% include "includes/icon.html" with icon="user-plus" %} {% trans "Inscription" %}
-                            </a>
-                            <a class="btn btn-outline-primary" href="{% url 'account_login' %}">
-                                {% include "includes/icon.html" with icon="log-in" %} {% trans "Connexion" %}
+                                {% include "includes/icon.html" with icon="log-in" %} {% trans "Inscription / Connexion" %}
                             </a>
                         </nav>
                     {% endif %}
@@ -142,6 +139,7 @@
                         <h6>{% trans "Aide" %}</h6>
                         <ul class="list-unstyled text-small">
                             <li><a href="{% url 'content:faq' %}">{% trans "FAQ" %}</a></li>
+                            <li><a href="{% url 'home:eligibility_criteria' %}">{% trans "Qui est éligible à l'IAE ?" %}</a></li>
                         </ul>
                     </div>
                 </div>
