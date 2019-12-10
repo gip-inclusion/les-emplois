@@ -66,13 +66,20 @@
                         </ul>
                     {% endif %}
                 </div>
-                {% if siae.has_members %}
-                    <div class="card-footer">
+
+                <div class="card-footer">
+                    {% if siae.has_members %}
                         <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                         </a>
-                    </div>
-                {% endif %}
+                    {% else %}
+                        <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                        </a>
+                        <small>{% trans "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
+                    {% endif %}
+                </div>
+
             </div>
         {% endfor %}
 
