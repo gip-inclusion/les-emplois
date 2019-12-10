@@ -6,9 +6,15 @@
 {% block content %}
 
     <h1>
-        {% blocktrans with siae_name=siae.display_name %}
-            Postuler chez <span class="text-muted">{{ siae_name }}</span>
-        {% endblocktrans %}
+        {% if request.user.is_siae_staff %}
+            {% blocktrans with siae_name=siae.display_name %}
+                <span class="text-muted">{{ siae_name }}</span>
+            {% endblocktrans %}
+        {% else %}
+            {% blocktrans with siae_name=siae.display_name %}
+                Postuler chez <span class="text-muted">{{ siae_name }}</span>
+            {% endblocktrans %}
+        {% endif %}
     </h1>
 
     {% if job_seeker and request.user != job_seeker %}

@@ -5,6 +5,11 @@
 
 {% block messages %}
     {{ block.super }}
+    {% if current_siae %}
+        <div class="alert alert-warning" role="alert">
+            Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
+        </div>
+    {% endif %}
     {% if current_siae and not current_siae.has_reliable_coords %}
         <div class="alert alert-warning" role="alert">
             {% url 'siaes_views:edit_siae' as edit_siae_url %}
@@ -23,24 +28,6 @@
     <h1>{% trans "Tableau de bord" %}</h1>
 
     <div class="card-deck mt-3">
-
-        <div class="card">
-            <h5 class="card-header">{% trans "Vos informations" %}</h5>
-            <div class="card-body">
-                <p class="card-text">
-                    {% include "includes/icon.html" with icon="lock" %}
-                    <a href="{% url 'account_change_password' %}">
-                        {% trans "Modifier votre mot de passe" %}
-                    </a>
-                </p>
-                <p class="card-text">
-                    {% include "includes/icon.html" with icon="edit-2" %}
-                    <a href="{% url 'dashboard:edit_user_info' %}">
-                        {% trans "Modifier votre profil" %}
-                    </a>
-                </p>
-            </div>
-        </div>
 
         {% if user.is_staff %}
             <div class="card">
@@ -118,6 +105,12 @@
                         {% include "includes/icon.html" with icon="message-square" %}
                         <a href="{% url 'apply:list_for_prescriber' %}">{% trans "Suivi des candidatures" %}</a>
                     </p>
+
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="user-check" %}
+                        <a href="/">{% trans "Postuler pour un candidat" %}</a>
+                    </p>
+
                 </div>
             </div>
         {% endif %}
@@ -154,11 +147,11 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_siae' %}">{% trans "Répondre aux candidatures" %}</a>
+                        <a href="{% url 'apply:list_for_siae' %}">{% trans "Répondre aux candidatures reçues" %}</a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="user-check" %}
-                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">{% trans "Embaucher un candidat" %}</a>
+                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">{% trans "Obtenir un numéro d'agrément (candidature spontanée)" %}</a>
                     </p>
                 </div>
             </div>
