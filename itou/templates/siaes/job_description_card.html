@@ -10,8 +10,24 @@
         {{ job.display_name }}
     </h1>
 
-    {% if job.description %}
-        <div class="alert alert-secondary pb-0">{{ job.description|linebreaks }}</div>
+    <div class="alert alert-secondary pb-0">
+        {% if job.description %}
+            {{ job.description|linebreaks }}
+        {% else %}
+            <p>
+                <i>
+                    {% blocktrans with siae.display_name as display_name %}<b>{{ display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.{% endblocktrans %}
+                </i>
+            </p>
+        {% endif %}
+    </div>
+
+    {% if siae.has_members %}
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}">
+                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+            </a>
+        </p>
     {% endif %}
 
     <hr>
@@ -21,7 +37,7 @@
     </p>
 
     <h2 class="mb-0">
-        {{ siae.display_name }}
+        <a href="{{ siae.get_card_url }}">{{ siae.display_name }}</a>
         {# Display non-user-edited name too. #}
         {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
     </h2>
@@ -32,30 +48,20 @@
         {{ siae.post_code }} {{ siae.city }}
     </p>
 
-    <p>
-        <a href="{{ siae.get_card_url }}">{% blocktrans with siae.display_name as display_name %}
-            Plus d'informations sur {{ display_name }}
-        {% endblocktrans %}</a>
-    </p>
-
     <hr>
 
-    <div class="form-group">
+    <p>
+      <a data-toggle="collapse" href="#share-job-description-job" role="button" aria-expanded="false">
+          {% trans "Partager cette offre" %}
+      </a>
+    </p>
+    <div class="collapse form-group" id="share-job-description-job">
         <p>
             {% trans "Copiez-collez ce lien pour partager cette fiche de poste :" %}
         </p>
         {# Poor man's copy and paste with onClick #}
         <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
     </div>
-
-    {% if siae.has_members %}
-        <hr>
-        <p>
-            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}">
-                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-            </a>
-        </p>
-    {% endif %}
 
     {% if back_url %}
         <hr>
