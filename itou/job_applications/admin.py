@@ -22,6 +22,7 @@ class JobsInline(admin.TabularInline):
 
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
+    date_hierarchy = "created_at"
     list_display = ("id", "state", "job_seeker", "sender", "sender_kind", "created_at")
     raw_id_fields = (
         "job_seeker",
@@ -31,9 +32,10 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "to_siae",
     )
     exclude = ("selected_jobs",)
-    list_filter = ("sender_kind", "state")
+    list_filter = ("sender_kind", "state", "to_siae__department")
     readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)
+    search_fields = ("to_siae__siret",)
 
 
 @admin.register(models.JobApplicationTransitionLog)
