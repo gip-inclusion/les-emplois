@@ -30,7 +30,7 @@ class AddressMixin(models.Model):
 
     # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
     # This score is arbitrarily set based on general observation.
-    API_BAN_RELIABLE_MIN_SCORE = 0.6
+    API_BAN_RELIABLE_MIN_SCORE = 0.4
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
