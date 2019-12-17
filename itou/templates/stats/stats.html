@@ -54,9 +54,11 @@
 
     <h3>{% trans "Graphiques d'évolution" %}</h3>
 
-    {% include "stats/includes/chart.html" with chart_id=1 data=data.job_applications_per_creation_week title="Candidatures groupées par la semaine de leur date de création" %}
+    {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
+    {% include "stats/includes/chart.html" with chart_id=1 data=data.job_applications_per_creation_week title=chart_title %}
 
-    {% include "stats/includes/chart.html" with chart_id=2 data=data.accepted_job_applications_per_creation_week title="Recrutements (c.a.d. candidatures de type \"acceptée\") groupés par la semaine de la date de création de la candidature correspondante" %}
+    {% trans "Recrutements (c.a.d. candidatures de type \"acceptée\") groupés par la semaine de la date de création de la candidature correspondante" as chart_title %}
+    {% include "stats/includes/chart.html" with chart_id=2 data=data.accepted_job_applications_per_creation_week title=chart_title %}
 
     <h2>{% trans "Stats prescripteurs" %}</h2>
 
@@ -70,8 +72,10 @@
 
     <h3>{% trans "Graphiques d'évolution" %}</h3>
 
-    {% include "stats/includes/chart.html" with chart_id=3 data=data.prescriber_users_per_creation_week title="Nombre de comptes utilisateurs de type prescripteur groupés par la semaine de leur date de création" %}
+    {% trans "Nombre de comptes utilisateurs de type prescripteur groupés par la semaine de leur date de création" as chart_title %}
+    {% include "stats/includes/chart.html" with chart_id=3 data=data.prescriber_users_per_creation_week title=chart_title %}
 
-    {% include "stats/includes/chart.html" with chart_id=4 data=data.active_prescriber_users_per_week title="Nombre de comptes utilisateurs de type prescripteur actifs (c.a.d. ayant crée au moins une candidature) groupés par la semaine de la date de création de la candidature" %}
+    {% trans "Nombre de comptes utilisateurs de type prescripteur actifs (c.a.d. ayant crée au moins une candidature) groupés par la semaine de la date de création de la candidature" as chart_title %}
+    {% include "stats/includes/chart.html" with chart_id=4 data=data.active_prescriber_users_per_week title=chart_title %}
 
 {% endblock %}
