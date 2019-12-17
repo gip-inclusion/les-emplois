@@ -3,9 +3,12 @@
 
 {% block title %}{% trans "Statistiques" %}{{ block.super }}{% endblock %}
 
-{% block content %}
+{% block extra_head %}
+    {{ block.super }}
+    <script src="https://code.highcharts.com/highcharts.src.js"></script>
+{% endblock %}
 
-<script src="https://code.highcharts.com/highcharts.src.js"></script>
+{% block content %}
 
     <h1>{% trans "[Page en construction...]" %}</h1>
     
