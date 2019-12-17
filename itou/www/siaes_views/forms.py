@@ -31,7 +31,7 @@ class CreateSiaeForm(forms.ModelForm):
 
         self.fields["department"].choices = TEST_DEPARTMENTS
 
-        required_fields = ["address_line_1", "city", "department", "phone"]
+        required_fields = ["address_line_1", "post_code", "city", "department", "phone"]
         for required_field in required_fields:
             self.fields[required_field].required = True
 
