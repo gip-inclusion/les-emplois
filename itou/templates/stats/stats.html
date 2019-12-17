@@ -1,11 +1,12 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}{% trans "Statistiques" %}{{ block.super }}{% endblock %}
 
 {% block extra_head %}
     {{ block.super }}
-    <script src="https://code.highcharts.com/highcharts.src.js"></script>
+    <script src="{% static "js/highcharts.src.js" %}"></script>
 {% endblock %}
 
 {% block content %}
