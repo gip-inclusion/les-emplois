@@ -1,7 +1,7 @@
 {% load i18n %}
-<div id="chart_{{ chart_id }}"></div>
+<div id="{{ chart_id }}_basic_column_chart"></div>
 <script>
-    Highcharts.chart('chart_{{ chart_id }}', {
+    Highcharts.chart('{{ chart_id }}_basic_column_chart', {
         chart: {
             type: 'column'
         },
@@ -10,7 +10,10 @@
         },
         xAxis: {
             categories: [
-                {% for entry in data %}'Semaine {{ entry.week }} ({{ entry.year }})'{% if not forloop.last %}, {% endif %}{% endfor %}
+                {% for entry in data %}
+                    'Semaine {{ entry.week }} ({{ entry.year }})'
+                    {% if not forloop.last %}, {% endif %}
+                {% endfor %}
             ]
         },
         series: [{
