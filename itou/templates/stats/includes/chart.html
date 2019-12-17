@@ -1,7 +1,7 @@
 {% load i18n %}
-<div id="{{ chart_id }}"></div>
+<div id="chart_{{ chart_id }}"></div>
 <script>
-    Highcharts.chart('{{ chart_id }}', {
+    Highcharts.chart('chart_{{ chart_id }}', {
         chart: {
             type: 'column'
         },
