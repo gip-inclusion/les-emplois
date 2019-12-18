@@ -21,7 +21,7 @@ class ModelTest(TestCase):
             approval.save()
 
     def test_get_next_number(self):
-        approval = ApprovalFactory(number="999991900030")
+        ApprovalFactory(number="999991900030")
         self.assertEqual(Approval.get_next_number(), 999991900031)
 
     def test_accepted_by(self):

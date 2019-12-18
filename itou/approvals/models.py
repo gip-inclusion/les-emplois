@@ -99,7 +99,7 @@ class Approval(models.Model):
 
     @staticmethod
     def get_next_number():
-        last_approval = Approval.objects.last()
+        last_approval = Approval.objects.order_by("created_at").last()
         if last_approval:
             return int(last_approval.number) + 1
         return None
