@@ -1,3 +1,5 @@
+import datetime
+
 import factory
 import factory.fuzzy
 
@@ -22,6 +24,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     to_siae = factory.SubFactory(SiaeWithMembershipFactory)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
+    date_of_hiring = datetime.date.today()
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):

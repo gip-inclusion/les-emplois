@@ -25,6 +25,6 @@ Voir la candidature dans l'admin :
 {{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:job_applications_jobapplication_change" job_application.id %}
 
 Ajouter un numéro d'agrément dans l'admin :
-{{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:approvals_approval_add" %}
+{{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:approvals_approval_add" %}?{{ approvals_admin_query_string }}
 
 {% endblock body %}

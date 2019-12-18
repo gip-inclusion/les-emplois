@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core import mail
 from django.db import models
 from django.utils import timezone
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
 from django_xworkflows import models as xwf_models
@@ -333,7 +334,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def email_accept_trigger_manual_approval(self, accepted_by):
         to = [settings.ITOU_EMAIL_CONTACT]
-        context = {"job_application": self}
+        context = {
+            "job_application": self,
+            # Used to prepopulate the admin form.
+            "approvals_admin_query_string": urlencode(
+                {
+                    "user": self.job_seeker.pk,
+                    "start_at": self.date_of_hiring.strftime("%d/%m/%Y"),
+                }
+            ),
+        }
         if accepted_by:
             context["accepted_by"] = accepted_by
         subject = "apply/email/accept_trigger_approval_subject.txt"

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.http import urlencode
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -175,6 +176,13 @@ class JobApplicationEmailTest(TestCase):
             email.body,
         )
         self.assertIn(reverse("admin:approvals_approval_add"), email.body)
+        approvals_admin_query_string = urlencode(
+            {
+                "user": job_application.job_seeker.pk,
+                "start_at": job_application.date_of_hiring.strftime("%d/%m/%Y"),
+            }
+        )
+        self.assertIn(approvals_admin_query_string, email.body)
 
     def test_refuse(self):
 
