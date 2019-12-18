@@ -91,7 +91,7 @@
 
                     {% else %}
                         <nav>
-                            <a class="btn btn-outline-primary" href="{% url 'account_signup' %}">
+                            <a class="btn btn-outline-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                 {% include "includes/icon.html" with icon="log-in" %} {% trans "Inscription / Connexion" %}
                             </a>
                         </nav>

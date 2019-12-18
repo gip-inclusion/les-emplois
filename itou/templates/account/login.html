@@ -32,4 +32,15 @@
 <p>
     <a href="{% url 'account_reset_password' %}">{% trans "Mot de passe oublié ?" %}</a>
 </p>
+
+<hr>
+
+<p>{% trans "Vous n'avez pas de compte ?" %}</p>
+
+<p>
+    <a class="btn btn-outline-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+    {% trans "Inscription" %}
+    </a>
+</p>
+
 {% endblock %}

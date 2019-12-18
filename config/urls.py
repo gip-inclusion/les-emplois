@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
+from itou.www.signup import views as signup_views
 
 
 register_converter(SiretConverter, "siret")
@@ -22,7 +23,7 @@ urlpatterns = [
     # We don't want any user to be able to signup using the default allauth `signup` url
     # because we have multiple specific signup processes for different kind of users.
     re_path(
-        r"^accounts/signup/$", TemplateView.as_view(template_name="signup/signup.html")
+        r"^accounts/signup/$", signup_views.signup
     ),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_change_password` URL.
