@@ -1,0 +1,13 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+{% blocktrans with job_seeker_full_name=approval.user.get_full_name number=approval.number %}
+
+Bonjour,
+
+Le numéro PASS IAE à saisir dans l'ASP pour {{ job_seeker_full_name }} est le {{ number }}. Ceci correspond pour l'ASP au numéro d'agrément.
+
+Ce numéro est également présent dans la plateforme dans la candidature de {{ job_seeker_full_name }}.
+
+{% endblocktrans %}
+{% endblock body %}

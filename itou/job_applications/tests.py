@@ -180,6 +180,7 @@ class JobApplicationEmailTest(TestCase):
             {
                 "user": job_application.job_seeker.pk,
                 "start_at": job_application.date_of_hiring.strftime("%d/%m/%Y"),
+                "job_application": job_application.pk,
             }
         )
         self.assertIn(approvals_admin_query_string, email.body)

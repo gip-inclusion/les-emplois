@@ -341,6 +341,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 {
                     "user": self.job_seeker.pk,
                     "start_at": self.date_of_hiring.strftime("%d/%m/%Y"),
+                    "job_application": self.pk,
                 }
             ),
         }
