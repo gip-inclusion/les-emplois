@@ -3,7 +3,9 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 from django.contrib import admin
+from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from itou.approvals import models
 
@@ -22,7 +24,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     list_filter = ("number_sent_by_email",)
     list_display_links = ("id", "number")
     raw_id_fields = ("user", "job_application", "created_by")
-    readonly_fields = ("created_at", "created_by")
+    readonly_fields = ("created_at", "created_by", "number_sent_by_email")
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -45,6 +47,19 @@ class ApprovalAdmin(admin.ModelAdmin):
 
     def send_number_by_email(self, request, queryset):
         for approval in queryset:
+            if approval.number_sent_by_email:
+                message = _(
+                    f"Email non envoyé pour {approval.number} : déjà envoyé précédemment."
+                )
+                messages.warning(request, message)
+                continue
+            if not approval.job_application:
+                message = _(
+                    f"Email non envoyé pour {approval.number} : candidature d'origine "
+                    f" inconnue, impossible de déterminer le destinataire."
+                )
+                messages.warning(request, message)
+                continue
             approval.send_number_by_email()
             approval.number_sent_by_email = True
             approval.save()
