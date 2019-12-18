@@ -6,7 +6,7 @@ python-dateutil==2.8.1  # https://pypi.org/project/python-dateutil/
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.8  # pyup: < 3.0  # https://www.djangoproject.com/
+django==2.2.9  # pyup: < 3.0  # https://www.djangoproject.com/
 
 # Django REST Framework
 djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
