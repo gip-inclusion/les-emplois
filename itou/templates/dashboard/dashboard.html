@@ -51,6 +51,10 @@
                         {% include "includes/icon.html" with icon="message-square" %}
                         <a href="{% url 'apply:list_for_job_seeker' %}">{% trans "Vos candidatures" %}</a>
                     </p>
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="briefcase" %}
+                        <a href="/">{% trans "Rechercher une entreprise" %}</a>
+                    </p>
                 </div>
             </div>
             {% with user.get_approval as approval %}
