@@ -14,3 +14,10 @@ class ApprovalAdmin(admin.ModelAdmin):
         if not obj.pk:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+    def add_view(self, request, form_url="", extra_context=None):
+        # Prepopulate the form with calculated data.
+        g = request.GET.copy()
+        g.update({"number": self.model.get_next_number()})
+        request.GET = g
+        return super().add_view(request, form_url, extra_context=extra_context)
