@@ -161,6 +161,8 @@ class JobApplicationEmailTest(TestCase):
             job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body
         )
         self.assertIn(job_application.to_siae.siret, email.body)
+        self.assertIn(job_application.to_siae.get_kind_display(), email.body)
+        self.assertIn(job_application.to_siae.get_department_display(), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.date_of_hiring.strftime("%d/%m/%Y"), email.body)
         self.assertIn(accepted_by.get_full_name(), email.body)
