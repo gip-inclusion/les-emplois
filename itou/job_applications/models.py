@@ -255,6 +255,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and not self.job_seeker.has_eligibility_diagnosis
         )
 
+    @property
+    def accepted_by(self):
+        if not self.state.is_accepted:
+            return None
+        return (
+            self.logs.select_related("user")
+            .get(to_state=JobApplicationWorkflow.STATE_ACCEPTED)
+            .user
+        )
+
     # Workflow transitions.
 
     @xwf_models.transition()

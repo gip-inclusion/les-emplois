@@ -48,20 +48,18 @@ class ApprovalAdmin(admin.ModelAdmin):
     def send_number_by_email(self, request, queryset):
         for approval in queryset:
             if approval.number_sent_by_email:
-                message = _(
-                    f"Email non envoyé pour {approval.number} : déjà envoyé précédemment."
-                )
+                message = _(f"{approval.number} - Email non envoyé : déjà envoyé.")
                 messages.warning(request, message)
                 continue
-            if not approval.job_application:
+            try:
+                approval.send_number_by_email()
+                approval.number_sent_by_email = True
+                approval.save()
+            except RuntimeError:
                 message = _(
-                    f"Email non envoyé pour {approval.number} : candidature d'origine "
-                    f" inconnue, impossible de déterminer le destinataire."
+                    f"{approval.number} - Email non envoyé : impossible de déterminer "
+                    f" le destinataire (candidature inconnue)."
                 )
                 messages.warning(request, message)
-                continue
-            approval.send_number_by_email()
-            approval.number_sent_by_email = True
-            approval.save()
 
     send_number_by_email.short_description = _("Envoyer le numéro par email")

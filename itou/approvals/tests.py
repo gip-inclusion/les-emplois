@@ -24,16 +24,6 @@ class ModelTest(TestCase):
         ApprovalFactory(number="999991900030")
         self.assertEqual(Approval.get_next_number(), 999991900031)
 
-    def test_accepted_by(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        job_application.accept(user=job_application.to_siae.members.first())
-        approval = ApprovalFactory(
-            number="999991900030", job_application=job_application
-        )
-        self.assertEqual(approval.accepted_by, job_application.to_siae.members.first())
-
     def test_send_number_by_email(self):
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(

@@ -35,6 +35,14 @@ class JobApplicationModelTest(TestCase):
         self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
+    def test_accepted_by(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        user = job_application.to_siae.members.first()
+        job_application.accept(user=user)
+        self.assertEqual(job_application.accepted_by, user)
+
 
 class JobApplicationFactoriesTest(TestCase):
     def test_job_application_factory(self):

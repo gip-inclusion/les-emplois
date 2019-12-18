@@ -8,7 +8,6 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
 from itou.utils.validators import alphanumeric
 
@@ -75,23 +74,15 @@ class Approval(models.Model):
             )
         super().clean()
 
-    @property
-    def accepted_by(self):
-        if not self.job_application:
-            return None
-        return (
-            self.job_application.logs.select_related("user")
-            .get(to_state=JobApplicationWorkflow.STATE_ACCEPTED)
-            .user
-        )
-
     def send_number_by_email(self):
+        if not self.job_application or not self.job_application.accepted_by:
+            raise RuntimeError(_("Unable to determine the recipient email address."))
         context = {"approval": self}
         subject = "approvals/email/approval_number_subject.txt"
         body = "approvals/email/approval_number_body.txt"
         email = mail.EmailMessage(
             from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[self.accepted_by.email],
+            to=[self.job_application.accepted_by.email],
             subject=get_email_text_template(subject, context),
             body=get_email_text_template(body, context),
         )
