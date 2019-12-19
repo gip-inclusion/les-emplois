@@ -68,7 +68,10 @@ class User(AbstractUser):
         if not self.is_job_seeker:
             return False
         now = timezone.now().date()
-        return self.approvals.filter(start_at__lte=now, end_at__gte=now).exists()
+        return (
+            self.approvals.filter(start_at__lte=now, end_at__gte=now).exists()
+            | self.approvals.filter(start_at__gte=now).exists()
+        )
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):

@@ -66,3 +66,10 @@ class ModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         user = approval.user
         self.assertFalse(user.has_valid_approval())
+
+        # In the future.
+        start_at = datetime.date.today() + relativedelta(years=2)
+        end_at = start_at + relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        user = approval.user
+        self.assertTrue(user.has_valid_approval())

@@ -78,8 +78,8 @@ class Approval(models.Model):
         if not self.pk and self.user.has_valid_approval():
             raise ValidationError(
                 _(
-                    f"Un agrément en cours de validité existe déjà pour "
-                    f"{self.user.get_full_name()} ({self.user.email})."
+                    f"Un agrément dans le futur ou en cours de validité existe déjà "
+                    f"pour {self.user.get_full_name()} ({self.user.email})."
                 )
             )
         super().clean()
