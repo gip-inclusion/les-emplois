@@ -15,8 +15,8 @@ from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import CheckJobSeekerInfoForm
 from itou.www.apply.forms import CreateJobSeekerForm
-from itou.www.apply.forms import JobSeekerExistsForm
 from itou.www.apply.forms import SubmitJobApplicationForm
+from itou.www.apply.forms import UserExistsForm
 
 
 def valid_session_required(function=None):
@@ -99,11 +99,11 @@ def step_job_seeker(
 
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
 
-    form = JobSeekerExistsForm(data=request.POST or None)
+    form = UserExistsForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        job_seeker = form.get_job_seeker_from_email()
+        job_seeker = form.get_user()
 
         if job_seeker:
             session_data["job_seeker_pk"] = job_seeker.pk

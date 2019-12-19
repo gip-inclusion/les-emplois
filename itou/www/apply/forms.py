@@ -8,14 +8,25 @@ from django.utils.translation import gettext_lazy as _
 from itou.job_applications.models import JobApplication
 
 
-class JobSeekerExistsForm(forms.Form):
+class UserExistsForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = None
 
     email = forms.EmailField(label=_("E-mail du candidat"))
 
-    def get_job_seeker_from_email(self):
+    def clean_email(self):
         email = self.cleaned_data["email"]
-        user = get_user_model().objects.filter(email=email, is_job_seeker=True).first()
-        return user
+        self.user = get_user_model().objects.filter(email=email).first()
+        if self.user and not self.user.is_job_seeker:
+            error = _(
+                "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
+            )
+            raise forms.ValidationError(error)
+        return email
+
+    def get_user(self):
+        return self.user
 
 
 class CheckJobSeekerInfoForm(forms.ModelForm):
