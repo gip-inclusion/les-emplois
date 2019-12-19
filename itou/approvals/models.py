@@ -72,7 +72,16 @@ class Approval(models.Model):
             raise ValidationError(
                 _("La date de fin doit être postérieure à la date de début.")
             )
+        if self.user.has_valid_approval():
+            raise ValidationError(
+                _(f"Un agrément valide existe déjà pour {self.user.get_full_name()}.")
+            )
         super().clean()
+
+    def is_valid(self):
+        if self.start_at <= timezone.now().date() <= self.end_at:
+            return True
+        return False
 
     def send_number_by_email(self):
         if not self.job_application or not self.job_application.accepted_by:
