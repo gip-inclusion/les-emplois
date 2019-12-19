@@ -78,6 +78,7 @@ class Approval(models.Model):
             )
         super().clean()
 
+    @property
     def is_valid(self):
         if self.start_at <= timezone.now().date() <= self.end_at:
             return True

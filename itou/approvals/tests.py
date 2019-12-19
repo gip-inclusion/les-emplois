@@ -50,22 +50,22 @@ class ModelTest(TestCase):
         start_at = datetime.date.today()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid())
+        self.assertTrue(approval.is_valid)
 
         # End today.
         end_at = datetime.date.today()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid())
+        self.assertTrue(approval.is_valid)
 
         # Ended 1 year ago.
         end_at = datetime.date.today() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid())
+        self.assertFalse(approval.is_valid)
 
         # Ended yesterday.
         end_at = datetime.date.today() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid())
+        self.assertFalse(approval.is_valid)

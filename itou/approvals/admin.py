@@ -19,6 +19,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         "user",
         "start_at",
         "end_at",
+        "is_valid",
         "number_sent_by_email",
     )
     list_filter = ("number_sent_by_email",)
@@ -30,6 +31,12 @@ class ApprovalAdmin(admin.ModelAdmin):
         if not obj.pk:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+    def is_valid(self, obj):
+        return obj.is_valid
+
+    is_valid.boolean = True
+    is_valid.short_description = _("En cours de validité")
 
     def add_view(self, request, form_url="", extra_context=None):
         """
