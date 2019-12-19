@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
-from itou.eligibility.criteria import CRITERIA
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -204,7 +203,7 @@ def step_eligibility(
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "job_seeker": job_seeker, "eligibility_criteria": CRITERIA}
+    context = {"siae": siae, "job_seeker": job_seeker}
     return render(request, template_name, context)
 
 

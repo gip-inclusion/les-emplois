@@ -1,6 +1,5 @@
 from django.shortcuts import render
 
-from itou.eligibility.criteria import CRITERIA
 from itou.www.search.forms import SiaeSearchForm
 
 
@@ -14,5 +13,5 @@ def trigger_error(request):
 
 
 def eligibility_criteria(request, template_name="home/eligibility_criteria.html"):
-    context = {"eligibility_criteria": CRITERIA}
+    context = {}
     return render(request, template_name, context)

@@ -17,14 +17,14 @@
 
     {% if request.user.is_prescriber %}
         <div class="alert alert-warning" role="alert">
-            {% trans "Pour valider une éligibilité, la personne doit relever d'au moins un besoin d'accompagnement." %}
+            {% blocktrans %}La prescription d'un parcours IAE implique la réalisation préalable d'un diagnostic socio-professionnel permettant d'identifier les raisons, tenant compte <a href="#criteres_administratifs">des critères administratifs</a> et des freins sociaux, pour lesquelles la personne relève d'un parcours d'insertion par l'IAE. Ce diagnostic devra reprendre a minima les éléments présents dans <a href="#diagnostic_de_reference">le diagnostic de référence</a>{% endblocktrans %}
         </div>
     {% endif %}
 
     {% if request.user.is_siae_staff %}
         <div class="alert alert-warning" role="alert">
             <p>{% trans "Pour valider une éligibilité la personne doit relever :" %}</p>
-            <ul class="mb-0">
+            <ul>
                 <li>{% trans "d'au moins un besoin d'accompagnement" %}</li>
                 <li><b>{% trans "et" %}</b></li>
                 <li>
@@ -36,6 +36,9 @@
                     </ul>
                 </li>
             </ul>
+            <p class="mb-0">
+                {% trans "Les personnes, qui ne répondraient pas aux critères d'éligibilité administratifs requis, pourront être orientées vers un prescripteur habilité (exemples des personnes sans ressource ou sans emploi de longue durée) qui pourra passer outre ces critères pour prescrire un parcours IAE." %}
+            </p>
         </div>
     {% endif %}
 

@@ -7,7 +7,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_http_methods
 
-from itou.eligibility.criteria import CRITERIA
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.job_applications.models import JobApplicationWorkflow
@@ -195,5 +194,5 @@ def eligibility(
             )
             return HttpResponseRedirect(next_url)
 
-    context = {"job_application": job_application, "eligibility_criteria": CRITERIA}
+    context = {"job_application": job_application}
     return render(request, template_name, context)
