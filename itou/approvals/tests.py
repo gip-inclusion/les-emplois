@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory
 from itou.approvals.models import Approval
@@ -23,8 +24,37 @@ class ModelTest(TestCase):
             approval.save()
 
     def test_get_next_number(self):
-        ApprovalFactory(number="999991900030")
-        self.assertEqual(Approval.get_next_number(), 999991900031)
+
+        now = timezone.now().date()
+        current_year = now.strftime("%y")
+
+        # No pre-existing Approval objects.
+        expected_number = f"99999{current_year}00001"
+        self.assertEqual(Approval.get_next_number(), expected_number)
+
+        # With pre-existing Approval objects.
+        ApprovalFactory(number=f"99999{current_year}00038", start_at=now)
+        ApprovalFactory(number=f"99999{current_year}00039", start_at=now)
+        ApprovalFactory(number=f"99999{current_year}00040", start_at=now)
+        expected_number = f"99999{current_year}00041"
+        self.assertEqual(Approval.get_next_number(), expected_number)
+        Approval.objects.all().delete()
+
+        # Date of hiring in the past.
+        date_of_hiring = now - relativedelta(years=3)
+        year = date_of_hiring.strftime("%y")
+        ApprovalFactory(number=f"99999{year}99998", start_at=date_of_hiring)
+        expected_number = f"99999{year}99999"
+        self.assertEqual(Approval.get_next_number(date_of_hiring), expected_number)
+        Approval.objects.all().delete()
+
+        # Date of hiring in the future.
+        date_of_hiring = now + relativedelta(years=3)
+        year = date_of_hiring.strftime("%y")
+        ApprovalFactory(number=f"99999{year}00020", start_at=date_of_hiring)
+        expected_number = f"99999{year}00021"
+        self.assertEqual(Approval.get_next_number(date_of_hiring), expected_number)
+        Approval.objects.all().delete()
 
     def test_send_number_by_email(self):
 

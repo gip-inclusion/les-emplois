@@ -1,6 +1,7 @@
 import datetime
 import string
 
+from dateutil.relativedelta import relativedelta
 import factory
 import factory.fuzzy
 
@@ -17,4 +18,6 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
     start_at = datetime.date.today()
-    end_at = datetime.date.today() + datetime.timedelta(days=365 * 2)
+    end_at = factory.LazyAttribute(
+        lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1)
+    )

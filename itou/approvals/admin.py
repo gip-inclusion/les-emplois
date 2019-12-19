@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ugettext as _
 
 from itou.approvals import models
+from itou.job_applications.models import JobApplication
 
 
 @admin.register(models.Approval)
@@ -40,16 +41,26 @@ class ApprovalAdmin(admin.ModelAdmin):
 
     def add_view(self, request, form_url="", extra_context=None):
         """
-        Prepopulate the form with calculated data.
+        Prepopulate form fields with calculated data.
         """
         g = request.GET.copy()
-        g.update({"number": self.model.get_next_number()})
+
+        # Prepopulate `number`.
+        job_application = JobApplication.objects.filter(
+            id=g.get("job_application")
+        ).first()
+        date_of_hiring = job_application.date_of_hiring if job_application else None
+        g.update({"number": self.model.get_next_number(date_of_hiring=date_of_hiring)})
+
+        # Prepopulate `start_at` and `end_at`.
         start_at = g.get("start_at")
         if start_at:
             start_at = datetime.datetime.strptime(start_at, "%d/%m/%Y").date()
             end_at = start_at + relativedelta(years=2) - relativedelta(days=1)
             g.update({"start_at": start_at, "end_at": end_at})
+
         request.GET = g
+
         return super().add_view(request, form_url, extra_context=extra_context)
 
     def send_number_by_email(self, request, queryset):

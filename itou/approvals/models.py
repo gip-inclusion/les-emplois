@@ -19,6 +19,9 @@ class Approval(models.Model):
     Store approval(s) (or `agrément` in French) of a user.
     """
 
+    # This prefix is used by the ASP system to identify itou as the issuer of a number.
+    NUMBER_PREFIX = "99999"
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
@@ -102,8 +105,23 @@ class Approval(models.Model):
         email.send()
 
     @staticmethod
-    def get_next_number():
-        last_approval = Approval.objects.order_by("created_at").last()
+    def get_next_number(date_of_hiring=None):
+        """
+        Find next "PASS IAE" number.
+
+        Structure of a "PASS IAE" number (12 chars):
+            NUMBER_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
+
+        Rule:
+            The "PASS IAE"'s year is equal to the start year of the `JobApplication.date_of_hiring`.
+        """
+        date_of_hiring = date_of_hiring or timezone.now().date()
+        year = date_of_hiring.strftime("%Y")
+        last_approval = (
+            Approval.objects.filter(start_at__year=year).order_by("created_at").last()
+        )
         if last_approval:
-            return int(last_approval.number) + 1
-        return None
+            next_number = int(last_approval.number) + 1
+            return str(next_number)
+        year_2_chars = date_of_hiring.strftime("%y")
+        return f"{Approval.NUMBER_PREFIX}{year_2_chars}00001"
