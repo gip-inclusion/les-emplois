@@ -47,7 +47,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         start_at = g.get("start_at")
         if start_at:
             start_at = datetime.datetime.strptime(start_at, "%d/%m/%Y").date()
-            end_at = start_at + relativedelta(years=2)
+            end_at = start_at + relativedelta(years=2) - relativedelta(days=1)
             g.update({"start_at": start_at, "end_at": end_at})
         request.GET = g
         return super().add_view(request, form_url, extra_context=extra_context)

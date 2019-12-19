@@ -72,9 +72,12 @@ class Approval(models.Model):
             raise ValidationError(
                 _("La date de fin doit être postérieure à la date de début.")
             )
-        if self.user.has_valid_approval():
+        if not self.pk and self.user.has_valid_approval():
             raise ValidationError(
-                _(f"Un agrément valide existe déjà pour {self.user.get_full_name()}.")
+                _(
+                    f"Un agrément en cours de validité existe déjà pour "
+                    f"{self.user.get_full_name()} ({self.user.email})."
+                )
             )
         super().clean()
 
