@@ -78,7 +78,7 @@ class JobApplicationQuerySet(models.QuerySet):
             return self
         return self.filter(to_siae__members=user, to_siae__members__is_active=True)
 
-    def pendind(self):
+    def pending(self):
         return self.filter(
             state__in=[
                 JobApplicationWorkflow.STATE_NEW,
@@ -276,7 +276,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(
             pk=self.pk
-        ).pendind():
+        ).pending():
             job_application.render_obsolete(*args, **kwargs)
         # Send notification.
         connection = mail.get_connection()

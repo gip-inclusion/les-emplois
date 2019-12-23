@@ -242,7 +242,7 @@ class JobApplicationWorkflowTest(TestCase):
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
 
         self.assertEqual(user.job_applications.count(), 4)
-        self.assertEqual(user.job_applications.pendind().count(), 4)
+        self.assertEqual(user.job_applications.pending().count(), 4)
 
         job_application = user.job_applications.filter(
             state=JobApplicationWorkflow.STATE_PROCESSING
@@ -288,7 +288,7 @@ class JobApplicationWorkflowTest(TestCase):
         JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
 
         self.assertEqual(user.job_applications.count(), 2)
-        self.assertEqual(user.job_applications.pendind().count(), 2)
+        self.assertEqual(user.job_applications.pending().count(), 2)
 
         for job_application in user.job_applications.all():
             job_application.refuse()
