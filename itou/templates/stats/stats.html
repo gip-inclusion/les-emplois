@@ -74,7 +74,7 @@
             {% trans "Candidatures à ce jour" %} : <b>{{ data.total_job_applications }}</b>
         </li>
         <li>
-            {% trans "Embauches à ce jour" %} : <b>{{ data.total_accepted_job_applications }}</b>
+            {% trans "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
         </li>
     </ul>
 
@@ -83,8 +83,14 @@
     {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
 
+    {% trans "Source<br>des candidatures" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
+
     {% trans "Embauches groupés par la semaine de la date de création de la candidature correspondante" as chart_title %}
-    {% include "stats/includes/basic_column_chart.html" with chart_id="accepted_job_applications" data=data.accepted_job_applications_per_creation_week title=chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
+
+    {% trans "Source<br>des embauches" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_sources" data=data.hirings_per_sender_kind title=chart_title %}
 
     <h2>{% trans "Stats prescripteurs" %}</h2>
 
