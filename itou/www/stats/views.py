@@ -1,6 +1,7 @@
-import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.shortcuts import render
+from django.utils import timezone
 
 from django.db.models import Q
 from django.db.models.functions import ExtractWeek, ExtractYear
@@ -99,15 +100,16 @@ def stats(request, template_name="stats/stats.html"):
     )
 
     kpi_name = "Siaes actives à ce jour"
-    two_weeks_ago = datetime.date.today() - datetime.timedelta(2 * 7)
+    today = timezone.localtime(timezone.now()).date()
+    two_weeks_ago = today + relativedelta(weeks=-2)
     siaes_subset = Siae.active_objects.filter(
-        Q(updated_at__gte=two_weeks_ago)
-        | Q(created_at__gte=two_weeks_ago)
-        | Q(siaemembership__user__date_joined__gte=two_weeks_ago)
-        | Q(job_description_through__created_at__gte=two_weeks_ago)
-        | Q(job_description_through__updated_at__gte=two_weeks_ago)
-        | Q(job_applications_received__created_at__gte=two_weeks_ago)
-        | Q(job_applications_received__updated_at__gte=two_weeks_ago)
+        Q(updated_at__date__gte=two_weeks_ago)
+        | Q(created_at__date__gte=two_weeks_ago)
+        | Q(siaemembership__user__date_joined__date__gte=two_weeks_ago)
+        | Q(job_description_through__created_at__date__gte=two_weeks_ago)
+        | Q(job_description_through__updated_at__date__gte=two_weeks_ago)
+        | Q(job_applications_received__created_at__date__gte=two_weeks_ago)
+        | Q(job_applications_received__updated_at__date__gte=two_weeks_ago)
     ).distinct()
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
@@ -121,7 +123,7 @@ def stats(request, template_name="stats/stats.html"):
 
     data["total_job_applications"] = JobApplication.objects.count()
 
-    data["total_accepted_job_applications"] = JobApplication.objects.filter(
+    data["total_hirings"] = JobApplication.objects.filter(
         state=JobApplicationWorkflow.STATE_ACCEPTED
     ).count()
 
@@ -129,10 +131,18 @@ def stats(request, template_name="stats/stats.html"):
         JobApplication.objects, date_field="created_at", total_expression=Count("pk")
     )
 
-    data["accepted_job_applications_per_creation_week"] = get_total_per_week(
+    data["hirings_per_creation_week"] = get_total_per_week(
         JobApplication.objects.filter(state=JobApplicationWorkflow.STATE_ACCEPTED),
         date_field="created_at",
         total_expression=Count("pk"),
+    )
+
+    data["job_applications_per_sender_kind"] = get_pie_chart_data_per_sender_kind(
+        JobApplication.objects
+    )
+
+    data["hirings_per_sender_kind"] = get_pie_chart_data_per_sender_kind(
+        JobApplication.objects.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
     )
 
     # --- Prescriber stats.
@@ -157,6 +167,55 @@ def stats(request, template_name="stats/stats.html"):
 
     context = {"data": data}
     return render(request, template_name, context)
+
+
+def get_pie_chart_data_per_sender_kind(queryset):
+    total_per_sender_kind_as_list = (
+        queryset.values("sender_kind")
+        .annotate(total=Count("pk", distinct=True))
+        .order_by("sender_kind")
+    )
+    total_per_sender_kind_as_dict = {
+        item["sender_kind"]: item["total"] for item in total_per_sender_kind_as_list
+    }
+    sender_kind_choices_as_dict = {
+        item[0]: item[1] for item in JobApplication.SENDER_KIND_CHOICES
+    }
+    total_authorized_prescribers = (
+        queryset.filter(sender_prescriber_organization__is_authorized=True)
+        .distinct()
+        .count()
+    )
+
+    if (
+        total_per_sender_kind_as_dict[JobApplication.SENDER_KIND_PRESCRIBER]
+        < total_authorized_prescribers
+    ):
+        raise ValueError("Inconsistent prescriber data.")
+
+    pie_chart_data = [
+        {
+            "name": sender_kind_choices_as_dict[JobApplication.SENDER_KIND_JOB_SEEKER],
+            "value": total_per_sender_kind_as_dict[
+                JobApplication.SENDER_KIND_JOB_SEEKER
+            ],
+        },
+        {
+            "name": "Prescripteur non habilité",
+            "value": total_per_sender_kind_as_dict[
+                JobApplication.SENDER_KIND_PRESCRIBER
+            ]
+            - total_authorized_prescribers,
+        },
+        {"name": "Prescripteur habilité", "value": total_authorized_prescribers},
+        {
+            "name": sender_kind_choices_as_dict[JobApplication.SENDER_KIND_SIAE_STAFF],
+            "value": total_per_sender_kind_as_dict[
+                JobApplication.SENDER_KIND_SIAE_STAFF
+            ],
+        },
+    ]
+    return pie_chart_data
 
 
 def get_total_per_week(queryset, date_field, total_expression):
