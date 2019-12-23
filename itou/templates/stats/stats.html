@@ -11,71 +11,97 @@
 
 {% block content %}
 
-    <h1>{% trans "[Page en construction...]" %}</h1>
-    
-    <h2>{% trans "Stats siaes" %}</h2>
-
-    <h3>{% trans "Indicateurs globaux" %}</h3>
+    <h2>{% trans "Lexique" %}</h2>
 
     <ul>
         <li>
-            {% trans "Siaes à ce jour" %} : {{ data.total_siaes }}
+            {% trans "<b>FDP</b> : fiche de poste." %}
         </li>
         <li>
-            {% trans "Siaes ayant au moins un utilisateur à ce jour" %} : {{ data.total_siaes_with_user }}
+            {% trans "<b>FDP active</b> : fiche de poste ouverte aux candidatures." %}
         </li>
         <li>
-            {% trans "Siaes ayant au moins une fiche de poste à ce jour" %} : {{ data.total_siaes_with_job_description }}
+            {% trans "<b>Embauche</b> : candidature de type \"acceptée\"." %}
         </li>
         <li>
-            {% trans "Siaes ayant au moins une fiche de poste ouverte aux candidatures à ce jour" %} : {{ data.total_siaes_with_active_job_description }}
+            {% trans "<b>Siae active</b> : Siae créée ou modifiée il y a moins de 15 jours, ou ayant un nouvel utilisateur créé il y a moins de 15 jours, ou ayant créé ou modifié une FDP il y a moins de 15 jours, ou ayant reçu ou modifié une candidature il y a moins de 15 jours." %}
+        </li>
+        {% for entry in data.siaes_by_kind.categories %}
+            <li>
+                {% blocktrans with abbreviation=entry.0 description=entry.1 %}
+                    <b>{{ abbreviation }}</b> : {{ description }}.
+                {% endblocktrans %}
+            </li>
+        {% endfor %}
+        <li>
+            {% trans "<b>[...]</b> : [...]." %}
         </li>
         <li>
-            {% trans "Siaes actives (créées ou modifiées il y a moins de 15 jours, ou ayant un nouvel utilisateur créé il y a moins de 15 jours, ou ayant créé ou modifié une fiche de poste il y a moins de 15 jours, ou ayant reçu ou modifié une candidature il y a moins de 15 jours) à ce jour" %} : {{ data.total_active_siaes }}
+            {% trans "<b>[...]</b> : [...]." %}
+        </li>
+        <li>
+            {% trans "<b>[...]</b> : [...]." %}
         </li>
     </ul>
+
+    <h2>{% trans "Stats siaes" %}</h2>
+
+    <h3>{% trans "Indicateurs" %}</h3>
+
+    <ul>
+        {% for entry in data.siaes_by_kind.series %}
+            <li>
+                {{ entry.name }} : <b>{{ entry.total }}</b>.
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h3>{% trans "Répartition des indicateurs par type de siae" %}</h3>
+
+    {% trans "Répartition des indicateurs par type de siae" as chart_title %}
+    {% include "stats/includes/basic_bar_chart.html" with chart_id="siaes_by_kind" data=data.siaes_by_kind title=chart_title %}
 
     <h3>{% trans "Graphiques d'évolution" %}</h3>
 
     <p>{% trans "En construction..." %}</p>
 
-    <h2>{% trans "Stats candidats / recrutements" %}</h2>
+    <h2>{% trans "Stats candidats / embauches" %}</h2>
 
-    <h3>{% trans "Indicateurs globaux" %}</h3>
+    <h3>{% trans "Indicateurs" %}</h3>
 
     <ul>
         <li>
-            {% trans "Candidatures à ce jour" %} : {{ data.total_job_applications }}
+            {% trans "Candidatures à ce jour" %} : <b>{{ data.total_job_applications }}</b>
         </li>
         <li>
-            {% trans "Recrutements (c.a.d. candidatures de type \"acceptée\") à ce jour" %} : {{ data.total_accepted_job_applications }}
+            {% trans "Embauches à ce jour" %} : <b>{{ data.total_accepted_job_applications }}</b>
         </li>
     </ul>
 
     <h3>{% trans "Graphiques d'évolution" %}</h3>
 
     {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
-    {% include "stats/includes/chart.html" with chart_id=1 data=data.job_applications_per_creation_week title=chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
 
-    {% trans "Recrutements (c.a.d. candidatures de type \"acceptée\") groupés par la semaine de la date de création de la candidature correspondante" as chart_title %}
-    {% include "stats/includes/chart.html" with chart_id=2 data=data.accepted_job_applications_per_creation_week title=chart_title %}
+    {% trans "Embauches groupés par la semaine de la date de création de la candidature correspondante" as chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="accepted_job_applications" data=data.accepted_job_applications_per_creation_week title=chart_title %}
 
     <h2>{% trans "Stats prescripteurs" %}</h2>
 
-    <h3>{% trans "Indicateurs globaux" %}</h3>
+    <h3>{% trans "Indicateurs" %}</h3>
 
     <ul>
         <li>
-            {% trans "Nombre de comptes utilisateurs de type prescripteur à ce jour" %} : {{ data.total_prescriber_users }}
+            {% trans "Nombre de comptes utilisateurs de type prescripteur à ce jour" %} : <b>{{ data.total_prescriber_users }}</b>
         </li>
     </ul>
 
     <h3>{% trans "Graphiques d'évolution" %}</h3>
 
     {% trans "Nombre de comptes utilisateurs de type prescripteur groupés par la semaine de leur date de création" as chart_title %}
-    {% include "stats/includes/chart.html" with chart_id=3 data=data.prescriber_users_per_creation_week title=chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="prescriber_users" data=data.prescriber_users_per_creation_week title=chart_title %}
 
     {% trans "Nombre de comptes utilisateurs de type prescripteur actifs (c.a.d. ayant crée au moins une candidature) groupés par la semaine de la date de création de la candidature" as chart_title %}
-    {% include "stats/includes/chart.html" with chart_id=4 data=data.active_prescriber_users_per_week title=chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="active_prescriber_users" data=data.active_prescriber_users_per_week title=chart_title %}
 
 {% endblock %}

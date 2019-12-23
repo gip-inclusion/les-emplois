@@ -1,0 +1,77 @@
+{% load i18n %}
+<div id="{{ chart_id }}_basic_bar_chart"></div>
+<script>
+    Highcharts.chart('{{ chart_id }}_basic_bar_chart', {
+        chart: {
+            type: 'bar'
+        },
+        title: {
+            text: '{{ title }}'
+        },
+        subtitle: {
+            text: 'Astuce: séléctionnez interactivement dans la légende le ou les indicateurs que vous souhaitez visualiser.'
+        },
+        xAxis: {
+            categories: [
+                {% for entry in data.categories %}
+                    '{{ entry.0 }}'
+                    {% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            ],
+            title: {
+                text: null
+            }
+        },
+        yAxis: {
+            min: 0,
+            title: {
+                text: 'Nombre de siaes',
+                align: 'high'
+            },
+            labels: {
+                overflow: 'justify'
+            }
+        },
+        tooltip: {
+            valueSuffix: ' siaes'
+        },
+        plotOptions: {
+            bar: {
+                dataLabels: {
+                    enabled: true
+                }
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            // FIXME WIP
+            verticalAlign: 'bottom',
+            // x: -40,
+            // y: 80,
+            floating: true,
+            borderWidth: 1,
+            backgroundColor:
+                Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',
+            shadow: true
+        },
+        credits: {
+            enabled: false
+        },
+        series: [
+            {% for serie in data.series %}
+                {
+                    name: "{{ serie.name }} (Total={{ serie.total }})",
+                    data: [
+                        {% for value in serie.values %}
+                            {{ value }}
+                            {% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    ],
+                    visible: {% if serie.visible %}true{% else %}false{% endif %}
+                }
+                {% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        ]
+    });
+</script>
