@@ -75,6 +75,12 @@
         <li>
             {% trans "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
         </li>
+        <li>
+            {% trans "Nombre de jours en moyenne entre la candidature et son acceptation" %} : <b>{{ data.average_delay_from_application_to_approval.days }}</b>
+        </li>
+        <li>
+            {% trans "Nombre de jours en moyenne entre l'acceptation de la candidature et le début du contrat" %} : <b>{{ data.average_delay_from_approval_to_hiring.days }}</b>
+        </li>
     </ul>
 
     <h3>{% trans "Graphiques d'évolution" %}</h3>
