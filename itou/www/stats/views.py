@@ -1,12 +1,11 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from dateutil.relativedelta import relativedelta
 
 from django.shortcuts import render
 from django.utils import timezone
 
-from django.db.models import Q
+from django.db.models import Avg, Count, DateTimeField, F, Q
 from django.db.models.functions import ExtractWeek, ExtractYear
-from django.db.models import Count
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -104,27 +103,17 @@ def stats(request, template_name="stats/stats.html"):
         hirings, date_field="created_at", total_expression=Count("pk")
     )
 
-    data["job_applications_per_sender_kind"] = get_pie_chart_data_per_sender_kind(
+    data["job_applications_per_sender_kind"] = get_donut_chart_data_per_sender_kind(
         job_applications
     )
 
-    data["hirings_per_sender_kind"] = get_pie_chart_data_per_sender_kind(hirings)
+    data["hirings_per_sender_kind"] = get_donut_chart_data_per_sender_kind(hirings)
 
-    hirings_per_eligibility_author_kind = {}
-    author_kind_choices_as_dict = {
-        choice[0]: choice[1] for choice in EligibilityDiagnosis.AUTHOR_KIND_CHOICES
-    }
-    # Ensure an entry exists even for author_kind values which have zero records.
-    for author_kind in author_kind_choices_as_dict:
-        hirings_per_eligibility_author_kind[author_kind] = 0
-    # FIXME Find how to make a proper GROUP BY on a second order related field.
-    for hiring in hirings.values("job_seeker__eligibility_diagnoses__author_kind"):
-        author_kind = hiring["job_seeker__eligibility_diagnoses__author_kind"]
-        hirings_per_eligibility_author_kind[author_kind] += 1
-    data["hirings_per_eligibility_author_kind"] = [
-        {"name": author_kind_choices_as_dict[k], "value": v}
-        for k, v in hirings_per_eligibility_author_kind.items()
-    ]
+    data[
+        "hirings_per_eligibility_author_kind"
+    ] = get_donut_chart_data_per_eligibility_author_kind(hirings)
+
+    data.update(get_hiring_delays(hirings))
 
     # --- Prescriber stats.
 
@@ -146,6 +135,17 @@ def stats(request, template_name="stats/stats.html"):
 
     context = {"data": data}
     return render(request, template_name, context)
+
+
+def get_total_per_week(queryset, date_field, total_expression):
+    result = list(
+        queryset.annotate(year=ExtractYear(date_field))
+        .annotate(week=ExtractWeek(date_field))
+        .values("year", "week")
+        .annotate(total=total_expression)
+        .order_by("year", "week")
+    )
+    return result
 
 
 def inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset, visible=True):
@@ -182,62 +182,123 @@ def inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset, visible=
     return data
 
 
-def get_pie_chart_data_per_sender_kind(queryset):
-    total_per_sender_kind_as_list = (
-        queryset.values("sender_kind")
+def get_hiring_delays(hirings):
+    # Fetch several key dates of hirings.
+    # Job application date is field created_at.
+    # Approval date is found in the hiring transition logs.
+    # Start of contract is field date_of_hiring.
+    hiring_dates = (
+        hirings.filter(logs__transition="accept", logs__to_state="accepted")
+        .distinct()
+        .values("created_at", "logs__timestamp", "date_of_hiring")
+    )
+
+    hiring_delays = hiring_dates.aggregate(
+        average_delay_from_application_to_approval=Avg(
+            F("logs__timestamp") - F("created_at"), output_field=DateTimeField()
+        ),
+        average_delay_from_approval_to_hiring=Avg(
+            F("date_of_hiring") - F("logs__timestamp"), output_field=DateTimeField()
+        ),
+    )
+    return hiring_delays
+
+
+def get_donut_chart_data_per_eligibility_author_kind(job_applications):
+    kind_choices_as_dict = OrderedDict(EligibilityDiagnosis.AUTHOR_KIND_CHOICES)
+
+    # Ensure an entry exists even for author_kind values which have zero records.
+    job_applications_per_eligibility_author_kind = {
+        author_kind: 0 for author_kind in kind_choices_as_dict
+    }
+
+    # FIXME Find how to make a proper GROUP BY on a second order related field.
+    for job_application in job_applications.values(
+        "job_seeker__eligibility_diagnoses__author_kind"
+    ):
+        author_kind = job_application["job_seeker__eligibility_diagnoses__author_kind"]
+        job_applications_per_eligibility_author_kind[author_kind] += 1
+
+    donut_chart_data = _get_donut_chart_data(
+        job_applications=job_applications,
+        job_applications_per_kind=job_applications_per_eligibility_author_kind,
+        kind_choices_as_dict=kind_choices_as_dict,
+        prescriber_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
+        siae_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+    )
+    return donut_chart_data
+
+
+def get_donut_chart_data_per_sender_kind(job_applications):
+    kind_choices_as_dict = OrderedDict(JobApplication.SENDER_KIND_CHOICES)
+
+    job_applications_per_sender_kind_as_list = (
+        job_applications.values("sender_kind")
         .annotate(total=Count("pk", distinct=True))
         .order_by("sender_kind")
     )
-    total_per_sender_kind_as_dict = defaultdict(
+    job_applications_per_sender_kind_as_dict = defaultdict(
         int,
-        {item["sender_kind"]: item["total"] for item in total_per_sender_kind_as_list},
+        {
+            item["sender_kind"]: item["total"]
+            for item in job_applications_per_sender_kind_as_list
+        },
     )
-    sender_kind_choices_as_dict = {
-        item[0]: item[1] for item in JobApplication.SENDER_KIND_CHOICES
-    }
-    total_authorized_prescribers = (
-        queryset.filter(sender_prescriber_organization__is_authorized=True)
+
+    donut_chart_data = _get_donut_chart_data(
+        job_applications=job_applications,
+        job_applications_per_kind=job_applications_per_sender_kind_as_dict,
+        kind_choices_as_dict=kind_choices_as_dict,
+        prescriber_kind=JobApplication.SENDER_KIND_PRESCRIBER,
+        siae_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+    )
+    return donut_chart_data
+
+
+def _get_donut_chart_data(
+    job_applications,
+    job_applications_per_kind,
+    kind_choices_as_dict,
+    prescriber_kind,
+    siae_kind,
+):
+    """
+    Internal method designed to factorize as much code as possible
+    between various donut charts (DNRY).
+    """
+    job_applications_having_authorized_prescriber = (
+        job_applications.filter(sender_prescriber_organization__is_authorized=True)
         .distinct()
         .count()
     )
 
     if (
-        total_per_sender_kind_as_dict[JobApplication.SENDER_KIND_PRESCRIBER]
-        < total_authorized_prescribers
+        job_applications_per_kind[prescriber_kind]
+        < job_applications_having_authorized_prescriber
     ):
         raise ValueError("Inconsistent prescriber data.")
 
-    pie_chart_data = [
-        {
-            "name": sender_kind_choices_as_dict[JobApplication.SENDER_KIND_JOB_SEEKER],
-            "value": total_per_sender_kind_as_dict[
-                JobApplication.SENDER_KIND_JOB_SEEKER
-            ],
-        },
-        {
-            "name": "Prescripteur non habilité",
-            "value": total_per_sender_kind_as_dict[
-                JobApplication.SENDER_KIND_PRESCRIBER
-            ]
-            - total_authorized_prescribers,
-        },
-        {"name": "Prescripteur habilité", "value": total_authorized_prescribers},
-        {
-            "name": sender_kind_choices_as_dict[JobApplication.SENDER_KIND_SIAE_STAFF],
-            "value": total_per_sender_kind_as_dict[
-                JobApplication.SENDER_KIND_SIAE_STAFF
-            ],
-        },
-    ]
-    return pie_chart_data
-
-
-def get_total_per_week(queryset, date_field, total_expression):
-    result = list(
-        queryset.annotate(year=ExtractYear(date_field))
-        .annotate(week=ExtractWeek(date_field))
-        .values("year", "week")
-        .annotate(total=total_expression)
-        .order_by("year", "week")
+    # At this point data is split this way : job_seeker / prescriber / siae_staff.
+    donut_chart_data_as_dict = OrderedDict(
+        (kind_choices_as_dict[k], v) for k, v in job_applications_per_kind.items()
     )
-    return result
+
+    # Split prescriber data even more : authorized / unauthorized.
+    del donut_chart_data_as_dict[kind_choices_as_dict[prescriber_kind]]
+    donut_chart_data_as_dict["Prescripteur non habilité"] = (
+        job_applications_per_kind[prescriber_kind]
+        - job_applications_having_authorized_prescriber
+    )
+    donut_chart_data_as_dict[
+        "Prescripteur habilité"
+    ] = job_applications_having_authorized_prescriber
+
+    # Move SIAE data last for aesthetics.
+    siae_value = donut_chart_data_as_dict.get(kind_choices_as_dict[siae_kind], 0)
+    donut_chart_data_as_dict.pop(kind_choices_as_dict[siae_kind], None)
+    donut_chart_data_as_dict[kind_choices_as_dict[siae_kind]] = siae_value
+
+    donut_chart_data = [
+        {"name": k, "value": v} for k, v in donut_chart_data_as_dict.items()
+    ]
+    return donut_chart_data
