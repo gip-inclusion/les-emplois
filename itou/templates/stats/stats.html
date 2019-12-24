@@ -24,7 +24,10 @@
             {% trans "<b>Embauche</b> : candidature de type \"acceptée\"." %}
         </li>
         <li>
-            {% trans "<b>Siae active</b> : Siae créée ou modifiée il y a moins de 15 jours, ou ayant un nouvel utilisateur créé il y a moins de 15 jours, ou ayant créé ou modifié une FDP il y a moins de 15 jours, ou ayant reçu ou modifié une candidature il y a moins de 15 jours." %}
+            {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique." %}
+        </li>
+        <li>
+            {% trans "<b>SIAE active</b> : SIAE créée ou modifiée il y a moins de 15 jours, ou ayant un nouvel utilisateur créé il y a moins de 15 jours, ou ayant créé ou modifié une FDP il y a moins de 15 jours, ou ayant reçu ou modifié une candidature il y a moins de 15 jours." %}
         </li>
         {% for entry in data.siaes_by_kind.categories %}
             <li>
@@ -44,7 +47,7 @@
         </li>
     </ul>
 
-    <h2>{% trans "Stats siaes" %}</h2>
+    <h2>{% trans "Stats SIAE" %}</h2>
 
     <h3>{% trans "Indicateurs" %}</h3>
 
@@ -56,14 +59,10 @@
         {% endfor %}
     </ul>
 
-    <h3>{% trans "Répartition des indicateurs par type de siae" %}</h3>
+    <h3>{% trans "Répartition des indicateurs par type de SIAE" %}</h3>
 
-    {% trans "Répartition des indicateurs par type de siae" as chart_title %}
+    {% trans "Répartition des indicateurs par type de SIAE" as chart_title %}
     {% include "stats/includes/basic_bar_chart.html" with chart_id="siaes_by_kind" data=data.siaes_by_kind title=chart_title %}
-
-    <h3>{% trans "Graphiques d'évolution" %}</h3>
-
-    <p>{% trans "En construction..." %}</p>
 
     <h2>{% trans "Stats candidats / embauches" %}</h2>
 
@@ -83,14 +82,21 @@
     {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
 
-    {% trans "Source<br>des candidatures" as chart_title %}
-    {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
-
     {% trans "Embauches groupés par la semaine de la date de création de la candidature correspondante" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
 
+    <h3>{% trans "Graphiques de répartition selon la source" %}</h3>
+
+    {% trans "Source<br>des candidatures" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
+
     {% trans "Source<br>des embauches" as chart_title %}
     {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_sources" data=data.hirings_per_sender_kind title=chart_title %}
+
+    <h3>{% trans "Source du diagnostic d'éligibilité" %}</h3>
+
+    {% trans "Source<br>de l\\\'éligibilité" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="eligibility_sources" data=data.hirings_per_eligibility_author_kind title=chart_title %}
 
     <h2>{% trans "Stats prescripteurs" %}</h2>
 
