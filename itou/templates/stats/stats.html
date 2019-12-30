@@ -11,20 +11,91 @@
 
 {% block content %}
 
-    <h2>{% trans "Lexique" %}</h2>
+    <div class="layout-header">
+        <div class="layout-header-content">
+            <div class="dropdown">
+                {% include "includes/icon.html" with icon="map-pin" %}
+                <a
+                    href="#"
+                    class="dropdown-toggle"
+                    data-toggle="dropdown"
+                    data-display="static"
+                    aria-expanded="false">{{ current_department_name }}</a>
+                <div class="dropdown-menu dropdown-menu-lg-right">
+                    <span class="dropdown-item-text">
+                        <small>{% trans "Départements :" %}</small>
+                    </span>
+                    <form action="{% url 'stats:index' %}" method="post">
+                        {% csrf_token %}
+                        {% for d in departments %}
+                            {% if d.0 != current_department %}
+                                <button
+                                    class="dropdown-item"
+                                    type="submit"
+                                    name="department"
+                                    value="{{ d.0 }}">{{ d.1 }}
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h2>{% trans "Statistiques des candidatures et embauches" %}</h2>
+
+    <h3>{% trans "Indicateurs" %}</h3>
 
     <ul>
+        <li>
+            {% trans "Candidatures à ce jour" %} : <b>{{ data.total_job_applications }}</b>
+        </li>
+        <li>
+            {% trans "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
+        </li>
+        <li>
+            {% trans "Durée moyenne entre la candidature et son acceptation" %} : <b>{{ data.average_delay_from_application_to_approval.days }} {% trans "jour(s)" %}</b>
+        </li>
+        <li>
+            {% trans "Durée moyenne entre l'acceptation de la candidature et le début du contrat" %} : <b>{{ data.average_delay_from_approval_to_hiring.days }} {% trans "jour(s)" %}</b>
+        </li>
+    </ul>
+
+    <h3>{% trans "Evolution des candidatures et embauches dans le temps" %}</h3>
+
+    {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
+
+    {% trans "Embauches groupées par la semaine de la date de création de la candidature correspondante" as chart_title %}
+    {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
+
+    <h3>{% trans "Répartition de la source des candidatures et embauches" %}</h3>
+
+    {% trans "Source<br>des candidatures" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
+
+    {% trans "Source<br>des embauches" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_sources" data=data.hirings_per_sender_kind title=chart_title %}
+
+    <h3>{% trans "Répartition de la source du diagnostic d'éligibilité" %}</h3>
+
+    {% trans "Source<br>de l\\\'éligibilité" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="eligibility_sources" data=data.hirings_per_eligibility_author_kind title=chart_title %}
+
+    <h2>{% trans "Statistiques SIAE" %}</h2>
+
+    <h3>{% trans "Lexique SIAE" %}</h3>
+
+    <ul>
+        <li>
+            {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique." %}
+        </li>
         <li>
             {% trans "<b>FDP</b> : fiche de poste." %}
         </li>
         <li>
             {% trans "<b>FDP active</b> : fiche de poste ouverte aux candidatures." %}
-        </li>
-        <li>
-            {% trans "<b>Embauche</b> : candidature de type \"acceptée\"." %}
-        </li>
-        <li>
-            {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique." %}
         </li>
         <li>
             {% trans "<b>SIAE active</b> : SIAE créée ou modifiée il y a moins de 15 jours, ou ayant un nouvel utilisateur créé il y a moins de 15 jours, ou ayant créé ou modifié une FDP il y a moins de 15 jours, ou ayant reçu ou modifié une candidature il y a moins de 15 jours." %}
@@ -36,18 +107,7 @@
                 {% endblocktrans %}
             </li>
         {% endfor %}
-        <li>
-            {% trans "<b>[...]</b> : [...]." %}
-        </li>
-        <li>
-            {% trans "<b>[...]</b> : [...]." %}
-        </li>
-        <li>
-            {% trans "<b>[...]</b> : [...]." %}
-        </li>
     </ul>
-
-    <h2>{% trans "Stats SIAE" %}</h2>
 
     <h3>{% trans "Indicateurs" %}</h3>
 
@@ -64,47 +124,7 @@
     {% trans "Répartition des indicateurs par type de SIAE" as chart_title %}
     {% include "stats/includes/basic_bar_chart.html" with chart_id="siaes_by_kind" data=data.siaes_by_kind title=chart_title %}
 
-    <h2>{% trans "Stats candidats / embauches" %}</h2>
-
-    <h3>{% trans "Indicateurs" %}</h3>
-
-    <ul>
-        <li>
-            {% trans "Candidatures à ce jour" %} : <b>{{ data.total_job_applications }}</b>
-        </li>
-        <li>
-            {% trans "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
-        </li>
-        <li>
-            {% trans "Nombre de jours en moyenne entre la candidature et son acceptation" %} : <b>{{ data.average_delay_from_application_to_approval.days }}</b>
-        </li>
-        <li>
-            {% trans "Nombre de jours en moyenne entre l'acceptation de la candidature et le début du contrat" %} : <b>{{ data.average_delay_from_approval_to_hiring.days }}</b>
-        </li>
-    </ul>
-
-    <h3>{% trans "Graphiques d'évolution" %}</h3>
-
-    {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
-    {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
-
-    {% trans "Embauches groupés par la semaine de la date de création de la candidature correspondante" as chart_title %}
-    {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
-
-    <h3>{% trans "Graphiques de répartition selon la source" %}</h3>
-
-    {% trans "Source<br>des candidatures" as chart_title %}
-    {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
-
-    {% trans "Source<br>des embauches" as chart_title %}
-    {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_sources" data=data.hirings_per_sender_kind title=chart_title %}
-
-    <h3>{% trans "Source du diagnostic d'éligibilité" %}</h3>
-
-    {% trans "Source<br>de l\\\'éligibilité" as chart_title %}
-    {% include "stats/includes/semi_circle_donut.html" with chart_id="eligibility_sources" data=data.hirings_per_eligibility_author_kind title=chart_title %}
-
-    <h2>{% trans "Stats prescripteurs" %}</h2>
+    <h2>{% trans "Statistiques prescripteurs" %}</h2>
 
     <h3>{% trans "Indicateurs" %}</h3>
 
@@ -114,7 +134,7 @@
         </li>
     </ul>
 
-    <h3>{% trans "Graphiques d'évolution" %}</h3>
+    <h3>{% trans "Graphiques d'évolution dans le temps" %}</h3>
 
     {% trans "Nombre de comptes utilisateurs de type prescripteur groupés par la semaine de leur date de création" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="prescriber_users" data=data.prescriber_users_per_creation_week title=chart_title %}

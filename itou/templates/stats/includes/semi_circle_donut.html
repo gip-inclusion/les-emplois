@@ -38,7 +38,11 @@
             innerSize: '50%',
             data: [
                 {% for entry in data %}
-                ['{{ entry.name }} ({{ entry.value }})', {{ entry.value }}]
+                    {
+                        name: '{{ entry.name }} ({{ entry.value }})',
+                        y: {{ entry.value }},
+                        color: '{{ entry.color }}'
+                    }
                     {% if not forloop.last %}, {% endif %}
                 {% endfor %}
             ]
