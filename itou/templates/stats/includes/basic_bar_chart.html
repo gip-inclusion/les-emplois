@@ -3,7 +3,8 @@
 <script>
     Highcharts.chart('{{ chart_id }}_basic_bar_chart', {
         chart: {
-            type: 'bar'
+            type: 'bar',
+            height: 550
         },
         title: {
             text: '{{ title }}'
@@ -43,13 +44,9 @@
             }
         },
         legend: {
-            layout: 'vertical',
-            align: 'right',
-            // FIXME WIP
-            verticalAlign: 'bottom',
-            // x: -40,
-            // y: 80,
-            floating: true,
+            layout: 'horizontal',
+            align: 'center',
+            floating: false,
             borderWidth: 1,
             backgroundColor:
                 Highcharts.defaultOptions.legend.backgroundColor || '#FFFFFF',

@@ -1,12 +1,13 @@
 from collections import defaultdict, OrderedDict
+from datetime import timedelta
 from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
 
-from django.db.models import Avg, Count, DateTimeField, F, Q
-from django.db.models.functions import ExtractWeek, ExtractYear
+from django.db.models import Avg, Count, DateTimeField, F, Q, ExpressionWrapper
+from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -18,43 +19,30 @@ from itou.utils.address.departments import DEPARTMENTS
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
-    departments = [
-        (None, f"Tous les départements ({ ', '.join(settings.ITOU_TEST_DEPARTMENTS) })")
-    ]
-    departments += [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
+    departments = get_department_choices()
+    current_department = get_current_department(request, departments)
 
-    current_department = request.POST.get("department", None)
-    if current_department not in dict(departments):
-        current_department = None
-
-    siaes = Siae.active_objects
-    job_applications = JobApplication.objects
-    prescriber_users = User.objects.filter(is_prescriber=True)
-
+    current_departments = settings.ITOU_TEST_DEPARTMENTS
     if current_department:
-        siaes = siaes.filter(department=current_department)
-        job_applications = job_applications.filter(
-            to_siae__department=current_department
-        )
-        prescriber_users = prescriber_users.filter(
-            prescriberorganization__department=current_department
-        ).distinct()
-    else:
-        # Necessary filters otherwise many prescriber users from
-        # departments outside of settings.ITOU_TEST_DEPARTMENTS
-        # would pollute results.
-        siaes = siaes.filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
-        job_applications = job_applications.filter(
-            to_siae__department__in=settings.ITOU_TEST_DEPARTMENTS
-        )
-        prescriber_users = prescriber_users.filter(
-            prescriberorganization__department__in=settings.ITOU_TEST_DEPARTMENTS
-        ).distinct()
+        current_departments = [current_department]
+
+    siaes = Siae.active_objects.filter(department__in=current_departments)
+    job_applications = JobApplication.objects.filter(
+        to_siae__department__in=current_departments
+    )
+    prescriber_users = (
+        User.objects.filter(is_prescriber=True, is_active=True)
+        .filter(prescriberorganization__department__in=current_departments)
+        .distinct()
+    )
 
     hirings = job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
 
+    # Job seeker data has no geolocalization and thus cannot be filtered by department.
+    job_seeker_users = User.objects.filter(is_job_seeker=True, is_active=True)
+
     data.update(get_siae_stats(siaes))
-    data.update(get_candidate_stats(job_applications, hirings))
+    data.update(get_candidate_stats(job_applications, hirings, job_seeker_users))
     data.update(get_prescriber_stats(prescriber_users, job_applications))
 
     context = {
@@ -64,6 +52,22 @@ def stats(request, template_name="stats/stats.html"):
         "current_department_name": dict(departments)[current_department],
     }
     return render(request, template_name, context)
+
+
+def get_department_choices():
+    all_departments_text = (
+        f"Tous les départements ({ ', '.join(settings.ITOU_TEST_DEPARTMENTS) })"
+    )
+    departments = [(None, all_departments_text)]
+    departments += [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
+    return departments
+
+
+def get_current_department(request, departments):
+    current_department = request.POST.get("department", None)
+    if current_department not in dict(departments):
+        current_department = None
+    return current_department
 
 
 def get_siae_stats(siaes):
@@ -112,16 +116,19 @@ def get_siae_stats(siaes):
     )
 
     kpi_name = "SIAE actives à ce jour"
-    today = timezone.localtime(timezone.now()).date()
-    two_weeks_ago = today + relativedelta(weeks=-2)
+    today = get_today()
+    data["days_for_siae_to_be_considered_active"] = 15
+    some_time_ago = today + relativedelta(
+        days=-data["days_for_siae_to_be_considered_active"]
+    )
     siaes_subset = siaes.filter(
-        Q(updated_at__date__gte=two_weeks_ago)
-        | Q(created_at__date__gte=two_weeks_ago)
-        | Q(siaemembership__user__date_joined__date__gte=two_weeks_ago)
-        | Q(job_description_through__created_at__date__gte=two_weeks_ago)
-        | Q(job_description_through__updated_at__date__gte=two_weeks_ago)
-        | Q(job_applications_received__created_at__date__gte=two_weeks_ago)
-        | Q(job_applications_received__updated_at__date__gte=two_weeks_ago)
+        Q(updated_at__date__gte=some_time_ago)
+        | Q(created_at__date__gte=some_time_ago)
+        | Q(siaemembership__user__date_joined__date__gte=some_time_ago)
+        | Q(job_description_through__created_at__date__gte=some_time_ago)
+        | Q(job_description_through__updated_at__date__gte=some_time_ago)
+        | Q(job_applications_received__created_at__date__gte=some_time_ago)
+        | Q(job_applications_received__updated_at__date__gte=some_time_ago)
     ).distinct()
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
@@ -134,11 +141,29 @@ def get_siae_stats(siaes):
     return data
 
 
-def get_candidate_stats(job_applications, hirings):
+def get_today():
+    return timezone.localtime(timezone.now()).date()
+
+
+def get_candidate_stats(job_applications, hirings, job_seeker_users):
     data = {}
     data["total_job_applications"] = job_applications.count()
 
     data["total_hirings"] = hirings.count()
+
+    data["total_job_seeker_users"] = job_seeker_users.count()
+
+    # Job seekers registered for more than X days, having
+    # at least one job_application but no hiring.
+    days = 45
+    data["days_for_total_job_seeker_users_without_opportunity"] = days
+    data["total_job_seeker_users_without_opportunity"] = (
+        job_seeker_users.filter(date_joined__lte=get_today() - relativedelta(days=days))
+        .exclude(job_applications__isnull=True)
+        .exclude(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED)
+        .distinct()
+        .count()
+    )
 
     data["job_applications_per_creation_week"] = get_total_per_week(
         job_applications, date_field="created_at", total_expression=Count("pk")
@@ -181,9 +206,25 @@ def get_prescriber_stats(prescriber_users, job_applications):
 
 
 def get_total_per_week(queryset, date_field, total_expression):
+    # Getting correct week and year of Monday Dec 30th 2019 is tricky,
+    # because ExtractWeek will give correct week number 1,
+    # but ExtractYear will give 2019 instead of 2020.
+    # Thus we have to focus on the last day of the week
+    # instead of the actual day.
     result = list(
-        queryset.annotate(year=ExtractYear(date_field))
-        .annotate(week=ExtractWeek(date_field))
+        queryset.annotate(
+            # TruncWeek truncates to midnight on the Monday of the week.
+            monday_of_week=TruncWeek(date_field)
+        )
+        .annotate(
+            # Unfortunately relativedelta is not supported by Django ORM: we get a
+            # `django.db.utils.ProgrammingError: can't adapt type 'relativedelta'` error.
+            sunday_of_week=ExpressionWrapper(
+                F("monday_of_week") + timedelta(days=6, hours=20), DateTimeField()
+            )
+        )
+        .annotate(year=ExtractYear("sunday_of_week"))
+        .annotate(week=ExtractWeek("sunday_of_week"))
         .values("year", "week")
         .annotate(total=total_expression)
         .order_by("year", "week")
@@ -255,7 +296,7 @@ def get_donut_chart_data_per_eligibility_author_kind(job_applications):
         author_kind: 0 for author_kind in kind_choices_as_dict
     }
 
-    # FIXME Find how to make a proper GROUP BY on a second order related field.
+    # TODO Find how to make a proper GROUP BY on a second order related field.
     for job_application in job_applications.values(
         "job_seeker__eligibility_diagnoses__author_kind"
     ):
