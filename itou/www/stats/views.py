@@ -1,6 +1,7 @@
 from collections import defaultdict, OrderedDict
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -11,44 +12,88 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.models import User
+from itou.utils.address.departments import DEPARTMENTS
 
 
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
-    # --- Siae stats.
+    departments = [
+        (None, f"Tous les départements ({ ', '.join(settings.ITOU_TEST_DEPARTMENTS) })")
+    ]
+    departments += [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
+
+    current_department = request.POST.get("department", None)
+    if current_department not in dict(departments):
+        current_department = None
+
+    siaes = Siae.active_objects
+    job_applications = JobApplication.objects
+    prescriber_users = User.objects.filter(is_prescriber=True)
+
+    if current_department:
+        siaes = siaes.filter(department=current_department)
+        job_applications = job_applications.filter(
+            to_siae__department=current_department
+        )
+        prescriber_users = prescriber_users.filter(
+            prescriberorganization__department=current_department
+        ).distinct()
+    else:
+        # Necessary filters otherwise many prescriber users from
+        # departments outside of settings.ITOU_TEST_DEPARTMENTS
+        # would pollute results.
+        siaes = siaes.filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
+        job_applications = job_applications.filter(
+            to_siae__department__in=settings.ITOU_TEST_DEPARTMENTS
+        )
+        prescriber_users = prescriber_users.filter(
+            prescriberorganization__department__in=settings.ITOU_TEST_DEPARTMENTS
+        ).distinct()
+
+    hirings = job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
+
+    data.update(get_siae_stats(siaes))
+    data.update(get_candidate_stats(job_applications, hirings))
+    data.update(get_prescriber_stats(prescriber_users, job_applications))
+
+    context = {
+        "data": data,
+        "departments": departments,
+        "current_department": current_department,
+        "current_department_name": dict(departments)[current_department],
+    }
+    return render(request, template_name, context)
+
+
+def get_siae_stats(siaes):
+    data = {}
 
     kpi_name = "SIAE à ce jour"
-    siaes_subset = Siae.active_objects
+    siaes_subset = siaes
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
     kpi_name = "SIAE ayant au moins un utilisateur à ce jour"
-    siaes_subset = Siae.active_objects.filter(
-        siaemembership__user__is_active=True
-    ).distinct()
+    siaes_subset = siaes.filter(siaemembership__user__is_active=True).distinct()
     data = inject_siaes_subset_total_and_by_kind(
         data, kpi_name, siaes_subset, visible=False
     )
 
     kpi_name = "SIAE ayant au moins une FDP à ce jour"
-    siaes_subset = Siae.active_objects.exclude(
-        job_description_through__isnull=True
-    ).distinct()
+    siaes_subset = siaes.exclude(job_description_through__isnull=True).distinct()
     data = inject_siaes_subset_total_and_by_kind(
         data, kpi_name, siaes_subset, visible=False
     )
 
     kpi_name = "SIAE ayant au moins une FDP active à ce jour"
-    siaes_subset = Siae.active_objects.filter(
-        job_description_through__is_active=True
-    ).distinct()
+    siaes_subset = siaes.filter(job_description_through__is_active=True).distinct()
     data = inject_siaes_subset_total_and_by_kind(
         data, kpi_name, siaes_subset, visible=False
     )
 
     kpi_name = "SIAE ayant au moins un utilisateur et une FDP à ce jour"
     siaes_subset = (
-        Siae.active_objects.filter(siaemembership__user__is_active=True)
+        siaes.filter(siaemembership__user__is_active=True)
         .exclude(job_description_through__isnull=True)
         .distinct()
     )
@@ -58,7 +103,7 @@ def stats(request, template_name="stats/stats.html"):
 
     kpi_name = "SIAE ayant au moins un utilisateur et une FDP active à ce jour"
     siaes_subset = (
-        Siae.active_objects.filter(siaemembership__user__is_active=True)
+        siaes.filter(siaemembership__user__is_active=True)
         .filter(job_description_through__is_active=True)
         .distinct()
     )
@@ -69,7 +114,7 @@ def stats(request, template_name="stats/stats.html"):
     kpi_name = "SIAE actives à ce jour"
     today = timezone.localtime(timezone.now()).date()
     two_weeks_ago = today + relativedelta(weeks=-2)
-    siaes_subset = Siae.active_objects.filter(
+    siaes_subset = siaes.filter(
         Q(updated_at__date__gte=two_weeks_ago)
         | Q(created_at__date__gte=two_weeks_ago)
         | Q(siaemembership__user__date_joined__date__gte=two_weeks_ago)
@@ -81,16 +126,16 @@ def stats(request, template_name="stats/stats.html"):
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
     kpi_name = "SIAE ayant au moins une embauche"
-    siaes_subset = Siae.active_objects.filter(
+    siaes_subset = siaes.filter(
         job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED
     ).distinct()
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
-    # --- Candidate stats.
+    return data
 
-    job_applications = JobApplication.objects
-    hirings = job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
 
+def get_candidate_stats(job_applications, hirings):
+    data = {}
     data["total_job_applications"] = job_applications.count()
 
     data["total_hirings"] = hirings.count()
@@ -114,15 +159,15 @@ def stats(request, template_name="stats/stats.html"):
     ] = get_donut_chart_data_per_eligibility_author_kind(hirings)
 
     data.update(get_hiring_delays(hirings))
+    return data
 
-    # --- Prescriber stats.
 
-    data["total_prescriber_users"] = User.objects.filter(is_prescriber=True).count()
+def get_prescriber_stats(prescriber_users, job_applications):
+    data = {}
+    data["total_prescriber_users"] = prescriber_users.count()
 
     data["prescriber_users_per_creation_week"] = get_total_per_week(
-        User.objects.filter(is_prescriber=True),
-        date_field="date_joined",
-        total_expression=Count("pk"),
+        prescriber_users, date_field="date_joined", total_expression=Count("pk")
     )
 
     # Active prescriber means created at least one job
@@ -132,9 +177,7 @@ def stats(request, template_name="stats/stats.html"):
         date_field="created_at",
         total_expression=Count("sender_id", distinct=True),
     )
-
-    context = {"data": data}
-    return render(request, template_name, context)
+    return data
 
 
 def get_total_per_week(queryset, date_field, total_expression):
@@ -225,6 +268,7 @@ def get_donut_chart_data_per_eligibility_author_kind(job_applications):
         kind_choices_as_dict=kind_choices_as_dict,
         prescriber_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
         siae_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+        job_seeker_kind=EligibilityDiagnosis.AUTHOR_KIND_JOB_SEEKER,
     )
     return donut_chart_data
 
@@ -251,6 +295,7 @@ def get_donut_chart_data_per_sender_kind(job_applications):
         kind_choices_as_dict=kind_choices_as_dict,
         prescriber_kind=JobApplication.SENDER_KIND_PRESCRIBER,
         siae_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+        job_seeker_kind=JobApplication.SENDER_KIND_JOB_SEEKER,
     )
     return donut_chart_data
 
@@ -261,6 +306,7 @@ def _get_donut_chart_data(
     kind_choices_as_dict,
     prescriber_kind,
     siae_kind,
+    job_seeker_kind,
 ):
     """
     Internal method designed to factorize as much code as possible
@@ -279,26 +325,31 @@ def _get_donut_chart_data(
         raise ValueError("Inconsistent prescriber data.")
 
     # At this point data is split this way : job_seeker / prescriber / siae_staff.
-    donut_chart_data_as_dict = OrderedDict(
-        (kind_choices_as_dict[k], v) for k, v in job_applications_per_kind.items()
-    )
-
+    # Hardcode order and colors for consistency between heterogeneous charts.
+    donut_chart_data_as_dict = OrderedDict()
+    donut_chart_data_as_dict[
+        kind_choices_as_dict[job_seeker_kind]
+    ] = job_applications_per_kind[job_seeker_kind]
+    donut_chart_data_as_dict[
+        kind_choices_as_dict[siae_kind]
+    ] = job_applications_per_kind[siae_kind]
     # Split prescriber data even more : authorized / unauthorized.
-    del donut_chart_data_as_dict[kind_choices_as_dict[prescriber_kind]]
+    donut_chart_data_as_dict[
+        "Prescripteur habilité"
+    ] = job_applications_having_authorized_prescriber
     donut_chart_data_as_dict["Prescripteur non habilité"] = (
         job_applications_per_kind[prescriber_kind]
         - job_applications_having_authorized_prescriber
     )
-    donut_chart_data_as_dict[
-        "Prescripteur habilité"
-    ] = job_applications_having_authorized_prescriber
-
-    # Move SIAE data last for aesthetics.
-    siae_value = donut_chart_data_as_dict.get(kind_choices_as_dict[siae_kind], 0)
-    donut_chart_data_as_dict.pop(kind_choices_as_dict[siae_kind], None)
-    donut_chart_data_as_dict[kind_choices_as_dict[siae_kind]] = siae_value
 
     donut_chart_data = [
         {"name": k, "value": v} for k, v in donut_chart_data_as_dict.items()
     ]
+
+    # Let's hardcode colors for aesthetics.
+    colors = ["#2f7ed8", "#0d233a", "#8bbc21", "#910000"]
+
+    for idx, val in enumerate(donut_chart_data):
+        val["color"] = colors[idx]
+
     return donut_chart_data
