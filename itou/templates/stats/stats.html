@@ -11,39 +11,9 @@
 
 {% block content %}
 
-    <div class="layout-header">
-        <div class="layout-header-content">
-            <div class="dropdown">
-                {% include "includes/icon.html" with icon="map-pin" %}
-                <a
-                    href="#"
-                    class="dropdown-toggle"
-                    data-toggle="dropdown"
-                    data-display="static"
-                    aria-expanded="false">{{ current_department_name }}</a>
-                <div class="dropdown-menu dropdown-menu-lg-right">
-                    <span class="dropdown-item-text">
-                        <small>{% trans "Départements :" %}</small>
-                    </span>
-                    <form action="{% url 'stats:index' %}" method="post">
-                        {% csrf_token %}
-                        {% for d in departments %}
-                            {% if d.0 != current_department %}
-                                <button
-                                    class="dropdown-item"
-                                    type="submit"
-                                    name="department"
-                                    value="{{ d.0 }}">{{ d.1 }}
-                                </button>
-                            {% endif %}
-                        {% endfor %}
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <h2>{% trans "Statistiques des candidatures et embauches" %}</h2>
+
+    {% include "stats/includes/department_selector.html" %}
 
     <h3>{% trans "Indicateurs" %}</h3>
 
@@ -59,6 +29,14 @@
         </li>
         <li>
             {% trans "Durée moyenne entre l'acceptation de la candidature et le début du contrat" %} : <b>{{ data.average_delay_from_approval_to_hiring.days }} {% trans "jour(s)" %}</b>
+        </li>
+        <li>
+            {% trans "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }} ({% trans "tous départements confondus car donnée non disponible par département" %})</b>
+        </li>
+        <li>
+            {% blocktrans with days=data.days_for_total_job_seeker_users_without_opportunity value=data.total_job_seeker_users_without_opportunity %}
+                Comptes candidat sans opportunité (inscrits depuis plus de {{ days }} jours avec au moins une candidature mais sans embauche) à ce jour : <b>{{ value }} (tous départements confondus car donnée non disponible par département)</b>
+            {% endblocktrans %}
         </li>
     </ul>
 
@@ -85,6 +63,8 @@
 
     <h2>{% trans "Statistiques SIAE" %}</h2>
 
+    {% include "stats/includes/department_selector.html" %}
+
     <h3>{% trans "Lexique SIAE" %}</h3>
 
     <ul>
@@ -98,7 +78,9 @@
             {% trans "<b>FDP active</b> : fiche de poste ouverte aux candidatures." %}
         </li>
         <li>
-            {% trans "<b>SIAE active</b> : SIAE créée ou modifiée il y a moins de 15 jours, ou ayant un nouvel utilisateur créé il y a moins de 15 jours, ou ayant créé ou modifié une FDP il y a moins de 15 jours, ou ayant reçu ou modifié une candidature il y a moins de 15 jours." %}
+            {% blocktrans with days=data.days_for_siae_to_be_considered_active %}
+                <b>SIAE active</b> : SIAE créée ou modifiée il y a moins de {{ days }} jours, ou ayant un nouvel utilisateur créé il y a moins de {{ days }} jours, ou ayant créé ou modifié une FDP il y a moins de {{ days }} jours, ou ayant reçu ou modifié une candidature il y a moins de {{ days }} jours.
+            {% endblocktrans %}
         </li>
         {% for entry in data.siaes_by_kind.categories %}
             <li>
@@ -125,6 +107,8 @@
     {% include "stats/includes/basic_bar_chart.html" with chart_id="siaes_by_kind" data=data.siaes_by_kind title=chart_title %}
 
     <h2>{% trans "Statistiques prescripteurs" %}</h2>
+
+    {% include "stats/includes/department_selector.html" %}
 
     <h3>{% trans "Indicateurs" %}</h3>
 
