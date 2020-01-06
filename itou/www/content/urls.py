@@ -27,9 +27,4 @@ urlpatterns = [
         TemplateView.as_view(template_name="content/qui_sommes_nous.html"),
         name="qui_sommes_nous",
     ),
-    path(
-        "simplifier_les_procedures/",
-        TemplateView.as_view(template_name="content/simplifier_les_procedures.html"),
-        name="simplifier_les_procedures",
-    ),
 ]
