@@ -8,11 +8,6 @@ app_name = "content"
 urlpatterns = [
     path("faq/", TemplateView.as_view(template_name="content/faq.html"), name="faq"),
     path(
-        "experimentation/",
-        TemplateView.as_view(template_name="content/experimentation.html"),
-        name="experimentation",
-    ),
-    path(
         "inclusion_kesako/",
         TemplateView.as_view(template_name="content/inclusion_kesako.html"),
         name="inclusion_kesako",
