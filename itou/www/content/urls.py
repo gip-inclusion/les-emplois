@@ -18,11 +18,6 @@ urlpatterns = [
         name="inclusion_kesako",
     ),
     path(
-        "le_pacte_ambition_iae/",
-        TemplateView.as_view(template_name="content/le_pacte_ambition_iae.html"),
-        name="le_pacte_ambition_iae",
-    ),
-    path(
         "qui_sommes_nous/",
         TemplateView.as_view(template_name="content/qui_sommes_nous.html"),
         name="qui_sommes_nous",
