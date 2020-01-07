@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
 
 from django.db.models import Avg, Count, DateTimeField, F, Q, ExpressionWrapper
 from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
@@ -19,6 +20,10 @@ from itou.utils.address.departments import DEPARTMENTS
 DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE = "donnée non disponible par département"
 
 
+# TODO FIXME Run a cronjob to regenerate the stats page every X minutes,
+# so that the user never has to wait!
+# see https://stackoverflow.com/questions/4631865/caching-query-results-in-django
+@cache_page(60 * 5)
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
