@@ -18,11 +18,17 @@ class UserExistsForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data["email"]
         self.user = get_user_model().objects.filter(email=email).first()
-        if self.user and not self.user.is_job_seeker:
-            error = _(
-                "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
-            )
-            raise forms.ValidationError(error)
+        if self.user:
+            if not self.user.is_active:
+                error = _(
+                    "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
+                )
+                raise forms.ValidationError(error)
+            if not self.user.is_job_seeker:
+                error = _(
+                    "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
+                )
+                raise forms.ValidationError(error)
         return email
 
     def get_user(self):
