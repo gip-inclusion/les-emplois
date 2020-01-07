@@ -42,10 +42,10 @@
 
     <h3>{% trans "Evolution des candidatures et embauches dans le temps" %}</h3>
 
-    {% trans "Candidatures groupées par la semaine de leur date de création" as chart_title %}
+    {% trans "Candidatures" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
 
-    {% trans "Embauches groupées par la semaine de la date de création de la candidature correspondante" as chart_title %}
+    {% trans "Embauches (groupées selon la date de la candidature correspondante)" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
 
     <h3>{% trans "Source des candidatures et embauches" %}</h3>
