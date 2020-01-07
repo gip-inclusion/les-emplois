@@ -39,7 +39,6 @@ urlpatterns = [
     path("", include("itou.www.home.urls")),
     path("apply/", include("itou.www.apply.urls")),
     path("autocomplete/", include("itou.www.autocomplete.urls")),
-    path("content/", include("itou.www.content.urls")),
     path("dashboard/", include("itou.www.dashboard.urls")),
     path("search/", include("itou.www.search.urls")),
     path("siae/", include("itou.www.siaes_views.urls")),

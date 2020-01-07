@@ -126,30 +126,43 @@
                     <div class="col-sm">
                         <h6>{% trans "À propos" %}</h6>
                         <ul class="list-unstyled text-small">
-                            <li><a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{% trans "Nous contacter" %}</a></li>
+                            <li>
+                                <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{% trans "Nous contacter" %}</a>
+                            </li>
+                            <li>
+                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580">
+                                    {% trans "Inscription Newsletter" %}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="col-sm">
                         <h6>{% trans "Pourquoi cette plateforme ?" %}</h6>
                         <ul class="list-unstyled text-small">
-                            <li><a href="{% url 'content:faciliter_embauche_en_iae' %}">{% trans "Faciliter l'embauche en IAE" %}</a></li>
-                            <li><a href="{% url 'content:simplifier_les_procedures' %}">{% trans "Simplifier les procédures" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/pourquoi-cette-plateforme#faciliter-lembauche-en-iae">
+                                {% trans "Faciliter l'embauche en IAE" %}
+                            </a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/pourquoi-cette-plateforme#simplifier-les-procedures">
+                                {% trans "Simplifier les procédures" %}
+                            </a></li>
                         </ul>
                     </div>
                     <div class="col-sm">
                         <h6>{% trans "En savoir plus" %}</h6>
                         <ul class="list-unstyled text-small">
-                            <li><a href="{% url 'content:le_pacte_ambition_iae' %}">{% trans "Le pacte d'ambition IAE" %}</a></li>
-                            <li><a href="{% url 'content:experimentation' %}">{% trans "L'expérimentation" %}</a></li>
-                            <li><a href="{% url 'content:inclusion_kesako' %}">{% trans "L'inclusion, kesako ?" %}</a></li>
-                            <li><a href="{% url 'content:qui_sommes_nous' %}">{% trans "Qui sommes-nous ?" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/le-pacte-dambition-iae">{% trans "Le pacte d'ambition IAE" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/lexperimentation">{% trans "L'expérimentation" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/linclusion-kesako">{% trans "L'inclusion, kesako ?" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/qui-sommes-nous">{% trans "Qui sommes-nous ?" %}</a></li>
                         </ul>
                     </div>
                     <div class="col-sm">
                         <h6>{% trans "Aide" %}</h6>
                         <ul class="list-unstyled text-small">
-                            <li><a href="{% url 'content:faq' %}">{% trans "FAQ" %}</a></li>
-                            <li><a href="{% url 'home:eligibility_criteria' %}">{% trans "Qui est éligible à l'IAE ?" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/foire-aux-questions">{% trans "FAQ" %}</a></li>
+                            <li><a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique">
+                                {% trans "Qui est éligible à l'IAE ?" %}
+                            </a></li>
                         </ul>
                     </div>
                 </div>
