@@ -31,11 +31,11 @@
             {% trans "Durée moyenne entre l'acceptation de la candidature et le début du contrat" %} : <b>{{ data.average_delay_from_approval_to_hiring.days }} {% trans "jour(s)" %}</b>
         </li>
         <li>
-            {% trans "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }} ({% trans "tous départements confondus car donnée non disponible par département" %})</b>
+            {% trans "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }}</b>
         </li>
         <li>
             {% blocktrans with days=data.days_for_total_job_seeker_users_without_opportunity value=data.total_job_seeker_users_without_opportunity %}
-                Comptes candidat sans opportunité (inscrits depuis plus de {{ days }} jours avec au moins une candidature mais sans embauche) à ce jour : <b>{{ value }} (tous départements confondus car donnée non disponible par département)</b>
+                Comptes candidat sans opportunité (inscrits depuis plus de {{ days }} jours avec au moins une candidature mais sans embauche) à ce jour : <b>{{ value }}</b>
             {% endblocktrans %}
         </li>
     </ul>
@@ -48,7 +48,7 @@
     {% trans "Embauches groupées par la semaine de la date de création de la candidature correspondante" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
 
-    <h3>{% trans "Répartition de la source des candidatures et embauches" %}</h3>
+    <h3>{% trans "Source des candidatures et embauches" %}</h3>
 
     {% trans "Source<br>des candidatures" as chart_title %}
     {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
@@ -56,31 +56,31 @@
     {% trans "Source<br>des embauches" as chart_title %}
     {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_sources" data=data.hirings_per_sender_kind title=chart_title %}
 
-    <h3>{% trans "Répartition de la source du diagnostic d'éligibilité" %}</h3>
+    <h3>{% trans "Auteurs de la validation d'éligibilité" %}</h3>
 
-    {% trans "Source<br>de l\\\'éligibilité" as chart_title %}
+    {% trans "Auteurs<br>de l\\\'éligibilité" as chart_title %}
     {% include "stats/includes/semi_circle_donut.html" with chart_id="eligibility_sources" data=data.hirings_per_eligibility_author_kind title=chart_title %}
 
-    <h2>{% trans "Statistiques SIAE" %}</h2>
+    <h3>{% trans "Structures destinataires des candidatures et embauches" %}</h3>
+
+    {% trans "Destination<br>des candidatures" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_destinations" data=data.job_applications_per_destination_kind title=chart_title %}
+
+    {% trans "Destination<br>des embauches" as chart_title %}
+    {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_destinations" data=data.hirings_per_destination_kind title=chart_title %}
+
+    <h2>{% trans "Statistiques employeurs" %}</h2>
 
     {% include "stats/includes/department_selector.html" %}
 
-    <h3>{% trans "Lexique SIAE" %}</h3>
+    <h3>{% trans "Lexique employeurs" %}</h3>
 
     <ul>
         <li>
-            {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique." %}
+            {% trans "<b>Employeur</b> : SIAE, GEIQ ou EA." %}
         </li>
         <li>
-            {% trans "<b>FDP</b> : fiche de poste." %}
-        </li>
-        <li>
-            {% trans "<b>FDP active</b> : fiche de poste ouverte aux candidatures." %}
-        </li>
-        <li>
-            {% blocktrans with days=data.days_for_siae_to_be_considered_active %}
-                <b>SIAE active</b> : SIAE créée ou modifiée il y a moins de {{ days }} jours, ou ayant un nouvel utilisateur créé il y a moins de {{ days }} jours, ou ayant créé ou modifié une FDP il y a moins de {{ days }} jours, ou ayant reçu ou modifié une candidature il y a moins de {{ days }} jours.
-            {% endblocktrans %}
+            {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique: ACI, AI, EI, ETTI ou EITI." %}
         </li>
         {% for entry in data.siaes_by_kind.categories %}
             <li>
@@ -89,9 +89,26 @@
                 {% endblocktrans %}
             </li>
         {% endfor %}
+        <li>
+            {% trans "<b>EITI</b> : Entreprise d’insertion par le travail indépendant." %}
+        </li>
+        <li>
+            {% trans "<b>EA</b> : Entreprise adaptée." %}
+        </li>
+        <li>
+            {% blocktrans with days=data.days_for_siae_to_be_considered_active %}
+                <b>Employeur actif</b> : Employeur créé ou modifié il y a moins de {{ days }} jours, ou ayant un nouvel utilisateur créé il y a moins de {{ days }} jours, ou ayant créé ou modifié une FDP il y a moins de {{ days }} jours, ou ayant reçu ou modifié une candidature il y a moins de {{ days }} jours.
+            {% endblocktrans %}
+        </li>
+        <li>
+            {% trans "<b>FDP</b> : fiche de poste." %}
+        </li>
+        <li>
+            {% trans "<b>FDP active</b> : fiche de poste ouverte aux candidatures." %}
+        </li>
     </ul>
 
-    <h3>{% trans "Indicateurs" %}</h3>
+    <h3>{% trans "Indicateurs employeurs" %}</h3>
 
     <ul>
         {% for entry in data.siaes_by_kind.series %}
@@ -101,29 +118,52 @@
         {% endfor %}
     </ul>
 
-    <h3>{% trans "Répartition des indicateurs par type de SIAE" %}</h3>
+    <h3>{% trans "Répartition des indicateurs par type d'employeur" %}</h3>
 
-    {% trans "Répartition des indicateurs par type de SIAE" as chart_title %}
+    {% trans "Répartition des indicateurs par type d\\\'employeur" as chart_title %}
     {% include "stats/includes/basic_bar_chart.html" with chart_id="siaes_by_kind" data=data.siaes_by_kind title=chart_title %}
 
     <h2>{% trans "Statistiques prescripteurs" %}</h2>
 
     {% include "stats/includes/department_selector.html" %}
 
-    <h3>{% trans "Indicateurs" %}</h3>
+    <h3>{% trans "Lexique prescripteurs" %}</h3>
 
     <ul>
         <li>
-            {% trans "Nombre de comptes utilisateurs de type prescripteur à ce jour" %} : <b>{{ data.total_prescriber_users }}</b>
+            {% trans "<b>Prescripteur</b> : compte utilisateur de type prescripteur." %}
+        </li>
+        <li>
+            {% trans "<b>Prescripteur actif</b> : prescripteur ayant créé au moins une candidature sur la période considérée." %}
         </li>
     </ul>
 
-    <h3>{% trans "Graphiques d'évolution dans le temps" %}</h3>
+    <h3>{% trans "Indicateurs prescripteurs" %}</h3>
 
-    {% trans "Nombre de comptes utilisateurs de type prescripteur groupés par la semaine de leur date de création" as chart_title %}
-    {% include "stats/includes/basic_column_chart.html" with chart_id="prescriber_users" data=data.prescriber_users_per_creation_week title=chart_title %}
+    <ul>
+        <li>
+            {% trans "Prescripteurs à ce jour" %} : <b>{{ data.total_prescriber_users }}</b>
+        </li>
+        <li>
+            {% trans "Prescripteurs habilités à ce jour" %} : <b>{{ data.total_authorized_prescriber_users }}</b>
+        </li>
+        <li>
+            {% trans "Prescripteurs non habilités (parfois aussi appelés \"Orienteurs\") à ce jour" %} : <b>{{ data.total_unauthorized_prescriber_users }}</b>
+        </li>
+    </ul>
 
-    {% trans "Nombre de comptes utilisateurs de type prescripteur actifs (c.a.d. ayant crée au moins une candidature) groupés par la semaine de la date de création de la candidature" as chart_title %}
+    {% trans "Inscriptions de nouveaux prescripteurs" as chart_title %}
+    <h3>{{ chart_title }}</h3>
+    {% if data.prescriber_users_per_creation_week %}
+        {% include "stats/includes/basic_column_chart.html" with chart_id="prescriber_users" data=data.prescriber_users_per_creation_week title=chart_title %}
+    {% else %}
+        <h4>
+            Ce graphe n'est pas disponible par départment
+        </h4>
+    {% endif %}
+
+    <h3>{% trans "Evolution des prescripteurs actifs dans le temps" %}</h3>
+    {% trans "Prescripteur actifs" as chart_title %}
     {% include "stats/includes/basic_column_chart.html" with chart_id="active_prescriber_users" data=data.active_prescriber_users_per_week title=chart_title %}
 
 {% endblock %}

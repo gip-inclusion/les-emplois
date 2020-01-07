@@ -16,6 +16,9 @@ from itou.users.models import User
 from itou.utils.address.departments import DEPARTMENTS
 
 
+DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE = "donnée non disponible par département"
+
+
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
@@ -23,27 +26,55 @@ def stats(request, template_name="stats/stats.html"):
     current_department = get_current_department(request, departments)
 
     current_departments = settings.ITOU_TEST_DEPARTMENTS
+    department_filter_is_selected = False
     if current_department:
         current_departments = [current_department]
+        department_filter_is_selected = True
 
     siaes = Siae.active_objects.filter(department__in=current_departments)
     job_applications = JobApplication.objects.filter(
         to_siae__department__in=current_departments
     )
-    prescriber_users = (
+    nationwide_prescriber_users = (
         User.objects.filter(is_prescriber=True, is_active=True)
-        .filter(prescriberorganization__department__in=current_departments)
+        # We cannot filter by department otherwise we would filter out
+        # prescribers without organization!
+        # .filter(prescriberorganization__department__in=current_departments)
         .distinct()
     )
 
     hirings = job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
 
     # Job seeker data has no geolocalization and thus cannot be filtered by department.
-    job_seeker_users = User.objects.filter(is_job_seeker=True, is_active=True)
+    nationwide_job_seeker_users = User.objects.filter(
+        is_job_seeker=True, is_active=True
+    )
 
     data.update(get_siae_stats(siaes))
-    data.update(get_candidate_stats(job_applications, hirings, job_seeker_users))
-    data.update(get_prescriber_stats(prescriber_users, job_applications))
+
+    data.update(
+        get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users)
+    )
+    if department_filter_is_selected:
+        data["total_job_seeker_users"] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+        data[
+            "total_job_seeker_users_without_opportunity"
+        ] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+
+    data.update(get_prescriber_stats(nationwide_prescriber_users, job_applications))
+    if department_filter_is_selected:
+        data["total_prescriber_users"] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+        data["total_authorized_prescriber_users"] = (
+            nationwide_prescriber_users.filter(
+                prescriberorganization__department__in=current_departments
+            )
+            .distinct()
+            .count()
+        )
+        data[
+            "total_unauthorized_prescriber_users"
+        ] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+        data["prescriber_users_per_creation_week"] = None
 
     context = {
         "data": data,
@@ -73,29 +104,29 @@ def get_current_department(request, departments):
 def get_siae_stats(siaes):
     data = {}
 
-    kpi_name = "SIAE à ce jour"
+    kpi_name = "Employeurs à ce jour"
     siaes_subset = siaes
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
-    kpi_name = "SIAE ayant au moins un utilisateur à ce jour"
+    kpi_name = "Employeurs ayant au moins un utilisateur à ce jour"
     siaes_subset = siaes.filter(siaemembership__user__is_active=True).distinct()
     data = inject_siaes_subset_total_and_by_kind(
         data, kpi_name, siaes_subset, visible=False
     )
 
-    kpi_name = "SIAE ayant au moins une FDP à ce jour"
+    kpi_name = "Employeurs ayant au moins une FDP à ce jour"
     siaes_subset = siaes.exclude(job_description_through__isnull=True).distinct()
     data = inject_siaes_subset_total_and_by_kind(
         data, kpi_name, siaes_subset, visible=False
     )
 
-    kpi_name = "SIAE ayant au moins une FDP active à ce jour"
+    kpi_name = "Employeurs ayant au moins une FDP active à ce jour"
     siaes_subset = siaes.filter(job_description_through__is_active=True).distinct()
     data = inject_siaes_subset_total_and_by_kind(
         data, kpi_name, siaes_subset, visible=False
     )
 
-    kpi_name = "SIAE ayant au moins un utilisateur et une FDP à ce jour"
+    kpi_name = "Employeurs ayant au moins un utilisateur et une FDP à ce jour"
     siaes_subset = (
         siaes.filter(siaemembership__user__is_active=True)
         .exclude(job_description_through__isnull=True)
@@ -105,7 +136,7 @@ def get_siae_stats(siaes):
         data, kpi_name, siaes_subset, visible=False
     )
 
-    kpi_name = "SIAE ayant au moins un utilisateur et une FDP active à ce jour"
+    kpi_name = "Employeurs ayant au moins un utilisateur et une FDP active à ce jour"
     siaes_subset = (
         siaes.filter(siaemembership__user__is_active=True)
         .filter(job_description_through__is_active=True)
@@ -115,7 +146,7 @@ def get_siae_stats(siaes):
         data, kpi_name, siaes_subset, visible=False
     )
 
-    kpi_name = "SIAE actives à ce jour"
+    kpi_name = "Employeurs actifs à ce jour"
     today = get_today()
     data["days_for_siae_to_be_considered_active"] = 15
     some_time_ago = today + relativedelta(
@@ -132,7 +163,7 @@ def get_siae_stats(siaes):
     ).distinct()
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
-    kpi_name = "SIAE ayant au moins une embauche"
+    kpi_name = "Employeurs ayant au moins une embauche"
     siaes_subset = siaes.filter(
         job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED
     ).distinct()
@@ -145,20 +176,22 @@ def get_today():
     return timezone.localtime(timezone.now()).date()
 
 
-def get_candidate_stats(job_applications, hirings, job_seeker_users):
+def get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users):
     data = {}
     data["total_job_applications"] = job_applications.count()
 
     data["total_hirings"] = hirings.count()
 
-    data["total_job_seeker_users"] = job_seeker_users.count()
+    data["total_job_seeker_users"] = nationwide_job_seeker_users.count()
 
     # Job seekers registered for more than X days, having
     # at least one job_application but no hiring.
     days = 45
     data["days_for_total_job_seeker_users_without_opportunity"] = days
     data["total_job_seeker_users_without_opportunity"] = (
-        job_seeker_users.filter(date_joined__lte=get_today() - relativedelta(days=days))
+        nationwide_job_seeker_users.filter(
+            date_joined__lte=get_today() - relativedelta(days=days)
+        )
         .exclude(job_applications__isnull=True)
         .exclude(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED)
         .distinct()
@@ -183,16 +216,35 @@ def get_candidate_stats(job_applications, hirings, job_seeker_users):
         "hirings_per_eligibility_author_kind"
     ] = get_donut_chart_data_per_eligibility_author_kind(hirings)
 
+    data[
+        "job_applications_per_destination_kind"
+    ] = get_donut_chart_data_per_destination_kind(job_applications)
+
+    data["hirings_per_destination_kind"] = get_donut_chart_data_per_destination_kind(
+        hirings
+    )
+
     data.update(get_hiring_delays(hirings))
     return data
 
 
-def get_prescriber_stats(prescriber_users, job_applications):
+def get_prescriber_stats(nationwide_prescriber_users, job_applications):
     data = {}
-    data["total_prescriber_users"] = prescriber_users.count()
+    data["total_prescriber_users"] = nationwide_prescriber_users.count()
+    data["total_authorized_prescriber_users"] = nationwide_prescriber_users.filter(
+        prescriberorganization__is_authorized=True
+    ).count()
+    data["total_unauthorized_prescriber_users"] = (
+        data["total_prescriber_users"] - data["total_authorized_prescriber_users"]
+    )
+
+    # FIXME TODO stats V9
+    # Répartition des prescripteurs par type (PE, ML, Cap Emploi, PJJ, etc)
 
     data["prescriber_users_per_creation_week"] = get_total_per_week(
-        prescriber_users, date_field="date_joined", total_expression=Count("pk")
+        nationwide_prescriber_users,
+        date_field="date_joined",
+        total_expression=Count("pk"),
     )
 
     # Active prescriber means created at least one job
@@ -288,29 +340,16 @@ def get_hiring_delays(hirings):
     return hiring_delays
 
 
-def get_donut_chart_data_per_eligibility_author_kind(job_applications):
-    kind_choices_as_dict = OrderedDict(EligibilityDiagnosis.AUTHOR_KIND_CHOICES)
-
-    # Ensure an entry exists even for author_kind values which have zero records.
-    job_applications_per_eligibility_author_kind = {
-        author_kind: 0 for author_kind in kind_choices_as_dict
-    }
-
-    # TODO Find how to make a proper GROUP BY on a second order related field.
-    for job_application in job_applications.values(
-        "job_seeker__eligibility_diagnoses__author_kind"
-    ):
-        author_kind = job_application["job_seeker__eligibility_diagnoses__author_kind"]
-        job_applications_per_eligibility_author_kind[author_kind] += 1
-
-    donut_chart_data = _get_donut_chart_data(
-        job_applications=job_applications,
-        job_applications_per_kind=job_applications_per_eligibility_author_kind,
-        kind_choices_as_dict=kind_choices_as_dict,
-        prescriber_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
-        siae_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
-        job_seeker_kind=EligibilityDiagnosis.AUTHOR_KIND_JOB_SEEKER,
+def get_donut_chart_data_per_destination_kind(job_applications):
+    job_applications_per_destination_kind_as_list = (
+        job_applications.values("to_siae__kind")
+        .annotate(total=Count("pk", distinct=True))
+        .order_by("to_siae__kind")
     )
+    donut_chart_data = [
+        {"name": item["to_siae__kind"], "value": item["total"]}
+        for item in job_applications_per_destination_kind_as_list
+    ]
     return donut_chart_data
 
 
@@ -336,7 +375,35 @@ def get_donut_chart_data_per_sender_kind(job_applications):
         kind_choices_as_dict=kind_choices_as_dict,
         prescriber_kind=JobApplication.SENDER_KIND_PRESCRIBER,
         siae_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
+        siae_kind_custom_name="Employeur",
         job_seeker_kind=JobApplication.SENDER_KIND_JOB_SEEKER,
+    )
+    return donut_chart_data
+
+
+def get_donut_chart_data_per_eligibility_author_kind(job_applications):
+    kind_choices_as_dict = OrderedDict(EligibilityDiagnosis.AUTHOR_KIND_CHOICES)
+
+    # Ensure an entry exists even for author_kind values which have zero records.
+    job_applications_per_eligibility_author_kind = {
+        author_kind: 0 for author_kind in kind_choices_as_dict
+    }
+
+    # TODO Find how to make a proper GROUP BY on a second order related field.
+    for job_application in job_applications.values(
+        "job_seeker__eligibility_diagnoses__author_kind"
+    ):
+        author_kind = job_application["job_seeker__eligibility_diagnoses__author_kind"]
+        job_applications_per_eligibility_author_kind[author_kind] += 1
+
+    donut_chart_data = _get_donut_chart_data(
+        job_applications=job_applications,
+        job_applications_per_kind=job_applications_per_eligibility_author_kind,
+        kind_choices_as_dict=kind_choices_as_dict,
+        prescriber_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
+        siae_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
+        siae_kind_custom_name="SIAE",
+        job_seeker_kind=EligibilityDiagnosis.AUTHOR_KIND_JOB_SEEKER,
     )
     return donut_chart_data
 
@@ -347,6 +414,7 @@ def _get_donut_chart_data(
     kind_choices_as_dict,
     prescriber_kind,
     siae_kind,
+    siae_kind_custom_name,
     job_seeker_kind,
 ):
     """
@@ -371,9 +439,9 @@ def _get_donut_chart_data(
     donut_chart_data_as_dict[
         kind_choices_as_dict[job_seeker_kind]
     ] = job_applications_per_kind[job_seeker_kind]
-    donut_chart_data_as_dict[
-        kind_choices_as_dict[siae_kind]
-    ] = job_applications_per_kind[siae_kind]
+    donut_chart_data_as_dict[siae_kind_custom_name] = job_applications_per_kind[
+        siae_kind
+    ]
     # Split prescriber data even more : authorized / unauthorized.
     donut_chart_data_as_dict[
         "Prescripteur habilité"
