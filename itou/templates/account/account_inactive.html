@@ -1,0 +1,15 @@
+{# django-allauth template override. #}
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Compte inactif" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Compte inactif" %}</h1>
+
+    <div class="alert alert-warning" role="alert">
+        {% trans "Ce compte est inactif." %}
+    </div>
+
+{% endblock %}
