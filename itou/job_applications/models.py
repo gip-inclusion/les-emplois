@@ -87,6 +87,13 @@ class JobApplicationQuerySet(models.QuerySet):
             ]
         )
 
+    def created_in_past_hours(self, hours):
+        """
+        Returns objects created during the specified hours period.
+        """
+        past_dt = timezone.now() - timezone.timedelta(hours=hours)
+        return self.filter(created_at__gte=past_dt)
+
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """

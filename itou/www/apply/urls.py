@@ -28,6 +28,11 @@ urlpatterns = [
         name="step_create_job_seeker",
     ),
     path(
+        "<int:siae_pk>/step_check_prev_applications",
+        submit_views.step_check_prev_applications,
+        name="step_check_prev_applications",
+    ),
+    path(
         "<int:siae_pk>/step_eligibility",
         submit_views.step_eligibility,
         name="step_eligibility",

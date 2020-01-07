@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.jobs.factories import create_test_romes_and_appellations
@@ -42,6 +43,24 @@ class JobApplicationModelTest(TestCase):
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
         self.assertEqual(job_application.accepted_by, user)
+
+
+class JobApplicationQuerySetTest(TestCase):
+    def test_created_in_past_hours(self):
+
+        now = timezone.now()
+        hours_ago_10 = now - timezone.timedelta(hours=10)
+        hours_ago_20 = now - timezone.timedelta(hours=20)
+        hours_ago_30 = now - timezone.timedelta(hours=30)
+
+        JobApplicationSentByJobSeekerFactory(created_at=hours_ago_10)
+        JobApplicationSentByJobSeekerFactory(created_at=hours_ago_20)
+        JobApplicationSentByJobSeekerFactory(created_at=hours_ago_30)
+
+        self.assertEqual(JobApplication.objects.created_in_past_hours(5).count(), 0)
+        self.assertEqual(JobApplication.objects.created_in_past_hours(15).count(), 1)
+        self.assertEqual(JobApplication.objects.created_in_past_hours(25).count(), 2)
+        self.assertEqual(JobApplication.objects.created_in_past_hours(35).count(), 3)
 
 
 class JobApplicationFactoriesTest(TestCase):

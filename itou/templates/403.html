@@ -7,10 +7,12 @@
 
     <h1>{% trans "Erreur 403" %}</h1>
     <p class="lead">{% trans "Accès refusé." %}</p>
-    <p>{% trans "Vous n'avez pas la permission d'accéder à cette page." %}</p>
 
-    {% if exception %}
-        <p>{{ exception }}</p>
-    {% endif %}
+    <div class="alert alert-warning" role="alert">
+        <p>{% trans "Vous n'avez pas la permission d'accéder à cette page." %}</p>
+        {% if exception %}
+            <p class="mb-0">{{ exception }}</p>
+        {% endif %}
+    </div>
 
 {% endblock %}

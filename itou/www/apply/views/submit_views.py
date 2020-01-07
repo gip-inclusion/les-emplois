@@ -127,7 +127,9 @@ def step_check_job_seeker_info(
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
-    next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae_pk})
+    next_url = reverse(
+        "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
+    )
 
     # Ensure that the job seeker has a birthdate.
     if job_seeker.birthdate:
@@ -169,6 +171,50 @@ def step_create_job_seeker(
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form}
+    return render(request, template_name, context)
+
+
+@login_required
+@valid_session_required
+def step_check_prev_applications(
+    request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"
+):
+    """
+    Check previous job applications to avoid duplicates.
+    """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+
+    prev_applications = job_seeker.job_applications.filter(to_siae=siae)
+
+    # Limit the possibility of applying to the same SIAE for 24 hours.
+    if prev_applications.created_in_past_hours(24).exists():
+        raise PermissionDenied(
+            _(
+                "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
+            )
+        )
+
+    next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+
+    if not prev_applications.exists():
+        return HttpResponseRedirect(next_url)
+
+    # At this point we know that the candidate is applying to an SIAE
+    # where he or she has already applied.
+    # Allow a new application if the user confirm it despite the duplication warning.
+    if (
+        request.method == "POST"
+        and request.POST.get("force_new_application") == "force"
+    ):
+        return HttpResponseRedirect(next_url)
+
+    context = {
+        "job_seeker": job_seeker,
+        "siae": siae,
+        "prev_application": prev_applications.latest("created_at"),
+    }
     return render(request, template_name, context)
 
 

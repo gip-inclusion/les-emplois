@@ -103,6 +103,17 @@ class ApplyAsJobSeekerTest(TestCase):
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 
+        next_url = reverse(
+            "apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk}
+        )
+        self.assertEqual(response.url, next_url)
+
+        # Step check previous job applications.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(next_url)
+        self.assertEqual(response.status_code, 302)
+
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
