@@ -1,0 +1,139 @@
+import datetime
+import logging
+import os
+import pprint
+
+import openpyxl
+
+from django.core.management.base import BaseCommand
+
+from itou.approvals.models import PoleEmploiApproval
+
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+
+# The content of `{CURRENT_DIR}/data/` must be git ignored.
+XLSX_FILE = f"{CURRENT_DIR}/data/2019_10_base_agrements_PE.xlsx"
+
+
+class Command(BaseCommand):
+    """
+    Import Pole emploi's approvals (or `agrément` in French) into the database.
+
+    To debug:
+        django-admin import_pe_approvals --dry-run
+        django-admin import_pe_approvals --dry-run --verbosity=2
+
+    To populate the database:
+        django-admin import_pe_approvals
+    """
+
+    help = (
+        "Import the content of the Pole emploi's approvals xlsx file into the database."
+    )
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--dry-run",
+            dest="dry_run",
+            action="store_true",
+            help="Only print data to import",
+        )
+
+    def set_logger(self, verbosity):
+        """
+        Set logger level based on the verbosity option.
+        """
+        handler = logging.StreamHandler(self.stdout)
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.propagate = False
+        self.logger.addHandler(handler)
+
+        self.logger.setLevel(logging.INFO)
+        if verbosity > 1:
+            self.logger.setLevel(logging.DEBUG)
+
+    def handle(self, dry_run=False, **options):
+
+        self.set_logger(options.get("verbosity"))
+
+        file_size_in_bytes = os.path.getsize(XLSX_FILE)
+        self.stdout.write(
+            f"Opening a {file_size_in_bytes >> 20} MB file… (this will take some time)"
+        )
+
+        # https://openpyxl.readthedocs.io/en/latest/optimized.html#read-only-mode
+        wb = openpyxl.load_workbook(XLSX_FILE, read_only=True)
+        ws = wb.active
+
+        self.stdout.write(f"Ready.")
+        self.stdout.write(f"Creating approvals… 0%")
+
+        last_progress = 0
+        for i, row in enumerate(ws.rows):
+
+            if i == 0:
+                # Skip XLSX header.
+                continue
+
+            progress = int((100 * i) / ws.max_row)
+            if progress > last_progress + 5:
+                self.stdout.write(f"Creating approvals… {progress}%")
+                last_progress = progress
+
+            self.logger.debug("-" * 80)
+
+            CODE_STRUCT_AFFECT_BENE = str(row[0].value)
+            assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
+            self.logger.debug(CODE_STRUCT_AFFECT_BENE)
+
+            ID_REGIONAL_BENE = row[1].value.strip()
+            assert len(ID_REGIONAL_BENE) == 8
+            self.logger.debug(ID_REGIONAL_BENE)
+
+            NOM_USAGE_BENE = row[2].value.strip()
+            self.logger.debug(NOM_USAGE_BENE)
+            assert "  " not in NOM_USAGE_BENE
+            # max length 29
+
+            PRENOM_BENE = row[3].value.strip()
+            self.logger.debug(PRENOM_BENE)
+            assert "  " not in PRENOM_BENE
+            # max length 13
+
+            NOM_NAISS_BENE = row[4].value.strip()
+            self.logger.debug(NOM_NAISS_BENE)
+            assert "  " not in NOM_NAISS_BENE
+            # max length 25
+
+            NUM_AGR_DEC = row[5].value.strip()
+            self.logger.debug(NUM_AGR_DEC)
+            assert "  " not in NUM_AGR_DEC
+            # max length 18
+
+            DATE_DEB_AGR_DEC = datetime.datetime.strptime(
+                row[6].value.strip(), "%d/%m/%y"
+            ).date()
+            self.logger.debug(DATE_DEB_AGR_DEC)
+
+            DATE_FIN_AGR_DEC = datetime.datetime.strptime(
+                row[7].value.strip(), "%d/%m/%y"
+            ).date()
+            self.logger.debug(DATE_FIN_AGR_DEC)
+
+            if not dry_run:
+
+                pe_approval = PoleEmploiApproval()
+                pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
+                pe_approval.pe_regional_id = ID_REGIONAL_BENE
+                pe_approval.number = NUM_AGR_DEC
+                pe_approval.first_name = PRENOM_BENE
+                pe_approval.last_name = NOM_USAGE_BENE
+                pe_approval.birth_name = NOM_NAISS_BENE
+                pe_approval.start_at = DATE_DEB_AGR_DEC
+                pe_approval.end_at = DATE_FIN_AGR_DEC
+                pe_approval.save()
+
+        self.stdout.write("-" * 80)
+        self.stdout.write("Done.")
