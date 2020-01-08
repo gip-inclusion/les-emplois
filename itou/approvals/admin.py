@@ -81,3 +81,17 @@ class ApprovalAdmin(admin.ModelAdmin):
                 messages.warning(request, message)
 
     send_number_by_email.short_description = _("Envoyer le numéro par email")
+
+
+@admin.register(models.PoleEmploiApproval)
+class PoleEmploiApprovalAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "number",
+        "first_name",
+        "last_name",
+        "birth_name",
+        "start_at",
+        "end_at",
+    )
+    search_fields = ("number", "first_name", "last_name", "birth_name")

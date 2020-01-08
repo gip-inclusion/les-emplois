@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 class Approval(models.Model):
     """
-    Store approval(s) (or `agrément` in French) of a user.
+    Store approvals (`agréments` in French) delivered by Itou.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -125,3 +125,28 @@ class Approval(models.Model):
             return str(next_number)
         year_2_chars = date_of_hiring.strftime("%y")
         return f"{Approval.NUMBER_PREFIX}{year_2_chars}00001"
+
+
+class PoleEmploiApproval(models.Model):
+    """
+    Store approvals (`agréments` in French) delivered by Pôle emploi.
+    """
+
+    pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
+    pe_regional_id = models.CharField(_("Code regional Pôle emploi"), max_length=8)
+    number = models.CharField(verbose_name=_("Numéro"), max_length=18, unique=True)
+    first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
+    last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
+    birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
+    start_at = models.DateField(verbose_name=_("Date de début"))
+    end_at = models.DateField(verbose_name=_("Date de fin"))
+    created_at = models.DateTimeField(
+        verbose_name=_("Date de création"), default=timezone.now
+    )
+
+    class Meta:
+        verbose_name = _("Agrément Pôle emploi")
+        verbose_name_plural = _("Agréments Pôle emploi")
+
+    def __str__(self):
+        return self.number
