@@ -57,6 +57,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_ACI = "ACI"
     KIND_ETTI = "ETTI"
     KIND_GEIQ = "GEIQ"
+    KIND_EA = "EA"
 
     KIND_CHOICES = (
         (
@@ -67,6 +68,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_ACI, _("Atelier chantier d'insertion")),
         (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
         (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
+        (KIND_EA, _("Entreprise adaptée")),
     )
 
     SOURCE_ASP = "ASP"
