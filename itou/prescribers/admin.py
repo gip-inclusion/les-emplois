@@ -74,3 +74,8 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         queryset = super().get_queryset(request)
         queryset = queryset.annotate(_member_count=Count("members", distinct=True))
         return queryset
+
+    def save_model(self, request, obj, form, change):
+        if not obj.geocoding_score:
+            obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+        super().save_model(request, obj, form, change)
