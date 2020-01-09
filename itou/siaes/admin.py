@@ -96,6 +96,11 @@ class SiaeAdmin(admin.ModelAdmin):
         queryset = queryset.annotate(_member_count=Count("members", distinct=True))
         return queryset
 
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields["source"].initial = models.Siae.SOURCE_USER_CREATED
+        return form
+
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.created_by = request.user
