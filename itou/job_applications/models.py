@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval
-from itou.utils.emails import get_email_text_template
+from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
@@ -448,23 +448,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.to_siae.members.filter(is_active=True).values_list("email", flat=True)
         )
 
-    def get_email_message(
-        self, to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL
-    ):
-        return mail.EmailMessage(
-            from_email=from_email,
-            to=to,
-            subject=get_email_text_template(subject, context),
-            body=get_email_text_template(body, context),
-        )
-
     @property
     def email_new_for_siae(self):
         to = self.get_siae_recipents_email_list()
         context = {"job_application": self}
         subject = "apply/email/new_for_siae_subject.txt"
         body = "apply/email/new_for_siae_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body)
 
     @property
     def email_accept(self):
@@ -474,7 +464,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/accept_subject.txt"
         body = "apply/email/accept_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body)
 
     @property
     def email_refuse(self):
@@ -484,7 +474,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
         body = "apply/email/refuse_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body)
 
     def email_accept_trigger_manual_approval(self, accepted_by):
         to = [settings.ITOU_EMAIL_CONTACT]
@@ -498,7 +488,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             context["accepted_by"] = accepted_by
         subject = "apply/email/accept_trigger_approval_subject.txt"
         body = "apply/email/accept_trigger_approval_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body)
 
     def email_approval_number(self, accepted_by):
         if not accepted_by:

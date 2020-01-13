@@ -5,9 +5,13 @@ from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
+from itou.utils.emails import get_email_message
+from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_naf, validate_siret
 
 
@@ -70,6 +74,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
         (KIND_EA, _("Entreprise adaptée")),
     )
+
+    KIND_TO_NAME = {item[0]: item[1] for item in KIND_CHOICES}
 
     SOURCE_ASP = "ASP"
     SOURCE_GEIQ = "GEIQ"
@@ -186,6 +192,55 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
+
+    @property
+    def active_members(self):
+        return self.members.filter(siaemembership__user__is_active=True)
+
+    @property
+    def active_admin_members(self):
+        return self.active_members.filter(siaemembership__is_siae_admin=True)
+
+    @property
+    def signup_magic_link(self):
+        return reverse(
+            "signup:siae",
+            kwargs={
+                "encoded_siae_id": urlsafe_base64_encode(force_bytes(self.pk)),
+                "token": siae_signup_token_generator.make_token(self),
+            },
+        )
+
+    def new_signup_warning_email_to_admins(self, user):
+        """
+        Send a warning fyi-only email to all existing admins of siae
+        about a new user signup.
+        """
+        to = [u.email for u in self.active_admin_members]
+        context = {"new_user": user, "siae": self}
+        subject = "siaes/email/new_signup_warning_email_to_admins_subject.txt"
+        body = "siaes/email/new_signup_warning_email_to_admins_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def new_signup_activation_email_to_official_contact(self, request):
+        """
+        Send email to siae.auth_email with a magic link to continue signup.
+
+        Request object is needed to build absolute URL for magic link in email body.
+        See https://stackoverflow.com/questions/2345708/how-can-i-get-the-full-absolute-url-with-domain-in-django
+        """
+        if self.auth_email == "":
+            raise RuntimeError(
+                "Siae cannot be signed up for, this should never happen."
+            )
+        to = [self.auth_email]
+        signup_magic_link = request.build_absolute_uri(self.signup_magic_link)
+        context = {"siae": self, "signup_magic_link": signup_magic_link}
+        subject = (
+            "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
+        )
+        body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
+        return get_email_message(to, context, subject, body)
 
 
 class SiaeMembership(models.Model):

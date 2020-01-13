@@ -2,16 +2,20 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Employeur solidaire - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "SIAE - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Employeur solidaire" %}
+    {% trans "SIAE" %}
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
 
-<form method="post" action="{% url 'signup:siae' %}" role="form" class="js-prevent-multiple-submit">
+<p>
+    Pour des raisons de sécurité, vous devez identifier votre SIAE par son type et soit par son numéro SIRET connu de l'ASP, soit par son adresse email connue de l'ASP.
+</p>
+
+<form method="post" action="{% url 'signup:select_siae' %}" role="form">
 
     {% csrf_token %}
 
@@ -23,12 +27,7 @@
 
     {% bootstrap_field form.kind %}
     {% bootstrap_field form.siret %}
-    {% bootstrap_field form.siae_name %}
-    {% bootstrap_field form.first_name %}
-    {% bootstrap_field form.last_name %}
     {% bootstrap_field form.email %}
-    {% bootstrap_field form.password1 %}
-    {% bootstrap_field form.password2 %}
 
     {% include "signup/includes/submit_rgpd.html" %}
 
