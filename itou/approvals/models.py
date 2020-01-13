@@ -138,6 +138,10 @@ class PoleEmploiApproval(models.Model):
     first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
     last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
+    # TODO: make `birthdate` mandatory as soon as the data is available.
+    birthdate = models.DateField(
+        verbose_name=_("Date de naissance"), null=True, blank=True, db_index=True
+    )
     start_at = models.DateField(verbose_name=_("Date de début"))
     end_at = models.DateField(verbose_name=_("Date de fin"))
     created_at = models.DateTimeField(
