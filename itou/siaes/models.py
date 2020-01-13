@@ -81,6 +81,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (SOURCE_USER_CREATED, _("Utilisateur")),
     )
 
+    ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI]
+
     siret = models.CharField(
         verbose_name=_("Siret"),
         max_length=14,
@@ -174,7 +176,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def is_subject_to_eligibility_rules(self):
-        return self.kind in [self.KIND_EI, self.KIND_AI, self.KIND_ACI, self.KIND_ETTI]
+        return self.kind in self.ELIGIBILITY_REQUIRED_KINDS
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
