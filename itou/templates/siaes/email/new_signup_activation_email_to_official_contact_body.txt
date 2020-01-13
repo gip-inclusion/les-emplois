@@ -1,0 +1,27 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% load i18n %}
+{% block body %}
+
+{% trans "Un nouvel utilisateur souhaite rejoindre votre structure sur la plateforme de l'inclusion !" %}
+
+{% trans "*Nouvel utilisateur* :" %}
+
+- Nom : {{ new_user.last_name }}
+- Prénom : {{ new_user.first_name }}
+- Email : {{ new_user.email }}
+
+{% trans "*Structure* :" %}
+
+- Nom : {{ siae.display_name }}
+- SIRET : {{ siae.siret }}
+- Type : {{ siae.kind }}
+- Email de contact : {{ siae.email }}
+
+Pour valider l'activation de ce nouvel utilisateur, ouvrez ce lien : {{ new_user.uservalidation.get_magic_link }}
+
+Pour refuser la validation de ce nouvel utilisateur, veuillez simplement ignorer cet email.
+
+Cet email a été envoyé à {{ siae.email }} qui est l'addresse présente dans notre base de données alimentée par les données de l'ASP.
+
+{% endblock body %}

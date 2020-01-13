@@ -4,10 +4,13 @@ import uuid
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from allauth.utils import generate_unique_username
+
+from itou.utils.tokens import generate_random_token
 
 
 class User(AbstractUser):
@@ -50,10 +53,15 @@ class User(AbstractUser):
     )
 
     # Sometimes used as a hard-to-guess user id.
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True, unique=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4, editable=False, db_index=True, unique=True
+    )
 
     def __str__(self):
         return self.email
+
+    def is_admin_of_siae(self, siae):
+        return self.siaemembership_set.filter(siae=siae, is_siae_admin=True).exists()
 
     @property
     def has_eligibility_diagnosis(self):
@@ -105,6 +113,74 @@ class User(AbstractUser):
         )
         return user
 
+    def create_pending_validation(self):
+        if hasattr(self, "uservalidation"):
+            raise RuntimeError("Validation already exists.")
+        validation = UserValidation(user=self)
+        validation.save()
+
+    @property
+    def has_pending_validation(self):
+        return hasattr(self, "uservalidation") and not self.uservalidation.is_validated
+
 
 def get_allauth_account_user_display(user):
     return user.email
+
+
+class UserValidation(models.Model):
+    """
+    Validation of new user signups by authoritative users.
+    Used for SIAE only at the moment:
+    - when a new siae user joins an existing siae with existing
+      admin user(s), the new user is pending validation and an email
+      is sent to the existing admin user(s) to validate it.
+    """
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True
+    )
+    secret = models.CharField(
+        verbose_name=_("Secret du magic link"),
+        help_text=_(
+            "Code secret présent dans le magic link permettant la validation sécurisée d'un nouvel utilisateur."
+        ),
+        max_length=32,
+        default=partial(generate_random_token, n=32),
+        unique=True,
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_("Date de création"), default=timezone.now
+    )
+    updated_at = models.DateTimeField(
+        verbose_name=_("Date de modification"), blank=True, null=True
+    )
+    sent_to_email = models.EmailField(verbose_name=_("Demandée à cet email"))
+    is_validated = models.BooleanField(verbose_name=_("Est validée"), default=False)
+    validated_at = models.DateTimeField(
+        verbose_name=_("Date de validation"), blank=True, null=True
+    )
+
+    class Meta:
+        verbose_name = _("Validation de compte utilisateur")
+        verbose_name_plural = _("Validations de compte utilisateur")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    def get_magic_link(self):
+        return reverse(
+            "signup:validation",
+            kwargs={"user_uuid": self.user.uuid, "secret": self.secret},
+        )
+
+    def complete(self):
+        if self.is_validated:
+            raise RuntimeError("Validation is already validated. See the irony?")
+        self.user.is_active = True
+        self.user.save()
+        self.is_validated = True
+        self.validated_at = timezone.now()
+        self.save()

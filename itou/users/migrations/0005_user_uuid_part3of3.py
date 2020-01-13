@@ -6,14 +6,14 @@ import uuid
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0004_user_uuid_part2of3'),
-    ]
+    dependencies = [("users", "0004_user_uuid_part2of3")]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='uuid',
-            field=models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True),
-        ),
+            model_name="user",
+            name="uuid",
+            field=models.UUIDField(
+                db_index=True, default=uuid.uuid4, editable=False, unique=True
+            ),
+        )
     ]

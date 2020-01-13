@@ -3,18 +3,18 @@
 from django.db import migrations
 import uuid
 
+
 def gen_uuid(apps, schema_editor):
-    MyModel = apps.get_model('users', 'User')
+    MyModel = apps.get_model("users", "User")
     for row in MyModel.objects.all():
         row.uuid = uuid.uuid4()
-        row.save(update_fields=['uuid'])
+        row.save(update_fields=["uuid"])
+
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0003_user_uuid_part1of3'),
-    ]
+    dependencies = [("users", "0003_user_uuid_part1of3")]
 
     operations = [
-        migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(gen_uuid, reverse_code=migrations.RunPython.noop)
     ]

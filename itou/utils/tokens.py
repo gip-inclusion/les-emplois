@@ -1,9 +1,9 @@
 import secrets
 
 
-def generate_random_token():
+def generate_random_token(n=6):
     """
-    Returns a random token of 6 chars.
+    Returns a random token of n chars.
     https://docs.python.org/3/library/secrets.html#secrets.token_hex
     E.g.:
         F0915B
@@ -12,4 +12,5 @@ def generate_random_token():
         C50364
         etc.
     """
-    return secrets.token_hex(3).upper()
+    # Little arithmetic trick for odd numbers.
+    return secrets.token_hex(1 + n // 2)[:n].upper()

@@ -1,0 +1,9 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Validation d'un nouveau compte utilisateur" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+    {{ message }}
+{% endblock %}

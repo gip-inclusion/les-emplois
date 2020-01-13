@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
+from itou.utils.emails import get_email_message
 from itou.utils.validators import validate_naf, validate_siret
 
 
@@ -180,6 +181,30 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
+
+    @property
+    def active_members(self):
+        return self.members.filter(siaemembership__user__is_active=True)
+
+    @property
+    def active_admin_members(self):
+        return self.active_members.filter(siaemembership__is_siae_admin=True)
+
+    def new_signup_warning_email_to_admins(self, user):
+        to = [u.email for u in self.active_admin_members]
+        context = {"new_user": user, "siae": self}
+        subject = "siaes/email/new_signup_warning_email_to_admins_subject.txt"
+        body = "siaes/email/new_signup_warning_email_to_admins_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def new_signup_activation_email_to_official_contact(self, user):
+        to = [self.email]
+        context = {"new_user": user, "siae": self}
+        subject = (
+            "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
+        )
+        body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
+        return get_email_message(to, context, subject, body)
 
 
 class SiaeMembership(models.Model):

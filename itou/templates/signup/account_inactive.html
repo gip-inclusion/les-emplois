@@ -1,0 +1,21 @@
+{# django-allauth template override. #}
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Compte inactif" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Compte inactif" %}</h1>
+
+    <div class="alert alert-warning" role="alert">
+    	{% if user.has_pending_validation %}
+        	{% trans "Ce compte est inactif et en attente de validation. Un email d'activation a été envoyé à l'adresse suivante :" %}
+        	{{ user.uservalidation.sent_to_email }}
+        	{% trans "Si vous le souhaitez vous pouvez supprimer ce compte en cliquant ici FIXME-link-and-js-confirm afin de pouvoir procéder à une nouvelle inscription." %}
+        {% else %}
+        	{% trans "Ce compte est inactif car il a été manuellement désactivé soit par l'équipe Itou soit par un administrateur de la structure associée à ce compte." %}
+        {% endif %}
+    </div>
+
+{% endblock %}

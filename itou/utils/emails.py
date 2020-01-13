@@ -1,5 +1,6 @@
 import re
 
+from django.core import mail
 from django.conf import settings
 from django.template.loader import get_template
 
@@ -19,3 +20,14 @@ def get_email_text_template(template, context):
         {"itou_protocol": settings.ITOU_PROTOCOL, "itou_fqdn": settings.ITOU_FQDN}
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())
+
+
+def get_email_message(
+    to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL
+):
+    return mail.EmailMessage(
+        from_email=from_email,
+        to=to,
+        subject=get_email_text_template(subject, context),
+        body=get_email_text_template(body, context),
+    )

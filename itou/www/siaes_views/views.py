@@ -34,7 +34,7 @@ def card_legacy(request, siret, template_name="siaes/card.html"):
         return HttpResponsePermanentRedirect(
             reverse_lazy("siaes_views:card", kwargs={"siae_id": siae.pk})
         )
-    raise Http404("Aucune structure trouvée correspondant à ce SIRET.")
+    raise Http404(_("Aucune structure trouvée correspondant à ce SIRET."))
 
 
 # Public view.

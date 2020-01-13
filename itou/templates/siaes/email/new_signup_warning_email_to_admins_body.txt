@@ -1,0 +1,22 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% load i18n %}
+{% block body %}
+
+{% trans "Un nouvel utilisateur vient de rejoindre votre structure ! Si vous ne connaissez pas cette personne veuillez nous contacter." %}
+
+{% trans "*Nouvel utilisateur* :" %}
+
+- Nom : {{ new_user.last_name }}
+- Prénom : {{ new_user.first_name }}
+- Email : {{ new_user.email }}
+
+{% trans "*Structure* :" %}
+
+- Nom : {{ siae.display_name }}
+- SIRET : {{ siae.siret }}
+- Type : {{ siae.kind }}
+
+Vous recevez cet email en tant que propriétaire d'un compte administrateur de la structure ci-dessus.
+
+{% endblock body %}

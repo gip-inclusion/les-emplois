@@ -53,6 +53,18 @@ class SiaeWithMembershipFactory(SiaeFactory):
     membership = factory.RelatedFactory(SiaeMembershipFactory, "siae")
 
 
+class SiaeWith2MembershipsFactory(SiaeFactory):
+    """
+    Generates an Siae() object with 2 members for unit tests.
+    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
+    """
+
+    membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
+    membership2 = factory.RelatedFactory(
+        SiaeMembershipFactory, "siae", is_siae_admin=False
+    )
+
+
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
     """
     Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.

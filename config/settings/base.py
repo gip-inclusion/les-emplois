@@ -255,6 +255,9 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
+# https://django-allauth.readthedocs.io/en/latest/advanced.html#custom-redirects
+ACCOUNT_ADAPTER = 'itou.www.signup.adapter.MyAccountAdapter'
+
 # django-bootstrap4.
 # https://django-bootstrap4.readthedocs.io/en/latest/settings.html
 # ------------------------------------------------------------------------------
