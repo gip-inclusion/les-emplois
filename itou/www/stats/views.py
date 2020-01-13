@@ -333,13 +333,15 @@ def get_hiring_delays(hirings):
     hiring_dates = (
         hirings.filter(logs__transition="accept", logs__to_state="accepted")
         # only seek most recent approval
-        .annotate(
-            max_date=Max('job_seeker__approvals__created_at')
-        ).filter(
-            job_seeker__approvals__created_at=F('max_date')
-        )
+        .annotate(max_date=Max("job_seeker__approvals__created_at"))
+        .filter(job_seeker__approvals__created_at=F("max_date"))
         .distinct()
-        .values("created_at", "logs__timestamp", "job_seeker__approvals__created_at", "job_seeker__approvals__start_at")
+        .values(
+            "created_at",
+            "logs__timestamp",
+            "job_seeker__approvals__created_at",
+            "job_seeker__approvals__start_at",
+        )
     )
 
     hiring_delays = hiring_dates.aggregate(
@@ -347,10 +349,13 @@ def get_hiring_delays(hirings):
             F("logs__timestamp") - F("created_at"), output_field=DateTimeField()
         ),
         average_delay_from_hiring_to_pass_delivery=Avg(
-            F("job_seeker__approvals__created_at") - F("logs__timestamp"), output_field=DateTimeField()
+            F("job_seeker__approvals__created_at") - F("logs__timestamp"),
+            output_field=DateTimeField(),
         ),
         average_delay_from_pass_delivery_to_contract_start=Avg(
-            F("job_seeker__approvals__start_at") - F("job_seeker__approvals__created_at"), output_field=DateTimeField()
+            F("job_seeker__approvals__start_at")
+            - F("job_seeker__approvals__created_at"),
+            output_field=DateTimeField(),
         ),
     )
     return hiring_delays
