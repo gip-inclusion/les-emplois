@@ -13,7 +13,7 @@ from itou.approvals.models import PoleEmploiApproval
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # The content of `{CURRENT_DIR}/data/` must be git ignored.
-XLSX_FILE = f"{CURRENT_DIR}/data/2019_10_base_agrements_PE.xlsx"
+XLSX_FILE_PATH = f"{CURRENT_DIR}/data"
 
 
 class Command(BaseCommand):
@@ -21,11 +21,11 @@ class Command(BaseCommand):
     Import Pole emploi's approvals (or `agrément` in French) into the database.
 
     To debug:
-        django-admin import_pe_approvals --dry-run
-        django-admin import_pe_approvals --dry-run --verbosity=2
+        django-admin import_pe_approvals --file-name=2019_10_base_agrements_PE.xlsx --dry-run
+        django-admin import_pe_approvals --file-name=2019_10_base_agrements_PE.xlsx --dry-run --verbosity=2
 
     To populate the database:
-        django-admin import_pe_approvals
+        django-admin import_pe_approvals --file-name=2019_10_base_agrements_PE.xlsx
     """
 
     help = (
@@ -33,6 +33,13 @@ class Command(BaseCommand):
     )
 
     def add_arguments(self, parser):
+        parser.add_argument(
+            "--file-name",
+            dest="file_name",
+            required=True,
+            action="store",
+            help=f"Name of the XLSX file to import (must be located in {XLSX_FILE_PATH})",
+        )
         parser.add_argument(
             "--dry-run",
             dest="dry_run",
@@ -54,14 +61,18 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, file_name, dry_run=False, **options):
 
         self.set_logger(options.get("verbosity"))
 
+        XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
         file_size_in_bytes = os.path.getsize(XLSX_FILE)
         self.stdout.write(
             f"Opening a {file_size_in_bytes >> 20} MB file… (this will take some time)"
         )
+
+        bulk_create_queue = []
+        chunk_size = 5000
 
         # https://openpyxl.readthedocs.io/en/latest/optimized.html#read-only-mode
         wb = openpyxl.load_workbook(XLSX_FILE, read_only=True)
@@ -123,7 +134,6 @@ class Command(BaseCommand):
             self.logger.debug(DATE_FIN_AGR_DEC)
 
             if not dry_run:
-
                 pe_approval = PoleEmploiApproval()
                 pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
                 pe_approval.pe_regional_id = ID_REGIONAL_BENE
@@ -133,7 +143,23 @@ class Command(BaseCommand):
                 pe_approval.birth_name = NOM_NAISS_BENE
                 pe_approval.start_at = DATE_DEB_AGR_DEC
                 pe_approval.end_at = DATE_FIN_AGR_DEC
-                pe_approval.save()
+                bulk_create_queue.append(pe_approval)
+                if len(bulk_create_queue) > chunk_size:
+                    # Setting the ignore_conflicts parameter to True tells the
+                    # database to ignore failure to insert any rows that fail
+                    # constraints such as duplicate unique values.
+                    # This allows us to update the database when a new source
+                    # file is available.
+                    PoleEmploiApproval.objects.bulk_create(
+                        bulk_create_queue, ignore_conflicts=True
+                    )
+                    bulk_create_queue = []
+
+        # Create any remaining objects.
+        if not dry_run and bulk_create_queue:
+            PoleEmploiApproval.objects.bulk_create(
+                bulk_create_queue, ignore_conflicts=True
+            )
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
