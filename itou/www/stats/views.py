@@ -410,6 +410,11 @@ def get_donut_chart_data_per_eligibility_author_kind(job_applications):
         author_kind: 0 for author_kind in kind_choices_as_dict
     }
 
+    # Only consider applications which are supposed to actually have eligibility diagnoses.
+    job_applications = job_applications.filter(
+        to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS
+    )
+
     # TODO Find how to make a proper GROUP BY on a second order related field.
     for job_application in job_applications.values(
         "job_seeker__eligibility_diagnoses__author_kind"
