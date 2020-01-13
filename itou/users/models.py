@@ -104,6 +104,9 @@ class User(AbstractUser):
             return None
         return ApprovalsWrapper(self)
 
+    def is_admin_of_siae(self, siae):
+        return self.siaemembership_set.filter(siae=siae, is_siae_admin=True).exists()
+
     @property
     def has_eligibility_diagnosis(self):
         """

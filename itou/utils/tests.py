@@ -36,7 +36,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
-        self.assertTrue(user.siaemembership_set.get(siae=siae).is_siae_admin)
+        self.assertTrue(user.is_admin_of_siae(siae))
 
         factory = RequestFactory()
         request = factory.get("/")
@@ -61,15 +61,15 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         siae1 = SiaeWithMembershipFactory()
         user = siae1.members.first()
-        self.assertTrue(user.siaemembership_set.get(siae=siae1).is_siae_admin)
+        self.assertTrue(user.is_admin_of_siae(siae1))
 
         siae2 = SiaeFactory()
         siae2.members.add(user)
-        self.assertFalse(user.siaemembership_set.get(siae=siae2).is_siae_admin)
+        self.assertFalse(user.is_admin_of_siae(siae2))
 
         siae3 = SiaeFactory()
         siae3.members.add(user)
-        self.assertFalse(user.siaemembership_set.get(siae=siae3).is_siae_admin)
+        self.assertFalse(user.is_admin_of_siae(siae3))
 
         factory = RequestFactory()
         request = factory.get("/")

@@ -3,6 +3,7 @@ from django.test import TestCase
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.siaes.models import Siae
 
 
@@ -10,10 +11,25 @@ class FactoriesTest(TestCase):
     def test_siae_with_membership_factory(self):
         siae = SiaeWithMembershipFactory()
         self.assertEqual(siae.members.count(), 1)
+        user = siae.members.get()
+        self.assertTrue(user.is_admin_of_siae(siae))
 
     def test_siae_with_membership_and_jobs_factory(self):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         self.assertEqual(siae.jobs.count(), 4)
+
+    def test_siae_with_2_memberships_factory(self):
+        siae = SiaeWith2MembershipsFactory()
+        self.assertEqual(siae.members.count(), 2)
+        self.assertEqual(siae.active_admin_members.count(), 1)
+        admin_user = siae.active_admin_members.get()
+        self.assertTrue(admin_user.is_admin_of_siae(siae))
+        all_users = list(siae.members.all())
+        self.assertEqual(len(all_users), 2)
+        all_users.remove(admin_user)
+        self.assertEqual(len(all_users), 1)
+        normal_user = all_users[0]
+        self.assertFalse(normal_user.is_admin_of_siae(siae))
 
 
 class ModelTest(TestCase):
@@ -23,6 +39,13 @@ class ModelTest(TestCase):
 
         siae = SiaeFactory(kind=Siae.KIND_EI)
         self.assertTrue(siae.is_subject_to_eligibility_rules)
+
+    def test_has_members(self):
+        siae1 = SiaeFactory()
+        siae2 = SiaeWithMembershipFactory()
+
+        self.assertFalse(siae1.has_members)
+        self.assertTrue(siae2.has_members)
 
     def test_has_member(self):
         siae1 = SiaeWithMembershipFactory()

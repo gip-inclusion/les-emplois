@@ -9,6 +9,7 @@ from allauth.account.forms import SignupForm
 from itou.prescribers.models import PrescriberOrganization, PrescriberMembership
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.validators import validate_siret
+from itou.www.signup import utils
 
 
 class FullnameFormMixin(forms.Form):
@@ -91,50 +92,140 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         return user
 
 
-class SiaeSignupForm(FullnameFormMixin, SignupForm):
+class SelectSiaeForm(forms.ModelForm):
+    """
+    First of two forms of siae signup process.
+    This first form allows the user to select which siae will be joined.
+    """
+
+    class Meta:
+        model = Siae
+        fields = ["kind", "siret", "email"]
+
+    kind = forms.ChoiceField(
+        label=gettext_lazy("Type de votre structure"), choices=Siae.KIND_CHOICES, required=True
+    )
 
     siret = forms.CharField(
         label=gettext_lazy("Numéro SIRET de votre structure"),
+        min_length=14,
         max_length=14,
         validators=[validate_siret],
         required=True,
         strip=True,
-        help_text=gettext_lazy("Saisissez 14 chiffres."),
+        help_text=gettext_lazy(
+            "Saisissez 14 chiffres. Doit si possible être le SIRET connu de l'ASP pour les SIAE."
+        ),
     )
 
-    def clean_siret(self):
+    email = forms.EmailField(
+        label=gettext_lazy("E-mail"),
+        required=True,
+        help_text=gettext_lazy("Doit si possible être l'adresse e-mail connue de l'ASP pour les SIAE."),
+    )
+
+    def save(self, request, commit=True):
+        raise RuntimeError("SelectSiaeForm.save() should never be called.")
+
+    # pylint: disable=R1710
+    def clean(self):
         siret = self.cleaned_data["siret"]
+        email = self.cleaned_data["email"]
+        kind = self.cleaned_data["kind"]
 
-        siret_exists_in_db = Siae.active_objects.filter(siret=siret).exists()
-        if siret_exists_in_db:
-            return siret
+        siaes_matching_siret = Siae.active_objects.filter(siret=siret, kind=kind)
+        siret_exists = siaes_matching_siret.exists()
+        siaes_matching_email = Siae.active_objects.filter(auth_email=email, kind=kind)
+        email_exists = siaes_matching_email.exists()
+        several_siaes_share_same_email = siaes_matching_email.count() >= 2
 
-        error = _(
-            "Ce SIRET ne figure pas dans notre base de données ou ne fait pas partie des "
+        if siret_exists:
+            return self.cleaned_data
+
+        if several_siaes_share_same_email:
+            error_message = _(
+                "Comme plusieurs structures partagent cet email nous nous basons "
+                "sur le SIRET pour identifier votre structure, or "
+                "ce SIRET ne figure pas dans notre base de données.<br>"
+                "Veuillez saisir un SIRET connu de l'ASP."
+            )
+            self.raise_validation_error(error_message)
+
+        if email_exists:
+            return self.cleaned_data
+
+        error_message = _(
+            "Ni ce SIRET ni cet email ne figurent dans notre base de données.<br>"
+            "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
+            "de l'ASP.<br>Si nécéssaire veuillez vous rapprocher de votre service gestion "
+            "pour obtenir ces informations."
+        )
+        self.raise_validation_error(error_message)
+
+    def raise_validation_error(self, error_message):
+        error_message_suffix = _(
+            "<br>Veuillez noter qu'actuellement notre base de données "
+            "ne contient que les structures des "
             "territoires d'expérimentation (Pas-de-Calais, Bas-Rhin et Seine Saint Denis).<br>"
             "Contactez-nous si vous rencontrez des problèmes pour vous inscrire : "
             f'<a href="mailto:{settings.ITOU_EMAIL_CONTACT}">{settings.ITOU_EMAIL_CONTACT}</a>'
         )
-        raise forms.ValidationError(mark_safe(error))
+        # Concatenating two __proxy__ strings is a little tricky.
+        error_message = "%s %s" % (error_message, error_message_suffix)
+        raise forms.ValidationError(mark_safe(error_message))
+
+
+class SiaeSignupForm(FullnameFormMixin, SignupForm):
+    """
+    Second of two forms of siae signup process.
+    This is the final form where the signup actually happens
+    on the siae identified by the first form.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(SiaeSignupForm, self).__init__(*args, **kwargs)
+        self.fields["kind"].widget.attrs["readonly"] = True
+        self.fields["siret"].widget.attrs["readonly"] = True
+        self.fields["siae_name"].widget.attrs["readonly"] = True
+
+    kind = forms.CharField(
+        label=_("Type de votre SIAE"),
+        help_text=_("Ce champ n'est pas modifiable."),
+        required=True,
+    )
+
+    siret = forms.CharField(
+        label=_("Numéro SIRET de votre SIAE"),
+        help_text=_("Ce champ n'est pas modifiable."),
+        required=True,
+    )
+
+    siae_name = forms.CharField(
+        label=_("Nom de votre SIAE"),
+        help_text=_("Ce champ n'est pas modifiable."),
+        required=True,
+    )
 
     def save(self, request):
-
         user = super().save(request)
 
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
+        if utils.check_siae_signup_credentials(request.session):
+            siae = utils.get_siae_from_session(request.session)
+        else:
+            raise RuntimeError("This should never happen. Attack attempted.")
+
+        if siae.has_members:
+            siae.new_signup_warning_email_to_admins(user).send()
+
         user.is_siae_staff = True
         user.save()
 
-        siaes = Siae.active_objects.filter(siret=self.cleaned_data["siret"])
-
-        for siae in siaes:
-            membership = SiaeMembership()
-            membership.user = user
-            membership.siae = siae
-            # The first member becomes an admin.
-            membership.is_siae_admin = siae.members.count() == 0
-            membership.save()
+        membership = SiaeMembership()
+        membership.user = user
+        membership.siae = siae
+        # Only the first member becomes an admin.
+        membership.is_siae_admin = siae.active_members.count() == 0
+        membership.save()
 
         return user
 
