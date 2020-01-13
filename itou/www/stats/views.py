@@ -5,8 +5,9 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
 
-from django.db.models import Avg, Count, DateTimeField, F, Q, ExpressionWrapper
+from django.db.models import Avg, Count, Max, DateTimeField, F, Q, ExpressionWrapper
 from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 
 from itou.eligibility.models import EligibilityDiagnosis
@@ -19,6 +20,10 @@ from itou.utils.address.departments import DEPARTMENTS
 DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE = "donnée non disponible par département"
 
 
+# TODO FIXME Run a cronjob to regenerate the stats page every X minutes,
+# so that the user never has to wait!
+# see https://stackoverflow.com/questions/4631865/caching-query-results-in-django
+@cache_page(60 * 5)
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
@@ -319,22 +324,38 @@ def inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset, visible=
 
 
 def get_hiring_delays(hirings):
-    # Fetch several key dates of hirings.
-    # Job application date is field created_at.
-    # Approval date is found in the hiring transition logs.
-    # Start of contract is field date_of_hiring.
+    # Fetch several key dates of hirings, in chronological order:
+    # 1) Job application date is job_application.created_at
+    # 2) Approval date (aka "Hiring date") is job_application.logs__timestamp
+    #    where job_application.logs__state="accepted"
+    # 3) IAE Pass delivery date is job_application.job_seeker__approvals__created_at
+    # 4) Start of contract is job_application.job_seeker__approvals__start_at
     hiring_dates = (
         hirings.filter(logs__transition="accept", logs__to_state="accepted")
+        # only seek most recent approval
+        .annotate(max_date=Max("job_seeker__approvals__created_at"))
+        .filter(job_seeker__approvals__created_at=F("max_date"))
         .distinct()
-        .values("created_at", "logs__timestamp", "date_of_hiring")
+        .values(
+            "created_at",
+            "logs__timestamp",
+            "job_seeker__approvals__created_at",
+            "job_seeker__approvals__start_at",
+        )
     )
 
     hiring_delays = hiring_dates.aggregate(
-        average_delay_from_application_to_approval=Avg(
+        average_delay_from_application_to_hiring=Avg(
             F("logs__timestamp") - F("created_at"), output_field=DateTimeField()
         ),
-        average_delay_from_approval_to_hiring=Avg(
-            F("date_of_hiring") - F("logs__timestamp"), output_field=DateTimeField()
+        average_delay_from_hiring_to_pass_delivery=Avg(
+            F("job_seeker__approvals__created_at") - F("logs__timestamp"),
+            output_field=DateTimeField(),
+        ),
+        average_delay_from_pass_delivery_to_contract_start=Avg(
+            F("job_seeker__approvals__start_at")
+            - F("job_seeker__approvals__created_at"),
+            output_field=DateTimeField(),
         ),
     )
     return hiring_delays
