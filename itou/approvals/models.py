@@ -1,5 +1,8 @@
 import logging
 
+from dateutil.relativedelta import relativedelta
+from unidecode import unidecode
+
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -86,9 +89,7 @@ class Approval(models.Model):
 
     @property
     def is_valid(self):
-        if self.start_at <= timezone.now().date() <= self.end_at:
-            return True
-        return False
+        return self.start_at <= timezone.now().date() <= self.end_at
 
     def send_number_by_email(self):
         if not self.job_application or not self.job_application.accepted_by:
@@ -127,9 +128,42 @@ class Approval(models.Model):
         return f"{Approval.NUMBER_PREFIX}{year_2_chars}00001"
 
 
+class PoleEmploiApprovalManager(models.Manager):
+    def find_for(self, first_name, last_name, birthdate):
+        """
+        Returns all available entries for the given `first_name`, `last_name`
+        and `birthdate` (in an ideal case there is only 1 result).
+        """
+        first_name = PoleEmploiApproval.name_format(first_name)
+        last_name = PoleEmploiApproval.name_format(last_name)
+        qs = self.filter(
+            first_name=first_name, last_name=last_name, birthdate=birthdate
+        )
+        if not qs.exists():
+            # Try with `birth_name` instead of `last_name.
+            qs = self.filter(
+                first_name=first_name, birth_name=last_name, birthdate=birthdate
+            )
+        return qs
+
+
 class PoleEmploiApproval(models.Model):
     """
     Store approvals (`agréments` in French) delivered by Pôle emploi.
+
+    These are either legacy approvals or approvals issued in parallel to
+    Itou's approvals because the 2 systems have to co-exist before Itou
+    is fully deployed all over France.
+
+    Thus, before Itou can deliver an approval, we have to check if there
+    isn't already a valid Pôle emploi's approval.
+
+    This check can only be done on the triplet `first_name` + `last_name`
+    + `birthdate` and with the custom format of names used by Pôle emploi.
+    It's far from ideal…
+
+    This table is populated and updated through the `import_pe_approvals`
+    admin command.
     """
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
@@ -148,9 +182,33 @@ class PoleEmploiApproval(models.Model):
         verbose_name=_("Date de création"), default=timezone.now
     )
 
+    objects = PoleEmploiApprovalManager()
+
     class Meta:
         verbose_name = _("Agrément Pôle emploi")
         verbose_name_plural = _("Agréments Pôle emploi")
 
     def __str__(self):
         return self.number
+
+    @property
+    def is_valid(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    @property
+    def time_since_end(self):
+        return relativedelta(timezone.now().date(), self.end_at)
+
+    @property
+    def can_obtain_new_approval(self):
+        return self.time_since_end.years > 4 or (
+            self.time_since_end.years == 4 and self.time_since_end.days > 0
+        )
+
+    @staticmethod
+    def name_format(name):
+        """
+        Format `name` in the same way as it is in the Pôle emploi export file:
+        Upper-case ASCII transliterations of Unicode text.
+        """
+        return unidecode(name.strip()).upper()
