@@ -195,7 +195,7 @@ def get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users):
     data["days_for_total_job_seeker_users_without_opportunity"] = days
     data["total_job_seeker_users_without_opportunity"] = (
         nationwide_job_seeker_users.filter(
-            date_joined__lte=get_today() - relativedelta(days=days)
+            date_joined__date__lte=get_today() - relativedelta(days=days)
         )
         .exclude(job_applications__isnull=True)
         .exclude(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED)
