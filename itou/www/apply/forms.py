@@ -17,7 +17,7 @@ class UserExistsForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.user = get_user_model().objects.filter(email=email).first()
+        self.user = get_user_model().objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:
                 error = _(
