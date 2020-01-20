@@ -64,6 +64,8 @@ class Command(BaseCommand):
 
         self.set_logger(options.get("verbosity"))
 
+        count_before = PoleEmploiApproval.objects.count()
+
         XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
         file_size_in_bytes = os.path.getsize(XLSX_FILE)
         self.stdout.write(
@@ -160,5 +162,10 @@ class Command(BaseCommand):
                 bulk_create_queue, ignore_conflicts=True
             )
 
+        count_after = PoleEmploiApproval.objects.count()
+
         self.stdout.write("-" * 80)
+        self.stdout.write(f"Before: {count_before}")
+        self.stdout.write(f"After: {count_after}")
+        self.stdout.write(f"New ojects: {count_after - count_before}")
         self.stdout.write("Done.")
