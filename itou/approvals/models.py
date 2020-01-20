@@ -17,7 +17,28 @@ from itou.utils.validators import alphanumeric
 logger = logging.getLogger(__name__)
 
 
-class Approval(models.Model):
+# A period after expiry of an Approval during which a person cannot obtain a new one.
+YEARS_BEFORE_NEW_APPROVAL = 2
+
+
+class ApprovalMixin:
+    @property
+    def is_valid(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    @property
+    def time_since_end(self):
+        return relativedelta(timezone.now().date(), self.end_at)
+
+    @property
+    def can_obtain_new_approval(self):
+        return self.time_since_end.years > YEARS_BEFORE_NEW_APPROVAL or (
+            self.time_since_end.years == YEARS_BEFORE_NEW_APPROVAL
+            and self.time_since_end.days > 0
+        )
+
+
+class Approval(models.Model, ApprovalMixin):
     """
     Store approvals (`agréments` in French) delivered by Itou.
     """
@@ -87,10 +108,6 @@ class Approval(models.Model):
             )
         super().clean()
 
-    @property
-    def is_valid(self):
-        return self.start_at <= timezone.now().date() <= self.end_at
-
     def send_number_by_email(self):
         if not self.job_application or not self.job_application.accepted_by:
             raise RuntimeError(_("Unable to determine the recipient email address."))
@@ -147,7 +164,7 @@ class PoleEmploiApprovalManager(models.Manager):
         return qs
 
 
-class PoleEmploiApproval(models.Model):
+class PoleEmploiApproval(models.Model, ApprovalMixin):
     """
     Store approvals (`agréments` in French) delivered by Pôle emploi.
 
@@ -190,20 +207,6 @@ class PoleEmploiApproval(models.Model):
 
     def __str__(self):
         return self.number
-
-    @property
-    def is_valid(self):
-        return self.start_at <= timezone.now().date() <= self.end_at
-
-    @property
-    def time_since_end(self):
-        return relativedelta(timezone.now().date(), self.end_at)
-
-    @property
-    def can_obtain_new_approval(self):
-        return self.time_since_end.years > 4 or (
-            self.time_since_end.years == 4 and self.time_since_end.days > 0
-        )
 
     @staticmethod
     def name_format(name):

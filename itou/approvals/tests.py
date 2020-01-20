@@ -10,6 +10,7 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory
 from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.approvals.models import YEARS_BEFORE_NEW_APPROVAL
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
 )
@@ -102,7 +103,7 @@ class ApprovalModelTest(TestCase):
         self.assertFalse(approval.is_valid)
 
 
-class PoleEmploiApprovalModelTest(TestCase):
+class ApprovalMixinTest(TestCase):
     def test_is_valid(self):
 
         # End today.
@@ -126,30 +127,34 @@ class PoleEmploiApprovalModelTest(TestCase):
 
     def test_can_obtain_new_approval(self):
 
-        # Ended 3 years ago.
-        end_at = datetime.date.today() - relativedelta(years=3)
+        # 1 day before `YEARS_BEFORE_NEW_APPROVAL`.
+        end_at = (
+            datetime.date.today()
+            - relativedelta(years=YEARS_BEFORE_NEW_APPROVAL)
+            + relativedelta(days=1)
+        )
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.can_obtain_new_approval)
 
-        # Ended 4 years ago.
-        end_at = datetime.date.today() - relativedelta(years=4)
+        # Exactly `YEARS_BEFORE_NEW_APPROVAL`.
+        end_at = datetime.date.today() - relativedelta(years=YEARS_BEFORE_NEW_APPROVAL)
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.can_obtain_new_approval)
 
-        # Ended 1 day and 4 years ago.
-        end_at = datetime.date.today() - relativedelta(years=4) - relativedelta(days=1)
+        # 1 day after `YEARS_BEFORE_NEW_APPROVAL`.
+        end_at = (
+            datetime.date.today()
+            - relativedelta(years=YEARS_BEFORE_NEW_APPROVAL)
+            - relativedelta(days=1)
+        )
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.can_obtain_new_approval)
 
-        # Ended 8 years ago.
-        end_at = datetime.date.today() - relativedelta(years=8)
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.can_obtain_new_approval)
 
+class PoleEmploiApprovalModelTest(TestCase):
     def test_name_format(self):
         self.assertEqual(PoleEmploiApproval.name_format(" François"), "FRANCOIS")
         self.assertEqual(PoleEmploiApproval.name_format("M'Hammed "), "M'HAMMED")
