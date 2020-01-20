@@ -97,6 +97,9 @@ class SignupTest(TestCase):
         self.assertTrue(user.siaemembership_set.get(siae=siae2).is_siae_admin)
         self.assertEqual(1, siae2.members.count())
 
+    # FIXME test if 1st user is never valitated, and second one signs up
+
+
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
 
@@ -286,3 +289,85 @@ class PasswordChangeTest(TestCase):
         self.client.logout()
         self.assertTrue(self.client.login(username=user.email, password="mlkjhgfdsq2"))
         self.client.logout()
+
+
+class UserEmailUniquenessTest(TestCase):
+    def test_user_email_uniqueness(self):
+        """Test case insensitive uniqueness of user email"""
+        email_lowercase = "john.doe@siae.com"
+        email_mixedcase = "JoHn.DoE@SiAe.cOm"
+        email_uppercase = "JOHN.DOE@SIAE.com"
+        email_different = "XoHn.DoE@SiAe.cOm"
+
+        url = reverse("signup:job_seeker")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": email_lowercase,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertTrue(user.is_job_seeker)
+        self.assertFalse(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        self.client.logout()
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": email_lowercase,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(
+            response, "Un autre utilisateur utilise déjà cette adresse e-mail."
+        )
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": email_mixedcase,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(
+            response, "Un autre utilisateur utilise déjà cette adresse e-mail."
+        )
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": email_uppercase,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(
+            response, "Un autre utilisateur utilise déjà cette adresse e-mail."
+        )
+
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": email_different,
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
