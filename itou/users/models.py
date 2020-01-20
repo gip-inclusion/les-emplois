@@ -1,6 +1,5 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from allauth.utils import generate_unique_username
@@ -63,15 +62,6 @@ class User(AbstractUser):
         if not self.is_job_seeker or not self.approvals.exists():
             return None
         return self.approvals.latest("-created_at")
-
-    def has_valid_approval(self):
-        if not self.is_job_seeker:
-            return False
-        now = timezone.now().date()
-        return (
-            self.approvals.filter(start_at__lte=now, end_at__gte=now).exists()
-            | self.approvals.filter(start_at__gte=now).exists()
-        )
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):

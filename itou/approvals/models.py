@@ -1,3 +1,4 @@
+import collections
 import logging
 
 from dateutil.relativedelta import relativedelta
@@ -8,6 +9,7 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -17,14 +19,18 @@ from itou.utils.validators import alphanumeric
 logger = logging.getLogger(__name__)
 
 
-# A period after expiry of an Approval during which a person cannot obtain a new one.
-YEARS_BEFORE_NEW_APPROVAL = 2
+class CommonApprovalMixin:
+    """
+    A set of methods shared by both Approval and PoleEmploiApproval models.
+    """
 
+    # A period after expiry of an Approval during which a person cannot obtain a new one.
+    YEARS_BEFORE_NEW_APPROVAL = 2
 
-class ApprovalMixin:
     @property
     def is_valid(self):
-        return self.start_at <= timezone.now().date() <= self.end_at
+        now = timezone.now().date()
+        return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
 
     @property
     def time_since_end(self):
@@ -32,15 +38,26 @@ class ApprovalMixin:
 
     @property
     def can_obtain_new_approval(self):
-        return self.time_since_end.years > YEARS_BEFORE_NEW_APPROVAL or (
-            self.time_since_end.years == YEARS_BEFORE_NEW_APPROVAL
+        return self.time_since_end.years > self.YEARS_BEFORE_NEW_APPROVAL or (
+            self.time_since_end.years == self.YEARS_BEFORE_NEW_APPROVAL
             and self.time_since_end.days > 0
         )
 
 
-class Approval(models.Model, ApprovalMixin):
+class CommonApprovalQuerySet(models.QuerySet):
+    """
+    A QuerySet shared by both Approval and PoleEmploiApproval models.
+    """
+
+    def valid(self):
+        now = timezone.now().date()
+        return self.filter(Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now))
+
+
+class Approval(models.Model, CommonApprovalMixin):
     """
     Store approvals (`agréments` in French) delivered by Itou.
+    Another name is "PASS IAE".
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -82,6 +99,8 @@ class Approval(models.Model, ApprovalMixin):
         on_delete=models.SET_NULL,
     )
 
+    objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
+
     class Meta:
         verbose_name = _("Agrément")
         verbose_name_plural = _("Agréments")
@@ -99,7 +118,7 @@ class Approval(models.Model, ApprovalMixin):
             raise ValidationError(
                 _("La date de fin doit être postérieure à la date de début.")
             )
-        if not self.pk and self.user.has_valid_approval():
+        if not self.pk and self.user.approvals.valid().exists():
             raise ValidationError(
                 _(
                     f"Un agrément dans le futur ou en cours de validité existe déjà "
@@ -164,7 +183,7 @@ class PoleEmploiApprovalManager(models.Manager):
         return qs
 
 
-class PoleEmploiApproval(models.Model, ApprovalMixin):
+class PoleEmploiApproval(models.Model, CommonApprovalMixin):
     """
     Store approvals (`agréments` in French) delivered by Pôle emploi.
 
@@ -199,7 +218,7 @@ class PoleEmploiApproval(models.Model, ApprovalMixin):
         verbose_name=_("Date de création"), default=timezone.now
     )
 
-    objects = PoleEmploiApprovalManager()
+    objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
     class Meta:
         verbose_name = _("Agrément Pôle emploi")
@@ -215,3 +234,55 @@ class PoleEmploiApproval(models.Model, ApprovalMixin):
         Upper-case ASCII transliterations of Unicode text.
         """
         return unidecode(name.strip()).upper()
+
+
+class ApprovalsChecker:
+    """
+    TODO
+    """
+
+    RESULT = collections.namedtuple("ApprovalCheckerResult", ["code", "result"])
+
+    # Result codes.
+    FOUND = "FOUND"
+    CAN_OBTAIN_NEW_APPROVAL = "CAN_OBTAIN_NEW_APPROVAL"
+    CANNOT_OBTAIN_NEW_APPROVAL = "CANNOT_OBTAIN_NEW_APPROVAL"
+    MULTIPLE_RESULTS = "MULTIPLE_RESULTS"
+
+    def __init__(self, user):
+        self.user = user
+
+    def _get_latest_approval(self):
+        try:
+            return Approval.objects.filter(user=self.user).latest("start_at")
+        except Approval.DoesNotExist:
+            return None
+
+    def _get_pole_emploi_approvals(self):
+        return PoleEmploiApproval.objects.find_for(
+            self.user.first_name, self.user.last_name, self.user.birthdate
+        )
+
+    def _check_single_approval(self, approval):
+        if approval.is_valid:
+            return self.RESULT(code=self.FOUND, result=approval)
+        if approval.can_obtain_new_approval:
+            return self.RESULT(code=self.CAN_OBTAIN_NEW_APPROVAL, result=approval)
+        return self.RESULT(code=self.CANNOT_OBTAIN_NEW_APPROVAL, result=approval)
+
+    def check(self):
+
+        approval = self._get_latest_approval()
+
+        if approval:
+            return self._check_single_approval(approval)
+
+        pole_emploi_approvals = self._get_pole_emploi_approvals()
+
+        if not pole_emploi_approvals:
+            return self.RESULT(code=self.CAN_OBTAIN_NEW_APPROVAL, result=None)
+
+        if pole_emploi_approvals.count() > 1:
+            return self.RESULT(code=self.MULTIPLE_RESULTS, result=pole_emploi_approvals)
+
+        return self._check_single_approval(pole_emploi_approvals.first())

@@ -10,14 +10,152 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory
 from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.approvals.models import YEARS_BEFORE_NEW_APPROVAL
+from itou.approvals.models import ApprovalsChecker
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.users.factories import JobSeekerFactory
+
+
+class CommonApprovalQuerySetTest(TestCase):
+    """
+    Test CommonApprovalQuerySet.
+    """
+
+    def test_valid_for_pole_emploi_approval_model(self):
+        """
+        Test for PoleEmploiApproval model.
+        """
+
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = start_at + relativedelta(years=1)
+        PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+
+        start_at = datetime.date.today() - relativedelta(years=5)
+        end_at = start_at + relativedelta(years=2)
+        PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+
+        self.assertEqual(2, PoleEmploiApproval.objects.count())
+        self.assertEqual(1, PoleEmploiApproval.objects.valid().count())
+
+    def test_valid_for_approval_model(self):
+        """
+        Test for Approval model.
+        """
+
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = start_at + relativedelta(years=1)
+        ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        start_at = datetime.date.today() - relativedelta(years=5)
+        end_at = start_at + relativedelta(years=2)
+        ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        self.assertEqual(2, Approval.objects.count())
+        self.assertEqual(1, Approval.objects.valid().count())
+
+    def test_valid(self):
+
+        # Start today, end in 2 years.
+        start_at = datetime.date.today()
+        end_at = start_at + relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+
+        # End today.
+        end_at = datetime.date.today()
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+
+        # Ended 1 year ago.
+        end_at = datetime.date.today() - relativedelta(years=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(Approval.objects.filter(id=approval.id).valid().exists())
+
+        # Ended yesterday.
+        end_at = datetime.date.today() - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(Approval.objects.filter(id=approval.id).valid().exists())
+
+        # In the future.
+        start_at = datetime.date.today() + relativedelta(years=2)
+        end_at = start_at + relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+
+
+class CommonApprovalMixinTest(TestCase):
+    """
+    Test CommonApprovalMixin.
+    """
+
+    def test_is_valid(self):
+
+        # End today.
+        end_at = datetime.date.today()
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.is_valid)
+
+        # Ended yesterday.
+        end_at = datetime.date.today() - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_valid)
+
+        # Start tomorrow.
+        start_at = datetime.date.today() + relativedelta(days=1)
+        end_at = start_at + relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.is_valid)
+
+    def test_time_since_end(self):
+
+        end_at = datetime.date.today() - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.time_since_end.days, 1)
+
+    def test_can_obtain_new_approval(self):
+
+        # 1 day before `YEARS_BEFORE_NEW_APPROVAL`.
+        end_at = (
+            datetime.date.today()
+            - relativedelta(years=Approval.YEARS_BEFORE_NEW_APPROVAL)
+            + relativedelta(days=1)
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.can_obtain_new_approval)
+
+        # Exactly `YEARS_BEFORE_NEW_APPROVAL`.
+        end_at = datetime.date.today() - relativedelta(
+            years=Approval.YEARS_BEFORE_NEW_APPROVAL
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.can_obtain_new_approval)
+
+        # 1 day after `YEARS_BEFORE_NEW_APPROVAL`.
+        end_at = (
+            datetime.date.today()
+            - relativedelta(years=Approval.YEARS_BEFORE_NEW_APPROVAL)
+            - relativedelta(days=1)
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.can_obtain_new_approval)
 
 
 class ApprovalModelTest(TestCase):
+    """
+    Test Approval model.
+    """
+
     def test_clean(self):
         approval = ApprovalFactory()
         approval.start_at = datetime.date.today()
@@ -103,58 +241,11 @@ class ApprovalModelTest(TestCase):
         self.assertFalse(approval.is_valid)
 
 
-class ApprovalMixinTest(TestCase):
-    def test_is_valid(self):
-
-        # End today.
-        end_at = datetime.date.today()
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
-
-        # Ended yesterday.
-        end_at = datetime.date.today() - relativedelta(days=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
-
-    def test_time_since_end(self):
-
-        end_at = datetime.date.today() - relativedelta(days=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertEqual(approval.time_since_end.days, 1)
-
-    def test_can_obtain_new_approval(self):
-
-        # 1 day before `YEARS_BEFORE_NEW_APPROVAL`.
-        end_at = (
-            datetime.date.today()
-            - relativedelta(years=YEARS_BEFORE_NEW_APPROVAL)
-            + relativedelta(days=1)
-        )
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.can_obtain_new_approval)
-
-        # Exactly `YEARS_BEFORE_NEW_APPROVAL`.
-        end_at = datetime.date.today() - relativedelta(years=YEARS_BEFORE_NEW_APPROVAL)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.can_obtain_new_approval)
-
-        # 1 day after `YEARS_BEFORE_NEW_APPROVAL`.
-        end_at = (
-            datetime.date.today()
-            - relativedelta(years=YEARS_BEFORE_NEW_APPROVAL)
-            - relativedelta(days=1)
-        )
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.can_obtain_new_approval)
-
-
 class PoleEmploiApprovalModelTest(TestCase):
+    """
+    Test PoleEmploiApproval model.
+    """
+
     def test_name_format(self):
         self.assertEqual(PoleEmploiApproval.name_format(" François"), "FRANCOIS")
         self.assertEqual(PoleEmploiApproval.name_format("M'Hammed "), "M'HAMMED")
@@ -178,6 +269,10 @@ class PoleEmploiApprovalModelTest(TestCase):
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
+    """
+    Test PoleEmploiApprovalManager.
+    """
+
     def test_find_for(self):
 
         first_name = "Désirée"
@@ -224,3 +319,24 @@ class PoleEmploiApprovalManagerTest(TestCase):
         self.assertEqual(search_results.count(), 1)
         self.assertEqual(search_results.first(), pe_approval)
         PoleEmploiApproval.objects.all().delete()
+
+
+class ApprovalsCheckerTest(TestCase):
+    """
+    Test ApprovalsChecker.
+    """
+
+    def test_get_approval_without_approval(self):
+        user = JobSeekerFactory()
+        result = ApprovalsChecker(user).check()
+        self.assertEqual(result.code, ApprovalsChecker.CAN_OBTAIN_NEW_APPROVAL)
+        self.assertEqual(result.result, None)
+
+    def test_get_approval_with_has_valid_itou_approval(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(
+            user=user, start_at=datetime.date.today() - relativedelta(days=1)
+        )
+        result = ApprovalsChecker(user).check()
+        self.assertEqual(result.code, ApprovalsChecker.FOUND)
+        self.assertEqual(result.result, approval)
