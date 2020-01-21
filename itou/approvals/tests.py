@@ -365,7 +365,7 @@ class ApprovalsWrapperTest(TestCase):
             user=user, start_at=datetime.date.today() - relativedelta(days=1)
         )
         status = ApprovalsWrapper(user).get_status()
-        self.assertEqual(status.code, ApprovalsWrapper.FOUND)
+        self.assertEqual(status.code, ApprovalsWrapper.VALID_APPROVAL_FOUND)
         self.assertEqual(status.result, approval)
 
     def test_status_with_recently_expired_approval(self):
@@ -400,7 +400,7 @@ class ApprovalsWrapperTest(TestCase):
             first_name=first_name, last_name=last_name, birthdate=birthdate
         )
         status = ApprovalsWrapper(user).get_status()
-        self.assertEqual(status.code, ApprovalsWrapper.MULTIPLE_RESULTS)
+        self.assertEqual(status.code, ApprovalsWrapper.MULTIPLE_APPROVALS_FOUND)
         self.assertEqual(2, len(status.result))
         self.assertIn(approval1, status.result)
         self.assertIn(approval2, status.result)
@@ -413,5 +413,5 @@ class ApprovalsWrapperTest(TestCase):
             birthdate=user.birthdate,
         )
         status = ApprovalsWrapper(user).get_status()
-        self.assertEqual(status.code, ApprovalsWrapper.FOUND)
+        self.assertEqual(status.code, ApprovalsWrapper.VALID_APPROVAL_FOUND)
         self.assertEqual(status.result, approval)

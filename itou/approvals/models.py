@@ -254,10 +254,12 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
         Insert spaces to format number as in the Pôle emploi export file
         (we store the number without spaces).
         """
+        # pylint: disable=unsubscriptable-object
         if len(self.number) == 15:
             return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
         # 12 chars.
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
+        # pylint: enable=unsubscriptable-object
 
     @staticmethod
     def name_format(name):
@@ -276,17 +278,17 @@ class ApprovalsWrapper:
     STATUS = collections.namedtuple("ApprovalCheckerResult", ["code", "result"])
 
     # Status codes.
-    FOUND = "FOUND"
+    VALID_APPROVAL_FOUND = "VALID_APPROVAL_FOUND"
     CAN_OBTAIN_NEW_APPROVAL = "CAN_OBTAIN_NEW_APPROVAL"
     CANNOT_OBTAIN_NEW_APPROVAL = "CANNOT_OBTAIN_NEW_APPROVAL"
-    MULTIPLE_RESULTS = "MULTIPLE_RESULTS"
+    MULTIPLE_APPROVALS_FOUND = "MULTIPLE_APPROVALS_FOUND"
 
     def __init__(self, user):
         self.user = user
 
-    def _check_single_approval(self, approval):
+    def _get_single_approval_status(self, approval):
         if approval.is_valid:
-            return self.STATUS(code=self.FOUND, result=approval)
+            return self.STATUS(code=self.VALID_APPROVAL_FOUND, result=approval)
         if approval.can_obtain_new_approval:
             return self.STATUS(code=self.CAN_OBTAIN_NEW_APPROVAL, result=approval)
         return self.STATUS(code=self.CANNOT_OBTAIN_NEW_APPROVAL, result=approval)
@@ -299,7 +301,7 @@ class ApprovalsWrapper:
             approval = None
 
         if approval:
-            return self._check_single_approval(approval)
+            return self._get_single_approval_status(approval)
 
         pole_emploi_approvals = PoleEmploiApproval.objects.find_for(
             self.user.first_name, self.user.last_name, self.user.birthdate
@@ -309,6 +311,8 @@ class ApprovalsWrapper:
             return self.STATUS(code=self.CAN_OBTAIN_NEW_APPROVAL, result=None)
 
         if pole_emploi_approvals.count() > 1:
-            return self.STATUS(code=self.MULTIPLE_RESULTS, result=pole_emploi_approvals)
+            return self.STATUS(
+                code=self.MULTIPLE_APPROVALS_FOUND, result=pole_emploi_approvals
+            )
 
-        return self._check_single_approval(pole_emploi_approvals.first())
+        return self._get_single_approval_status(pole_emploi_approvals.first())
