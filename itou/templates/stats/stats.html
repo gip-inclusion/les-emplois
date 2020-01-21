@@ -103,9 +103,6 @@
             {% trans "<b>EITI</b> : Entreprise d’insertion par le travail indépendant." %}
         </li>
         <li>
-            {% trans "<b>EA</b> : Entreprise adaptée." %}
-        </li>
-        <li>
             {% blocktrans with days=data.days_for_siae_to_be_considered_active %}
                 <b>Employeur actif</b> : Employeur créé ou modifié il y a moins de {{ days }} jours, ou ayant un nouvel utilisateur créé il y a moins de {{ days }} jours, ou ayant créé ou modifié une FDP il y a moins de {{ days }} jours, ou ayant reçu ou modifié une candidature il y a moins de {{ days }} jours.
             {% endblocktrans %}
