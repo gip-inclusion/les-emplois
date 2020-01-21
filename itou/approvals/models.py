@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 class CommonApprovalMixin:
     """
     A set of methods shared by both Approval and PoleEmploiApproval models.
+    Manipulated fields must be common to both models.
     """
 
     # A period after expiry of an Approval during which a person cannot obtain a new one.
@@ -48,6 +49,7 @@ class CommonApprovalMixin:
 class CommonApprovalQuerySet(models.QuerySet):
     """
     A QuerySet shared by both Approval and PoleEmploiApproval models.
+    Manipulated fields must be common to both models.
     """
 
     def valid(self):
@@ -63,12 +65,14 @@ class CommonApprovalQuerySet(models.QuerySet):
 
 class Approval(models.Model, CommonApprovalMixin):
     """
-    Store approvals (`agréments` in French) delivered by Itou.
-    Another name is "PASS IAE".
+    Store approvals (`agréments` in French). Another name is `PASS IAE`.
+
+    A number starting with `ASP_ITOU_PREFIX` means it has been delivered through ITOU.
+    Otherwise, it was delivered by Pôle emploi.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
-    NUMBER_PREFIX = "99999"
+    ASP_ITOU_PREFIX = "99999"
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -154,21 +158,25 @@ class Approval(models.Model, CommonApprovalMixin):
         Find next "PASS IAE" number.
 
         Structure of a "PASS IAE" number (12 chars):
-            NUMBER_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
+            ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
 
         Rule:
             The "PASS IAE"'s year is equal to the start year of the `JobApplication.date_of_hiring`.
         """
         date_of_hiring = date_of_hiring or timezone.now().date()
         year = date_of_hiring.strftime("%Y")
-        last_approval = (
-            Approval.objects.filter(start_at__year=year).order_by("created_at").last()
+        last_itou_approval = (
+            Approval.objects.filter(
+                number__startswith=Approval.ASP_ITOU_PREFIX, start_at__year=year
+            )
+            .order_by("created_at")
+            .last()
         )
-        if last_approval:
-            next_number = int(last_approval.number) + 1
+        if last_itou_approval:
+            next_number = int(last_itou_approval.number) + 1
             return str(next_number)
         year_2_chars = date_of_hiring.strftime("%y")
-        return f"{Approval.NUMBER_PREFIX}{year_2_chars}00001"
+        return f"{Approval.ASP_ITOU_PREFIX}{year_2_chars}00001"
 
 
 class PoleEmploiApprovalManager(models.Manager):
@@ -194,19 +202,21 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
     """
     Store approvals (`agréments` in French) delivered by Pôle emploi.
 
-    These are either legacy approvals or approvals issued in parallel to
-    Itou's approvals because the 2 systems have to co-exist before Itou
-    is fully deployed all over France.
+    Two approval's delivering systems co-exist. Pôle emploi's approvals
+    are issued in parallel.
 
-    Thus, before Itou can deliver an approval, we have to check if there
-    isn't already a valid Pôle emploi's approval.
-
-    This check can only be done on the triplet `first_name` + `last_name`
-    + `birthdate` and with the custom format of names used by Pôle emploi.
-    It's far from ideal…
+    Thus, before Itou can deliver an approval, we have to check this table
+    to ensure that there isn't already a valid Pôle emploi's approval.
 
     This table is populated and updated through the `import_pe_approvals`
-    admin command.
+    admin command on a regular basis with data shared by Pôle emploi.
+
+    If a valid Pôle emploi's approval is found, it's copied in the `Approval`
+    model.
+
+    When searching for a Pôle emploi's approval, the check can only be done
+    on the triplet `first_name` + `last_name` + `birthdate` with the custom
+    format of names used by Pôle emploi. It's far from ideal…
     """
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)

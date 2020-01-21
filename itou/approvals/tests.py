@@ -165,35 +165,50 @@ class ApprovalModelTest(TestCase):
 
     def test_get_next_number(self):
 
+        PREFIX = Approval.ASP_ITOU_PREFIX
+
         now = timezone.now().date()
         current_year = now.strftime("%y")
 
-        # No pre-existing Approval objects.
-        expected_number = f"99999{current_year}00001"
+        # No pre-existing objects.
+        expected_number = f"{PREFIX}{current_year}00001"
         self.assertEqual(Approval.get_next_number(), expected_number)
 
-        # With pre-existing Approval objects.
-        ApprovalFactory(number=f"99999{current_year}00038", start_at=now)
-        ApprovalFactory(number=f"99999{current_year}00039", start_at=now)
-        ApprovalFactory(number=f"99999{current_year}00040", start_at=now)
-        expected_number = f"99999{current_year}00041"
+        # With pre-existing objects.
+        ApprovalFactory(number=f"{PREFIX}{current_year}00038", start_at=now)
+        ApprovalFactory(number=f"{PREFIX}{current_year}00039", start_at=now)
+        ApprovalFactory(number=f"{PREFIX}{current_year}00040", start_at=now)
+        expected_number = f"{PREFIX}{current_year}00041"
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
 
         # Date of hiring in the past.
         date_of_hiring = now - relativedelta(years=3)
         year = date_of_hiring.strftime("%y")
-        ApprovalFactory(number=f"99999{year}99998", start_at=date_of_hiring)
-        expected_number = f"99999{year}99999"
+        ApprovalFactory(number=f"{PREFIX}{year}99998", start_at=date_of_hiring)
+        expected_number = f"{PREFIX}{year}99999"
         self.assertEqual(Approval.get_next_number(date_of_hiring), expected_number)
         Approval.objects.all().delete()
 
         # Date of hiring in the future.
         date_of_hiring = now + relativedelta(years=3)
         year = date_of_hiring.strftime("%y")
-        ApprovalFactory(number=f"99999{year}00020", start_at=date_of_hiring)
-        expected_number = f"99999{year}00021"
+        ApprovalFactory(number=f"{PREFIX}{year}00020", start_at=date_of_hiring)
+        expected_number = f"{PREFIX}{year}00021"
         self.assertEqual(Approval.get_next_number(date_of_hiring), expected_number)
+        Approval.objects.all().delete()
+
+        # With pre-existing Pôle emploi approval.
+        ApprovalFactory(number=f"625741810182", start_at=now)
+        expected_number = f"{PREFIX}{current_year}00001"
+        self.assertEqual(Approval.get_next_number(), expected_number)
+        Approval.objects.all().delete()
+
+        # With various pre-existing objects.
+        ApprovalFactory(number=f"{PREFIX}{current_year}00222", start_at=now)
+        ApprovalFactory(number=f"625741810182", start_at=now)
+        expected_number = f"{PREFIX}{current_year}00223"
+        self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
 
     def test_send_number_by_email(self):
