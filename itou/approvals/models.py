@@ -211,7 +211,10 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
     pe_regional_id = models.CharField(_("Code regional Pôle emploi"), max_length=8)
-    number = models.CharField(verbose_name=_("Numéro"), max_length=18, unique=True)
+    # The normal length of a number is 12 chars.
+    # Sometimes the number ends with an extension ('A01', 'A02', 'A03' or 'S01') that
+    # increases the length to 15 chars. Their meaning is yet unclear.
+    number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
     first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
     last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
@@ -234,6 +237,17 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
 
     def __str__(self):
         return self.number
+
+    @property
+    def number_as_pe_format(self):
+        """
+        Insert spaces to format number as in the Pôle emploi export file
+        (we store the number without spaces).
+        """
+        if len(self.number) == 15:
+            return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
+        # 12 chars.
+        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
     @staticmethod
     def name_format(name):

@@ -119,11 +119,6 @@ class Command(BaseCommand):
             assert "  " not in NOM_NAISS_BENE
             # max length 25
 
-            NUM_AGR_DEC = row[5].value.strip()
-            self.logger.debug(NUM_AGR_DEC)
-            assert "  " not in NUM_AGR_DEC
-            # max length 18
-
             DATE_DEB_AGR_DEC = datetime.datetime.strptime(
                 row[6].value.strip(), "%d/%m/%y"
             ).date()
@@ -133,6 +128,20 @@ class Command(BaseCommand):
                 row[7].value.strip(), "%d/%m/%y"
             ).date()
             self.logger.debug(DATE_FIN_AGR_DEC)
+
+            NUM_AGR_DEC = row[5].value.strip().replace(" ", "")
+            self.logger.debug(NUM_AGR_DEC)
+            assert " " not in NUM_AGR_DEC
+            if len(NUM_AGR_DEC) not in [12, 15]:
+                self.stderr.write("-" * 80)
+                self.stderr.write("Invalid number, skipping…")
+                self.stderr.write(CODE_STRUCT_AFFECT_BENE)
+                self.stderr.write(ID_REGIONAL_BENE)
+                self.stderr.write(NOM_USAGE_BENE)
+                self.stderr.write(PRENOM_BENE)
+                self.stderr.write(NOM_NAISS_BENE)
+                self.stderr.write(NUM_AGR_DEC)
+                continue
 
             if not dry_run:
                 pe_approval = PoleEmploiApproval()

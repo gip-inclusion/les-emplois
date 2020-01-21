@@ -246,6 +246,18 @@ class PoleEmploiApprovalModelTest(TestCase):
     Test PoleEmploiApproval model.
     """
 
+    def test_number_as_pe_format(self):
+
+        # 12 chars.
+        pole_emploi_approval = PoleEmploiApprovalFactory(number="400121910144")
+        expected = "40012 19 10144"
+        self.assertEqual(pole_emploi_approval.number_as_pe_format, expected)
+
+        # 15 chars.
+        pole_emploi_approval = PoleEmploiApprovalFactory(number="010331610106A01")
+        expected = "01033 16 10106 A01"
+        self.assertEqual(pole_emploi_approval.number_as_pe_format, expected)
+
     def test_name_format(self):
         self.assertEqual(PoleEmploiApproval.name_format(" François"), "FRANCOIS")
         self.assertEqual(PoleEmploiApproval.name_format("M'Hammed "), "M'HAMMED")
