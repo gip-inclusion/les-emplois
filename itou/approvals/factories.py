@@ -21,7 +21,9 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         model = Approval
 
     user = factory.SubFactory(JobSeekerFactory)
-    number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
+    number = factory.fuzzy.FuzzyText(
+        length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX
+    )
     start_at = datetime.date.today()
     end_at = factory.LazyAttribute(
         lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1)

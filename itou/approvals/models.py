@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 class CommonApprovalMixin:
     """
-    A set of methods shared by both Approval and PoleEmploiApproval models.
+    A set of methods shared by both `Approval` and `PoleEmploiApproval` models.
     Manipulated fields must be common to both models.
     """
 
@@ -48,7 +48,7 @@ class CommonApprovalMixin:
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
-    A QuerySet shared by both Approval and PoleEmploiApproval models.
+    A QuerySet shared by both `Approval` and `PoleEmploiApproval` models.
     Manipulated fields must be common to both models.
     """
 
@@ -268,14 +268,14 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
         return unidecode(name.strip()).upper()
 
 
-class ApprovalsChecker:
+class ApprovalsWrapper:
     """
-    TODO
+    Helper that manipulates both `Approval` and `PoleEmploiApproval` models.
     """
 
-    RESULT = collections.namedtuple("ApprovalCheckerResult", ["code", "result"])
+    STATUS = collections.namedtuple("ApprovalCheckerResult", ["code", "result"])
 
-    # Result codes.
+    # Status codes.
     FOUND = "FOUND"
     CAN_OBTAIN_NEW_APPROVAL = "CAN_OBTAIN_NEW_APPROVAL"
     CANNOT_OBTAIN_NEW_APPROVAL = "CANNOT_OBTAIN_NEW_APPROVAL"
@@ -286,12 +286,12 @@ class ApprovalsChecker:
 
     def _check_single_approval(self, approval):
         if approval.is_valid:
-            return self.RESULT(code=self.FOUND, result=approval)
+            return self.STATUS(code=self.FOUND, result=approval)
         if approval.can_obtain_new_approval:
-            return self.RESULT(code=self.CAN_OBTAIN_NEW_APPROVAL, result=approval)
-        return self.RESULT(code=self.CANNOT_OBTAIN_NEW_APPROVAL, result=approval)
+            return self.STATUS(code=self.CAN_OBTAIN_NEW_APPROVAL, result=approval)
+        return self.STATUS(code=self.CANNOT_OBTAIN_NEW_APPROVAL, result=approval)
 
-    def check(self):
+    def get_status(self):
 
         try:
             approval = Approval.objects.filter(user=self.user).latest("start_at")
@@ -306,9 +306,9 @@ class ApprovalsChecker:
         )
 
         if not pole_emploi_approvals:
-            return self.RESULT(code=self.CAN_OBTAIN_NEW_APPROVAL, result=None)
+            return self.STATUS(code=self.CAN_OBTAIN_NEW_APPROVAL, result=None)
 
         if pole_emploi_approvals.count() > 1:
-            return self.RESULT(code=self.MULTIPLE_RESULTS, result=pole_emploi_approvals)
+            return self.STATUS(code=self.MULTIPLE_RESULTS, result=pole_emploi_approvals)
 
         return self._check_single_approval(pole_emploi_approvals.first())

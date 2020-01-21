@@ -10,7 +10,7 @@ from django.utils import timezone
 from itou.approvals.factories import ApprovalFactory
 from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.approvals.models import ApprovalsChecker
+from itou.approvals.models import ApprovalsWrapper
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
 )
@@ -348,22 +348,70 @@ class PoleEmploiApprovalManagerTest(TestCase):
         PoleEmploiApproval.objects.all().delete()
 
 
-class ApprovalsCheckerTest(TestCase):
+class ApprovalsWrapperTest(TestCase):
     """
-    Test ApprovalsChecker.
+    Test ApprovalsWrapper.
     """
 
-    def test_get_approval_without_approval(self):
+    def test_status_without_approval(self):
         user = JobSeekerFactory()
-        result = ApprovalsChecker(user).check()
-        self.assertEqual(result.code, ApprovalsChecker.CAN_OBTAIN_NEW_APPROVAL)
-        self.assertEqual(result.result, None)
+        status = ApprovalsWrapper(user).get_status()
+        self.assertEqual(status.code, ApprovalsWrapper.CAN_OBTAIN_NEW_APPROVAL)
+        self.assertEqual(status.result, None)
 
-    def test_get_approval_with_has_valid_itou_approval(self):
+    def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(
             user=user, start_at=datetime.date.today() - relativedelta(days=1)
         )
-        result = ApprovalsChecker(user).check()
-        self.assertEqual(result.code, ApprovalsChecker.FOUND)
-        self.assertEqual(result.result, approval)
+        status = ApprovalsWrapper(user).get_status()
+        self.assertEqual(status.code, ApprovalsWrapper.FOUND)
+        self.assertEqual(status.result, approval)
+
+    def test_status_with_recently_expired_approval(self):
+        user = JobSeekerFactory()
+        end_at = datetime.date.today() - relativedelta(days=30)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        status = ApprovalsWrapper(user).get_status()
+        self.assertEqual(status.code, ApprovalsWrapper.CANNOT_OBTAIN_NEW_APPROVAL)
+        self.assertEqual(status.result, approval)
+
+    def test_status_with_formerly_expired_approval(self):
+        user = JobSeekerFactory()
+        end_at = datetime.date.today() - relativedelta(years=3)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        status = ApprovalsWrapper(user).get_status()
+        self.assertEqual(status.code, ApprovalsWrapper.CAN_OBTAIN_NEW_APPROVAL)
+        self.assertEqual(status.result, approval)
+
+    def test_status_with_multiple_homonym_pole_emploi_approvals(self):
+        first_name = "Marie-Louise"
+        last_name = "Dufour"
+        birthdate = datetime.date(1992, 1, 1)
+        user = JobSeekerFactory(
+            first_name=first_name, last_name=last_name, birthdate=birthdate
+        )
+        approval1 = PoleEmploiApprovalFactory(
+            first_name=first_name, last_name=last_name, birthdate=birthdate
+        )
+        approval2 = PoleEmploiApprovalFactory(
+            first_name=first_name, last_name=last_name, birthdate=birthdate
+        )
+        status = ApprovalsWrapper(user).get_status()
+        self.assertEqual(status.code, ApprovalsWrapper.MULTIPLE_RESULTS)
+        self.assertEqual(2, len(status.result))
+        self.assertIn(approval1, status.result)
+        self.assertIn(approval2, status.result)
+
+    def test_status_with_valid_pole_emploi_approval(self):
+        user = JobSeekerFactory()
+        approval = PoleEmploiApprovalFactory(
+            first_name=user.first_name,
+            last_name=user.last_name,
+            birthdate=user.birthdate,
+        )
+        status = ApprovalsWrapper(user).get_status()
+        self.assertEqual(status.code, ApprovalsWrapper.FOUND)
+        self.assertEqual(status.result, approval)
