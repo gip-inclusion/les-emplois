@@ -11,6 +11,22 @@ from itou.approvals import models
 from itou.job_applications.models import JobApplication
 
 
+class IsValidFilter(admin.SimpleListFilter):
+    title = _("En cours de validité")
+    parameter_name = "is_valid"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.valid()
+        if value == "no":
+            return queryset.invalid()
+        return queryset
+
+
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
     actions = ("send_number_by_email",)
@@ -23,10 +39,11 @@ class ApprovalAdmin(admin.ModelAdmin):
         "is_valid",
         "number_sent_by_email",
     )
-    list_filter = ("number_sent_by_email",)
+    list_filter = ("number_sent_by_email", IsValidFilter)
     list_display_links = ("id", "number")
     raw_id_fields = ("user", "job_application", "created_by")
     readonly_fields = ("created_at", "created_by", "number_sent_by_email")
+    date_hierarchy = "start_at"
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -93,5 +110,14 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "birth_name",
         "start_at",
         "end_at",
+        "is_valid",
     )
     search_fields = ("number", "first_name", "last_name", "birth_name")
+    list_filter = (IsValidFilter,)
+    date_hierarchy = "start_at"
+
+    def is_valid(self, obj):
+        return obj.is_valid
+
+    is_valid.boolean = True
+    is_valid.short_description = _("En cours de validité")

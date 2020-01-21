@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from itou.utils.emails import get_email_text_template
 from itou.utils.validators import alphanumeric
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -52,6 +53,12 @@ class CommonApprovalQuerySet(models.QuerySet):
     def valid(self):
         now = timezone.now().date()
         return self.filter(Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now))
+
+    def invalid(self):
+        now = timezone.now().date()
+        return self.exclude(
+            Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now)
+        )
 
 
 class Approval(models.Model, CommonApprovalMixin):
@@ -223,6 +230,7 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
     class Meta:
         verbose_name = _("Agrément Pôle emploi")
         verbose_name_plural = _("Agréments Pôle emploi")
+        ordering = ["-start_at"]
 
     def __str__(self):
         return self.number
@@ -252,17 +260,6 @@ class ApprovalsChecker:
     def __init__(self, user):
         self.user = user
 
-    def _get_latest_approval(self):
-        try:
-            return Approval.objects.filter(user=self.user).latest("start_at")
-        except Approval.DoesNotExist:
-            return None
-
-    def _get_pole_emploi_approvals(self):
-        return PoleEmploiApproval.objects.find_for(
-            self.user.first_name, self.user.last_name, self.user.birthdate
-        )
-
     def _check_single_approval(self, approval):
         if approval.is_valid:
             return self.RESULT(code=self.FOUND, result=approval)
@@ -272,12 +269,17 @@ class ApprovalsChecker:
 
     def check(self):
 
-        approval = self._get_latest_approval()
+        try:
+            approval = Approval.objects.filter(user=self.user).latest("start_at")
+        except Approval.DoesNotExist:
+            approval = None
 
         if approval:
             return self._check_single_approval(approval)
 
-        pole_emploi_approvals = self._get_pole_emploi_approvals()
+        pole_emploi_approvals = PoleEmploiApproval.objects.find_for(
+            self.user.first_name, self.user.last_name, self.user.birthdate
+        )
 
         if not pole_emploi_approvals:
             return self.RESULT(code=self.CAN_OBTAIN_NEW_APPROVAL, result=None)
