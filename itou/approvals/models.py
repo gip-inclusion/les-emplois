@@ -45,6 +45,19 @@ class CommonApprovalMixin:
             and self.time_since_end.days > 0
         )
 
+    @property
+    def number_with_spaces(self):
+        """
+        Insert spaces to format the number as in the Pôle emploi export file
+        (number is stored without spaces).
+        """
+        # pylint: disable=unsubscriptable-object
+        if len(self.number) == 15:
+            return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
+        # 12 chars.
+        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
+        # pylint: enable=unsubscriptable-object
+
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
@@ -247,19 +260,6 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
 
     def __str__(self):
         return self.number
-
-    @property
-    def number_as_pe_format(self):
-        """
-        Insert spaces to format number as in the Pôle emploi export file
-        (we store the number without spaces).
-        """
-        # pylint: disable=unsubscriptable-object
-        if len(self.number) == 15:
-            return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
-        # 12 chars.
-        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-        # pylint: enable=unsubscriptable-object
 
     @staticmethod
     def name_format(name):
