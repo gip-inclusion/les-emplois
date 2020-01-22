@@ -285,6 +285,20 @@ class ApprovalsWrapper:
     CANNOT_OBTAIN_NEW_APPROVAL = "CANNOT_OBTAIN_NEW_APPROVAL"
     MULTIPLE_APPROVALS_FOUND = "MULTIPLE_APPROVALS_FOUND"
 
+    # Error messages.
+    ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_USER = _(
+        "Vous avez terminé un parcours il y à moins de deux ans. "
+        "Pour prétendre à nouveau à un parcours en structure d'insertion "
+        "par l'activité économique vous devez rencontrer un prescripteur "
+        "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
+    )
+    ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY = _(
+        "Le candidat a terminé un parcours il y à moins de deux ans. "
+        "Pour prétendre à nouveau à un parcours en structure d'insertion "
+        "par l'activité économique il doit rencontrer un prescripteur "
+        "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
+    )
+
     def __init__(self, user):
         self.user = user
 

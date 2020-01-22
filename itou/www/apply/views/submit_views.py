@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
+from itou.approvals.models import ApprovalsWrapper
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -203,7 +204,8 @@ def step_check_prev_applications(
 
     # At this point we know that the candidate is applying to an SIAE
     # where he or she has already applied.
-    # Allow a new application if the user confirm it despite the duplication warning.
+    # Allow a new job application if the user confirm it despite the
+    # duplication warning.
     if (
         request.method == "POST"
         and request.POST.get("force_new_application") == "force"
@@ -228,20 +230,36 @@ def step_eligibility(
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
-    user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
-    step_required = (
-        user_info.is_authorized_prescriber and siae.is_subject_to_eligibility_rules
-    )
-    if not step_required:
+    if not siae.is_subject_to_eligibility_rules:
         return HttpResponseRedirect(next_url)
 
+    user_info = get_user_info(request)
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 
-    # This step is only required if the job seeker hasn't already
-    # an eligibility diagnosis.
-    if job_seeker.has_eligibility_diagnosis:
+    approvals_wrapper = ApprovalsWrapper(job_seeker)
+    approval_status = approvals_wrapper.get_status()
+
+    # Stop here if the current user is not an "authorized prescribers" because
+    # only "authorized prescribers" can renew recently outdated approvals.
+    if (
+        approval_status.code == ApprovalsWrapper.CANNOT_OBTAIN_NEW_APPROVAL
+        and not user_info.is_authorized_prescriber
+    ):
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY
+        if user_info.user == job_seeker:
+            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_USER
+        raise PermissionDenied(error)
+
+    can_skip = (
+        (approval_status.code == ApprovalsWrapper.VALID_APPROVAL_FOUND)
+        # Only "authorized prescribers" can perform an eligibility diagnosis.
+        or (not user_info.is_authorized_prescriber)
+        # Eligibility diagnosis already performed.
+        or job_seeker.has_eligibility_diagnosis
+    )
+    if can_skip:
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST":
