@@ -275,7 +275,9 @@ class ApprovalsWrapper:
     Helper that manipulates both `Approval` and `PoleEmploiApproval` models.
     """
 
-    STATUS = collections.namedtuple("ApprovalCheckerResult", ["code", "result"])
+    STATUS = collections.namedtuple(
+        "ApprovalCheckerResult", ["code", "approval", "multiple_approvals"]
+    )
 
     # Status codes.
     VALID_APPROVAL_FOUND = "VALID_APPROVAL_FOUND"
@@ -288,10 +290,22 @@ class ApprovalsWrapper:
 
     def _get_single_approval_status(self, approval):
         if approval.is_valid:
-            return self.STATUS(code=self.VALID_APPROVAL_FOUND, result=approval)
+            return self.STATUS(
+                code=self.VALID_APPROVAL_FOUND,
+                approval=approval,
+                multiple_approvals=None,
+            )
         if approval.can_obtain_new_approval:
-            return self.STATUS(code=self.CAN_OBTAIN_NEW_APPROVAL, result=approval)
-        return self.STATUS(code=self.CANNOT_OBTAIN_NEW_APPROVAL, result=approval)
+            return self.STATUS(
+                code=self.CAN_OBTAIN_NEW_APPROVAL,
+                approval=approval,
+                multiple_approvals=None,
+            )
+        return self.STATUS(
+            code=self.CANNOT_OBTAIN_NEW_APPROVAL,
+            approval=approval,
+            multiple_approvals=None,
+        )
 
     def get_status(self):
 
@@ -308,11 +322,17 @@ class ApprovalsWrapper:
         )
 
         if not pole_emploi_approvals:
-            return self.STATUS(code=self.CAN_OBTAIN_NEW_APPROVAL, result=None)
+            return self.STATUS(
+                code=self.CAN_OBTAIN_NEW_APPROVAL,
+                approval=None,
+                multiple_approvals=None,
+            )
 
         if pole_emploi_approvals.count() > 1:
             return self.STATUS(
-                code=self.MULTIPLE_APPROVALS_FOUND, result=pole_emploi_approvals
+                code=self.MULTIPLE_APPROVALS_FOUND,
+                approval=None,
+                multiple_approvals=pole_emploi_approvals,
             )
 
         return self._get_single_approval_status(pole_emploi_approvals.first())
