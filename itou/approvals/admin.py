@@ -39,6 +39,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         "is_valid",
         "number_sent_by_email",
     )
+    search_fields = ("number", "user__first_name", "user__last_name")
     list_filter = ("number_sent_by_email", IsValidFilter)
     list_display_links = ("id", "number")
     raw_id_fields = ("user", "job_application", "created_by")
