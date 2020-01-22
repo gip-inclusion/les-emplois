@@ -4,6 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 from allauth.utils import generate_unique_username
 
+from itou.approvals.models import ApprovalsWrapper
+
 
 class User(AbstractUser):
     """
@@ -50,6 +52,11 @@ class User(AbstractUser):
     @property
     def has_eligibility_diagnosis(self):
         return self.is_job_seeker and self.eligibility_diagnoses.exists()
+
+    def get_approval_status(self):
+        if not self.is_job_seeker:
+            return None
+        return ApprovalsWrapper(self).get_status()
 
     def get_eligibility_diagnosis(self):
         if not self.is_job_seeker:
