@@ -65,11 +65,6 @@ class User(AbstractUser):
             "author", "author_siae", "author_prescriber_organization"
         ).latest("-created_at")
 
-    def get_approval(self):
-        if not self.is_job_seeker or not self.approvals.exists():
-            return None
-        return self.approvals.latest("-created_at")
-
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):
         """

@@ -272,6 +272,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             .user
         )
 
+    @property
+    def approval(self):
+        if not self.to_siae.is_subject_to_eligibility_rules:
+            return None
+        return self.approval_set.filter(user=self.job_seeker).first()
+
     # Workflow transitions.
 
     @xwf_models.transition()

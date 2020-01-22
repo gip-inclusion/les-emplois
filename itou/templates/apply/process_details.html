@@ -14,11 +14,11 @@
     <ul>
 
         {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-            {% with job_application.job_seeker.get_approval as approval %}
+            {% with job_application.approval as approval %}
                 {% if approval %}
                     <li>
                         {% trans "Numéro d'agrément :" %}
-                        <span class="text-success">
+                        <span class="text-{% if approval.is_valid %}success{% else %}danger{% endif %}">
                             <b>{{ approval.number }}</b>
                             (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
                         </span>
