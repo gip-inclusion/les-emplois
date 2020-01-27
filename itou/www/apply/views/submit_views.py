@@ -241,8 +241,8 @@ def step_eligibility(
     approvals_wrapper = ApprovalsWrapper(job_seeker)
     approval_status = approvals_wrapper.get_status()
 
-    # Stop here if the current user is not an "authorized prescribers" because
-    # only "authorized prescribers" can renew recently outdated approvals.
+    # Stop here if the current user is not an "authorized prescriber" because
+    # only "authorized prescribers" can renew a recently outdated approval.
     if (
         approval_status.code == ApprovalsWrapper.CANNOT_OBTAIN_NEW_APPROVAL
         and not user_info.is_authorized_prescriber

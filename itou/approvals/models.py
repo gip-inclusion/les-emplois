@@ -20,14 +20,28 @@ from itou.utils.validators import alphanumeric
 logger = logging.getLogger(__name__)
 
 
-class CommonApprovalMixin:
+class CommonApprovalMixin(models.Model):
     """
-    A set of methods shared by both `Approval` and `PoleEmploiApproval` models.
-    Manipulated fields must be common to both models.
+    Abstract model for fields and methods common to both `Approval`
+    and `PoleEmploiApproval` models.
     """
 
-    # A period after expiry of an Approval during which a person cannot obtain a new one.
+    # A period after expiry of an Approval during which a person cannot obtain a new one
+    # except from an "authorized prescriber".
     YEARS_BEFORE_NEW_APPROVAL = 2
+
+    start_at = models.DateField(
+        verbose_name=_("Date de début"), blank=True, null=True, db_index=True
+    )
+    end_at = models.DateField(
+        verbose_name=_("Date de fin"), blank=True, null=True, db_index=True
+    )
+    created_at = models.DateTimeField(
+        verbose_name=_("Date de création"), default=timezone.now
+    )
+
+    class Meta:
+        abstract = True
 
     @property
     def is_valid(self):
@@ -45,24 +59,10 @@ class CommonApprovalMixin:
             and self.time_since_end.days > 0
         )
 
-    @property
-    def number_with_spaces(self):
-        """
-        Insert spaces to format the number as in the Pôle emploi export file
-        (number is stored without spaces).
-        """
-        # pylint: disable=unsubscriptable-object
-        if len(self.number) == 15:
-            return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
-        # 12 chars.
-        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-        # pylint: enable=unsubscriptable-object
-
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
     A QuerySet shared by both `Approval` and `PoleEmploiApproval` models.
-    Manipulated fields must be common to both models.
     """
 
     def valid(self):
@@ -76,12 +76,12 @@ class CommonApprovalQuerySet(models.QuerySet):
         )
 
 
-class Approval(models.Model, CommonApprovalMixin):
+class Approval(CommonApprovalMixin):
     """
     Store approvals (`agréments` in French). Another name is `PASS IAE`.
 
     A number starting with `ASP_ITOU_PREFIX` means it has been delivered through ITOU.
-    Otherwise, it was delivered by Pôle emploi.
+    Otherwise, it was delivered by Pôle emploi (and found in `PoleEmploiApproval`).
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -100,8 +100,6 @@ class Approval(models.Model, CommonApprovalMixin):
         validators=[alphanumeric, MinLengthValidator(12)],
         unique=True,
     )
-    start_at = models.DateField(verbose_name=_("Date de début"), blank=True, null=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), blank=True, null=True)
     job_application = models.ForeignKey(
         "job_applications.JobApplication",
         verbose_name=_("Candidature d'origine"),
@@ -111,9 +109,6 @@ class Approval(models.Model, CommonApprovalMixin):
     )
     number_sent_by_email = models.BooleanField(
         verbose_name=_("Numéro envoyé par email"), default=False
-    )
-    created_at = models.DateTimeField(
-        verbose_name=_("Date de création"), default=timezone.now
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -150,6 +145,15 @@ class Approval(models.Model, CommonApprovalMixin):
                 )
             )
         super().clean()
+
+    @property
+    def number_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        # pylint: disable=unsubscriptable-object
+        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
+        # pylint: enable=unsubscriptable-object
 
     def send_number_by_email(self):
         if not self.job_application or not self.job_application.accepted_by:
@@ -211,7 +215,7 @@ class PoleEmploiApprovalManager(models.Manager):
         return qs
 
 
-class PoleEmploiApproval(models.Model, CommonApprovalMixin):
+class PoleEmploiApproval(CommonApprovalMixin):
     """
     Store approvals (`agréments` in French) delivered by Pôle emploi.
 
@@ -233,22 +237,17 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
     """
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
-    pe_regional_id = models.CharField(_("Code regional Pôle emploi"), max_length=8)
     # The normal length of a number is 12 chars.
     # Sometimes the number ends with an extension ('A01', 'A02', 'A03' or 'S01') that
     # increases the length to 15 chars. Their meaning is yet unclear.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
+    pe_regional_id = models.CharField(_("Code regional Pôle emploi"), max_length=8)
     first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
     last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
     # TODO: make `birthdate` mandatory as soon as the data is available.
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, db_index=True
-    )
-    start_at = models.DateField(verbose_name=_("Date de début"))
-    end_at = models.DateField(verbose_name=_("Date de fin"))
-    created_at = models.DateTimeField(
-        verbose_name=_("Date de création"), default=timezone.now
     )
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
@@ -268,6 +267,19 @@ class PoleEmploiApproval(models.Model, CommonApprovalMixin):
         Upper-case ASCII transliterations of Unicode text.
         """
         return unidecode(name.strip()).upper()
+
+    @property
+    def number_with_spaces(self):
+        """
+        Insert spaces to format the number as in the Pôle emploi export file
+        (number is stored without spaces).
+        """
+        # pylint: disable=unsubscriptable-object
+        if len(self.number) == 15:
+            return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
+        # 12 chars.
+        return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
+        # pylint: enable=unsubscriptable-object
 
 
 class ApprovalsWrapper:
