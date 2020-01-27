@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from allauth.utils import generate_unique_username
 
 from itou.approvals.models import ApprovalsWrapper
+from itou.approvals.models import PoleEmploiApproval
 
 
 class User(AbstractUser):
@@ -50,14 +51,26 @@ class User(AbstractUser):
         return self.email
 
     @property
-    def has_eligibility_diagnosis(self):
-        return self.is_job_seeker and self.eligibility_diagnoses.exists()
-
-    @property
     def approvals_wrapper(self):
         if not self.is_job_seeker:
             return None
         return ApprovalsWrapper(self)
+
+    @property
+    def has_eligibility_diagnosis(self):
+        """
+        Returns True if a diagnosis exists, False otherwise.
+        The existence of a valid `PoleEmploiApproval` implies that a diagnosis
+        has been made outside of Itou.
+        """
+        return self.is_job_seeker and (
+            self.eligibility_diagnoses.exists()
+            or PoleEmploiApproval.objects.find_for(
+                self.first_name, self.last_name, self.birthdate
+            )
+            .valid()
+            .exists()
+        )
 
     def get_eligibility_diagnosis(self):
         if not self.is_job_seeker:

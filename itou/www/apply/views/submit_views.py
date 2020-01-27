@@ -9,7 +9,6 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext as _
 
-from itou.approvals.models import ApprovalsWrapper
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -238,13 +237,13 @@ def step_eligibility(
     user_info = get_user_info(request)
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 
-    approvals_wrapper = ApprovalsWrapper(job_seeker)
+    approvals_wrapper = job_seeker.approvals_wrapper
     approval_status = approvals_wrapper.get_status()
 
     # Stop here if the current user is not an "authorized prescriber" because
     # only "authorized prescribers" can renew a recently outdated approval.
     if (
-        approval_status.code == ApprovalsWrapper.CANNOT_OBTAIN_NEW_APPROVAL
+        approval_status.code == approvals_wrapper.CANNOT_OBTAIN_NEW_APPROVAL
         and not user_info.is_authorized_prescriber
     ):
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY
@@ -253,9 +252,8 @@ def step_eligibility(
         raise PermissionDenied(error)
 
     can_skip = (
-        (approval_status.code == ApprovalsWrapper.VALID_APPROVAL_FOUND)
         # Only "authorized prescribers" can perform an eligibility diagnosis.
-        or (not user_info.is_authorized_prescriber)
+        not user_info.is_authorized_prescriber
         # Eligibility diagnosis already performed.
         or job_seeker.has_eligibility_diagnosis
     )

@@ -5,11 +5,11 @@
 
 {% block content %}
 
-    <h1>{% trans "Erreur 403" %}</h1>
-    <p class="lead">{% trans "Accès refusé." %}</p>
+    <h1>{% trans "Accès refusé" %}</h1>
+    <p><small>{% trans "Erreur 403" %}</small></p>
 
     {% if exception %}
-        <div class="alert alert-warning" role="alert">
+        <div class="lead alert alert-warning" role="alert">
             <p class="mb-0">{{ exception }}</p>
         </div>
     {% endif %}

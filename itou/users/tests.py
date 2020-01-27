@@ -1,6 +1,13 @@
+import datetime
+
+from dateutil.relativedelta import relativedelta
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
+from itou.approvals.factories import PoleEmploiApprovalFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.users.factories import JobSeekerFactory
 from itou.users.factories import PrescriberFactory
 
 
@@ -31,3 +38,36 @@ class ModelTest(TestCase):
         self.assertEqual(user.phone, user_data["phone"])
         self.assertEqual(user.created_by, proxy_user)
         self.assertEqual(user.last_login, None)
+
+    def test_has_eligibility_diagnosis(self):
+
+        # No diagnosis.
+        job_seeker = JobSeekerFactory()
+        self.assertFalse(job_seeker.has_eligibility_diagnosis)
+
+        # Has Itou diagnosis.
+        job_seeker = JobSeekerFactory()
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertTrue(job_seeker.has_eligibility_diagnosis)
+
+        # Has valid Pôle emploi diagnosis.
+        job_seeker = JobSeekerFactory()
+        approval = PoleEmploiApprovalFactory(
+            first_name=job_seeker.first_name,
+            last_name=job_seeker.last_name,
+            birthdate=job_seeker.birthdate,
+        )
+        self.assertTrue(job_seeker.has_eligibility_diagnosis)
+
+        # Has expired Pôle emploi diagnosis.
+        job_seeker = JobSeekerFactory()
+        end_at = datetime.date.today() - relativedelta(years=2)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(
+            first_name=job_seeker.first_name,
+            last_name=job_seeker.last_name,
+            birthdate=job_seeker.birthdate,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        self.assertFalse(job_seeker.has_eligibility_diagnosis)
