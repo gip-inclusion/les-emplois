@@ -65,6 +65,7 @@ class Command(BaseCommand):
         self.set_logger(options.get("verbosity"))
 
         count_before = PoleEmploiApproval.objects.count()
+        count_canceled_approvals = 0
 
         XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
         file_size_in_bytes = os.path.getsize(XLSX_FILE)
@@ -94,43 +95,25 @@ class Command(BaseCommand):
                 self.stdout.write(f"Creating approvals… {progress}%")
                 last_progress = progress
 
-            self.logger.debug("-" * 80)
-
             CODE_STRUCT_AFFECT_BENE = str(row[0].value)
             assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
-            self.logger.debug(CODE_STRUCT_AFFECT_BENE)
 
             ID_REGIONAL_BENE = row[1].value.strip()
             assert len(ID_REGIONAL_BENE) == 8
-            self.logger.debug(ID_REGIONAL_BENE)
 
             NOM_USAGE_BENE = row[2].value.strip()
-            self.logger.debug(NOM_USAGE_BENE)
             assert "  " not in NOM_USAGE_BENE
             # max length 29
 
             PRENOM_BENE = row[3].value.strip()
-            self.logger.debug(PRENOM_BENE)
             assert "  " not in PRENOM_BENE
             # max length 13
 
             NOM_NAISS_BENE = row[4].value.strip()
-            self.logger.debug(NOM_NAISS_BENE)
             assert "  " not in NOM_NAISS_BENE
             # max length 25
 
-            DATE_DEB_AGR_DEC = datetime.datetime.strptime(
-                row[6].value.strip(), "%d/%m/%y"
-            ).date()
-            self.logger.debug(DATE_DEB_AGR_DEC)
-
-            DATE_FIN_AGR_DEC = datetime.datetime.strptime(
-                row[7].value.strip(), "%d/%m/%y"
-            ).date()
-            self.logger.debug(DATE_FIN_AGR_DEC)
-
             NUM_AGR_DEC = row[5].value.strip().replace(" ", "")
-            self.logger.debug(NUM_AGR_DEC)
             assert " " not in NUM_AGR_DEC
             if len(NUM_AGR_DEC) not in [12, 15]:
                 self.stderr.write("-" * 80)
@@ -141,6 +124,22 @@ class Command(BaseCommand):
                 self.stderr.write(PRENOM_BENE)
                 self.stderr.write(NOM_NAISS_BENE)
                 self.stderr.write(NUM_AGR_DEC)
+                continue
+
+            DATE_DEB_AGR_DEC = datetime.datetime.strptime(
+                row[6].value.strip(), "%d/%m/%y"
+            ).date()
+
+            DATE_FIN_AGR_DEC = datetime.datetime.strptime(
+                row[7].value.strip(), "%d/%m/%y"
+            ).date()
+
+            # Same start and end dates means that the approval has been canceled.
+            if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
+                count_canceled_approvals += 1
+                self.logger.debug("-" * 80)
+                self.logger.debug("Canceled approval found, skipping…")
+                self.logger.debug(f"{NUM_AGR_DEC} - {NOM_USAGE_BENE} - {PRENOM_BENE}")
                 continue
 
             if not dry_run:
@@ -177,4 +176,5 @@ class Command(BaseCommand):
         self.stdout.write(f"Before: {count_before}")
         self.stdout.write(f"After: {count_after}")
         self.stdout.write(f"New ojects: {count_after - count_before}")
+        self.stdout.write(f"Skipped {count_canceled_approvals} canceled approvals")
         self.stdout.write("Done.")
