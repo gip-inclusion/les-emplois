@@ -66,6 +66,7 @@ class Command(BaseCommand):
 
         count_before = PoleEmploiApproval.objects.count()
         count_canceled_approvals = 0
+        unique_approval_suffixes = set()
 
         XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
         file_size_in_bytes = os.path.getsize(XLSX_FILE)
@@ -126,6 +127,11 @@ class Command(BaseCommand):
                 self.stderr.write(NUM_AGR_DEC)
                 continue
 
+            # Keep track o unique suffixes added by PE at the end of a 12 chars number
+            # that increases the length to 15 chars.
+            if len(NUM_AGR_DEC) > 12:
+                unique_approval_suffixes.add(NUM_AGR_DEC[12:])
+
             DATE_DEB_AGR_DEC = datetime.datetime.strptime(
                 row[6].value.strip(), "%d/%m/%y"
             ).date()
@@ -177,4 +183,5 @@ class Command(BaseCommand):
         self.stdout.write(f"After: {count_after}")
         self.stdout.write(f"New ojects: {count_after - count_before}")
         self.stdout.write(f"Skipped {count_canceled_approvals} canceled approvals")
+        self.stdout.write(f"Unique suffixes: {unique_approval_suffixes}")
         self.stdout.write("Done.")

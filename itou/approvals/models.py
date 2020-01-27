@@ -239,7 +239,8 @@ class PoleEmploiApproval(CommonApprovalMixin):
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
     # The normal length of a number is 12 chars.
     # Sometimes the number ends with an extension ('A01', 'A02', 'A03' or 'S01') that
-    # increases the length to 15 chars. Their meaning is yet unclear.
+    # increases the length to 15 chars. Their meaning is yet unclear: we were told
+    # `A01` means "interruption" and `S01` means "suspension".
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
     pe_regional_id = models.CharField(_("Code regional Pôle emploi"), max_length=8)
     first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
