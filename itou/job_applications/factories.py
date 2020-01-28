@@ -57,6 +57,15 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
     sender_kind = models.JobApplication.SENDER_KIND_JOB_SEEKER
 
 
+class JobApplicationSentBySiaeFactory(JobApplicationFactory):
+    """Generates a JobApplication() object sent by an Siae."""
+
+    sender_kind = models.JobApplication.SENDER_KIND_SIAE_STAFF
+    # Currently an Siae can only postulate for itself,
+    # this is the default behavior here.
+    sender_siae = factory.LazyAttribute(lambda obj: obj.to_siae)
+
+
 class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber."""
 

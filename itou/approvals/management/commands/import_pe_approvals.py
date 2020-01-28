@@ -145,7 +145,9 @@ class Command(BaseCommand):
                 count_canceled_approvals += 1
                 self.logger.debug("-" * 80)
                 self.logger.debug("Canceled approval found, skipping…")
-                self.logger.debug(f"{NUM_AGR_DEC} - {NOM_USAGE_BENE} - {PRENOM_BENE}")
+                self.logger.debug(
+                    "%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE
+                )
                 continue
 
             if not dry_run:

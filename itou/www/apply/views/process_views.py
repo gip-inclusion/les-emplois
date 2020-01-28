@@ -179,6 +179,17 @@ def eligibility(
     if not job_application.to_siae.is_subject_to_eligibility_rules:
         raise Http404()
 
+    # An approval may expire between the time an application is sent and
+    # the time it is processed. If the job application is not sent by an
+    # authorized prescriber, the job seeker cannot obtain a new approval.
+    cannot_obtain_new_approval = False
+    job_seeker_approvals = job_application.job_seeker.approvals_wrapper
+    approval_status = job_seeker_approvals.get_status()
+    if (
+        approval_status.code == job_seeker_approvals.CANNOT_OBTAIN_NEW
+    ) and not job_application.is_sent_by_authorized_prescriber:
+        cannot_obtain_new_approval = True
+
     if request.method == "POST":
         if not request.POST.get("confirm-eligibility") == "1":
             messages.error(
@@ -194,5 +205,9 @@ def eligibility(
             )
             return HttpResponseRedirect(next_url)
 
-    context = {"job_application": job_application}
+    context = {
+        "cannot_obtain_new_approval": cannot_obtain_new_approval,
+        "job_application": job_application,
+        "job_seeker_approvals": job_seeker_approvals,
+    }
     return render(request, template_name, context)

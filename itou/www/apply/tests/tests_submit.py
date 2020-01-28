@@ -174,7 +174,7 @@ class ApplyAsJobSeekerTest(TestCase):
         user = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             first_name=user.first_name,
             last_name=user.last_name,
             birthdate=user.birthdate,
@@ -373,7 +373,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # Create a recently outdated approval.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
         prescriber_organization = PrescriberOrganizationWithMembershipFactory(
             is_authorized=True
@@ -725,7 +725,7 @@ class ApplyAsPrescriberTest(TestCase):
         # Create a recently outdated approval.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
         user = PrescriberFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -931,7 +931,7 @@ class ApplyAsSiaeTest(TestCase):
         # Create a recently outdated approval.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)

@@ -206,12 +206,12 @@ class PoleEmploiApprovalManager(models.Manager):
         last_name = PoleEmploiApproval.name_format(last_name)
         qs = self.filter(
             first_name=first_name, last_name=last_name, birthdate=birthdate
-        )
+        ).order_by("-start_at")
         if not qs.exists():
             # Try with `birth_name` instead of `last_name.
             qs = self.filter(
                 first_name=first_name, birth_name=last_name, birthdate=birthdate
-            )
+            ).order_by("-start_at")
         return qs
 
 
@@ -288,9 +288,7 @@ class ApprovalsWrapper:
     Helper that manipulates both `Approval` and `PoleEmploiApproval` models.
     """
 
-    STATUS = collections.namedtuple(
-        "ApprovalCheckerResult", ["code", "approval", "approvals"]
-    )
+    STATUS = collections.namedtuple("ApprovalCheckerResult", ["code", "approval"])
 
     # Status codes.
     VALID = "VALID"
@@ -313,34 +311,22 @@ class ApprovalsWrapper:
     )
 
     def __init__(self, user):
-        self.user = user
-
-    def get_approvals(self):
-        return Approval.objects.filter(user=self.user).order_by(
+        self.approvals = Approval.objects.filter(user=user).order_by(
             "-start_at"
         ) or PoleEmploiApproval.objects.find_for(
-            self.user.first_name, self.user.last_name, self.user.birthdate
+            user.first_name, user.last_name, user.birthdate
         )
 
     def get_status(self):
+        if not self.approvals:
+            return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=None)
+        if self.approvals.count() > 1:
+            return self.STATUS(code=self.MULTIPLE_RESULTS, approval=None)
 
-        approvals = self.get_approvals()
-
-        if not approvals:
-            return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=None, approvals=None)
-        if approvals.count() > 1:
-            return self.STATUS(
-                code=self.MULTIPLE_RESULTS, approval=None, approvals=approvals
-            )
-
-        approval = approvals.first()
+        approval = self.approvals.first()
 
         if approval.is_valid:
-            return self.STATUS(code=self.VALID, approval=approval, approvals=None)
+            return self.STATUS(code=self.VALID, approval=approval)
         if approval.CAN_OBTAIN_NEW:
-            return self.STATUS(
-                code=self.CAN_OBTAIN_NEW, approval=approval, approvals=None
-            )
-        return self.STATUS(
-            code=self.CANNOT_OBTAIN_NEW, approval=approval, approvals=None
-        )
+            return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=approval)
+        return self.STATUS(code=self.CANNOT_OBTAIN_NEW, approval=approval)

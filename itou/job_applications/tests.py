@@ -15,6 +15,7 @@ from itou.job_applications.factories import (
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
+    JobApplicationSentBySiaeFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
@@ -43,6 +44,22 @@ class JobApplicationModelTest(TestCase):
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
         self.assertEqual(job_application.accepted_by, user)
+
+    def test_is_sent_by_authorized_prescriber(self):
+        job_application = JobApplicationSentByJobSeekerFactory()
+        self.assertFalse(job_application.is_sent_by_authorized_prescriber)
+
+        job_application = JobApplicationSentByPrescriberFactory()
+        self.assertFalse(job_application.is_sent_by_authorized_prescriber)
+
+        job_application = JobApplicationSentByPrescriberOrganizationFactory()
+        self.assertFalse(job_application.is_sent_by_authorized_prescriber)
+
+        job_application = JobApplicationSentBySiaeFactory()
+        self.assertFalse(job_application.is_sent_by_authorized_prescriber)
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        self.assertTrue(job_application.is_sent_by_authorized_prescriber)
 
 
 class JobApplicationQuerySetTest(TestCase):

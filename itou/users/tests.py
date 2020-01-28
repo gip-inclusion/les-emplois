@@ -47,12 +47,12 @@ class ModelTest(TestCase):
 
         # Has Itou diagnosis.
         job_seeker = JobSeekerFactory()
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        EligibilityDiagnosisFactory(job_seeker=job_seeker)
         self.assertTrue(job_seeker.has_eligibility_diagnosis)
 
         # Has valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
-        approval = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             first_name=job_seeker.first_name,
             last_name=job_seeker.last_name,
             birthdate=job_seeker.birthdate,
@@ -63,7 +63,7 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             first_name=job_seeker.first_name,
             last_name=job_seeker.last_name,
             birthdate=job_seeker.birthdate,

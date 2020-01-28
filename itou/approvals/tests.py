@@ -364,7 +364,6 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.CAN_OBTAIN_NEW)
         self.assertEqual(status.approval, None)
-        self.assertEqual(status.approvals, None)
 
     def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
@@ -374,7 +373,6 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.VALID)
         self.assertEqual(status.approval, approval)
-        self.assertEqual(status.approvals, None)
 
     def test_status_with_recently_expired_approval(self):
         user = JobSeekerFactory()
@@ -384,7 +382,6 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.CANNOT_OBTAIN_NEW)
         self.assertEqual(status.approval, approval)
-        self.assertEqual(status.approvals, None)
 
     def test_status_with_formerly_expired_approval(self):
         user = JobSeekerFactory()
@@ -394,7 +391,6 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.CAN_OBTAIN_NEW)
         self.assertEqual(status.approval, approval)
-        self.assertEqual(status.approvals, None)
 
     def test_status_with_multiple_homonym_pole_emploi_approvals(self):
         user = JobSeekerFactory(
@@ -402,12 +398,12 @@ class ApprovalsWrapperTest(TestCase):
             last_name="Dufour",
             birthdate=datetime.date(1992, 1, 1),
         )
-        approval1 = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             first_name=user.first_name,
             last_name=user.last_name,
             birthdate=user.birthdate,
         )
-        approval2 = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             first_name=user.first_name,
             last_name=user.last_name,
             birthdate=user.birthdate,
@@ -415,9 +411,6 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.MULTIPLE_RESULTS)
         self.assertEqual(status.approval, None)
-        self.assertEqual(2, len(status.approvals))
-        self.assertIn(approval1, status.approvals)
-        self.assertIn(approval2, status.approvals)
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory()
@@ -429,4 +422,3 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.VALID)
         self.assertEqual(status.approval, approval)
-        self.assertEqual(status.approvals, None)
