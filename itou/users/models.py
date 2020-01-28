@@ -1,3 +1,7 @@
+from functools import partial
+import uuid
+
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
@@ -44,6 +48,9 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
+
+    # Sometimes used as a hard-to-guess user id.
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, db_index=True, unique=True)
 
     def __str__(self):
         return self.email
