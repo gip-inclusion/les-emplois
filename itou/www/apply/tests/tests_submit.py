@@ -192,7 +192,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             response.context["exception"],
-            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_USER,
+            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER,
         )
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(
@@ -750,7 +750,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             response.context["exception"],
-            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY,
+            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY,
         )
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(
@@ -956,7 +956,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             response.context["exception"],
-            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY,
+            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY,
         )
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(

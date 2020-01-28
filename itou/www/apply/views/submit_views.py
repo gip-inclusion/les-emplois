@@ -243,12 +243,12 @@ def step_eligibility(
     # Stop here if the current user is not an "authorized prescriber" because
     # only "authorized prescribers" can renew a recently outdated approval.
     if (
-        approval_status.code == approvals_wrapper.CANNOT_OBTAIN_NEW_APPROVAL
+        approval_status.code == approvals_wrapper.CANNOT_OBTAIN_NEW
         and not user_info.is_authorized_prescriber
     ):
-        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         if user_info.user == job_seeker:
-            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_USER
+            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
         raise PermissionDenied(error)
 
     can_skip = (

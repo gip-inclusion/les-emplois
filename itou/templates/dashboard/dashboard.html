@@ -60,11 +60,11 @@
             </div>
 
             {% with user.approvals_wrapper.get_status as status %}
-                {% if status.code in "VALID_APPROVAL_FOUND,CANNOT_OBTAIN_NEW_APPROVAL" %}
+                {% if status.code in "VALID,CANNOT_OBTAIN_NEW" %}
                     <div class="card">
                         <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
                         <div class="card-body">
-                            {% if status.code == "VALID_APPROVAL_FOUND" %}
+                            {% if status.code == "VALID" %}
                                 <p class="card-text">
                                     {% include "includes/icon.html" with icon="award" %}
                                     <b>{{ status.approval.number_with_spaces }}</b>
@@ -72,7 +72,7 @@
                                         valide du {{ start }} au {{ end }}.
                                     {% endblocktrans %}
                                 </p>
-                            {% elif status.code == "CANNOT_OBTAIN_NEW_APPROVAL" %}
+                            {% elif status.code == "CANNOT_OBTAIN_NEW" %}
                                 <p class="card-text">
                                     <span class="card-text text-danger">
                                         {% include "includes/icon.html" with icon="award" %}
@@ -83,7 +83,7 @@
                                     </span>
                                     <br>
                                     <small>
-                                        {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_USER }}
+                                        {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
                                     </small>
                                 </p>
                             {% endif %}

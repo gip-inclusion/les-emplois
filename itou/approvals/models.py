@@ -53,7 +53,7 @@ class CommonApprovalMixin(models.Model):
         return relativedelta(timezone.now().date(), self.end_at)
 
     @property
-    def can_obtain_new_approval(self):
+    def CAN_OBTAIN_NEW(self):
         return self.time_since_end.years > self.YEARS_BEFORE_NEW_APPROVAL or (
             self.time_since_end.years == self.YEARS_BEFORE_NEW_APPROVAL
             and self.time_since_end.days > 0
@@ -289,23 +289,23 @@ class ApprovalsWrapper:
     """
 
     STATUS = collections.namedtuple(
-        "ApprovalCheckerResult", ["code", "approval", "multiple_approvals"]
+        "ApprovalCheckerResult", ["code", "approval", "approvals"]
     )
 
     # Status codes.
-    VALID_APPROVAL_FOUND = "VALID_APPROVAL_FOUND"
-    CAN_OBTAIN_NEW_APPROVAL = "CAN_OBTAIN_NEW_APPROVAL"
-    CANNOT_OBTAIN_NEW_APPROVAL = "CANNOT_OBTAIN_NEW_APPROVAL"
-    MULTIPLE_APPROVALS_FOUND = "MULTIPLE_APPROVALS_FOUND"
+    VALID = "VALID"
+    CAN_OBTAIN_NEW = "CAN_OBTAIN_NEW"
+    CANNOT_OBTAIN_NEW = "CANNOT_OBTAIN_NEW"
+    MULTIPLE_RESULTS = "MULTIPLE_RESULTS"
 
     # Error messages.
-    ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_USER = _(
+    ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
         "Vous avez terminé un parcours il y à moins de deux ans. "
         "Pour prétendre à nouveau à un parcours en structure d'insertion "
         "par l'activité économique vous devez rencontrer un prescripteur "
         "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
     )
-    ERROR_CANNOT_OBTAIN_NEW_APPROVAL_FOR_PROXY = _(
+    ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = _(
         "Le candidat a terminé un parcours il y à moins de deux ans. "
         "Pour prétendre à nouveau à un parcours en structure d'insertion "
         "par l'activité économique il doit rencontrer un prescripteur "
@@ -315,51 +315,32 @@ class ApprovalsWrapper:
     def __init__(self, user):
         self.user = user
 
-    def _get_single_approval_status(self, approval):
-        if approval.is_valid:
-            return self.STATUS(
-                code=self.VALID_APPROVAL_FOUND,
-                approval=approval,
-                multiple_approvals=None,
-            )
-        if approval.can_obtain_new_approval:
-            return self.STATUS(
-                code=self.CAN_OBTAIN_NEW_APPROVAL,
-                approval=approval,
-                multiple_approvals=None,
-            )
-        return self.STATUS(
-            code=self.CANNOT_OBTAIN_NEW_APPROVAL,
-            approval=approval,
-            multiple_approvals=None,
+    def get_approvals(self):
+        return Approval.objects.filter(user=self.user).order_by(
+            "-start_at"
+        ) or PoleEmploiApproval.objects.find_for(
+            self.user.first_name, self.user.last_name, self.user.birthdate
         )
 
     def get_status(self):
 
-        try:
-            approval = Approval.objects.filter(user=self.user).latest("start_at")
-        except Approval.DoesNotExist:
-            approval = None
+        approvals = self.get_approvals()
 
-        if approval:
-            return self._get_single_approval_status(approval)
+        if not approvals:
+            return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=None, approvals=None)
+        if approvals.count() > 1:
+            return self.STATUS(
+                code=self.MULTIPLE_RESULTS, approval=None, approvals=approvals
+            )
 
-        pole_emploi_approvals = PoleEmploiApproval.objects.find_for(
-            self.user.first_name, self.user.last_name, self.user.birthdate
+        approval = approvals.first()
+
+        if approval.is_valid:
+            return self.STATUS(code=self.VALID, approval=approval, approvals=None)
+        if approval.CAN_OBTAIN_NEW:
+            return self.STATUS(
+                code=self.CAN_OBTAIN_NEW, approval=approval, approvals=None
+            )
+        return self.STATUS(
+            code=self.CANNOT_OBTAIN_NEW, approval=approval, approvals=None
         )
-
-        if not pole_emploi_approvals:
-            return self.STATUS(
-                code=self.CAN_OBTAIN_NEW_APPROVAL,
-                approval=None,
-                multiple_approvals=None,
-            )
-
-        if pole_emploi_approvals.count() > 1:
-            return self.STATUS(
-                code=self.MULTIPLE_APPROVALS_FOUND,
-                approval=None,
-                multiple_approvals=pole_emploi_approvals,
-            )
-
-        return self._get_single_approval_status(pole_emploi_approvals.first())
