@@ -221,8 +221,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         blank=True,
     )
 
-    date_of_hiring = models.DateField(
-        verbose_name=_("Date de l'embauche"), blank=True, null=True
+    hiring_start_at = models.DateField(
+        verbose_name=_("Date de début du contrat"), blank=True, null=True
+    )
+    hiring_end_at = models.DateField(
+        verbose_name=_("Date de fin du contrat"), blank=True, null=True
     )
 
     created_at = models.DateTimeField(
@@ -370,7 +373,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             "approvals_admin_query_string": urlencode(
                 {
                     "user": self.job_seeker.pk,
-                    "start_at": self.date_of_hiring.strftime("%d/%m/%Y"),
+                    "hiring_start_at": self.hiring_start_at.strftime("%d/%m/%Y"),
                     "job_application": self.pk,
                 }
             ),

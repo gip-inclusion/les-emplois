@@ -170,7 +170,7 @@ class Approval(CommonApprovalMixin):
         email.send()
 
     @staticmethod
-    def get_next_number(date_of_hiring=None):
+    def get_next_number(hiring_start_at=None):
         """
         Find next "PASS IAE" number.
 
@@ -178,10 +178,10 @@ class Approval(CommonApprovalMixin):
             ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
 
         Rule:
-            The "PASS IAE"'s year is equal to the start year of the `JobApplication.date_of_hiring`.
+            The "PASS IAE"'s year is equal to the start year of the `JobApplication.hiring_start_at`.
         """
-        date_of_hiring = date_of_hiring or timezone.now().date()
-        year = date_of_hiring.strftime("%Y")
+        hiring_start_at = hiring_start_at or timezone.now().date()
+        year = hiring_start_at.strftime("%Y")
         last_itou_approval = (
             Approval.objects.filter(
                 number__startswith=Approval.ASP_ITOU_PREFIX, start_at__year=year
@@ -192,7 +192,7 @@ class Approval(CommonApprovalMixin):
         if last_itou_approval:
             next_number = int(last_itou_approval.number) + 1
             return str(next_number)
-        year_2_chars = date_of_hiring.strftime("%y")
+        year_2_chars = hiring_start_at.strftime("%y")
         return f"{Approval.ASP_ITOU_PREFIX}{year_2_chars}00001"
 
 

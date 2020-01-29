@@ -67,11 +67,13 @@ class ApprovalAdmin(admin.ModelAdmin):
         job_application = JobApplication.objects.filter(
             id=g.get("job_application")
         ).first()
-        date_of_hiring = job_application.date_of_hiring if job_application else None
-        g.update({"number": self.model.get_next_number(date_of_hiring=date_of_hiring)})
+        hiring_start_at = job_application.hiring_start_at if job_application else None
+        g.update(
+            {"number": self.model.get_next_number(hiring_start_at=hiring_start_at)}
+        )
 
         # Prepopulate `start_at` and `end_at`.
-        start_at = g.get("start_at")
+        start_at = g.get("hiring_start_at")
         if start_at:
             start_at = datetime.datetime.strptime(start_at, "%d/%m/%Y").date()
             end_at = start_at + relativedelta(years=2) - relativedelta(days=1)

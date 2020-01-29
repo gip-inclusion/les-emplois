@@ -18,7 +18,7 @@ Informations pour l'obtention d'un numéro d'agrément.
 - Nom : {{ job_application.to_siae.display_name }}
 - Type : {{ job_application.to_siae.get_kind_display }}
 - Département : {{ job_application.to_siae.get_department_display }}
-- Date de l'embauche : {{ job_application.date_of_hiring|date:"d/m/Y" }}{% if accepted_by %}
+- Date de l'embauche : {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if accepted_by %}
 - Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
 
 Voir la candidature dans l'admin :

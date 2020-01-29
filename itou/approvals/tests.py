@@ -183,19 +183,19 @@ class ApprovalModelTest(TestCase):
         Approval.objects.all().delete()
 
         # Date of hiring in the past.
-        date_of_hiring = now - relativedelta(years=3)
-        year = date_of_hiring.strftime("%y")
-        ApprovalFactory(number=f"{PREFIX}{year}99998", start_at=date_of_hiring)
+        hiring_start_at = now - relativedelta(years=3)
+        year = hiring_start_at.strftime("%y")
+        ApprovalFactory(number=f"{PREFIX}{year}99998", start_at=hiring_start_at)
         expected_number = f"{PREFIX}{year}99999"
-        self.assertEqual(Approval.get_next_number(date_of_hiring), expected_number)
+        self.assertEqual(Approval.get_next_number(hiring_start_at), expected_number)
         Approval.objects.all().delete()
 
         # Date of hiring in the future.
-        date_of_hiring = now + relativedelta(years=3)
-        year = date_of_hiring.strftime("%y")
-        ApprovalFactory(number=f"{PREFIX}{year}00020", start_at=date_of_hiring)
+        hiring_start_at = now + relativedelta(years=3)
+        year = hiring_start_at.strftime("%y")
+        ApprovalFactory(number=f"{PREFIX}{year}00020", start_at=hiring_start_at)
         expected_number = f"{PREFIX}{year}00021"
-        self.assertEqual(Approval.get_next_number(date_of_hiring), expected_number)
+        self.assertEqual(Approval.get_next_number(hiring_start_at), expected_number)
         Approval.objects.all().delete()
 
         # With pre-existing Pôle emploi approval.

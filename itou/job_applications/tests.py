@@ -191,7 +191,7 @@ class JobApplicationEmailTest(TestCase):
     def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            date_of_hiring=datetime.date.today(),
+            hiring_start_at=datetime.date.today(),
         )
         accepted_by = job_application.to_siae.members.first()
         email = job_application.email_accept_trigger_manual_approval(accepted_by)
@@ -209,7 +209,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.get_kind_display(), email.body)
         self.assertIn(job_application.to_siae.get_department_display(), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.date_of_hiring.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn(accepted_by.get_full_name(), email.body)
         self.assertIn(accepted_by.email, email.body)
         self.assertIn(
@@ -223,7 +223,7 @@ class JobApplicationEmailTest(TestCase):
         approvals_admin_query_string = urlencode(
             {
                 "user": job_application.job_seeker.pk,
-                "start_at": job_application.date_of_hiring.strftime("%d/%m/%Y"),
+                "hiring_start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
                 "job_application": job_application.pk,
             }
         )

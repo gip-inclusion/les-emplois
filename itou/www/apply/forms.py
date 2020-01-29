@@ -143,23 +143,23 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["date_of_hiring"].required = True
-        self.fields["date_of_hiring"].input_formats = settings.DATE_INPUT_FORMATS
+        self.fields["hiring_start_at"].required = True
+        self.fields["hiring_start_at"].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
         model = JobApplication
-        fields = ["date_of_hiring", "answer"]
+        fields = ["hiring_start_at", "answer"]
         help_texts = {
-            "date_of_hiring": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            "hiring_start_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
             % {"date": datetime.date.today().strftime("%d/%m/%Y")}
         }
 
-    def clean_date_of_hiring(self):
-        date_of_hiring = self.cleaned_data["date_of_hiring"]
-        if date_of_hiring and date_of_hiring < datetime.date.today():
+    def clean_hiring_start_at(self):
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
+        if hiring_start_at and hiring_start_at < datetime.date.today():
             error = _("La date d'embauche ne doit pas être dans le passé.")
             raise forms.ValidationError(error)
-        return date_of_hiring
+        return hiring_start_at
 
 
 class FilterJobApplicationsForm(forms.Form):
