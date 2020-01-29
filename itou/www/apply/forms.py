@@ -1,11 +1,14 @@
 import datetime
 
+from dateutil.relativedelta import relativedelta
+
 from django import forms
 from django.conf import settings
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.widgets import DatePickerField
 
@@ -141,25 +144,64 @@ class AcceptForm(forms.ModelForm):
     Allow an SIAE to add an answer message when postponing or accepting.
     """
 
+    ERROR_START_IN_PAST = _(
+        f"La date de début du contrat ne doit pas être dans le passé."
+    )
+    ERROR_START_LATER_THAN_END = _(
+        f"La date de début du contrat ne peut être postérieure à la date de fin."
+    )
+    ERROR_DURATION_TOO_LONG = _(
+        f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["hiring_start_at"].required = True
-        self.fields["hiring_start_at"].input_formats = settings.DATE_INPUT_FORMATS
+        for field in ["hiring_start_at", "hiring_end_at"]:
+            self.fields[field].required = True
+            self.fields[field].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
         model = JobApplication
-        fields = ["hiring_start_at", "answer"]
+        fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
             "hiring_start_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
-            % {"date": datetime.date.today().strftime("%d/%m/%Y")}
+            % {"date": datetime.date.today().strftime("%d/%m/%Y")},
+            "hiring_end_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            % {
+                "date": (
+                    datetime.date.today()
+                    + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+                ).strftime("%d/%m/%Y")
+            },
         }
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         if hiring_start_at and hiring_start_at < datetime.date.today():
-            error = _("La date d'embauche ne doit pas être dans le passé.")
-            raise forms.ValidationError(error)
+            raise forms.ValidationError(self.ERROR_START_IN_PAST)
         return hiring_start_at
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.errors:
+            return cleaned_data
+
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
+        hiring_end_at = self.cleaned_data["hiring_end_at"]
+
+        if hiring_end_at <= hiring_start_at:
+            raise forms.ValidationError(self.ERROR_START_LATER_THAN_END)
+
+        if self.instance.to_siae.is_subject_to_eligibility_rules:
+            duration = relativedelta(hiring_end_at, hiring_start_at)
+            benchmark = Approval.DEFAULT_APPROVAL_YEARS
+            if duration.years > benchmark or (
+                duration.years == benchmark and duration.days > 0
+            ):
+                raise forms.ValidationError(self.ERROR_DURATION_TOO_LONG)
+
+        return cleaned_data
 
 
 class FilterJobApplicationsForm(forms.Form):

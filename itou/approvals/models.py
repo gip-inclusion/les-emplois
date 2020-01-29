@@ -26,6 +26,8 @@ class CommonApprovalMixin(models.Model):
     and `PoleEmploiApproval` models.
     """
 
+    # Default duration of an approval.
+    DEFAULT_APPROVAL_YEARS = 2
     # A period after expiry of an Approval during which a person cannot obtain a new one
     # except from an "authorized prescriber".
     YEARS_BEFORE_NEW_APPROVAL = 2
@@ -53,7 +55,7 @@ class CommonApprovalMixin(models.Model):
         return relativedelta(timezone.now().date(), self.end_at)
 
     @property
-    def CAN_OBTAIN_NEW(self):
+    def can_obtain_new(self):
         return self.time_since_end.years > self.YEARS_BEFORE_NEW_APPROVAL or (
             self.time_since_end.years == self.YEARS_BEFORE_NEW_APPROVAL
             and self.time_since_end.days > 0
@@ -327,6 +329,6 @@ class ApprovalsWrapper:
 
         if approval.is_valid:
             return self.STATUS(code=self.VALID, approval=approval)
-        if approval.CAN_OBTAIN_NEW:
+        if approval.can_obtain_new:
             return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=approval)
         return self.STATUS(code=self.CANNOT_OBTAIN_NEW, approval=approval)

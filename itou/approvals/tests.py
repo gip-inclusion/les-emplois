@@ -120,7 +120,7 @@ class CommonApprovalMixinTest(TestCase):
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertEqual(approval.time_since_end.days, 1)
 
-    def test_CAN_OBTAIN_NEW(self):
+    def test_can_obtain_new(self):
 
         # 1 day before `YEARS_BEFORE_NEW_APPROVAL`.
         end_at = (
@@ -130,7 +130,7 @@ class CommonApprovalMixinTest(TestCase):
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.CAN_OBTAIN_NEW)
+        self.assertFalse(approval.can_obtain_new)
 
         # Exactly `YEARS_BEFORE_NEW_APPROVAL`.
         end_at = datetime.date.today() - relativedelta(
@@ -138,7 +138,7 @@ class CommonApprovalMixinTest(TestCase):
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.CAN_OBTAIN_NEW)
+        self.assertFalse(approval.can_obtain_new)
 
         # 1 day after `YEARS_BEFORE_NEW_APPROVAL`.
         end_at = (
@@ -148,7 +148,7 @@ class CommonApprovalMixinTest(TestCase):
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.CAN_OBTAIN_NEW)
+        self.assertTrue(approval.can_obtain_new)
 
 
 class ApprovalModelTest(TestCase):
