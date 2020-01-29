@@ -144,16 +144,6 @@ class AcceptForm(forms.ModelForm):
     Allow an SIAE to add an answer message when postponing or accepting.
     """
 
-    ERROR_START_IN_PAST = _(
-        f"La date de début du contrat ne doit pas être dans le passé."
-    )
-    ERROR_START_LATER_THAN_END = _(
-        f"La date de début du contrat ne peut être postérieure à la date de fin."
-    )
-    ERROR_DURATION_TOO_LONG = _(
-        f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field in ["hiring_start_at", "hiring_end_at"]:

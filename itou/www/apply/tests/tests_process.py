@@ -141,12 +141,7 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(
-            response,
-            "form",
-            "hiring_start_at",
-            response.context["form"].ERROR_START_IN_PAST,
-        )
+        self.assertFormError(response, "form", None, JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
         hiring_start_at = datetime.date.today()
@@ -158,7 +153,7 @@ class ProcessViewsTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(
-            response, "form", None, response.context["form"].ERROR_START_LATER_THAN_END
+            response, "form", None, JobApplication.ERROR_END_IS_BEFORE_START
         )
 
         # Duration too long.
@@ -171,7 +166,7 @@ class ProcessViewsTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(
-            response, "form", None, response.context["form"].ERROR_DURATION_TOO_LONG
+            response, "form", None, JobApplication.ERROR_DURATION_TOO_LONG
         )
 
         # Good duration.

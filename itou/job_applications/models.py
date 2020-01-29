@@ -1,8 +1,12 @@
+import datetime
 import logging
 import uuid
 
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.http import urlencode
@@ -10,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django_xworkflows import models as xwf_models
 
+from itou.approvals.models import Approval
 from itou.utils.emails import get_email_text_template
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
@@ -152,6 +157,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
+    ERROR_START_IN_PAST = _(
+        f"La date de début du contrat ne doit pas être dans le passé."
+    )
+    ERROR_END_IS_BEFORE_START = _(
+        f"La date de fin du contrat doit être postérieure à la date de début."
+    )
+    ERROR_DURATION_TOO_LONG = _(
+        f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(
@@ -246,8 +261,29 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return str(self.id)
 
     def save(self, *args, **kwargs):
+        self.clean()
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    def clean(self):
+
+        if self.hiring_start_at and self.hiring_start_at < datetime.date.today():
+            raise ValidationError(self.ERROR_START_IN_PAST)
+
+        if self.hiring_start_at and self.hiring_end_at:
+
+            if self.hiring_end_at <= self.hiring_start_at:
+                raise ValidationError(self.ERROR_END_IS_BEFORE_START)
+
+            if self.to_siae and self.to_siae.is_subject_to_eligibility_rules:
+                duration = relativedelta(self.hiring_end_at, self.hiring_start_at)
+                benchmark = Approval.DEFAULT_APPROVAL_YEARS
+                if duration.years > benchmark or (
+                    duration.years == benchmark and duration.days > 0
+                ):
+                    raise ValidationError(self.ERROR_DURATION_TOO_LONG)
+
+        super().clean()
 
     @property
     def is_sent_by_proxy(self):
