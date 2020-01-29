@@ -101,6 +101,11 @@ class Command(BaseCommand):
 
             ID_REGIONAL_BENE = row[1].value.strip()
             assert len(ID_REGIONAL_BENE) == 8
+            # Check the format of ID_REGIONAL_BENE.
+            # First 7 chars should be digits.
+            assert ID_REGIONAL_BENE[:7].isdigit()
+            # Last char should be alphanumeric.
+            assert ID_REGIONAL_BENE[7:].isalnum()
 
             NOM_USAGE_BENE = row[2].value.strip()
             assert "  " not in NOM_USAGE_BENE
