@@ -28,6 +28,9 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.LazyAttribute(lambda obj: f"{obj.name}@example.com")
     department = factory.fuzzy.FuzzyChoice(settings.ITOU_TEST_DEPARTMENTS)
+    address_line_1 = factory.Faker("street_address", locale="fr_FR")
+    post_code = factory.Faker("postalcode")
+    city = factory.Faker("city", locale="fr_FR")
 
 
 class SiaeMembershipFactory(factory.django.DjangoModelFactory):

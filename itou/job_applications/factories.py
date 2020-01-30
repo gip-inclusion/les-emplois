@@ -3,6 +3,8 @@ import datetime
 import factory
 import factory.fuzzy
 
+from dateutil.relativedelta import relativedelta
+
 from itou.job_applications import models
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
@@ -25,6 +27,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = datetime.date.today()
+    hiring_end_at = datetime.date.today() + relativedelta(years=2)
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):

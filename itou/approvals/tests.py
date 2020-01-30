@@ -2,6 +2,7 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 
+from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -225,9 +226,25 @@ class ApprovalModelTest(TestCase):
         approval.send_number_by_email()
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
+
         self.assertIn(approval.user.get_full_name(), email.subject)
-        self.assertIn(approval.user.get_full_name(), email.body)
-        self.assertIn(approval.number, email.body)
+        self.assertIn(approval.number_with_spaces, email.body)
+        self.assertIn(approval.user.last_name, email.body)
+        self.assertIn(approval.user.first_name, email.body)
+        self.assertIn(approval.user.birthdate.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(
+            approval.job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body
+        )
+        self.assertIn(
+            approval.job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body
+        )
+        self.assertIn(approval.job_application.to_siae.display_name, email.body)
+        self.assertIn(approval.job_application.to_siae.get_kind_display(), email.body)
+        self.assertIn(approval.job_application.to_siae.address_line_1, email.body)
+        self.assertIn(approval.job_application.to_siae.address_line_2, email.body)
+        self.assertIn(approval.job_application.to_siae.post_code, email.body)
+        self.assertIn(approval.job_application.to_siae.city, email.body)
+        self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
 
     def test_is_valid(self):
 
