@@ -23,3 +23,17 @@ def validate_naf(naf):
         raise ValidationError(
             _("Le code NAF doit être composé de de 4 chiffres et d'une lettre.")
         )
+
+
+def validate_pole_emploi_id(pole_emploi_id):
+    if (
+        len(pole_emploi_id) != 8
+        or not pole_emploi_id[:7].isdigit()
+        or not pole_emploi_id[7:].isalnum()
+    ):
+        raise ValidationError(
+            _(
+                "L'identifiant Pôle emploi doit être composé de 8 caractères : "
+                "7 chiffres suivis d'une 1 lettre ou d'un chiffre."
+            )
+        )

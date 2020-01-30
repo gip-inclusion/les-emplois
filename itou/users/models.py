@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -6,6 +7,7 @@ from allauth.utils import generate_unique_username
 
 from itou.approvals.models import ApprovalsWrapper
 from itou.approvals.models import PoleEmploiApproval
+from itou.utils.validators import validate_pole_emploi_id
 
 
 class User(AbstractUser):
@@ -38,7 +40,13 @@ class User(AbstractUser):
     is_siae_staff = models.BooleanField(
         verbose_name=_("Employeur (SIAE)"), default=False
     )
-
+    pole_emploi_id = models.CharField(
+        verbose_name=_("Identifiant Pôle emploi"),
+        help_text=_("7 chiffres suivis d'une 1 lettre ou d'un chiffre."),
+        max_length=8,
+        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
+        blank=True,
+    )
     created_by = models.ForeignKey(
         "self",
         verbose_name=_("Créé par"),

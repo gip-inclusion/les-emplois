@@ -99,6 +99,7 @@ class Command(BaseCommand):
             CODE_STRUCT_AFFECT_BENE = str(row[0].value)
             assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
 
+            # This is known as "Identifiant Pôle emploi".
             ID_REGIONAL_BENE = row[1].value.strip()
             assert len(ID_REGIONAL_BENE) == 8
             # Check the format of ID_REGIONAL_BENE.

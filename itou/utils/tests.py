@@ -23,8 +23,9 @@ from itou.utils.urls import get_safe_url
 from itou.utils.validators import (
     alphanumeric,
     validate_naf,
-    validate_siret,
+    validate_pole_emploi_id,
     validate_post_code,
+    validate_siret,
 )
 
 
@@ -260,6 +261,21 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_post_code, "123456")
         self.assertRaises(ValidationError, validate_post_code, "1234X")
         validate_post_code("12345")
+
+    def test_validate_post_code(self):
+        self.assertRaises(ValidationError, validate_post_code, "")
+        self.assertRaises(ValidationError, validate_post_code, "1234")
+        self.assertRaises(ValidationError, validate_post_code, "123456")
+        self.assertRaises(ValidationError, validate_post_code, "1234X")
+        validate_post_code("12345")
+
+    def test_validate_pole_emploi_id(self):
+        self.assertRaises(ValidationError, validate_pole_emploi_id, "A2345678")
+        self.assertRaises(ValidationError, validate_pole_emploi_id, "1234")
+        self.assertRaises(ValidationError, validate_pole_emploi_id, "123412345654")
+        self.assertRaises(ValidationError, validate_pole_emploi_id, "A234567É")
+        validate_pole_emploi_id("12345678")
+        validate_pole_emploi_id("A234567E")
 
 
 class UtilsTemplateTagsTestCase(TestCase):

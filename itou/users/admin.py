@@ -56,6 +56,7 @@ class ItouUserAdmin(UserAdmin):
                     "is_job_seeker",
                     "is_prescriber",
                     "is_siae_staff",
+                    "pole_emploi_id",
                     "created_by",
                 )
             },
