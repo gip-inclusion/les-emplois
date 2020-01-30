@@ -26,7 +26,13 @@
             {% trans "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
         </li>
         <li>
-            {% trans "Durée moyenne entre la candidature et son acceptation" %} : <b>{{ data.average_delay_from_application_to_hiring.days }} {% trans "jour(s)" %}</b>
+            {% trans "Durée moyenne entre la candidature et son acceptation" %} :
+            <b>
+                {{ data.average_delay_from_application_to_hiring.days }}
+                {% trans "jour(s) et " %}
+                {{ data.average_delay_from_application_to_hiring.seconds|intdiv:3600 }}
+                {% trans "heure(s)" %}
+            </b>
         </li>
         <li>
             {% trans "Durée moyenne entre l'acceptation de la candidature et la délivrance du pass IAE" %} :
@@ -38,7 +44,13 @@
             </b>
         </li>
         <li>
-            {% trans "Durée moyenne entre la délivrance du pass IAE et le début du contrat" %} : <b>{{ data.average_delay_from_pass_delivery_to_contract_start.days }} {% trans "jour(s)" %}</b>
+            {% trans "Durée moyenne entre la délivrance du pass IAE et le début du contrat" %} :
+            <b>
+                {{ data.average_delay_from_pass_delivery_to_contract_start.days }}
+                {% trans "jour(s) et " %}
+                {{ data.average_delay_from_pass_delivery_to_contract_start.seconds|intdiv:3600 }}
+                {% trans "heure(s)" %}
+            </b>
         </li>
         <li>
             {% trans "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }}</b>
