@@ -283,6 +283,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -488,6 +489,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -644,6 +646,7 @@ class ApplyAsPrescriberTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -850,6 +853,7 @@ class ApplyAsSiaeTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
