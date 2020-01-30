@@ -275,7 +275,7 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_pole_emploi_id, "123412345654")
         self.assertRaises(ValidationError, validate_pole_emploi_id, "A234567É")
         validate_pole_emploi_id("12345678")
-        validate_pole_emploi_id("A234567E")
+        validate_pole_emploi_id("1234567E")
 
 
 class UtilsTemplateTagsTestCase(TestCase):

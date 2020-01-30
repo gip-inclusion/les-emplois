@@ -3,6 +3,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.approvals.factories import PoleEmploiApprovalFactory
@@ -38,6 +39,10 @@ class ModelTest(TestCase):
         self.assertEqual(user.phone, user_data["phone"])
         self.assertEqual(user.created_by, proxy_user)
         self.assertEqual(user.last_login, None)
+
+        # E-mail already exists, this should raise an error.
+        with self.assertRaises(ValidationError):
+            User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
     def test_has_eligibility_diagnosis(self):
 

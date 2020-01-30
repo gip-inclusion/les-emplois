@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -54,6 +55,19 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
+
+    def save(self, *args, **kwargs):
+        already_exists = bool(self.pk)
+        # There is no unicity constraint on `email` at the DB level.
+        # It's in anticipation of other authentication methods to
+        # authenticate against something else, e.g. username/password.
+        if (
+            not already_exists
+            and self.email
+            and User.objects.filter(email=self.email).exists()
+        ):
+            raise ValidationError(_("Cet e-mail existe déjà."))
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email
