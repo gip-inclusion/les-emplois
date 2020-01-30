@@ -37,7 +37,7 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
         model = PoleEmploiApproval
 
     pe_structure_code = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
-    pe_regional_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
+    pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
     number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
     birth_name = factory.LazyAttribute(lambda obj: obj.last_name)
     birthdate = factory.fuzzy.FuzzyDate(

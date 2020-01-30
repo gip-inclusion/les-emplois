@@ -159,7 +159,7 @@ class Command(BaseCommand):
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
                 pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
-                pe_approval.pe_regional_id = ID_REGIONAL_BENE
+                pe_approval.pole_emploi_id = ID_REGIONAL_BENE
                 pe_approval.number = NUM_AGR_DEC
                 pe_approval.first_name = PRENOM_BENE
                 pe_approval.last_name = NOM_USAGE_BENE

@@ -199,22 +199,33 @@ class Approval(CommonApprovalMixin):
 
 
 class PoleEmploiApprovalManager(models.Manager):
-    def find_for(self, first_name, last_name, birthdate):
+    def find_for(self, user):
         """
-        Returns all available entries for the given `first_name`, `last_name`
-        and `birthdate` (in an ideal case there is only 1 result).
+        Find an existing valid Pôle emploi's approval for the given user.
+
+        The check could be done on `first_name` + `last_name` + `birthdate`
+        but it's far from ideal:
+
+        - the character encoding format is different between databases
+        - there are no accents in the PE database
+            => `name_format()` is required to harmonize the formats
+        - input errors in names are possible on both sides
+        - there can be an inversion of first and last name fields
+        - imported data can be poorly structured (first and last names in the same field)
+
+        The only solution to ID a person between information systems would be to have
+        a unique ID per user known by everyone (Itou, PE and the job seeker).
+
+        Yet we don't have such an identifier.
+
+        As a workaround, we rely on the combination of `pole_emploi_id` (non-unique)
+        and `birthdate`.
+
+        Their input formats can be checked to limit the risk of errors.
         """
-        first_name = PoleEmploiApproval.name_format(first_name)
-        last_name = PoleEmploiApproval.name_format(last_name)
-        qs = self.filter(
-            first_name=first_name, last_name=last_name, birthdate=birthdate
+        return self.filter(
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         ).order_by("-start_at")
-        if not qs.exists():
-            # Try with `birth_name` instead of `last_name.
-            qs = self.filter(
-                first_name=first_name, birth_name=last_name, birthdate=birthdate
-            ).order_by("-start_at")
-        return qs
 
 
 class PoleEmploiApproval(CommonApprovalMixin):
@@ -232,10 +243,6 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
     If a valid Pôle emploi's approval is found, it's copied in the `Approval`
     model.
-
-    When searching for a Pôle emploi's approval, the check can only be done
-    on the triplet `first_name` + `last_name` + `birthdate` with the custom
-    format of names used by Pôle emploi. It's far from ideal…
     """
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
@@ -244,7 +251,9 @@ class PoleEmploiApproval(CommonApprovalMixin):
     # increases the length to 15 chars. Their meaning is yet unclear: we were told
     # `A01` means "interruption" and `S01` means "suspension".
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
-    pe_regional_id = models.CharField(_("Code regional Pôle emploi"), max_length=8)
+    pole_emploi_id = models.CharField(
+        _("Identifiant Pôle emploi"), max_length=8, db_index=True
+    )
     first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
     last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
@@ -315,9 +324,7 @@ class ApprovalsWrapper:
     def __init__(self, user):
         self.approvals = Approval.objects.filter(user=user).order_by(
             "-start_at"
-        ) or PoleEmploiApproval.objects.find_for(
-            user.first_name, user.last_name, user.birthdate
-        )
+        ) or PoleEmploiApproval.objects.find_for(user)
 
     def get_status(self):
         if not self.approvals:

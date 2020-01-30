@@ -58,9 +58,7 @@ class ModelTest(TestCase):
         # Has valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
         PoleEmploiApprovalFactory(
-            first_name=job_seeker.first_name,
-            last_name=job_seeker.last_name,
-            birthdate=job_seeker.birthdate,
+            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
         )
         self.assertTrue(job_seeker.has_eligibility_diagnosis)
 
@@ -69,8 +67,7 @@ class ModelTest(TestCase):
         end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
-            first_name=job_seeker.first_name,
-            last_name=job_seeker.last_name,
+            pole_emploi_id=job_seeker.pole_emploi_id,
             birthdate=job_seeker.birthdate,
             start_at=start_at,
             end_at=end_at,

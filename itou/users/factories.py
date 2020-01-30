@@ -29,6 +29,7 @@ class UserFactory(factory.django.DjangoModelFactory):
 
 class JobSeekerFactory(UserFactory):
     is_job_seeker = True
+    pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
 
 
 class PrescriberFactory(UserFactory):

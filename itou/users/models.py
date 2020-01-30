@@ -87,11 +87,7 @@ class User(AbstractUser):
         """
         return self.is_job_seeker and (
             self.eligibility_diagnoses.exists()
-            or PoleEmploiApproval.objects.find_for(
-                self.first_name, self.last_name, self.birthdate
-            )
-            .valid()
-            .exists()
+            or PoleEmploiApproval.objects.find_for(self).valid().exists()
         )
 
     def get_eligibility_diagnosis(self):

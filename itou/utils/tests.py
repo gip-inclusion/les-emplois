@@ -262,13 +262,6 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_post_code, "1234X")
         validate_post_code("12345")
 
-    def test_validate_post_code(self):
-        self.assertRaises(ValidationError, validate_post_code, "")
-        self.assertRaises(ValidationError, validate_post_code, "1234")
-        self.assertRaises(ValidationError, validate_post_code, "123456")
-        self.assertRaises(ValidationError, validate_post_code, "1234X")
-        validate_post_code("12345")
-
     def test_validate_pole_emploi_id(self):
         self.assertRaises(ValidationError, validate_pole_emploi_id, "A2345678")
         self.assertRaises(ValidationError, validate_pole_emploi_id, "1234")

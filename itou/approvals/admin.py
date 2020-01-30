@@ -107,6 +107,7 @@ class ApprovalAdmin(admin.ModelAdmin):
 class PoleEmploiApprovalAdmin(admin.ModelAdmin):
     list_display = (
         "id",
+        "pole_emploi_id",
         "number",
         "first_name",
         "last_name",
@@ -115,7 +116,13 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "end_at",
         "is_valid",
     )
-    search_fields = ("number", "first_name", "last_name", "birth_name")
+    search_fields = (
+        "pole_emploi_id",
+        "number",
+        "first_name",
+        "last_name",
+        "birth_name",
+    )
     list_filter = (IsValidFilter,)
     date_hierarchy = "start_at"
 

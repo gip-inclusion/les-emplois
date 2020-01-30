@@ -325,47 +325,11 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
     def test_find_for(self):
 
-        first_name = "Désirée"
-        last_name = "Backer-Grøndahl"
-        birthdate = datetime.date(1988, 12, 20)
+        user = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(
-            first_name=first_name, last_name=last_name, birthdate=birthdate
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         )
-        search_results = PoleEmploiApproval.objects.find_for(
-            first_name, last_name, birthdate
-        )
-        self.assertEqual(search_results.count(), 1)
-        self.assertEqual(search_results.first(), pe_approval)
-        PoleEmploiApproval.objects.all().delete()
-
-        # Ensure `birthdate` is checked.
-        PoleEmploiApprovalFactory(
-            first_name="Kertész",
-            last_name="István",
-            birthdate=datetime.date(1988, 12, 20),
-        )
-        pe_approval = PoleEmploiApprovalFactory(
-            first_name="Kertész",
-            last_name="István",
-            birthdate=datetime.date(1987, 2, 12),
-        )
-        search_results = PoleEmploiApproval.objects.find_for(
-            "Kertész", "István", datetime.date(1987, 2, 12)
-        )
-        self.assertEqual(search_results.count(), 1)
-        self.assertEqual(search_results.first(), pe_approval)
-        PoleEmploiApproval.objects.all().delete()
-
-        # Test search on `birth_name`.
-        pe_approval = PoleEmploiApprovalFactory(
-            first_name="Marie-Louise",
-            last_name="Dufour",
-            birth_name="Durand",
-            birthdate=datetime.date(1992, 1, 1),
-        )
-        search_results = PoleEmploiApproval.objects.find_for(
-            "marie-louise", "durand", datetime.date(1992, 1, 1)
-        )
+        search_results = PoleEmploiApproval.objects.find_for(user)
         self.assertEqual(search_results.count(), 1)
         self.assertEqual(search_results.first(), pe_approval)
         PoleEmploiApproval.objects.all().delete()
@@ -409,21 +373,13 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(status.code, ApprovalsWrapper.CAN_OBTAIN_NEW)
         self.assertEqual(status.approval, approval)
 
-    def test_status_with_multiple_homonym_pole_emploi_approvals(self):
-        user = JobSeekerFactory(
-            first_name="Marie-Louise",
-            last_name="Dufour",
-            birthdate=datetime.date(1992, 1, 1),
+    def test_status_with_multiple_results(self):
+        user = JobSeekerFactory()
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         )
         PoleEmploiApprovalFactory(
-            first_name=user.first_name,
-            last_name=user.last_name,
-            birthdate=user.birthdate,
-        )
-        PoleEmploiApprovalFactory(
-            first_name=user.first_name,
-            last_name=user.last_name,
-            birthdate=user.birthdate,
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         )
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.MULTIPLE_RESULTS)
@@ -432,9 +388,7 @@ class ApprovalsWrapperTest(TestCase):
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory()
         approval = PoleEmploiApprovalFactory(
-            first_name=user.first_name,
-            last_name=user.last_name,
-            birthdate=user.birthdate,
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         )
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.VALID)

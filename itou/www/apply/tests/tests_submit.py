@@ -175,8 +175,7 @@ class ApplyAsJobSeekerTest(TestCase):
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
-            first_name=user.first_name,
-            last_name=user.last_name,
+            pole_emploi_id=user.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=start_at,
             end_at=end_at,
