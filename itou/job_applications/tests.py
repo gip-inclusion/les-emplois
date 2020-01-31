@@ -5,8 +5,8 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 
+from itou.approvals.factories import ApprovalFactory
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.job_applications.factories import (
@@ -206,28 +206,21 @@ class JobApplicationEmailTest(TestCase):
             job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body
         )
         self.assertIn(job_application.to_siae.siret, email.body)
+        self.assertIn(job_application.to_siae.kind, email.body)
         self.assertIn(job_application.to_siae.get_kind_display(), email.body)
         self.assertIn(job_application.to_siae.get_department_display(), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn(accepted_by.get_full_name(), email.body)
         self.assertIn(accepted_by.email, email.body)
         self.assertIn(
             reverse(
-                "admin:job_applications_jobapplication_change",
-                args=[job_application.id],
+                "admin:approvals_approval_manually_add_approval",
+                args=[job_application.pk],
             ),
             email.body,
         )
-        self.assertIn(reverse("admin:approvals_approval_add"), email.body)
-        approvals_admin_query_string = urlencode(
-            {
-                "user": job_application.job_seeker.pk,
-                "hiring_start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
-                "job_application": job_application.pk,
-            }
-        )
-        self.assertIn(approvals_admin_query_string, email.body)
 
     def test_refuse(self):
 
@@ -260,6 +253,39 @@ class JobApplicationEmailTest(TestCase):
         # Body.
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
+
+    def test_send_approval_number_by_email(self):
+
+        job_seeker = JobSeekerFactory()
+        approval = ApprovalFactory(user=job_seeker)
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            approval=approval,
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+
+        # Delete `accept` and `accept_trigger_manual_approval` emails.
+        mail.outbox = []
+
+        job_application.send_approval_number_by_email()
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+
+        self.assertIn(approval.user.get_full_name(), email.subject)
+        self.assertIn(approval.number_with_spaces, email.body)
+        self.assertIn(approval.user.last_name, email.body)
+        self.assertIn(approval.user.first_name, email.body)
+        self.assertIn(approval.user.birthdate.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.to_siae.get_kind_display(), email.body)
+        self.assertIn(job_application.to_siae.address_line_1, email.body)
+        self.assertIn(job_application.to_siae.address_line_2, email.body)
+        self.assertIn(job_application.to_siae.post_code, email.body)
+        self.assertIn(job_application.to_siae.city, email.body)
+        self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
 
 
 class JobApplicationWorkflowTest(TestCase):

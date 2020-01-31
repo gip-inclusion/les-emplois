@@ -2,21 +2,22 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 
-from django.conf import settings
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory
 from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.approvals.models import ApprovalsWrapper
-from itou.job_applications.factories import (
-    JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
-)
-from itou.job_applications.models import JobApplicationWorkflow
-from itou.users.factories import JobSeekerFactory
+from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import JobSeekerFactory, UserFactory
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -212,40 +213,6 @@ class ApprovalModelTest(TestCase):
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
 
-    def test_send_number_by_email(self):
-
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        job_application.accept(user=job_application.to_siae.members.first())
-        approval = ApprovalFactory(job_application=job_application)
-
-        # Delete `accept` and `accept_trigger_manual_approval` emails.
-        mail.outbox = []
-
-        approval.send_number_by_email()
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-
-        self.assertIn(approval.user.get_full_name(), email.subject)
-        self.assertIn(approval.number_with_spaces, email.body)
-        self.assertIn(approval.user.last_name, email.body)
-        self.assertIn(approval.user.first_name, email.body)
-        self.assertIn(approval.user.birthdate.strftime("%d/%m/%Y"), email.body)
-        self.assertIn(
-            approval.job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body
-        )
-        self.assertIn(
-            approval.job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body
-        )
-        self.assertIn(approval.job_application.to_siae.display_name, email.body)
-        self.assertIn(approval.job_application.to_siae.get_kind_display(), email.body)
-        self.assertIn(approval.job_application.to_siae.address_line_1, email.body)
-        self.assertIn(approval.job_application.to_siae.address_line_2, email.body)
-        self.assertIn(approval.job_application.to_siae.post_code, email.body)
-        self.assertIn(approval.job_application.to_siae.city, email.body)
-        self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
-
     def test_is_valid(self):
 
         # Start today, end in 2 years.
@@ -393,3 +360,67 @@ class ApprovalsWrapperTest(TestCase):
         status = ApprovalsWrapper(user).get_status()
         self.assertEqual(status.code, ApprovalsWrapper.VALID)
         self.assertEqual(status.approval, approval)
+
+
+class CustomAdminViewsTest(TestCase):
+    """
+    Test custom admin views.
+    """
+
+    def test_manually_add_approval(self):
+        user = UserFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            approval=None,
+            approval_number_sent_by_email=False,
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+
+        # Delete emails sent by previous transition.
+        mail.outbox = []
+
+        url = reverse(
+            "admin:approvals_approval_manually_add_approval", args=[job_application.pk]
+        )
+
+        # Not enough perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        user.is_staff = True
+        user.save()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(
+            content_type=content_type, codename="add_approval"
+        )
+        user.user_permissions.add(permission)
+
+        # With good perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Create an approval.
+        post_data = {
+            "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
+            "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
+            "number": "400121910144",
+            "user": job_application.job_seeker.pk,
+            "created_by": user.pk,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        # An approval should have been created, attached to the job
+        # application, and sent by email.
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        approval = job_application.approval
+        self.assertEqual(approval.created_by, user)
+        self.assertEqual(approval.number, post_data["number"])
+        self.assertEqual(approval.user, job_application.job_seeker)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn(approval.number_with_spaces, email.body)

@@ -1,14 +1,26 @@
-import datetime
-
-from dateutil.relativedelta import relativedelta
-
 from django.contrib import admin
-from django.contrib import messages
+from django.urls import path
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ugettext as _
 
 from itou.approvals import models
+from itou.approvals.admin_views import manually_add_approval
 from itou.job_applications.models import JobApplication
+
+
+class JobApplicationInline(admin.StackedInline):
+    model = JobApplication
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    fields = ("job_seeker", "hiring_start_at", "hiring_end_at", "approval")
+    raw_id_fields = ("job_seeker",)
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
 
 
 class IsValidFilter(admin.SimpleListFilter):
@@ -29,22 +41,14 @@ class IsValidFilter(admin.SimpleListFilter):
 
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
-    actions = ("send_number_by_email",)
-    list_display = (
-        "id",
-        "number",
-        "user",
-        "start_at",
-        "end_at",
-        "is_valid",
-        "number_sent_by_email",
-    )
+    list_display = ("id", "number", "user", "start_at", "end_at", "is_valid")
     search_fields = ("number", "user__first_name", "user__last_name")
-    list_filter = ("number_sent_by_email", IsValidFilter)
+    list_filter = (IsValidFilter,)
     list_display_links = ("id", "number")
-    raw_id_fields = ("user", "job_application", "created_by")
-    readonly_fields = ("created_at", "created_by", "number_sent_by_email")
+    raw_id_fields = ("user", "created_by")
+    readonly_fields = ("created_at", "created_by")
     date_hierarchy = "start_at"
+    inlines = (JobApplicationInline,)
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -57,50 +61,21 @@ class ApprovalAdmin(admin.ModelAdmin):
     is_valid.boolean = True
     is_valid.short_description = _("En cours de validité")
 
-    def add_view(self, request, form_url="", extra_context=None):
+    def manually_add_approval(self, request, job_application_id):
         """
-        Prepopulate form fields with calculated data.
+        Custom admin view to manually add an approval.
         """
-        g = request.GET.copy()
+        return manually_add_approval(request, self, job_application_id)
 
-        # Prepopulate `number`.
-        job_application = JobApplication.objects.filter(
-            id=g.get("job_application")
-        ).first()
-        hiring_start_at = job_application.hiring_start_at if job_application else None
-        g.update(
-            {"number": self.model.get_next_number(hiring_start_at=hiring_start_at)}
-        )
-
-        # Prepopulate `start_at` and `end_at`.
-        start_at = g.get("hiring_start_at")
-        if start_at:
-            start_at = datetime.datetime.strptime(start_at, "%d/%m/%Y").date()
-            end_at = start_at + relativedelta(years=2) - relativedelta(days=1)
-            g.update({"start_at": start_at, "end_at": end_at})
-
-        request.GET = g
-
-        return super().add_view(request, form_url, extra_context=extra_context)
-
-    def send_number_by_email(self, request, queryset):
-        for approval in queryset:
-            if approval.number_sent_by_email:
-                message = _(f"{approval.number} - Email non envoyé : déjà envoyé.")
-                messages.warning(request, message)
-                continue
-            try:
-                approval.send_number_by_email()
-                approval.number_sent_by_email = True
-                approval.save()
-            except RuntimeError:
-                message = _(
-                    f"{approval.number} - Email non envoyé : impossible de déterminer "
-                    f" le destinataire (candidature inconnue)."
-                )
-                messages.warning(request, message)
-
-    send_number_by_email.short_description = _("Envoyer le numéro par email")
+    def get_urls(self):
+        additional_urls = [
+            path(
+                "<uuid:job_application_id>/add_approval",
+                self.admin_site.admin_view(self.manually_add_approval),
+                name="approvals_approval_manually_add_approval",
+            )
+        ]
+        return additional_urls + super().get_urls()
 
 
 @admin.register(models.PoleEmploiApproval)

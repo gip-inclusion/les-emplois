@@ -1,15 +1,11 @@
-import datetime
 import logging
 import uuid
 
-from dateutil.relativedelta import relativedelta
-
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
 from django_xworkflows import models as xwf_models
@@ -242,6 +238,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     hiring_end_at = models.DateField(
         verbose_name=_("Date de fin du contrat"), blank=True, null=True
     )
+    approval = models.ForeignKey(
+        "approvals.Approval",
+        verbose_name=_("PASS IAE"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    approval_number_sent_by_email = models.BooleanField(
+        verbose_name=_("PASS IAE envoyé par email"), default=False
+    )
 
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
@@ -261,29 +267,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return str(self.id)
 
     def save(self, *args, **kwargs):
-        self.clean()
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
-
-    def clean(self):
-
-        if self.hiring_start_at and self.hiring_start_at < datetime.date.today():
-            raise ValidationError(self.ERROR_START_IN_PAST)
-
-        if self.hiring_start_at and self.hiring_end_at:
-
-            if self.hiring_end_at <= self.hiring_start_at:
-                raise ValidationError(self.ERROR_END_IS_BEFORE_START)
-
-            if self.to_siae and self.to_siae.is_subject_to_eligibility_rules:
-                duration = relativedelta(self.hiring_end_at, self.hiring_start_at)
-                benchmark = Approval.DEFAULT_APPROVAL_YEARS
-                if duration.years > benchmark or (
-                    duration.years == benchmark and duration.days > 0
-                ):
-                    raise ValidationError(self.ERROR_DURATION_TOO_LONG)
-
-        super().clean()
 
     @property
     def is_sent_by_proxy(self):
@@ -317,12 +302,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             .get(to_state=JobApplicationWorkflow.STATE_ACCEPTED)
             .user
         )
-
-    @property
-    def approval(self):
-        if not self.to_siae.is_subject_to_eligibility_rules:
-            return None
-        return self.approval_set.filter(user=self.job_seeker).first()
 
     # Workflow transitions.
 
@@ -405,13 +384,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "job_application": self,
-            # Used to prepopulate the admin form.
-            "approvals_admin_query_string": urlencode(
-                {
-                    "user": self.job_seeker.pk,
-                    "hiring_start_at": self.hiring_start_at.strftime("%d/%m/%Y"),
-                    "job_application": self.pk,
-                }
+            "admin_manually_add_approval_url": reverse(
+                "admin:approvals_approval_manually_add_approval", args=[self.pk]
             ),
         }
         if accepted_by:
@@ -419,6 +393,20 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         subject = "apply/email/accept_trigger_approval_subject.txt"
         body = "apply/email/accept_trigger_approval_body.txt"
         return self.get_email_message(to, context, subject, body)
+
+    def send_approval_number_by_email(self):
+        if not self.accepted_by:
+            raise RuntimeError(_("Unable to determine the recipient email address."))
+        if not self.approval:
+            raise RuntimeError(_("No approval found for this job application."))
+        to = [self.accepted_by.email]
+        context = {"job_application": self}
+        subject = "apply/email/approval_number_subject.txt"
+        body = "apply/email/approval_number_body.txt"
+        email = self.get_email_message(to, context, subject, body)
+        email.send()
+        self.approval_number_sent_by_email = True
+        self.save()
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):

@@ -175,7 +175,7 @@ class AcceptForm(forms.ModelForm):
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         if hiring_start_at and hiring_start_at < datetime.date.today():
-            raise forms.ValidationError(self.ERROR_START_IN_PAST)
+            raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
         return hiring_start_at
 
     def clean(self):
@@ -188,7 +188,7 @@ class AcceptForm(forms.ModelForm):
         hiring_end_at = self.cleaned_data["hiring_end_at"]
 
         if hiring_end_at <= hiring_start_at:
-            raise forms.ValidationError(self.ERROR_START_LATER_THAN_END)
+            raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
         if self.instance.to_siae.is_subject_to_eligibility_rules:
             duration = relativedelta(hiring_end_at, hiring_start_at)
@@ -196,7 +196,7 @@ class AcceptForm(forms.ModelForm):
             if duration.years > benchmark or (
                 duration.years == benchmark and duration.days > 0
             ):
-                raise forms.ValidationError(self.ERROR_DURATION_TOO_LONG)
+                raise forms.ValidationError(JobApplication.ERROR_DURATION_TOO_LONG)
 
         return cleaned_data
 

@@ -16,15 +16,13 @@ Informations pour l'obtention d'un numéro d'agrément.
 
 - Siret : {{ job_application.to_siae.siret }}
 - Nom : {{ job_application.to_siae.display_name }}
-- Type : {{ job_application.to_siae.get_kind_display }}
+- Type : {{ job_application.to_siae.kind }} ({{ job_application.to_siae.get_kind_display }})
 - Département : {{ job_application.to_siae.get_department_display }}
-- Date de l'embauche : {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if accepted_by %}
+- Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if job_application.hiring_end_at %}
+- Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y" }}{% endif %}{% if accepted_by %}
 - Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
 
-Voir la candidature dans l'admin :
-{{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:job_applications_jobapplication_change" job_application.id %}
-
 Ajouter un numéro d'agrément dans l'admin :
-{{ itou_protocol }}://{{ itou_fqdn }}{% url "admin:approvals_approval_add" %}?{{ approvals_admin_query_string }}
+{{ itou_protocol }}://{{ itou_fqdn }}{{ admin_manually_add_approval_url }}
 
 {% endblock body %}

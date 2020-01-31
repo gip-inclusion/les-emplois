@@ -5,7 +5,6 @@ from dateutil.relativedelta import relativedelta
 from unidecode import unidecode
 
 from django.conf import settings
-from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -13,7 +12,6 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from itou.utils.emails import get_email_text_template
 from itou.utils.validators import alphanumeric
 
 
@@ -102,16 +100,6 @@ class Approval(CommonApprovalMixin):
         validators=[alphanumeric, MinLengthValidator(12)],
         unique=True,
     )
-    job_application = models.ForeignKey(
-        "job_applications.JobApplication",
-        verbose_name=_("Candidature d'origine"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-    number_sent_by_email = models.BooleanField(
-        verbose_name=_("Numéro envoyé par email"), default=False
-    )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Créé par"),
@@ -135,11 +123,20 @@ class Approval(CommonApprovalMixin):
         super().save(*args, **kwargs)
 
     def clean(self):
-        if self.end_at <= self.start_at:
-            raise ValidationError(
-                _("La date de fin doit être postérieure à la date de début.")
-            )
-        if not self.pk and self.user.approvals.valid().exists():
+        try:
+            if self.end_at <= self.start_at:
+                raise ValidationError(
+                    _("La date de fin doit être postérieure à la date de début.")
+                )
+        except TypeError:
+            # This can happen if `end_at` or `start_at` are empty or malformed
+            # (e.g. when data comes from a form).
+            pass
+        if (
+            not self.pk
+            and hasattr(self, "user")
+            and self.user.approvals.valid().exists()
+        ):
             raise ValidationError(
                 _(
                     f"Un agrément dans le futur ou en cours de validité existe déjà "
@@ -156,20 +153,6 @@ class Approval(CommonApprovalMixin):
         # pylint: disable=unsubscriptable-object
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
         # pylint: enable=unsubscriptable-object
-
-    def send_number_by_email(self):
-        if not self.job_application or not self.job_application.accepted_by:
-            raise RuntimeError(_("Unable to determine the recipient email address."))
-        context = {"approval": self}
-        subject = "approvals/email/approval_number_subject.txt"
-        body = "approvals/email/approval_number_body.txt"
-        email = mail.EmailMessage(
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[self.job_application.accepted_by.email],
-            subject=get_email_text_template(subject, context),
-            body=get_email_text_template(body, context),
-        )
-        email.send()
 
     @staticmethod
     def get_next_number(hiring_start_at=None):

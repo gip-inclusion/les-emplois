@@ -132,7 +132,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # Wrong dates: start in past.
+        # Wrong dates: force `hiring_start_at` in past.
         hiring_start_at = datetime.date.today() - relativedelta(days=1)
         hiring_end_at = hiring_start_at + relativedelta(years=2)
         post_data = {
@@ -141,7 +141,9 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form", None, JobApplication.ERROR_START_IN_PAST)
+        self.assertFormError(
+            response, "form", "hiring_start_at", JobApplication.ERROR_START_IN_PAST
+        )
 
         # Wrong dates: end < start.
         hiring_start_at = datetime.date.today()
