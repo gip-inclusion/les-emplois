@@ -291,7 +291,7 @@ class JobApplicationEmailTest(TestCase):
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
 
-    def test_accept(self):
+    def test_accept_job_application_sent_by_job_seeker(self):
         user = JobSeekerFactory()
         kwargs = {
             "job_seeker": user,
@@ -329,11 +329,51 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
         self.assertIn("Numéro d'agrément requis sur Itou", mail.outbox[1].subject)
 
-    def test_accept_for_siae_not_subject_to_eligibility_rules(self):
+    def test_accept_job_application_sent_by_prescriber(self):
+        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNone(job_application.approval)
+        self.assertFalse(job_application.approval_number_sent_by_email)
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("Numéro d'agrément requis sur Itou", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_authorized_prescriber(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_siae(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertTrue(job_application.to_siae.is_subject_to_eligibility_rules)
+        self.assertIsNotNone(job_application.approval)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_siae_not_subject_to_eligibility_rules(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
         job_application.accept(user=job_application.to_siae.members.first())
+        self.assertFalse(job_application.to_siae.is_subject_to_eligibility_rules)
+        self.assertIsNone(job_application.approval)
+        self.assertFalse(job_application.approval_number_sent_by_email)
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)

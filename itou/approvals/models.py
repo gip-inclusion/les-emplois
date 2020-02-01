@@ -120,6 +120,9 @@ class Approval(CommonApprovalMixin):
 
     def save(self, *args, **kwargs):
         self.clean()
+
+        # TODO: check number.
+
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -179,6 +182,33 @@ class Approval(CommonApprovalMixin):
             return str(next_number)
         year_2_chars = hiring_start_at.strftime("%y")
         return f"{Approval.ASP_ITOU_PREFIX}{year_2_chars}00001"
+
+    @staticmethod
+    def get_default_end_date(start_at):
+        return (
+            start_at
+            + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+            - relativedelta(days=1)
+        )
+
+    @classmethod
+    def get_or_create_from_valid(cls, approval, user):
+        """
+        Returns an existing valid Approval or create a new entry from
+        an existing valid PoleEmploiApproval.
+        """
+        if not approval.is_valid or not isinstance(approval, (cls, PoleEmploiApproval)):
+            raise RuntimeError(_("Invalid approval."))
+        if isinstance(approval, cls):
+            return approval
+        approval_from_pe = cls(
+            start_at=approval.start_at,
+            end_at=approval.end_at,
+            user=user,
+            number=approval.number,
+        )
+        approval_from_pe.save()
+        return approval_from_pe
 
 
 class PoleEmploiApprovalManager(models.Manager):
@@ -305,9 +335,10 @@ class ApprovalsWrapper:
     )
 
     def __init__(self, user):
-        self.approvals = Approval.objects.filter(user=user).order_by(
+        self.user = user
+        self.approvals = Approval.objects.filter(user=self.user).order_by(
             "-start_at"
-        ) or PoleEmploiApproval.objects.find_for(user)
+        ) or PoleEmploiApproval.objects.find_for(self.user)
 
     def get_status(self):
         if not self.approvals:

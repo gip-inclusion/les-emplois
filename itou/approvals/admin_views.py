@@ -1,5 +1,3 @@
-from dateutil.relativedelta import relativedelta
-
 from django.contrib import admin
 from django.contrib import messages
 from django.contrib.auth import get_permission_codename
@@ -52,15 +50,10 @@ def manually_add_approval(
         approval=None,
     )
 
-    end_at = (
-        job_application.hiring_start_at + relativedelta(years=2) - relativedelta(days=1)
-    )
     initial = {
         "start_at": job_application.hiring_start_at,
-        "end_at": end_at,
-        "number": Approval.get_next_number(
-            hiring_start_at=job_application.hiring_start_at
-        ),
+        "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
+        "number": Approval.get_next_number(job_application.hiring_start_at),
         "user": job_application.job_seeker.pk,
         "created_by": request.user.pk,
     }

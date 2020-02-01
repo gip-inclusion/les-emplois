@@ -245,6 +245,37 @@ class ApprovalModelTest(TestCase):
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
 
+    def test_get_or_create_from_valid(self):
+
+        # With an existing valid `PoleEmploiApproval`.
+
+        user = JobSeekerFactory()
+        valid_pe_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
+        )
+        status = ApprovalsWrapper(user).get_status()
+
+        approval = Approval.get_or_create_from_valid(status.approval, user)
+
+        self.assertTrue(isinstance(approval, Approval))
+        self.assertEqual(approval.start_at, valid_pe_approval.start_at)
+        self.assertEqual(approval.end_at, valid_pe_approval.end_at)
+        self.assertEqual(approval.number, valid_pe_approval.number)
+        self.assertEqual(approval.user, user)
+        self.assertEqual(approval.created_by, None)
+
+        # With an existing valid `Approval`.
+
+        user = JobSeekerFactory()
+        valid_approval = ApprovalFactory(
+            user=user, start_at=datetime.date.today() - relativedelta(days=1)
+        )
+        status = ApprovalsWrapper(user).get_status()
+
+        approval = Approval.get_or_create_from_valid(status.approval, user)
+        self.assertTrue(isinstance(approval, Approval))
+        self.assertEqual(approval, valid_approval)
+
 
 class PoleEmploiApprovalModelTest(TestCase):
     """

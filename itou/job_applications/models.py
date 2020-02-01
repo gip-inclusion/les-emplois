@@ -277,7 +277,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def is_sent_by_authorized_prescriber(self):
         return bool(
-            self.sender_prescriber_organization
+            self.sender_kind == self.SENDER_KIND_PRESCRIBER
+            and self.sender_prescriber_organization
             and self.sender_prescriber_organization.is_authorized
         )
 
@@ -311,18 +312,49 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
+
+        accepted_by = kwargs.get("user")
+
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(
             pk=self.pk
         ).pending():
             job_application.render_obsolete(*args, **kwargs)
-        # Send notification.
-        connection = mail.get_connection()
-        accepted_by = kwargs.get("user")
+
+        # Notification email.
         emails = [self.email_accept]
-        if self.to_siae.is_subject_to_eligibility_rules:
-            emails.append(self.email_accept_trigger_manual_approval(accepted_by))
+        connection = mail.get_connection()
         connection.send_messages(emails)
+
+        # Approval logic.
+        if self.to_siae.is_subject_to_eligibility_rules:
+            if not (
+                self.sender_kind == self.SENDER_KIND_SIAE_STAFF
+                or self.is_sent_by_authorized_prescriber
+            ):
+                # Trigger an Approval manual creation.
+                self.email_accept_trigger_manual_approval(accepted_by).send()
+            else:
+                # Automatic Approval creation.
+                job_seeker_approvals = self.job_seeker.approvals_wrapper
+                approval_status = job_seeker_approvals.get_status()
+                if approval_status.code == job_seeker_approvals.VALID:
+                    # Use an existing valid approval.
+                    approval = Approval.get_or_create_from_valid(
+                        approval_status.approval, self.job_seeker
+                    )
+                else:
+                    # In all other cases, create a new one.
+                    approval = Approval(
+                        start_at=self.hiring_start_at,
+                        end_at=Approval.get_default_end_date(self.hiring_start_at),
+                        number=Approval.get_next_number(self.hiring_start_at),
+                        user=self.job_seeker,
+                    )
+                    approval.save()
+                self.approval = approval
+                self.save()
+                self.send_approval_number_by_email(accepted_by)
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
@@ -394,12 +426,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/accept_trigger_approval_body.txt"
         return self.get_email_message(to, context, subject, body)
 
-    def send_approval_number_by_email(self):
-        if not self.accepted_by:
+    def send_approval_number_by_email(self, accepted_by=None):
+        accepted_by = accepted_by or self.accepted_by
+        if not accepted_by:
             raise RuntimeError(_("Unable to determine the recipient email address."))
         if not self.approval:
             raise RuntimeError(_("No approval found for this job application."))
-        to = [self.accepted_by.email]
+        to = [accepted_by.email]
         context = {"job_application": self}
         subject = "apply/email/approval_number_subject.txt"
         body = "apply/email/approval_number_body.txt"
