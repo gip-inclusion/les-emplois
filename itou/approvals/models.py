@@ -119,9 +119,11 @@ class Approval(CommonApprovalMixin):
 
     def save(self, *args, **kwargs):
         self.clean()
-
-        # TODO: check number.
-
+        already_exists = bool(self.pk)
+        if not already_exists and hasattr(self, "number") and hasattr(self, "start_at"):
+            if self.number.startswith(self.ASP_ITOU_PREFIX):
+                while Approval.objects.filter(number=self.number).exists():
+                    self.number = self.get_next_number(self.start_at)
         super().save(*args, **kwargs)
 
     def clean(self):
