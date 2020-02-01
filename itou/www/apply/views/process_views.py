@@ -184,9 +184,8 @@ def eligibility(
     # authorized prescriber, the job seeker cannot obtain a new approval.
     cannot_obtain_new_approval = False
     job_seeker_approvals = job_application.job_seeker.approvals_wrapper
-    approval_status = job_seeker_approvals.get_status()
     if (
-        approval_status.code == job_seeker_approvals.CANNOT_OBTAIN_NEW
+        job_seeker_approvals.code == job_seeker_approvals.CANNOT_OBTAIN_NEW
     ) and not job_application.is_sent_by_authorized_prescriber:
         cannot_obtain_new_approval = True
 

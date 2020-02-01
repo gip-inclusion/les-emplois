@@ -59,7 +59,7 @@
                 </div>
             </div>
 
-            {% with user.approvals_wrapper.get_status as status %}
+            {% with user.approvals_wrapper as status %}
                 {% if status.code in "VALID,CANNOT_OBTAIN_NEW" %}
                     <div class="card">
                         <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>

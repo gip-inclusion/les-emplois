@@ -1,4 +1,3 @@
-import collections
 import logging
 
 from dateutil.relativedelta import relativedelta
@@ -312,8 +311,6 @@ class ApprovalsWrapper:
     Helper that manipulates both `Approval` and `PoleEmploiApproval` models.
     """
 
-    STATUS = collections.namedtuple("ApprovalCheckerResult", ["code", "approval"])
-
     # Status codes.
     VALID = "VALID"
     CAN_OBTAIN_NEW = "CAN_OBTAIN_NEW"
@@ -335,21 +332,22 @@ class ApprovalsWrapper:
     )
 
     def __init__(self, user):
+
         self.user = user
+        self.approval = None
         self.approvals = Approval.objects.filter(user=self.user).order_by(
             "-start_at"
         ) or PoleEmploiApproval.objects.find_for(self.user)
 
-    def get_status(self):
         if not self.approvals:
-            return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=None)
-        if self.approvals.count() > 1:
-            return self.STATUS(code=self.MULTIPLE_RESULTS, approval=None)
-
-        approval = self.approvals.first()
-
-        if approval.is_valid:
-            return self.STATUS(code=self.VALID, approval=approval)
-        if approval.can_obtain_new:
-            return self.STATUS(code=self.CAN_OBTAIN_NEW, approval=approval)
-        return self.STATUS(code=self.CANNOT_OBTAIN_NEW, approval=approval)
+            self.code = self.CAN_OBTAIN_NEW
+        elif self.approvals.count() > 1:
+            self.code = self.MULTIPLE_RESULTS
+        else:
+            self.approval = self.approvals.first()
+            if self.approval.is_valid:
+                self.code = self.VALID
+            elif self.approval.can_obtain_new:
+                self.code = self.CAN_OBTAIN_NEW
+            else:
+                self.code = self.CANNOT_OBTAIN_NEW
