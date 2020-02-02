@@ -41,6 +41,8 @@ class User(AbstractUser):
     is_siae_staff = models.BooleanField(
         verbose_name=_("Employeur (SIAE)"), default=False
     )
+    # Only for job seekers. Used to search in `PoleEmploiApproval`.
+    # It's not guaranteed to be unique!
     pole_emploi_id = models.CharField(
         verbose_name=_("Identifiant Pôle emploi"),
         help_text=_("7 chiffres suivis d'une 1 lettre ou d'un chiffre."),

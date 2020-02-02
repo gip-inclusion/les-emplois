@@ -79,8 +79,9 @@ class Approval(CommonApprovalMixin):
     """
     Store approvals (`agréments` in French). Another name is `PASS IAE`.
 
-    A number starting with `ASP_ITOU_PREFIX` means it has been delivered through ITOU.
-    Otherwise, it was delivered by Pôle emploi (and found in `PoleEmploiApproval`).
+    A number starting with `ASP_ITOU_PREFIX` means it has been delivered
+    through ITOU. Otherwise, it was delivered by Pôle emploi and initially
+    found in `PoleEmploiApproval`.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -163,7 +164,7 @@ class Approval(CommonApprovalMixin):
         """
         Find next "PASS IAE" number.
 
-        Structure of a "PASS IAE" number (12 chars):
+        Structure of a 12 chars "PASS IAE" number:
             ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
 
         Rule:
@@ -196,7 +197,7 @@ class Approval(CommonApprovalMixin):
     def get_or_create_from_valid(cls, approval, user):
         """
         Returns an existing valid Approval or create a new entry from
-        an existing valid PoleEmploiApproval.
+        a pre-existing valid PoleEmploiApproval by copying its data.
         """
         if not approval.is_valid or not isinstance(approval, (cls, PoleEmploiApproval)):
             raise RuntimeError(_("Invalid approval."))
@@ -217,7 +218,7 @@ class PoleEmploiApprovalManager(models.Manager):
         """
         Find an existing valid Pôle emploi's approval for the given user.
 
-        The check could be done on `first_name` + `last_name` + `birthdate`
+        We were told to check on `first_name` + `last_name` + `birthdate`
         but it's far from ideal:
 
         - the character encoding format is different between databases
@@ -232,8 +233,8 @@ class PoleEmploiApprovalManager(models.Manager):
 
         Yet we don't have such an identifier.
 
-        As a workaround, we rely on the combination of `pole_emploi_id` (non-unique)
-        and `birthdate`.
+        As a workaround, we rely on the combination of `pole_emploi_id` (non-unique
+        but it is assumed that every job seeker knows his number) and `birthdate`.
 
         Their input formats can be checked to limit the risk of errors.
         """
@@ -310,7 +311,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
 class ApprovalsWrapper:
     """
-    Helper that manipulates both `Approval` and `PoleEmploiApproval` models.
+    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models.
     """
 
     # Status codes.

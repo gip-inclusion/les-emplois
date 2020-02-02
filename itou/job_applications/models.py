@@ -314,6 +314,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def accept(self, *args, **kwargs):
 
         accepted_by = kwargs.get("user")
+        approval = None
 
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(
@@ -323,27 +324,28 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Notification email.
         emails = [self.email_accept]
-        connection = mail.get_connection()
-        connection.send_messages(emails)
 
         # Approval logic.
         if self.to_siae.is_subject_to_eligibility_rules:
-            if not (
-                self.sender_kind == self.SENDER_KIND_SIAE_STAFF
-                or self.is_sent_by_authorized_prescriber
-            ):
-                # Trigger an Approval manual creation.
-                self.email_accept_trigger_manual_approval(accepted_by).send()
-            else:
-                # Automatic Approval creation.
-                job_seeker_approvals = self.job_seeker.approvals_wrapper
-                if job_seeker_approvals.status == job_seeker_approvals.VALID:
-                    # Use an existing valid approval.
-                    approval = Approval.get_or_create_from_valid(
-                        job_seeker_approvals.approval, self.job_seeker
+
+            # Find an existing valid approval.
+            job_seeker_approvals = self.job_seeker.approvals_wrapper
+            if job_seeker_approvals.status == job_seeker_approvals.VALID:
+                approval = Approval.get_or_create_from_valid(
+                    job_seeker_approvals.approval, self.job_seeker
+                )
+
+            if not approval:
+                if not (
+                    self.sender_kind == self.SENDER_KIND_SIAE_STAFF
+                    or self.is_sent_by_authorized_prescriber
+                ):
+                    # Trigger a manual creation.
+                    emails.append(
+                        self.email_accept_trigger_manual_approval(accepted_by)
                     )
                 else:
-                    # In all other cases, create a new one.
+                    # Automatic creation.
                     approval = Approval(
                         start_at=self.hiring_start_at,
                         end_at=Approval.get_default_end_date(self.hiring_start_at),
@@ -351,9 +353,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                         user=self.job_seeker,
                     )
                     approval.save()
-                self.approval = approval
-                self.save()
-                self.send_approval_number_by_email(accepted_by)
+
+        # Send emails in batch.
+        connection = mail.get_connection()
+        connection.send_messages(emails)
+
+        if approval:
+            self.approval = approval
+            # Send approval number after all other emails.
+            self.send_approval_number_by_email(accepted_by)
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):

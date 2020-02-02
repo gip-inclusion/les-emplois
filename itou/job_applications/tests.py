@@ -6,7 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.job_applications.factories import (
@@ -328,6 +328,23 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
         self.assertIn("Numéro d'agrément requis sur Itou", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_job_seeker_with_valid_approval(self):
+        job_seeker = JobSeekerFactory()
+        pe_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+        )
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertEqual(job_application.approval.number, pe_approval.number)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_prescriber(self):
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
