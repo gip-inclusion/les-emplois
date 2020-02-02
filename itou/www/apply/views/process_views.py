@@ -139,20 +139,28 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         messages.success(request, _("Embauche acceptée !"))
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
-            # TODO: display another message if the user already have an approval number.
-            messages.success(
-                request,
-                mark_safe(
+            if job_application.approval:
+                messages.success(
+                    request,
                     _(
-                        "Embauche acceptée.<br>"
-                        "Il n'est pas nécessaire de demander le numéro d'agrément à votre interlocuteur "
-                        "Pôle emploi.<br>"
-                        "Le numéro d'agrément sera indiqué sur cette page - "
-                        "vous serez prévenu par email dès qu'il sera disponible.<br>"
-                        "Ce numéro pourra être utilisé pour la déclaration de la personne dans l'ASP.<br>"
-                    )
-                ),
-            )
+                        "Le numéro d'agrément peut être utilisé pour "
+                        "la déclaration de la personne dans l'ASP."
+                    ),
+                )
+            else:
+                messages.success(
+                    request,
+                    mark_safe(
+                        _(
+                            "Il n'est pas nécessaire de demander le numéro d'agrément "
+                            "à votre interlocuteur Pôle emploi.<br>"
+                            "Le numéro d'agrément sera indiqué sur cette page - "
+                            "vous serez prévenu par email dès qu'il sera disponible.<br>"
+                            "Ce numéro pourra être utilisé pour la déclaration de la "
+                            "personne dans l'ASP."
+                        )
+                    ),
+                )
 
         next_url = reverse(
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}

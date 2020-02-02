@@ -251,7 +251,9 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182A01"
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            number="625741810182A01",
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
