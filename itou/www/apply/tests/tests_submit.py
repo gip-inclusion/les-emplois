@@ -103,12 +103,18 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"birthdate": "20/12/1978"}
+        post_data = {
+            "birthdate": "20/12/1978",
+            "phone": "0610203040",
+            "pole_emploi_id": "1234567A",
+        }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+        self.assertEqual(user.phone, post_data["phone"])
+        self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
 
         next_url = reverse(
             "apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk}

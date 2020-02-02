@@ -48,7 +48,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ["birthdate", "phone"]
+        fields = ["birthdate", "phone", "pole_emploi_id"]
         help_texts = {
             "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
             "phone": _("Par exemple 0610203040."),
