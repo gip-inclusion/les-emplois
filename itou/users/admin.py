@@ -2,7 +2,37 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import ugettext as _
 
+from itou.prescribers.models import PrescriberMembership
+from itou.siaes.models import SiaeMembership
 from itou.users import models
+
+
+class SiaeMembershipInline(admin.TabularInline):
+    model = SiaeMembership
+    extra = 0
+    raw_id_fields = ("siae",)
+    readonly_fields = ("siae", "siae_id", "joined_at", "is_siae_admin")
+    can_delete = False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
+
+
+class PrescriberMembershipInline(admin.TabularInline):
+    model = PrescriberMembership
+    extra = 0
+    raw_id_fields = ("organization",)
+    readonly_fields = ("organization", "organization_id", "joined_at", "is_admin")
+    can_delete = False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request):
+        return False
 
 
 class KindFilter(admin.SimpleListFilter):
@@ -45,6 +75,8 @@ class ItouUserAdmin(UserAdmin):
     list_display_links = ("id", "email")
 
     raw_id_fields = ("created_by",)
+
+    inlines = UserAdmin.inlines + [SiaeMembershipInline, PrescriberMembershipInline]
 
     fieldsets = UserAdmin.fieldsets + (
         (
