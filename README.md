@@ -21,7 +21,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 
 ### Peupler la base de données
 
-    $ make populate-db
+    $ make populate_db
 
 The following users will be created with the password `password` (*sic*):
 
@@ -30,6 +30,11 @@ The following users will be created with the password `password` (*sic*):
 - `prescriber@test.com`
 - `siae@test.com`
 - `prescriber-solo@test.com`
+
+### Créer un compte admin
+
+    $ make shell_on_django_container
+    $ django-admin createsuperuser
 
 ### Avant un commit
 
