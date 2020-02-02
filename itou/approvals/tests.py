@@ -251,7 +251,7 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182A01"
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
@@ -260,7 +260,7 @@ class ApprovalModelTest(TestCase):
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval.start_at, valid_pe_approval.start_at)
         self.assertEqual(approval.end_at, valid_pe_approval.end_at)
-        self.assertEqual(approval.number, valid_pe_approval.number)
+        self.assertEqual(approval.number, valid_pe_approval.number[:12])
         self.assertEqual(approval.user, user)
         self.assertEqual(approval.created_by, None)
 

@@ -207,7 +207,8 @@ class Approval(CommonApprovalMixin):
             start_at=approval.start_at,
             end_at=approval.end_at,
             user=user,
-            number=approval.number,
+            # Only store 12 chars numbers.
+            number=approval.number[:12],
         )
         approval_from_pe.save()
         return approval_from_pe
