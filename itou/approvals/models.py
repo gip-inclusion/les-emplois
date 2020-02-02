@@ -342,14 +342,14 @@ class ApprovalsWrapper:
         ) or PoleEmploiApproval.objects.find_for(self.user)
 
         if not self.approvals:
-            self.code = self.CAN_OBTAIN_NEW
+            self.status = self.CAN_OBTAIN_NEW
         elif self.approvals.count() > 1:
-            self.code = self.MULTIPLE_RESULTS
+            self.status = self.MULTIPLE_RESULTS
         else:
             self.approval = self.approvals.first()
             if self.approval.is_valid:
-                self.code = self.VALID
+                self.status = self.VALID
             elif self.approval.can_obtain_new:
-                self.code = self.CAN_OBTAIN_NEW
+                self.status = self.CAN_OBTAIN_NEW
             else:
-                self.code = self.CANNOT_OBTAIN_NEW
+                self.status = self.CANNOT_OBTAIN_NEW

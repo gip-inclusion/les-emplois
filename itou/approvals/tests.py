@@ -341,7 +341,7 @@ class ApprovalsWrapperTest(TestCase):
     def test_status_without_approval(self):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.code, ApprovalsWrapper.CAN_OBTAIN_NEW)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CAN_OBTAIN_NEW)
         self.assertEqual(approvals_wrapper.approval, None)
 
     def test_status_with_valid_approval(self):
@@ -350,7 +350,7 @@ class ApprovalsWrapperTest(TestCase):
             user=user, start_at=datetime.date.today() - relativedelta(days=1)
         )
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.code, ApprovalsWrapper.VALID)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertEqual(approvals_wrapper.approval, approval)
 
     def test_status_with_recently_expired_approval(self):
@@ -359,7 +359,7 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.code, ApprovalsWrapper.CANNOT_OBTAIN_NEW)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CANNOT_OBTAIN_NEW)
         self.assertEqual(approvals_wrapper.approval, approval)
 
     def test_status_with_formerly_expired_approval(self):
@@ -368,7 +368,7 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.code, ApprovalsWrapper.CAN_OBTAIN_NEW)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CAN_OBTAIN_NEW)
         self.assertEqual(approvals_wrapper.approval, approval)
 
     def test_status_with_multiple_results(self):
@@ -380,7 +380,7 @@ class ApprovalsWrapperTest(TestCase):
             pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         )
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.code, ApprovalsWrapper.MULTIPLE_RESULTS)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.MULTIPLE_RESULTS)
         self.assertEqual(approvals_wrapper.approval, None)
 
     def test_status_with_valid_pole_emploi_approval(self):
@@ -389,7 +389,7 @@ class ApprovalsWrapperTest(TestCase):
             pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         )
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.code, ApprovalsWrapper.VALID)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertEqual(approvals_wrapper.approval, approval)
 
 

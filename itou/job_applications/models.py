@@ -337,7 +337,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             else:
                 # Automatic Approval creation.
                 job_seeker_approvals = self.job_seeker.approvals_wrapper
-                if job_seeker_approvals.code == job_seeker_approvals.VALID:
+                if job_seeker_approvals.status == job_seeker_approvals.VALID:
                     # Use an existing valid approval.
                     approval = Approval.get_or_create_from_valid(
                         job_seeker_approvals.approval, self.job_seeker
