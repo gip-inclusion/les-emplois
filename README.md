@@ -38,7 +38,12 @@ The following users will be created with the password `password` (*sic*):
 
 ### Avant un commit
 
-    $ make check-code-quality  ## will run black and pylint
+    $ make black
+    $ make pylint
+
+Ou :
+
+    $ make check_code_quality  # Will run black and pylint.
 
 ## Front-end
 
