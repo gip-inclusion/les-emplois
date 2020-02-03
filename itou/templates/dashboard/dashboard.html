@@ -67,8 +67,8 @@
                             {% if approvals_wrapper.status == "VALID" %}
                                 <p class="card-text">
                                     {% include "includes/icon.html" with icon="award" %}
-                                    <b>{{ approvals_wrapper.approval.number_with_spaces }}</b>
-                                    {% blocktrans with start=approvals_wrapper.approval.start_at|date:"d/m/Y" end=approvals_wrapper.approval.end_at|date:"d/m/Y" %}
+                                    <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
+                                    {% blocktrans with start=approvals_wrapper.approval.start_at|date:"d/m/Y" end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
                                         valide du {{ start }} au {{ end }}.
                                     {% endblocktrans %}
                                 </p>
@@ -76,8 +76,8 @@
                                 <p class="card-text">
                                     <span class="card-text text-danger">
                                         {% include "includes/icon.html" with icon="award" %}
-                                        <b>{{ approvals_wrapper.approval.number_with_spaces }}</b>
-                                        {% blocktrans with end=approvals_wrapper.approval.end_at|date:"d/m/Y" %}
+                                        <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
+                                        {% blocktrans with end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
                                             expiré depuis le {{ end }}.
                                         {% endblocktrans %}
                                     </span>

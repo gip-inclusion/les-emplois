@@ -319,7 +319,6 @@ class ApprovalsWrapper:
     VALID = "VALID"
     CAN_OBTAIN_NEW = "CAN_OBTAIN_NEW"
     CANNOT_OBTAIN_NEW = "CANNOT_OBTAIN_NEW"
-    MULTIPLE_RESULTS = "MULTIPLE_RESULTS"
 
     # Error messages.
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
@@ -338,20 +337,26 @@ class ApprovalsWrapper:
     def __init__(self, user):
 
         self.user = user
-        self.approval = None
-        self.approvals = Approval.objects.filter(user=self.user).order_by(
-            "-start_at"
-        ) or PoleEmploiApproval.objects.find_for(self.user)
+        self.latest_approval = None
+        self.merged_approvals = self._merge_approvals()
 
-        if not self.approvals:
+        if not self.merged_approvals:
             self.status = self.CAN_OBTAIN_NEW
-        elif self.approvals.count() > 1:
-            self.status = self.MULTIPLE_RESULTS
         else:
-            self.approval = self.approvals.first()
-            if self.approval.is_valid:
+            self.latest_approval = self.merged_approvals[0]
+            if self.latest_approval.is_valid:
                 self.status = self.VALID
-            elif self.approval.can_obtain_new:
+            elif self.latest_approval.can_obtain_new:
                 self.status = self.CAN_OBTAIN_NEW
             else:
                 self.status = self.CANNOT_OBTAIN_NEW
+
+    def _merge_approvals(self):
+        """
+        Returns a list of merged `Approval` and `PoleEmploiApproval` objects
+        ordered by most recent `start_at` dates.
+        """
+        approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
+        pe_approvals = list(PoleEmploiApproval.objects.find_for(self.user))
+        merged_approvals = approvals + pe_approvals
+        return sorted(merged_approvals, key=lambda x: x.start_at, reverse=True)

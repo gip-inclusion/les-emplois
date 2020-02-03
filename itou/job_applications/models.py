@@ -332,7 +332,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             job_seeker_approvals = self.job_seeker.approvals_wrapper
             if job_seeker_approvals.status == job_seeker_approvals.VALID:
                 approval = Approval.get_or_create_from_valid(
-                    job_seeker_approvals.approval, self.job_seeker
+                    job_seeker_approvals.latest_approval, self.job_seeker
                 )
 
             if not approval:
