@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
+from itou.www.apply.forms import FilterJobApplicationsForm
 
 
 @login_required
@@ -74,8 +75,21 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
     queryset = Siae.active_objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
+    job_applications_query = siae.job_applications_received
 
-    job_applications = siae.job_applications_received.select_related(
+    # Job application filters
+    filters_form = FilterJobApplicationsForm()
+    filters = request.GET
+
+    if filters:
+        filters_form = FilterJobApplicationsForm(data=filters)
+        if filters_form.is_valid():
+            states = filters_form.cleaned_data['states']
+            job_applications_query = job_applications_query.filter(
+                state__in=states
+            )
+
+    job_applications = job_applications_query.select_related(
         "job_seeker",
         "sender",
         "sender_siae",
@@ -86,5 +100,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         job_applications, request.GET.get("page"), items_per_page=10
     )
 
-    context = {"siae": siae, "job_applications_page": job_applications_page}
+    context = {
+        "siae": siae,
+        "job_applications_page": job_applications_page,
+        "filters_form": filters_form,
+    }
     return render(request, template_name, context)

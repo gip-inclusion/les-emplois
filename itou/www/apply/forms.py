@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 
 
 class UserExistsForm(forms.Form):
@@ -158,3 +158,14 @@ class AcceptForm(forms.ModelForm):
             error = _("La date d'embauche ne doit pas être dans le passé.")
             raise forms.ValidationError(error)
         return date_of_hiring
+
+
+class FilterJobApplicationsForm(forms.Form):
+    """
+    Allow some users to filter job applications based on specific fields.
+    """
+    states = forms.MultipleChoiceField(
+        required=False,
+        choices=JobApplicationWorkflow.STATE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )

@@ -1,5 +1,6 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
+{% load bootstrap4 %}
 
 {% block title %}{% trans "Candidatures reçues" %}{{ block.super }}{% endblock %}
 
@@ -8,6 +9,32 @@
     <h1>{% trans "Candidatures reçues" %}</h1>
 
     <h2 class="text-muted">{{ siae.display_name }}</h2>
+
+    <div class="row no-gutters">
+        <div class="col-md-3 offset-md-9">
+            <div class="ml-4"> <!-- add a left margin to align the button with each job application status. Not perfect... :( -->
+              <button class="btn btn-info btn-sm dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {% trans "Statut" %}
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <form method="get" action="">
+                    {% for choice in filters_form.states %}
+                    <div class="form-check form-check-inline dropdown-item">
+                        <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
+                        <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                    </div>
+                    {% endfor %}
+                    <div class="dropdown-divider"></div>
+                    <div class="text-center">
+                          <button type="submit" class="btn btn-light">
+                            {% trans "Appliquer" %}
+                          </button>
+                    </div>
+                </form>
+              </div> <!-- .dropdon-menu -->
+            </div> <!-- .dropdown -->
+        </div> <!-- .col-md-3 -->
+    </div> <!-- .row -->
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
