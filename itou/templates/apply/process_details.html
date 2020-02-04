@@ -13,26 +13,6 @@
 
     <ul>
 
-        {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-            {% with job_application.approval as approval %}
-                {% if approval %}
-                    <li>
-                        {% trans "Numéro d'agrément :" %}
-                        <span class="text-{% if approval.is_valid %}success{% else %}danger{% endif %}">
-                            {% blocktrans with number=approval.number start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
-                                <b>{{ number }}</b> (du {{ start }} au {{ end }})
-                            {% endblocktrans %}
-                        </span>
-                    </li>
-                {% elif job_application.state.is_accepted %}
-                    <li>
-                        {% trans "Numéro d'agrément :" %}
-                        <b>{% trans "en cours de délivrance" %}</b>
-                    </li>
-                {% endif %}
-            {% endwith %}
-        {% endif %}
-
         <li>{% trans "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
 
         <li>{% trans "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>

@@ -66,15 +66,11 @@
                         <div class="card-body">
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
-                                <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
-                                {% blocktrans with start=approvals_wrapper.latest_approval.start_at|date:"d/m/Y" end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
-                                    valide du {{ start }} au {{ end }}.
-                                {% endblocktrans %}
+                                {% include "approvals/includes/number.html" with approval=approvals_wrapper.latest_approval %}
                             </p>
                         </div>
                     </div>
-                {% endif %}
-                {% if approvals_wrapper.cannot_obtain_new %}
+                {% elif approvals_wrapper.cannot_obtain_new %}
                     <div class="card">
                         <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
                         <div class="card-body">

@@ -17,11 +17,29 @@
         <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
     </h1>
 
-    <hr>
+    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-    {# Find an existing valid approval while none is attached to the job application. #}
-    {% if job_application.to_siae.is_subject_to_eligibility_rules and not job_application.approval %}
-        {% include "approvals/includes/valid_approval.html" with job_seeker=job_application.job_seeker %}
+        {% if job_application.state.is_accepted %}
+            <div class="alert border">
+                {% if job_application.approval %}
+                    {% include "approvals/includes/number.html" with approval=job_application.approval %}
+                {% else %}
+                    {% trans "Numéro d'agrément en cours de délivrance." %}
+                {% endif %}
+            </div>
+        {% else %}
+            {# Find an existing valid approval. #}
+            {% with job_application.job_seeker.approvals_wrapper as approvals_wrapper %}
+                {% if approvals_wrapper.has_valid %}
+                    <div class="alert border">
+                        {% include "approvals/includes/number.html" with approval=approvals_wrapper.latest_approval %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+
     {% endif %}
+
+    <hr>
 
 {% endblock %}

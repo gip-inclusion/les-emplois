@@ -254,13 +254,13 @@ def step_eligibility(
             error = job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
         raise PermissionDenied(error)
 
-    can_skip = (
+    must_skip = (
         # Only "authorized prescribers" can perform an eligibility diagnosis.
         not user_info.is_authorized_prescriber
         # Eligibility diagnosis already performed.
         or job_seeker.has_eligibility_diagnosis
     )
-    if can_skip:
+    if must_skip:
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST":

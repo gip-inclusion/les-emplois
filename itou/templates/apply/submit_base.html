@@ -25,6 +25,12 @@
         </div>
     {% endif %}
 
-    {% include "approvals/includes/valid_approval.html" with job_seeker=job_seeker %}
+    {% with job_seeker.approvals_wrapper as approvals_wrapper %}
+        {% if approvals_wrapper.has_valid %}
+            <div class="alert border">
+                {% include "approvals/includes/number.html" with approval=approvals_wrapper.latest_approval %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
 {% endblock %}

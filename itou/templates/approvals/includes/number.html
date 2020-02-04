@@ -1,0 +1,15 @@
+{% load i18n %}
+{% trans "Numéro d'agrément :" %}
+{% if approval.is_valid %}
+    <span class="text-success">
+        {% blocktrans with number=approval.number_with_spaces start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" still=approval.end_at|timeuntil %}
+            <b>{{ number }}</b> valide du {{ start }} au {{ end }} (encore {{ still }})
+        {% endblocktrans %}
+    </span>
+{% else %}
+    <span class="text-danger">
+        {% blocktrans with number=approval.number_with_spaces start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
+            <b>{{ number }}</b> valide du {{ start }} au {{ end }} (expiré depuis {{ since }})
+        {% endblocktrans %}
+    </span>
+{% endif %}
