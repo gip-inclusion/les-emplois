@@ -353,10 +353,16 @@ class ApprovalsWrapper:
 
     def _merge_approvals(self):
         """
-        Returns a list of merged `Approval` and `PoleEmploiApproval` objects
-        ordered by most recent `start_at` dates.
+        Returns a list of merged unique `Approval` and `PoleEmploiApproval`
+        objects ordered by most recent `start_at` dates.
         """
         approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
-        pe_approvals = list(PoleEmploiApproval.objects.find_for(self.user))
+        approvals_numbers = [approval.number for approval in approvals]
+        pe_approvals = [
+            pe_approval
+            for pe_approval in list(PoleEmploiApproval.objects.find_for(self.user))
+            # A `PoleEmploiApproval` could already have been copied in `Approval`.
+            if pe_approval not in approvals_numbers
+        ]
         merged_approvals = approvals + pe_approvals
         return sorted(merged_approvals, key=lambda x: x.start_at, reverse=True)
