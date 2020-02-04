@@ -371,6 +371,9 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CAN_OBTAIN_NEW)
+        self.assertFalse(approvals_wrapper.has_valid)
+        self.assertTrue(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, None)
 
     def test_status_with_valid_approval(self):
@@ -380,6 +383,9 @@ class ApprovalsWrapperTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
+        self.assertTrue(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_recently_expired_approval(self):
@@ -389,6 +395,9 @@ class ApprovalsWrapperTest(TestCase):
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CANNOT_OBTAIN_NEW)
+        self.assertFalse(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.can_obtain_new)
+        self.assertTrue(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_formerly_expired_approval(self):
@@ -398,6 +407,9 @@ class ApprovalsWrapperTest(TestCase):
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CAN_OBTAIN_NEW)
+        self.assertFalse(approvals_wrapper.has_valid)
+        self.assertTrue(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_pole_emploi_approval(self):
@@ -407,6 +419,9 @@ class ApprovalsWrapperTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
+        self.assertTrue(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 

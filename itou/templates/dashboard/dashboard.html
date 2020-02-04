@@ -60,33 +60,37 @@
             </div>
 
             {% with user.approvals_wrapper as approvals_wrapper %}
-                {% if approvals_wrapper.status in "VALID,CANNOT_OBTAIN_NEW" %}
+                {% if approvals_wrapper.has_valid %}
                     <div class="card">
                         <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
                         <div class="card-body">
-                            {% if approvals_wrapper.status == "VALID" %}
-                                <p class="card-text">
+                            <p class="card-text">
+                                {% include "includes/icon.html" with icon="award" %}
+                                <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
+                                {% blocktrans with start=approvals_wrapper.latest_approval.start_at|date:"d/m/Y" end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
+                                    valide du {{ start }} au {{ end }}.
+                                {% endblocktrans %}
+                            </p>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if approvals_wrapper.cannot_obtain_new %}
+                    <div class="card">
+                        <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <span class="card-text text-danger">
                                     {% include "includes/icon.html" with icon="award" %}
                                     <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
-                                    {% blocktrans with start=approvals_wrapper.approval.start_at|date:"d/m/Y" end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
-                                        valide du {{ start }} au {{ end }}.
+                                    {% blocktrans with end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
+                                        expiré depuis le {{ end }}.
                                     {% endblocktrans %}
-                                </p>
-                            {% elif approvals_wrapper.status == "CANNOT_OBTAIN_NEW" %}
-                                <p class="card-text">
-                                    <span class="card-text text-danger">
-                                        {% include "includes/icon.html" with icon="award" %}
-                                        <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
-                                        {% blocktrans with end=approvals_wrapper.latest_approval.end_at|date:"d/m/Y" %}
-                                            expiré depuis le {{ end }}.
-                                        {% endblocktrans %}
-                                    </span>
-                                    <br>
-                                    <small>
-                                        {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
-                                    </small>
-                                </p>
-                            {% endif %}
+                                </span>
+                                <br>
+                                <small>
+                                    {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
+                                </small>
+                            </p>
                         </div>
                     </div>
                 {% endif %}

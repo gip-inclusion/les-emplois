@@ -19,4 +19,9 @@
 
     <hr>
 
+    {# Find an existing valid approval while none is attached to the job application. #}
+    {% if job_application.to_siae.is_subject_to_eligibility_rules and not job_application.approval %}
+        {% include "approvals/includes/valid_approval.html" with job_seeker=job_application.job_seeker %}
+    {% endif %}
+
 {% endblock %}

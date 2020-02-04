@@ -190,11 +190,15 @@ def step_check_prev_applications(
 
     # Limit the possibility of applying to the same SIAE for 24 hours.
     if prev_applications.created_in_past_hours(24).exists():
-        raise PermissionDenied(
-            _(
+        if request.user == job_seeker:
+            msg = _(
                 "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
             )
-        )
+        else:
+            msg = _(
+                "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
+            )
+        raise PermissionDenied(msg)
 
     next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
 
@@ -242,7 +246,7 @@ def step_eligibility(
     # Stop here if the current user is not an "authorized prescriber" because
     # only "authorized prescribers" can renew a recently outdated approval.
     if (
-        job_seeker_approvals.status == job_seeker_approvals.CANNOT_OBTAIN_NEW
+        job_seeker_approvals.cannot_obtain_new
         and not user_info.is_authorized_prescriber
     ):
         error = job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
@@ -328,7 +332,7 @@ def step_application(
 
         job_application.email_new_for_siae.send()
 
-        messages.success(request, _("Votre candidature a bien été envoyée !"))
+        messages.success(request, _("Candidature bien envoyée !"))
 
         return HttpResponseRedirect(next_url)
 

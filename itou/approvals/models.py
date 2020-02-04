@@ -240,6 +240,9 @@ class PoleEmploiApprovalManager(models.Manager):
 
         Their input formats can be checked to limit the risk of errors.
         """
+        # Save some SQL queries.
+        if not user.pole_emploi_id or not user.birthdate:
+            return self.none()
         return self.filter(
             pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
         ).order_by("-start_at")
@@ -353,6 +356,10 @@ class ApprovalsWrapper:
                 self.status = self.CAN_OBTAIN_NEW
             else:
                 self.status = self.CANNOT_OBTAIN_NEW
+
+        self.has_valid = self.status == self.VALID
+        self.can_obtain_new = self.status == self.CAN_OBTAIN_NEW
+        self.cannot_obtain_new = self.status == self.CANNOT_OBTAIN_NEW
 
     def _merge_approvals(self):
         """

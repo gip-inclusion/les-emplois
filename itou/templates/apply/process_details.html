@@ -19,8 +19,9 @@
                     <li>
                         {% trans "Numéro d'agrément :" %}
                         <span class="text-{% if approval.is_valid %}success{% else %}danger{% endif %}">
-                            <b>{{ approval.number }}</b>
-                            (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
+                            {% blocktrans with number=approval.number start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
+                                <b>{{ number }}</b> (du {{ start }} au {{ end }})
+                            {% endblocktrans %}
                         </span>
                     </li>
                 {% elif job_application.state.is_accepted %}
