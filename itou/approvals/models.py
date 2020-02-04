@@ -194,11 +194,12 @@ class Approval(CommonApprovalMixin):
         )
 
     @classmethod
-    def get_or_create_from_valid(cls, approval, user):
+    def get_or_create_from_valid(cls, approvals_wrapper):
         """
         Returns an existing valid Approval or create a new entry from
         a pre-existing valid PoleEmploiApproval by copying its data.
         """
+        approval = approvals_wrapper.latest_approval
         if not approval.is_valid or not isinstance(approval, (cls, PoleEmploiApproval)):
             raise RuntimeError(_("Invalid approval."))
         if isinstance(approval, cls):
@@ -206,7 +207,7 @@ class Approval(CommonApprovalMixin):
         approval_from_pe = cls(
             start_at=approval.start_at,
             end_at=approval.end_at,
-            user=user,
+            user=approvals_wrapper.user,
             # Only store 12 chars numbers.
             number=approval.number[:12],
         )
@@ -313,6 +314,8 @@ class PoleEmploiApproval(CommonApprovalMixin):
 class ApprovalsWrapper:
     """
     Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models.
+
+    This should be the only way to access approvals for a given job seeker.
     """
 
     # Status codes.

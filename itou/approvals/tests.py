@@ -257,9 +257,7 @@ class ApprovalModelTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
-        approval = Approval.get_or_create_from_valid(
-            approvals_wrapper.latest_approval, user
-        )
+        approval = Approval.get_or_create_from_valid(approvals_wrapper)
 
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval.start_at, valid_pe_approval.start_at)
@@ -276,9 +274,7 @@ class ApprovalModelTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
-        approval = Approval.get_or_create_from_valid(
-            approvals_wrapper.latest_approval, user
-        )
+        approval = Approval.get_or_create_from_valid(approvals_wrapper)
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval, valid_approval)
 
