@@ -73,3 +73,43 @@ class ModelTest(TestCase):
             end_at=end_at,
         )
         self.assertFalse(job_seeker.has_eligibility_diagnosis)
+
+    def test_clean_pole_emploi_fields(self):
+
+        User = get_user_model()
+
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=""
+        )
+
+        # Both fields cannot be empty.
+        with self.assertRaises(ValidationError):
+            User.clean_pole_emploi_fields(
+                job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+            )
+
+        # Both fields cannot be NOT empty.
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="69970749",
+            lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+        )
+        with self.assertRaises(ValidationError):
+            User.clean_pole_emploi_fields(
+                job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+            )
+
+        # No exception should be raised for the following cases.
+
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="62723349", lack_of_pole_emploi_id_reason=""
+        )
+        User.clean_pole_emploi_fields(
+            job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+        )
+
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN
+        )
+        User.clean_pole_emploi_fields(
+            job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+        )

@@ -48,11 +48,23 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ["birthdate", "phone", "pole_emploi_id"]
+        fields = [
+            "birthdate",
+            "phone",
+            "pole_emploi_id",
+            "lack_of_pole_emploi_id_reason",
+        ]
         help_texts = {
             "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
             "phone": _("Par exemple 0610203040."),
         }
+
+    def clean(self):
+        super().clean()
+        self._meta.model.clean_pole_emploi_fields(
+            self.cleaned_data["pole_emploi_id"],
+            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+        )
 
 
 class CreateJobSeekerForm(forms.ModelForm):
@@ -74,18 +86,26 @@ class CreateJobSeekerForm(forms.ModelForm):
             "birthdate",
             "phone",
             "pole_emploi_id",
+            "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
             "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
             "phone": _("Par exemple 0610203040."),
         }
 
+    def clean(self):
+        super().clean()
+        self._meta.model.clean_pole_emploi_fields(
+            self.cleaned_data["pole_emploi_id"],
+            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+        )
+
     def save(self, commit=True):
         if commit:
             return self._meta.model.create_job_seeker_by_proxy(
                 self.proxy_user, **self.cleaned_data
             )
-        return super().save(commit=False)
+        super().save(commit=False)
 
 
 class SubmitJobApplicationForm(forms.ModelForm):

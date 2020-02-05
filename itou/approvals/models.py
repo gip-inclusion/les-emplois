@@ -25,9 +25,10 @@ class CommonApprovalMixin(models.Model):
 
     # Default duration of an approval.
     DEFAULT_APPROVAL_YEARS = 2
-    # A period after expiry of an Approval during which a person cannot obtain a new one
-    # except from an "authorized prescriber".
-    YEARS_BEFORE_NEW_APPROVAL = 2
+    # `Période de carence` in French.
+    # A period after expiry of an Approval during which a person cannot
+    # obtain a new one except from an "authorized prescriber".
+    WAITING_PERIOD_YEARS = 2
 
     start_at = models.DateField(
         verbose_name=_("Date de début"), blank=True, null=True, db_index=True
@@ -52,9 +53,9 @@ class CommonApprovalMixin(models.Model):
         return relativedelta(timezone.now().date(), self.end_at)
 
     @property
-    def can_obtain_new(self):
-        return self.time_since_end.years > self.YEARS_BEFORE_NEW_APPROVAL or (
-            self.time_since_end.years == self.YEARS_BEFORE_NEW_APPROVAL
+    def waiting_period_has_elapsed(self):
+        return self.time_since_end.years > self.WAITING_PERIOD_YEARS or (
+            self.time_since_end.years == self.WAITING_PERIOD_YEARS
             and self.time_since_end.days > 0
         )
 
@@ -322,9 +323,10 @@ class ApprovalsWrapper:
     """
 
     # Status codes.
+    NONE_FOUND = "NONE_FOUND"
     VALID = "VALID"
-    CAN_OBTAIN_NEW = "CAN_OBTAIN_NEW"
-    CANNOT_OBTAIN_NEW = "CANNOT_OBTAIN_NEW"
+    IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
+    WAITING_PERIOD_HAS_ELAPSED = "WAITING_PERIOD_HAS_ELAPSED"
 
     # Error messages.
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
@@ -347,19 +349,22 @@ class ApprovalsWrapper:
         self.merged_approvals = self._merge_approvals()
 
         if not self.merged_approvals:
-            self.status = self.CAN_OBTAIN_NEW
+            self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
             if self.latest_approval.is_valid:
                 self.status = self.VALID
-            elif self.latest_approval.can_obtain_new:
-                self.status = self.CAN_OBTAIN_NEW
+            elif self.latest_approval.waiting_period_has_elapsed:
+                self.status = self.WAITING_PERIOD_HAS_ELAPSED
             else:
-                self.status = self.CANNOT_OBTAIN_NEW
+                self.status = self.IN_WAITING_PERIOD
 
+        self.can_obtain_new = self.status in [
+            self.NONE_FOUND,
+            self.WAITING_PERIOD_HAS_ELAPSED,
+        ]
         self.has_valid = self.status == self.VALID
-        self.can_obtain_new = self.status == self.CAN_OBTAIN_NEW
-        self.cannot_obtain_new = self.status == self.CANNOT_OBTAIN_NEW
+        self.in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):
         """

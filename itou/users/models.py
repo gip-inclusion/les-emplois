@@ -29,6 +29,13 @@ class User(AbstractUser):
         self.prescribermembership_set.all()
     """
 
+    REASON_FORGOTTEN = "FORGOTTEN"
+    REASON_NON_REGISTERED = "NON_REGISTERED"
+    REASON_CHOICES = (
+        (REASON_FORGOTTEN, _("Identifiant Pôle emploi oublié")),
+        (REASON_NON_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
+    )
+
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True
     )
@@ -41,8 +48,14 @@ class User(AbstractUser):
     is_siae_staff = models.BooleanField(
         verbose_name=_("Employeur (SIAE)"), default=False
     )
-    # Only for job seekers. Used to search in `PoleEmploiApproval`.
-    # It's not guaranteed to be unique!
+
+    # The two following fields are only for job seekers.
+    # They are used in the process of delivering an approval.
+
+    # Pôle emploi ID is not guaranteed to be unique.
+    # At least, we haven't received any confirmation of its uniqueness.
+    # It looks like it pre-dates the national merger and may be unique
+    # by user and by region…
     pole_emploi_id = models.CharField(
         verbose_name=_("Identifiant Pôle emploi"),
         help_text=_("7 chiffres suivis d'une 1 lettre ou d'un chiffre."),
@@ -50,6 +63,14 @@ class User(AbstractUser):
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
         blank=True,
     )
+    lack_of_pole_emploi_id_reason = models.CharField(
+        verbose_name=_("Pas d'identifiant Pôle emploi ?"),
+        help_text=_("Indiquez la raison de l'absence d'identifiant Pôle emploi."),
+        max_length=30,
+        choices=REASON_CHOICES,
+        blank=True,
+    )
+
     created_by = models.ForeignKey(
         "self",
         verbose_name=_("Créé par"),
@@ -57,6 +78,9 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
+
+    def __str__(self):
+        return self.email
 
     def save(self, *args, **kwargs):
         already_exists = bool(self.pk)
@@ -70,9 +94,6 @@ class User(AbstractUser):
         ):
             raise ValidationError(_("Cet e-mail existe déjà."))
         super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.email
 
     @property
     def approvals_wrapper(self):
@@ -123,6 +144,22 @@ class User(AbstractUser):
             **fields
         )
         return user
+
+    @staticmethod
+    def clean_pole_emploi_fields(pole_emploi_id, lack_of_pole_emploi_id_reason):
+        """
+        Validate Pôle emploi fields that depend on each other:
+        one or the other but not both.
+        Intended to be used in forms and modelforms that manipulate a job seeker.
+        """
+        if (pole_emploi_id and lack_of_pole_emploi_id_reason) or (
+            not pole_emploi_id and not lack_of_pole_emploi_id_reason
+        ):
+            raise ValidationError(
+                _(
+                    "Renseignez soit votre identifiant Pôle emploi, soit la raison de son absence."
+                )
+            )
 
 
 def get_allauth_account_user_display(user):

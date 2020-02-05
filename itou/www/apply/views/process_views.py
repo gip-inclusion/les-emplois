@@ -190,13 +190,11 @@ def eligibility(
     # An approval may expire between the time an application is sent and
     # the time it is processed. If the job application is not sent by an
     # authorized prescriber, the job seeker cannot obtain a new approval.
-    cannot_obtain_new_approval = False
     job_seeker_approvals = job_application.job_seeker.approvals_wrapper
-    if (
-        job_seeker_approvals.cannot_obtain_new
-        and not job_application.is_sent_by_authorized_prescriber
-    ):
-        cannot_obtain_new_approval = True
+    can_obtain_new = job_seeker_approvals.can_obtain_new or (
+        job_seeker_approvals.in_waiting_period
+        and job_application.is_sent_by_authorized_prescriber
+    )
 
     if request.method == "POST":
         if not request.POST.get("confirm-eligibility") == "1":
@@ -214,7 +212,7 @@ def eligibility(
             return HttpResponseRedirect(next_url)
 
     context = {
-        "cannot_obtain_new_approval": cannot_obtain_new_approval,
+        "can_obtain_new": can_obtain_new,
         "job_application": job_application,
         "job_seeker_approvals": job_seeker_approvals,
     }

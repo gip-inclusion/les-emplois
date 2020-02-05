@@ -131,8 +131,9 @@ def step_check_job_seeker_info(
         "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
     )
 
-    # Ensure that the job seeker has a birthdate.
-    if job_seeker.birthdate:
+    if job_seeker.birthdate and (
+        job_seeker.pole_emploi_id or job_seeker.lack_of_pole_emploi_id_reason
+    ):
         return HttpResponseRedirect(next_url)
 
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
@@ -245,10 +246,10 @@ def step_eligibility(
 
     # Stop here if the current user is not an "authorized prescriber" because
     # only "authorized prescribers" can renew a recently outdated approval.
-    if (
-        job_seeker_approvals.cannot_obtain_new
-        and not user_info.is_authorized_prescriber
-    ):
+    can_obtain_new = job_seeker_approvals.can_obtain_new or (
+        job_seeker_approvals.in_waiting_period and user_info.is_authorized_prescriber
+    )
+    if not can_obtain_new:
         error = job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         if user_info.user == job_seeker:
             error = job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_USER

@@ -70,7 +70,7 @@
                             </p>
                         </div>
                     </div>
-                {% elif approvals_wrapper.cannot_obtain_new %}
+                {% elif not approvals_wrapper.can_obtain_new %}
                     <div class="card">
                         <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
                         <div class="card-body">

@@ -7,7 +7,7 @@
 
     <h2>{% trans "Critères d'éligibilité" %}</h2>
 
-    {% if cannot_obtain_new_approval %}
+    {% if not can_obtain_new %}
 
         <div class="alert alert-warning" role="alert">
             {{ job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY }}

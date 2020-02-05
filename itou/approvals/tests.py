@@ -122,35 +122,35 @@ class CommonApprovalMixinTest(TestCase):
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertEqual(approval.time_since_end.days, 1)
 
-    def test_can_obtain_new(self):
+    def test_waiting_period_has_elapsed(self):
 
-        # 1 day before `YEARS_BEFORE_NEW_APPROVAL`.
+        # 1 day before `WAITING_PERIOD_YEARS`.
         end_at = (
             datetime.date.today()
-            - relativedelta(years=Approval.YEARS_BEFORE_NEW_APPROVAL)
+            - relativedelta(years=Approval.WAITING_PERIOD_YEARS)
             + relativedelta(days=1)
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.can_obtain_new)
+        self.assertFalse(approval.waiting_period_has_elapsed)
 
-        # Exactly `YEARS_BEFORE_NEW_APPROVAL`.
+        # Exactly `WAITING_PERIOD_YEARS`.
         end_at = datetime.date.today() - relativedelta(
-            years=Approval.YEARS_BEFORE_NEW_APPROVAL
+            years=Approval.WAITING_PERIOD_YEARS
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.can_obtain_new)
+        self.assertFalse(approval.waiting_period_has_elapsed)
 
-        # 1 day after `YEARS_BEFORE_NEW_APPROVAL`.
+        # 1 day after `WAITING_PERIOD_YEARS`.
         end_at = (
             datetime.date.today()
-            - relativedelta(years=Approval.YEARS_BEFORE_NEW_APPROVAL)
+            - relativedelta(years=Approval.WAITING_PERIOD_YEARS)
             - relativedelta(days=1)
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.can_obtain_new)
+        self.assertTrue(approval.waiting_period_has_elapsed)
 
 
 class ApprovalModelTest(TestCase):
@@ -370,10 +370,10 @@ class ApprovalsWrapperTest(TestCase):
     def test_status_without_approval(self):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CAN_OBTAIN_NEW)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
         self.assertFalse(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.in_waiting_period)
         self.assertTrue(approvals_wrapper.can_obtain_new)
-        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, None)
 
     def test_status_with_valid_approval(self):
@@ -384,8 +384,8 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertTrue(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.in_waiting_period)
         self.assertFalse(approvals_wrapper.can_obtain_new)
-        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_recently_expired_approval(self):
@@ -394,10 +394,10 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CANNOT_OBTAIN_NEW)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
         self.assertFalse(approvals_wrapper.has_valid)
+        self.assertTrue(approvals_wrapper.in_waiting_period)
         self.assertFalse(approvals_wrapper.can_obtain_new)
-        self.assertTrue(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_formerly_expired_approval(self):
@@ -406,10 +406,12 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.CAN_OBTAIN_NEW)
+        self.assertEqual(
+            approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED
+        )
         self.assertFalse(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.in_waiting_period)
         self.assertTrue(approvals_wrapper.can_obtain_new)
-        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_pole_emploi_approval(self):
@@ -419,9 +421,9 @@ class ApprovalsWrapperTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
+        self.assertFalse(approvals_wrapper.in_waiting_period)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.can_obtain_new)
-        self.assertFalse(approvals_wrapper.cannot_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 

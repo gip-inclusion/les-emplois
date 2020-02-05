@@ -7,11 +7,7 @@
     {{ block.super }}
 
     <div class="alert alert-warning" role="alert">
-        {% if request.user == job_seeker %}
-            {% trans "Votre date de naissance est obligatoire pour continuer." %}
-        {% else %}
-            {% trans "La date de naissance du candidat est obligatoire pour continuer." %}
-        {% endif %}
+        {% trans "La date de naissance et les informations Pôle emploi sont obligatoires pour continuer." %}
     </div>
 
     <form method="post" action="">
