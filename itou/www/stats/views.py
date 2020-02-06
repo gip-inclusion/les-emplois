@@ -344,9 +344,9 @@ def get_hiring_delays(hirings):
         )
         # We ignore hirings whose events are in the wrong chronological order.
         .filter(
-            logs__timestamp__gte=F('created_at'),
-            job_seeker__approvals__created_at__gte=F('logs__timestamp'),
-            job_seeker__approvals__start_at__gte=F('job_seeker__approvals__created_at'),
+            logs__timestamp__gte=F("created_at"),
+            job_seeker__approvals__created_at__gte=F("logs__timestamp"),
+            job_seeker__approvals__start_at__gte=F("job_seeker__approvals__created_at"),
         )
     )
 
@@ -454,7 +454,10 @@ def _get_donut_chart_data(
     between various donut charts (DNRY).
     """
     job_applications_having_authorized_prescriber = (
-        job_applications.filter(sender_prescriber_organization__is_authorized=True)
+        job_applications.filter(
+            job_seeker__eligibility_diagnoses__author_kind=prescriber_kind
+        )
+        .filter(sender_prescriber_organization__is_authorized=True)
         .distinct()
         .count()
     )
