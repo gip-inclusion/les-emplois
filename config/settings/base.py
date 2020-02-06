@@ -45,6 +45,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "anymail",
     "bootstrap4",
+    "bootstrap_datepicker_plus",
     "mathfilters",
 ]
 
