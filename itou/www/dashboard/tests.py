@@ -30,7 +30,7 @@ class EditUserInfoViewTest(TestCase):
         post_data = {
             "birthdate": "20/12/1978",
             "phone": "0610203050",
-            "lack_of_pole_emploi_id_reason": user.REASON_NON_REGISTERED,
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)

@@ -331,19 +331,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             # Find an existing valid approval.
             job_seeker_approvals = self.job_seeker.approvals_wrapper
             if job_seeker_approvals.has_valid:
+                # Reuse an existing Itou or PE approval.
                 approval = Approval.get_or_create_from_valid(job_seeker_approvals)
 
             if not approval:
-                if not (
-                    self.sender_kind == self.SENDER_KIND_SIAE_STAFF
-                    or self.is_sent_by_authorized_prescriber
+                if (
+                    self.job_seeker.pole_emploi_id
+                    or self.job_seeker.lack_of_pole_emploi_id_reason
+                    == self.job_seeker.REASON_NOT_REGISTERED
                 ):
-                    # Trigger a manual creation.
-                    emails.append(
-                        self.email_accept_trigger_manual_approval(accepted_by)
-                    )
-                else:
-                    # Automatic creation.
+                    # Automatic approval creation.
                     approval = Approval(
                         start_at=self.hiring_start_at,
                         end_at=Approval.get_default_end_date(self.hiring_start_at),
@@ -351,6 +348,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                         user=self.job_seeker,
                     )
                     approval.save()
+                elif (
+                    self.job_seeker.lack_of_pole_emploi_id_reason
+                    == self.job_seeker.REASON_FORGOTTEN
+                ):
+                    # Trigger a manual approval creation.
+                    emails.append(
+                        self.email_accept_trigger_manual_approval(accepted_by)
+                    )
 
         # Send emails in batch.
         connection = mail.get_connection()
@@ -358,7 +363,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         if approval:
             self.approval = approval
-            # Send approval number after all other emails.
+            # Send approval number by email after all other emails.
             self.send_approval_number_by_email(accepted_by)
 
     @xwf_models.transition()

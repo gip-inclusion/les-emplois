@@ -30,10 +30,10 @@ class User(AbstractUser):
     """
 
     REASON_FORGOTTEN = "FORGOTTEN"
-    REASON_NON_REGISTERED = "NON_REGISTERED"
+    REASON_NOT_REGISTERED = "NOT_REGISTERED"
     REASON_CHOICES = (
         (REASON_FORGOTTEN, _("Identifiant Pôle emploi oublié")),
-        (REASON_NON_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
+        (REASON_NOT_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
     )
 
     birthdate = models.DateField(
@@ -49,8 +49,9 @@ class User(AbstractUser):
         verbose_name=_("Employeur (SIAE)"), default=False
     )
 
-    # The two following fields are only for job seekers.
+    # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.
+    # They depend on each other: one or the other must be filled but not both.
 
     # Pôle emploi ID is not guaranteed to be unique.
     # At least, we haven't received any confirmation of its uniqueness.
