@@ -63,7 +63,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)
-    search_fields = ("to_siae__siret",)
+    search_fields = ("to_siae__siret", "job_seeker__email")
 
     def send_approval_number_by_email(self, request, queryset):
         queryset = queryset.exclude(approval=None).filter(
