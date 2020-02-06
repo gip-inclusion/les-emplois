@@ -1,15 +1,14 @@
-from datetime import datetime, time
-
-from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext_lazy as _
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 from itou.www.apply.forms import FilterJobApplicationsForm
+from itou.job_applications.models import JobApplicationWorkflow
 
 
 @login_required
@@ -84,9 +83,11 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
 
     if filters:
         filters_form = FilterJobApplicationsForm(data=filters)
-        job_applications_query = _add_filters_to_query(
-            query=job_applications_query, form=filters_form
-        )
+        if filters_form.is_valid():
+            job_applications_query = _add_filters_to_query(
+                query=job_applications_query, data=filters_form.cleaned_data
+            )
+        filters = _humanize_filters(filters_form.cleaned_data)
 
     job_applications = job_applications_query.select_related(
         "job_seeker",
@@ -103,6 +104,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "siae": siae,
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
+        "filters": filters,
     }
     return render(request, template_name, context)
 
@@ -112,43 +114,49 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
 ##########################################################################
 
 
-def _add_filters_to_query(query, form):
+def _add_filters_to_query(data, query):
     """
     Add filters coming from a form to a query.
-    Input:
-        query: Django QuerySet type
-        form: Django Form type
-    Output:
-        Django QuerySet type
     """
-    if form.is_valid():
-        data = form.cleaned_data
 
-        # Active filters
-        states = data.get("states")
-        start_date = data.get("start_date")
-        end_date = data.get("end_date")
+    # Active filters
+    states = data.get("states")
+    start_date = data.get("start_date")
+    end_date = data.get("end_date")
 
-        if states:
-            query = query.filter(state__in=states)
+    if states:
+        query = query.filter(state__in=states)
 
-        if start_date or end_date:
-            start_date, end_date = _process_dates(start_date, end_date)
-            query = query.filter(created_at__range=[start_date, end_date])
+    if start_date:
+        query = query.filter(created_at__gte=start_date)
+
+    if end_date:
+        query = query.filter(created_at__lte=end_date)
 
     return query
 
 
-def _process_dates(start_date: datetime, end_date: datetime):
+def _humanize_filters(filters):
     """
-    When a start_date and an end_date do not include time values,
-    consider that it means "the whole day".
-    Therefore, start_date time should be 0 am and end_date time should be 23.59 pm.
+    Return active filters to be displayed in a template.
     """
-    start_date = datetime.combine(start_date, time())
-    start_date = timezone.make_aware(start_date)
+    start_date = filters.get("start_date")
+    end_date = filters.get("end_date")
+    states = filters.get("states")
+    active_filters = []
 
-    end_date = datetime.combine(end_date, time(hour=23, minute=59, second=59))
-    end_date = timezone.make_aware(end_date)
+    if start_date:
+        label = FilterJobApplicationsForm.base_fields.get("start_date").label
+        active_filters.append([label, start_date])
 
-    return start_date, end_date
+    if end_date:
+        label = FilterJobApplicationsForm.base_fields.get("end_date").label
+        active_filters.append([label, end_date])
+
+    if states:
+        values = [str(JobApplicationWorkflow.states[state].title) for state in states]
+        value = ", ".join(values)
+        label = _("Statuts") if (len(values) > 1) else _("Statut")
+        active_filters.append([label, value])
+
+    return [{"label": f[0], "value": f[1]} for f in active_filters]

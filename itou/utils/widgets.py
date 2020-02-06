@@ -11,12 +11,11 @@ class DatePickerField(DatePickerInput):
     Initializes a JS datepicker in a date field.
     Usage:
         end_date = forms.DateField(
-            input_formats=DatePickerField().date_format,
+            input_formats=[DatePickerField.DATE_FORMAT],
             widget=DatePickerField()
         )
     """
 
-    # Date format for Python scripts.
     # /!\ Make sure it matches OPTIONS['format']!!
     DATE_FORMAT = "%d-%m-%Y"
 

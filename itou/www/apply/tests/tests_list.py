@@ -70,11 +70,8 @@ class ProcessListTest(TestCase):
         url = f"{self.base_url}?{job_application_states}"
         response = self.client.get(url)
 
-        # Count job applications used by the template
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        # Result page should only contain job applications which status
-        # matches the one selected by the user.
         self.assertEqual(total_applications, 2)
 
     def test_list_for_siae_view__filtered_by_dates(self):
@@ -102,3 +99,19 @@ class ProcessListTest(TestCase):
         # Result page should only contain job applications which dates
         # match the date range selected by the user.
         self.assertEqual(total_applications, total_expected)
+
+    def test_list_for_siae_view__empty_dates_in_params(self):
+        """
+        Our form uses a Datepicker that adds empty start and end dates
+        in the HTTP query if they are not filled in by the user.
+        Make sure the template loads all available job applications if fields are empty.
+        """
+        url = f"{self.base_url}?start_date=&end_date="
+        response = self.client.get(url)
+
+        # Count job applications used by the template
+        total_applications = len(response.context["job_applications_page"].object_list)
+
+        # Result page should only contain job applications which dates
+        # match the date range selected by the user.
+        self.assertEqual(total_applications, len(JobApplicationWorkflow.states))
