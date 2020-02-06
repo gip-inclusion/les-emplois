@@ -50,11 +50,11 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def first_name(self):
-        return PoleEmploiApproval.name_format(fake.first_name())
+        return PoleEmploiApproval.format_name_as_pole_emploi(fake.first_name())
 
     @factory.lazy_attribute
     def last_name(self):
-        return PoleEmploiApproval.name_format(fake.last_name())
+        return PoleEmploiApproval.format_name_as_pole_emploi(fake.last_name())
 
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
@@ -62,7 +62,13 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
         If any `*_name` is passed through kwargs, ensure that it's
         formatted like it is in the Pôle emploi export file.
         """
-        kwargs["first_name"] = PoleEmploiApproval.name_format(kwargs["first_name"])
-        kwargs["last_name"] = PoleEmploiApproval.name_format(kwargs["last_name"])
-        kwargs["birth_name"] = PoleEmploiApproval.name_format(kwargs["birth_name"])
+        kwargs["first_name"] = PoleEmploiApproval.format_name_as_pole_emploi(
+            kwargs["first_name"]
+        )
+        kwargs["last_name"] = PoleEmploiApproval.format_name_as_pole_emploi(
+            kwargs["last_name"]
+        )
+        kwargs["birth_name"] = PoleEmploiApproval.format_name_as_pole_emploi(
+            kwargs["birth_name"]
+        )
         return kwargs

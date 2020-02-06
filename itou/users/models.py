@@ -149,9 +149,10 @@ class User(AbstractUser):
     @staticmethod
     def clean_pole_emploi_fields(pole_emploi_id, lack_of_pole_emploi_id_reason):
         """
-        Validate Pôle emploi fields that depend on each other:
-        one or the other but not both.
-        Intended to be used in forms and modelforms that manipulate a job seeker.
+        Validate Pôle emploi fields that depend on each other: one or
+        the other must be filled but not both.
+        It must be used in forms and modelforms that manipulate users
+        with the `is_job_seeker` flag set to True.
         """
         if (pole_emploi_id and lack_of_pole_emploi_id_reason) or (
             not pole_emploi_id and not lack_of_pole_emploi_id_reason

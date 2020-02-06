@@ -115,42 +115,37 @@ class CommonApprovalMixinTest(TestCase):
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
 
-    def test_time_since_end(self):
+    def test_waiting_period(self):
 
-        end_at = datetime.date.today() - relativedelta(days=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertEqual(approval.time_since_end.days, 1)
-
-    def test_waiting_period_has_elapsed(self):
-
-        # 1 day before `WAITING_PERIOD_YEARS`.
-        end_at = (
-            datetime.date.today()
-            - relativedelta(years=Approval.WAITING_PERIOD_YEARS)
-            + relativedelta(days=1)
+        # End is 1 day before `WAITING_PERIOD_YEARS`.
+        end_at = datetime.date.today() - relativedelta(
+            years=Approval.WAITING_PERIOD_YEARS, days=1
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.waiting_period_has_elapsed)
+        self.assertFalse(approval.is_valid)
+        self.assertTrue(approval.waiting_period_has_elapsed)
+        self.assertFalse(approval.is_in_waiting_period)
 
-        # Exactly `WAITING_PERIOD_YEARS`.
+        # End is exactly at `WAITING_PERIOD_YEARS`.
         end_at = datetime.date.today() - relativedelta(
             years=Approval.WAITING_PERIOD_YEARS
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_valid)
         self.assertFalse(approval.waiting_period_has_elapsed)
+        self.assertTrue(approval.is_in_waiting_period)
 
-        # 1 day after `WAITING_PERIOD_YEARS`.
-        end_at = (
-            datetime.date.today()
-            - relativedelta(years=Approval.WAITING_PERIOD_YEARS)
-            - relativedelta(days=1)
+        # End is 1 day after `WAITING_PERIOD_YEARS`.
+        end_at = datetime.date.today() - relativedelta(
+            years=Approval.WAITING_PERIOD_YEARS, days=1
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_valid)
         self.assertTrue(approval.waiting_period_has_elapsed)
+        self.assertFalse(approval.is_in_waiting_period)
 
 
 class ApprovalModelTest(TestCase):
@@ -284,26 +279,39 @@ class PoleEmploiApprovalModelTest(TestCase):
     Test PoleEmploiApproval model.
     """
 
-    def test_name_format(self):
-        self.assertEqual(PoleEmploiApproval.name_format(" François"), "FRANCOIS")
-        self.assertEqual(PoleEmploiApproval.name_format("M'Hammed "), "M'HAMMED")
+    def test_format_name_as_pole_emploi(self):
         self.assertEqual(
-            PoleEmploiApproval.name_format("     jean kevin  "), "JEAN KEVIN"
+            PoleEmploiApproval.format_name_as_pole_emploi(" François"), "FRANCOIS"
         )
         self.assertEqual(
-            PoleEmploiApproval.name_format("     Jean-Kevin  "), "JEAN-KEVIN"
+            PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed "), "M'HAMMED"
         )
         self.assertEqual(
-            PoleEmploiApproval.name_format("Kertész István"), "KERTESZ ISTVAN"
+            PoleEmploiApproval.format_name_as_pole_emploi("     jean kevin  "),
+            "JEAN KEVIN",
         )
         self.assertEqual(
-            PoleEmploiApproval.name_format("Backer-Grøndahl"), "BACKER-GRONDAHL"
+            PoleEmploiApproval.format_name_as_pole_emploi("     Jean-Kevin  "),
+            "JEAN-KEVIN",
         )
         self.assertEqual(
-            PoleEmploiApproval.name_format("désirée artôt"), "DESIREE ARTOT"
+            PoleEmploiApproval.format_name_as_pole_emploi("Kertész István"),
+            "KERTESZ ISTVAN",
         )
-        self.assertEqual(PoleEmploiApproval.name_format("N'Guessan"), "N'GUESSAN")
-        self.assertEqual(PoleEmploiApproval.name_format("N Guessan"), "N GUESSAN")
+        self.assertEqual(
+            PoleEmploiApproval.format_name_as_pole_emploi("Backer-Grøndahl"),
+            "BACKER-GRONDAHL",
+        )
+        self.assertEqual(
+            PoleEmploiApproval.format_name_as_pole_emploi("désirée artôt"),
+            "DESIREE ARTOT",
+        )
+        self.assertEqual(
+            PoleEmploiApproval.format_name_as_pole_emploi("N'Guessan"), "N'GUESSAN"
+        )
+        self.assertEqual(
+            PoleEmploiApproval.format_name_as_pole_emploi("N Guessan"), "N GUESSAN"
+        )
 
     def test_number_with_spaces(self):
 
@@ -372,8 +380,7 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.in_waiting_period)
-        self.assertTrue(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, None)
 
     def test_status_with_valid_approval(self):
@@ -384,8 +391,7 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertTrue(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.in_waiting_period)
-        self.assertFalse(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_recently_expired_approval(self):
@@ -396,8 +402,7 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertTrue(approvals_wrapper.in_waiting_period)
-        self.assertFalse(approvals_wrapper.can_obtain_new)
+        self.assertTrue(approvals_wrapper.has_pending_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_formerly_expired_approval(self):
@@ -410,8 +415,7 @@ class ApprovalsWrapperTest(TestCase):
             approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED
         )
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.in_waiting_period)
-        self.assertTrue(approvals_wrapper.can_obtain_new)
+        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_pole_emploi_approval(self):
@@ -421,9 +425,8 @@ class ApprovalsWrapperTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
-        self.assertFalse(approvals_wrapper.in_waiting_period)
+        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
         self.assertTrue(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.can_obtain_new)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 

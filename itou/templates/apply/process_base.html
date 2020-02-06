@@ -28,14 +28,11 @@
                 {% endif %}
             </div>
         {% else %}
-            {# Find an existing valid approval. #}
-            {% with job_application.job_seeker.approvals_wrapper as approvals_wrapper %}
-                {% if approvals_wrapper.has_valid %}
-                    <div class="alert border">
-                        {% include "approvals/includes/number.html" with approval=approvals_wrapper.latest_approval %}
-                    </div>
-                {% endif %}
-            {% endwith %}
+            {% if approvals_wrapper.latest_approval %}
+                <div class="alert border">
+                    {% include "approvals/includes/number.html" with approval=approvals_wrapper.latest_approval %}
+                </div>
+            {% endif %}
         {% endif %}
 
     {% endif %}

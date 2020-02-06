@@ -242,17 +242,15 @@ def step_eligibility(
     user_info = get_user_info(request)
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 
-    job_seeker_approvals = job_seeker.approvals_wrapper
-
-    # Stop here if the current user is not an "authorized prescriber" because
-    # only "authorized prescribers" can renew a recently outdated approval.
-    can_obtain_new = job_seeker_approvals.can_obtain_new or (
-        job_seeker_approvals.in_waiting_period and user_info.is_authorized_prescriber
-    )
-    if not can_obtain_new:
-        error = job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+    # Only "authorized prescribers" can bypass an approval in waiting period.
+    approvals_wrapper = job_seeker.approvals_wrapper
+    if (
+        approvals_wrapper.has_pending_waiting_period
+        and not user_info.is_authorized_prescriber
+    ):
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         if user_info.user == job_seeker:
-            error = job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
         raise PermissionDenied(error)
 
     must_skip = (

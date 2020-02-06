@@ -7,22 +7,12 @@
 
     <h2>{% trans "Critères d'éligibilité" %}</h2>
 
-    {% if not can_obtain_new %}
-
-        <div class="alert alert-warning" role="alert">
-            {{ job_seeker_approvals.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY }}
-        </div>
-
-    {% else %}
-
-        {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
-        {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
-
-    {% endif %}
+    {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
+    {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
     <div class="alert alert-secondary" role="alert">
         <p>
-            {% trans "Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :" %}
+            {% trans "Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :" %}
         </p>
         <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
             {% trans "Je ne veux pas l'embaucher" %}

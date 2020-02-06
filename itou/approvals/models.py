@@ -49,15 +49,18 @@ class CommonApprovalMixin(models.Model):
         return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
 
     @property
-    def time_since_end(self):
-        return relativedelta(timezone.now().date(), self.end_at)
+    def waiting_period_end(self):
+        return self.end_at + relativedelta(years=self.WAITING_PERIOD_YEARS)
+
+    @property
+    def is_in_waiting_period(self):
+        now = timezone.now().date()
+        return self.end_at < now <= self.waiting_period_end
 
     @property
     def waiting_period_has_elapsed(self):
-        return self.time_since_end.years > self.WAITING_PERIOD_YEARS or (
-            self.time_since_end.years == self.WAITING_PERIOD_YEARS
-            and self.time_since_end.days > 0
-        )
+        now = timezone.now().date()
+        return now > self.waiting_period_end
 
 
 class CommonApprovalQuerySet(models.QuerySet):
@@ -83,6 +86,9 @@ class Approval(CommonApprovalMixin):
     A number starting with `ASP_ITOU_PREFIX` means it has been delivered
     through ITOU. Otherwise, it was delivered by Pôle emploi and initially
     found in `PoleEmploiApproval`.
+
+    If an approval exists in this table it means it has been delivered
+    through Itou and created by either Itou or Pôle emploi.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -226,7 +232,7 @@ class PoleEmploiApprovalManager(models.Manager):
 
         - the character encoding format is different between databases
         - there are no accents in the PE database
-            => `name_format()` is required to harmonize the formats
+            => `format_name_as_pole_emploi()` is required to harmonize the formats
         - input errors in names are possible on both sides
         - there can be an inversion of first and last name fields
         - imported data can be poorly structured (first and last names in the same field)
@@ -294,7 +300,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
         return self.number
 
     @staticmethod
-    def name_format(name):
+    def format_name_as_pole_emploi(name):
         """
         Format `name` in the same way as it is in the Pôle emploi export file:
         Upper-case ASCII transliterations of Unicode text.
@@ -359,12 +365,9 @@ class ApprovalsWrapper:
             else:
                 self.status = self.IN_WAITING_PERIOD
 
-        self.can_obtain_new = self.status in [
-            self.NONE_FOUND,
-            self.WAITING_PERIOD_HAS_ELAPSED,
-        ]
+        # Only one of the following attributes can be True at a time.
         self.has_valid = self.status == self.VALID
-        self.in_waiting_period = self.status == self.IN_WAITING_PERIOD
+        self.has_pending_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):
         """

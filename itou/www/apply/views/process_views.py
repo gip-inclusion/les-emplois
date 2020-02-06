@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -39,7 +40,11 @@ def details_for_siae(
         job_application.logs.select_related("user").all().order_by("timestamp")
     )
 
-    context = {"job_application": job_application, "transition_logs": transition_logs}
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "job_application": job_application,
+        "transition_logs": transition_logs,
+    }
     return render(request, template_name, context)
 
 
@@ -86,8 +91,11 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
             "apply:details_for_siae", kwargs={"job_application_id": job_application.id}
         )
         return HttpResponseRedirect(next_url)
-
-    context = {"job_application": job_application, "form": form}
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "form": form,
+        "job_application": job_application,
+    }
     return render(request, template_name, context)
 
 
@@ -99,6 +107,18 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
 
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
+
+    # This should be an edge case.
+    # An approval may expire between the time an application is sent and
+    # the time it is accepted.
+    # Only "authorized prescribers" can bypass an approval in waiting period.
+    approvals_wrapper = job_application.job_seeker.approvals_wrapper
+    if (
+        approvals_wrapper.has_pending_waiting_period
+        and not job_application.is_sent_by_authorized_prescriber
+    ):
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+        raise PermissionDenied(error)
 
     form = AnswerForm(data=request.POST or None)
 
@@ -116,7 +136,11 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
         )
         return HttpResponseRedirect(next_url)
 
-    context = {"job_application": job_application, "form": form}
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "form": form,
+        "job_application": job_application,
+    }
     return render(request, template_name, context)
 
 
@@ -128,6 +152,18 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
+
+    # This should be an edge case.
+    # An approval may expire between the time an application is sent and
+    # the time it is accepted.
+    # Only "authorized prescribers" can bypass an approval in waiting period.
+    approvals_wrapper = job_application.job_seeker.approvals_wrapper
+    if (
+        approvals_wrapper.has_pending_waiting_period
+        and not job_application.is_sent_by_authorized_prescriber
+    ):
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+        raise PermissionDenied(error)
 
     form = AcceptForm(instance=job_application, data=request.POST or None)
 
@@ -167,7 +203,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         )
         return HttpResponseRedirect(next_url)
 
-    context = {"job_application": job_application, "form": form}
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "form": form,
+        "job_application": job_application,
+    }
     return render(request, template_name, context)
 
 
@@ -187,15 +227,6 @@ def eligibility(
     if not job_application.to_siae.is_subject_to_eligibility_rules:
         raise Http404()
 
-    # An approval may expire between the time an application is sent and
-    # the time it is processed. If the job application is not sent by an
-    # authorized prescriber, the job seeker cannot obtain a new approval.
-    job_seeker_approvals = job_application.job_seeker.approvals_wrapper
-    can_obtain_new = job_seeker_approvals.can_obtain_new or (
-        job_seeker_approvals.in_waiting_period
-        and job_application.is_sent_by_authorized_prescriber
-    )
-
     if request.method == "POST":
         if not request.POST.get("confirm-eligibility") == "1":
             messages.error(
@@ -212,8 +243,7 @@ def eligibility(
             return HttpResponseRedirect(next_url)
 
     context = {
-        "can_obtain_new": can_obtain_new,
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "job_application": job_application,
-        "job_seeker_approvals": job_seeker_approvals,
     }
     return render(request, template_name, context)
