@@ -85,8 +85,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     if filters:
         filters_form = FilterJobApplicationsForm(data=filters)
         job_applications_query = _add_filters_to_query(
-            query=job_applications_query,
-            form=filters_form
+            query=job_applications_query, form=filters_form
         )
 
     job_applications = job_applications_query.select_related(
@@ -112,6 +111,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
 ######## Functions for internal-use only, not linked to a path. ##########
 ##########################################################################
 
+
 def _add_filters_to_query(query, form):
     """
     Add filters coming from a form to a query.
@@ -125,22 +125,19 @@ def _add_filters_to_query(query, form):
         data = form.cleaned_data
 
         # Active filters
-        states = data.get('states')
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
+        states = data.get("states")
+        start_date = data.get("start_date")
+        end_date = data.get("end_date")
 
         if states:
-            query = query.filter(
-                state__in=states,
-            )
+            query = query.filter(state__in=states)
 
         if start_date or end_date:
             start_date, end_date = _process_dates(start_date, end_date)
-            query = query.filter(
-                created_at__range=[start_date, end_date],
-            )
+            query = query.filter(created_at__range=[start_date, end_date])
 
     return query
+
 
 def _process_dates(start_date: datetime, end_date: datetime):
     """

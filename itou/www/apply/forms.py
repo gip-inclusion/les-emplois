@@ -165,6 +165,7 @@ class FilterJobApplicationsForm(forms.Form):
     """
     Allow some users to filter job applications based on specific fields.
     """
+
     states = forms.MultipleChoiceField(
         required=False,
         choices=JobApplicationWorkflow.STATE_CHOICES,
@@ -174,11 +175,11 @@ class FilterJobApplicationsForm(forms.Form):
         input_formats=[DatePickerField().DATE_FORMAT],
         label=_("Début"),
         required=False,
-        widget=DatePickerField().start_of('date_range')
+        widget=DatePickerField().start_of("date_range"),
     )
     end_date = forms.DateField(
         input_formats=[DatePickerField().DATE_FORMAT],
         label=_("Fin"),
         required=False,
-        widget=DatePickerField().end_of('date_range')
+        widget=DatePickerField().end_of("date_range"),
     )

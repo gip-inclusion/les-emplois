@@ -22,7 +22,7 @@ class DatePickerField(DatePickerInput):
 
     # http://eonasdan.github.io/bootstrap-datetimepicker/Options/
     OPTIONS = {
-        "format": "DD-MM-YYYY", # moment date-time format
+        "format": "DD-MM-YYYY",  # moment date-time format
         "showClose": True,
         "showClear": True,
         "showTodayButton": True,
@@ -42,7 +42,7 @@ class DatePickerField(DatePickerInput):
             "nextDecade": str(_("Décennie suivante")),
             "prevCentury": str(_("Centenaire précédent")),
             "nextCentury": str(_("Centenaire suivant")),
-        }
+        },
     }
 
     def __init__(self):

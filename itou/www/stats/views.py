@@ -344,9 +344,9 @@ def get_hiring_delays(hirings):
         )
         # We ignore hirings whose events are in the wrong chronological order.
         .filter(
-            logs__timestamp__gte=F('created_at'),
-            job_seeker__approvals__created_at__gte=F('logs__timestamp'),
-            job_seeker__approvals__start_at__gte=F('job_seeker__approvals__created_at'),
+            logs__timestamp__gte=F("created_at"),
+            job_seeker__approvals__created_at__gte=F("logs__timestamp"),
+            job_seeker__approvals__start_at__gte=F("job_seeker__approvals__created_at"),
         )
     )
 
