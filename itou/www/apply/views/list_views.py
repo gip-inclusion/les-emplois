@@ -1,3 +1,6 @@
+from datetime import datetime, time
+
+from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
@@ -76,18 +79,15 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     queryset = Siae.active_objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     job_applications_query = siae.job_applications_received
-
-    # Job application filters
     filters_form = FilterJobApplicationsForm()
     filters = request.GET
 
     if filters:
         filters_form = FilterJobApplicationsForm(data=filters)
-        if filters_form.is_valid():
-            states = filters_form.cleaned_data['states']
-            job_applications_query = job_applications_query.filter(
-                state__in=states
-            )
+        job_applications_query = _add_filters_to_query(
+            query=job_applications_query,
+            form=filters_form
+        )
 
     job_applications = job_applications_query.select_related(
         "job_seeker",
@@ -106,3 +106,52 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "filters_form": filters_form,
     }
     return render(request, template_name, context)
+
+
+##########################################################################
+######## Functions for internal-use only, not linked to a path. ##########
+##########################################################################
+
+def _add_filters_to_query(query, form):
+    """
+    Add filters coming from a form to a query.
+    Input:
+        query: Django QuerySet type
+        form: Django Form type
+    Output:
+        Django QuerySet type
+    """
+    if form.is_valid():
+        data = form.cleaned_data
+
+        # Active filters
+        states = data.get('states')
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+
+        if states:
+            query = query.filter(
+                state__in=states,
+            )
+
+        if start_date or end_date:
+            start_date, end_date = _process_dates(start_date, end_date)
+            query = query.filter(
+                created_at__range=[start_date, end_date],
+            )
+
+    return query
+
+def _process_dates(start_date: datetime, end_date: datetime):
+    """
+    When a start_date and an end_date do not include time values,
+    consider that it means "the whole day".
+    Therefore, start_date time should be 0 am and end_date time should be 23.59 pm.
+    """
+    start_date = datetime.combine(start_date, time())
+    start_date = timezone.make_aware(start_date)
+
+    end_date = datetime.combine(end_date, time(hour=23, minute=59, second=59))
+    end_date = timezone.make_aware(end_date)
+
+    return start_date, end_date

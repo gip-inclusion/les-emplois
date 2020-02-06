@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.widgets import DatePickerField
 
 
 class UserExistsForm(forms.Form):
@@ -168,4 +169,16 @@ class FilterJobApplicationsForm(forms.Form):
         required=False,
         choices=JobApplicationWorkflow.STATE_CHOICES,
         widget=forms.CheckboxSelectMultiple,
+    )
+    start_date = forms.DateField(
+        input_formats=[DatePickerField().DATE_FORMAT],
+        label=_("Début"),
+        required=False,
+        widget=DatePickerField().start_of('date_range')
+    )
+    end_date = forms.DateField(
+        input_formats=[DatePickerField().DATE_FORMAT],
+        label=_("Fin"),
+        required=False,
+        widget=DatePickerField().end_of('date_range')
     )
