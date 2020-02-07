@@ -394,7 +394,7 @@ class ApprovalsWrapperTest(TestCase):
         self.assertFalse(approvals_wrapper.has_pending_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
-    def test_status_with_recently_expired_approval(self):
+    def test_status_approval_in_waiting_period(self):
         user = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
@@ -405,7 +405,7 @@ class ApprovalsWrapperTest(TestCase):
         self.assertTrue(approvals_wrapper.has_pending_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
-    def test_status_with_formerly_expired_approval(self):
+    def test_status_approval_with_elapsed_waiting_period(self):
         user = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)

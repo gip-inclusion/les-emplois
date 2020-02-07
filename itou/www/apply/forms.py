@@ -105,7 +105,7 @@ class CreateJobSeekerForm(forms.ModelForm):
             return self._meta.model.create_job_seeker_by_proxy(
                 self.proxy_user, **self.cleaned_data
             )
-        super().save(commit=False)
+        return super().save(commit=False)
 
 
 class SubmitJobApplicationForm(forms.ModelForm):

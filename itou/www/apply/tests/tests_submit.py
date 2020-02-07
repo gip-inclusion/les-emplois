@@ -173,8 +173,8 @@ class ApplyAsJobSeekerTest(TestCase):
             job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
         )
 
-    def test_apply_as_jobseeker_with_recently_outdated_approval(self):
-        """Apply as jobseeker with a recently outdated approval."""
+    def test_apply_as_jobseeker_with_approval_in_waiting_period(self):
+        """Apply as jobseeker with an approval in waiting period."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         user = JobSeekerFactory()
@@ -201,7 +201,8 @@ class ApplyAsJobSeekerTest(TestCase):
         )
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(
-            last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+            last_url,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
         )
 
 
@@ -369,14 +370,14 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
         )
 
-    def test_apply_as_authorized_prescriber_for_recently_outdated_approval(self):
-        """Apply as authorized prescriber for a job seeker with a recently outdated approval."""
+    def test_apply_as_authorized_prescriber_for_approval_in_waiting_period(self):
+        """Apply as authorized prescriber for a job seeker with an approval in waiting period."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         job_seeker = JobSeekerFactory()
 
-        # Create a recently outdated approval.
+        # Create an approval in waiting period.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
@@ -723,14 +724,14 @@ class ApplyAsPrescriberTest(TestCase):
             job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
         )
 
-    def test_apply_as_prescriber_for_recently_outdated_approval(self):
-        """Apply as prescriber for a job seeker with a recently outdated approval."""
+    def test_apply_as_prescriber_for_approval_in_waiting_period(self):
+        """Apply as prescriber for a job seeker with an approval in waiting period."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         job_seeker = JobSeekerFactory()
 
-        # Create a recently outdated approval.
+        # Create an approval in waiting period.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
@@ -762,7 +763,8 @@ class ApplyAsPrescriberTest(TestCase):
         )
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(
-            last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+            last_url,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
         )
 
 
@@ -930,14 +932,14 @@ class ApplyAsSiaeTest(TestCase):
             job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
         )
 
-    def test_apply_as_siae_for_recently_outdated_approval(self):
-        """Apply as SIAE for a job seeker with a recently outdated approval."""
+    def test_apply_as_siae_for_approval_in_waiting_period(self):
+        """Apply as SIAE for a job seeker with an approval in waiting period."""
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         job_seeker = JobSeekerFactory()
 
-        # Create a recently outdated approval.
+        # Create an approval in waiting period.
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
@@ -969,5 +971,6 @@ class ApplyAsSiaeTest(TestCase):
         )
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(
-            last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+            last_url,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
         )

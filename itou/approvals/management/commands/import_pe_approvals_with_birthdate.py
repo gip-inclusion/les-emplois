@@ -1,4 +1,7 @@
-import datetime
+# **************************************************************************************
+# This is a temporary import command with data containing fakes birthdates while waiting
+# for the cleaned and definitive dataset.
+# **************************************************************************************
 import logging
 import os
 

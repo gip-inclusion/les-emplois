@@ -127,9 +127,21 @@ def step_check_job_seeker_info(
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    user_info = get_user_info(request)
     next_url = reverse(
         "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
     )
+
+    # Only "authorized prescribers" can bypass an approval in waiting period.
+    approvals_wrapper = job_seeker.approvals_wrapper
+    if (
+        approvals_wrapper.has_pending_waiting_period
+        and not user_info.is_authorized_prescriber
+    ):
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+        if user_info.user == job_seeker:
+            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+        raise PermissionDenied(error)
 
     if job_seeker.birthdate and (
         job_seeker.pole_emploi_id or job_seeker.lack_of_pole_emploi_id_reason
@@ -241,17 +253,6 @@ def step_eligibility(
 
     user_info = get_user_info(request)
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
-
-    # Only "authorized prescribers" can bypass an approval in waiting period.
-    approvals_wrapper = job_seeker.approvals_wrapper
-    if (
-        approvals_wrapper.has_pending_waiting_period
-        and not user_info.is_authorized_prescriber
-    ):
-        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
-        if user_info.user == job_seeker:
-            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
-        raise PermissionDenied(error)
 
     must_skip = (
         # Only "authorized prescribers" can perform an eligibility diagnosis.

@@ -31,10 +31,10 @@ class CommonApprovalMixin(models.Model):
     WAITING_PERIOD_YEARS = 2
 
     start_at = models.DateField(
-        verbose_name=_("Date de début"), blank=True, null=True, db_index=True
+        verbose_name=_("Date de début"), default=timezone.now, db_index=True
     )
     end_at = models.DateField(
-        verbose_name=_("Date de fin"), blank=True, null=True, db_index=True
+        verbose_name=_("Date de fin"), default=timezone.now, db_index=True
     )
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now
@@ -87,8 +87,9 @@ class Approval(CommonApprovalMixin):
     through ITOU. Otherwise, it was delivered by Pôle emploi and initially
     found in `PoleEmploiApproval`.
 
-    If an approval exists in this table it means it has been delivered
-    through Itou and created by either Itou or Pôle emploi.
+    If an approval exists in this table it means that:
+    - it has been delivered through Itou
+    - but was created by either Itou or Pôle emploi
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -128,6 +129,7 @@ class Approval(CommonApprovalMixin):
     def save(self, *args, **kwargs):
         self.clean()
         already_exists = bool(self.pk)
+        # Prevent a database integrity error during automatic creation.
         if not already_exists and hasattr(self, "number") and hasattr(self, "start_at"):
             if self.number.startswith(self.ASP_ITOU_PREFIX):
                 while Approval.objects.filter(number=self.number).exists():
@@ -197,6 +199,7 @@ class Approval(CommonApprovalMixin):
         return (
             start_at
             + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+            # TODO: ensure that subtracting 1 day is the right thing to do.
             - relativedelta(days=1)
         )
 
@@ -284,9 +287,8 @@ class PoleEmploiApproval(CommonApprovalMixin):
     first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
     last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
-    # TODO: make `birthdate` mandatory as soon as the data is available.
     birthdate = models.DateField(
-        verbose_name=_("Date de naissance"), null=True, blank=True, db_index=True
+        verbose_name=_("Date de naissance"), default=timezone.now, db_index=True
     )
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
