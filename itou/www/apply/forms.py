@@ -221,6 +221,19 @@ class AcceptForm(forms.ModelForm):
         return cleaned_data
 
 
+class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
+    class Meta:
+        model = get_user_model()
+        fields = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+
+    def clean(self):
+        super().clean()
+        self._meta.model.clean_pole_emploi_fields(
+            self.cleaned_data["pole_emploi_id"],
+            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+        )
+
+
 class FilterJobApplicationsForm(forms.Form):
     """
     Allow users to filter job applications based on specific fields.

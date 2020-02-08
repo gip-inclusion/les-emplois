@@ -142,7 +142,10 @@ class ProcessViewsTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(
-            response, "form", "hiring_start_at", JobApplication.ERROR_START_IN_PAST
+            response,
+            "form_accept",
+            "hiring_start_at",
+            JobApplication.ERROR_START_IN_PAST,
         )
 
         # Wrong dates: end < start.
@@ -155,7 +158,7 @@ class ProcessViewsTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(
-            response, "form", None, JobApplication.ERROR_END_IS_BEFORE_START
+            response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START
         )
 
         # Duration too long.
@@ -168,13 +171,16 @@ class ProcessViewsTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(
-            response, "form", None, JobApplication.ERROR_DURATION_TOO_LONG
+            response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG
         )
 
         # Good duration.
         hiring_start_at = datetime.date.today()
         hiring_end_at = hiring_start_at + relativedelta(years=2)
         post_data = {
+            # Data for `JobSeekerPoleEmploiStatusForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            # Data for `AcceptForm`.
             "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
             "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
             "answer": "",

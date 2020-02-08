@@ -159,7 +159,7 @@ class User(AbstractUser):
         ):
             raise ValidationError(
                 _(
-                    "Renseignez soit votre identifiant Pôle emploi, soit la raison de son absence."
+                    "Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."
                 )
             )
 

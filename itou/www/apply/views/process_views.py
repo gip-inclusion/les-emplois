@@ -13,6 +13,7 @@ from itou.job_applications.models import JobApplication
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import AcceptForm, AnswerForm, RefusalForm
+from itou.www.apply.forms import JobSeekerPoleEmploiStatusForm
 
 
 @login_required
@@ -165,11 +166,26 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         raise PermissionDenied(error)
 
-    form = AcceptForm(instance=job_application, data=request.POST or None)
+    forms = []
 
-    if request.method == "POST" and form.is_valid():
+    # Ask the SIAE to verify the job seeker's Pôle emploi status.
+    # This will ensure a smooth Approval delivery.
+    form_pe_status = None
+    if job_application.to_siae.is_subject_to_eligibility_rules:
+        form_pe_status = form_pe_status = JobSeekerPoleEmploiStatusForm(
+            instance=job_application.job_seeker, data=request.POST or None
+        )
+        forms.append(form_pe_status)
 
-        job_application = form.save()
+    form_accept = AcceptForm(instance=job_application, data=request.POST or None)
+    forms.append(form_accept)
+
+    if request.method == "POST" and all([form.is_valid() for form in forms]):
+
+        if form_pe_status:
+            form_pe_status.save()
+
+        job_application = form_accept.save()
         job_application.accept(user=request.user)
 
         messages.success(request, _("Embauche acceptée !"))
@@ -205,7 +221,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
-        "form": form,
+        "form_accept": form_accept,
+        "form_pe_status": form_pe_status,
         "job_application": job_application,
     }
     return render(request, template_name, context)
