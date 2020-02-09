@@ -1,12 +1,17 @@
 import datetime
 
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from django_xworkflows import models as xwf_models
+
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.approvals.models import PoleEmploiApproval
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.job_applications.factories import (
@@ -353,6 +358,10 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIsNotNone(job_application.approval)
         self.assertEqual(job_application.approval.number, pe_approval.number)
         self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
@@ -370,6 +379,10 @@ class JobApplicationWorkflowTest(TestCase):
         )
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertIsNone(job_application.approval)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_MANUAL,
+        )
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
@@ -384,6 +397,10 @@ class JobApplicationWorkflowTest(TestCase):
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
@@ -398,10 +415,65 @@ class JobApplicationWorkflowTest(TestCase):
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
         self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(
+        self
+    ):
+        user = JobSeekerFactory()
+        # Ended 1 year ago.
+        end_at = datetime.date.today() - relativedelta(years=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        self.assertTrue(approval.is_in_waiting_period)
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        # A valid Pôle emploi ID should trigger an automatic approval delivery.
+        self.assertNotEqual(job_application.job_seeker.pole_emploi_id, "")
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertIsNotNone(job_application.approval)
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(
+        self
+    ):
+        user = JobSeekerFactory()
+        # Ended 1 year ago.
+        end_at = datetime.date.today() - relativedelta(years=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        self.assertTrue(approval.is_in_waiting_period)
+        job_application = JobApplicationSentByPrescriberOrganizationFactory(
+            job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        with self.assertRaises(xwf_models.AbortTransition):
+            job_application.accept(user=job_application.to_siae.members.first())
 
     def test_accept_job_application_sent_by_siae(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -413,6 +485,10 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertTrue(job_application.to_siae.is_subject_to_eligibility_rules)
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC,
+        )
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
@@ -426,6 +502,7 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertFalse(job_application.to_siae.is_subject_to_eligibility_rules)
         self.assertIsNone(job_application.approval)
         self.assertFalse(job_application.approval_number_sent_by_email)
+        self.assertEqual(job_application.approval_delivery_mode, "")
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)

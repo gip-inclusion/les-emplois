@@ -25,6 +25,7 @@ def move_data_forward(apps, schema_editor):
         job_application = JobApplication.objects.get(pk=approval.job_application.pk)
         job_application.approval = approval
         job_application.approval_number_sent_by_email = approval.number_sent_by_email
+        job_application.approval_delivery_mode = "manual"
         job_application.save()
 
 

@@ -59,6 +59,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         ApprovalNumberSentByEmailFilter,
         "sender_kind",
         "state",
+        "approval_delivery_mode",
         "to_siae__department",
     )
     readonly_fields = ("created_at", "updated_at")

@@ -29,6 +29,27 @@ def valid_session_required(function=None):
     return decorated
 
 
+def valid_approval_status_required(function=None):
+    def decorated(request, *args, **kwargs):
+        session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)
+        if session_data and session_data["job_seeker_pk"]:
+            job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+            user_info = get_user_info(request)
+            # Only "authorized prescribers" can bypass an approval in waiting period.
+            approvals_wrapper = job_seeker.approvals_wrapper
+            if (
+                approvals_wrapper.has_pending_waiting_period
+                and not user_info.is_authorized_prescriber
+            ):
+                error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+                if user_info.user == job_seeker:
+                    error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+                raise PermissionDenied(error)
+        return function(request, *args, **kwargs)
+
+    return decorated
+
+
 @login_required
 def start(request, siae_pk):
     """
@@ -119,6 +140,7 @@ def step_job_seeker(
 
 @login_required
 @valid_session_required
+@valid_approval_status_required
 def step_check_job_seeker_info(
     request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"
 ):
@@ -131,17 +153,6 @@ def step_check_job_seeker_info(
     next_url = reverse(
         "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
     )
-
-    # Only "authorized prescribers" can bypass an approval in waiting period.
-    approvals_wrapper = job_seeker.approvals_wrapper
-    if (
-        approvals_wrapper.has_pending_waiting_period
-        and not user_info.is_authorized_prescriber
-    ):
-        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
-        if user_info.user == job_seeker:
-            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
-        raise PermissionDenied(error)
 
     if job_seeker.birthdate and (
         job_seeker.pole_emploi_id or job_seeker.lack_of_pole_emploi_id_reason
@@ -189,6 +200,7 @@ def step_create_job_seeker(
 
 @login_required
 @valid_session_required
+@valid_approval_status_required
 def step_check_prev_applications(
     request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"
 ):
@@ -238,6 +250,7 @@ def step_check_prev_applications(
 
 @login_required
 @valid_session_required
+@valid_approval_status_required
 def step_eligibility(
     request, siae_pk, template_name="apply/submit_step_eligibility.html"
 ):
@@ -274,6 +287,7 @@ def step_eligibility(
 
 @login_required
 @valid_session_required
+@valid_approval_status_required
 def step_application(
     request, siae_pk, template_name="apply/submit_step_application.html"
 ):

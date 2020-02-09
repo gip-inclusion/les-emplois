@@ -30,4 +30,14 @@ class Migration(migrations.Migration):
                 default=False, verbose_name="PASS IAE envoyé par email"
             ),
         ),
+        migrations.AddField(
+            model_name="jobapplication",
+            name="approval_delivery_mode",
+            field=models.CharField(
+                blank=True,
+                choices=[("automatic", "Automatique"), ("manual", "Manuel")],
+                max_length=30,
+                verbose_name="Mode d'attribution du PASS IAE",
+            ),
+        ),
     ]

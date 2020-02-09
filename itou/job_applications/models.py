@@ -163,6 +163,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
     )
 
+    APPROVAL_DELIVERY_MODE_AUTOMATIC = "automatic"
+    APPROVAL_DELIVERY_MODE_MANUAL = "manual"
+
+    APPROVAL_DELIVERY_MODE_CHOICES = (
+        (APPROVAL_DELIVERY_MODE_AUTOMATIC, _("Automatique")),
+        (APPROVAL_DELIVERY_MODE_MANUAL, _("Manuel")),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(
@@ -238,6 +246,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     hiring_end_at = models.DateField(
         verbose_name=_("Date de fin du contrat"), blank=True, null=True
     )
+
+    # Job applications sent to SIAEs subject to eligibility rules will
+    # obtain an Approval after being accepted.
     approval = models.ForeignKey(
         "approvals.Approval",
         verbose_name=_("PASS IAE"),
@@ -247,6 +258,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     approval_number_sent_by_email = models.BooleanField(
         verbose_name=_("PASS IAE envoyé par email"), default=False
+    )
+    approval_delivery_mode = models.CharField(
+        verbose_name=_("Mode d'attribution du PASS IAE"),
+        max_length=30,
+        choices=APPROVAL_DELIVERY_MODE_CHOICES,
+        blank=True,
     )
 
     created_at = models.DateTimeField(
@@ -327,18 +344,27 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Approval issuance logic.
         if self.to_siae.is_subject_to_eligibility_rules:
 
-            job_seeker_approvals = self.job_seeker.approvals_wrapper
-            if job_seeker_approvals.has_valid:
-                # Reuse an existing valid Itou or PE approval.
-                self.approval = Approval.get_or_create_from_valid(job_seeker_approvals)
+            approvals_wrapper = self.job_seeker.approvals_wrapper
+
+            if (
+                approvals_wrapper.has_pending_waiting_period
+                and not self.is_sent_by_authorized_prescriber
+            ):
+                # Security check: it's supposed to be blocked upstream.
+                raise xwf_models.AbortTransition(
+                    "Job seeker has an approval in waiting period."
+                )
+
+            if approvals_wrapper.has_valid:
+                # Automatically reuse an existing valid Itou or PE approval.
+                self.approval = Approval.get_or_create_from_valid(approvals_wrapper)
                 emails.append(self.email_approval_number(accepted_by))
-                self.approval_number_sent_by_email = True
             elif (
                 self.job_seeker.pole_emploi_id
                 or self.job_seeker.lack_of_pole_emploi_id_reason
                 == self.job_seeker.REASON_NOT_REGISTERED
             ):
-                # Automatic approval creation.
+                # Automatically create a new approval.
                 new_approval = Approval(
                     start_at=self.hiring_start_at,
                     end_at=Approval.get_default_end_date(self.hiring_start_at),
@@ -348,13 +374,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval.save()
                 self.approval = new_approval
                 emails.append(self.email_approval_number(accepted_by))
-                self.approval_number_sent_by_email = True
             elif (
                 self.job_seeker.lack_of_pole_emploi_id_reason
                 == self.job_seeker.REASON_FORGOTTEN
             ):
                 # Trigger a manual approval creation.
                 emails.append(self.email_accept_trigger_manual_approval(accepted_by))
+                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
             else:
                 raise xwf_models.AbortTransition(
                     "Job seeker has an invalid PE status, cannot issue approval."
@@ -363,6 +389,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Send emails in batch.
         connection = mail.get_connection()
         connection.send_messages(emails)
+
+        if self.approval:
+            self.approval_number_sent_by_email = True
+            self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):

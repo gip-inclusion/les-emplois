@@ -117,27 +117,31 @@ class CommonApprovalMixinTest(TestCase):
 
     def test_waiting_period(self):
 
-        # End is 1 day before `WAITING_PERIOD_YEARS`.
-        end_at = datetime.date.today() - relativedelta(
-            years=Approval.WAITING_PERIOD_YEARS, days=1
-        )
+        # End is tomorrow.
+        end_at = datetime.date.today() + relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
-        self.assertTrue(approval.waiting_period_has_elapsed)
+        self.assertTrue(approval.is_valid)
+        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
-        # End is exactly at `WAITING_PERIOD_YEARS`.
-        end_at = datetime.date.today() - relativedelta(
-            years=Approval.WAITING_PERIOD_YEARS
-        )
+        # End is today.
+        end_at = datetime.date.today()
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.is_valid)
+        self.assertFalse(approval.waiting_period_has_elapsed)
+        self.assertFalse(approval.is_in_waiting_period)
+
+        # End is yesterday.
+        end_at = datetime.date.today() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid)
         self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertTrue(approval.is_in_waiting_period)
 
-        # End is 1 day after `WAITING_PERIOD_YEARS`.
+        # Ended since more than WAITING_PERIOD_YEARS.
         end_at = datetime.date.today() - relativedelta(
             years=Approval.WAITING_PERIOD_YEARS, days=1
         )
