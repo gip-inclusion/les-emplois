@@ -56,9 +56,7 @@
             {% if eligibility_diagnosis %}
 
                 <hr>
-
                 <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
-
                 <p>
                     {% trans "Validés par :" %}
                     <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
@@ -70,6 +68,16 @@
                     {% endif %}
                     {% trans "le" %}
                     <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
+                </p>
+
+            {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
+
+                {# The existence of a valid `PoleEmploiApproval` implies that #}
+                {# a diagnosis has been made outside of Itou. #}
+                <hr>
+                <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
+                <p>
+                    {% trans "Validés par :" %} <b>{% trans "Pôle emploi" %}</b>
                 </p>
 
             {% endif %}

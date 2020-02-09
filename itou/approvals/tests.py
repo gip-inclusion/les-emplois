@@ -147,6 +147,12 @@ class CommonApprovalMixinTest(TestCase):
         self.assertTrue(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
+    def test_originates_from_itou(self):
+        approval = ApprovalFactory(number="999990000001")
+        self.assertTrue(approval.originates_from_itou)
+        approval = PoleEmploiApprovalFactory(number="625741810182")
+        self.assertFalse(approval.originates_from_itou)
+
 
 class ApprovalModelTest(TestCase):
     """

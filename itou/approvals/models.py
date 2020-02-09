@@ -62,6 +62,10 @@ class CommonApprovalMixin(models.Model):
         now = timezone.now().date()
         return now > self.waiting_period_end
 
+    @property
+    def originates_from_itou(self):
+        return self.number.startswith(Approval.ASP_ITOU_PREFIX)
+
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
