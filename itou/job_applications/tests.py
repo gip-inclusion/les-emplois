@@ -254,24 +254,20 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
 
-    def test_send_approval_number_by_email(self):
-
+    def test_email_approval_number(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval,
         )
-        job_application.accept(user=job_application.to_siae.members.first())
-
-        # Delete `accept` and `accept_trigger_manual_approval` emails.
-        mail.outbox = []
-
-        job_application.send_approval_number_by_email()
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-
+        accepted_by = job_application.to_siae.members.first()
+        email = job_application.email_approval_number(accepted_by)
+        # To.
+        self.assertIn(accepted_by.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        # Body.
         self.assertIn(approval.user.get_full_name(), email.subject)
         self.assertIn(approval.number_with_spaces, email.body)
         self.assertIn(approval.user.last_name, email.body)
@@ -286,6 +282,19 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.post_code, email.body)
         self.assertIn(job_application.to_siae.city, email.body)
         self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
+
+    def test_send_approval_number_by_email(self):
+        job_seeker = JobSeekerFactory()
+        approval = ApprovalFactory(user=job_seeker)
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            approval=approval,
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        mail.outbox = []  # Delete previous emails.
+        job_application.send_approval_number_by_email()
+        self.assertEqual(len(mail.outbox), 1)
 
 
 class JobApplicationWorkflowTest(TestCase):

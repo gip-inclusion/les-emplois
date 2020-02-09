@@ -70,7 +70,6 @@ class JobApplicationAdmin(admin.ModelAdmin):
             approval_number_sent_by_email=False
         )
         for job_application in queryset:
-            print("-" * 80)
             job_application.send_approval_number_by_email()
 
     send_approval_number_by_email.short_description = _("Envoyer le PASS IAE par email")
