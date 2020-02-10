@@ -2,10 +2,12 @@ import datetime
 
 from django import forms
 from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.widgets import DatePickerField
 
 
 class UserExistsForm(forms.Form):
@@ -158,3 +160,53 @@ class AcceptForm(forms.ModelForm):
             error = _("La date d'embauche ne doit pas être dans le passé.")
             raise forms.ValidationError(error)
         return date_of_hiring
+
+
+class FilterJobApplicationsForm(forms.Form):
+    """
+    Allow users to filter job applications based on specific fields.
+    """
+
+    states = forms.MultipleChoiceField(
+        required=False,
+        choices=JobApplicationWorkflow.STATE_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+    )
+    start_date = forms.DateField(
+        input_formats=[DatePickerField.DATE_FORMAT],
+        label=_("Début"),
+        required=False,
+        widget=DatePickerField(),
+    )
+    end_date = forms.DateField(
+        input_formats=[DatePickerField.DATE_FORMAT],
+        label=_("Fin"),
+        required=False,
+        widget=DatePickerField(),
+    )
+
+    def clean_start_date(self):
+        """
+        When a start_date does not include time values,
+        consider that it means "the whole day".
+        Therefore, start_date time should be 0 am.
+        """
+        start_date = self.cleaned_data.get("start_date")
+        if start_date:
+            start_date = datetime.datetime.combine(start_date, datetime.time())
+            start_date = timezone.make_aware(start_date)
+        return start_date
+
+    def clean_end_date(self):
+        """
+        When an end_date does not include time values,
+        consider that it means "the whole day".
+        Therefore, end_date time should be 23.59 pm.
+        """
+        end_date = self.cleaned_data.get("end_date")
+        if end_date:
+            end_date = datetime.datetime.combine(
+                end_date, datetime.time(hour=23, minute=59, second=59)
+            )
+            end_date = timezone.make_aware(end_date)
+        return end_date
