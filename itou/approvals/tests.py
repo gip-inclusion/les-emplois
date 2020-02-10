@@ -95,6 +95,13 @@ class CommonApprovalMixinTest(TestCase):
     Test CommonApprovalMixin.
     """
 
+    def test_waiting_period_end(self):
+        end_at = datetime.date(2000, 1, 1)
+        start_at = datetime.date(1998, 1, 1)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        expected = datetime.date(2002, 1, 1)
+        self.assertEqual(approval.waiting_period_end, expected)
+
     def test_is_valid(self):
 
         # End today.
@@ -390,7 +397,7 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
+        self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, None)
 
     def test_status_with_valid_approval(self):
@@ -401,7 +408,7 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertTrue(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
+        self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_approval_in_waiting_period(self):
@@ -412,7 +419,7 @@ class ApprovalsWrapperTest(TestCase):
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertTrue(approvals_wrapper.has_pending_waiting_period)
+        self.assertTrue(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_approval_with_elapsed_waiting_period(self):
@@ -425,7 +432,7 @@ class ApprovalsWrapperTest(TestCase):
             approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED
         )
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
+        self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_pole_emploi_approval(self):
@@ -435,7 +442,7 @@ class ApprovalsWrapperTest(TestCase):
         )
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
-        self.assertFalse(approvals_wrapper.has_pending_waiting_period)
+        self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 

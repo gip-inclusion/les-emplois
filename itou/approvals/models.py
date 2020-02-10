@@ -276,7 +276,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     admin command on a regular basis with data shared by Pôle emploi.
 
     If a valid Pôle emploi's approval is found, it's copied in the `Approval`
-    model.
+    model when it is attached to a JobApplication.
     """
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
@@ -373,7 +373,7 @@ class ApprovalsWrapper:
 
         # Only one of the following attributes can be True at a time.
         self.has_valid = self.status == self.VALID
-        self.has_pending_waiting_period = self.status == self.IN_WAITING_PERIOD
+        self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):
         """

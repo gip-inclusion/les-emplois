@@ -38,7 +38,7 @@ def valid_approval_status_required(function=None):
             # Only "authorized prescribers" can bypass an approval in waiting period.
             approvals_wrapper = job_seeker.approvals_wrapper
             if (
-                approvals_wrapper.has_pending_waiting_period
+                approvals_wrapper.has_in_waiting_period
                 and not user_info.is_authorized_prescriber
             ):
                 error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
@@ -149,14 +149,16 @@ def step_check_job_seeker_info(
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
-    user_info = get_user_info(request)
     next_url = reverse(
         "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
     )
 
-    if job_seeker.birthdate and (
+    # Check required info that will allow us to find a pre-existing approval.
+    has_required_info = job_seeker.birthdate and (
         job_seeker.pole_emploi_id or job_seeker.lack_of_pole_emploi_id_reason
-    ):
+    )
+
+    if has_required_info:
         return HttpResponseRedirect(next_url)
 
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
@@ -267,13 +269,13 @@ def step_eligibility(
     user_info = get_user_info(request)
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
 
-    must_skip = (
+    skip = (
         # Only "authorized prescribers" can perform an eligibility diagnosis.
         not user_info.is_authorized_prescriber
         # Eligibility diagnosis already performed.
         or job_seeker.has_eligibility_diagnosis
     )
-    if must_skip:
+    if skip:
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST":

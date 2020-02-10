@@ -347,7 +347,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             approvals_wrapper = self.job_seeker.approvals_wrapper
 
             if (
-                approvals_wrapper.has_pending_waiting_period
+                approvals_wrapper.has_in_waiting_period
                 and not self.is_sent_by_authorized_prescriber
             ):
                 # Security check: it's supposed to be blocked upstream.

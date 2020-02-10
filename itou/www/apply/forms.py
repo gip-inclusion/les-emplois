@@ -222,9 +222,14 @@ class AcceptForm(forms.ModelForm):
 
 
 class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
+    """
+    Info that will be used to find an existing Pôle emploi approval.
+    """
+
     class Meta:
         model = get_user_model()
-        fields = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        help_texts = {"birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978.")}
 
     def clean(self):
         super().clean()

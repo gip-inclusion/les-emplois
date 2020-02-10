@@ -115,7 +115,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
     # Only "authorized prescribers" can bypass an approval in waiting period.
     approvals_wrapper = job_application.job_seeker.approvals_wrapper
     if (
-        approvals_wrapper.has_pending_waiting_period
+        approvals_wrapper.has_in_waiting_period
         and not job_application.is_sent_by_authorized_prescriber
     ):
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
@@ -160,7 +160,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     # Only "authorized prescribers" can bypass an approval in waiting period.
     approvals_wrapper = job_application.job_seeker.approvals_wrapper
     if (
-        approvals_wrapper.has_pending_waiting_period
+        approvals_wrapper.has_in_waiting_period
         and not job_application.is_sent_by_authorized_prescriber
     ):
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
