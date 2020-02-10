@@ -7,20 +7,9 @@
 {% block content %}
 
     <h1>{% trans "Candidatures reçues" %}</h1>
-
     <h2 class="text-muted">{{ siae.display_name }}</h2>
-        <ul class="list-group list-group-horizontal mt-sm-5 mb-sm-0">
-            <li class="list-group-item border-0 pl-0">
-                <button class="btn btn-secondary" type="button" data-toggle="modal" data-target="#itouModal">
-                  {% trans "Filtres" %}
-                </button>
-            </li>
-            {% for filter in filters %}
-                <li class="list-group-item border-0 pl-0 pt-3">
-                    <span class="badge badge-light align-middle">{{ filter.label }} : {{ filter.value }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+
+    {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted mt-4">
@@ -49,40 +38,6 @@
     {% include "includes/pagination.html" with page=job_applications_page %}
 
 {% endblock %}
-
-
-{% block modal_content %}
-    <form method="get" action="">
-        {{ block.super }}
-    </form>
-{% endblock modal_content %}
-
-{% block modal_title %}
-    <h4 class="modal-title">{% trans "Filtres" %}</h4>
-    <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Fermer' %}">
-        <span aria-hidden="true">&times;</span>
-    </button>
-{% endblock modal_title %}
-
-{% block modal_body %}
-    <h5>{% trans "Date de candidature" %}</h5>
-    {% bootstrap_field filters_form.start_date form_group_class="form_group m-3" %}
-    {% bootstrap_field filters_form.end_date form_group_class="form_group m-3" %}
-
-    <h5>{% trans "Statut" %}</h5>
-      {% for choice in filters_form.states %}
-      <div class="form-check form-check-inline dropdown-item">
-          <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
-          <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
-      </div>
-      {% endfor %}
-{% endblock %}
-
-{% block modal_footer %}
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>
-    <button type="submit" class="btn btn-primary">{% trans "Appliquer" %}</button>
-{% endblock %}
-
 
 {% block script %}
     {{ block.super }}

@@ -18,7 +18,19 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     List of applications for a job seeker.
     """
 
-    job_applications = request.user.job_applications.select_related(
+    job_applications_query = request.user.job_applications
+    filters_form = FilterJobApplicationsForm()
+    filters = request.GET
+
+    if filters:
+        filters_form = FilterJobApplicationsForm(data=filters)
+        if filters_form.is_valid():
+            job_applications_query = _add_filters_to_query(
+                query=job_applications_query, data=filters_form.cleaned_data
+            )
+        filters = _humanize_filters(filters_form.cleaned_data)
+
+    job_applications = job_applications_query.select_related(
         "job_seeker",
         "sender",
         "sender_siae",
@@ -29,7 +41,11 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         job_applications, request.GET.get("page"), items_per_page=10
     )
 
-    context = {"job_applications_page": job_applications_page}
+    context = {
+        "job_applications_page": job_applications_page,
+        "filters_form": filters_form,
+        "filters": filters,
+    }
     return render(request, template_name, context)
 
 

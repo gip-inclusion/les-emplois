@@ -174,26 +174,6 @@
 
     </div>
 
-    {% block modal %}
-    <div class="modal fade" id="itouModal" tabindex="-1" role="dialog" aria-labelledby="itouModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                {% block modal_content %}
-                    <div class="modal-header">
-                    {% block modal_title %}{% endblock modal_title %}
-                    </div>
-                    <div class="modal-body">
-                        {% block modal_body %}{% endblock modal_body %}
-                    </div>
-                    <div class="modal-footer">
-                        {% block modal_footer %}{% endblock modal_footer %}
-                    </div>
-                {% endblock modal_content %}
-            </div> <!-- .modal-content -->
-        </div> <!-- .modal-dialog -->
-    </div> <!-- .modal -->
-    {% endblock modal %}
-
     <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
     <script src="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.js" %}"></script>
     <script src="{% static "vendor/bootstrap-4.3.1/popper.min.js" %}"></script>
