@@ -9,11 +9,12 @@ from itou.job_applications.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.job_applications.models import JobApplicationWorkflow, JobApplication
-from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory
+from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
 from itou.utils.widgets import DatePickerField
 
 
-class ProcessListTest(TestCase):
+class ProcessListJobSeekerAndSIAETest(TestCase):
     def setUp(self):
         # Create 1 JobApplication per available state and attach it to the same SIAE.
         siae = SiaeWithMembershipFactory()
@@ -33,8 +34,9 @@ class ProcessListTest(TestCase):
 
         # Create one more SIAE and one more application
         # so that a job seeker has 2 applications in his dashboard.
-        siae = SiaeWithMembershipFactory()
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=siae)
+        JobApplicationFactory(
+            job_seeker=self.job_seeker, to_siae=SiaeWithMembershipFactory()
+        )
 
     def test_list_for_siae_view(self):
         """
@@ -130,7 +132,6 @@ class ProcessListTest(TestCase):
         # match the date range selected by the user.
         self.assertEqual(total_applications, len(JobApplicationWorkflow.states))
 
-
     ############################################################
     ################## Job seeker view #########################
     ############################################################
@@ -147,7 +148,6 @@ class ProcessListTest(TestCase):
         # Result page should contain all SIAE's job applications.
         self.assertEqual(total_applications, self.job_seeker.job_applications.count())
 
-
     def test_list_for_job_seeker_view__filtered_by_state(self):
         """
         Provide a list of job applications sent by a job seeker
@@ -156,6 +156,52 @@ class ProcessListTest(TestCase):
         self.client.login(username=self.job_seeker.email, password=DEFAULT_PASSWORD)
         query = f"states={JobApplicationWorkflow.initial_state}"
         url = f"{self.job_seeker_base_url}?{query}"
+        response = self.client.get(url)
+
+        # Count job applications used by the template
+        total_applications = len(response.context["job_applications_page"].object_list)
+
+        # Result page should only contain job applications which status
+        # matches the one selected by the user.
+        self.assertEqual(total_applications, 1)
+
+
+class ProcessListPrescriberTest(TestCase):
+    def setUp(self):
+        siae = SiaeWithMembershipFactory()
+        self.prescriber = PrescriberFactory()
+        for i, state in enumerate(JobApplicationWorkflow.states):
+            creation_date = timezone.now() - timezone.timedelta(days=i)
+            JobApplicationSentByPrescriberFactory(
+                to_siae=siae,
+                state=state,
+                created_at=creation_date,
+                sender=self.prescriber,
+            )
+        self.prescriber_base_url = reverse("apply:list_for_prescriber")
+
+    def test_list_for_prescriber_view(self):
+        """
+        Provide a list of job applications sent by a prescriber.
+        """
+        self.client.login(username=self.prescriber.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.prescriber_base_url)
+
+        # Count job applications used by the template
+        total_applications = len(response.context["job_applications_page"].object_list)
+
+        self.assertEqual(
+            total_applications, self.prescriber.job_applications_sent.count()
+        )
+
+    def test_list_for_prescriber_view__filtered_by_state(self):
+        """
+        Provide a list of job applications sent by a prescriber
+        and filtered by a state.
+        """
+        self.client.login(username=self.prescriber.email, password=DEFAULT_PASSWORD)
+        query = f"states={JobApplicationWorkflow.initial_state}"
+        url = f"{self.prescriber_base_url}?{query}"
         response = self.client.get(url)
 
         # Count job applications used by the template
