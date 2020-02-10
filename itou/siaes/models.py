@@ -100,6 +100,12 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     brand = models.CharField(verbose_name=_("Enseigne"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
+    # All siaes without any existing user require this auth_email
+    # for the siae secure signup process to even be possible.
+    # Comes from external exports (ASP, GEIQ...)
+    auth_email = models.EmailField(
+        verbose_name=_("E-mail d'authentification"), blank=True
+    )
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
 
