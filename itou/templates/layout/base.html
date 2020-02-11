@@ -21,13 +21,19 @@
     <div class="layout">
 
         <header class="layout-section layout-section-white">
-            <div class="layout-header">
-                <a href="/" class="layout-header-logo">
-                    <img src="{% static "img/logo_inclusion_gouv.svg" %}" alt="inclusion.beta.gouv.fr" width="300">
-                    <br>
-                    <a href="/" class="text-dark">
-                        {% trans "La plateforme de l'inclusion" %}
-                    </a>
+            <div class="layout-header px-3 py-2">
+                <a href="/" class="text-decoration-none text-reset">
+                    <div class="row layout-header-logo pt-1">
+                        <div class="col-4">
+                            <img src="{% static "img/logo_rf.svg" %}" alt="inclusion.beta.gouv.fr" width="85">
+                        </div>
+                        <div class="col-8 h5">
+                            <div class="font-weight-light h5 mb-0 pt-1">
+                                <span>inclusion</span><span class="font-weight-bold">.beta.gouv.fr</span>
+                            </div>
+                            <div class="text-muted small pt-1">{% trans "Plateforme de l'inclusion" %}</div>
+                        </div>
+                    </div>
                 </a>
                 <div class="layout-header-content">
                     {% if user.is_authenticated %}
@@ -92,8 +98,8 @@
 
                     {% else %}
                         <nav>
-                            <a class="btn btn-outline-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                {% include "includes/icon.html" with icon="log-in" %} {% trans "Inscription / Connexion" %}
+                            <a class="btn btn-outline-primary w-100" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                {% trans "Inscription / Connexion" %}
                             </a>
                         </nav>
                     {% endif %}

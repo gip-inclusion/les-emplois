@@ -122,10 +122,6 @@ main.layout-section {
 /* Spacing.
 --------------------------------------------------------------------------- */
 
-.layout-header {
-    padding: 1.4rem 1rem;
-}
-
 .layout-content {
     padding: 1rem 1rem 2rem 1rem;
 }
