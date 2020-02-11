@@ -210,3 +210,46 @@ class FilterJobApplicationsForm(forms.Form):
             )
             end_date = timezone.make_aware(end_date)
         return end_date
+
+    def get_qs_filters(self):
+        """
+        Get filters to be applied to a query set.
+        """
+        filters = {}
+        data = self.cleaned_data
+
+        if data.get("states"):
+            filters["state__in"] = data.get("states")
+        if data.get("start_date"):
+            filters["created_at__gte"] = data.get("start_date")
+        if data.get("end_date"):
+            filters["created_at__lte"] = data.get("end_date")
+
+        return filters
+
+    def humanize_filters(self):
+        """
+        Return active filters to be displayed in a template.
+        """
+        start_date = self.cleaned_data.get("start_date")
+        end_date = self.cleaned_data.get("end_date")
+        states = self.cleaned_data.get("states")
+        active_filters = []
+
+        if start_date:
+            label = FilterJobApplicationsForm.base_fields.get("start_date").label
+            active_filters.append([label, start_date])
+
+        if end_date:
+            label = FilterJobApplicationsForm.base_fields.get("end_date").label
+            active_filters.append([label, end_date])
+
+        if states:
+            values = [
+                str(JobApplicationWorkflow.states[state].title) for state in states
+            ]
+            value = ", ".join(values)
+            label = _("Statuts") if (len(values) > 1) else _("Statut")
+            active_filters.append([label, value])
+
+        return [{"label": f[0], "value": f[1]} for f in active_filters]
