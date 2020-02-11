@@ -7,6 +7,8 @@
 
     <h1>{% trans "Suivi des candidatures" %}</h1>
 
+    {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
+
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
             {% trans "Aucune candidature pour le moment." %}
@@ -31,4 +33,10 @@
 
     {% include "includes/pagination.html" with page=job_applications_page %}
 
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ filters_form.media }}
 {% endblock %}
