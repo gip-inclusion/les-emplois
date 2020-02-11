@@ -10,7 +10,7 @@
         {% trans "Cet email n'existe pas dans notre base de données. Vous devez créer un compte pour votre candidat en utilisant le formulaire ci-dessous afin de pouvoir continuer." %}
     </div>
 
-    <form method="post" action="">
+    <form method="post" action="" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
 

@@ -12,7 +12,7 @@
         {% trans "Si vous travaillez au sein d'une organisation comprenant plusieurs personnes, vous pouvez la créer ici afin d'obtenir un code qui permettra à d'autres utilisateurs de la rejoindre au moment de leur inscription." %}
     </div>
 
-    <form method="post" action="">
+    <form method="post" action="" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
 

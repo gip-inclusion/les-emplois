@@ -134,7 +134,7 @@
 
         <hr>
 
-        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}">
+        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
             {% csrf_token %}
             {% buttons %}
                 <button type="submit" class="btn btn-warning">{% trans "J'étudie cette candidature" %}</button>

@@ -18,7 +18,7 @@
     {% blocktrans %}Si vous devez modifier le nom de votre SIAE, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a>.{% endblocktrans %}
 </div>
 
-<form method="post" action="">
+<form method="post" action="" class="js-prevent-multiple-submit">
 
     <div class="alert alert-secondary" role="alert">
         <i>{% trans "Laisser les champs vides pour ne rien afficher." %}</i>

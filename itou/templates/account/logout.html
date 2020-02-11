@@ -13,7 +13,7 @@
 
     <p>{% trans "Voulez-vous vraiment vous déconnecter ?" %}</p>
 
-    <form method="post" action="{% url 'account_logout' %}">
+    <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
 
