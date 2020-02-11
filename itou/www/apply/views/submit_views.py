@@ -274,6 +274,21 @@ def step_application(
 
     if request.method == "POST" and form.is_valid():
 
+        next_url = reverse("apply:list_for_job_seeker")
+        if request.user.is_prescriber:
+            next_url = reverse("apply:list_for_prescriber")
+        elif request.user.is_siae_staff:
+            next_url = reverse("apply:list_for_siae")
+
+        # Prevent multiple rapid clicks on the submit button to create multiple
+        # job applications.
+        if (
+            job_seeker.job_applications.filter(to_siae=siae)
+            .created_in_past_hours(1)
+            .exists()
+        ):
+            return HttpResponseRedirect(next_url)
+
         sender_prescriber_organization_pk = session_data.get(
             "sender_prescriber_organization_pk"
         )
@@ -300,12 +315,6 @@ def step_application(
 
         messages.success(request, _("Votre candidature a bien été envoyée !"))
 
-        if request.user.is_job_seeker:
-            next_url = reverse("apply:list_for_job_seeker")
-        elif request.user.is_prescriber:
-            next_url = reverse("apply:list_for_prescriber")
-        elif request.user.is_siae_staff:
-            next_url = reverse("apply:list_for_siae")
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form, "job_seeker": job_seeker}
