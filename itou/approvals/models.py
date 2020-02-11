@@ -72,15 +72,16 @@ class CommonApprovalQuerySet(models.QuerySet):
     A QuerySet shared by both `Approval` and `PoleEmploiApproval` models.
     """
 
-    def valid(self):
+    @property
+    def valid_lookup(self):
         now = timezone.now().date()
-        return self.filter(Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now))
+        return Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now)
+
+    def valid(self):
+        return self.filter(self.valid_lookup)
 
     def invalid(self):
-        now = timezone.now().date()
-        return self.exclude(
-            Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now)
-        )
+        return self.exclude(self.valid_lookup)
 
 
 class Approval(CommonApprovalMixin):
@@ -150,8 +151,9 @@ class Approval(CommonApprovalMixin):
             # This can happen if `end_at` or `start_at` are empty or malformed
             # (e.g. when data comes from a form).
             pass
+        already_exists = bool(self.pk)
         if (
-            not self.pk
+            not already_exists
             and hasattr(self, "user")
             and self.user.approvals.valid().exists()
         ):

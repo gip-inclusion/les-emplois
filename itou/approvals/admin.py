@@ -41,7 +41,15 @@ class IsValidFilter(admin.SimpleListFilter):
 
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
-    list_display = ("id", "number", "user", "start_at", "end_at", "is_valid")
+    list_display = (
+        "id",
+        "number",
+        "user",
+        "start_at",
+        "end_at",
+        "is_valid",
+        "created_at",
+    )
     search_fields = ("number", "user__first_name", "user__last_name", "user__email")
     list_filter = (IsValidFilter,)
     list_display_links = ("id", "number")
