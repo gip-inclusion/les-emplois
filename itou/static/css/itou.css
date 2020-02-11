@@ -169,3 +169,37 @@ body:after {
     content: " *";
     color: #d63626;
 }
+
+/* Home.
+--------------------------------------------------------------------------- */
+.column-full-width {
+    grid-column-start: full-end;
+    grid-column-end: full-start;
+}
+
+section.home-search {
+    /* TODO: compatibility when gradient colors are validated by JB; */
+    background: rgb(3,50,138);
+    background: linear-gradient(180deg, rgba(3,50,138,1) 0%, rgba(204,236,250,1) 40%, rgba(184,239,210,1) 100%);
+}
+
+section.home-search > .bg-image {
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: block;
+    height: 21rem;
+    margin-top:7rem;
+}
+
+@media (max-width: 700px) {
+
+    section.home-search > .bg-image {
+        height: 10rem;
+        margin-top: 5rem;
+    }
+
+    section.home-search > form {
+        width: 90% !important;
+    }
+
+}

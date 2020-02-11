@@ -1,4 +1,4 @@
-{% extends "layout/content.html" %}
+{% extends "layout/content_full_viewport.html" %}
 {% load i18n %}
 {% load static %}
 
@@ -7,58 +7,66 @@
 
 {% block content %}
 
-    <h2 class="text-center mb-4">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
+<div class="layout-section layout-section-white">
+    <section class="pt-5 column-full-width home-search">
+
+        <h2 class="text-center mb-3 mx-4 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
+
+        <form method="get" action="{% url 'search:siaes' %}" class="my-3 w-50 mx-auto">
+            {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
+        </form>
+
+        <div class="w-100 bg-image" style="background-image: url('{% static 'img/home-bg.svg' %}');"></div>
+
+    </section>
 
     {% if not user.is_authenticated %}
+        <section>
+            <div class="card-deck mb-4">
 
-        <div class="card-deck mb-4">
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {% trans "Accès candidat" %}
-                    </h5>
-                    <a class="card-link" href="{% url 'signup:job_seeker' %}">
-                        {% trans "Inscription" %}
-                    </a>
-                    <a class="card-link" href="{% url 'account_login' %}">
-                        {% trans "Connexion" %}
-                    </a>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {% trans "Accès candidat" %}
+                        </h5>
+                        <a class="card-link" href="{% url 'signup:job_seeker' %}">
+                            {% trans "Inscription" %}
+                        </a>
+                        <a class="card-link" href="{% url 'account_login' %}">
+                            {% trans "Connexion" %}
+                        </a>
+                    </div>
                 </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{% trans "Accès prescripteur" %}</h5>
+                        <a class="card-link" href="{% url 'signup:prescriber' %}">
+                            {% trans "Inscription" %}
+                        </a>
+                        <a class="card-link" href="{% url 'account_login' %}">
+                            {% trans "Connexion" %}
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{% trans "Accès employeur" %}</h5>
+                        <a class="card-link" href="{% url 'signup:siae' %}">
+                            {% trans "Inscription" %}
+                        </a>
+                        <a class="card-link" href="{% url 'account_login' %}">
+                            {% trans "Connexion" %}
+                        </a>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{% trans "Accès prescripteur" %}</h5>
-                    <a class="card-link" href="{% url 'signup:prescriber' %}">
-                        {% trans "Inscription" %}
-                    </a>
-                    <a class="card-link" href="{% url 'account_login' %}">
-                        {% trans "Connexion" %}
-                    </a>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{% trans "Accès employeur" %}</h5>
-                    <a class="card-link" href="{% url 'signup:siae' %}">
-                        {% trans "Inscription" %}
-                    </a>
-                    <a class="card-link" href="{% url 'account_login' %}">
-                        {% trans "Connexion" %}
-                    </a>
-                </div>
-            </div>
-
-        </div>
+        </section>
 
     {% endif %}
 
-    <h3 class="text-center">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
-
-    <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
-        {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
-    </form>
-
+</div>
 {% endblock %}
