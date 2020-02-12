@@ -99,7 +99,7 @@
                     {% else %}
                         <nav>
                             <a class="btn btn-outline-primary w-100" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                {% trans "Inscription / Connexion" %}
+                                {% trans "Se connecter" %}
                             </a>
                         </nav>
                     {% endif %}
@@ -126,56 +126,143 @@
 
         {% block content_full_viewport %}{% endblock %}
 
-        <footer class="layout-section layout-section-dark">
-            <div class="layout-footer">
-                <div class="row">
-                    <div class="col-sm">
-                        <h6>{% trans "À propos" %}</h6>
-                        <ul class="list-unstyled text-small">
-                            <li>
-                                <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{% trans "Nous contacter" %}</a>
-                            </li>
-                            <li>
-                                <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580">
-                                    {% trans "Inscription Newsletter" %}
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-sm">
-                        <h6>{% trans "Pourquoi cette plateforme ?" %}</h6>
-                        <ul class="list-unstyled text-small">
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/pourquoi-cette-plateforme#faciliter-lembauche-en-iae">
-                                {% trans "Faciliter l'embauche en IAE" %}
-                            </a></li>
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/pourquoi-cette-plateforme#simplifier-les-procedures">
-                                {% trans "Simplifier les procédures" %}
-                            </a></li>
-                        </ul>
-                    </div>
-                    <div class="col-sm">
-                        <h6>{% trans "En savoir plus" %}</h6>
-                        <ul class="list-unstyled text-small">
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/le-pacte-dambition-iae">{% trans "Le pacte d'ambition IAE" %}</a></li>
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/lexperimentation">{% trans "L'expérimentation" %}</a></li>
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/linclusion-kesako">{% trans "L'inclusion, kesako ?" %}</a></li>
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/qui-sommes-nous">{% trans "Qui sommes-nous ?" %}</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-sm">
-                        <h6>{% trans "Aide" %}</h6>
-                        <ul class="list-unstyled text-small">
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/foire-aux-questions">{% trans "FAQ" %}</a></li>
-                            <li><a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique">
-                                {% trans "Qui est éligible à l'IAE ?" %}
-                            </a></li>
-                        </ul>
+        <footer class="layout-section text-light text-center text-sm-left">
+            <section class="layout layout-column-full bg-secondary">
+                <div class="layout-column-main py-4">
+                    <div class="row">
+                        <div class="col-sm my-2 my-sm-0">
+                            <h5>{% trans "À propos" %}</h5>
+                            <ul class="list-unstyled text-small">
+                                <li>
+                                    <a href="mailto:{{ ITOU_EMAIL_CONTACT }}" class="text-reset">{% trans "Contact" %}</a>
+                                </li>
+                                <li>
+                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" class="text-reset">
+                                        {% trans "Inscription Newsletter" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://github.com/betagouv/itou" target="_blank" class="text-reset">
+                                        {% trans "Code source de la page" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-sm my-2 my-sm-0">
+                            <h5>{% trans "Pourquoi une plateforme ?" %}</h5>
+                            <ul class="list-unstyled text-small">
+                                <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/pourquoi-cette-plateforme#faciliter-lembauche-en-iae" class="text-reset">
+                                    {% trans "Faciliter l'embauche en IAE" %}
+                                </a></li>
+                                <li><a href="https://doc.inclusion.beta.gouv.fr/presentation/pourquoi-cette-plateforme#simplifier-les-procedures" class="text-reset">
+                                    {% trans "Simplifier les procédures" %}
+                                </a></li>
+                            </ul>
+                        </div>
+                        <div class="col-sm my-2 my-sm-0">
+                            <h5>{% trans "Besoin d'aide ?" %}</h5>
+                            <ul class="list-unstyled text-small">
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/foire-aux-questions" class="text-reset">
+                                        {% trans "Foire aux questions (FAQ)" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" class="text-reset">
+                                        {% trans "Qui est éligible à l'IAE ?" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="mailto:{{ ITOU_EMAIL_CONTACT }}" class="text-reset">{% trans "Nous contacter" %}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-sm my-2 my-sm-0">
+                            <h5>{% trans "En savoir plus" %}</h5>
+                            <ul class="list-unstyled text-small">
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/presentation/le-pacte-dambition-iae" class="text-reset">
+                                        {% trans "Le pacte d'ambition IAE" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/presentation/lexperimentation" class="text-reset">
+                                        {% trans "L'expérimentation" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/presentation/linclusion-kesako" class="text-reset">
+                                        {% trans "L'inclusion, kesako ?" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/presentation/qui-sommes-nous" class="text-reset">
+                                        {% trans "Qui sommes-nous ?" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'stats:index' %}" class="text-reset">
+                                        {% trans "Statistiques, lexiques et indicateurs" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-                <p class="mt-3 text-center">
-                    <i>{% trans "La plateforme de l'inclusion est en phase d'expérimentation sur les départements du Bas-Rhin (67), du Pas-de-Calais (62) et de la Seine Saint Denis (93)." %}</i>
-                </p>
-            </div>
+            </section>
+
+            <section class="layout layout-column-full bg-dark-grey">
+                <div class="layout-column-main py-4">
+                    <div class="row align-items-center">
+                        <div class="col-4 col-sm-2">
+                            <img src="{% static 'img/logo_ministere_du_travail.svg' %}" class="w-sm-75 w-100">
+                        </div>
+
+                        <div class="col-8 col-sm-5">
+                            <p class="h5"><span class="font-weight-bold">inclusion.beta</span>.gouv.fr</p>
+                            <p>
+                              {% trans "Plateforme de l'inclusion en expérimentation sur les départements du Bas-Rhin <strong>(67)</strong>, du Pas-de-Calais <strong>(62)</strong> et de la Seine Saint Denis <strong>(93)</strong>." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="layout layout-column-full bg-dark text-light text-center">
+                <div class="layout-column-main py-4">
+                    <ul class="list-unstyled list-inline h5 mb-0 row">
+                        <li class="col-sm list-inline-item text-sm-left">
+                            <a href="https://www.service-public.fr" class="text-reset with-icon" target=_blank>
+                                service-public.fr<span>{% include "includes/icon.html" with icon="external-link" %}</span>
+                            </a>
+                        <li class="col-sm list-inline-item pl-2">
+                            <a href="https://www.data.gouv.fr" class="text-reset with-icon" target=_blank>
+                                data.gouv.fr<span>{% include "includes/icon.html" with icon="external-link" %}</span>
+                            </a>
+                        </li>
+                        <li class="col-sm list-inline-item pl-2">
+                            <a href="https://www.elysee.fr" class="text-reset with-icon" target=_blank>
+                                elysee.fr<span>{% include "includes/icon.html" with icon="external-link" %}</span>
+                            </a>
+                        </li>
+                        <li class="col-sm list-inline-item pl-2">
+                            <a href="https://www.gouvernement.fr" class="text-reset with-icon" target=_blank>
+                                gouvernement.fr<span>{% include "includes/icon.html" with icon="external-link" %}</span>
+                            </a>
+                        </li>
+                        <li class="col-sm list-inline-item pl-2">
+                            <a href="https://www.france.fr" class="text-reset with-icon" target=_blank>
+                                france.fr<span>{% include "includes/icon.html" with icon="external-link" %}</span>
+                            </a>
+                        </li>
+                        <li class="col-sm list-inline-item pl-2 text-sm-right">
+                            <a href="https://www.legifrance.gouv.fr" class="text-reset with-icon" target=_blank>
+                                legifrance.gouv.fr<span>{% include "includes/icon.html" with icon="external-link" %}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
         </footer>
 
     </div>

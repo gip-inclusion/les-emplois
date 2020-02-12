@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="1441px" height="265px" viewBox="0 0 1441 265" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="1441px" height="166px" viewBox="0 0 1441 166" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 62 (91390) - https://sketch.com -->
     <title>Itou</title>
     <desc>Created with Sketch.</desc>
     <defs>
-        <rect id="path-1" x="0" y="0" width="1441" height="313.355154"></rect>
+        <rect id="path-1" x="0" y="0" width="1441" height="215"></rect>
         <linearGradient x1="50%" y1="17.4936587%" x2="50%" y2="50%" id="linearGradient-3">
             <stop stop-color="#70BC81" offset="0%"></stop>
             <stop stop-color="#E9C7A4" offset="100%"></stop>
@@ -126,7 +126,6 @@
                             <rect id="Rectangle" fill="#FFFFFF" fill-rule="nonzero" x="0" y="12.9156155" width="32.7030996" height="3.3484929" rx="1.67424645"></rect>
                             <rect id="Rectangle" fill="#FFFFFF" fill-rule="nonzero" x="27.8938202" y="0" width="54.3448567" height="3.3484929" rx="1.67424645"></rect>
                         </g>
-                        <rect id="Rectangle" fill="#F2F2F2" fill-rule="nonzero" x="2.16854778" y="155.927765" width="1442.08427" height="108.427389"></rect>
                         <polygon id="Rectangle" fill="url(#linearGradient-3)" fill-rule="nonzero" transform="translate(736.101685, 139.906428) rotate(-2.000000) translate(-736.101685, -139.906428) " points="3.38483299 94.1630865 1468.81757 94.1785458 1468.81854 185.649769 3.38579824 185.634309"></polygon>
                         <polygon id="Rectangle" fill="url(#linearGradient-4)" fill-rule="nonzero" transform="translate(734.655825, 150.553758) rotate(1.000000) translate(-734.655825, -150.553758) " points="1.93941267 104.822027 1467.37272 104.814292 1467.37224 196.28549 1.93892975 196.293224"></polygon>
                         <rect id="Rectangle" fill="url(#linearGradient-5)" fill-rule="nonzero" x="0" y="122.315275" width="1464.85403" height="94.3318284"></rect>
