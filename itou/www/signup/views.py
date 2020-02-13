@@ -3,6 +3,7 @@ Handle multiple user types sign up with django-allauth.
 """
 from allauth.account.views import SignupView
 
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -40,11 +41,6 @@ class PrescriberSignupView(SignupView):
         return super().post(request, *args, **kwargs)
 
 
-def store_siae_signup_credentials_in_session(kwargs, request):
-    request.session["siae_signup_encoded_siae_id"] = kwargs.get("encoded_siae_id", None)
-    request.session["siae_signup_token"] = kwargs.get("token", None)
-
-
 def select_siae(request, template_name="signup/select_siae.html"):
     """
     Select an existing SIAE (Agence / Etablissement in French) to join.
@@ -60,7 +56,12 @@ def select_siae(request, template_name="signup/select_siae.html"):
         try:
             siae = Siae.active_objects.get(siret=siret, kind=kind)
         except Siae.DoesNotExist:
-            siae = Siae.active_objects.get(auth_email=email, kind=kind)
+            try:
+                siae = Siae.active_objects.get(auth_email=email, kind=kind)
+            except Siae.DoesNotExist:
+                raise RuntimeError(
+                    "Siae found while cleaning form can no longer be found. This should never happen."
+                )
 
         if siae.has_members:
             return HttpResponseRedirect(siae.signup_magic_link)
@@ -95,7 +96,10 @@ class SiaeSignupView(SignupView):
     template_name = "signup/signup_siae.html"
 
     def get(self, request, *args, **kwargs):
-        store_siae_signup_credentials_in_session(kwargs, request)
+        request.session[settings.ITOU_SESSION_SIAE_SIGNUP_ID] = kwargs.get(
+            "encoded_siae_id"
+        )
+        request.session[settings.ITOU_SESSION_SIAE_SIGNUP_TOKEN] = kwargs.get("token")
         if utils.check_siae_signup_credentials(request.session):
             self.initial = get_initial_from_session(request.session)
             return super().get(request, *args, **kwargs)

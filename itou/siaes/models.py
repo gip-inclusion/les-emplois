@@ -75,8 +75,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_EA, _("Entreprise adaptée")),
     )
 
-    KIND_TO_NAME = {item[0]: item[1] for item in KIND_CHOICES}
-
     SOURCE_ASP = "ASP"
     SOURCE_GEIQ = "GEIQ"
     SOURCE_USER_CREATED = "USER_CREATED"
@@ -181,9 +179,16 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             siaemembership__user=user, siaemembership__user__is_active=True
         ).exists()
 
+    def has_admin(self, user):
+        return self.members.filter(
+            siaemembership__user=user,
+            siaemembership__user__is_active=True,
+            siaemembership__is_siae_admin=True,
+        ).exists()
+
     @property
     def siren(self):
-        # pylint: disable=E1136
+        # pylint: disable=unsubscriptable-object
         return self.siret[:9]
 
     @property
@@ -229,7 +234,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         Request object is needed to build absolute URL for magic link in email body.
         See https://stackoverflow.com/questions/2345708/how-can-i-get-the-full-absolute-url-with-domain-in-django
         """
-        if self.auth_email == "":
+        if not self.auth_email:
             raise RuntimeError(
                 "Siae cannot be signed up for, this should never happen."
             )

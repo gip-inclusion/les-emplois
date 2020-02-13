@@ -20,7 +20,11 @@ def generate_random_token(n=6):
         C50364
         etc.
     """
-    # Little arithmetic trick for odd numbers.
+    # Little arithmetic trick to get the correct length in both cases:
+    # - if n even (n=2k), len(token_hex(1 + n // 2)) == 2+2k == n+2
+    # - if n odd (n=2k+1), len(token_hex(1 + n // 2)) == 2+2k == n+1
+    # the final `[:n]` ensures we get the correct length (n)
+    # while calculating as little extra characters as possible.
     return secrets.token_hex(1 + n // 2)[:n].upper()
 
 

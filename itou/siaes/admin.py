@@ -108,8 +108,8 @@ class SiaeAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         if not obj.geocoding_score:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
-        if obj.auth_email == "":
-            messages.error(
+        if not obj.auth_email:
+            messages.warning(
                 request,
                 "Cette structure n'ayant pas d'email d'authentification il est impossible de s'y inscrire.",
             )
