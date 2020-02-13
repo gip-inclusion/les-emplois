@@ -24,10 +24,10 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
     kind = models.Siae.KIND_EI
-    name = factory.Sequence(lambda n: f"siae{n}")
+    name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    email = factory.LazyAttribute(lambda obj: f"{obj.name}@example.com")
-    auth_email = factory.LazyAttribute(lambda obj: f"{obj.name}@auth.com")
+    email = factory.Faker("email", locale="fr_FR")
+    auth_email = factory.Faker("email", locale="fr_FR")
     department = factory.fuzzy.FuzzyChoice(settings.ITOU_TEST_DEPARTMENTS)
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.Faker("postalcode")

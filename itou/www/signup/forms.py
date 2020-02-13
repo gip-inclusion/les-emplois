@@ -12,6 +12,9 @@ from itou.utils.validators import validate_siret
 from itou.www.signup import utils
 
 
+BLANK_CHOICE = (("", "---------"),)
+
+
 class FullnameFormMixin(forms.Form):
 
     first_name = forms.CharField(
@@ -103,7 +106,9 @@ class SelectSiaeForm(forms.ModelForm):
         fields = ["kind", "siret", "email"]
 
     kind = forms.ChoiceField(
-        label=gettext_lazy("Type de votre structure"), choices=Siae.KIND_CHOICES, required=True
+        label=gettext_lazy("Type de votre structure"),
+        choices=BLANK_CHOICE + Siae.KIND_CHOICES,
+        required=True,
     )
 
     siret = forms.CharField(
@@ -111,36 +116,53 @@ class SelectSiaeForm(forms.ModelForm):
         min_length=14,
         max_length=14,
         validators=[validate_siret],
-        required=True,
         strip=True,
         help_text=gettext_lazy(
             "Saisissez 14 chiffres. Doit si possible être le SIRET connu de l'ASP pour les SIAE."
         ),
+        required=False,
     )
 
     email = forms.EmailField(
         label=gettext_lazy("E-mail"),
-        required=True,
         help_text=gettext_lazy("Doit si possible être l'adresse e-mail connue de l'ASP pour les SIAE."),
+        required=False,
     )
 
     def save(self, request, commit=True):
         raise RuntimeError("SelectSiaeForm.save() should never be called.")
 
-    # pylint: disable=R1710
+    # pylint: disable=inconsistent-return-statements
     def clean(self):
+        kind = self.cleaned_data["kind"]
         siret = self.cleaned_data["siret"]
         email = self.cleaned_data["email"]
-        kind = self.cleaned_data["kind"]
 
-        siaes_matching_siret = Siae.active_objects.filter(siret=siret, kind=kind)
-        siret_exists = siaes_matching_siret.exists()
-        siaes_matching_email = Siae.active_objects.filter(auth_email=email, kind=kind)
-        email_exists = siaes_matching_email.exists()
-        several_siaes_share_same_email = siaes_matching_email.count() >= 2
+        if not siret and not email:
+            error_message = _(
+                "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
+                "de l'ASP."
+            )
+            self.raise_validation_error(error_message, add_suffix=False)
+
+        if siret:
+            siaes_matching_siret = Siae.active_objects.filter(siret=siret, kind=kind)
+            siret_exists = siaes_matching_siret.exists()
+        else:
+            siret_exists = False
 
         if siret_exists:
             return self.cleaned_data
+
+        if email:
+            siaes_matching_email = Siae.active_objects.filter(
+                auth_email=email, kind=kind
+            )
+            email_exists = siaes_matching_email.exists()
+            several_siaes_share_same_email = siaes_matching_email.count() > 1
+        else:
+            email_exists = False
+            several_siaes_share_same_email = False
 
         if several_siaes_share_same_email:
             error_message = _(
@@ -155,23 +177,23 @@ class SelectSiaeForm(forms.ModelForm):
             return self.cleaned_data
 
         error_message = _(
-            "Ni ce SIRET ni cet email ne figurent dans notre base de données.<br>"
-            "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
-            "de l'ASP.<br>Si nécéssaire veuillez vous rapprocher de votre service gestion "
+            "Ni ce SIRET ni cet email ne figurent dans notre base de données "
+            "pour ce type de SIAE.<br>"
+            "Veuillez saisir le type correct de votre SIAE et soit un email connu de l'ASP "
+            "soit un SIRET connu de l'ASP.<br>"
+            "Si nécéssaire veuillez vous rapprocher de votre service gestion "
             "pour obtenir ces informations."
         )
         self.raise_validation_error(error_message)
 
-    def raise_validation_error(self, error_message):
+    def raise_validation_error(self, error_message, add_suffix=True):
         error_message_suffix = _(
-            "<br>Veuillez noter qu'actuellement notre base de données "
-            "ne contient que les structures des "
-            "territoires d'expérimentation (Pas-de-Calais, Bas-Rhin et Seine Saint Denis).<br>"
             "Contactez-nous si vous rencontrez des problèmes pour vous inscrire : "
             f'<a href="mailto:{settings.ITOU_EMAIL_CONTACT}">{settings.ITOU_EMAIL_CONTACT}</a>'
         )
-        # Concatenating two __proxy__ strings is a little tricky.
-        error_message = "%s %s" % (error_message, error_message_suffix)
+        if add_suffix:
+            # Concatenating two __proxy__ strings is a little tricky.
+            error_message = "%s<br>%s" % (error_message, error_message_suffix)
         raise forms.ValidationError(mark_safe(error_message))
 
 
@@ -189,20 +211,20 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         self.fields["siae_name"].widget.attrs["readonly"] = True
 
     kind = forms.CharField(
-        label=_("Type de votre SIAE"),
-        help_text=_("Ce champ n'est pas modifiable."),
+        label=gettext_lazy("Type de votre structure"),
+        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
         required=True,
     )
 
     siret = forms.CharField(
-        label=_("Numéro SIRET de votre SIAE"),
-        help_text=_("Ce champ n'est pas modifiable."),
+        label=gettext_lazy("Numéro SIRET de votre structure"),
+        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
         required=True,
     )
 
     siae_name = forms.CharField(
-        label=_("Nom de votre SIAE"),
-        help_text=_("Ce champ n'est pas modifiable."),
+        label=gettext_lazy("Nom de votre structure"),
+        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
         required=True,
     )
 

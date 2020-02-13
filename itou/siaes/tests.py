@@ -12,7 +12,7 @@ class FactoriesTest(TestCase):
         siae = SiaeWithMembershipFactory()
         self.assertEqual(siae.members.count(), 1)
         user = siae.members.get()
-        self.assertTrue(user.is_admin_of_siae(siae))
+        self.assertTrue(siae.has_admin(user))
 
     def test_siae_with_membership_and_jobs_factory(self):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -23,13 +23,13 @@ class FactoriesTest(TestCase):
         self.assertEqual(siae.members.count(), 2)
         self.assertEqual(siae.active_admin_members.count(), 1)
         admin_user = siae.active_admin_members.get()
-        self.assertTrue(admin_user.is_admin_of_siae(siae))
+        self.assertTrue(siae.has_admin(admin_user))
         all_users = list(siae.members.all())
         self.assertEqual(len(all_users), 2)
         all_users.remove(admin_user)
         self.assertEqual(len(all_users), 1)
-        normal_user = all_users[0]
-        self.assertFalse(normal_user.is_admin_of_siae(siae))
+        regular_user = all_users[0]
+        self.assertFalse(siae.has_admin(regular_user))
 
 
 class ModelTest(TestCase):

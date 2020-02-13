@@ -82,17 +82,12 @@ class SiaeSignupTest(TestCase):
         user_first_name = "Jessica"
         user_email = "jessica.doe@siae.com"
 
-        siae1 = SiaeWithMembershipFactory()
-        siae1.kind = Siae.KIND_ETTI
-        siae1.save()
+        siae1 = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
 
         self.assertEqual(len(siae1.active_admin_members), 1)
         existing_admin_user = siae1.active_admin_members[0]
 
-        siae2 = SiaeFactory()
-        siae2.kind = Siae.KIND_ACI
-        siae2.siret = siae1.siret
-        siae2.save()
+        siae2 = SiaeFactory(kind=Siae.KIND_ACI, siret=siae1.siret)
 
         url = reverse("signup:select_siae")
         response = self.client.get(url)
@@ -130,7 +125,7 @@ class SiaeSignupTest(TestCase):
         self.assertFalse(new_user.is_prescriber)
         self.assertTrue(new_user.is_siae_staff)
         self.assertTrue(new_user.is_active)
-        self.assertFalse(new_user.is_admin_of_siae(siae1))
+        self.assertFalse(siae1.has_admin(new_user))
         self.assertEqual(2, siae1.members.count())
 
         self.assertEqual(new_user.first_name, user_first_name)
@@ -179,14 +174,9 @@ class SiaeSignupTest(TestCase):
         user_email = "jacques.doe@siae.com"
         user_secondary_email = "jacques.doe@hotmail.com"
 
-        siae1 = SiaeFactory()
-        siae1.kind = Siae.KIND_ETTI
-        siae1.save()
+        siae1 = SiaeFactory(kind=Siae.KIND_ETTI)
 
-        siae2 = SiaeFactory()
-        siae2.kind = Siae.KIND_ACI
-        siae2.siret = siae1.siret
-        siae2.save()
+        siae2 = SiaeFactory(kind=Siae.KIND_ACI, siret=siae1.siret)
 
         url = reverse("signup:select_siae")
         response = self.client.get(url)
@@ -261,7 +251,7 @@ class SiaeSignupTest(TestCase):
         self.assertFalse(new_user.is_prescriber)
         self.assertTrue(new_user.is_siae_staff)
         self.assertTrue(new_user.is_active)
-        self.assertTrue(new_user.is_admin_of_siae(siae1))
+        self.assertTrue(siae1.has_admin(new_user))
         self.assertEqual(1, siae1.members.count())
         self.assertEqual(new_user.first_name, user_first_name)
         self.assertEqual(new_user.last_name, "Doe")
@@ -288,6 +278,32 @@ class SiaeSignupTest(TestCase):
         )
         self.assertContains(response, escape(expected_message))
 
+    def test_siae_signup_story_of_marcel(self):
+        """
+        Test the following SIAE signup case:
+        - user did not even input an email nor a siret
+        Story and expected results:
+        - we show an explanation that a ASP-siret or ASP-email is required
+        """
+        # pylint: disable=unused-variable
+        user_first_name = "Marcel"
+        user_email = "marcel.doe@siae.com"
+
+        unknown_siret = "12345678901234"
+
+        url = reverse("signup:select_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {"kind": Siae.KIND_ACI}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        expected_message = _(
+            "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
+            "de l'ASP."
+        )
+        self.assertContains(response, expected_message)
+
     def test_siae_signup_story_of_daniela(self):
         """
         Test the following SIAE signup case:
@@ -296,7 +312,7 @@ class SiaeSignupTest(TestCase):
         Story and expected results:
         - we show an explanation that a ASP-siret or ASP-email is required
         """
-        # pylint: disable=W0612
+        # pylint: disable=unused-variable
         user_first_name = "Daniela"
         user_email = "daniela.doe@siae.com"
 
@@ -310,7 +326,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            "Ni ce SIRET ni cet email ne figurent dans notre base de données."
+            "Ni ce SIRET ni cet email ne figurent dans notre base de données"
         )
         self.assertContains(response, escape(expected_message))
 
@@ -322,21 +338,15 @@ class SiaeSignupTest(TestCase):
         Story and expected results:
         - we show a message explaining why we could not decide a match
         """
-        # pylint: disable=W0612
+        # pylint: disable=unused-variable
         user_first_name = "Emilie"
         user_email = "emilie.doe@siae.com"
 
         shared_siae_kind = Siae.KIND_ACI
 
-        siae1 = SiaeFactory()
-        siae1.kind = shared_siae_kind
-        siae1.auth_email = user_email
-        siae1.save()
+        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
 
-        siae2 = SiaeFactory()
-        siae2.kind = shared_siae_kind
-        siae2.auth_email = user_email
-        siae2.save()
+        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
 
         unknown_siret = "12345678901234"
 
@@ -374,20 +384,13 @@ class SiaeSignupTest(TestCase):
 
         shared_siae_kind = Siae.KIND_ACI
 
-        siae1 = SiaeFactory()
-        siae1.kind = shared_siae_kind
-        siae1.auth_email = user_email
-        siae1.save()
+        # pylint: disable=unused-variable
+        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
 
-        siae2 = SiaeFactory()
-        siae2.kind = shared_siae_kind
-        siae2.auth_email = user_email
-        siae2.save()
+        # pylint: disable=unused-variable
+        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
 
-        siae3 = SiaeWithMembershipFactory()
-        siae3.kind = shared_siae_kind
-        siae3.siret = "12345678901234"
-        siae3.save()
+        siae3 = SiaeWithMembershipFactory(kind=shared_siae_kind, siret="12345678901234")
 
         url = reverse("signup:select_siae")
         response = self.client.get(url)
@@ -429,7 +432,7 @@ class SiaeSignupTest(TestCase):
         self.assertFalse(new_user.is_prescriber)
         self.assertTrue(new_user.is_siae_staff)
         self.assertTrue(new_user.is_active)
-        self.assertFalse(new_user.is_admin_of_siae(siae3))
+        self.assertFalse(siae3.has_admin(new_user))
         self.assertEqual(2, siae3.members.count())
 
         self.assertEqual(new_user.first_name, user_first_name)
@@ -449,9 +452,7 @@ class SiaeSignupTest(TestCase):
         user_first_name = "Bernadette"
         user_email = "bernadette.doe@siae.com"
 
-        siae = SiaeWithMembershipFactory()
-        siae.auth_email = user_email
-        siae.save()
+        siae = SiaeWithMembershipFactory(auth_email=user_email)
 
         unknown_siret = "12345678901234"
 
@@ -491,7 +492,7 @@ class SiaeSignupTest(TestCase):
         self.assertFalse(new_user.is_prescriber)
         self.assertTrue(new_user.is_siae_staff)
         self.assertTrue(new_user.is_active)
-        self.assertFalse(new_user.is_admin_of_siae(siae))
+        self.assertFalse(siae.has_admin(new_user))
         self.assertEqual(2, siae.members.count())
 
         self.assertEqual(new_user.first_name, user_first_name)
@@ -514,14 +515,10 @@ class SiaeSignupTest(TestCase):
 
         shared_siae_kind = Siae.KIND_GEIQ
 
-        siae1 = SiaeFactory()
-        siae1.auth_email = user_email
-        siae1.kind = shared_siae_kind
-        siae1.save()
+        # pylint: disable=unused-variable
+        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
 
-        siae2 = SiaeWithMembershipFactory()
-        siae2.kind = shared_siae_kind
-        siae2.save()
+        siae2 = SiaeWithMembershipFactory(kind=shared_siae_kind)
 
         url = reverse("signup:select_siae")
         response = self.client.get(url)
@@ -563,7 +560,7 @@ class SiaeSignupTest(TestCase):
         self.assertFalse(new_user.is_prescriber)
         self.assertTrue(new_user.is_siae_staff)
         self.assertTrue(new_user.is_active)
-        self.assertFalse(new_user.is_admin_of_siae(siae2))
+        self.assertFalse(siae2.has_admin(new_user))
         self.assertEqual(2, siae2.members.count())
 
         self.assertEqual(new_user.first_name, user_first_name)
