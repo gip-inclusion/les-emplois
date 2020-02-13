@@ -138,6 +138,13 @@ main.layout-section {
     margin-bottom: 0;
 }
 
+/* Icons */
+
+a.with-icon span {
+    padding-left: 0.2rem;
+    vertical-align: sub;
+}
+
 /* BETA banner.
 --------------------------------------------------------------------------- */
 
@@ -242,16 +249,9 @@ section.home-search .bg-image:after {
     background-color: #343434;
 }
 
-a.with-icon span {
-    padding-left: 0.2rem;
-    vertical-align: sub;
-}
-
 
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
-
-
 
 @media (min-width: 700px) {
     /* Set width depending on a breaking point. */
@@ -267,8 +267,6 @@ a.with-icon span {
         width: 75% !important;
     }
 }
-
-/* Margins and paddings */
 
 .mt-7 {
     margin-top: 7rem !important;

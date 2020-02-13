@@ -24,48 +24,7 @@
             <h3 class="h4 font-weight-bold">{% trans "Vous êtes un professionnel de l'insertion" %}</h3>
             <h3 class="h4 pt-2 font-weight-light">{% trans "Découvrez la plateforme de l'inclusion" %}</h4>
 
-            <div class="card-deck my-5 justify-content-between">
-                <div class="card p-4" style="flex: 0 0 23%;">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">
-                            <span class="d-block">{% trans "Vous êtes un employeur solidaire" %}</span>
-                            <span class="d-block">{% trans "(SIAE, GEIQ, AE, ...)" %}</span>
-                        </h5>
-                        <a href="{% url 'signup:siae' %}">
-                            <button class="btn btn-primary">
-                                {% trans "Créer un compte" %}
-                            </button>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card p-4" style="flex: 0 0 23%;">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">
-                            {% trans "Vous êtes prescripteur ou un orienteur de l'inclusion" %}
-                        </h5>
-                        <a class="card-link" href="{% url 'signup:prescriber' %}">
-                            <button class="btn btn-primary">
-                                {% trans "Créer un compte" %}
-                            </button>
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card p-4" style="flex: 0 0 23%;">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">
-                            {% trans "Vous êtes candidat et souhaitez postuler à un emploi" %}
-                        </h5>
-                        <a class="card-link" href="{% url 'signup:job_seeker' %}">
-                            <button class="btn btn-primary">
-                                {% trans "Créer un compte" %}
-                            </button>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
+            {% include "signup/includes/signup_profile_cards.html" %}
 
         </section>
 
