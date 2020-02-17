@@ -138,7 +138,7 @@ class SelectSiaeForm(forms.ModelForm):
         siret = self.cleaned_data["siret"]
         email = self.cleaned_data["email"]
 
-        if not siret and not email:
+        if not (siret or email):
             error_message = _(
                 "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
                 "de l'ASP."
