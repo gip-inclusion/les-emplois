@@ -1,3 +1,15 @@
+/* Colors
+--------------------------------------------------------------------------- */
+
+/* Add some Bootstrap colors available in SCSS as custom values. */
+/* Usage: var(--my-custom-value); */
+/* See https://developer.mozilla.org/en-US/docs/Web/CSS/--* */
+:root {
+    --gray-700: #495057;
+    --gray-900: #212529;
+}
+
+
 /* Layout.
 --------------------------------------------------------------------------- */
 
@@ -174,40 +186,15 @@ body:after {
 --------------------------------------------------------------------------- */
 
 section.home-search {
-    /* Compatible with IE6+ */
-    background: rgb(3,50,138);
+    background: rgb(205,237,251);
     background: linear-gradient(
         180deg,
         rgba(0,49,137,1) 0%,
         rgba(49,151,223,1) 32%,
-        rgba(205,237,251,1) 79%,
-        rgba(173,240,188,1) 100%
-    );
-    background: rgb(3,50,138);
-    background: -moz-linear-gradient(
-        180deg,
-        rgba(0,49,137,1) 0%,
-        rgba(49,151,223,1) 32%,
-        rgba(205,237,251,1) 79%,
-        rgba(173,240,188,1) 100%
-    );
-    background: -webkit-linear-gradient(
-            180deg,
-            rgba(0,49,137,1) 0%,
-            rgba(49,151,223,1) 32%,
-            rgba(205,237,251,1) 79%,
-            rgba(173,240,188,1) 100%
-    );
-    background: linear-gradient(
-            180deg,
-            rgba(0,49,137,1) 0%,
-            rgba(49,151,223,1) 32%,
-            rgba(205,237,251,1) 79%,
-            rgba(173,240,188,1) 100%
-    );
-    filter: progid:DXImageTransform.Microsoft.gradient(
-        startColorstr="#03328a",
-        endColorstr="#b8efd2",GradientType=1
+        rgba(205,237,251,1) 70%,
+        rgba(173,240,188,1) 83%,
+        rgba(206, 212, 218,1) 90%,
+        rgba(248, 249, 250,1) 100%
     );
 }
 
@@ -215,38 +202,19 @@ section.home-search .bg-image {
     background-repeat: no-repeat;
     background-size: cover;
     display: block;
-    height: 13rem;
-}
-
-section.home-search .bg-image:after {
-    content: "";
-    position: absolute;
-    display: block;
-    left: 0;
-    bottom: -15%;
-    width: 100%;
-    height: 15%;
-    background: linear-gradient(#ebebeb, #f8f9fa);
+    height: 17rem;
 }
 
 @media (max-width: 700px) {
 
     section.home-search .bg-image {
-        height: 6rem;
-        margin-top: 5rem;
+        height: 8rem;
     }
 
     section.home-search form {
         width: 90% !important;
     }
 
-}
-
-/* Modifiers.
---------------------------------------------------------------------------- */
-
-.bg-dark-grey {
-    background-color: #343434;
 }
 
 
@@ -270,4 +238,14 @@ section.home-search .bg-image:after {
 
 .mt-7 {
     margin-top: 7rem !important;
+}
+
+.bg-gray-700 {
+    background-color: #495057; /* max-compatibility */
+    background-color: var(--gray-700);
+}
+
+.bg-gray-900 {
+    background-color: #212529; /* max-compatibility */
+    background-color: var(--gray-900);
 }
