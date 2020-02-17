@@ -395,10 +395,16 @@ def get_donut_chart_data_per_sender_kind(job_applications):
             for item in job_applications_per_sender_kind_as_list
         },
     )
+    total_with_authorized_prescriber = (
+        job_applications.filter(sender_prescriber_organization__is_authorized=True)
+        .distinct()
+        .count()
+    )
 
     donut_chart_data = _get_donut_chart_data(
         job_applications=job_applications,
         job_applications_per_kind=job_applications_per_sender_kind_as_dict,
+        total_with_authorized_prescriber=total_with_authorized_prescriber,
         kind_choices_as_dict=kind_choices_as_dict,
         prescriber_kind=JobApplication.SENDER_KIND_PRESCRIBER,
         siae_kind=JobApplication.SENDER_KIND_SIAE_STAFF,
@@ -428,9 +434,19 @@ def get_donut_chart_data_per_eligibility_author_kind(job_applications):
         author_kind = job_application["job_seeker__eligibility_diagnoses__author_kind"]
         job_applications_per_eligibility_author_kind[author_kind] += 1
 
+    total_with_authorized_prescriber = (
+        job_applications.filter(
+            job_seeker__eligibility_diagnoses__author_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
+            job_seeker__eligibility_diagnoses__author_prescriber_organization__is_authorized=True,
+        )
+        .distinct()
+        .count()
+    )
+
     donut_chart_data = _get_donut_chart_data(
         job_applications=job_applications,
         job_applications_per_kind=job_applications_per_eligibility_author_kind,
+        total_with_authorized_prescriber=total_with_authorized_prescriber,
         kind_choices_as_dict=kind_choices_as_dict,
         prescriber_kind=EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER,
         siae_kind=EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF,
@@ -443,6 +459,7 @@ def get_donut_chart_data_per_eligibility_author_kind(job_applications):
 def _get_donut_chart_data(
     job_applications,
     job_applications_per_kind,
+    total_with_authorized_prescriber,
     kind_choices_as_dict,
     prescriber_kind,
     siae_kind,
@@ -453,21 +470,6 @@ def _get_donut_chart_data(
     Internal method designed to factorize as much code as possible
     between various donut charts (DNRY).
     """
-    job_applications_having_authorized_prescriber = (
-        job_applications.filter(
-            job_seeker__eligibility_diagnoses__author_kind=prescriber_kind
-        )
-        .filter(sender_prescriber_organization__is_authorized=True)
-        .distinct()
-        .count()
-    )
-
-    if (
-        job_applications_per_kind[prescriber_kind]
-        < job_applications_having_authorized_prescriber
-    ):
-        raise ValueError("Inconsistent prescriber data.")
-
     # At this point data is split this way : job_seeker / prescriber / siae_staff.
     # Hardcode order and colors for consistency between heterogeneous charts.
     donut_chart_data_as_dict = OrderedDict()
@@ -478,12 +480,9 @@ def _get_donut_chart_data(
         siae_kind
     ]
     # Split prescriber data even more : authorized / unauthorized.
-    donut_chart_data_as_dict[
-        "Prescripteur habilité"
-    ] = job_applications_having_authorized_prescriber
+    donut_chart_data_as_dict["Prescripteur habilité"] = total_with_authorized_prescriber
     donut_chart_data_as_dict["Prescripteur non habilité"] = (
-        job_applications_per_kind[prescriber_kind]
-        - job_applications_having_authorized_prescriber
+        job_applications_per_kind[prescriber_kind] - total_with_authorized_prescriber
     )
 
     donut_chart_data = [
