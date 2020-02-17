@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -145,24 +146,28 @@ class SelectSiaeForm(forms.ModelForm):
             )
             self.raise_validation_error(error_message, add_suffix=False)
 
-        if siret:
-            siaes_matching_siret = Siae.active_objects.filter(siret=siret, kind=kind)
-            siret_exists = siaes_matching_siret.exists()
+        siaes = Siae.active_objects.filter(kind=kind)
+        if siret and email:
+            # We match siaes having any of the two correct fields.
+            siaes = siaes.filter(Q(siret=siret) | Q(auth_email=email))
+        elif email:
+            siaes = siaes.filter(auth_email=email)
         else:
-            siret_exists = False
+            siaes = siaes.filter(siret=siret)
+        # Hit the database only once.
+        siaes = list(siaes.all())
+
+        siaes_matching_siret = [s for s in siaes if s.siret == siret]
+        # There can be at most one siret match due to (kind, siret) unicity.
+        siret_exists = len(siaes_matching_siret) == 1
 
         if siret_exists:
+            self.selected_siae_pk = siaes_matching_siret[0].pk
             return self.cleaned_data
 
-        if email:
-            siaes_matching_email = Siae.active_objects.filter(
-                auth_email=email, kind=kind
-            )
-            email_exists = siaes_matching_email.exists()
-            several_siaes_share_same_email = siaes_matching_email.count() > 1
-        else:
-            email_exists = False
-            several_siaes_share_same_email = False
+        siaes_matching_email = [s for s in siaes if s.auth_email == email]
+        email_exists = len(siaes_matching_email) > 0
+        several_siaes_share_same_email = len(siaes_matching_email) > 1
 
         if several_siaes_share_same_email:
             error_message = _(
@@ -174,6 +179,7 @@ class SelectSiaeForm(forms.ModelForm):
             self.raise_validation_error(error_message)
 
         if email_exists:
+            self.selected_siae_pk = siaes_matching_email[0].pk
             return self.cleaned_data
 
         error_message = _(

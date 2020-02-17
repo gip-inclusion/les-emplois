@@ -53,15 +53,8 @@ def select_siae(request, template_name="signup/select_siae.html"):
         email = form.cleaned_data["email"]
         kind = form.cleaned_data["kind"]
 
-        try:
-            siae = Siae.active_objects.get(siret=siret, kind=kind)
-        except Siae.DoesNotExist:
-            try:
-                siae = Siae.active_objects.get(auth_email=email, kind=kind)
-            except Siae.DoesNotExist:
-                raise RuntimeError(
-                    "Siae found while cleaning form can no longer be found. This should never happen."
-                )
+        siae_pk = form.selected_siae_pk
+        siae = Siae.active_objects.get(pk=siae_pk)
 
         if siae.has_members:
             return HttpResponseRedirect(siae.signup_magic_link)
