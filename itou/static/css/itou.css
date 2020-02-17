@@ -236,10 +236,6 @@ section.home-search .bg-image {
     }
 }
 
-.mt-7 {
-    margin-top: 7rem !important;
-}
-
 .bg-gray-700 {
     background-color: #495057; /* max-compatibility */
     background-color: var(--gray-700);
