@@ -7,7 +7,22 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.widgets import DatePickerField
+
+# WARNING: this is a duplicate from itou.www.siae_views.forms
+TEST_DEPARTMENTS = [("", "---")] + [
+    (d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS
+]
+
+TEST_DEPARTMENTS_HELP_TEXT = _(
+    (
+        "Seuls les départements du Bas-Rhin (67), du Pas-de-Calais (62) "
+        "et de la Seine Saint Denis (93) sont disponibles pendant la phase actuelle "
+        "d'expérimentation de la plateforme de l'inclusion."
+    )
+)
+# Consider refactoring that
 
 
 class UserExistsForm(forms.Form):
@@ -40,16 +55,35 @@ class UserExistsForm(forms.Form):
 class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DatePickerField()
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
+        self.fields["department"].choices = TEST_DEPARTMENTS
+
+        required_fields = [
+            "birthdate",
+            "address_line_1",
+            "post_code",
+            "city",
+            "department",
+        ]
+        for required_field in required_fields:
+            self.fields[required_field].required = True
 
     class Meta:
         model = get_user_model()
-        fields = ["birthdate", "phone"]
+        fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "department",
+            "birthdate",
+            "phone",
+        ]
         help_texts = {
             "birthdate": _("Au format jj-mm-aaaa, par exemple 20-12-1978"),
             "phone": _("Par exemple 0610203040"),
+            "department": TEST_DEPARTMENTS_HELP_TEXT,
         }
 
 
@@ -57,21 +91,41 @@ class CreateJobSeekerForm(forms.ModelForm):
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
-        self.fields["email"].required = True
-        self.fields["first_name"].required = True
-        self.fields["last_name"].required = True
-
-        # Birth date
-        self.fields["birthdate"].required = True
+        self.fields["department"].choices = TEST_DEPARTMENTS
         self.fields["birthdate"].widget = DatePickerField()
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
+        required_fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "birthdate",
+            "address_line_1",
+            "post_code",
+            "city",
+            "department",
+        ]
+        for required_field in required_fields:
+            self.fields[required_field].required = True
+
     class Meta:
         model = get_user_model()
-        fields = ["email", "first_name", "last_name", "birthdate", "phone"]
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "department",
+            "birthdate",
+            "phone",
+        ]
         help_texts = {
             "birthdate": _("Au format jj-mm-aaaa, par exemple 20-12-1978"),
             "phone": _("Par exemple 0610203040"),
+            "department": TEST_DEPARTMENTS_HELP_TEXT,
         }
 
     def save(self, commit=True):

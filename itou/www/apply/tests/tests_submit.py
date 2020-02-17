@@ -96,7 +96,13 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"birthdate": "20-12-1978"}
+        post_data = {
+            "address_line_1": "121 boulevard de la Liberté",
+            "post_code": "59000",
+            "city": "Lille",
+            "department": "62",
+            "birthdate": "20-12-1978",
+        }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -242,6 +248,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "email": "new.job.seeker@test.com",
             "first_name": "John",
             "last_name": "Doe",
+            "address_line_1": "121 boulevard de la Liberté",
+            "post_code": "59000",
+            "city": "Lille",
+            "department": "62",
             "birthdate": "20-12-1978",
             "phone": "0610200305",
         }
@@ -406,6 +416,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "email": "new.job.seeker@test.com",
             "first_name": "John",
             "last_name": "Doe",
+            "address_line_1": "121 boulevard de la Liberté",
+            "post_code": "59000",
+            "city": "Lille",
+            "department": "62",
             "birthdate": "20-12-1978",
             "phone": "0610200305",
         }
@@ -562,6 +576,10 @@ class ApplyAsPrescriberTest(TestCase):
             "email": "new.job.seeker@test.com",
             "first_name": "John",
             "last_name": "Doe",
+            "address_line_1": "121 boulevard de la Liberté",
+            "post_code": "59000",
+            "city": "Lille",
+            "department": "62",
             "birthdate": "20-12-1978",
             "phone": "0610200305",
         }
@@ -726,6 +744,10 @@ class ApplyAsSiaeTest(TestCase):
             "email": "new.job.seeker@test.com",
             "first_name": "John",
             "last_name": "Doe",
+            "address_line_1": "121 boulevard de la Liberté",
+            "post_code": "59000",
+            "city": "Lille",
+            "department": "62",
             "birthdate": "20-12-1978",
             "phone": "0610200305",
         }

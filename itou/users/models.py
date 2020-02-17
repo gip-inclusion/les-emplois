@@ -5,8 +5,10 @@ from django.utils.translation import gettext_lazy as _
 
 from allauth.utils import generate_unique_username
 
+from itou.utils.address.models import AddressMixin
 
-class User(AbstractUser):
+
+class User(AbstractUser, AddressMixin):
     """
     Custom user model.
 
