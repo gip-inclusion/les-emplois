@@ -42,13 +42,14 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
+        self.fields["birthdate"].widget = DatePickerField()
+        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = get_user_model()
         fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
-            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978."),
+            "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978."),
             "phone": gettext_lazy("Par exemple 0610203040."),
         }
 
@@ -67,8 +68,11 @@ class CreateJobSeekerForm(forms.ModelForm):
         self.fields["email"].widget.attrs["readonly"] = True
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
+
+        # Birth date
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
+        self.fields["birthdate"].widget = DatePickerField()
+        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = get_user_model()
@@ -82,7 +86,7 @@ class CreateJobSeekerForm(forms.ModelForm):
             "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
-            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978."),
+            "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978."),
             "phone": gettext_lazy("Par exemple 0610203040."),
         }
 
