@@ -20,11 +20,11 @@ class Command(BaseCommand):
     Import Pole emploi's approvals (or `agrément` in French) into the database.
 
     To debug:
-        django-admin import_pe_approvals --file-name=2019_10_base_agrements_PE.xlsx --dry-run
-        django-admin import_pe_approvals --file-name=2019_10_base_agrements_PE.xlsx --dry-run --verbosity=2
+        django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx --dry-run
+        django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx --dry-run --verbosity=2
 
     To populate the database:
-        django-admin import_pe_approvals --file-name=2019_10_base_agrements_PE.xlsx
+        django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx
     """
 
     help = (
@@ -66,7 +66,7 @@ class Command(BaseCommand):
 
         count_before = PoleEmploiApproval.objects.count()
         count_canceled_approvals = 0
-        unique_approval_suffixes = set()
+        unique_approval_suffixes = {}
 
         XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
         file_size_in_bytes = os.path.getsize(XLSX_FILE)
@@ -91,16 +91,22 @@ class Command(BaseCommand):
                 # Skip XLSX header.
                 continue
 
+            if not row[0].value:
+                # It should only concern the last XLSX line.
+                self.stderr.write("EmptyCell found, skipping…")
+                self.stderr.write(str(row))
+                continue
+
             progress = int((100 * i) / ws.max_row)
             if progress > last_progress + 5:
                 self.stdout.write(f"Creating approvals… {progress}%")
                 last_progress = progress
 
-            CODE_STRUCT_AFFECT_BENE = str(row[0].value)
+            CODE_STRUCT_AFFECT_BENE = str(row[6].value)
             assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
 
             # This is known as "Identifiant Pôle emploi".
-            ID_REGIONAL_BENE = row[1].value.strip()
+            ID_REGIONAL_BENE = row[0].value.strip()
             assert len(ID_REGIONAL_BENE) == 8
             # Check the format of ID_REGIONAL_BENE.
             # First 7 chars should be digits.
@@ -112,15 +118,15 @@ class Command(BaseCommand):
             assert "  " not in NOM_USAGE_BENE
             # max length 29
 
-            PRENOM_BENE = row[3].value.strip()
+            PRENOM_BENE = row[4].value.strip()
             assert "  " not in PRENOM_BENE
             # max length 13
 
-            NOM_NAISS_BENE = row[4].value.strip()
+            NOM_NAISS_BENE = row[3].value.strip()
             assert "  " not in NOM_NAISS_BENE
             # max length 25
 
-            NUM_AGR_DEC = row[5].value.strip().replace(" ", "")
+            NUM_AGR_DEC = row[7].value.strip().replace(" ", "")
             assert " " not in NUM_AGR_DEC
             if len(NUM_AGR_DEC) not in [12, 15]:
                 self.stderr.write("-" * 80)
@@ -136,14 +142,17 @@ class Command(BaseCommand):
             # Keep track o unique suffixes added by PE at the end of a 12 chars number
             # that increases the length to 15 chars.
             if len(NUM_AGR_DEC) > 12:
-                unique_approval_suffixes.add(NUM_AGR_DEC[12:])
+                suffix = NUM_AGR_DEC[12:]
+                unique_approval_suffixes[suffix] = (
+                    unique_approval_suffixes.get(suffix, 0) + 1
+                )
 
             DATE_DEB_AGR_DEC = datetime.datetime.strptime(
-                row[6].value.strip(), "%d/%m/%y"
+                row[8].value.strip(), "%d/%m/%y"
             ).date()
 
             DATE_FIN_AGR_DEC = datetime.datetime.strptime(
-                row[7].value.strip(), "%d/%m/%y"
+                row[9].value.strip(), "%d/%m/%y"
             ).date()
 
             # Same start and end dates means that the approval has been canceled.
@@ -156,6 +165,10 @@ class Command(BaseCommand):
                 )
                 continue
 
+            DATE_NAISS_BENE = datetime.datetime.strptime(
+                row[5].value.strip(), "%d/%m/%y"
+            ).date()
+
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
                 pe_approval.pe_structure_code = CODE_STRUCT_AFFECT_BENE
@@ -164,6 +177,7 @@ class Command(BaseCommand):
                 pe_approval.first_name = PRENOM_BENE
                 pe_approval.last_name = NOM_USAGE_BENE
                 pe_approval.birth_name = NOM_NAISS_BENE
+                pe_approval.birthdate = DATE_NAISS_BENE
                 pe_approval.start_at = DATE_DEB_AGR_DEC
                 pe_approval.end_at = DATE_FIN_AGR_DEC
                 bulk_create_queue.append(pe_approval)
