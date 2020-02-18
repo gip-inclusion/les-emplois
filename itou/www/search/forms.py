@@ -16,7 +16,8 @@ class SiaeSearchForm(forms.Form):
     KIND_CHOICES = [("", "---")] + [(k[0], k[0]) for k in Siae.KIND_CHOICES]
 
     distance = forms.ChoiceField(
-        choices=DISTANCE_CHOICES, widget=forms.Select(attrs={"class": "form-control"})
+        choices=DISTANCE_CHOICES,
+        widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
 
     # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
@@ -38,7 +39,7 @@ class SiaeSearchForm(forms.Form):
     kind = forms.ChoiceField(
         choices=KIND_CHOICES,
         required=False,
-        widget=forms.Select(attrs={"class": "form-control"}),
+        widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
 
     def clean_city(self):

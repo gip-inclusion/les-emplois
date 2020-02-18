@@ -1,5 +1,5 @@
 {% load i18n %}
-<div class="rounded p-3 bg-light">
+<div class="rounded p-3">
     <div class="row no-gutters">
         {# Apply bottom margins only on `sm` sizes: https://stackoverflow.com/a/50879258 #}
         <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
@@ -25,12 +25,11 @@
         <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
             {{ form.kind }}
         </div>
-        <div class="col-sm-1">
-            <button type="submit" class="btn btn-primary form-control" title="{% trans "Chercher" %}">
-                {% trans "Rechercher" as icon_search_title %}
-                {% include "includes/icon.html" with icon="search" title=icon_search_title %}
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-danger form-control" title="{% trans 'Rechercher' %}">
+                {% trans "Rechercher" %}
             </button>
         </div>
     </div>
-    <p class="text-center mt-1 mb-0"><small><i>{% trans "En version beta, la recherche ne fonctionne que pour les départements du Bas-Rhin (67), du Pas-de-Calais (62) et de la Seine Saint Denis (93)." %}</i></small></p>
+    <p class="text-center mt-1 mb-0"><small><i>{% trans "Bas-Rhin (67), Pas-de-Calais (62) et Seine Saint Denis (93) exclusivement, pour le moment." %}</i></small></p>
 </div>

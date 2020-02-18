@@ -6,46 +6,45 @@
 
 
 {% block content %}
-<div class="card-deck">
+    <div class="card-deck my-5 justify-content-between text-center">
+        <div class="card p-4" style="flex: 0 0 23%;">
+            <div class="card-body">
+                <h5 class="card-title font-weight-light mb-4">
+                    <span class="d-block">{% trans "Vous êtes un employeur solidaire" %}</span>
+                    <span class="d-block">{% trans "(SIAE, GEIQ, EA, ...)" %}</span>
+                </h5>
+                <a href="{% url 'signup:siae' %}">
+                    <button class="btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </button>
+                </a>
+            </div>
+        </div>
 
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{% trans "Accès candidat" %}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{% trans "Personne ne me donne ma chance, mais je veux travailler !" %}</h6>
-            <a class="card-link" href="{% url 'signup:job_seeker' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                {% trans "Inscription" %}
-            </a>
-            <a class="card-link" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                {% trans "Connexion" %}
-            </a>
+        <div class="card p-4" style="flex: 0 0 23%;">
+            <div class="card-body">
+                <h5 class="card-title font-weight-light mb-4">
+                    {% trans "Vous êtes prescripteur ou un orienteur de l'inclusion" %}
+                </h5>
+                <a class="card-link" href="{% url 'signup:prescriber' %}">
+                    <button class="btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <div class="card p-4" style="flex: 0 0 23%;">
+            <div class="card-body">
+                <h5 class="card-title font-weight-light mb-4">
+                    {% trans "Vous êtes candidat et souhaitez postuler à un emploi" %}
+                </h5>
+                <a class="card-link" href="{% url 'signup:job_seeker' %}">
+                    <button class="btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </button>
+                </a>
+            </div>
         </div>
     </div>
-
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{% trans "Accès prescripteur" %}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{% trans "Je veux trouver un travail à une personne en difficulté" %}</h6>
-            <a class="card-link" href="{% url 'signup:prescriber' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                {% trans "Inscription" %}
-            </a>
-            <a class="card-link" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                {% trans "Connexion" %}
-            </a>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{% trans "Accès employeur" %}</h5>
-            <h6 class="card-subtitle mb-2 text-muted">{% trans "Je recrute une personne en difficulté" %}</h6>
-            <a class="card-link" href="{% url 'signup:siae' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                {% trans "Inscription" %}
-            </a>
-            <a class="card-link" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                {% trans "Connexion" %}
-            </a>
-        </div>
-    </div>
-
-</div>
 {% endblock %}

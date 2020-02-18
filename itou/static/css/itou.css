@@ -1,3 +1,15 @@
+/* Colors
+--------------------------------------------------------------------------- */
+
+/* Add some Bootstrap colors available in SCSS as custom values. */
+/* Usage: var(--my-custom-value); */
+/* See https://developer.mozilla.org/en-US/docs/Web/CSS/--* */
+:root {
+    --gray-700: #495057;
+    --gray-900: #212529;
+}
+
+
 /* Layout.
 --------------------------------------------------------------------------- */
 
@@ -20,8 +32,9 @@ html {
     display: grid;
     grid-template-columns:
       [full-start] minmax(1em, 1fr)
-      [main-start] minmax(0, 1280px) [main-end]
-      minmax(1em, 1fr) [full-end];
+      [main-start] minmax(0, 1280px)
+      [main-end] minmax(1em, 1fr)
+      [full-end];
 }
 
 .layout > * {
@@ -36,6 +49,14 @@ html {
 
 .layout-section > * {
     grid-column: main;
+}
+
+.layout-column-full {
+    grid-column: full !important;
+}
+
+.layout-column-main {
+    grid-column: main !important;
 }
 
 .layout-section-white {
@@ -103,28 +124,8 @@ main.layout-section {
 
 }
 
-/* Footer.
---------------------------------------------------------------------------- */
-
-.layout-footer a,
-.layout-footer a:link,
-.layout-footer a:visited {
-    color: #fff;
-    text-decoration: underline;
-}
-
-.layout-footer a:focus,
-.layout-footer a:hover,
-.layout-footer a:active {
-    text-decoration: none;
-}
-
 /* Spacing.
 --------------------------------------------------------------------------- */
-
-.layout-header {
-    padding: 1.4rem 1rem;
-}
 
 .layout-content {
     padding: 1rem 1rem 2rem 1rem;
@@ -147,6 +148,13 @@ main.layout-section {
 
 .layout-messages .alert:last-child {
     margin-bottom: 0;
+}
+
+/* Icons */
+
+a.with-icon span {
+    padding-left: 0.2rem;
+    vertical-align: sub;
 }
 
 /* BETA banner.
@@ -172,4 +180,68 @@ body:after {
 .form-group-required > label:first-of-type:after {
     content: " *";
     color: #d63626;
+}
+
+/* Home.
+--------------------------------------------------------------------------- */
+
+section.home-search {
+    background: rgb(205,237,251);
+    background: linear-gradient(
+        180deg,
+        rgba(0,49,137,1) 0%,
+        rgba(49,151,223,1) 32%,
+        rgba(205,237,251,1) 70%,
+        rgba(173,240,188,1) 83%,
+        rgba(206, 212, 218,1) 90%,
+        rgba(248, 249, 250,1) 100%
+    );
+}
+
+section.home-search .bg-image {
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: block;
+    height: 17rem;
+}
+
+@media (max-width: 700px) {
+
+    section.home-search .bg-image {
+        height: 8rem;
+    }
+
+    section.home-search form {
+        width: 90% !important;
+    }
+
+}
+
+
+/* Missing Boostrap utilities
+--------------------------------------------------------------------------- */
+
+@media (min-width: 700px) {
+    /* Set width depending on a breaking point. */
+    .w-sm-25 {
+        width: 25% !important;
+    }
+
+    .w-sm-50 {
+        width: 50% !important;
+    }
+
+    .w-sm-75 {
+        width: 75% !important;
+    }
+}
+
+.bg-gray-700 {
+    background-color: #495057; /* max-compatibility */
+    background-color: var(--gray-700);
+}
+
+.bg-gray-900 {
+    background-color: #212529; /* max-compatibility */
+    background-color: var(--gray-900);
 }

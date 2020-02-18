@@ -1,4 +1,4 @@
-{% extends "layout/content.html" %}
+{% extends "layout/content_full_viewport.html" %}
 {% load i18n %}
 {% load static %}
 
@@ -7,58 +7,66 @@
 
 {% block content %}
 
-    <h2 class="text-center mb-4">{% trans "Tous les jours, les entreprises de l'insertion recrutent !" %}</h2>
+    <section class="layout-section home-search">
+        <div class="layout-column-full">
+            <h2 class="text-center mt-5 mb-3 mx-4 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
+
+            <form method="get" action="{% url 'search:siaes' %}" class="my-3 w-50 mx-auto">
+                {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
+            </form>
+
+            <div class="w-100 bg-image position-relative mt-5" style="background-image: url('{% static 'img/home-bg.svg' %}');"></div>
+        </div>
+    </section>
 
     {% if not user.is_authenticated %}
+        <section class="layout-section bg-light py-5 text-center">
+            <h3 class="h4 font-weight-bold">{% trans "Vous êtes un professionnel de l'insertion" %}</h3>
+            <h3 class="h4 pt-2 font-weight-light">{% trans "Découvrez la plateforme de l'inclusion" %}</h4>
 
-        <div class="card-deck mb-4">
+            <div class="card-deck my-5 justify-content-between text-center">
+                <div class="card p-4" style="flex: 0 0 23%;">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-light mb-4">
+                            <span class="d-block">{% trans "Vous êtes un employeur solidaire" %}</span>
+                            <span class="d-block">{% trans "(SIAE, GEIQ, EA, ...)" %}</span>
+                        </h5>
+                        <a href="{% url 'signup:siae' %}">
+                            <button class="btn btn-primary">
+                                {% trans "Créer un compte" %}
+                            </button>
+                        </a>
+                    </div>
+                </div>
 
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {% trans "Accès candidat" %}
-                    </h5>
-                    <a class="card-link" href="{% url 'signup:job_seeker' %}">
-                        {% trans "Inscription" %}
-                    </a>
-                    <a class="card-link" href="{% url 'account_login' %}">
-                        {% trans "Connexion" %}
-                    </a>
+                <div class="card p-4" style="flex: 0 0 23%;">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-light mb-4">
+                            {% trans "Vous êtes prescripteur ou un orienteur de l'inclusion" %}
+                        </h5>
+                        <a class="card-link" href="{% url 'signup:prescriber' %}">
+                            <button class="btn btn-primary">
+                                {% trans "Créer un compte" %}
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card p-4" style="flex: 0 0 23%;">
+                    <div class="card-body">
+                        <h5 class="card-title font-weight-light mb-4">
+                            {% trans "Découvrez l’inclusion par l’activité économique" %}
+                        </h5>
+                        <a class="card-link" href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" target=_blank>
+                            <button class="btn btn-primary">
+                                {% trans "En savoir plus" %}
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{% trans "Accès prescripteur" %}</h5>
-                    <a class="card-link" href="{% url 'signup:prescriber' %}">
-                        {% trans "Inscription" %}
-                    </a>
-                    <a class="card-link" href="{% url 'account_login' %}">
-                        {% trans "Connexion" %}
-                    </a>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">{% trans "Accès employeur" %}</h5>
-                    <a class="card-link" href="{% url 'signup:siae' %}">
-                        {% trans "Inscription" %}
-                    </a>
-                    <a class="card-link" href="{% url 'account_login' %}">
-                        {% trans "Connexion" %}
-                    </a>
-                </div>
-            </div>
-
-        </div>
+        </section>
 
     {% endif %}
-
-    <h3 class="text-center">{% trans "Trouvez votre employeur solidaire à :" %}</h3>
-
-    <form method="get" action="{% url 'search:siaes' %}" class="d-block my-3">
-        {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
-    </form>
 
 {% endblock %}
