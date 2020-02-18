@@ -263,6 +263,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     approval_number_sent_by_email = models.BooleanField(
         verbose_name=_("PASS IAE envoyé par email"), default=False
     )
+    approval_number_sent_at = models.DateTimeField(
+        verbose_name=_("Date d'envoi du PASS IAE"), blank=True, null=True, db_index=True
+    )
     approval_delivery_mode = models.CharField(
         verbose_name=_("Mode d'attribution du PASS IAE"),
         max_length=30,
@@ -396,6 +399,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         if self.approval:
             self.approval_number_sent_by_email = True
+            self.approval_number_sent_at = timezone.now()
             self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
 
     @xwf_models.transition()
@@ -483,6 +487,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email = self.email_approval_number(self.accepted_by)
         email.send()
         self.approval_number_sent_by_email = True
+        self.approval_number_sent_at = timezone.now()
         self.save()
 
 
