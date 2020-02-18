@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
-from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms, utils
 
@@ -49,12 +48,7 @@ def select_siae(request, template_name="signup/select_siae.html"):
     form = forms.SelectSiaeForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        siret = form.cleaned_data["siret"]
-        email = form.cleaned_data["email"]
-        kind = form.cleaned_data["kind"]
-
-        siae_pk = form.selected_siae_pk
-        siae = Siae.active_objects.get(pk=siae_pk)
+        siae = form.selected_siae
 
         if siae.has_members:
             return HttpResponseRedirect(siae.signup_magic_link)
@@ -68,7 +62,7 @@ def select_siae(request, template_name="signup/select_siae.html"):
         messages.success(request, message)
         return HttpResponseRedirect(reverse("home:hp"))
 
-    context = {"form": form}
+    context = {"form": form, "itou_email_contact": settings.ITOU_EMAIL_CONTACT}
     return render(request, template_name, context)
 
 

@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils.safestring import mark_safe
@@ -96,15 +95,11 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         return user
 
 
-class SelectSiaeForm(forms.ModelForm):
+class SelectSiaeForm(forms.Form):
     """
     First of two forms of siae signup process.
     This first form allows the user to select which siae will be joined.
     """
-
-    class Meta:
-        model = Siae
-        fields = ["kind", "siret", "email"]
 
     kind = forms.ChoiceField(
         label=gettext_lazy("Type de votre structure"),
@@ -130,21 +125,18 @@ class SelectSiaeForm(forms.ModelForm):
         required=False,
     )
 
-    def save(self, request, commit=True):
-        raise RuntimeError("SelectSiaeForm.save() should never be called.")
-
-    # pylint: disable=inconsistent-return-statements
     def clean(self):
-        kind = self.cleaned_data["kind"]
-        siret = self.cleaned_data["siret"]
-        email = self.cleaned_data["email"]
+        cleaned_data = super().clean()
+        kind = cleaned_data.get("kind")
+        siret = cleaned_data.get("siret")
+        email = cleaned_data.get("email")
 
         if not (siret or email):
             error_message = _(
                 "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
                 "de l'ASP."
             )
-            self.raise_validation_error(error_message, add_suffix=False)
+            raise forms.ValidationError(mark_safe(error_message))
 
         siaes = Siae.active_objects.filter(kind=kind)
         if siret and email:
@@ -155,52 +147,40 @@ class SelectSiaeForm(forms.ModelForm):
         else:
             siaes = siaes.filter(siret=siret)
         # Hit the database only once.
-        siaes = list(siaes.all())
+        siaes = list(siaes)
 
         siaes_matching_siret = [s for s in siaes if s.siret == siret]
         # There can be at most one siret match due to (kind, siret) unicity.
         siret_exists = len(siaes_matching_siret) == 1
 
         if siret_exists:
-            self.selected_siae_pk = siaes_matching_siret[0].pk
-            return self.cleaned_data
+            self.selected_siae = siaes_matching_siret[0]
+        else:
+            siaes_matching_email = [s for s in siaes if s.auth_email == email]
+            email_exists = len(siaes_matching_email) > 0
+            several_siaes_share_same_email = len(siaes_matching_email) > 1
 
-        siaes_matching_email = [s for s in siaes if s.auth_email == email]
-        email_exists = len(siaes_matching_email) > 0
-        several_siaes_share_same_email = len(siaes_matching_email) > 1
+            if several_siaes_share_same_email:
+                error_message = _(
+                    "Comme plusieurs structures partagent cet email nous nous basons "
+                    "sur le SIRET pour identifier votre structure, or "
+                    "ce SIRET ne figure pas dans notre base de données.<br>"
+                    "Veuillez saisir un SIRET connu de l'ASP."
+                )
+                raise forms.ValidationError(mark_safe(error_message))
 
-        if several_siaes_share_same_email:
-            error_message = _(
-                "Comme plusieurs structures partagent cet email nous nous basons "
-                "sur le SIRET pour identifier votre structure, or "
-                "ce SIRET ne figure pas dans notre base de données.<br>"
-                "Veuillez saisir un SIRET connu de l'ASP."
-            )
-            self.raise_validation_error(error_message)
+            if not email_exists:
+                error_message = _(
+                    "Ni ce SIRET ni cet email ne figurent dans notre base de données "
+                    "pour ce type de SIAE.<br>"
+                    "Veuillez saisir le type correct de votre SIAE et soit un email connu de l'ASP "
+                    "soit un SIRET connu de l'ASP.<br>"
+                    "Si nécéssaire veuillez vous rapprocher de votre service gestion "
+                    "pour obtenir ces informations."
+                )
+                raise forms.ValidationError(mark_safe(error_message))
 
-        if email_exists:
-            self.selected_siae_pk = siaes_matching_email[0].pk
-            return self.cleaned_data
-
-        error_message = _(
-            "Ni ce SIRET ni cet email ne figurent dans notre base de données "
-            "pour ce type de SIAE.<br>"
-            "Veuillez saisir le type correct de votre SIAE et soit un email connu de l'ASP "
-            "soit un SIRET connu de l'ASP.<br>"
-            "Si nécéssaire veuillez vous rapprocher de votre service gestion "
-            "pour obtenir ces informations."
-        )
-        self.raise_validation_error(error_message)
-
-    def raise_validation_error(self, error_message, add_suffix=True):
-        error_message_suffix = _(
-            "Contactez-nous si vous rencontrez des problèmes pour vous inscrire : "
-            f'<a href="mailto:{settings.ITOU_EMAIL_CONTACT}">{settings.ITOU_EMAIL_CONTACT}</a>'
-        )
-        if add_suffix:
-            # Concatenating two __proxy__ strings is a little tricky.
-            error_message = "%s<br>%s" % (error_message, error_message_suffix)
-        raise forms.ValidationError(mark_safe(error_message))
+            self.selected_siae = siaes_matching_email[0]
 
 
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
