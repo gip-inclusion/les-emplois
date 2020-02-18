@@ -146,10 +146,6 @@ main.layout-section {
     margin: 1.4rem 0;
 }
 
-.layout-messages .alert:last-child {
-    margin-bottom: 0;
-}
-
 /* Icons */
 
 a.with-icon span {
