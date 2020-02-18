@@ -34,6 +34,7 @@ class AddressMixin(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
+    # model fields
     address_line_1 = models.CharField(
         verbose_name=_("Adresse"), max_length=255, blank=True
     )

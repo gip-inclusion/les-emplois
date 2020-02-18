@@ -7,22 +7,8 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.widgets import DatePickerField
-
-# WARNING: this is a duplicate from itou.www.siae_views.forms
-TEST_DEPARTMENTS = [("", "---")] + [
-    (d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS
-]
-
-TEST_DEPARTMENTS_HELP_TEXT = _(
-    (
-        "Seuls les départements du Bas-Rhin (67), du Pas-de-Calais (62) "
-        "et de la Seine Saint Denis (93) sont disponibles pendant la phase actuelle "
-        "d'expérimentation de la plateforme de l'inclusion."
-    )
-)
-# Consider refactoring that
+from itou.utils.address import TEST_DEPARTMENTS, TEST_DEPARTMENTS_HELP_TEXT
 
 
 class UserExistsForm(forms.Form):
