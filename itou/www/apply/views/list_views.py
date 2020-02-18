@@ -6,7 +6,10 @@ from django.shortcuts import get_object_or_404, render
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
-from itou.www.apply.forms import FilterJobApplicationsForm
+from itou.www.apply.forms import (
+    FilterJobApplicationsForm,
+    PrescriberFilterJobApplicationsForm,
+)
 
 
 @login_required
@@ -20,7 +23,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     job_applications = request.user.job_applications
 
     if filters_form.is_valid():
-        job_applications = job_applications.filter(**filters_form.get_qs_filters())
+        job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
@@ -61,11 +64,12 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     else:
         job_applications = request.user.job_applications_sent
 
-    filters_form = FilterJobApplicationsForm(request.GET or None)
+    filters_form = PrescriberFilterJobApplicationsForm(request.GET or None)
     filters = None
 
     if filters_form.is_valid():
-        job_applications = job_applications.filter(**filters_form.get_qs_filters())
+        import ipdb; ipdb.set_trace()
+        job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
@@ -102,7 +106,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     filters = None
 
     if filters_form.is_valid():
-        job_applications = job_applications.filter(**filters_form.get_qs_filters())
+        job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(

@@ -2,6 +2,7 @@ import datetime
 
 from django import forms
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
@@ -225,6 +226,8 @@ class FilterJobApplicationsForm(forms.Form):
         if data.get("end_date"):
             filters["created_at__lte"] = data.get("end_date")
 
+        filters = [Q(**filters)]
+
         return filters
 
     def humanize_filters(self):
@@ -253,3 +256,34 @@ class FilterJobApplicationsForm(forms.Form):
             active_filters.append([label, value])
 
         return [{"label": f[0], "value": f[1]} for f in active_filters]
+
+
+class SIAEFilterJobApplicationsForm(FilterJobApplicationsForm):
+    """
+    Allow SIAE members to filter job applications.
+    """
+
+    sender = forms.CharField(required=False)
+
+
+class PrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
+    """
+    Allow prescribers to filter job applications.
+    """
+
+    sender = forms.CharField(required=False)
+
+    def get_qs_filters(self):
+        qs_list = super().get_qs_filters()
+        data = self.cleaned_data
+
+        if data.get("sender"):
+            sender = data.get("sender")
+            qs = (
+                Q(sender__first_name__iexact=sender) |
+                Q(sender__last_name__icontains=sender) |
+                Q(sender_prescriber_organization__name__iexact=sender)
+            )
+            qs_list.append(qs)
+
+        return qs_list

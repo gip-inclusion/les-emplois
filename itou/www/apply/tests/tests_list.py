@@ -11,6 +11,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplicationWorkflow, JobApplication
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory
 from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.utils.widgets import DatePickerField
 
 
@@ -180,6 +181,11 @@ class ProcessListPrescriberTest(TestCase):
             )
         self.prescriber_base_url = reverse("apply:list_for_prescriber")
 
+        # Apply as another prescriber to be able to filter.
+        self.organization = PrescriberOrganizationWithMembershipFactory()
+        self.second_prescriber = self.organization.members.first()
+        JobApplicationSentByPrescriberFactory(sender=self.prescriber)
+
     def test_list_for_prescriber_view(self):
         """
         Provide a list of job applications sent by a prescriber.
@@ -194,19 +200,70 @@ class ProcessListPrescriberTest(TestCase):
             total_applications, self.prescriber.job_applications_sent.count()
         )
 
-    def test_list_for_prescriber_view__filtered_by_state(self):
+    def test_view__filtered_by_state(self):
         """
         Provide a list of job applications sent by a prescriber
         and filtered by a state.
         """
         self.client.login(username=self.prescriber.email, password=DEFAULT_PASSWORD)
-        query = f"states={JobApplicationWorkflow.initial_state}"
+        expected_state = JobApplicationWorkflow.initial_state
+        query = f"states={expected_state}"
+        url = f"{self.prescriber_base_url}?{query}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+        for application in applications:
+            self.assertEqual(application.state, expected_state)
+
+    def test_view__filtered_by_sender_first_name(self):
+        """
+        Provide a list of job applications sent by a prescriber
+        and filtered by a state.
+        """
+        self.client.login(username=self.prescriber.email, password=DEFAULT_PASSWORD)
+        expected_name = self.second_prescriber.first_name
+        query = f"sender={expected_name}"
+        url = f"{self.prescriber_base_url}?{query}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+        for application in applications:
+            self.assertEqual(application.sender.first_name, expected_name)
+
+    def test_view__filtered_by_sender_last_name(self):
+        """
+        Provide a list of job applications sent by a prescriber
+        and filtered by a state.
+        """
+        self.client.login(username=self.prescriber.email, password=DEFAULT_PASSWORD)
+        expected_name = self.second_prescriber.last_name
+        query = f"sender={expected_name}"
+        url = f"{self.prescriber_base_url}?{query}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+        for application in applications:
+            self.assertEqual(application.sender.first_name, expected_name)
+
+    def test_view__filtered_by_sender_organization_name(self):
+        """
+        Provide a list of job applications sent by a prescriber
+        and filtered by a state.
+        """
+        self.client.login(
+            username=self.second_prescriber.email, password=DEFAULT_PASSWORD
+        )
+        sender_oragnization_name = self.organization.name
+        query = f"sender={sender_oragnization_name}"
         url = f"{self.prescriber_base_url}?{query}"
         response = self.client.get(url)
 
         # Count job applications used by the template
-        total_applications = len(response.context["job_applications_page"].object_list)
+        applications = response.context["job_applications_page"].object_list
 
-        # Result page should only contain job applications which status
-        # matches the one selected by the user.
-        self.assertEqual(total_applications, 1)
+        applications = response.context["job_applications_page"].object_list
+        for application in applications:
+            self.assertEqual(
+                application.sender_prescriber_organization.name,
+                sender_oragnization_name,
+            )
