@@ -78,6 +78,8 @@ class CommonApprovalMixin(models.Model):
         if not self.is_valid:
             return "0"
         now = timezone.now().date()
+        if self.start_at > now:
+            return "in_future"
         if self.end_at == now:
             return "0"
         return timeuntil(self.end_at, now)

@@ -27,6 +27,8 @@
         {% with approval.time_until_waiting_period as still %}
             {% if still == "0" %}
                 {% trans "(expire aujourd'hui)" %}
+            {% elif still == "in_future" %}
+                {% trans "(dans le futur)" %}
             {% else %}
                 {% blocktrans %}(encore {{ still }}){% endblocktrans %}
             {% endif %}
