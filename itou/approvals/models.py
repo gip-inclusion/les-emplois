@@ -9,6 +9,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.validators import alphanumeric
@@ -65,6 +66,14 @@ class CommonApprovalMixin(models.Model):
     @property
     def originates_from_itou(self):
         return self.number.startswith(Approval.ASP_ITOU_PREFIX)
+
+    @property
+    def time_until_waiting_period(self):
+        now = timezone.now().date()
+        if self.end_at == now:
+            # Return a string, like `timeuntil`.
+            return "0"
+        return timeuntil(self.end_at, now)
 
 
 class CommonApprovalQuerySet(models.QuerySet):

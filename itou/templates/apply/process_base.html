@@ -22,7 +22,7 @@
         {% if job_application.state.is_accepted %}
             <div class="alert border">
                 {% if job_application.approval %}
-                    {% include "approvals/includes/number.html" with approval=job_application.approval %}
+                    {% include "approvals/includes/status.html" with approval=job_application.approval job_application=job_application %}
                 {% else %}
                     {% trans "Numéro d'agrément en cours de délivrance." %}
                 {% endif %}
@@ -30,7 +30,7 @@
         {% else %}
             {% if approvals_wrapper.latest_approval %}
                 <div class="alert border">
-                    {% include "approvals/includes/number.html" with approval=approvals_wrapper.latest_approval %}
+                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
                 </div>
             {% endif %}
         {% endif %}
