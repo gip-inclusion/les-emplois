@@ -69,9 +69,16 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def time_until_waiting_period(self):
+        """
+        Helper primarily used within templates whose sole purpose is to catch
+        and display a custom message for the localized "0 minutes" otherwise
+        returned by the built-in `timeuntil` template filter:
+        https://docs.djangoproject.com/en/dev/ref/templates/builtins/#timeuntil
+        """
+        if not self.is_valid:
+            return "0"
         now = timezone.now().date()
         if self.end_at == now:
-            # Return a string, like `timeuntil`.
             return "0"
         return timeuntil(self.end_at, now)
 
@@ -292,9 +299,15 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
     # The normal length of a number is 12 chars.
-    # Sometimes the number ends with an extension ('A01', 'A02', 'A03' or 'S01') that
-    # increases the length to 15 chars. Their meaning is yet unclear: we were told
-    # `A01` means "interruption" and `S01` means "suspension".
+    # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
+    # increases the length to 15 chars.
+    # Suffixes menaing:
+    # - `P`: Prolongation
+    # - `E`: Extension
+    # - `A`: Interruption
+    # - `S`: Suspension
+    # The last two digits refer to the act number (e.g. E02 = second extension).
+    # Suffixes are not taken into account in Itou yet but that might change.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
     pole_emploi_id = models.CharField(
         _("Identifiant Pôle emploi"), max_length=8, db_index=True
