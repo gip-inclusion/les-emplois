@@ -7,6 +7,8 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from itou.users.models import User
+from itou.prescribers.models import PrescriberOrganization
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.widgets import DatePickerField
 
@@ -240,11 +242,11 @@ class FilterJobApplicationsForm(forms.Form):
         active_filters = []
 
         if start_date:
-            label = FilterJobApplicationsForm.base_fields.get("start_date").label
+            label = self.base_fields.get("start_date").label
             active_filters.append([label, start_date])
 
         if end_date:
-            label = FilterJobApplicationsForm.base_fields.get("end_date").label
+            label = self.base_fields.get("end_date").label
             active_filters.append([label, end_date])
 
         if states:
@@ -258,12 +260,105 @@ class FilterJobApplicationsForm(forms.Form):
         return [{"label": f[0], "value": f[1]} for f in active_filters]
 
 
+class SiaeFilterJobApplicationsForm(FilterJobApplicationsForm):
+    """
+    Allow SIAE members to filter job applications.
+    """
+
+    sender = forms.ChoiceField(
+        required=False,
+        label=_("Personne"),
+        choices=[("", "-"*50)],
+    )
+
+    sender_organization = forms.ChoiceField(
+        required=False,
+        label=_("Organisation"),
+        choices=[("", "-"*50)],
+    )
+
+    def get_qs_filters(self):
+        qs_list = super().get_qs_filters()
+        data = self.cleaned_data
+        sender = data.get("sender")
+        sender_organization = data.get("sender_organization")
+
+        if sender:
+            qs = Q(sender__id=sender)
+            qs_list.append(qs)
+
+        if sender_organization:
+            qs = Q(sender_prescriber_organization__id=sender_organization)
+            qs_list.append(qs)
+
+        return qs_list
+
+
+    def set_sender_organization_choices(self, job_applications_qs):
+        u_senders = job_applications_qs\
+            .order_by('sender_prescriber_organization')\
+            .exclude(sender_prescriber_organization__isnull=True)\
+            .distinct('sender_prescriber_organization')
+        senders_values = u_senders.values_list(
+            'sender_prescriber_organization__id',
+            'sender_prescriber_organization__name',
+        )
+        choices = [
+            (value[0], value[1].title()) for value in senders_values
+        ]
+        self.fields['sender_organization'].choices += choices
+
+
+    def set_sender_choices(self, job_applications_qs):
+        u_senders = job_applications_qs\
+            .order_by('sender')\
+            .exclude(sender__first_name__isnull=True)\
+            .exclude(sender__last_name__isnull=True)\
+            .distinct('sender')
+        senders_values = u_senders.values_list(
+            'sender__id',
+            'sender__first_name',
+            'sender__last_name',
+        )
+
+        choices = [
+            (value[0], f"{value[1]} {value[2]}".title()) for value in senders_values
+        ]
+        self.fields['sender'].choices += choices
+
+
+    def humanize_filters(self):
+        humanized_filters = super().humanize_filters()
+        sender = self.cleaned_data.get("sender")
+        sender_organization = self.cleaned_data.get("sender_organization")
+
+        if sender:
+            label = self.base_fields.get("sender").label
+            user = User.objects.get(id=int(sender))
+            value = user.get_full_name().title()
+            humanized_filters.append({"label": label, "value": value})
+
+        if sender_organization:
+            label = self.base_fields.get("sender_organization").label
+            organization = PrescriberOrganization.objects.get(id=int(sender_organization))
+            value = organization.name.title()
+            humanized_filters.append({"label": label, "value": value})
+
+        return humanized_filters
+
+
 class PrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
     Allow prescribers to filter job applications.
     """
 
-    sender = forms.CharField(required=False)
+    sender = forms.CharField(
+        required=False,
+        label="",
+        widget=forms.TextInput(
+            attrs={"placeholder": _("Prénom ou nom d'un collaborateur")}
+        ),
+    )
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -271,9 +366,8 @@ class PrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
         if data.get("sender"):
             sender = data.get("sender")
-            qs = (
-                Q(sender__first_name__iexact=sender) |
-                Q(sender__last_name__icontains=sender)
+            qs = Q(sender__first_name__iexact=sender) | Q(
+                sender__last_name__icontains=sender
             )
             qs_list.append(qs)
 

@@ -25,17 +25,27 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h5>{% trans "Date de candidature" %}</h5>
+                    <h5 class="mt-4">{% trans "Date de candidature" %}</h5>
                     {% bootstrap_field filters_form.start_date form_group_class="form_group m-3" %}
                     {% bootstrap_field filters_form.end_date form_group_class="form_group m-3" %}
 
-                    <h5>{% trans "Statut" %}</h5>
+                    <h5 class="mt-4">{% trans "Statut" %}</h5>
                       {% for choice in filters_form.states %}
                       <div class="form-check form-check-inline dropdown-item">
                           <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
                           <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
                       </div>
                       {% endfor %}
+
+                    {% if filters_form.sender_organization %}
+                          {% bootstrap_field filters_form.sender_organization form_group_class="form_group m-3" %}
+                    {% endif %}
+
+                    {% if filters_form.sender %}
+                        <h5 class="mt-4">{% trans "Emetteur" %}</h5>
+                          {% bootstrap_field filters_form.sender form_group_class="form_group m-3" %}
+                    {% endif %}
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>

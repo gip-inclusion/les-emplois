@@ -9,6 +9,7 @@ from itou.utils.pagination import pager
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
+    SiaeFilterJobApplicationsForm
 )
 
 
@@ -101,7 +102,10 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     queryset = Siae.active_objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     job_applications = siae.job_applications_received
-    filters_form = FilterJobApplicationsForm(request.GET or None)
+
+    filters_form = SiaeFilterJobApplicationsForm(request.GET or None)
+    filters_form.set_sender_choices(job_applications)
+    filters_form.set_sender_organization_choices(job_applications)
     filters = None
 
     if filters_form.is_valid():
