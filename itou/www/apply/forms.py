@@ -258,14 +258,6 @@ class FilterJobApplicationsForm(forms.Form):
         return [{"label": f[0], "value": f[1]} for f in active_filters]
 
 
-class SIAEFilterJobApplicationsForm(FilterJobApplicationsForm):
-    """
-    Allow SIAE members to filter job applications.
-    """
-
-    sender = forms.CharField(required=False)
-
-
 class PrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
     Allow prescribers to filter job applications.
@@ -281,8 +273,7 @@ class PrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             sender = data.get("sender")
             qs = (
                 Q(sender__first_name__iexact=sender) |
-                Q(sender__last_name__icontains=sender) |
-                Q(sender_prescriber_organization__name__iexact=sender)
+                Q(sender__last_name__icontains=sender)
             )
             qs_list.append(qs)
 

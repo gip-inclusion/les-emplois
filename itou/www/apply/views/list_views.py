@@ -68,7 +68,6 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     filters = None
 
     if filters_form.is_valid():
-        import ipdb; ipdb.set_trace()
         job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
