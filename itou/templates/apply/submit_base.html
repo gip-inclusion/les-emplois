@@ -25,14 +25,12 @@
         </div>
     {% endif %}
 
-    {% with job_seeker.approvals_wrapper as approvals_wrapper %}
-        {% if approvals_wrapper.latest_approval %}
-            <div class="alert border">
-                {% trans "Agrément existant" %}
-                <br>
-                {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
-            </div>
-        {% endif %}
-    {% endwith %}
+    {% if approvals_wrapper.latest_approval %}
+        <div class="alert border">
+            {% trans "Agrément existant" %}
+            <br>
+            {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+        </div>
+    {% endif %}
 
 {% endblock %}

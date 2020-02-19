@@ -139,7 +139,7 @@ class Command(BaseCommand):
                 self.stderr.write(NUM_AGR_DEC)
                 continue
 
-            # Keep track o unique suffixes added by PE at the end of a 12 chars number
+            # Keep track of unique suffixes added by PE at the end of a 12 chars number
             # that increases the length to 15 chars.
             if len(NUM_AGR_DEC) > 12:
                 suffix = NUM_AGR_DEC[12:]
