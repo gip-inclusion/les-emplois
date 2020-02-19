@@ -32,6 +32,7 @@ def details_for_siae(
             "sender_siae",
             "sender_prescriber_organization",
             "to_siae",
+            "approval",
         )
         .prefetch_related("selected_jobs__appellation")
     )

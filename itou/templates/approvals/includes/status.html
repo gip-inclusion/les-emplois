@@ -3,25 +3,15 @@
 
     Usage:
         {% include "approvals/includes/status.html" with approval=approval %}
-        {% include "approvals/includes/status.html" with approval=approval job_application=job_application %}
 
 {% endcomment %}
-
-{% trans "Numéro d'agrément" %}
 
 {% if approval.is_valid %}
 
     <span class="text-success">
 
-        {# A valid approval number can only be displayed to an SIAE after a job application has been accepted #}
-        {% if not user.is_siae_staff or job_application.state.is_accepted %}
-            <b>{{ approval.number_with_spaces }}</b>
-        {% endif %}
-
-        {% trans "valide" %}
-
         {% blocktrans with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
-            du {{ start }} au {{ end }}
+            <b>Valide</b> du {{ start }} au {{ end }}
         {% endblocktrans %}
 
         {% with approval.time_until_waiting_period as still %}
@@ -40,12 +30,8 @@
 
     <span class="text-danger">
 
-        <b>{{ approval.number_with_spaces }}</b>
-
-        {% trans "expiré" %}
-
-        {% blocktrans with start=approval.start_at|date:"d/m/Y" since=approval.end_at|timesince %}
-            le {{ start }} (depuis {{ since }})
+        {% blocktrans with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
+            <b>Expiré</b> le {{ end }} (depuis {{ since }})
         {% endblocktrans %}
 
     </span>
