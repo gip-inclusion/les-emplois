@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -9,6 +9,16 @@ from allauth.utils import generate_unique_username
 from itou.approvals.models import ApprovalsWrapper
 from itou.approvals.models import PoleEmploiApproval
 from itou.utils.validators import validate_pole_emploi_id
+
+
+class UserQuerySet(models.QuerySet):
+    def email_already_exists(self, email):
+        """
+        RFC 5321 Part 2.4 states that only the domain portion of an email
+        is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
+        the same email.
+        """
+        return self.filter(email__iexact=email).exists()
 
 
 class User(AbstractUser):
@@ -35,6 +45,8 @@ class User(AbstractUser):
         (REASON_FORGOTTEN, _("Identifiant Pôle emploi oublié")),
         (REASON_NOT_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
     )
+
+    ERROR_EMAIL_ALREADY_EXISTS = _(f"Cet e-mail existe déjà.")
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True
@@ -80,6 +92,8 @@ class User(AbstractUser):
         blank=True,
     )
 
+    objects = UserManager.from_queryset(UserQuerySet)()
+
     def __str__(self):
         return self.email
 
@@ -90,10 +104,10 @@ class User(AbstractUser):
         # authenticate against something else, e.g. username/password.
         if (
             not already_exists
-            and self.email
-            and User.objects.filter(email=self.email).exists()
+            and hasattr(self, "email")
+            and User.objects.email_already_exists(self.email)
         ):
-            raise ValidationError(_("Cet e-mail existe déjà."))
+            raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
         super().save(*args, **kwargs)
 
     @property
@@ -142,17 +156,17 @@ class User(AbstractUser):
             username,
             email=fields.pop("email"),
             password=cls.objects.make_random_password(),
-            **fields
+            **fields,
         )
         return user
 
     @staticmethod
     def clean_pole_emploi_fields(pole_emploi_id, lack_of_pole_emploi_id_reason):
         """
+        Only for users with the `is_job_seeker` flag set to True.
         Validate Pôle emploi fields that depend on each other: one or
         the other must be filled but not both.
-        It must be used in forms and modelforms that manipulate users
-        with the `is_job_seeker` flag set to True.
+        It must be used in forms and modelforms that manipulate job seekers.
         """
         if (pole_emploi_id and lack_of_pole_emploi_id_reason) or (
             not pole_emploi_id and not lack_of_pole_emploi_id_reason

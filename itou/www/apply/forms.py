@@ -72,6 +72,7 @@ class CreateJobSeekerForm(forms.ModelForm):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
+        self.fields["email"].widget.attrs["readonly"] = True
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
         self.fields["birthdate"].required = True
@@ -92,6 +93,12 @@ class CreateJobSeekerForm(forms.ModelForm):
             "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
             "phone": _("Par exemple 0610203040."),
         }
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if get_user_model().objects.email_already_exists(email):
+            raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
+        return email
 
     def clean(self):
         super().clean()
