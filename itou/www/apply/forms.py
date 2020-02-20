@@ -96,7 +96,7 @@ class CreateJobSeekerForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if get_user_model().objects.email_already_exists(email):
+        if get_user_model().email_already_exists(email):
             raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
         return email
 

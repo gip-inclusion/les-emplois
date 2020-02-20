@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -9,16 +9,6 @@ from allauth.utils import generate_unique_username
 from itou.approvals.models import ApprovalsWrapper
 from itou.approvals.models import PoleEmploiApproval
 from itou.utils.validators import validate_pole_emploi_id
-
-
-class UserQuerySet(models.QuerySet):
-    def email_already_exists(self, email):
-        """
-        RFC 5321 Part 2.4 states that only the domain portion of an email
-        is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
-        the same email.
-        """
-        return self.filter(email__iexact=email).exists()
 
 
 class User(AbstractUser):
@@ -92,8 +82,6 @@ class User(AbstractUser):
         blank=True,
     )
 
-    objects = UserManager.from_queryset(UserQuerySet)()
-
     def __str__(self):
         return self.email
 
@@ -105,7 +93,7 @@ class User(AbstractUser):
         if (
             not already_exists
             and hasattr(self, "email")
-            and User.objects.email_already_exists(self.email)
+            and User.email_already_exists(self.email)
         ):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
         super().save(*args, **kwargs)
@@ -159,6 +147,15 @@ class User(AbstractUser):
             **fields,
         )
         return user
+
+    @classmethod
+    def email_already_exists(cls, email):
+        """
+        RFC 5321 Part 2.4 states that only the domain portion of an email
+        is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
+        the same email.
+        """
+        return cls.objects.filter(email__iexact=email).exists()
 
     @staticmethod
     def clean_pole_emploi_fields(pole_emploi_id, lack_of_pole_emploi_id_reason):

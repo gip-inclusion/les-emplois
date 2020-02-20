@@ -12,14 +12,6 @@ from itou.users.factories import JobSeekerFactory
 from itou.users.factories import PrescriberFactory
 
 
-class ModelQuerySetTest(TestCase):
-    def test_email_already_exists(self):
-        JobSeekerFactory(email="foo@bar.com")
-        User = get_user_model()
-        self.assertTrue(User.objects.email_already_exists("foo@bar.com"))
-        self.assertTrue(User.objects.email_already_exists("FOO@bar.com"))
-
-
 class ModelTest(TestCase):
     def test_create_job_seeker_by_proxy(self):
 
@@ -121,3 +113,9 @@ class ModelTest(TestCase):
         User.clean_pole_emploi_fields(
             job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
         )
+
+    def test_email_already_exists(self):
+        JobSeekerFactory(email="foo@bar.com")
+        User = get_user_model()
+        self.assertTrue(User.email_already_exists("foo@bar.com"))
+        self.assertTrue(User.email_already_exists("FOO@bar.com"))
