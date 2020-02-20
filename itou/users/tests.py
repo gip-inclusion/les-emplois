@@ -88,7 +88,7 @@ class ModelTest(TestCase):
                 job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
             )
 
-        # Both fields cannot be NOT empty.
+        # Both fields cannot be present at the same time.
         job_seeker = JobSeekerFactory(
             pole_emploi_id="69970749",
             lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,

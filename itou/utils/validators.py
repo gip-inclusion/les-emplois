@@ -26,11 +26,12 @@ def validate_naf(naf):
 
 
 def validate_pole_emploi_id(pole_emploi_id):
-    if (
-        len(pole_emploi_id) != 8
-        or not pole_emploi_id[:7].isdigit()
-        or not pole_emploi_id[7:].isalnum()
-    ):
+    is_valid = (
+        len(pole_emploi_id) == 8
+        and pole_emploi_id[:7].isdigit()
+        and pole_emploi_id[7:].isalnum()
+    )
+    if not is_valid:
         raise ValidationError(
             _(
                 "L'identifiant Pôle emploi doit être composé de 8 caractères : "
