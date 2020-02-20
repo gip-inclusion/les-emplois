@@ -1,5 +1,7 @@
 /* Colors
 --------------------------------------------------------------------------- */
+/* Default Boostrap colors: */
+/* https://github.com/twbs/bootstrap/blob/master/dist/css/bootstrap.css#L7 */
 
 /* Add some Bootstrap colors available in SCSS as custom values. */
 /* Usage: var(--my-custom-value); */
@@ -18,7 +20,8 @@ body {
 }
 
 html {
-    background: #26353f;
+    background: #343a40!important;
+    background: var(--gray-dark);
 }
 
 .layout {
@@ -213,6 +216,12 @@ section.home-search .bg-image {
 
 }
 
+@media (min-width: 2000px) {
+    section.home-search .bg-image {
+        background-size: contain;
+        background-position: center;
+    }
+}
 
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
