@@ -251,8 +251,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
         for application in applications:
             self.assertEqual(
-                application.sender_prescriber_organization.id,
-                sender_organization.id,
+                application.sender_prescriber_organization.id, sender_organization.id
             )
 
     def test_view__filtered_by_sender_name(self):
@@ -270,10 +269,7 @@ class ProcessListSiaeTest(ProcessListTest):
         self.assertGreater(len(applications), 0)
 
         for application in applications:
-            self.assertEqual(
-                application.sender.id,
-                sender.id,
-            )
+            self.assertEqual(application.sender.id, sender.id)
 
 
 # ####################################################

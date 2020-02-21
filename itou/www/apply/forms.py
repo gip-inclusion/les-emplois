@@ -260,16 +260,57 @@ class FilterJobApplicationsForm(forms.Form):
         return [{"label": f[0], "value": f[1]} for f in active_filters]
 
 
-class SiaeFilterJobApplicationsForm(FilterJobApplicationsForm):
+class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
-    Allow SIAE members to filter job applications.
+    Job applications filters common to SIAE and Prescribers.
     """
 
     sender = forms.ChoiceField(
-        required=False,
-        label=_("Personne"),
-        choices=[("", "-"*50)],
+        required=False, label=_("Personne"), choices=[("", "-" * 50)]
     )
+
+    def __init__(self, job_applications_qs, *args, **kwargs):
+        self.job_applications_qs = job_applications_qs
+        super().__init__(*args, **kwargs)
+        self.fields["sender"].choices = self.get_sender_choices()
+
+    def get_qs_filters(self):
+        qs_list = super().get_qs_filters()
+        data = self.cleaned_data
+        sender = data.get("sender")
+
+        if sender:
+            qs = Q(sender__id=sender)
+            qs_list.append(qs)
+
+        return qs_list
+
+    def get_sender_choices(self):
+        senders = self.job_applications_qs.get_unique_fk_objects("sender")
+        senders = [sender for sender in senders if sender.get_full_name()]
+
+        return [
+            (sender.id, sender.get_full_name().title())
+            for sender in senders
+        ]
+
+    def humanize_filters(self):
+        humanized_filters = super().humanize_filters()
+        sender = self.cleaned_data.get("sender")
+
+        if sender:
+            label = self.base_fields.get("sender").label
+            user = User.objects.get(id=int(sender))
+            value = user.get_full_name().title()
+            humanized_filters.append({"label": label, "value": value})
+
+        return humanized_filters
+
+
+class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
+    """
+    Job applications filters for SIAE only.
+    """
 
     sender_organization = forms.ChoiceField(
         required=False,
@@ -277,15 +318,14 @@ class SiaeFilterJobApplicationsForm(FilterJobApplicationsForm):
         choices=[("", "-"*50)],
     )
 
+    def __init__(self, job_applications_qs, *args, **kwargs):
+        super().__init__(job_applications_qs, *args, **kwargs)
+        self.fields["sender_organization"].choices = self.get_sender_organization_choices()
+
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
-        sender = data.get("sender")
         sender_organization = data.get("sender_organization")
-
-        if sender:
-            qs = Q(sender__id=sender)
-            qs_list.append(qs)
 
         if sender_organization:
             qs = Q(sender_prescriber_organization__id=sender_organization)
@@ -294,49 +334,19 @@ class SiaeFilterJobApplicationsForm(FilterJobApplicationsForm):
         return qs_list
 
 
-    def set_sender_organization_choices(self, job_applications_qs):
-        u_senders = job_applications_qs\
-            .order_by('sender_prescriber_organization')\
-            .exclude(sender_prescriber_organization__isnull=True)\
-            .distinct('sender_prescriber_organization')
-        senders_values = u_senders.values_list(
-            'sender_prescriber_organization__id',
-            'sender_prescriber_organization__name',
-        )
-        choices = [
-            (value[0], value[1].title()) for value in senders_values
+    def get_sender_organization_choices(self):
+        sender_orgs = self.job_applications_qs.\
+            get_unique_fk_objects("sender_prescriber_organization")
+        sender_orgs = [sender for sender in sender_orgs if sender.name]
+
+        return [
+            (sender.id, sender.name.title()) for sender in sender_orgs
         ]
-        self.fields['sender_organization'].choices += choices
-
-
-    def set_sender_choices(self, job_applications_qs):
-        u_senders = job_applications_qs\
-            .order_by('sender')\
-            .exclude(sender__first_name__isnull=True)\
-            .exclude(sender__last_name__isnull=True)\
-            .distinct('sender')
-        senders_values = u_senders.values_list(
-            'sender__id',
-            'sender__first_name',
-            'sender__last_name',
-        )
-
-        choices = [
-            (value[0], f"{value[1]} {value[2]}".title()) for value in senders_values
-        ]
-        self.fields['sender'].choices += choices
 
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
-        sender = self.cleaned_data.get("sender")
         sender_organization = self.cleaned_data.get("sender_organization")
-
-        if sender:
-            label = self.base_fields.get("sender").label
-            user = User.objects.get(id=int(sender))
-            value = user.get_full_name().title()
-            humanized_filters.append({"label": label, "value": value})
 
         if sender_organization:
             label = self.base_fields.get("sender_organization").label
@@ -347,28 +357,9 @@ class SiaeFilterJobApplicationsForm(FilterJobApplicationsForm):
         return humanized_filters
 
 
-class PrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
+class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     """
-    Allow prescribers to filter job applications.
+    Job applications filters for Prescribers only.
     """
 
-    sender = forms.CharField(
-        required=False,
-        label="",
-        widget=forms.TextInput(
-            attrs={"placeholder": _("Prénom ou nom d'un collaborateur")}
-        ),
-    )
-
-    def get_qs_filters(self):
-        qs_list = super().get_qs_filters()
-        data = self.cleaned_data
-
-        if data.get("sender"):
-            sender = data.get("sender")
-            qs = Q(sender__first_name__iexact=sender) | Q(
-                sender__last_name__icontains=sender
-            )
-            qs_list.append(qs)
-
-        return qs_list
+    pass
