@@ -24,10 +24,7 @@ DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _(
 )
 
 
-# TODO FIXME Run a cronjob to regenerate the stats page every X minutes,
-# so that the user never has to wait!
-# see https://stackoverflow.com/questions/4631865/caching-query-results-in-django
-@cache_page(60 * 5)
+@cache_page(60 * 30)
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
