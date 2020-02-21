@@ -357,3 +357,6 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
     """
     Job applications filters for Prescribers only.
     """
+
+    # pylint: disable=unnecessary-pass
+    pass

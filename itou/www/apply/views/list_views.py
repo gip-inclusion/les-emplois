@@ -65,7 +65,9 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     else:
         job_applications = request.user.job_applications_sent
 
-    filters_form = PrescriberFilterJobApplicationsForm(request.GET or None)
+    filters_form = PrescriberFilterJobApplicationsForm(
+        job_applications, request.GET or None
+    )
     filters = None
 
     if filters_form.is_valid():

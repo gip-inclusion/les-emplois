@@ -37,13 +37,13 @@
                       </div>
                       {% endfor %}
 
-                    {% if filters_form.sender_organization %}
-                          {% bootstrap_field filters_form.sender_organization form_group_class="form_group m-3" %}
-                    {% endif %}
-
                     {% if filters_form.sender %}
                         <h5 class="mt-4">{% trans "Emetteur" %}</h5>
                           {% bootstrap_field filters_form.sender form_group_class="form_group m-3" %}
+                    {% endif %}
+
+                    {% if filters_form.sender_organization %}
+                          {% bootstrap_field filters_form.sender_organization form_group_class="form_group m-3" %}
                     {% endif %}
 
                 </div>

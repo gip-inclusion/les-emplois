@@ -95,45 +95,45 @@ class ProcessListTest(TestCase):
 ####################################################
 
 
-# class ProcessListJobSeekerTest(ProcessListTest):
-#     def test_list_for_job_seeker_view(self):
-#         """
-#         Maggie wants to see job applications sent for her.
-#         """
-#         self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
-#         response = self.client.get(self.job_seeker_base_url)
+class ProcessListJobSeekerTest(ProcessListTest):
+    def test_list_for_job_seeker_view(self):
+        """
+        Maggie wants to see job applications sent for her.
+        """
+        self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.job_seeker_base_url)
 
-#         # Count job applications used by the template
-#         total_applications = len(response.context["job_applications_page"].object_list)
+        # Count job applications used by the template
+        total_applications = len(response.context["job_applications_page"].object_list)
 
-#         # Result page should contain all SIAE's job applications.
-#         self.assertEqual(total_applications, self.maggie.job_applications.count())
+        # Result page should contain all SIAE's job applications.
+        self.assertEqual(total_applications, self.maggie.job_applications.count())
 
-#     def test_list_for_job_seeker_view__filtered_by_state(self):
-#         """
-#         Provide a list of job applications sent by a job seeker
-#         and filtered by a state.
-#         """
-#         self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
-#         expected_state = self.maggie.job_applications.last().state
-#         query = f"states={expected_state}"
-#         url = f"{self.job_seeker_base_url}?{query}"
-#         response = self.client.get(url)
+    def test_list_for_job_seeker_view__filtered_by_state(self):
+        """
+        Provide a list of job applications sent by a job seeker
+        and filtered by a state.
+        """
+        self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
+        expected_state = self.maggie.job_applications.last().state
+        query = f"states={expected_state}"
+        url = f"{self.job_seeker_base_url}?{query}"
+        response = self.client.get(url)
 
-#         # Count job applications used by the template
-#         applications = response.context["job_applications_page"].object_list
+        # Count job applications used by the template
+        applications = response.context["job_applications_page"].object_list
 
-#         # Result page should only contain job applications which status
-#         # matches the one selected by the user.
-#         self.assertGreater(len(applications), 0)
+        # Result page should only contain job applications which status
+        # matches the one selected by the user.
+        self.assertGreater(len(applications), 0)
 
-#         for application in applications:
-#             self.assertEqual(application.state, expected_state)
+        for application in applications:
+            self.assertEqual(application.state, expected_state)
 
 
-####################################################
-##################### SIAE #########################
-####################################################
+###################################################
+#################### SIAE #########################
+###################################################
 
 
 class ProcessListSiaeTest(ProcessListTest):
@@ -272,74 +272,57 @@ class ProcessListSiaeTest(ProcessListTest):
             self.assertEqual(application.sender.id, sender.id)
 
 
-# ####################################################
-# ################### Prescriber #####################
-# ####################################################
+####################################################
+################### Prescriber #####################
+####################################################
 
 
-# class ProcessListPrescriberTest(ProcessListTest):
-#     def test_list_for_prescriber_view(self):
-#         """
-#         Connect as Thibault to see a list of job applications
-#         sent by his organization (Pôle Emploi).
-#         """
-#         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
-#         response = self.client.get(self.prescriber_base_url)
+class ProcessListPrescriberTest(ProcessListTest):
+    def test_list_for_prescriber_view(self):
+        """
+        Connect as Thibault to see a list of job applications
+        sent by his organization (Pôle Emploi).
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.prescriber_base_url)
 
-#         # Count job applications used by the template
-#         total_applications = len(response.context["job_applications_page"].object_list)
+        # Count job applications used by the template
+        total_applications = len(response.context["job_applications_page"].object_list)
 
-#         self.assertEqual(
-#             total_applications, self.pole_emploi.jobapplication_set.count()
-#         )
+        self.assertEqual(
+            total_applications, self.pole_emploi.jobapplication_set.count()
+        )
 
-#     def test_view__filtered_by_state(self):
-#         """
-#         Thibault wants to filter a list of job applications
-#         by the default initial state.
-#         """
-#         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
-#         expected_state = JobApplicationWorkflow.initial_state
-#         query = f"states={expected_state}"
-#         url = f"{self.prescriber_base_url}?{query}"
-#         response = self.client.get(url)
+    def test_view__filtered_by_state(self):
+        """
+        Thibault wants to filter a list of job applications
+        by the default initial state.
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        expected_state = JobApplicationWorkflow.initial_state
+        query = f"states={expected_state}"
+        url = f"{self.prescriber_base_url}?{query}"
+        response = self.client.get(url)
 
-#         applications = response.context["job_applications_page"].object_list
-#         self.assertGreater(len(applications), 0)
+        applications = response.context["job_applications_page"].object_list
+        self.assertGreater(len(applications), 0)
 
-#         for application in applications:
-#             self.assertEqual(application.state, expected_state)
+        for application in applications:
+            self.assertEqual(application.state, expected_state)
 
-#     def test_view__filtered_by_sender_first_name(self):
-#         """
-#         Thibault wants to see job applications sent by his colleague Laurie.
-#         He filters results using her first name.
-#         """
-#         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
-#         expected_name = self.laurie_pe.first_name
-#         query = f"sender={expected_name}"
-#         url = f"{self.prescriber_base_url}?{query}"
-#         response = self.client.get(url)
+    def test_view__filtered_by_sender_name(self):
+        """
+        Thibault wants to see job applications sent by his colleague Laurie.
+        He filters results using her full name.
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        sender_id = self.laurie_pe.id
+        query = f"sender={sender_id}"
+        url = f"{self.prescriber_base_url}?{query}"
+        response = self.client.get(url)
 
-#         applications = response.context["job_applications_page"].object_list
-#         self.assertGreater(len(applications), 0)
+        applications = response.context["job_applications_page"].object_list
+        self.assertGreater(len(applications), 0)
 
-#         for application in applications:
-#             self.assertEqual(application.sender.first_name, expected_name)
-
-#     def test_view__filtered_by_sender_last_name(self):
-#         """
-#         Thibault wants to see job applications sent by his colleague Laurie.
-#         He filters results using her last name.
-#         """
-#         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
-#         expected_name = self.laurie_pe.last_name
-#         query = f"sender={expected_name}"
-#         url = f"{self.prescriber_base_url}?{query}"
-#         response = self.client.get(url)
-
-#         applications = response.context["job_applications_page"].object_list
-#         self.assertGreater(len(applications), 0)
-
-#         for application in applications:
-#             self.assertEqual(application.sender.last_name, expected_name)
+        for application in applications:
+            self.assertEqual(application.sender.id, sender_id)
