@@ -109,51 +109,17 @@ def get_current_department(request, departments):
 def get_siae_stats(siaes):
     data = {}
 
-    kpi_name = "Employeurs à ce jour"
+    kpi_name = "Employeurs connus à ce jour"
     siaes_subset = siaes
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
-    kpi_name = "Employeurs ayant au moins un utilisateur à ce jour"
+    kpi_name = "Employeurs inscrits à ce jour"
     siaes_subset = siaes.filter(siaemembership__user__is_active=True).distinct()
-    data = inject_siaes_subset_total_and_by_kind(
-        data, kpi_name, siaes_subset, visible=False
-    )
-
-    kpi_name = "Employeurs ayant au moins une FDP à ce jour"
-    siaes_subset = siaes.exclude(job_description_through__isnull=True).distinct()
-    data = inject_siaes_subset_total_and_by_kind(
-        data, kpi_name, siaes_subset, visible=False
-    )
-
-    kpi_name = "Employeurs ayant au moins une FDP active à ce jour"
-    siaes_subset = siaes.filter(job_description_through__is_active=True).distinct()
-    data = inject_siaes_subset_total_and_by_kind(
-        data, kpi_name, siaes_subset, visible=False
-    )
-
-    kpi_name = "Employeurs ayant au moins un utilisateur et une FDP à ce jour"
-    siaes_subset = (
-        siaes.filter(siaemembership__user__is_active=True)
-        .exclude(job_description_through__isnull=True)
-        .distinct()
-    )
-    data = inject_siaes_subset_total_and_by_kind(
-        data, kpi_name, siaes_subset, visible=False
-    )
-
-    kpi_name = "Employeurs ayant au moins un utilisateur et une FDP active à ce jour"
-    siaes_subset = (
-        siaes.filter(siaemembership__user__is_active=True)
-        .filter(job_description_through__is_active=True)
-        .distinct()
-    )
-    data = inject_siaes_subset_total_and_by_kind(
-        data, kpi_name, siaes_subset, visible=False
-    )
+    data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
     kpi_name = "Employeurs actifs à ce jour"
     today = get_today()
-    data["days_for_siae_to_be_considered_active"] = 15
+    data["days_for_siae_to_be_considered_active"] = 7
     some_time_ago = today + relativedelta(
         days=-data["days_for_siae_to_be_considered_active"]
     )
@@ -165,12 +131,6 @@ def get_siae_stats(siaes):
         | Q(job_description_through__updated_at__date__gte=some_time_ago)
         | Q(job_applications_received__created_at__date__gte=some_time_ago)
         | Q(job_applications_received__updated_at__date__gte=some_time_ago)
-    ).distinct()
-    data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
-
-    kpi_name = "Employeurs ayant au moins une embauche"
-    siaes_subset = siaes.filter(
-        job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED
     ).distinct()
     data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
 
