@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from django.contrib.auth import get_user_model
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -61,6 +62,16 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertEqual(JobApplication.objects.created_in_past_hours(15).count(), 1)
         self.assertEqual(JobApplication.objects.created_in_past_hours(25).count(), 2)
         self.assertEqual(JobApplication.objects.created_in_past_hours(35).count(), 3)
+
+    def test_get_unique_fk_objects(self):
+        JobApplicationSentByJobSeekerFactory()
+        job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
+        JobApplicationSentByJobSeekerFactory(job_seeker=job_seeker)
+
+        unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")
+
+        self.assertEqual(len(unique_job_seekers), 2)
+        self.assertEqual(type(unique_job_seekers[0]), get_user_model())
 
 
 class JobApplicationFactoriesTest(TestCase):

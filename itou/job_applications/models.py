@@ -92,22 +92,21 @@ class JobApplicationQuerySet(models.QuerySet):
         Get unique foreign key objects in a single query.
         """
         if fk_field not in [
-                "job_seeker",
-                "sender",
-                "sender_siae",
-                "sender_prescriber_organization",
-                "to_siae"
-            ]:
+            "job_seeker",
+            "sender",
+            "sender_siae",
+            "sender_prescriber_organization",
+            "to_siae",
+        ]:
             raise RuntimeError("Unauthorized fk_field")
 
         return [
             getattr(job_application, fk_field)
-            for job_application in self.order_by(fk_field)\
-                .distinct(fk_field)\
-                .select_related(fk_field)
+            for job_application in self.order_by(fk_field)
+            .distinct(fk_field)
+            .select_related(fk_field)
             if getattr(job_application, fk_field)
         ]
-
 
     def created_in_past_hours(self, hours):
         """

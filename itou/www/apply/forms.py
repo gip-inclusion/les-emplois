@@ -272,7 +272,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
-        self.fields["sender"].choices = self.get_sender_choices()
+        self.fields["sender"].choices += self.get_sender_choices()
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -288,11 +288,8 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def get_sender_choices(self):
         senders = self.job_applications_qs.get_unique_fk_objects("sender")
         senders = [sender for sender in senders if sender.get_full_name()]
-
-        return [
-            (sender.id, sender.get_full_name().title())
-            for sender in senders
-        ]
+        senders = [(sender.id, sender.get_full_name().title()) for sender in senders]
+        return sorted(senders, key=lambda l: l[1])
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
@@ -313,14 +310,14 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     """
 
     sender_organization = forms.ChoiceField(
-        required=False,
-        label=_("Organisation"),
-        choices=[("", "-"*50)],
+        required=False, label=_("Organisation"), choices=[("", "-" * 50)]
     )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
-        self.fields["sender_organization"].choices = self.get_sender_organization_choices()
+        self.fields[
+            "sender_organization"
+        ].choices += self.get_sender_organization_choices()
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -333,16 +330,13 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
 
         return qs_list
 
-
     def get_sender_organization_choices(self):
-        sender_orgs = self.job_applications_qs.\
-            get_unique_fk_objects("sender_prescriber_organization")
+        sender_orgs = self.job_applications_qs.get_unique_fk_objects(
+            "sender_prescriber_organization"
+        )
         sender_orgs = [sender for sender in sender_orgs if sender.name]
-
-        return [
-            (sender.id, sender.name.title()) for sender in sender_orgs
-        ]
-
+        sender_orgs = [(sender.id, sender.name.title()) for sender in sender_orgs]
+        return sorted(sender_orgs, key=lambda l: l[1])
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
@@ -350,7 +344,9 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
 
         if sender_organization:
             label = self.base_fields.get("sender_organization").label
-            organization = PrescriberOrganization.objects.get(id=int(sender_organization))
+            organization = PrescriberOrganization.objects.get(
+                id=int(sender_organization)
+            )
             value = organization.name.title()
             humanized_filters.append({"label": label, "value": value})
 
@@ -361,5 +357,3 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
     """
     Job applications filters for Prescribers only.
     """
-
-    pass
