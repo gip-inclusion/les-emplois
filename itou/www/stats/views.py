@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 
 from django.db.models import Avg, Count, Max, DateTimeField, F, Q, ExpressionWrapper
@@ -12,12 +13,15 @@ from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.address.departments import DEPARTMENTS
 
 
-DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE = "donnée non disponible par département"
+DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _(
+    "donnée non disponible par département"
+)
 
 
 # TODO FIXME Run a cronjob to regenerate the stats page every X minutes,
@@ -40,13 +44,24 @@ def stats(request, template_name="stats/stats.html"):
     job_applications = JobApplication.objects.filter(
         to_siae__department__in=current_departments
     )
-    nationwide_prescriber_users = (
-        User.objects.filter(is_prescriber=True, is_active=True)
-        # We cannot filter by department otherwise we would filter out
-        # prescribers without organization!
-        # .filter(prescriberorganization__department__in=current_departments)
-        .distinct()
-    )
+    # This is needed so that we can deliver at least some nationwide stats
+    # for prescribers even if they have no organization or an unauthorized one.
+    nationwide_prescriber_users = User.objects.filter(
+        is_prescriber=True, is_active=True
+    ).distinct()
+    # Warning: filtering by department here filters out all prescribers without
+    # organization, as those have no geolocation whatsoever. It also filters
+    # out prescribers with unauthorized organizations, as those also do
+    # not have geolocation in practice.
+    authorized_prescriber_users = nationwide_prescriber_users.filter(
+        prescriberorganization__department__in=current_departments,
+        prescriberorganization__is_authorized=True,
+    ).distinct()
+    # Note that filtering by departement here also filters out unauthorized
+    # organizations as they do not have geolocation in practice.
+    authorized_prescriber_orgs = PrescriberOrganization.active_objects.filter(
+        department__in=current_departments, is_authorized=True
+    ).distinct()
 
     hirings = job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
 
@@ -56,30 +71,33 @@ def stats(request, template_name="stats/stats.html"):
     )
 
     data.update(get_siae_stats(siaes))
+    if department_filter_is_selected:
+        data["siaes_by_dpt"] = None
 
     data.update(
         get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users)
     )
     if department_filter_is_selected:
-        data["total_job_seeker_users"] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+        data["total_job_seeker_users"] = DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE
         data[
             "total_job_seeker_users_without_opportunity"
-        ] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+        ] = DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE
 
-    data.update(get_prescriber_stats(nationwide_prescriber_users, job_applications))
-    if department_filter_is_selected:
-        data["total_prescriber_users"] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
-        data["total_authorized_prescriber_users"] = (
-            nationwide_prescriber_users.filter(
-                prescriberorganization__department__in=current_departments
-            )
-            .distinct()
-            .count()
+    data.update(
+        get_prescriber_stats(
+            nationwide_prescriber_users,
+            authorized_prescriber_users,
+            authorized_prescriber_orgs,
+            job_applications,
         )
+    )
+    if department_filter_is_selected:
+        data["total_prescriber_users"] = DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE
         data[
             "total_unauthorized_prescriber_users"
-        ] = DATA_UNAVAILABLE_BY_DEPARTEMENT_ERROR_MESSAGE
+        ] = DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE
         data["prescriber_users_per_creation_week"] = None
+        data["orgs_by_dpt"] = None
 
     context = {
         "data": data,
@@ -91,7 +109,7 @@ def stats(request, template_name="stats/stats.html"):
 
 
 def get_department_choices():
-    all_departments_text = (
+    all_departments_text = _(
         f"Tous les départements ({ ', '.join(settings.ITOU_TEST_DEPARTMENTS) })"
     )
     departments = [(None, all_departments_text)]
@@ -107,32 +125,38 @@ def get_current_department(request, departments):
 
 
 def get_siae_stats(siaes):
-    data = {}
+    data = {"siaes_by_kind": {}, "siaes_by_dpt": {}}
 
-    kpi_name = "Employeurs connus à ce jour"
+    kpi_name = _("Structures connues à ce jour")
     siaes_subset = siaes
-    data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
+    data = inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset)
 
-    kpi_name = "Employeurs inscrits à ce jour"
+    kpi_name = _("Structures inscrites à ce jour")
     siaes_subset = siaes.filter(siaemembership__user__is_active=True).distinct()
-    data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
+    data = inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset)
 
-    kpi_name = "Employeurs actifs à ce jour"
+    kpi_name = _("Structures actives à ce jour")
     today = get_today()
     data["days_for_siae_to_be_considered_active"] = 7
     some_time_ago = today + relativedelta(
         days=-data["days_for_siae_to_be_considered_active"]
     )
     siaes_subset = siaes.filter(
-        Q(updated_at__date__gte=some_time_ago)
-        | Q(created_at__date__gte=some_time_ago)
+        Q(created_at__date__gte=some_time_ago)
+        # Any migration updating all siaes can incorrectly make us believe
+        # the number of active siaes has skyrocketed. Thus we no longer trust
+        # siae.updated_at to mean the siae is "active".
+        # | Q(updated_at__date__gte=some_time_ago)
         | Q(siaemembership__user__date_joined__date__gte=some_time_ago)
         | Q(job_description_through__created_at__date__gte=some_time_ago)
         | Q(job_description_through__updated_at__date__gte=some_time_ago)
         | Q(job_applications_received__created_at__date__gte=some_time_ago)
         | Q(job_applications_received__updated_at__date__gte=some_time_ago)
     ).distinct()
-    data = inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset)
+    data = inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset)
+
+    data["siaes_by_kind"] = inject_table_data_from_series(data["siaes_by_kind"])
+    data["siaes_by_dpt"] = inject_table_data_from_series(data["siaes_by_dpt"])
 
     return data
 
@@ -193,18 +217,42 @@ def get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users):
     return data
 
 
-def get_prescriber_stats(nationwide_prescriber_users, job_applications):
-    data = {}
+def get_prescriber_stats(
+    nationwide_prescriber_users,
+    authorized_prescriber_users,
+    authorized_prescriber_orgs,
+    job_applications,
+):
+    data = {"orgs_by_kind": {}, "orgs_by_dpt": {}}
     data["total_prescriber_users"] = nationwide_prescriber_users.count()
-    data["total_authorized_prescriber_users"] = nationwide_prescriber_users.filter(
-        prescriberorganization__is_authorized=True
-    ).count()
+
+    data["total_authorized_prescriber_users"] = authorized_prescriber_users.count()
     data["total_unauthorized_prescriber_users"] = (
         data["total_prescriber_users"] - data["total_authorized_prescriber_users"]
     )
 
-    # FIXME TODO stats V9
-    # Répartition des prescripteurs par type (PE, ML, Cap Emploi, PJJ, etc)
+    data["total_authorized_prescriber_orgs"] = authorized_prescriber_orgs.count()
+
+    kpi_name = _("Organisations connues à ce jour")
+    orgs_subset = authorized_prescriber_orgs
+    data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
+
+    kpi_name = _("Organisations inscrites à ce jour")
+    orgs_subset = authorized_prescriber_orgs.filter(members__is_active=True)
+    data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
+
+    kpi_name = _("Organisations actives à ce jour")
+    today = get_today()
+    data["days_for_orgs_to_be_considered_active"] = 7
+    some_time_ago = today + relativedelta(
+        days=-data["days_for_orgs_to_be_considered_active"]
+    )
+    orgs_subset = authorized_prescriber_orgs.filter(
+        members__job_applications_sent__created_at__date__gte=some_time_ago
+    )
+    data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
+
+    data["orgs_by_dpt"] = inject_table_data_from_series(data["orgs_by_dpt"])
 
     data["prescriber_users_per_creation_week"] = get_total_per_week(
         nationwide_prescriber_users,
@@ -249,37 +297,128 @@ def get_total_per_week(queryset, date_field, total_expression):
     return result
 
 
-def inject_siaes_subset_total_and_by_kind(data, kpi_name, siaes_subset, visible=True):
-    if "siaes_by_kind" not in data:
-        data["siaes_by_kind"] = {}
-        data["siaes_by_kind"]["categories"] = Siae.KIND_CHOICES
-        data["siaes_by_kind"]["series"] = []
+def inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset):
+    data["siaes_by_kind"] = inject_siaes_subset_total_by_kind(
+        data["siaes_by_kind"], kpi_name, siaes_subset
+    )
+    data["siaes_by_dpt"] = inject_siaes_subset_total_by_dpt(
+        data["siaes_by_dpt"], kpi_name, siaes_subset
+    )
+    return data
 
-    siaes_by_kind_as_list = (
-        siaes_subset.values("kind")
+
+def inject_siaes_subset_total_by_kind(data, kpi_name, siaes_subset):
+    data = _inject_subset_total_by_category(
+        data=data,
+        kpi_name=kpi_name,
+        items_subset=siaes_subset,
+        category_choices=Siae.KIND_CHOICES,
+        category_field="kind",
+    )
+    return data
+
+
+def inject_siaes_subset_total_by_dpt(data, kpi_name, siaes_subset):
+    data = _inject_subset_total_by_category(
+        data=data,
+        kpi_name=kpi_name,
+        items_subset=siaes_subset,
+        category_choices=[(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS],
+        category_field="department",
+    )
+    return data
+
+
+def inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset):
+    data["orgs_by_dpt"] = inject_orgs_subset_total_by_dpt(
+        data["orgs_by_dpt"], kpi_name, orgs_subset
+    )
+    # TODO stats by kind as soon as we have a proper PrescriberOrganization.kind field!
+    return data
+
+
+def inject_orgs_subset_total_by_dpt(data, kpi_name, orgs_subset):
+    data = _inject_subset_total_by_category(
+        data=data,
+        kpi_name=kpi_name,
+        items_subset=orgs_subset,
+        category_choices=[(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS],
+        category_field="department",
+    )
+    return data
+
+
+def _inject_subset_total_by_category(
+    data, kpi_name, items_subset, category_choices, category_field
+):
+    if data == {}:
+        data["categories"] = category_choices
+        data["series"] = []
+
+    items_by_category_as_list = (
+        items_subset.values(category_field)
         .annotate(total=Count("pk", distinct=True))
-        .order_by("kind")
+        .order_by(category_field)
     )
 
-    siaes_by_kind_as_dict = {}
-    for item in siaes_by_kind_as_list:
-        siaes_by_kind_as_dict[item["kind"]] = item["total"]
+    items_by_category_as_dict = defaultdict(
+        int, {item[category_field]: item["total"] for item in items_by_category_as_list}
+    )
 
-    serie_values = []
-    for kind_choice in data["siaes_by_kind"]["categories"]:
-        kind = kind_choice[0]
-        if kind in siaes_by_kind_as_dict:
-            serie_values.append(siaes_by_kind_as_dict[kind])
-        else:
-            serie_values.append(0)
+    serie_values = [items_by_category_as_dict[choice[0]] for choice in category_choices]
 
-    total = siaes_subset.count()
+    total = items_subset.count()
     if sum(serie_values) != total:
         raise ValueError("Inconsistent results.")
 
-    data["siaes_by_kind"]["series"].append(
-        {"name": kpi_name, "values": serie_values, "total": total, "visible": visible}
-    )
+    data["series"].append({"name": kpi_name, "values": serie_values, "total": total})
+    return data
+
+
+def inject_table_data_from_series(data):
+    """
+    Transform series data into a format suitable for easy
+    display as a table (thead / tbody), compute percentage (%)
+    value for all columns but the first one, relative to the first one,
+    and add a final total row.
+    """
+    thead = ["#"]
+    for index, serie in enumerate(data["series"]):
+        thead.append(serie["name"])
+        if index != 0:
+            thead.append("(%)")
+
+    def inject_value_and_its_percentage_into_row(row, value, index_serie):
+        row.append(value)
+        if index_serie != 0:
+            first_column_value = row[1]
+            if first_column_value == 0:
+                row.append(_("N/A"))
+            else:
+                pct_value = round(100 * value / first_column_value)
+                row.append(f"{pct_value}%")
+
+    tbody = []
+    for index_category, category in enumerate(data["categories"]):
+        if category[1].endswith(f"({category[0]})"):
+            # Department choices already have department number as a suffix.
+            category_name = category[1]
+        else:
+            # Siae kind choices do not.
+            category_name = f"{category[1]} ({category[0]})"
+        row = [category_name]
+        for index_serie, serie in enumerate(data["series"]):
+            value = serie["values"][index_category]
+            inject_value_and_its_percentage_into_row(row, value, index_serie)
+        tbody.append(row)
+
+    row = [_("Total")]
+    for index_serie, serie in enumerate(data["series"]):
+        value = serie["total"]
+        inject_value_and_its_percentage_into_row(row, value, index_serie)
+    tbody.append(row)
+
+    data["as_table"] = {"thead": thead, "tbody": tbody}
     return data
 
 
@@ -288,6 +427,7 @@ def get_hiring_delays(hirings):
     # 1) Job application date is job_application.created_at
     # 2) Approval date (aka "Hiring date") is job_application.logs__timestamp
     #    where job_application.logs__state="accepted"
+    # FIXME after merging kemar/approvals
     # 3) IAE Pass delivery date is job_application.job_seeker__approvals__created_at
     # 4) Start of contract is job_application.job_seeker__approvals__start_at
     hiring_dates = (
@@ -449,7 +589,7 @@ def _get_donut_chart_data(
         {"name": k, "value": v} for k, v in donut_chart_data_as_dict.items()
     ]
 
-    # Let's hardcode colors for aesthetics.
+    # Let's hardcode colors for aesthetics and consistency between charts.
     colors = ["#2f7ed8", "#0d233a", "#8bbc21", "#910000"]
 
     for idx, val in enumerate(donut_chart_data):
