@@ -311,14 +311,12 @@ class PoleEmploiApproval(CommonApprovalMixin):
     # The last two digits refer to the act number (e.g. E02 = second extension).
     # Suffixes are not taken into account in Itou yet but that might change.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
-    pole_emploi_id = models.CharField(
-        _("Identifiant Pôle emploi"), max_length=8, db_index=True
-    )
-    first_name = models.CharField(_("Prénom"), max_length=150, db_index=True)
-    last_name = models.CharField(_("Nom"), max_length=150, db_index=True)
-    birth_name = models.CharField(_("Nom de naissance"), max_length=150, db_index=True)
+    pole_emploi_id = models.CharField(_("Identifiant Pôle emploi"), max_length=8)
+    first_name = models.CharField(_("Prénom"), max_length=150)
+    last_name = models.CharField(_("Nom"), max_length=150)
+    birth_name = models.CharField(_("Nom de naissance"), max_length=150)
     birthdate = models.DateField(
-        verbose_name=_("Date de naissance"), default=timezone.now, db_index=True
+        verbose_name=_("Date de naissance"), default=timezone.now
     )
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
@@ -327,6 +325,11 @@ class PoleEmploiApproval(CommonApprovalMixin):
         verbose_name = _("Agrément Pôle emploi")
         verbose_name_plural = _("Agréments Pôle emploi")
         ordering = ["-start_at"]
+        indexes = [
+            models.Index(
+                fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx"
+            )
+        ]
 
     def __str__(self):
         return self.number
