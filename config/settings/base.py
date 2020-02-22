@@ -192,6 +192,8 @@ STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
 # Security.
 # ------------------------------------------------------------------------------
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_HTTPONLY = True
