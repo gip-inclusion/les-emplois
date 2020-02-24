@@ -3,7 +3,7 @@ import logging
 from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -35,23 +35,27 @@ class AddressMixin(models.Model):
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
     address_line_1 = models.CharField(
-        verbose_name=_("Adresse"), max_length=255, blank=True
+        verbose_name=gettext_lazy("Adresse"), max_length=255, blank=True
     )
     address_line_2 = models.CharField(
-        verbose_name=_("Complément d'adresse"),
+        verbose_name=gettext_lazy("Complément d'adresse"),
         max_length=255,
         blank=True,
-        help_text=_("Appartement, suite, bloc, bâtiment, boite postale, etc."),
+        help_text=gettext_lazy(
+            "Appartement, suite, bloc, bâtiment, boite postale, etc."
+        ),
     )
     post_code = models.CharField(
-        verbose_name=_("Code Postal"),
+        verbose_name=gettext_lazy("Code Postal"),
         validators=[validate_post_code],
         max_length=5,
         blank=True,
     )
-    city = models.CharField(verbose_name=_("Ville"), max_length=255, blank=True)
+    city = models.CharField(
+        verbose_name=gettext_lazy("Ville"), max_length=255, blank=True
+    )
     department = models.CharField(
-        verbose_name=_("Département"),
+        verbose_name=gettext_lazy("Département"),
         choices=DEPARTMENT_CHOICES,
         max_length=3,
         blank=True,
@@ -61,7 +65,7 @@ class AddressMixin(models.Model):
     coords = gis_models.PointField(geography=True, null=True, blank=True)
     # BAN API score between 0 and 1 indicating the relevance of the geocoding result.
     geocoding_score = models.FloatField(
-        verbose_name=_("Score du geocoding"), blank=True, null=True
+        verbose_name=gettext_lazy("Score du geocoding"), blank=True, null=True
     )
 
     class Meta:

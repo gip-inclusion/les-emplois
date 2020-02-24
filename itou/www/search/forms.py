@@ -1,6 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
@@ -9,7 +9,7 @@ from itou.siaes.models import Siae
 class SiaeSearchForm(forms.Form):
 
     DISTANCES = [100, 75, 50, 25, 15, 10, 5]
-    DISTANCE_CHOICES = [(i, _(f"{i} Km")) for i in DISTANCES]
+    DISTANCE_CHOICES = [(i, gettext_lazy(f"{i} Km")) for i in DISTANCES]
 
     CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
@@ -30,7 +30,7 @@ class SiaeSearchForm(forms.Form):
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": CITY_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": _("Autour de (Arras, Bobigny, Strasbourg…)"),
+                "placeholder": gettext_lazy("Autour de (Arras, Bobigny, Strasbourg…)"),
                 "autocomplete": "off",
             }
         )

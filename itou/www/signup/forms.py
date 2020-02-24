@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 from allauth.account.forms import SignupForm
 
@@ -14,14 +14,14 @@ from itou.utils.validators import validate_siret
 class FullnameFormMixin(forms.Form):
 
     first_name = forms.CharField(
-        label=_("Prénom"),
+        label=gettext_lazy("Prénom"),
         max_length=get_user_model()._meta.get_field("first_name").max_length,
         required=True,
         strip=True,
     )
 
     last_name = forms.CharField(
-        label=_("Nom"),
+        label=gettext_lazy("Nom"),
         max_length=get_user_model()._meta.get_field("last_name").max_length,
         required=True,
         strip=True,
@@ -31,22 +31,22 @@ class FullnameFormMixin(forms.Form):
 class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 
     secret_code = forms.CharField(
-        label=_("Code de l'organisation"),
+        label=gettext_lazy("Code de l'organisation"),
         max_length=6,
         required=False,
         strip=True,
-        help_text=_("Le code est composé de 6 caractères."),
+        help_text=gettext_lazy("Le code est composé de 6 caractères."),
     )
 
     authorized_organization = forms.ModelChoiceField(
-        label=_(
+        label=gettext_lazy(
             "Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"
         ),
         queryset=PrescriberOrganization.active_objects.filter(
             is_authorized=True
         ).order_by("name"),
         required=False,
-        help_text=_("Liste des prescripteurs habilités par le Préfet."),
+        help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
     )
 
     def __init__(self, *args, **kwargs):
@@ -94,12 +94,12 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
     siret = forms.CharField(
-        label=_("Numéro SIRET de votre structure"),
+        label=gettext_lazy("Numéro SIRET de votre structure"),
         max_length=14,
         validators=[validate_siret],
         required=True,
         strip=True,
-        help_text=_("Saisissez 14 chiffres."),
+        help_text=gettext_lazy("Saisissez 14 chiffres."),
     )
 
     def clean_siret(self):

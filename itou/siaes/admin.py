@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db.models import Count
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itou.siaes import models
 

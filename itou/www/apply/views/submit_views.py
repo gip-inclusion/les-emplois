@@ -7,7 +7,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization

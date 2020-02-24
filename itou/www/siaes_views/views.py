@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, Http404
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription

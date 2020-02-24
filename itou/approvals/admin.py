@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval

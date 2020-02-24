@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership

@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy
 
 
 class EditUserInfoForm(forms.ModelForm):
@@ -29,8 +29,8 @@ class EditUserInfoForm(forms.ModelForm):
             "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
-            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978"),
-            "phone": _("Par exemple 0610203040"),
+            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978"),
+            "phone": gettext_lazy("Par exemple 0610203040"),
         }
 
     def clean(self):

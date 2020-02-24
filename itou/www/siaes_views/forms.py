@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
@@ -11,7 +11,7 @@ TEST_DEPARTMENTS = [("", "---")] + [
     (d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS
 ]
 
-TEST_DEPARTMENTS_HELP_TEXT = _(
+TEST_DEPARTMENTS_HELP_TEXT = gettext_lazy(
     (
         "Seuls les départements du Bas-Rhin (67), du Pas-de-Calais (62) "
         "et de la Seine Saint Denis (93) sont disponibles pendant la phase actuelle "
@@ -53,17 +53,19 @@ class CreateSiaeForm(forms.ModelForm):
             "description",
         ]
         help_texts = {
-            "brand": _(
+            "brand": gettext_lazy(
                 "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
             ),
             "department": TEST_DEPARTMENTS_HELP_TEXT,
-            "description": _("Texte de présentation de votre structure."),
-            "phone": _("Par exemple 0610203040"),
-            "siret": _(
+            "description": gettext_lazy("Texte de présentation de votre structure."),
+            "phone": gettext_lazy("Par exemple 0610203040"),
+            "siret": gettext_lazy(
                 "Saisissez 14 chiffres. "
                 "Doit être le SIRET de votre structure actuelle ou un SIRET avec le même SIREN."
             ),
-            "website": _("Votre site web doit commencer par http:// ou https://"),
+            "website": gettext_lazy(
+                "Votre site web doit commencer par http:// ou https://"
+            ),
         }
         error_messages = {
             NON_FIELD_ERRORS: {
@@ -123,13 +125,15 @@ class EditSiaeForm(forms.ModelForm):
             "department",
         ]
         help_texts = {
-            "brand": _(
+            "brand": gettext_lazy(
                 "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
             ),
             "department": TEST_DEPARTMENTS_HELP_TEXT,
-            "description": _("Texte de présentation de votre structure."),
-            "phone": _("Par exemple 0610203040"),
-            "website": _("Votre site web doit commencer par http:// ou https://"),
+            "description": gettext_lazy("Texte de présentation de votre structure."),
+            "phone": gettext_lazy("Par exemple 0610203040"),
+            "website": gettext_lazy(
+                "Votre site web doit commencer par http:// ou https://"
+            ),
         }
 
     def save(self, commit=True):

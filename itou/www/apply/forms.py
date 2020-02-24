@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _, gettext_lazy
 from django_select2.forms import Select2MultipleWidget
 
 from itou.prescribers.models import PrescriberOrganization
@@ -21,7 +21,7 @@ class UserExistsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.user = None
 
-    email = forms.EmailField(label=_("E-mail du candidat"))
+    email = forms.EmailField(label=gettext_lazy("E-mail du candidat"))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -58,8 +58,8 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
             "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
-            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
-            "phone": _("Par exemple 0610203040."),
+            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978."),
+            "phone": gettext_lazy("Par exemple 0610203040."),
         }
 
     def clean(self):
@@ -93,8 +93,8 @@ class CreateJobSeekerForm(forms.ModelForm):
             "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
-            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
-            "phone": _("Par exemple 0610203040."),
+            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978."),
+            "phone": gettext_lazy("Par exemple 0610203040."),
         }
 
     def clean_email(self):
@@ -135,7 +135,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
         model = JobApplication
         fields = ["selected_jobs", "message"]
         widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
-        labels = {"selected_jobs": _("Métiers recherchés (optionnel)")}
+        labels = {"selected_jobs": gettext_lazy("Métiers recherchés (optionnel)")}
 
 
 class RefusalForm(forms.Form):
@@ -143,7 +143,7 @@ class RefusalForm(forms.Form):
     Allow an SIAE to specify a reason for refusal.
     """
 
-    ANSWER_INITIAL = _(
+    ANSWER_INITIAL = gettext_lazy(
         "Nous avons étudié votre candidature avec la plus grande attention mais "
         "nous sommes au regret de vous informer que celle-ci n'a pas été retenue.\n\n"
         "Soyez assuré que cette décision ne met pas en cause vos qualités personnelles. "
@@ -153,16 +153,18 @@ class RefusalForm(forms.Form):
     )
 
     refusal_reason = forms.ChoiceField(
-        label=_("Motif du refus (ne sera pas envoyé au candidat)"),
+        label=gettext_lazy("Motif du refus (ne sera pas envoyé au candidat)"),
         widget=forms.RadioSelect,
         choices=JobApplication.REFUSAL_REASON_CHOICES,
     )
     answer = forms.CharField(
-        label=_("Réponse envoyée au candidat"),
+        label=gettext_lazy("Réponse envoyée au candidat"),
         widget=forms.Textarea(),
         strip=True,
         initial=ANSWER_INITIAL,
-        help_text=_("Vous pouvez modifier le texte proposé ou l'utiliser tel quel."),
+        help_text=gettext_lazy(
+            "Vous pouvez modifier le texte proposé ou l'utiliser tel quel."
+        ),
     )
 
 
@@ -172,7 +174,10 @@ class AnswerForm(forms.Form):
     """
 
     answer = forms.CharField(
-        label=_("Réponse"), widget=forms.Textarea(), required=False, strip=True
+        label=gettext_lazy("Réponse"),
+        widget=forms.Textarea(),
+        required=False,
+        strip=True,
     )
 
 
@@ -191,9 +196,13 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
-            "hiring_start_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            "hiring_start_at": gettext_lazy(
+                "Au format jj/mm/aaaa, par exemple  %(date)s."
+            )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            "hiring_end_at": gettext_lazy(
+                "Au format jj/mm/aaaa, par exemple  %(date)s."
+            )
             % {
                 "date": (
                     datetime.date.today()
@@ -239,7 +248,9 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-        help_texts = {"birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978.")}
+        help_texts = {
+            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978.")
+        }
 
     def clean(self):
         super().clean()
@@ -261,13 +272,13 @@ class FilterJobApplicationsForm(forms.Form):
     )
     start_date = forms.DateField(
         input_formats=[DatePickerField.DATE_FORMAT],
-        label=_("Début"),
+        label=gettext_lazy("Début"),
         required=False,
         widget=DatePickerField(),
     )
     end_date = forms.DateField(
         input_formats=[DatePickerField.DATE_FORMAT],
-        label=_("Fin"),
+        label=gettext_lazy("Fin"),
         required=False,
         widget=DatePickerField(),
     )
