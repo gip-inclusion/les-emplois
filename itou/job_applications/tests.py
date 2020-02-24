@@ -88,8 +88,8 @@ class JobApplicationQuerySetTest(TestCase):
         # Create 3 job applications for 2 candidates to check
         # that `get_unique_fk_objects` returns 2 candidates.
         JobApplicationSentByJobSeekerFactory()
-        job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
-        JobApplicationSentByJobSeekerFactory(job_seeker=job_seeker)
+        job_seeker = JobSeekerFactory()
+        JobApplicationSentByJobSeekerFactory.create_batch(2, job_seeker=job_seeker)
 
         unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")
 
