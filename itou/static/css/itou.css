@@ -181,6 +181,10 @@ body:after {
     color: #d63626;
 }
 
+.select2-container {
+    display: block !important;
+}
+
 /* Home.
 --------------------------------------------------------------------------- */
 

@@ -3,6 +3,8 @@
 
 {% block title %}{% trans "Suivi des candidatures" %}{{ block.super }}{% endblock %}
 
+{% block extra_head %}{{ filters_form.media.css }}{% endblock %}
+
 {% block content %}
 
     <h1>{% trans "Suivi des candidatures" %}</h1>
@@ -38,5 +40,5 @@
 {% block script %}
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
-    {{ filters_form.media }}
+    {{ filters_form.media.js }}
 {% endblock %}

@@ -4,10 +4,13 @@ from dateutil.relativedelta import relativedelta
 
 from django import forms
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django_select2.forms import Select2MultipleWidget
 
+from itou.prescribers.models import PrescriberOrganization
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.widgets import DatePickerField
@@ -309,6 +312,8 @@ class FilterJobApplicationsForm(forms.Form):
         if data.get("end_date"):
             filters["created_at__lte"] = data.get("end_date")
 
+        filters = [Q(**filters)]
+
         return filters
 
     def humanize_filters(self):
@@ -321,11 +326,11 @@ class FilterJobApplicationsForm(forms.Form):
         active_filters = []
 
         if start_date:
-            label = FilterJobApplicationsForm.base_fields.get("start_date").label
+            label = self.base_fields.get("start_date").label
             active_filters.append([label, start_date])
 
         if end_date:
-            label = FilterJobApplicationsForm.base_fields.get("end_date").label
+            label = self.base_fields.get("end_date").label
             active_filters.append([label, end_date])
 
         if states:
@@ -337,3 +342,113 @@ class FilterJobApplicationsForm(forms.Form):
             active_filters.append([label, value])
 
         return [{"label": f[0], "value": f[1]} for f in active_filters]
+
+
+class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
+    """
+    Job applications filters common to SIAE and Prescribers.
+    """
+
+    sender = forms.MultipleChoiceField(
+        required=False, label=_("Personne"), widget=Select2MultipleWidget
+    )
+
+    def __init__(self, job_applications_qs, *args, **kwargs):
+        self.job_applications_qs = job_applications_qs
+        super().__init__(*args, **kwargs)
+        self.fields["sender"].choices += self.get_sender_choices()
+
+    def get_qs_filters(self):
+        qs_list = super().get_qs_filters()
+        data = self.cleaned_data
+        senders = data.get("sender")
+
+        if senders:
+            qs = Q(sender__id__in=senders)
+            qs_list.append(qs)
+
+        return qs_list
+
+    def get_sender_choices(self):
+        senders = self.job_applications_qs.get_unique_fk_objects("sender")
+        senders = [sender for sender in senders if sender.get_full_name()]
+        senders = [(sender.id, sender.get_full_name().title()) for sender in senders]
+        return sorted(senders, key=lambda l: l[1])
+
+    def humanize_filters(self):
+        humanized_filters = super().humanize_filters()
+        senders = self.cleaned_data.get("sender")
+
+        if senders:
+            values = [
+                get_user_model().objects.get(id=int(sender)).get_full_name().title()
+                for sender in senders
+            ]
+            value = ", ".join(values)
+            label = self.base_fields.get("sender").label
+            label = f"{label}s" if (len(values) > 1) else label
+
+            humanized_filters.append({"label": label, "value": value})
+
+        return humanized_filters
+
+
+class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
+    """
+    Job applications filters for SIAE only.
+    """
+
+    sender_organization = forms.MultipleChoiceField(
+        required=False, label=_("Organisation"), widget=Select2MultipleWidget
+    )
+
+    def __init__(self, job_applications_qs, *args, **kwargs):
+        super().__init__(job_applications_qs, *args, **kwargs)
+        self.fields[
+            "sender_organization"
+        ].choices += self.get_sender_organization_choices()
+
+    def get_qs_filters(self):
+        qs_list = super().get_qs_filters()
+        data = self.cleaned_data
+        sender_organizations = data.get("sender_organization")
+
+        if sender_organizations:
+            qs = Q(sender_prescriber_organization__id__in=sender_organizations)
+            qs_list.append(qs)
+
+        return qs_list
+
+    def get_sender_organization_choices(self):
+        sender_orgs = self.job_applications_qs.get_unique_fk_objects(
+            "sender_prescriber_organization"
+        )
+        sender_orgs = [sender for sender in sender_orgs if sender.name]
+        sender_orgs = [(sender.id, sender.name.title()) for sender in sender_orgs]
+        return sorted(sender_orgs, key=lambda l: l[1])
+
+    def humanize_filters(self):
+        humanized_filters = super().humanize_filters()
+        sender_organizations = self.cleaned_data.get("sender_organization")
+
+        if sender_organizations:
+            values = [
+                PrescriberOrganization.objects.get(id=int(organization)).name.title()
+                for organization in sender_organizations
+            ]
+            value = ", ".join(values)
+            label = self.base_fields.get("sender_organization").label
+            label = f"{label}s" if (len(values) > 1) else label
+
+            humanized_filters.append({"label": label, "value": value})
+
+        return humanized_filters
+
+
+class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
+    """
+    Job applications filters for Prescribers only.
+    """
+
+    # pylint: disable=unnecessary-pass
+    pass

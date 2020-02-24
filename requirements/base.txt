@@ -37,3 +37,6 @@ django-bootstrap4==1.1.0  # https://github.com/zostera/django-bootstrap4
 
 # Datepicker widget for Django using Bootstrap
 django-bootstrap-datepicker-plus==3.0.5 # https://github.com/monim67/django-bootstrap-datepicker-plus
+
+# Enhance select fields in forms with jQuery Select plugin
+django_select2==7.2.0
