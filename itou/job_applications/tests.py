@@ -398,10 +398,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertIsNone(job_application.approval)
-        self.assertEqual(
-            job_application.approval_delivery_mode,
-            job_application.APPROVAL_DELIVERY_MODE_MANUAL,
-        )
+        # This will be set only after the effective approval delivery.
+        self.assertEqual(job_application.approval_delivery_mode, "")
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)

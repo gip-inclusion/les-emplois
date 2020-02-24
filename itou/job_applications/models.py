@@ -408,7 +408,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             ):
                 # Trigger a manual approval creation.
                 emails.append(self.email_accept_trigger_manual_approval(accepted_by))
-                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
             else:
                 raise xwf_models.AbortTransition(
                     "Job seeker has an invalid PE status, cannot issue approval."
