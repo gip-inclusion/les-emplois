@@ -15,6 +15,7 @@ class JobApplicationInline(admin.StackedInline):
     can_delete = False
     fields = (
         "job_seeker",
+        "to_siae",
         "hiring_start_at",
         "hiring_end_at",
         "approval",
@@ -23,7 +24,7 @@ class JobApplicationInline(admin.StackedInline):
         "approval_delivery_mode",
         "approval_number_delivered_by",
     )
-    raw_id_fields = ("job_seeker", "approval_number_delivered_by")
+    raw_id_fields = ("job_seeker", "to_siae", "approval_number_delivered_by")
 
     def has_change_permission(self, request, obj=None):
         return False
