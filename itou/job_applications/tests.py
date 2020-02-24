@@ -301,7 +301,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.city, email.body)
         self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
 
-    def test_send_approval_number_by_email(self):
+    def test_send_approval_number_by_email_manually(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -311,7 +311,13 @@ class JobApplicationEmailTest(TestCase):
         )
         job_application.accept(user=job_application.to_siae.members.first())
         mail.outbox = []  # Delete previous emails.
-        job_application.send_approval_number_by_email()
+        job_application.send_approval_number_by_email_manually()
+        self.assertTrue(job_application.approval_number_sent_by_email)
+        self.assertIsNotNone(job_application.approval_number_sent_at)
+        self.assertEqual(
+            job_application.approval_delivery_mode,
+            job_application.APPROVAL_DELIVERY_MODE_MANUAL,
+        )
         self.assertEqual(len(mail.outbox), 1)
 
 

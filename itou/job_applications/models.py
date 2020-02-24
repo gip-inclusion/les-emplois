@@ -504,11 +504,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/approval_number_body.txt"
         return self.get_email_message(to, context, subject, body)
 
-    def send_approval_number_by_email(self):
+    def send_approval_number_by_email_manually(self):
+        """
+        Manual delivery mode: used when an Itou member has created an approval.
+        """
         email = self.email_approval_number(self.accepted_by)
         email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
+        self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
         self.save()
 
 
