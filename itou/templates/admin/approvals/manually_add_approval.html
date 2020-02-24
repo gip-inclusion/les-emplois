@@ -64,6 +64,9 @@
             </small>
         </li>
     {% endif %}
+    {% if job_application.job_seeker.lack_of_pole_emploi_id_reason %}
+        <li>{% trans "Raison de l'absence d'identifiant Pôle emploi : " %} {{ job_application.job_seeker.get_lack_of_pole_emploi_id_reason_display }}</li>
+    {% endif %}
 </ul>
 
 <h2>
