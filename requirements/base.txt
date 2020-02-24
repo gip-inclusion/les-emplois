@@ -1,23 +1,23 @@
-Pillow==6.1.0  # https://github.com/python-pillow/Pillow
-psycopg2-binary==2.8.3  # https://github.com/psycopg/psycopg2
-pytz==2019.2  # https://github.com/stub42/pytz
-requests==2.22.0  # https://github.com/psf/requests
+Pillow==7.0.0  # https://github.com/python-pillow/Pillow
+psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2
+pytz==2019.3  # https://github.com/stub42/pytz
+requests==2.23.0  # https://github.com/psf/requests
 python-dateutil==2.8.1  # https://pypi.org/project/python-dateutil/
-openpyxl==3.0.2  # https://bitbucket.org/openpyxl/openpyxl/src/default/
+openpyxl==3.0.3  # https://openpyxl.readthedocs.io/en/stable/
 Unidecode==1.1.1  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.9  # pyup: < 3.0  # https://www.djangoproject.com/
+django==2.2.10  # pyup: < 3.0  # https://www.djangoproject.com/
 
 # Django REST Framework
 djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
 
 # django-allauth
-django-allauth==0.39.1  # https://github.com/pennersr/django-allauth
+django-allauth==0.41.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
-django-anymail==6.1.0  # https://github.com/anymail/django-anymail
+django-anymail==7.0  # https://github.com/anymail/django-anymail
 
 # API Insee
 api-insee==1.0.1  # https://github.com/sne3ks/api_insee
@@ -26,14 +26,14 @@ api-insee==1.0.1  # https://github.com/sne3ks/api_insee
 django-xworkflows==0.12.3  # https://github.com/rbarrois/django_xworkflows
 
 # Allow basic math (e.g. A/B) in templates
-django-mathfilters
+django-mathfilters==1.0.0  # https://github.com/dbrgn/django-mathfilters
 
 
 # Front-end
 # ------------------------------------------------------------------------------
 
 # Bootstrap 4 for Django
-django-bootstrap4==0.0.8  # https://github.com/zostera/django-bootstrap4
+django-bootstrap4==1.1.0  # https://github.com/zostera/django-bootstrap4
 
 # Datepicker widget for Django using Bootstrap
 django-bootstrap-datepicker-plus==3.0.5 # https://github.com/monim67/django-bootstrap-datepicker-plus
