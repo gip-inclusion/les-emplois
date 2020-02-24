@@ -364,18 +364,28 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         required=False, label=_("Personne"), widget=Select2MultipleWidget
     )
 
+    job_seekers = forms.MultipleChoiceField(
+        required=False, label=_("Candidat"), widget=Select2MultipleWidget
+    )
+
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
         self.fields["sender"].choices += self.get_sender_choices()
+        self.fields["job_seekers"].choices = self.get_job_seekers_choices()
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
         senders = data.get("sender")
+        job_seekers = data.get("job_seekers")
 
         if senders:
             qs = Q(sender__id__in=senders)
+            qs_list.append(qs)
+
+        if job_seekers:
+            qs = Q(job_seeker__id__in=job_seekers)
             qs_list.append(qs)
 
         return qs_list
@@ -386,9 +396,21 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         senders = [(sender.id, sender.get_full_name().title()) for sender in senders]
         return sorted(senders, key=lambda l: l[1])
 
+    def get_job_seekers_choices(self):
+        job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
+        job_seekers = [
+            job_seeker for job_seeker in job_seekers if job_seeker.get_full_name()
+        ]
+        job_seekers = [
+            (job_seeker.id, job_seeker.get_full_name().title())
+            for job_seeker in job_seekers
+        ]
+        return sorted(job_seekers, key=lambda l: l[1])
+
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
         senders = self.cleaned_data.get("sender")
+        job_seekers = self.cleaned_data.get("job_seekers")
 
         if senders:
             values = [
@@ -397,6 +419,17 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             ]
             value = ", ".join(values)
             label = self.base_fields.get("sender").label
+            label = f"{label}s" if (len(values) > 1) else label
+
+            humanized_filters.append({"label": label, "value": value})
+
+        if job_seekers:
+            values = [
+                get_user_model().objects.get(id=int(job_seeker)).get_full_name().title()
+                for job_seeker in job_seekers
+            ]
+            value = ", ".join(values)
+            label = self.base_fields.get("job_seekers").label
             label = f"{label}s" if (len(values) > 1) else label
 
             humanized_filters.append({"label": label, "value": value})

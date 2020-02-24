@@ -46,6 +46,11 @@
                           {% bootstrap_field filters_form.sender_organization form_group_class="form_group m-3" %}
                     {% endif %}
 
+                    {% if filters_form.job_seekers %}
+                        <h5 class="mt-4">{{ filters_form.job_seekers.label }}</h5>
+                        {% bootstrap_field filters_form.job_seekers form_group_class="form_group m-3" show_label=False%}
+                    {% endif %}
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>
