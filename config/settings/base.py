@@ -46,6 +46,7 @@ THIRD_PARTY_APPS = [
     "anymail",
     "bootstrap4",
     "bootstrap_datepicker_plus",
+    "django_select2",
     "mathfilters",
 ]
 

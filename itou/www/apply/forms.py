@@ -6,8 +6,8 @@ from django.db.models import Q
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django_select2.forms import Select2MultipleWidget
 
-from itou.users.models import User
 from itou.prescribers.models import PrescriberOrganization
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.widgets import DatePickerField
@@ -265,8 +265,8 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     Job applications filters common to SIAE and Prescribers.
     """
 
-    sender = forms.ChoiceField(
-        required=False, label=_("Personne"), choices=[("", "-" * 50)]
+    sender = forms.MultipleChoiceField(
+        required=False, label=_("Personne"), widget=Select2MultipleWidget
     )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
@@ -277,10 +277,10 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
-        sender = data.get("sender")
+        senders = data.get("sender")
 
-        if sender:
-            qs = Q(sender__id=sender)
+        if senders:
+            qs = Q(sender__id__in=senders)
             qs_list.append(qs)
 
         return qs_list
@@ -293,12 +293,17 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
-        sender = self.cleaned_data.get("sender")
+        senders = self.cleaned_data.get("sender")
 
-        if sender:
+        if senders:
+            values = [
+                get_user_model().objects.get(id=int(sender)).get_full_name().title()
+                for sender in senders
+            ]
+            value = ", ".join(values)
             label = self.base_fields.get("sender").label
-            user = User.objects.get(id=int(sender))
-            value = user.get_full_name().title()
+            label = f"{label}s" if (len(values) > 1) else label
+
             humanized_filters.append({"label": label, "value": value})
 
         return humanized_filters
@@ -309,8 +314,8 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     Job applications filters for SIAE only.
     """
 
-    sender_organization = forms.ChoiceField(
-        required=False, label=_("Organisation"), choices=[("", "-" * 50)]
+    sender_organization = forms.MultipleChoiceField(
+        required=False, label=_("Organisation"), widget=Select2MultipleWidget
     )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
@@ -322,10 +327,10 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
-        sender_organization = data.get("sender_organization")
+        sender_organizations = data.get("sender_organization")
 
-        if sender_organization:
-            qs = Q(sender_prescriber_organization__id=sender_organization)
+        if sender_organizations:
+            qs = Q(sender_prescriber_organization__id__in=sender_organizations)
             qs_list.append(qs)
 
         return qs_list
@@ -340,14 +345,17 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
-        sender_organization = self.cleaned_data.get("sender_organization")
+        sender_organizations = self.cleaned_data.get("sender_organization")
 
-        if sender_organization:
+        if sender_organizations:
+            values = [
+                PrescriberOrganization.objects.get(id=int(organization)).name.title()
+                for organization in sender_organizations
+            ]
+            value = ", ".join(values)
             label = self.base_fields.get("sender_organization").label
-            organization = PrescriberOrganization.objects.get(
-                id=int(sender_organization)
-            )
-            value = organization.name.title()
+            label = f"{label}s" if (len(values) > 1) else label
+
             humanized_filters.append({"label": label, "value": value})
 
         return humanized_filters

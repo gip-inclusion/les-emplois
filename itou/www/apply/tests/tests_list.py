@@ -84,9 +84,11 @@ class ProcessListTest(TestCase):
         # Variables available for unit tests
         self.pole_emploi = pole_emploi
         self.hit_pit = hit_pit
+        self.l_envol = l_envol
         self.thibault_pe = thibault_pe
         self.laurie_pe = laurie_pe
         self.eddie_hit_pit = eddie_hit_pit
+        self.audrey_envol = audrey_envol
         self.maggie = maggie
 
 
@@ -256,7 +258,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
     def test_view__filtered_by_sender_name(self):
         """
-        Eddie wants to see applications sent by Pôle Emploi.
+        Eddie wants to see applications sent by a member of Pôle Emploi.
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender = self.thibault_pe
@@ -270,6 +272,23 @@ class ProcessListSiaeTest(ProcessListTest):
 
         for application in applications:
             self.assertEqual(application.sender.id, sender.id)
+
+    def test_view__filtered_by_many_organization_names(self):
+        """
+        Eddie wants to see applications sent by Pôle Emploi and L'Envol.
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        senders_ids = [self.pole_emploi.id, self.l_envol.id]
+        query = f"sender_organization={self.thibault_pe.id}&sender_organization={self.audrey_envol.id}"
+        url = f"{self.siae_base_url}?{query}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+
+        self.assertGreater(len(applications), 0)
+
+        for application in applications:
+            self.assertIn(application.sender_prescriber_organization.id, senders_ids)
 
 
 ####################################################
