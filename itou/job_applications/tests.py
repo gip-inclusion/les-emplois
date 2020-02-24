@@ -24,7 +24,7 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
-from itou.users.factories import JobSeekerFactory
+from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.utils.templatetags import format_filters
 
 
@@ -302,6 +302,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
 
     def test_send_approval_number_by_email_manually(self):
+        staff_member = UserFactory(is_staff=True)
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -311,13 +312,14 @@ class JobApplicationEmailTest(TestCase):
         )
         job_application.accept(user=job_application.to_siae.members.first())
         mail.outbox = []  # Delete previous emails.
-        job_application.send_approval_number_by_email_manually()
+        job_application.send_approval_number_by_email_manually(deliverer=staff_member)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertIsNotNone(job_application.approval_number_sent_at)
         self.assertEqual(
             job_application.approval_delivery_mode,
             job_application.APPROVAL_DELIVERY_MODE_MANUAL,
         )
+        self.assertEqual(job_application.approval_number_delivered_by, staff_member)
         self.assertEqual(len(mail.outbox), 1)
 
 

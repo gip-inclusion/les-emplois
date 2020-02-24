@@ -63,7 +63,7 @@ def manually_add_approval(
         approval = form.save()
         job_application.approval = approval
         job_application.save()
-        job_application.send_approval_number_by_email_manually()
+        job_application.send_approval_number_by_email_manually(deliverer=request.user)
         messages.success(
             request,
             _(

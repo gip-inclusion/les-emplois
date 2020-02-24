@@ -293,6 +293,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         choices=APPROVAL_DELIVERY_MODE_CHOICES,
         blank=True,
     )
+    approval_number_delivered_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("PASS IAE envoyé par"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approval_numbers_sent",
+    )
 
     created_at = models.DateTimeField(
         verbose_name=_("Date de création"), default=timezone.now, db_index=True
@@ -503,7 +511,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/approval_number_body.txt"
         return self.get_email_message(to, context, subject, body)
 
-    def send_approval_number_by_email_manually(self):
+    def send_approval_number_by_email_manually(self, deliverer):
         """
         Manual delivery mode: used when an Itou member has created an approval.
         """
@@ -512,6 +520,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
         self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
+        self.approval_number_delivered_by = deliverer
         self.save()
 
 

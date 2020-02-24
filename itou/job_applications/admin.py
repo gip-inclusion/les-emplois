@@ -72,7 +72,9 @@ class JobApplicationAdmin(admin.ModelAdmin):
             approval_number_sent_by_email=False
         )
         for job_application in queryset:
-            job_application.send_approval_number_by_email_manually()
+            job_application.send_approval_number_by_email_manually(
+                deliverer=request.user
+            )
 
     send_approval_by_email.short_description = _("Envoyer le PASS IAE par email")
 
