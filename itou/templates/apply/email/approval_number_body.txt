@@ -1,0 +1,32 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+
+{% blocktrans %}Vous avez déclaré l'embauche d'un candidat sur la Plateforme de l'inclusion. Nous vous confirmons la délivrance d'un PASS IAE (valant agrément pour le compte de Pôle emploi conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail).
+
+Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktrans %}
+
+{% trans "PASS IAE N° :" %} {{ job_application.approval.number_with_spaces }}
+
+{% trans "Délivré pour l'embauche de :" %}
+{% trans "Nom :" %} {{ job_application.approval.user.last_name }}
+{% trans "Prénom :" %} {{ job_application.approval.user.first_name }}
+{% trans "Date de naissance :" %} {{ job_application.approval.user.birthdate|date:"d/m/Y" }}
+
+{% trans "Pour un contrat d'insertion :" %}
+{% trans "Débutant le :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if job_application.hiring_end_at %}
+{% trans "Se terminant le :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}{% endif %}
+
+{% trans "Au sein de la structure :" %}
+{{ job_application.to_siae.display_name }}
+{{ job_application.to_siae.get_kind_display }}
+{{ job_application.to_siae.address_line_1 }}{% if job_application.to_siae.address_line_2 %}
+{{ job_application.to_siae.address_line_2 }}{% endif %}
+{{ job_application.to_siae.post_code }} {{ job_application.to_siae.city }}
+
+{% trans "Pour le compte de Pôle emploi," %}
+
+{% trans "Votre contact :" %}
+{{ itou_contact_email }}
+
+{% endblock body %}

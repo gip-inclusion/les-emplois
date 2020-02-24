@@ -1,5 +1,7 @@
 import datetime
 
+from dateutil.relativedelta import relativedelta
+
 from django.test import TestCase
 from django.urls import reverse
 
@@ -130,8 +132,59 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        today = datetime.date.today()
-        post_data = {"date_of_hiring": today.strftime("%d/%m/%Y"), "answer": ""}
+        # Wrong dates: force `hiring_start_at` in past.
+        hiring_start_at = datetime.date.today() - relativedelta(days=1)
+        hiring_end_at = hiring_start_at + relativedelta(years=2)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(
+            response,
+            "form_accept",
+            "hiring_start_at",
+            JobApplication.ERROR_START_IN_PAST,
+        )
+
+        # Wrong dates: end < start.
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = hiring_start_at - relativedelta(days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(
+            response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START
+        )
+
+        # Duration too long.
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = hiring_start_at + relativedelta(years=2, days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(
+            response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG
+        )
+
+        # Good duration.
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = hiring_start_at + relativedelta(years=2)
+        post_data = {
+            # Data for `JobSeekerPoleEmploiStatusForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            # Data for `AcceptForm`.
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+        }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -141,7 +194,8 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
-        self.assertEqual(job_application.date_of_hiring, today)
+        self.assertEqual(job_application.hiring_start_at, hiring_start_at)
+        self.assertEqual(job_application.hiring_end_at, hiring_end_at)
         self.assertTrue(job_application.state.is_accepted)
 
     def test_eligibility(self):

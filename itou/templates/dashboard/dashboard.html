@@ -44,6 +44,7 @@
         {% endif %}
 
         {% if user.is_job_seeker %}
+
             <div class="card">
                 <h5 class="card-header">{% trans "Candidatures" %}</h5>
                 <div class="card-body">
@@ -57,20 +58,29 @@
                     </p>
                 </div>
             </div>
-            {% with user.get_approval as approval %}
-                {% if approval %}
+
+            {% with user.approvals_wrapper as approvals_wrapper %}
+                {% if approvals_wrapper.has_valid or approvals_wrapper.has_in_waiting_period %}
                     <div class="card">
                         <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
                         <div class="card-body">
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
-                                <b>{{ approval.number }}</b>
-                                (du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }})
+                                <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
+                                {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
                             </p>
+                            {% if approvals_wrapper.has_in_waiting_period %}
+                                <p class="card-text">
+                                    <small>
+                                        {{ user.approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER }}
+                                    </small>
+                                </p>
+                            {% endif %}
                         </div>
                     </div>
                 {% endif %}
             {% endwith %}
+
         {% endif %}
 
         {% if user.is_prescriber %}

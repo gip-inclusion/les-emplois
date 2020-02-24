@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.translation import ugettext as _
 
 from itou.job_applications import models
 
@@ -20,22 +21,60 @@ class JobsInline(admin.TabularInline):
     raw_id_fields = ("siaejobdescription",)
 
 
+class ApprovalNumberSentByEmailFilter(admin.SimpleListFilter):
+    title = _("PASS IAE envoyé par email")
+    parameter_name = "approval_number_sent_by_email"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.exclude(approval=None).filter(
+                approval_number_sent_by_email=True
+            )
+        if value == "no":
+            return queryset.exclude(approval=None).filter(
+                approval_number_sent_by_email=False
+            )
+        return queryset
+
+
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
+    actions = ("send_approval_number_by_email",)
     date_hierarchy = "created_at"
-    list_display = ("id", "state", "job_seeker", "sender", "sender_kind", "created_at")
+    list_display = ("id", "state", "sender_kind", "created_at")
     raw_id_fields = (
         "job_seeker",
         "sender",
         "sender_siae",
         "sender_prescriber_organization",
         "to_siae",
+        "approval",
     )
     exclude = ("selected_jobs",)
-    list_filter = ("sender_kind", "state", "to_siae__department")
+    list_filter = (
+        ApprovalNumberSentByEmailFilter,
+        "sender_kind",
+        "state",
+        "approval_delivery_mode",
+        "sender_prescriber_organization__is_authorized",
+        "to_siae__department",
+    )
     readonly_fields = ("created_at", "updated_at")
     inlines = (JobsInline, TransitionLogInline)
-    search_fields = ("to_siae__siret",)
+    search_fields = ("to_siae__siret", "job_seeker__email")
+
+    def send_approval_number_by_email(self, request, queryset):
+        queryset = queryset.exclude(approval=None).filter(
+            approval_number_sent_by_email=False
+        )
+        for job_application in queryset:
+            job_application.send_approval_number_by_email()
+
+    send_approval_number_by_email.short_description = _("Envoyer le PASS IAE par email")
 
 
 @admin.register(models.JobApplicationTransitionLog)

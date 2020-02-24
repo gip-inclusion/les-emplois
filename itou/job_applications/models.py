@@ -4,12 +4,13 @@ import uuid
 from django.conf import settings
 from django.core import mail
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
 from django_xworkflows import models as xwf_models
 
+from itou.approvals.models import Approval
 from itou.utils.emails import get_email_text_template
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
@@ -142,8 +143,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_INCOMPATIBLE = "incompatible"
     REFUSAL_REASON_PREVENT_OBJECTIVES = "prevent_objectives"
     REFUSAL_REASON_NO_POSITION = "no_position"
+    REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
     REFUSAL_REASON_OTHER = "other"
-
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, _("Candidat non venu ou non joignable")),
         (
@@ -170,7 +171,29 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             ),
         ),
         (REFUSAL_REASON_NO_POSITION, _("Pas de poste ouvert en ce moment")),
+        (
+            REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE,
+            _("La date de fin du PASS IAE / agrément est trop proche"),
+        ),
         (REFUSAL_REASON_OTHER, _("Autre")),
+    )
+
+    ERROR_START_IN_PAST = _(
+        f"La date de début du contrat ne doit pas être dans le passé."
+    )
+    ERROR_END_IS_BEFORE_START = _(
+        f"La date de fin du contrat doit être postérieure à la date de début."
+    )
+    ERROR_DURATION_TOO_LONG = _(
+        f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
+    )
+
+    APPROVAL_DELIVERY_MODE_AUTOMATIC = "automatic"
+    APPROVAL_DELIVERY_MODE_MANUAL = "manual"
+
+    APPROVAL_DELIVERY_MODE_CHOICES = (
+        (APPROVAL_DELIVERY_MODE_AUTOMATIC, _("Automatique")),
+        (APPROVAL_DELIVERY_MODE_MANUAL, _("Manuel")),
     )
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -242,8 +265,33 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         blank=True,
     )
 
-    date_of_hiring = models.DateField(
-        verbose_name=_("Date de l'embauche"), blank=True, null=True
+    hiring_start_at = models.DateField(
+        verbose_name=_("Date de début du contrat"), blank=True, null=True
+    )
+    hiring_end_at = models.DateField(
+        verbose_name=_("Date de fin du contrat"), blank=True, null=True
+    )
+
+    # Job applications sent to SIAEs subject to eligibility rules will
+    # obtain an Approval after being accepted.
+    approval = models.ForeignKey(
+        "approvals.Approval",
+        verbose_name=_("PASS IAE"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    approval_number_sent_by_email = models.BooleanField(
+        verbose_name=_("PASS IAE envoyé par email"), default=False
+    )
+    approval_number_sent_at = models.DateTimeField(
+        verbose_name=_("Date d'envoi du PASS IAE"), blank=True, null=True, db_index=True
+    )
+    approval_delivery_mode = models.CharField(
+        verbose_name=_("Mode d'attribution du PASS IAE"),
+        max_length=30,
+        choices=APPROVAL_DELIVERY_MODE_CHOICES,
+        blank=True,
     )
 
     created_at = models.DateTimeField(
@@ -270,6 +318,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def is_sent_by_proxy(self):
         return self.sender != self.job_seeker
+
+    @property
+    def is_sent_by_authorized_prescriber(self):
+        return bool(
+            self.sender_kind == self.SENDER_KIND_PRESCRIBER
+            and self.sender_prescriber_organization
+            and self.sender_prescriber_organization.is_authorized
+        )
 
     @property
     def eligibility_diagnosis_by_siae_required(self):
@@ -301,18 +357,71 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def accept(self, *args, **kwargs):
+
+        accepted_by = kwargs.get("user")
+
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(
             pk=self.pk
         ).pending():
             job_application.render_obsolete(*args, **kwargs)
-        # Send notification.
-        connection = mail.get_connection()
-        accepted_by = kwargs.get("user")
+
+        # Notification email.
         emails = [self.email_accept]
+
+        # Approval issuance logic.
         if self.to_siae.is_subject_to_eligibility_rules:
-            emails.append(self.email_accept_trigger_manual_approval(accepted_by))
+
+            approvals_wrapper = self.job_seeker.approvals_wrapper
+
+            if (
+                approvals_wrapper.has_in_waiting_period
+                and not self.is_sent_by_authorized_prescriber
+            ):
+                # Security check: it's supposed to be blocked upstream.
+                raise xwf_models.AbortTransition(
+                    "Job seeker has an approval in waiting period."
+                )
+
+            if approvals_wrapper.has_valid:
+                # Automatically reuse an existing valid Itou or PE approval.
+                self.approval = Approval.get_or_create_from_valid(approvals_wrapper)
+                emails.append(self.email_approval_number(accepted_by))
+            elif (
+                self.job_seeker.pole_emploi_id
+                or self.job_seeker.lack_of_pole_emploi_id_reason
+                == self.job_seeker.REASON_NOT_REGISTERED
+            ):
+                # Automatically create a new approval.
+                new_approval = Approval(
+                    start_at=self.hiring_start_at,
+                    end_at=Approval.get_default_end_date(self.hiring_start_at),
+                    number=Approval.get_next_number(self.hiring_start_at),
+                    user=self.job_seeker,
+                )
+                new_approval.save()
+                self.approval = new_approval
+                emails.append(self.email_approval_number(accepted_by))
+            elif (
+                self.job_seeker.lack_of_pole_emploi_id_reason
+                == self.job_seeker.REASON_FORGOTTEN
+            ):
+                # Trigger a manual approval creation.
+                emails.append(self.email_accept_trigger_manual_approval(accepted_by))
+                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
+            else:
+                raise xwf_models.AbortTransition(
+                    "Job seeker has an invalid PE status, cannot issue approval."
+                )
+
+        # Send emails in batch.
+        connection = mail.get_connection()
         connection.send_messages(emails)
+
+        if self.approval:
+            self.approval_number_sent_by_email = True
+            self.approval_number_sent_at = timezone.now()
+            self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_AUTOMATIC
 
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
@@ -374,13 +483,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "job_application": self,
-            # Used to prepopulate the admin form.
-            "approvals_admin_query_string": urlencode(
-                {
-                    "user": self.job_seeker.pk,
-                    "start_at": self.date_of_hiring.strftime("%d/%m/%Y"),
-                    "job_application": self.pk,
-                }
+            "admin_manually_add_approval_url": reverse(
+                "admin:approvals_approval_manually_add_approval", args=[self.pk]
             ),
         }
         if accepted_by:
@@ -388,6 +492,24 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         subject = "apply/email/accept_trigger_approval_subject.txt"
         body = "apply/email/accept_trigger_approval_body.txt"
         return self.get_email_message(to, context, subject, body)
+
+    def email_approval_number(self, accepted_by):
+        if not accepted_by:
+            raise RuntimeError(_("Unable to determine the recipient email address."))
+        if not self.approval:
+            raise RuntimeError(_("No approval found for this job application."))
+        to = [accepted_by.email]
+        context = {"job_application": self}
+        subject = "apply/email/approval_number_subject.txt"
+        body = "apply/email/approval_number_body.txt"
+        return self.get_email_message(to, context, subject, body)
+
+    def send_approval_number_by_email(self):
+        email = self.email_approval_number(self.accepted_by)
+        email.send()
+        self.approval_number_sent_by_email = True
+        self.approval_number_sent_at = timezone.now()
+        self.save()
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):

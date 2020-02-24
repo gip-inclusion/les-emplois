@@ -29,6 +29,27 @@ def valid_session_required(function=None):
     return decorated
 
 
+def get_approvals_wrapper(request, job_seeker):
+    """
+    Returns an `ApprovalsWrapper` if possible or stop
+    the job application submit process.
+    This works only when the `job_seeker` is known.
+    """
+    user_info = get_user_info(request)
+    approvals_wrapper = job_seeker.approvals_wrapper
+    # Ensure that an existing approval is not in waiting period.
+    # Only "authorized prescribers" can bypass an approval in waiting period.
+    if (
+        approvals_wrapper.has_in_waiting_period
+        and not user_info.is_authorized_prescriber
+    ):
+        error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
+        if user_info.user == job_seeker:
+            error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+        raise PermissionDenied(error)
+    return approvals_wrapper
+
+
 @login_required
 def start(request, siae_pk):
     """
@@ -127,12 +148,17 @@ def step_check_job_seeker_info(
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
     next_url = reverse(
         "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
     )
 
-    # Ensure that the job seeker has a birthdate.
-    if job_seeker.birthdate:
+    # Check required info that will allow us to find a pre-existing approval.
+    has_required_info = job_seeker.birthdate and (
+        job_seeker.pole_emploi_id or job_seeker.lack_of_pole_emploi_id_reason
+    )
+
+    if has_required_info:
         return HttpResponseRedirect(next_url)
 
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
@@ -143,7 +169,12 @@ def step_check_job_seeker_info(
         form.save()
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "siae": siae, "job_seeker": job_seeker}
+    context = {
+        "form": form,
+        "siae": siae,
+        "job_seeker": job_seeker,
+        "approvals_wrapper": approvals_wrapper,
+    }
     return render(request, template_name, context)
 
 
@@ -185,16 +216,20 @@ def step_check_prev_applications(
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
-
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
     # Limit the possibility of applying to the same SIAE for 24 hours.
     if prev_applications.created_in_past_hours(24).exists():
-        raise PermissionDenied(
-            _(
+        if request.user == job_seeker:
+            msg = _(
                 "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
             )
-        )
+        else:
+            msg = _(
+                "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
+            )
+        raise PermissionDenied(msg)
 
     next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
 
@@ -203,7 +238,8 @@ def step_check_prev_applications(
 
     # At this point we know that the candidate is applying to an SIAE
     # where he or she has already applied.
-    # Allow a new application if the user confirm it despite the duplication warning.
+    # Allow a new job application if the user confirm it despite the
+    # duplication warning.
     if (
         request.method == "POST"
         and request.POST.get("force_new_application") == "force"
@@ -214,6 +250,7 @@ def step_check_prev_applications(
         "job_seeker": job_seeker,
         "siae": siae,
         "prev_application": prev_applications.latest("created_at"),
+        "approvals_wrapper": approvals_wrapper,
     }
     return render(request, template_name, context)
 
@@ -228,20 +265,22 @@ def step_eligibility(
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
-    user_info = get_user_info(request)
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
-    step_required = (
-        user_info.is_authorized_prescriber and siae.is_subject_to_eligibility_rules
-    )
-    if not step_required:
+    if not siae.is_subject_to_eligibility_rules:
         return HttpResponseRedirect(next_url)
 
+    user_info = get_user_info(request)
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
 
-    # This step is only required if the job seeker hasn't already
-    # an eligibility diagnosis.
-    if job_seeker.has_eligibility_diagnosis:
+    skip = (
+        # Only "authorized prescribers" can perform an eligibility diagnosis.
+        not user_info.is_authorized_prescriber
+        # Eligibility diagnosis already performed.
+        or job_seeker.has_eligibility_diagnosis
+    )
+    if skip:
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST":
@@ -249,7 +288,11 @@ def step_eligibility(
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "job_seeker": job_seeker}
+    context = {
+        "siae": siae,
+        "job_seeker": job_seeker,
+        "approvals_wrapper": approvals_wrapper,
+    }
     return render(request, template_name, context)
 
 
@@ -271,6 +314,7 @@ def step_application(
     )
 
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
 
     if request.method == "POST" and form.is_valid():
 
@@ -313,9 +357,14 @@ def step_application(
 
         job_application.email_new_for_siae.send()
 
-        messages.success(request, _("Votre candidature a bien été envoyée !"))
+        messages.success(request, _("Candidature bien envoyée !"))
 
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "form": form, "job_seeker": job_seeker}
+    context = {
+        "siae": siae,
+        "form": form,
+        "job_seeker": job_seeker,
+        "approvals_wrapper": approvals_wrapper,
+    }
     return render(request, template_name, context)

@@ -17,6 +17,31 @@
         <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
     </h1>
 
+    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+
+        {% if job_application.state.is_accepted %}
+            <div class="alert border">
+                {% if job_application.approval %}
+                    {% trans "Numéro d'agrément :" %} <b>{{ job_application.approval.number_with_spaces }}</b>
+                    <br>
+                    {% include "approvals/includes/status.html" with approval=job_application.approval %}
+                {% else %}
+                    {% trans "Numéro d'agrément en cours de délivrance." %}
+                {% endif %}
+            </div>
+        {% else %}
+            {% if approvals_wrapper.latest_approval %}
+                <div class="alert border">
+                    {# Hide approval number while the job application hasn't been accepted. #}
+                    {% trans "Agrément existant" %}
+                    <br>
+                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+                </div>
+            {% endif %}
+        {% endif %}
+
+    {% endif %}
+
     <hr>
 
 {% endblock %}

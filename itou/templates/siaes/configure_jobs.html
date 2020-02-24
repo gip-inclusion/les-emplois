@@ -10,7 +10,7 @@
 
     <h2 class="text-muted">{{ siae.display_name }}</h2>
 
-    <form method="post" action="" class="d-block mt-3">
+    <form method="post" action="" class="d-block mt-3 js-prevent-multiple-submit">
 
         {% csrf_token %}
 

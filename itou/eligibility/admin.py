@@ -10,3 +10,4 @@ class EligibilityAdmin(admin.ModelAdmin):
     list_filter = ("author_kind",)
     raw_id_fields = ("job_seeker", "author_siae", "author_prescriber_organization")
     readonly_fields = ("created_at", "updated_at")
+    search_fields = ("job_seeker__email", "author__email")

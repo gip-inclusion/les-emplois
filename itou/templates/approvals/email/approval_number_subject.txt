@@ -1,5 +1,0 @@
-{% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
-{% block subject %}
-{% blocktrans with job_seeker_full_name=approval.user.get_full_name %}PASS IAE de {{ job_seeker_full_name }}{% endblocktrans %}
-{% endblock %}

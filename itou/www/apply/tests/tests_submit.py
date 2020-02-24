@@ -1,9 +1,16 @@
+import datetime
+
+from dateutil.relativedelta import relativedelta
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
 
+from itou.approvals.factories import ApprovalFactory
+from itou.approvals.factories import PoleEmploiApprovalFactory
+from itou.approvals.models import ApprovalsWrapper
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
@@ -96,12 +103,18 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"birthdate": "20/12/1978"}
+        post_data = {
+            "birthdate": "20/12/1978",
+            "phone": "0610203040",
+            "pole_emploi_id": "1234567A",
+        }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+        self.assertEqual(user.phone, post_data["phone"])
+        self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
 
         next_url = reverse(
             "apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk}
@@ -158,6 +171,38 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 1)
         self.assertEqual(
             job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
+        )
+
+    def test_apply_as_jobseeker_with_approval_in_waiting_period(self):
+        """Apply as jobseeker with an approval in waiting period."""
+
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        user = JobSeekerFactory()
+        end_at = datetime.date.today() - relativedelta(days=30)
+        start_at = end_at - relativedelta(years=2)
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until the expected 403.
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.context["exception"],
+            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER,
+        )
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
         )
 
 
@@ -244,6 +289,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -322,6 +368,47 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         )
         self.assertEqual(
             job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
+        )
+
+    def test_apply_as_authorized_prescriber_for_approval_in_waiting_period(self):
+        """Apply as authorized prescriber for a job seeker with an approval in waiting period."""
+
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        job_seeker = JobSeekerFactory()
+
+        # Create an approval in waiting period.
+        end_at = datetime.date.today() - relativedelta(days=30)
+        start_at = end_at - relativedelta(years=2)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
+            is_authorized=True
+        )
+        user = prescriber_organization.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until a job seeker has to be determined…
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        )
+
+        # …choose one, then follow all redirections…
+        post_data = {"email": job_seeker.email}
+        response = self.client.post(last_url, data=post_data, follow=True)
+
+        # …until the eligibility step which should trigger a 200 OK.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         )
 
     def test_apply_to_a_geiq_as_authorized_prescriber(self):
@@ -408,6 +495,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -564,6 +652,7 @@ class ApplyAsPrescriberTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -633,6 +722,49 @@ class ApplyAsPrescriberTest(TestCase):
         )
         self.assertEqual(
             job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
+        )
+
+    def test_apply_as_prescriber_for_approval_in_waiting_period(self):
+        """Apply as prescriber for a job seeker with an approval in waiting period."""
+
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        job_seeker = JobSeekerFactory()
+
+        # Create an approval in waiting period.
+        end_at = datetime.date.today() - relativedelta(days=30)
+        start_at = end_at - relativedelta(years=2)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+
+        user = PrescriberFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until a job seeker has to be determined…
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        )
+
+        # …choose one, then follow all redirections…
+        post_data = {"email": job_seeker.email}
+        response = self.client.post(last_url, data=post_data, follow=True)
+
+        # …until the expected 403.
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.context["exception"],
+            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY,
+        )
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
         )
 
 
@@ -728,6 +860,7 @@ class ApplyAsSiaeTest(TestCase):
             "last_name": "Doe",
             "birthdate": "20/12/1978",
             "phone": "0610200305",
+            "pole_emploi_id": "12345678",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -797,4 +930,47 @@ class ApplyAsSiaeTest(TestCase):
         )
         self.assertEqual(
             job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
+        )
+
+    def test_apply_as_siae_for_approval_in_waiting_period(self):
+        """Apply as SIAE for a job seeker with an approval in waiting period."""
+
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+
+        job_seeker = JobSeekerFactory()
+
+        # Create an approval in waiting period.
+        end_at = datetime.date.today() - relativedelta(days=30)
+        start_at = end_at - relativedelta(years=2)
+        ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
+
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+
+        # Follow all redirections…
+        response = self.client.get(url, follow=True)
+
+        # …until a job seeker has to be determined…
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
+        )
+
+        # …choose one, then follow all redirections…
+        post_data = {"email": job_seeker.email}
+        response = self.client.post(last_url, data=post_data, follow=True)
+
+        # …until the expected 403.
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(
+            response.context["exception"],
+            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY,
+        )
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(
+            last_url,
+            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
         )

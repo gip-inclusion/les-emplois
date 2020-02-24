@@ -3,6 +3,8 @@ import datetime
 import factory
 import factory.fuzzy
 
+from dateutil.relativedelta import relativedelta
+
 from itou.job_applications import models
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
@@ -24,7 +26,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     to_siae = factory.SubFactory(SiaeWithMembershipFactory)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
-    date_of_hiring = datetime.date.today()
+    hiring_start_at = datetime.date.today()
+    hiring_end_at = datetime.date.today() + relativedelta(years=2)
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):
@@ -55,6 +58,15 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
 
     sender = factory.SelfAttribute("job_seeker")
     sender_kind = models.JobApplication.SENDER_KIND_JOB_SEEKER
+
+
+class JobApplicationSentBySiaeFactory(JobApplicationFactory):
+    """Generates a JobApplication() object sent by an Siae."""
+
+    sender_kind = models.JobApplication.SENDER_KIND_SIAE_STAFF
+    # Currently an Siae can only postulate for itself,
+    # this is the default behavior here.
+    sender_siae = factory.LazyAttribute(lambda obj: obj.to_siae)
 
 
 class JobApplicationSentByPrescriberFactory(JobApplicationFactory):

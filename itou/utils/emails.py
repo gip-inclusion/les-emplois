@@ -16,6 +16,10 @@ def remove_extra_line_breaks(text):
 
 def get_email_text_template(template, context):
     context.update(
-        {"itou_protocol": settings.ITOU_PROTOCOL, "itou_fqdn": settings.ITOU_FQDN}
+        {
+            "itou_protocol": settings.ITOU_PROTOCOL,
+            "itou_fqdn": settings.ITOU_FQDN,
+            "itou_contact_email": settings.ITOU_EMAIL_CONTACT,
+        }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())

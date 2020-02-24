@@ -3,9 +3,12 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from itou.approvals.factories import ApprovalFactory
+from itou.approvals.factories import PoleEmploiApprovalFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.users.factories import JobSeekerFactory
 from itou.users.factories import PrescriberFactory
 
 
@@ -37,39 +40,82 @@ class ModelTest(TestCase):
         self.assertEqual(user.created_by, proxy_user)
         self.assertEqual(user.last_login, None)
 
-    def test_has_valid_approval(self):
+        # E-mail already exists, this should raise an error.
+        with self.assertRaises(ValidationError):
+            User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
-        # Start today, end in 2 years.
-        start_at = datetime.date.today()
-        end_at = start_at + relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        user = approval.user
-        self.assertTrue(user.has_valid_approval())
+    def test_has_eligibility_diagnosis(self):
 
-        # End today.
-        end_at = datetime.date.today()
+        # No diagnosis.
+        job_seeker = JobSeekerFactory()
+        self.assertFalse(job_seeker.has_eligibility_diagnosis)
+
+        # Has Itou diagnosis.
+        job_seeker = JobSeekerFactory()
+        EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertTrue(job_seeker.has_eligibility_diagnosis)
+
+        # Has valid Pôle emploi diagnosis.
+        job_seeker = JobSeekerFactory()
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+        )
+        self.assertTrue(job_seeker.has_eligibility_diagnosis)
+
+        # Has expired Pôle emploi diagnosis.
+        job_seeker = JobSeekerFactory()
+        end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        user = approval.user
-        self.assertTrue(user.has_valid_approval())
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=job_seeker.pole_emploi_id,
+            birthdate=job_seeker.birthdate,
+            start_at=start_at,
+            end_at=end_at,
+        )
+        self.assertFalse(job_seeker.has_eligibility_diagnosis)
 
-        # Ended 1 year ago.
-        end_at = datetime.date.today() - relativedelta(years=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        user = approval.user
-        self.assertFalse(user.has_valid_approval())
+    def test_clean_pole_emploi_fields(self):
 
-        # Ended yesterday.
-        end_at = datetime.date.today() - relativedelta(days=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        user = approval.user
-        self.assertFalse(user.has_valid_approval())
+        User = get_user_model()
 
-        # In the future.
-        start_at = datetime.date.today() + relativedelta(years=2)
-        end_at = start_at + relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        user = approval.user
-        self.assertTrue(user.has_valid_approval())
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=""
+        )
+
+        # Both fields cannot be empty.
+        with self.assertRaises(ValidationError):
+            User.clean_pole_emploi_fields(
+                job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+            )
+
+        # Both fields cannot be present at the same time.
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="69970749",
+            lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+        )
+        with self.assertRaises(ValidationError):
+            User.clean_pole_emploi_fields(
+                job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+            )
+
+        # No exception should be raised for the following cases.
+
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="62723349", lack_of_pole_emploi_id_reason=""
+        )
+        User.clean_pole_emploi_fields(
+            job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+        )
+
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN
+        )
+        User.clean_pole_emploi_fields(
+            job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
+        )
+
+    def test_email_already_exists(self):
+        JobSeekerFactory(email="foo@bar.com")
+        User = get_user_model()
+        self.assertTrue(User.email_already_exists("foo@bar.com"))
+        self.assertTrue(User.email_already_exists("FOO@bar.com"))

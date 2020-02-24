@@ -193,6 +193,8 @@ STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
 # Security.
 # ------------------------------------------------------------------------------
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 SESSION_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_HTTPONLY = True
@@ -263,6 +265,10 @@ ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
 BOOTSTRAP4 = {
     "required_css_class": "form-group-required",
+    # Remove the default `.is-valid` class that Bootstrap will style in green
+    # otherwise empty required fields will be marked as valid. This might be
+    # a bug in django-bootstrap4, it should be investigated.
+    "success_css_class": "",
 }
 
 # APIs.

@@ -1,5 +1,7 @@
 import datetime
 
+from dateutil.relativedelta import relativedelta
+
 from django import forms
 from django.conf import settings
 from django.db.models import Q
@@ -9,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from django_select2.forms import Select2MultipleWidget
 
 from itou.prescribers.models import PrescriberOrganization
+from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.widgets import DatePickerField
 
@@ -48,11 +51,23 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ["birthdate", "phone"]
+        fields = [
+            "birthdate",
+            "phone",
+            "pole_emploi_id",
+            "lack_of_pole_emploi_id_reason",
+        ]
         help_texts = {
-            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978"),
-            "phone": _("Par exemple 0610203040"),
+            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
+            "phone": _("Par exemple 0610203040."),
         }
+
+    def clean(self):
+        super().clean()
+        self._meta.model.clean_pole_emploi_fields(
+            self.cleaned_data["pole_emploi_id"],
+            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+        )
 
 
 class CreateJobSeekerForm(forms.ModelForm):
@@ -60,6 +75,7 @@ class CreateJobSeekerForm(forms.ModelForm):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
         self.fields["email"].required = True
+        self.fields["email"].widget.attrs["readonly"] = True
         self.fields["first_name"].required = True
         self.fields["last_name"].required = True
         self.fields["birthdate"].required = True
@@ -67,11 +83,32 @@ class CreateJobSeekerForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = ["email", "first_name", "last_name", "birthdate", "phone"]
+        fields = [
+            "email",
+            "first_name",
+            "last_name",
+            "birthdate",
+            "phone",
+            "pole_emploi_id",
+            "lack_of_pole_emploi_id_reason",
+        ]
         help_texts = {
-            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978"),
-            "phone": _("Par exemple 0610203040"),
+            "birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978."),
+            "phone": _("Par exemple 0610203040."),
         }
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if get_user_model().email_already_exists(email):
+            raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
+        return email
+
+    def clean(self):
+        super().clean()
+        self._meta.model.clean_pole_emploi_fields(
+            self.cleaned_data["pole_emploi_id"],
+            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+        )
 
     def save(self, commit=True):
         if commit:
@@ -146,23 +183,70 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["date_of_hiring"].required = True
-        self.fields["date_of_hiring"].input_formats = settings.DATE_INPUT_FORMATS
+        for field in ["hiring_start_at", "hiring_end_at"]:
+            self.fields[field].required = True
+            self.fields[field].input_formats = settings.DATE_INPUT_FORMATS
 
     class Meta:
         model = JobApplication
-        fields = ["date_of_hiring", "answer"]
+        fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
-            "date_of_hiring": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
-            % {"date": datetime.date.today().strftime("%d/%m/%Y")}
+            "hiring_start_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            % {"date": datetime.date.today().strftime("%d/%m/%Y")},
+            "hiring_end_at": _("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            % {
+                "date": (
+                    datetime.date.today()
+                    + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+                ).strftime("%d/%m/%Y")
+            },
         }
 
-    def clean_date_of_hiring(self):
-        date_of_hiring = self.cleaned_data["date_of_hiring"]
-        if date_of_hiring and date_of_hiring < datetime.date.today():
-            error = _("La date d'embauche ne doit pas être dans le passé.")
-            raise forms.ValidationError(error)
-        return date_of_hiring
+    def clean_hiring_start_at(self):
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
+        if hiring_start_at and hiring_start_at < datetime.date.today():
+            raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
+        return hiring_start_at
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.errors:
+            return cleaned_data
+
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
+        hiring_end_at = self.cleaned_data["hiring_end_at"]
+
+        if hiring_end_at <= hiring_start_at:
+            raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
+
+        if self.instance.to_siae.is_subject_to_eligibility_rules:
+            duration = relativedelta(hiring_end_at, hiring_start_at)
+            benchmark = Approval.DEFAULT_APPROVAL_YEARS
+            if duration.years > benchmark or (
+                duration.years == benchmark and duration.days > 0
+            ):
+                raise forms.ValidationError(JobApplication.ERROR_DURATION_TOO_LONG)
+
+        return cleaned_data
+
+
+class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
+    """
+    Info that will be used to find an existing Pôle emploi approval.
+    """
+
+    class Meta:
+        model = get_user_model()
+        fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        help_texts = {"birthdate": _("Au format jj/mm/aaaa, par exemple 20/12/1978.")}
+
+    def clean(self):
+        super().clean()
+        self._meta.model.clean_pole_emploi_fields(
+            self.cleaned_data["pole_emploi_id"],
+            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+        )
 
 
 class FilterJobApplicationsForm(forms.Form):

@@ -25,4 +25,12 @@
         </div>
     {% endif %}
 
+    {% if approvals_wrapper.latest_approval %}
+        <div class="alert border">
+            {% trans "Agrément existant" %}
+            <br>
+            {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+        </div>
+    {% endif %}
+
 {% endblock %}
