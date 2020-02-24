@@ -9,10 +9,11 @@ from itou.job_applications.factories import JobApplicationSentByPrescriberFactor
 from itou.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberMembershipFactory,
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.utils.widgets import DatePickerField
-from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory
+from itou.users.factories import DEFAULT_PASSWORD
 
 
 class ProcessListTest(TestCase):
@@ -37,25 +38,24 @@ class ProcessListTest(TestCase):
 
         # Pole Emploi
         pole_emploi = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            name="Pôle Emploi"
+            name="Pôle Emploi", membership__user__first_name="Thibault"
         )
-        laurie_pe = PrescriberFactory(first_name="Laurie")
-        thibault_pe = pole_emploi.members.first()
-        thibault_pe.save(update_fields={"first_name": "Thibault"})
-        pole_emploi.members.add(laurie_pe)
+        PrescriberMembershipFactory(organization=pole_emploi, user__first_name="Laurie")
+        thibault_pe = pole_emploi.members.get(first_name="Thibault")
+        laurie_pe = pole_emploi.members.get(first_name="Laurie")
 
         # L'Envol
-        l_envol = PrescriberOrganizationWithMembershipFactory(name="L'Envol")
-        manu_envol = PrescriberFactory(first_name="Manu")
-        audrey_envol = l_envol.members.first()
-        audrey_envol.save(update_fields={"first_name": "Audrey"})
-        l_envol.members.add(manu_envol)
+        l_envol = PrescriberOrganizationWithMembershipFactory(
+            name="L'Envol", membership__user__first_name="Manu"
+        )
+        PrescriberMembershipFactory(organization=l_envol, user__first_name="Audrey")
+        audrey_envol = l_envol.members.get(first_name="Audrey")
 
         # Hit Pit
-        hit_pit = SiaeWithMembershipAndJobsFactory(name="Hit Pit")
-        eddie_hit_pit = hit_pit.members.first()
-        eddie_hit_pit.first_name = "Eddie"
-        eddie_hit_pit.save()
+        hit_pit = SiaeWithMembershipAndJobsFactory(
+            name="Hit Pit", membership__user__first_name="Eddie"
+        )
+        eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
 
         # Now send applications
         for i, state in enumerate(JobApplicationWorkflow.states):
@@ -118,8 +118,8 @@ class ProcessListJobSeekerTest(ProcessListTest):
         """
         self.client.login(username=self.maggie.email, password=DEFAULT_PASSWORD)
         expected_state = self.maggie.job_applications.last().state
-        query = f"states={expected_state}"
-        url = f"{self.job_seeker_base_url}?{query}"
+        params = urlencode({"states": [expected_state]}, True)
+        url = f"{self.job_seeker_base_url}?{params}"
         response = self.client.get(url)
 
         # Count job applications used by the template
@@ -159,8 +159,8 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         state_accepted = JobApplicationWorkflow.STATE_ACCEPTED
-        query = f"states={state_accepted}"
-        url = f"{self.siae_base_url}?{query}"
+        params = urlencode({"states": [state_accepted]}, True)
+        url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
@@ -179,12 +179,8 @@ class ProcessListSiaeTest(ProcessListTest):
             JobApplicationWorkflow.STATE_NEW,
             JobApplicationWorkflow.STATE_PROCESSING,
         ]
-        job_applications_states_str = [
-            f"states={state}" for state in job_applications_states
-        ]
-        job_applications_states_str = "&".join(job_applications_states_str)
-
-        url = f"{self.siae_base_url}?{job_applications_states_str}"
+        params = urlencode({"states": job_applications_states}, True)
+        url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
@@ -243,8 +239,8 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender_organization = self.pole_emploi
-        query = f"sender_organization={sender_organization.id}"
-        url = f"{self.siae_base_url}?{query}"
+        params = urlencode({"sender_organization": sender_organization.id})
+        url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
@@ -262,8 +258,8 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender = self.thibault_pe
-        query = f"sender={sender.id}"
-        url = f"{self.siae_base_url}?{query}"
+        params = urlencode({"sender": sender.id})
+        url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
@@ -279,8 +275,10 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
-        query = f"sender_organization={self.thibault_pe.id}&sender_organization={self.audrey_envol.id}"
-        url = f"{self.siae_base_url}?{query}"
+        params = urlencode(
+            {"sender_organization": [self.thibault_pe.id, self.audrey_envol.id]}, True
+        )
+        url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
@@ -319,8 +317,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
         expected_state = JobApplicationWorkflow.initial_state
-        query = f"states={expected_state}"
-        url = f"{self.prescriber_base_url}?{query}"
+        params = urlencode({"states": [expected_state]}, True)
+        url = f"{self.prescriber_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
@@ -336,8 +334,8 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
         sender_id = self.laurie_pe.id
-        query = f"sender={sender_id}"
-        url = f"{self.prescriber_base_url}?{query}"
+        params = urlencode({"sender": sender_id})
+        url = f"{self.prescriber_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list

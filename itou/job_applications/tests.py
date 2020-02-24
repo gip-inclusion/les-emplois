@@ -7,7 +7,6 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 from django.contrib.auth import get_user_model
 
 from django_xworkflows import models as xwf_models
@@ -86,12 +85,15 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertEqual(JobApplication.objects.created_in_past_hours(35).count(), 3)
 
     def test_get_unique_fk_objects(self):
+        # Create 3 job applications for 2 candidates to check
+        # that `get_unique_fk_objects` returns 2 candidates.
         JobApplicationSentByJobSeekerFactory()
         job_seeker = JobApplicationSentByJobSeekerFactory().job_seeker
         JobApplicationSentByJobSeekerFactory(job_seeker=job_seeker)
 
         unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")
 
+        self.assertEqual(JobApplication.objects.count(), 3)
         self.assertEqual(len(unique_job_seekers), 2)
         self.assertEqual(type(unique_job_seekers[0]), get_user_model())
 
