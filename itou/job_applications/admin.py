@@ -43,7 +43,7 @@ class ApprovalNumberSentByEmailFilter(admin.SimpleListFilter):
 
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
-    actions = ("send_approval_by_email",)
+    actions = ("bulk_send_approval_by_email",)
     date_hierarchy = "created_at"
     list_display = ("id", "state", "sender_kind", "created_at")
     raw_id_fields = (
@@ -67,7 +67,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     inlines = (JobsInline, TransitionLogInline)
     search_fields = ("to_siae__siret", "job_seeker__email")
 
-    def send_approval_by_email(self, request, queryset):
+    def bulk_send_approval_by_email(self, request, queryset):
         queryset = queryset.exclude(approval=None).filter(
             approval_number_sent_by_email=False
         )
@@ -76,7 +76,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
                 deliverer=request.user
             )
 
-    send_approval_by_email.short_description = _("Envoyer le PASS IAE par email")
+    bulk_send_approval_by_email.short_description = _("Envoyer le PASS IAE par email")
 
 
 @admin.register(models.JobApplicationTransitionLog)
