@@ -57,7 +57,7 @@ class CreateSiaeForm(forms.ModelForm):
                 "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
             ),
             "department": TEST_DEPARTMENTS_HELP_TEXT,
-            "description": _("Texte de présentation de votre SIAE."),
+            "description": _("Texte de présentation de votre structure."),
             "phone": _("Par exemple 0610203040"),
             "siret": _(
                 "Saisissez 14 chiffres. "
@@ -127,7 +127,7 @@ class EditSiaeForm(forms.ModelForm):
                 "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
             ),
             "department": TEST_DEPARTMENTS_HELP_TEXT,
-            "description": _("Texte de présentation de votre SIAE."),
+            "description": _("Texte de présentation de votre structure."),
             "phone": _("Par exemple 0610203040"),
             "website": _("Votre site web doit commencer par http:// ou https://"),
         }
