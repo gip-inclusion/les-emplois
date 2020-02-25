@@ -60,6 +60,6 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         fields = ["name", "phone", "email", "website", "description"]
         help_texts = {
             "phone": _("Par exemple 0610203040"),
-            "description": _("Texte de présentation de votre SIAE."),
+            "description": _("Texte de présentation de votre structure."),
             "website": _("Votre site web doit commencer par http:// ou https://"),
         }

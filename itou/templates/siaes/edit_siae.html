@@ -2,11 +2,11 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Modifier les coordonnées de votre SIAE" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Modifier les coordonnées de votre structure" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Modifier les coordonnées de votre SIAE" %}</h1>
+<h1>{% trans "Modifier les coordonnées de votre structure" %}</h1>
 
 <h2 class="text-muted">
     {{ siae.display_name }}
@@ -15,7 +15,7 @@
 </h2>
 
 <div class="alert alert-info" role="alert">
-    {% blocktrans %}Si vous devez modifier le nom de votre SIAE, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a>.{% endblocktrans %}
+    {% blocktrans %}Si vous devez modifier le nom de votre structure, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a>.{% endblocktrans %}
 </div>
 
 <form method="post" action="" class="js-prevent-multiple-submit">

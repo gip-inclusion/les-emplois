@@ -12,7 +12,7 @@ Informations pour l'obtention d'un numéro d'agrément.
 - Email : {{ job_application.job_seeker.email }}{% endif %}
 - Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}
 
-{% trans "*SIAE* :" %}
+{% trans "*Employeur solidaire* :" %}
 
 - Siret : {{ job_application.to_siae.siret }}
 - Nom : {{ job_application.to_siae.display_name }}
