@@ -1,50 +1,50 @@
-import io
+from datetime import datetime as dt
 
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 from django.utils.translation import gettext as _
-from django.http import FileResponse
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.lib.pagesizes import A4
+from django.shortcuts import render
+from django.http import Http404
+# from django.http import FileResponse
 
 from itou.job_applications.models import JobApplication
 
-def approval_as_pdf(request, job_application_id):
-    page_width = A4[0]
-    job_application = JobApplication.objects.select_related(
-        "job_seeker",
-        "approval",
-        "to_siae",
-    ).get(pk=job_application_id)
-    user = job_application.job_seeker
+@login_required
+def approval_as_pdf(request,
+                    job_application_id,
+                    template_name="approvals/approval_as_pdf.html"):
+    try:
+        job_application = JobApplication.objects.select_related(
+            "job_seeker",
+            "approval",
+            "to_siae",
+        ).get(pk=job_application_id)
+
+    except JobApplication.DoesNotExist:
+        return Http404(_("""
+            Nous sommes au regret de vous informer que la candidature reliée à cet agrément n'existe pas."""
+        ))
+
+    job_seeker = job_application.job_seeker
+    user_name = job_seeker.get_full_name()
+    diagnosis = job_seeker.eligibility_diagnoses.latest("created_at")
+    diagnosis_author = diagnosis.author.get_full_name()
+    diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
+    diagnosis_author_org = diagnosis_author_org.display_name
+
     approval = job_application.approval
-    # Create a file-like buffer to receive PDF data.
-    buffer = io.BytesIO()
+    approval_has_started = approval.start_at <= dt.today().date()
+    approval_has_ended = approval.end_at <= dt.today().date()
 
-    # Create the PDF object, using the buffer as its "file."
-    p = canvas.Canvas(buffer)
+    context = {
+        "approval_has_started": approval_has_started,
+        "approval_has_ended": approval_has_ended,
+        "approval": approval,
+        "contact_email": settings.ITOU_EMAIL_CONTACT,
+        "diagnosis_author": diagnosis_author,
+        "diagnosis_author_org": diagnosis_author_org,
+        "user_name": user_name,
+        "siae": job_application.to_siae,
+    }
 
-    # Draw things on the PDF. Here's where the PDF generation happens.
-    # See the ReportLab documentation for the full list of functionality.
-
-    import logging
-    # handler = logging.StreamHandler(logging.stdout)
-    logger = logging.getLogger(__name__)
-    # logger.addHandler(handler)
-
-    logger.warning("#########################################" + str(A4))
-
-    p.drawString(260, 800, f"Agrément pour {user.get_full_name().title()}")
-    p.drawString(100, 100, "Hello world.")
-
-    # p.drawCentredString(x=100, text="texte")
-
-    # Close the PDF object cleanly, and we're done.
-    p.setTitle(_(f"Agrément pour {user.get_full_name().title()}"))
-    p.showPage()
-    p.save()
-
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    buffer.seek(0)
-    # return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
-    return FileResponse(buffer, filename='hello.pdf')
+    return render(request, template_name, context)
