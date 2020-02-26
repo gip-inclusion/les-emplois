@@ -360,45 +360,65 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     Job applications filters common to SIAE and Prescribers.
     """
 
-    sender = forms.MultipleChoiceField(
-        required=False, label=_("Personne"), widget=Select2MultipleWidget
+    senders = forms.MultipleChoiceField(
+        required=False, label=_("Nom"), widget=Select2MultipleWidget
+    )
+
+    job_seekers = forms.MultipleChoiceField(
+        required=False, label=_("Candidat"), widget=Select2MultipleWidget
     )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
-        self.fields["sender"].choices += self.get_sender_choices()
+        self.fields["senders"].choices += self._get_choices_for("sender")
+        self.fields["job_seekers"].choices = self._get_choices_for("job_seeker")
+
+    def _get_choices_for(self, user_type):
+        users = self.job_applications_qs.get_unique_fk_objects(user_type)
+        users = [user for user in users if user.get_full_name()]
+        users = [(user.id, user.get_full_name().title()) for user in users]
+        return sorted(users, key=lambda l: l[1])
+
+    def _humanize_multiple_choice_for_users(self, user_ids, field_name):
+        users = get_user_model().objects.filter(
+            pk__in=[int(user_id) for user_id in user_ids]
+        )
+        values = [user.get_full_name().title() for user in users]
+        value = ", ".join(values)
+        label = self.base_fields.get(field_name).label
+        label = f"{label}s" if (len(values) > 1) else label
+        return label, value
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
-        senders = data.get("sender")
+        senders = data.get("senders")
+        job_seekers = data.get("job_seekers")
 
         if senders:
             qs = Q(sender__id__in=senders)
             qs_list.append(qs)
 
-        return qs_list
+        if job_seekers:
+            qs = Q(job_seeker__id__in=job_seekers)
+            qs_list.append(qs)
 
-    def get_sender_choices(self):
-        senders = self.job_applications_qs.get_unique_fk_objects("sender")
-        senders = [sender for sender in senders if sender.get_full_name()]
-        senders = [(sender.id, sender.get_full_name().title()) for sender in senders]
-        return sorted(senders, key=lambda l: l[1])
+        return qs_list
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
-        senders = self.cleaned_data.get("sender")
+        senders = self.cleaned_data.get("senders")
+        job_seekers = self.cleaned_data.get("job_seekers")
 
         if senders:
-            values = [
-                get_user_model().objects.get(id=int(sender)).get_full_name().title()
-                for sender in senders
-            ]
-            value = ", ".join(values)
-            label = self.base_fields.get("sender").label
-            label = f"{label}s" if (len(values) > 1) else label
+            label, value = self._humanize_multiple_choice_for_users(senders, "senders")
+            humanized_filters.append({"label": label, "value": value})
 
+        if job_seekers:
+            label, value = self._humanize_multiple_choice_for_users(
+                job_seekers, "job_seekers"
+            )
             humanized_filters.append({"label": label, "value": value})
 
         return humanized_filters
@@ -409,20 +429,20 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     Job applications filters for SIAE only.
     """
 
-    sender_organization = forms.MultipleChoiceField(
-        required=False, label=_("Organisation"), widget=Select2MultipleWidget
+    sender_organizations = forms.MultipleChoiceField(
+        required=False, label=_("Prescripteur"), widget=Select2MultipleWidget
     )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields[
-            "sender_organization"
+            "sender_organizations"
         ].choices += self.get_sender_organization_choices()
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
         data = self.cleaned_data
-        sender_organizations = data.get("sender_organization")
+        sender_organizations = data.get("sender_organizations")
 
         if sender_organizations:
             qs = Q(sender_prescriber_organization__id__in=sender_organizations)
@@ -434,21 +454,25 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects(
             "sender_prescriber_organization"
         )
-        sender_orgs = [sender for sender in sender_orgs if sender.name]
-        sender_orgs = [(sender.id, sender.name.title()) for sender in sender_orgs]
+        sender_orgs = [sender for sender in sender_orgs if sender.display_name]
+        sender_orgs = [
+            (sender.id, sender.display_name.title()) for sender in sender_orgs
+        ]
         return sorted(sender_orgs, key=lambda l: l[1])
 
     def humanize_filters(self):
         humanized_filters = super().humanize_filters()
-        sender_organizations = self.cleaned_data.get("sender_organization")
+        sender_organizations = self.cleaned_data.get("sender_organizations")
 
         if sender_organizations:
             values = [
-                PrescriberOrganization.objects.get(id=int(organization)).name.title()
-                for organization in sender_organizations
+                PrescriberOrganization.objects.get(
+                    pk=int(organization_id)
+                ).display_name.title()
+                for organization_id in sender_organizations
             ]
             value = ", ".join(values)
-            label = self.base_fields.get("sender_organization").label
+            label = self.base_fields.get("sender_organizations").label
             label = f"{label}s" if (len(values) > 1) else label
 
             humanized_filters.append({"label": label, "value": value})

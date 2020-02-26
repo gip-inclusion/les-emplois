@@ -239,7 +239,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender_organization = self.pole_emploi
-        params = urlencode({"sender_organization": sender_organization.id})
+        params = urlencode({"sender_organizations": [sender_organization.id]}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
@@ -258,7 +258,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender = self.thibault_pe
-        params = urlencode({"sender": sender.id})
+        params = urlencode({"senders": [sender.id]}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
@@ -269,6 +269,23 @@ class ProcessListSiaeTest(ProcessListTest):
         for application in applications:
             self.assertEqual(application.sender.id, sender.id)
 
+    def test_view__filtered_by_job_seeker_name(self):
+        """
+        Eddie wants to see Maggie's job applications.
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        job_seekers_ids = [self.maggie.id]
+        params = urlencode({"job_seekers": job_seekers_ids}, True)
+        url = f"{self.siae_base_url}?{params}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+
+        self.assertGreater(len(applications), 0)
+
+        for application in applications:
+            self.assertIn(application.job_seeker.id, job_seekers_ids)
+
     def test_view__filtered_by_many_organization_names(self):
         """
         Eddie wants to see applications sent by Pôle Emploi and L'Envol.
@@ -276,7 +293,7 @@ class ProcessListSiaeTest(ProcessListTest):
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
         params = urlencode(
-            {"sender_organization": [self.thibault_pe.id, self.audrey_envol.id]}, True
+            {"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}, True
         )
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
@@ -334,7 +351,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
         sender_id = self.laurie_pe.id
-        params = urlencode({"sender": sender_id})
+        params = urlencode({"senders": sender_id})
         url = f"{self.prescriber_base_url}?{params}"
         response = self.client.get(url)
 
@@ -343,3 +360,19 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         for application in applications:
             self.assertEqual(application.sender.id, sender_id)
+
+    def test_view__filtered_by_job_seeker_name(self):
+        """
+        Thibault wants to see Maggie's job applications.
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        job_seekers_ids = [self.maggie.id]
+        params = urlencode({"job_seekers": job_seekers_ids}, True)
+        url = f"{self.prescriber_base_url}?{params}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+        self.assertGreater(len(applications), 0)
+
+        for application in applications:
+            self.assertIn(application.job_seeker.id, job_seekers_ids)
