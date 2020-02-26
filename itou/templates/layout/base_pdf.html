@@ -1,0 +1,30 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE HTML>
+<html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %} - La plateforme de l'inclusion{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {# Use this to get the value of the CSRF token in JavaScript. #}
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    {% block meta_description %}{% endblock %}
+    <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
+    <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "vendor/bootstrap-4.3.1/bootstrap.min.css" %}" type="text/css">
+    <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
+    <style type="text/css">
+        /* Don't display the BETA banner on pdf files. */
+        body:after {
+            content: "";
+            background: transparent;
+            color: transparent;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+  {% block content %}{% endblock %}
+</body>
+</html>
