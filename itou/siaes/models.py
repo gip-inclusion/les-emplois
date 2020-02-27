@@ -119,6 +119,13 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         choices=SOURCE_CHOICES,
         default=SOURCE_ASP,
     )
+    # In the case of exports from the ASP, this external_id is the internal ID of
+    # the siae objects in ASP's own database. These are supposed to never change,
+    # so as long as the ASP keeps including this field in all their exports,
+    # it will be easy for us to accurately match data between exports.
+    external_id = models.IntegerField(
+        verbose_name=_("ID externe"), null=True, blank=True
+    )
 
     jobs = models.ManyToManyField(
         "jobs.Appellation",
