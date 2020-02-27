@@ -62,7 +62,7 @@ def select_siae(request, template_name="signup/select_siae.html"):
         messages.success(request, message)
         return HttpResponseRedirect(reverse("home:hp"))
 
-    context = {"form": form, "itou_email_contact": settings.ITOU_EMAIL_CONTACT}
+    context = {"form": form}
     return render(request, template_name, context)
 
 
