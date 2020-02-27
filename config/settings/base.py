@@ -301,6 +301,10 @@ API_EMPLOI_STORE_SECRET = os.environ["API_EMPLOI_STORE_SECRET"]
 API_EMPLOI_STORE_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_EMPLOI_STORE_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
+# PDFShift
+PDFSHIFT_API_KEY = os.environ["PDFSHIFT_API_KEY"]
+PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
+
 # Itou.
 # ------------------------------------------------------------------------------
 

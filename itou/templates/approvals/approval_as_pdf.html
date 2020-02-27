@@ -12,13 +12,13 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container pt-5">
+    <div class="container-fluid" style="padding: 5rem 6rem;">
         <div class="row">
             <div class="col-sm-3 offset-sm-3 text-right">
-                <img src="{% static 'img/pdf/logoCIPE.png' %}" class="w-50">
+                <img src="{{ base_url }}{% static 'img/pdf/logoCIPE.png' %}" class="w-75">
             </div>
             <div class="col-sm-3">
-                <img src="{% static 'img/pdf/logoPE.png' %}" class="w-50">
+                <img src="{{ base_url }}{% static 'img/pdf/logoPE.png' %}" class="w-75">
             </div>
         </div>
 
@@ -56,7 +56,7 @@
         <section class="mt-5">
             <p>{% trans "Objet" %} : <span class="font-weight-bold">{% trans "Décision d'agrément pour un parcours d'insertion par l'activité économique" %}</span>
             </p>
-            <p>
+            <p class="text-justify">
                 {% blocktrans with diagnosis_author=diagnosis_author|title diagnosis_author_org=diagnosis_author_org|title user_name=user_name|title %}
 
                     Au vu du diagnostic individuel réalisé par {{ diagnosis_author }} ({{ diagnosis_author_org }}) portant sur la situation sociale et professionnelle de {{ user_name }} et de votre promesse d’embauche, la Plateforme de l’Inclusion vous délivre un PASS IAE pour un parcours d’insertion par l’activité économique, conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
@@ -89,10 +89,5 @@
                 {% endblocktrans %}
             </p>
         </section>
-        <div class="pb-5"></div>
-        <div class="pb-5"></div>
-        <div class="pb-5"></div>
-        <div class="pb-5"></div>
-        <div class="pb-5"></div>
     </div>
 {% endblock %}
