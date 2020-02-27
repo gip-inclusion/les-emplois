@@ -62,7 +62,6 @@ SIRET_KIND_TO_EMAIL_MAP = get_siret_kind_to_email_map()
 
 
 def populate_siae_auth_email(apps, schema_editor):
-    sirets_with_error = []
     print()  # New line so that logs below are more readable.
     for siae in Siae.objects.all():
         key = (siae.siret, siae.kind)
@@ -80,7 +79,7 @@ def populate_siae_auth_email(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("siaes", "0017_siae_auth_email")]
+    dependencies = [("siaes", "0018_siae_external_id")]
 
     operations = [
         migrations.RunPython(populate_siae_auth_email, migrations.RunPython.noop)

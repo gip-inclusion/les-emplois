@@ -119,6 +119,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         choices=SOURCE_CHOICES,
         default=SOURCE_ASP,
     )
+    external_id = models.IntegerField(
+        verbose_name=_("ID externe"), null=True, blank=True
+    )
 
     jobs = models.ManyToManyField(
         "jobs.Appellation",
