@@ -53,17 +53,20 @@ SIRET_KIND_TO_DATA_MAP = get_siret_kind_to_data_map()
 
 def populate_siae_external_id_and_update_auth_email(apps, schema_editor):
     print()  # New line so that logs below are more readable.
-    return  # FIXME WIP
     for siae in Siae.objects.all():
         if siae.kind == Siae.KIND_GEIQ:
             continue
         key = (siae.siret, siae.kind)
-        if key in SIRET_KIND_TO_DATA_MAP:
-            # siae.auth_email = SIRET_KIND_TO_DATA_MAP[key]
-            # siae.save()
-            pass
-        else:
-            raise RuntimeError("FIXME")
+        if key not in SIRET_KIND_TO_DATA_MAP:
+            # import ipdb; ipdb.set_trace()
+            raise
+        auth_email = SIRET_KIND_TO_DATA_MAP[key]["auth_email"]
+        name = SIRET_KIND_TO_DATA_MAP[key]["name"]
+        external_id = SIRET_KIND_TO_DATA_MAP[key]["external_id"]
+        if siae.auth_email != auth_email:
+            print(f"auth_email {siae.auth_email} changed to {auth_email}")
+        # siae.auth_email = auth_email
+        # siae.save()
         if not siae.has_members and not siae.auth_email:
             msg = (
                 f"Signup impossible for siae siret={siae.siret} "
