@@ -28,9 +28,21 @@
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
             <div class="card-footer">
-                <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">
-                    {% trans "Gérer la candidature" %}
-                </a>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">
+                            {% trans "Gérer la candidature" %}
+                        </a>
+
+                    </div>
+                {% if job_application.state.is_accepted %}
+                    <div class="col-sm-3">
+                        <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none">
+                            {% trans "Télécharger l'attestation" %}
+                        </a>
+                    </div>
+                {% endif %}
+                </div>
             </div>
 
         </div>
