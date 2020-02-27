@@ -42,3 +42,5 @@ DEBUG_TOOLBAR_CONFIG = {
     ],
     "SHOW_TEMPLATE_CONTEXT": True,
 }
+
+ITOU_FQDN = "staging.inclusion.beta.gouv.fr"
