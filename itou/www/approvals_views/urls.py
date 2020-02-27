@@ -7,5 +7,9 @@ from itou.www.approvals_views import views
 app_name = "approvals"
 
 urlpatterns = [
-    path("download/<uuid:job_application_id>", views.approval_as_pdf, name="approval_as_pdf"),
+    path(
+        "download/<uuid:job_application_id>",
+        views.approval_as_pdf,
+        name="approval_as_pdf",
+    )
 ]
