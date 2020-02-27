@@ -510,7 +510,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/approval_number_subject.txt"
         body = "apply/email/approval_number_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body)
 
     def send_approval_number_by_email_manually(self, deliverer):
         """

@@ -121,7 +121,9 @@ class SelectSiaeForm(forms.Form):
 
     email = forms.EmailField(
         label=gettext_lazy("E-mail"),
-        help_text=gettext_lazy("Doit si possible être l'adresse e-mail connue de l'ASP pour les SIAE."),
+        help_text=gettext_lazy(
+            "Doit si possible être l'adresse e-mail connue de l'ASP pour les SIAE."
+        ),
         required=False,
     )
 
