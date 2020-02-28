@@ -299,8 +299,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
-            "de l'ASP."
+            "Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services."
         )
         self.assertContains(response, expected_message)
 
@@ -326,7 +325,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            "Ni ce SIRET ni cet email ne figurent dans notre base de données"
+            "Votre numéro de SIRET et votre e-mail nous sont inconnus."
         )
         self.assertContains(response, escape(expected_message))
 
@@ -361,11 +360,7 @@ class SiaeSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
-        expected_message = _(
-            "Comme plusieurs structures partagent cet email nous nous basons "
-            "sur le SIRET pour identifier votre structure, or "
-            "ce SIRET ne figure pas dans notre base de données."
-        )
+        expected_message = _("Votre e-mail est partagé par plusieurs structures")
         self.assertContains(response, escape(expected_message))
 
     def test_siae_signup_story_of_david(self):
