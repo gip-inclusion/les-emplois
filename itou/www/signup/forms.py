@@ -102,19 +102,19 @@ class SelectSiaeForm(forms.Form):
     """
 
     kind = forms.ChoiceField(
-        label=gettext_lazy("Type de votre structure"),
+        label=gettext_lazy("Type de structure"),
         choices=BLANK_CHOICE + Siae.KIND_CHOICES,
         required=True,
     )
 
     siret = forms.CharField(
-        label=gettext_lazy("Numéro SIRET de votre structure"),
+        label=gettext_lazy("Numéro de SIRET"),
         min_length=14,
         max_length=14,
         validators=[validate_siret],
         strip=True,
         help_text=gettext_lazy(
-            "Saisissez 14 chiffres. Doit si possible être le SIRET connu de l'ASP pour les SIAE."
+            "Saisissez 14 chiffres. Numéro connue possiblement de l'Agence de services et de paiement (ASP)"
         ),
         required=False,
     )
@@ -122,7 +122,7 @@ class SelectSiaeForm(forms.Form):
     email = forms.EmailField(
         label=gettext_lazy("E-mail"),
         help_text=gettext_lazy(
-            "Doit si possible être l'adresse e-mail connue de l'ASP pour les SIAE."
+            "Pour les SIAE, adresse e-mail connue possiblement de l'Agence de services et de paiement (ASP)"
         ),
         required=False,
     )
@@ -135,8 +135,7 @@ class SelectSiaeForm(forms.Form):
 
         if not (siret or email):
             error_message = _(
-                "Veuillez saisir soit un email connu de l'ASP soit un SIRET connu "
-                "de l'ASP."
+                "Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services."
             )
             raise forms.ValidationError(mark_safe(error_message))
 
@@ -164,21 +163,18 @@ class SelectSiaeForm(forms.Form):
 
             if several_siaes_share_same_email:
                 error_message = _(
-                    "Comme plusieurs structures partagent cet email nous nous basons "
-                    "sur le SIRET pour identifier votre structure, or "
-                    "ce SIRET ne figure pas dans notre base de données.<br>"
-                    "Veuillez saisir un SIRET connu de l'ASP."
+                    "Votre e-mail est partagé par plusieurs structures "
+                    "et votre numéro de SIRET nous est inconnu.<br>"
+                    "Merci de vous rapprocher de votre service gestion "
+                    "afin d'obtenir votre numéro de SIRET."
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
             if not email_exists:
                 error_message = _(
-                    "Ni ce SIRET ni cet email ne figurent dans notre base de données "
-                    "pour ce type de SIAE.<br>"
-                    "Veuillez saisir le type correct de votre SIAE et soit un email connu de l'ASP "
-                    "soit un SIRET connu de l'ASP.<br>"
-                    "Si nécéssaire veuillez vous rapprocher de votre service gestion "
-                    "pour obtenir ces informations."
+                    "Votre numéro de SIRET et votre e-mail nous sont inconnus.<br>"
+                    "Merci de vous rapprocher de votre service gestion "
+                    "afin d'obtenir l'une de ces deux informations (SIRET ou e-mail)."
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
