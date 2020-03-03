@@ -1,12 +1,14 @@
 import io
 from datetime import datetime as dt
+from requests import exceptions as requests_exceptions
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.http import Http404, FileResponse
+from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
-from django.http import Http404, FileResponse
 import pdfshift
 
 from itou.job_applications.models import JobApplication
@@ -16,32 +18,32 @@ from itou.job_applications.models import JobApplication
 def approval_as_pdf(
     request, job_application_id, template_name="approvals/approval_as_pdf.html"
 ):
-    try:
-        job_application = JobApplication.objects.select_related(
-            "job_seeker", "approval", "to_siae"
-        ).get(pk=job_application_id)
+    queryset = JobApplication.objects.select_related(
+        "job_seeker", "approval", "to_siae"
+    )
+    job_application = get_object_or_404(queryset, pk=job_application_id)
 
-    except JobApplication.DoesNotExist:
-        return Http404(
+    if not job_application.has_a_downloadable_approval:
+        raise Http404(
             _(
                 """
-            Nous sommes au regret de vous informer que la candidature reliée à cet agrément n'existe pas."""
+            Nous sommes au regret de vous informer que
+            vous ne pouvez pas télécharger cet agrément."""
             )
         )
 
     job_seeker = job_application.job_seeker
     user_name = job_seeker.get_full_name()
 
-    diagnosis = job_seeker.eligibility_diagnoses.select_related(
-        "author", "author_prescriber_organization", "author_siae"
-    ).latest("created_at")
+    diagnosis = job_seeker.get_eligibility_diagnosis()
     diagnosis_author = diagnosis.author.get_full_name()
     diagnosis_author_org = (
         diagnosis.author_prescriber_organization or diagnosis.author_siae
     )
 
+    diagnosis_author_org_name = None
     if diagnosis_author_org:
-        diagnosis_author_org = diagnosis_author_org.display_name
+        diagnosis_author_org_name = diagnosis_author_org.display_name
 
     approval = job_application.approval
     approval_has_started = approval.start_at <= dt.today().date()
@@ -54,7 +56,7 @@ def approval_as_pdf(
     if settings.DEBUG:
         # Use staging or production styles when working locally
         # as PDF shift can't access local files.
-        base_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}"
+        base_url = f"{settings.ITOU_PROTOCOL}://{settings.ITOU_STAGING_DN}"
 
     context = {
         "base_url": base_url,
@@ -63,7 +65,7 @@ def approval_as_pdf(
         "approval": approval,
         "contact_email": settings.ITOU_EMAIL_CONTACT,
         "diagnosis_author": diagnosis_author,
-        "diagnosis_author_org": diagnosis_author_org,
+        "diagnosis_author_org_name": diagnosis_author_org_name,
         "user_name": user_name,
         "siae": job_application.to_siae,
     }
@@ -72,8 +74,12 @@ def approval_as_pdf(
         template=template_name, context=context
     ).rendered_content
 
-    pdfshift.api_key = settings.PDFSHIFT_API_KEY
-    binary_file = pdfshift.convert(html, sandbox=settings.PDFSHIFT_SANDBOX_MODE)
+    try:
+        pdfshift.api_key = settings.PDFSHIFT_API_KEY
+        binary_file = pdfshift.convert(html, sandbox=settings.PDFSHIFT_SANDBOX_MODE)
+    except requests_exceptions.ConnectionError as error:
+        # In Django 3 we can use RequestAborted here.
+        raise ConnectionAbortedError(error)
 
     buffer = io.BytesIO()
     buffer.write(binary_file)

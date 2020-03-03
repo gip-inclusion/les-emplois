@@ -119,6 +119,7 @@ class JobApplicationWithApprovalFactory(JobApplicationFactory):
     """
 
     approval = factory.SubFactory(ApprovalFactory)
+    state = models.JobApplicationWorkflow.STATE_ACCEPTED
 
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):

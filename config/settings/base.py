@@ -320,3 +320,8 @@ ITOU_TEST_DEPARTMENTS = ["62", "67", "93"]
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
+
+# Some external libraries, as PDF Shift, need access to static files
+# but they can't access them when working locally.
+# Use the staging domain name when this case arises.
+ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"

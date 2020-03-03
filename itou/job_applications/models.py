@@ -357,6 +357,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             .user
         )
 
+    @property
+    def has_a_downloadable_approval(self):
+        return (
+            self.state.is_accepted
+            and self.to_siae.is_subject_to_eligibility_rules
+            and self.approval
+        )
+
     # Workflow transitions.
 
     @xwf_models.transition()
