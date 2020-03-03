@@ -39,7 +39,9 @@ def approval_as_pdf(
     diagnosis_author_org = (
         diagnosis.author_prescriber_organization or diagnosis.author_siae
     )
-    diagnosis_author_org = diagnosis_author_org.display_name
+
+    if diagnosis_author_org:
+        diagnosis_author_org = diagnosis_author_org.display_name
 
     approval = job_application.approval
     approval_has_started = approval.start_at <= dt.today().date()
