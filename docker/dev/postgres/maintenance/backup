@@ -19,6 +19,7 @@ export PGHOST="${POSTGRES_HOST}"
 export PGPORT="${POSTGRES_PORT}"
 export PGUSER="${ITOU_POSTGRES_USER}"
 export PGPASSWORD="${ITOU_POSTGRES_PASSWORD}"
+export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"
 
 backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').sql.gz"
 pg_dump | gzip > "${BACKUP_DIR_PATH}/${backup_filename}"

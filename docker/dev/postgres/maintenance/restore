@@ -34,6 +34,7 @@ export PGHOST="${POSTGRES_HOST}"
 export PGPORT="${POSTGRES_PORT}"
 export PGUSER="${ITOU_POSTGRES_USER}"
 export PGPASSWORD="${ITOU_POSTGRES_PASSWORD}"
+export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"
 
 message_info "Dropping the database..."
 dropdb "${ITOU_POSTGRES_DATABASE_NAME}"
