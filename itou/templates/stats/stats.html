@@ -53,6 +53,12 @@
             </b>
         </li>
         <li>
+            {% trans "PASS IAE délivrés de façon automatique à ce jour" %} : <b>{{ data.total_auto_approval_deliveries }}</b>
+        </li>
+        <li>
+            {% trans "PASS IAE délivrés de façon manuelle à ce jour" %} : <b>{{ data.total_manual_approval_deliveries }}</b>
+        </li>
+        <li>
             {% trans "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }}</b>
         </li>
         <li>

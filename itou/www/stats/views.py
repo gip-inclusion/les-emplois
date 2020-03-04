@@ -167,14 +167,21 @@ def get_today():
 
 def get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users):
     data = {}
-    data["total_job_applications"] = job_applications.count()
 
+    data["total_job_applications"] = job_applications.count()
     data["total_hirings"] = hirings.count()
+    data.update(get_hiring_delays(hirings))
+    data["total_auto_approval_deliveries"] = job_applications.filter(
+        approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
+    ).count()
+    data["total_manual_approval_deliveries"] = job_applications.filter(
+        approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL
+    ).count()
 
     data["total_job_seeker_users"] = nationwide_job_seeker_users.count()
 
-    # Job seekers registered for more than X days, having
-    # at least one job_application but no hiring.
+    # Job seekers without opportunity are those registered for more
+    # than X days, having at least one job_application but no hiring.
     days = 45
     data["days_for_total_job_seeker_users_without_opportunity"] = days
     data["total_job_seeker_users_without_opportunity"] = (
@@ -212,8 +219,6 @@ def get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users):
     data["hirings_per_destination_kind"] = get_donut_chart_data_per_destination_kind(
         hirings
     )
-
-    data.update(get_hiring_delays(hirings))
     return data
 
 
