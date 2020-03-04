@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 
-from django.db.models import Avg, Count, Max, DateTimeField, F, Q, ExpressionWrapper
+from django.db.models import Avg, Count, DateTimeField, F, Q, ExpressionWrapper
 from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 
 from itou.eligibility.models import EligibilityDiagnosis
@@ -427,26 +427,22 @@ def get_hiring_delays(hirings):
     # 1) Job application date is job_application.created_at
     # 2) Approval date (aka "Hiring date") is job_application.logs__timestamp
     #    where job_application.logs__state="accepted"
-    # FIXME after merging kemar/approvals
-    # 3) IAE Pass delivery date is job_application.job_seeker__approvals__created_at
-    # 4) Start of contract is job_application.job_seeker__approvals__start_at
+    # 3) IAE Pass delivery date is job_application.approval_number_sent_at
+    # 4) Start of contract is job_application.approval__start_at
     hiring_dates = (
         hirings.filter(logs__transition="accept", logs__to_state="accepted")
-        # only seek most recent approval
-        .annotate(max_date=Max("job_seeker__approvals__created_at"))
-        .filter(job_seeker__approvals__created_at=F("max_date"))
         .distinct()
         .values(
             "created_at",
             "logs__timestamp",
-            "job_seeker__approvals__created_at",
-            "job_seeker__approvals__start_at",
+            "approval_number_sent_at",
+            "approval__start_at",
         )
         # We ignore hirings whose events are in the wrong chronological order.
         .filter(
             logs__timestamp__gte=F("created_at"),
-            job_seeker__approvals__created_at__gte=F("logs__timestamp"),
-            job_seeker__approvals__start_at__gte=F("job_seeker__approvals__created_at"),
+            approval_number_sent_at__gte=F("logs__timestamp"),
+            approval__start_at__gte=F("approval_number_sent_at"),
         )
     )
 
@@ -455,12 +451,11 @@ def get_hiring_delays(hirings):
             F("logs__timestamp") - F("created_at"), output_field=DateTimeField()
         ),
         average_delay_from_hiring_to_pass_delivery=Avg(
-            F("job_seeker__approvals__created_at") - F("logs__timestamp"),
+            F("approval_number_sent_at") - F("logs__timestamp"),
             output_field=DateTimeField(),
         ),
         average_delay_from_pass_delivery_to_contract_start=Avg(
-            F("job_seeker__approvals__start_at")
-            - F("job_seeker__approvals__created_at"),
+            F("approval__start_at") - F("approval_number_sent_at"),
             output_field=DateTimeField(),
         ),
     )
