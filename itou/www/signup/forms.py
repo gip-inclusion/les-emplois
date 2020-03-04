@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -8,8 +9,8 @@ from allauth.account.forms import SignupForm
 
 from itou.prescribers.models import PrescriberOrganization, PrescriberMembership
 from itou.siaes.models import Siae, SiaeMembership
+from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
-from itou.www.signup import utils
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -212,11 +213,15 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         required=True,
     )
 
+    encoded_siae_id = forms.CharField(widget=forms.HiddenInput())
+
+    token = forms.CharField(widget=forms.HiddenInput())
+
     def save(self, request):
         user = super().save(request)
 
-        if utils.check_siae_signup_credentials(request.session):
-            siae = utils.get_siae_from_session(request.session)
+        if self.check_siae_signup_credentials():
+            siae = self.get_siae()
         else:
             raise RuntimeError("This should never happen. Attack attempted.")
 
@@ -234,6 +239,39 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         membership.save()
 
         return user
+
+    def get_encoded_siae_id(self):
+        if "encoded_siae_id" in self.initial:
+            return self.initial["encoded_siae_id"]
+        return self.data["encoded_siae_id"]
+
+    def get_token(self):
+        if "token" in self.initial:
+            return self.initial["token"]
+        return self.data["token"]
+
+    def get_siae(self):
+        if not self.get_encoded_siae_id():
+            return None
+        siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
+        siae = Siae.objects.get(pk=siae_id)
+        return siae
+
+    def check_siae_signup_credentials(self):
+        siae = self.get_siae()
+        return siae_signup_token_generator.check_token(
+            siae=siae, token=self.get_token()
+        )
+
+    def get_initial(self):
+        siae = self.get_siae()
+        return {
+            "encoded_siae_id": self.get_encoded_siae_id(),
+            "token": self.get_token(),
+            "siret": siae.siret,
+            "kind": siae.kind,
+            "siae_name": siae.display_name,
+        }
 
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):

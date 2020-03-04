@@ -3,7 +3,6 @@ Handle multiple user types sign up with django-allauth.
 """
 from allauth.account.views import SignupView
 
-from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -13,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url
-from itou.www.signup import forms, utils
+from itou.www.signup import forms
 
 
 @require_GET
@@ -83,27 +82,25 @@ class SiaeSignupView(SignupView):
     template_name = "signup/signup_siae.html"
 
     def get(self, request, *args, **kwargs):
-        request.session[settings.ITOU_SESSION_SIAE_SIGNUP_ID] = kwargs.get(
-            "encoded_siae_id"
+        form = forms.SiaeSignupForm(
+            initial={
+                "encoded_siae_id": kwargs.get("encoded_siae_id"),
+                "token": kwargs.get("token"),
+            }
         )
-        request.session[settings.ITOU_SESSION_SIAE_SIGNUP_TOKEN] = kwargs.get("token")
-        if utils.check_siae_signup_credentials(request.session):
-            self.initial = get_initial_from_session(request.session)
+        if form.check_siae_signup_credentials():
+            self.initial = form.get_initial()
             return super().get(request, *args, **kwargs)
         return redirect_to_select_siae_form(request)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
-        if utils.check_siae_signup_credentials(request.session):
-            self.initial = get_initial_from_session(request.session)
+        form = forms.SiaeSignupForm(data=request.POST or None)
+        if form.check_siae_signup_credentials():
+            self.initial = form.get_initial()
             return super().post(request, *args, **kwargs)
         return redirect_to_select_siae_form(request)
-
-
-def get_initial_from_session(session):
-    siae = utils.get_siae_from_session(session)
-    return {"siret": siae.siret, "kind": siae.kind, "siae_name": siae.display_name}
 
 
 class JobSeekerSignupView(SignupView):

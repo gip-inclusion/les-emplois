@@ -218,10 +218,16 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return reverse(
             "signup:siae",
             kwargs={
-                "encoded_siae_id": urlsafe_base64_encode(force_bytes(self.pk)),
-                "token": siae_signup_token_generator.make_token(self),
+                "encoded_siae_id": self.get_encoded_siae_id(),
+                "token": self.get_token(),
             },
         )
+
+    def get_encoded_siae_id(self):
+        return urlsafe_base64_encode(force_bytes(self.pk))
+
+    def get_token(self):
+        return siae_signup_token_generator.make_token(self)
 
     def new_signup_warning_email_to_admins(self, user):
         """

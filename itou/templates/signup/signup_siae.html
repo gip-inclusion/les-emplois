@@ -21,6 +21,9 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
     {% endif %}
 
+    {% bootstrap_field form.encoded_siae_id %}
+    {% bootstrap_field form.token %}
+
     {% bootstrap_field form.kind %}
     {% bootstrap_field form.siret %}
     {% bootstrap_field form.siae_name %}

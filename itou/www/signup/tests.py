@@ -102,6 +102,9 @@ class SiaeSignupTest(TestCase):
 
         url = reverse("signup:siae")
         post_data = {
+            # hidden fields
+            "encoded_siae_id": siae1.get_encoded_siae_id(),
+            "token": siae1.get_token(),
             # readonly fields
             "siret": siae1.siret,
             "kind": siae1.kind,
@@ -226,6 +229,9 @@ class SiaeSignupTest(TestCase):
 
         url = reverse("signup:siae")
         post_data = {
+            # hidden fields
+            "encoded_siae_id": siae1.get_encoded_siae_id(),
+            "token": siae1.get_token(),
             # readonly fields
             "siret": siae1.siret,
             "kind": siae1.kind,
@@ -404,6 +410,9 @@ class SiaeSignupTest(TestCase):
 
         url = reverse("signup:siae")
         post_data = {
+            # hidden fields
+            "encoded_siae_id": siae3.get_encoded_siae_id(),
+            "token": siae3.get_token(),
             # readonly fields
             "siret": siae3.siret,
             "kind": shared_siae_kind,
@@ -464,6 +473,9 @@ class SiaeSignupTest(TestCase):
 
         url = reverse("signup:siae")
         post_data = {
+            # hidden fields
+            "encoded_siae_id": siae.get_encoded_siae_id(),
+            "token": siae.get_token(),
             # readonly fields
             "siret": siae.siret,
             "kind": siae.kind,
@@ -532,6 +544,9 @@ class SiaeSignupTest(TestCase):
 
         url = reverse("signup:siae")
         post_data = {
+            # hidden fields
+            "encoded_siae_id": siae2.get_encoded_siae_id(),
+            "token": siae2.get_token(),
             # readonly fields
             "siret": siae2.siret,
             "kind": shared_siae_kind,
