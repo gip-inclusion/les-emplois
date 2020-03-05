@@ -1,16 +1,14 @@
-import io
 from datetime import datetime as dt
-from requests import exceptions as requests_exceptions
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, FileResponse
+from django.http import Http404, FileResponse, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
-import pdfshift
 
+from itou.utils.pdf import HtmlToPdf
 from itou.job_applications.models import JobApplication
 
 
@@ -23,7 +21,7 @@ def approval_as_pdf(
     )
     job_application = get_object_or_404(queryset, pk=job_application_id)
 
-    if not job_application.has_a_downloadable_approval:
+    if not job_application.can_download_approval_as_pdf:
         raise Http404(
             _(
                 """
@@ -74,17 +72,7 @@ def approval_as_pdf(
         template=template_name, context=context
     ).rendered_content
 
-    try:
-        pdfshift.api_key = settings.PDFSHIFT_API_KEY
-        binary_file = pdfshift.convert(html, sandbox=settings.PDFSHIFT_SANDBOX_MODE)
-    except requests_exceptions.ConnectionError as error:
-        # In Django 3 we can use RequestAborted here.
-        raise ConnectionAbortedError(error)
-
-    buffer = io.BytesIO()
-    buffer.write(binary_file)
-    buffer.seek(0)
-
     filename = f"{slugify(user_name)}-pass-iae.pdf"
 
-    return FileResponse(buffer, as_attachment=True, filename=filename)
+    with HtmlToPdf(html, autoclose=False) as transformer:
+        return FileResponse(transformer.file, as_attachment=True, filename=filename)

@@ -10,4 +10,10 @@ $(document).ready(() => {
       })
   })
 
+  // Prevent a user from clicking frantically on a link.
+  $('a.click-once').on('click', function () {
+    $(this).class('disabled');
+    return false
+  });
+
 })

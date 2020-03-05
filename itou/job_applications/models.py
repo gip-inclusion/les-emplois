@@ -358,7 +358,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     @property
-    def has_a_downloadable_approval(self):
+    def can_download_approval_as_pdf(self):
         return (
             self.state.is_accepted
             and self.to_siae.is_subject_to_eligibility_rules

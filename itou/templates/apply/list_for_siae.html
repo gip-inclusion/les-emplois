@@ -35,7 +35,7 @@
                         </a>
 
                     </div>
-                    {% if job_application.has_a_downloadable_approval %}
+                    {% if job_application.can_download_approval_as_pdf %}
                         <div class="col-sm-3">
                             <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none">
                                 {% trans "Télécharger l'attestation" %}
