@@ -74,28 +74,9 @@
                 {% endblocktrans %}
             </p>
             <p>
-                {% blocktrans with approval_number=approval.number_with_spaces%}
-                    Ce PASS IAE, inscrit sous le numéro {{ approval_number }},
-                {% endblocktrans %}
-
-                {% if approval_has_started %}
-                    {% trans "a débuté" %}
-                {% else %}
-                    {% trans "débutera" %}
-                {% endif %}
-
-                {% blocktrans with start=approval.start_at|date:"d/m/Y"%}
-                    le {{ start }} et
-                {% endblocktrans %}
-
-                {% if approval_has_ended %}
-                    {% trans "s'est terminé" %}
-                {% else %}
-                    {% trans "se terminera" %}
-                {% endif %}
-
-                {% blocktrans with end=approval.end_at|date:"d/m/Y" %}
-                    le {{ end }}.
+                {% blocktrans with approval_nb=approval.number_with_spaces start=approval.start_at|date:"d/m/Y"  end=approval.end_at|date:"d/m/Y" %}
+                    Ce PASS IAE, inscrit sous le numéro {{ approval_nb }}, est valide du
+                    {{ start }} au {{ end }}.
                 {% endblocktrans %}
             </p>
         </section>
