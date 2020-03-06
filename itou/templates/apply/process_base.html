@@ -19,7 +19,7 @@
             </div>
             {% if job_application.can_download_approval_as_pdf %}
                 <div class="col-sm text-sm-right">
-                    <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click">
+                    <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="details-candidature">
                         <button type="button" class="btn btn-outline-primary">{% trans "Télécharger l'attestation" %}</button>
                     </a>
                 </div>

@@ -15,7 +15,6 @@ $(document).ready(() => {
     if ($(this).hasClass('disabled')) {
         return false
     }
-    console.log('clicked');
     $(this).addClass('disabled');
   });
 
