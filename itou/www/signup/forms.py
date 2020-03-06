@@ -172,9 +172,8 @@ class SelectSiaeForm(forms.Form):
 
             if not email_exists:
                 error_message = _(
-                    "Votre numéro de SIRET et votre e-mail nous sont inconnus.<br>"
-                    "Merci de vous rapprocher de votre service gestion "
-                    "afin d'obtenir l'une de ces deux informations (SIRET ou e-mail)."
+                    "Votre numéro de SIRET ou votre e-mail nous sont inconnus.<br>"
+                    "Merci de vérifier votre saisie ou veuillez nous contacter à l'adresse suivante : contact@inclusion.beta.gouv.fr<br>"
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
