@@ -185,8 +185,9 @@ class JobApplicationEmailTest(TestCase):
         email = job_application.email_accept
         # To.
         self.assertIn(job_application.job_seeker.email, email.to)
-        self.assertIn(job_application.sender.email, email.to)
-        self.assertEqual(len(email.to), 2)
+        self.assertIn(job_application.sender.email, email.bcc)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(len(email.bcc), 1)
         # Body.
         self.assertIn(job_application.sender.first_name, email.body)
         self.assertIn(job_application.sender.last_name, email.body)
@@ -249,8 +250,9 @@ class JobApplicationEmailTest(TestCase):
         email = job_application.email_refuse
         # To.
         self.assertIn(job_application.job_seeker.email, email.to)
-        self.assertIn(job_application.sender.email, email.to)
-        self.assertEqual(len(email.to), 2)
+        self.assertIn(job_application.sender.email, email.bcc)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(len(email.bcc), 1)
         # Body.
         self.assertIn(job_application.sender.first_name, email.body)
         self.assertIn(job_application.sender.last_name, email.body)

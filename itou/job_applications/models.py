@@ -449,11 +449,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     def get_email_message(
-        self, to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL
+        self,
+        to,
+        context,
+        subject,
+        body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        bcc=None,
     ):
         return mail.EmailMessage(
             from_email=from_email,
             to=to,
+            bcc=bcc,
             subject=get_email_text_template(subject, context),
             body=get_email_text_template(body, context),
         )
@@ -469,22 +476,24 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_accept(self):
         to = [self.job_seeker.email]
+        bcc = []
         if self.is_sent_by_proxy:
-            to.append(self.sender.email)
+            bcc.append(self.sender.email)
         context = {"job_application": self}
         subject = "apply/email/accept_subject.txt"
         body = "apply/email/accept_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return self.get_email_message(to, context, subject, body, bcc=bcc)
 
     @property
     def email_refuse(self):
         to = [self.job_seeker.email]
+        bcc = []
         if self.is_sent_by_proxy:
-            to.append(self.sender.email)
+            bcc.append(self.sender.email)
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
         body = "apply/email/refuse_body.txt"
-        return self.get_email_message(to, context, subject, body)
+        return self.get_email_message(to, context, subject, body, bcc=bcc)
 
     def email_accept_trigger_manual_approval(self, accepted_by):
         to = [settings.ITOU_EMAIL_CONTACT]
