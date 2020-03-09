@@ -162,6 +162,9 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
                         <a href="{% url 'apply:list_for_siae' %}">{% trans "Répondre aux candidatures reçues" %}</a>
+                        {% if job_applications_counter > 0 %}
+                            <span class="badge badge-danger">{{ job_applications_counter }}</span>
+                        {% endif %}
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="user-check" %}
