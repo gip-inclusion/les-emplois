@@ -229,8 +229,15 @@ section.home-search .bg-image {
 
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+    .fixed-sm-bottom {
+        position: fixed !important;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1030;
+    }
 
-@media (min-width: 700px) {
     /* Set width depending on a breaking point. */
     .w-sm-25 {
         width: 25% !important;
