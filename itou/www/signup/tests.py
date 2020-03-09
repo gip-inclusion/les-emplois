@@ -331,7 +331,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            "Votre numéro de SIRET et votre e-mail nous sont inconnus."
+            "Votre numéro de SIRET ou votre e-mail nous sont inconnus."
         )
         self.assertContains(response, escape(expected_message))
 

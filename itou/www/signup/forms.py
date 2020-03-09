@@ -1,4 +1,5 @@
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils.http import urlsafe_base64_decode
@@ -173,9 +174,9 @@ class SelectSiaeForm(forms.Form):
 
             if not email_exists:
                 error_message = _(
-                    "Votre numéro de SIRET et votre e-mail nous sont inconnus.<br>"
-                    "Merci de vous rapprocher de votre service gestion "
-                    "afin d'obtenir l'une de ces deux informations (SIRET ou e-mail)."
+                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus.<br>"
+                    f"Merci de vérifier votre saisie ou veuillez nous contacter "
+                    f"à l'adresse suivante : {settings.ITOU_EMAIL_CONTACT}"
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
