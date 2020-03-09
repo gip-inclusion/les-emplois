@@ -5,7 +5,7 @@ envs/secrets.env
 envs/staging.env
 
 # Config
-config/settings/dev.py
+# config/settings/dev.py
 config/settings/prod.py
 config/settings/staging.py
 docker-compose-prod.yml
