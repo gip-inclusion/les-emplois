@@ -13,6 +13,6 @@ done
 # tail -f /dev/null & wait
 
 django-admin migrate
-django-admin runserver_plus 0.0.0.0:8080
+django-admin runserver_plus 0.0.0.0:8000
 
 exec "$@"

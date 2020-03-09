@@ -74,4 +74,6 @@ WORKDIR $APP_DIR
 
 ENV PYTHONPATH=.
 
+EXPOSE 8000
+
 ENTRYPOINT ["./docker/dev/django/entrypoint.sh"]
