@@ -261,3 +261,21 @@ section.home-search .bg-image {
     background-color: #212529; /* max-compatibility */
     background-color: var(--gray-900);
 }
+
+a.disabled {
+    cursor: not-allowed !important;
+    color: #495057;
+    color: var(--gray-700);
+}
+
+a.disabled button, button.disabled {
+    cursor: not-allowed !important;
+    color: var(--grey);
+    border-color: var(--grey);
+}
+
+a.disabled button:hover, button.disabled:hover {
+    background-color: transparent;
+    color: inherit;
+    border-color: inherit;
+}

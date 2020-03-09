@@ -40,3 +40,10 @@ django-bootstrap-datepicker-plus==3.0.5 # https://github.com/monim67/django-boot
 
 # Enhance select fields in forms with jQuery Select plugin
 django_select2==7.2.0
+
+
+# Third-party applications
+# ------------------------------------------------------------------------------
+
+# Turn HTML files into PDF
+pdfshift==1.0.4   # https://github.com/pdfshift/pdfshift-python

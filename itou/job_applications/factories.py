@@ -14,6 +14,7 @@ from itou.prescribers.factories import (
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
 from itou.users.factories import PrescriberFactory, JobSeekerFactory
+from itou.approvals.factories import ApprovalFactory
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
@@ -110,3 +111,20 @@ class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             return
         self.sender = self.sender_prescriber_organization.members.first()
         self.save()
+
+
+class JobApplicationWithApprovalFactory(JobApplicationFactory):
+    """
+    Generates a Job Application and an Approval.
+    """
+
+    approval = factory.SubFactory(ApprovalFactory)
+    state = models.JobApplicationWorkflow.STATE_ACCEPTED
+
+    @factory.post_generation
+    def set_approval_user(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        self.approval.user = self.job_seeker
+        self.approval.save()
