@@ -529,7 +529,14 @@ def get_donut_chart_data_per_eligibility_author_kind(job_applications):
         "job_seeker__eligibility_diagnoses__author_kind"
     ):
         author_kind = job_application["job_seeker__eligibility_diagnoses__author_kind"]
-        job_applications_per_eligibility_author_kind[author_kind] += 1
+        if author_kind is None:
+            # Some hirings have a job_seeker without any eligibility_diagnoses.
+            # First ever example of this happened on March 20th, 2020:
+            # job_application.pk == '78df85ed-6923-47cf-bda4-8417045cfd2a'
+            # siae.pk == 1828 and siae.kind == 'ETTI'.
+            pass
+        else:
+            job_applications_per_eligibility_author_kind[author_kind] += 1
 
     total_with_authorized_prescriber = (
         job_applications.filter(
