@@ -38,12 +38,15 @@ The following users will be created with the password `password` (*sic*):
 
 ### Avant un commit
 
-    $ make black
-    $ make pylint
+    $ make check_code_quality  # Will run isort, black, flake8 and pylint.
 
-Ou :
+Even better, use a pre-commit git hook, simply set it up this way:
 
-    $ make check_code_quality  # Will run black and pylint.
+    $ make setup_git_pre_commit_hook
+
+Note that pylint is much slower than the three other tools. For this reason,
+our pre-commit hook does not run it. But you can still manually run it
+via `make pylint` or via `make check_code_quality`.
 
 ## Front-end
 

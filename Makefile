@@ -13,13 +13,31 @@ clean:
 cdsitepackages:
 	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/bash
 
+isort:
+	# FTR "Skipped 1 files" is about the .git folder.
+	docker exec -ti itou_django isort --apply
+
 black:
 	docker exec -ti itou_django black itou/
 
-pylint:
-	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou';
+flake8:
+	docker exec -ti itou_django flake8
 
-check_code_quality: black pylint
+pylint:
+	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou'
+
+check_code_quality: isort black flake8 pylint
+
+setup_git_pre_commit_hook:
+	touch .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	# Not exactly the same commands as above, `-i` has been removed.
+	echo "docker exec -t itou_django isort --apply" > .git/hooks/pre-commit
+	echo "docker exec -t itou_django black itou/" >> .git/hooks/pre-commit
+	echo "docker exec -t itou_django flake8" >> .git/hooks/pre-commit
+	# We disable pylint in our pre-commit because it is so much slower than
+	# the other tools we use. You will have to run it manually.
+	# echo "docker exec -t itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou'" >> .git/hooks/pre-commit
 
 # Django.
 # =============================================================================
