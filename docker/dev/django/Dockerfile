@@ -72,4 +72,6 @@ USER app
 
 WORKDIR $APP_DIR
 
+ENV PYTHONPATH=.
+
 ENTRYPOINT ["./docker/dev/django/entrypoint.sh"]
