@@ -12,6 +12,9 @@ done
 # trap : TERM INT
 # tail -f /dev/null & wait
 
+>&2 echo "############################# PYTHONPATH ####################"
+>&2 echo $PYTHONPATH
+
 django-admin migrate
 django-admin runserver_plus 0.0.0.0:8000
 
