@@ -13,8 +13,19 @@
     <h1>
         {% trans "Candidature de" %}
         <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
-        <br>
-        <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
+        <div class="row">
+            <div class="col-sm">
+                <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
+            </div>
+            {% if job_application.can_download_approval_as_pdf %}
+                <div class="col-sm text-sm-right">
+                    <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="details-candidature">
+                        <button type="button" class="btn btn-outline-primary">{% trans "Télécharger l'attestation" %}</button>
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
     </h1>
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}

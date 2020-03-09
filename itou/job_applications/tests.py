@@ -21,8 +21,10 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentBySiaeFactory,
+    JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, UserFactory
 from itou.utils.templatetags import format_filters
@@ -65,6 +67,48 @@ class JobApplicationModelTest(TestCase):
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         self.assertTrue(job_application.is_sent_by_authorized_prescriber)
+
+    def test_can_download_approval_as_pdf(self):
+        """
+        A user can download an approval only when certain conditions
+        are met:
+        - the job_application.to_siae is subject to eligibility rules,
+        - an approval exists (ie is not in the process of being delivered),
+        - this approval is valid,
+        - the job_application has been accepted.
+        """
+        job_application = JobApplicationWithApprovalFactory()
+        self.assertTrue(job_application.can_download_approval_as_pdf)
+
+        # SIAE not subject to eligibility rules.
+        not_eligible_kinds = [
+            choice[0]
+            for choice in Siae.KIND_CHOICES
+            if choice[0] not in Siae.ELIGIBILITY_REQUIRED_KINDS
+        ]
+        not_eligible_siae = SiaeFactory(kind=not_eligible_kinds[0])
+        job_application = JobApplicationWithApprovalFactory(to_siae=not_eligible_siae)
+        self.assertFalse(job_application.can_download_approval_as_pdf)
+
+        # Application is not accepted.
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_OBSOLETE
+        )
+        self.assertFalse(job_application.can_download_approval_as_pdf)
+
+        # Application accepted but without approval.
+        job_application = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        self.assertFalse(job_application.can_download_approval_as_pdf)
+
+        # Approval has ended
+        start = datetime.date.today() - relativedelta(years=2)
+        end = start + relativedelta(years=1) - relativedelta(days=1)
+        ended_approval = ApprovalFactory(start_at=start, end_at=end)
+
+        job_application = JobApplicationWithApprovalFactory(approval=ended_approval)
+        self.assertFalse(job_application.can_download_approval_as_pdf)
 
 
 class JobApplicationQuerySetTest(TestCase):
