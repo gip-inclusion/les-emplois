@@ -10,4 +10,12 @@ $(document).ready(() => {
       })
   })
 
+  // Prevent a user from clicking frantically on a link.
+  $('a.disable-on-click').on('click', function () {
+    if ($(this).hasClass('disabled')) {
+        return false
+    }
+    $(this).addClass('disabled');
+  });
+
 })
