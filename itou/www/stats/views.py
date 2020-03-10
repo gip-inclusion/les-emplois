@@ -1,15 +1,14 @@
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import timedelta
-from dateutil.relativedelta import relativedelta
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.db.models import Avg, Count, DateTimeField, ExpressionWrapper, F, Q
+from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
-
-from django.db.models import Avg, Count, DateTimeField, F, Q, ExpressionWrapper
-from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -17,7 +16,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.address.departments import DEPARTMENTS
-
 
 DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _(
     "donnée non disponible par département"

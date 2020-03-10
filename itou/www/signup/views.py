@@ -2,7 +2,6 @@
 Handle multiple user types sign up with django-allauth.
 """
 from allauth.account.views import SignupView
-
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect

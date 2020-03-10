@@ -8,7 +8,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.geocoding import get_geocoding_data
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/authorized_prescribers.csv"

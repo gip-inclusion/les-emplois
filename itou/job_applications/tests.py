@@ -1,19 +1,15 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.jobs.factories import create_test_romes_and_appellations
-from itou.jobs.models import Appellation
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -24,6 +20,8 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.jobs.factories import create_test_romes_and_appellations
+from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, UserFactory

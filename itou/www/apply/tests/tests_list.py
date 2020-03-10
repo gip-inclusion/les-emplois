@@ -1,19 +1,18 @@
-from django.utils import timezone
-
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import (
-    PrescriberOrganizationWithMembershipFactory,
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberMembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.utils.widgets import DatePickerField
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.widgets import DatePickerField
 
 
 class ProcessListTest(TestCase):

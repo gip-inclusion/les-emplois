@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
-
 logger = logging.getLogger(__name__)
 
 

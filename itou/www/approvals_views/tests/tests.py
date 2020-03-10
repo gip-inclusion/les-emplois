@@ -1,14 +1,15 @@
 from unittest import mock
-from requests import exceptions as requests_exceptions
+
 from django.test import TestCase
 from django.urls import reverse
+from requests import exceptions as requests_exceptions
 
-from itou.users.factories import DEFAULT_PASSWORD
-from itou.job_applications.factories import (
-    JobApplicationWithApprovalFactory,
-    JobApplicationFactory,
-)
 from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.job_applications.factories import (
+    JobApplicationFactory,
+    JobApplicationWithApprovalFactory,
+)
+from itou.users.factories import DEFAULT_PASSWORD
 
 from .pdfshift_mock import BITES_FILE
 

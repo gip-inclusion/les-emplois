@@ -8,7 +8,6 @@ from django.core.management.base import BaseCommand
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import DEPARTMENTS
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/pole_emploi_agencies.csv"

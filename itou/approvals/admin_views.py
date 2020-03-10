@@ -1,16 +1,14 @@
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.approvals.models import Approval
 from itou.approvals.admin_forms import ManuallyAddApprovalForm
+from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 
 

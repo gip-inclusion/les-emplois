@@ -5,8 +5,7 @@ from django.urls import reverse
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
-from itou.users.factories import DEFAULT_PASSWORD
-from itou.users.factories import PrescriberFactory
+from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 

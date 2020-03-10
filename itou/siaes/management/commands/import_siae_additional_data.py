@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/2019_07_liste_siae_additional_data.csv"

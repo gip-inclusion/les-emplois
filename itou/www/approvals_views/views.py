@@ -1,13 +1,13 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, FileResponse
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from itou.utils.pdf import HtmlToPdf
 from itou.job_applications.models import JobApplication
+from itou.utils.pdf import HtmlToPdf
 
 
 @login_required

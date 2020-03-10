@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.siaes.factories import SiaeWithMembershipFactory, SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 

@@ -2,19 +2,17 @@ import datetime
 
 import factory
 import factory.fuzzy
-
 from dateutil.relativedelta import relativedelta
 
+from itou.approvals.factories import ApprovalFactory
 from itou.job_applications import models
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.factories import PrescriberFactory, JobSeekerFactory
-from itou.approvals.factories import ApprovalFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):

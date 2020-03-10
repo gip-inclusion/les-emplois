@@ -1,20 +1,20 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from itou.approvals.factories import ApprovalFactory
-from itou.approvals.factories import PoleEmploiApprovalFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import (
+    SiaeWithMembershipAndJobsFactory,
+    SiaeWithMembershipFactory,
+)
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 

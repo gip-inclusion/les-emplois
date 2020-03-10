@@ -1,9 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy
 
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.utils.apis.siret import get_siret_data
-from itou.prescribers.models import PrescriberMembership
 
 
 class CreatePrescriberOrganizationForm(forms.ModelForm):

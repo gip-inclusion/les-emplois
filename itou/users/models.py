@@ -1,13 +1,11 @@
+from allauth.utils import generate_unique_username
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from allauth.utils import generate_unique_username
-
-from itou.approvals.models import ApprovalsWrapper
-from itou.approvals.models import PoleEmploiApproval
+from itou.approvals.models import ApprovalsWrapper, PoleEmploiApproval
 from itou.utils.validators import validate_pole_emploi_id
 
 

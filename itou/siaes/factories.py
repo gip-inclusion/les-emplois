@@ -1,15 +1,13 @@
 import string
 
-from django.conf import settings
-
 import factory
 import factory.fuzzy
+from django.conf import settings
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.users.factories import SiaeStaffFactory
-
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
 

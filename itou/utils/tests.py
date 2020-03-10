@@ -19,10 +19,14 @@ from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.perms.context_processors import get_current_organization_and_perms
-from itou.utils.perms.user import get_user_info
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.utils.perms.user import (
+    KIND_JOB_SEEKER,
+    KIND_PRESCRIBER,
+    KIND_SIAE_STAFF,
+    get_user_info,
+)
 from itou.utils.templatetags import format_filters
-from itou.utils.tokens import SiaeSignupTokenGenerator, SIAE_SIGNUP_MAGIC_LINK_TIMEOUT
+from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_safe_url
 from itou.utils.validators import (
     alphanumeric,

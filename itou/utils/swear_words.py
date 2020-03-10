@@ -2,7 +2,6 @@ from functools import lru_cache
 
 from django.template.defaultfilters import slugify
 
-
 # https://fr.wiktionary.org/w/index.php?title=Catégorie:Insultes_en_français
 
 FRENCH_SWEAR_WORDS = {

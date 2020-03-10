@@ -6,9 +6,8 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
 
-from itou.utils.address.departments import DEPARTMENTS
 from itou.cities.models import City
-
+from itou.utils.address.departments import DEPARTMENTS
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 

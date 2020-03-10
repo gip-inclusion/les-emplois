@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 
 from itou.jobs.models import Appellation, Rome
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 JSON_FILE = f"{CURRENT_DIR}/data/appellations_for_romes.json"

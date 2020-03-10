@@ -3,8 +3,7 @@ from django.test import TestCase
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
-from itou.utils.perms.user import KIND_SIAE_STAFF
-from itou.utils.perms.user import UserInfo
+from itou.utils.perms.user import KIND_SIAE_STAFF, UserInfo
 
 
 class ModelTest(TestCase):

@@ -1,8 +1,8 @@
 import io
 
+import pdfshift
 from django.conf import settings
 from requests import exceptions as requests_exceptions
-import pdfshift
 
 
 class HtmlToPdf:

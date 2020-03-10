@@ -7,13 +7,11 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
-
 
 logger = logging.getLogger(__name__)
 

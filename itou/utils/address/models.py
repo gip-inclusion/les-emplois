@@ -3,12 +3,12 @@ import logging
 from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import gettext as _, gettext_lazy
+from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.validators import validate_post_code
-
 
 logger = logging.getLogger(__name__)
 

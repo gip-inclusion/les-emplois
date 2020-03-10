@@ -1,5 +1,4 @@
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.db.models import Count
 from django.utils.translation import gettext as _
 

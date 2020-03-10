@@ -1,7 +1,6 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -10,14 +9,11 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory
-from itou.approvals.factories import PoleEmploiApprovalFactory
-from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.approvals.models import ApprovalsWrapper
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.users.factories import DEFAULT_PASSWORD
-from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
 class CommonApprovalQuerySetTest(TestCase):
