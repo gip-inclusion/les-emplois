@@ -6,10 +6,7 @@ from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import (
-    SiaeWithMembershipAndJobsFactory,
-    SiaeWithMembershipFactory,
-)
+from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK

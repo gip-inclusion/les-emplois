@@ -10,10 +10,7 @@ from django.utils.html import escape
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
-from itou.prescribers.factories import (
-    PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory

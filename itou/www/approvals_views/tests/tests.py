@@ -5,10 +5,7 @@ from django.urls import reverse
 from requests import exceptions as requests_exceptions
 
 from itou.eligibility.factories import EligibilityDiagnosisFactory
-from itou.job_applications.factories import (
-    JobApplicationFactory,
-    JobApplicationWithApprovalFactory,
-)
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.users.factories import DEFAULT_PASSWORD
 
 from .pdfshift_mock import BITES_FILE

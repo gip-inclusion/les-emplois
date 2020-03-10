@@ -13,12 +13,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import (
-    CheckJobSeekerInfoForm,
-    CreateJobSeekerForm,
-    SubmitJobApplicationForm,
-    UserExistsForm,
-)
+from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 
 
 def valid_session_required(function=None):

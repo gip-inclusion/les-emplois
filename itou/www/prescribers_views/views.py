@@ -8,10 +8,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberOrganization
-from itou.www.prescribers_views.forms import (
-    CreatePrescriberOrganizationForm,
-    EditPrescriberOrganizationForm,
-)
+from itou.www.prescribers_views.forms import CreatePrescriberOrganizationForm, EditPrescriberOrganizationForm
 
 
 @login_required

@@ -11,10 +11,7 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import (
-    SiaeWithMembershipAndJobsFactory,
-    SiaeWithMembershipFactory,
-)
+from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 

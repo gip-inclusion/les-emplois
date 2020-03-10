@@ -11,12 +11,7 @@ from django.views.decorators.http import require_http_methods
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import (
-    AcceptForm,
-    AnswerForm,
-    JobSeekerPoleEmploiStatusForm,
-    RefusalForm,
-)
+from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm
 
 
 def check_waiting_period(approvals_wrapper, job_application):
