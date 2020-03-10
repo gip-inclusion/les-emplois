@@ -1,0 +1,36 @@
+services:
+  - docker
+
+# If Master, CD to production app.
+# NOT IMPLEMENTED
+
+# If PR, create a review app.
+install:
+  - ' echo "⏳ Install phase'
+  - make run
+# script:
+#   - echo "🧪 PR En cours"
+
+
+after_success:
+  - echo "🎉 Success!
+
+  # clever published-config set <variable-name> <variable-value>
+
+
+jobs:
+  include:
+    - stage: test
+      script:
+        - echo "🧪 PR En cours"
+        - make test
+    - stage: create-review-app
+      if: branch != master
+      script: 🛸 Build disposable staging"
+    - stage: destroy-review-app
+      script: echo "EXTERMINATE!"
+
+# stages:
+#   - test
+#   - name: create-review-app
+#     if: branch != master
