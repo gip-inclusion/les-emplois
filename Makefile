@@ -18,7 +18,7 @@ isort:
 	docker exec -ti itou_django isort --apply
 
 black:
-	docker exec -ti itou_django black itou/
+	docker exec -ti itou_django black --line-length 119 itou/
 
 flake8:
 	docker exec -ti itou_django flake8
