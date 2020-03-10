@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest import mock
 
 from django.conf import settings
@@ -10,7 +11,9 @@ from django.test import RequestFactory, TestCase
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.users.models import User
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -19,6 +22,7 @@ from itou.utils.perms.context_processors import get_current_organization_and_per
 from itou.utils.perms.user import get_user_info
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.templatetags import format_filters
+from itou.utils.tokens import SiaeSignupTokenGenerator, SIAE_SIGNUP_MAGIC_LINK_TIMEOUT
 from itou.utils.urls import get_safe_url
 from itou.utils.validators import (
     alphanumeric,
@@ -36,7 +40,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
-        self.assertTrue(user.siaemembership_set.get(siae=siae).is_siae_admin)
+        self.assertTrue(siae.has_admin(user))
 
         factory = RequestFactory()
         request = factory.get("/")
@@ -61,15 +65,15 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         siae1 = SiaeWithMembershipFactory()
         user = siae1.members.first()
-        self.assertTrue(user.siaemembership_set.get(siae=siae1).is_siae_admin)
+        self.assertTrue(siae1.has_admin(user))
 
         siae2 = SiaeFactory()
         siae2.members.add(user)
-        self.assertFalse(user.siaemembership_set.get(siae=siae2).is_siae_admin)
+        self.assertFalse(siae2.has_admin(user))
 
         siae3 = SiaeFactory()
         siae3.members.add(user)
-        self.assertFalse(user.siaemembership_set.get(siae=siae3).is_siae_admin)
+        self.assertFalse(siae3.has_admin(user))
 
         factory = RequestFactory()
         request = factory.get("/")
@@ -437,3 +441,72 @@ class PermsUserTest(TestCase):
         self.assertEqual(user_info.prescriber_organization, None)
         self.assertEqual(user_info.is_authorized_prescriber, False)
         self.assertEqual(user_info.siae, None)
+
+
+class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
+    def __init__(self, now):
+        self._now_val = now
+
+    def _now(self):
+        return self._now_val
+
+
+class SiaeSignupTokenGeneratorTest(TestCase):
+    def test_make_token(self):
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        self.assertIs(p0.check_token(siae, tk1), True)
+
+    def test_10265(self):
+        """
+        The token generated for a siae created in the same request
+        will work correctly.
+        """
+        siae = Siae.objects.create(email="test@example.com")
+        siae_reload = Siae.objects.get(email="test@example.com")
+        p0 = MockedSiaeSignupTokenGenerator(datetime.now())
+        tk1 = p0.make_token(siae)
+        tk2 = p0.make_token(siae_reload)
+        self.assertEqual(tk1, tk2)
+
+    def test_timeout(self):
+        """The token is valid after n seconds, but no greater."""
+        # Uses a mocked version of SiaeSignupTokenGenerator so we can change
+        # the value of 'now'.
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        p1 = MockedSiaeSignupTokenGenerator(
+            datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
+        )
+        self.assertIs(p1.check_token(siae, tk1), True)
+        p2 = MockedSiaeSignupTokenGenerator(
+            datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
+        )
+        self.assertIs(p2.check_token(siae, tk1), False)
+
+    def test_check_token_with_nonexistent_token_and_user(self):
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        self.assertIs(p0.check_token(None, tk1), False)
+        self.assertIs(p0.check_token(siae, None), False)
+        self.assertIs(p0.check_token(siae, tk1), True)
+
+    def test_any_new_signup_invalidates_past_token(self):
+        """
+        Tokens are based on siae.members.count() so that
+        any new signup invalidates past tokens.
+        """
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        self.assertIs(p0.check_token(siae, tk1), True)
+        user = User()
+        user.save()
+        membership = SiaeMembership()
+        membership.user = user
+        membership.siae = siae
+        membership.save()
+        self.assertIs(p0.check_token(siae, tk1), False)

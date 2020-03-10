@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib import messages
 from django.db.models import Count
 from django.utils.translation import gettext as _
 
@@ -59,6 +60,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "brand",
                     "phone",
                     "email",
+                    "auth_email",
                     "website",
                     "description",
                     "source",
@@ -106,6 +108,11 @@ class SiaeAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         if not obj.geocoding_score:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+        if not obj.auth_email:
+            messages.warning(
+                request,
+                "Cette structure n'ayant pas d'email d'authentification il est impossible de s'y inscrire.",
+            )
         super().save_model(request, obj, form, change)
 
 

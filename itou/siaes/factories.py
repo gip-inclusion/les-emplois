@@ -24,9 +24,10 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     naf = factory.fuzzy.FuzzyChoice(NAF_CODES)
     kind = models.Siae.KIND_EI
-    name = factory.Sequence(lambda n: f"siae{n}")
+    name = factory.Faker("company", locale="fr_FR")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    email = factory.LazyAttribute(lambda obj: f"{obj.name}@example.com")
+    email = factory.Faker("email", locale="fr_FR")
+    auth_email = factory.Faker("email", locale="fr_FR")
     department = factory.fuzzy.FuzzyChoice(settings.ITOU_TEST_DEPARTMENTS)
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.Faker("postalcode")
@@ -54,6 +55,18 @@ class SiaeWithMembershipFactory(SiaeFactory):
     """
 
     membership = factory.RelatedFactory(SiaeMembershipFactory, "siae")
+
+
+class SiaeWith2MembershipsFactory(SiaeFactory):
+    """
+    Generates an Siae() object with 2 members for unit tests.
+    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
+    """
+
+    membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
+    membership2 = factory.RelatedFactory(
+        SiaeMembershipFactory, "siae", is_siae_admin=False
+    )
 
 
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):

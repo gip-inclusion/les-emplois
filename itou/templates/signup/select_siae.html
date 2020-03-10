@@ -10,8 +10,15 @@
     {% trans "Employeur solidaire" %}
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
+<div class="alert alert-info" role="info">
+    Pour des raisons de sécurité, merci de compléter les informations suivantes. 
+</div>
+<div class="alert alert-info" role="info">
+    Les inscriptions sont ouvertes exclusivement aux structures du Bas-Rhin (67), Pas-de-Calais (62) et Seine Saint Denis (93), pour le moment.
+</div>
 
-<form method="post" action="{% url 'signup:siae' %}" role="form" class="js-prevent-multiple-submit">
+
+<form method="post" action="{% url 'signup:select_siae' %}" role="form">
 
     {% csrf_token %}
 
@@ -21,21 +28,17 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
     {% endif %}
 
-    {% bootstrap_field form.encoded_siae_id %}
-    {% bootstrap_field form.token %}
-
     {% bootstrap_field form.kind %}
     {% bootstrap_field form.siret %}
-    {% bootstrap_field form.siae_name %}
-    {% bootstrap_field form.first_name %}
-    {% bootstrap_field form.last_name %}
     {% bootstrap_field form.email %}
-    {% bootstrap_field form.password1 %}
-    {% bootstrap_field form.password2 %}
 
     {% include "signup/includes/submit_rgpd.html" %}
 
 </form>
+
+<p>
+    En cas de problèmes ou pour plus d'informations, veuillez nous contactez à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
+</p>
 
 <hr>
 

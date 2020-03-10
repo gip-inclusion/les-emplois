@@ -3,8 +3,12 @@ Handle multiple user types sign up with django-allauth.
 """
 from allauth.account.views import SignupView
 
+from django.contrib import messages
 from django.db import transaction
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url
@@ -35,15 +39,68 @@ class PrescriberSignupView(SignupView):
         return super().post(request, *args, **kwargs)
 
 
+def select_siae(request, template_name="signup/select_siae.html"):
+    """
+    Select an existing SIAE (Agence / Etablissement in French) to join.
+    This is the first of the two forms of the siae signup process.
+    """
+    form = forms.SelectSiaeForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        siae = form.selected_siae
+
+        if siae.has_members:
+            return HttpResponseRedirect(siae.signup_magic_link)
+
+        siae.new_signup_activation_email_to_official_contact(request).send()
+        message = _(
+            f"Nous venons de vous envoyer un e-mail à l'adresse {siae.obfuscated_auth_email} "
+            f"pour continuer votre inscription. Veuillez consulter votre boite "
+            f"de réception."
+        )
+        messages.success(request, message)
+        return HttpResponseRedirect(reverse("home:hp"))
+
+    context = {"form": form}
+    return render(request, template_name, context)
+
+
+def redirect_to_select_siae_form(request):
+    messages.warning(
+        request,
+        _(
+            "Ce lien d'inscription est invalide ou a expiré. "
+            "Veuillez procéder à une nouvelle inscription."
+        ),
+    )
+    return HttpResponseRedirect(reverse("signup:select_siae"))
+
+
 class SiaeSignupView(SignupView):
 
     form_class = forms.SiaeSignupForm
     template_name = "signup/signup_siae.html"
 
+    def get(self, request, *args, **kwargs):
+        form = forms.SiaeSignupForm(
+            initial={
+                "encoded_siae_id": kwargs.get("encoded_siae_id"),
+                "token": kwargs.get("token"),
+            }
+        )
+        if form.check_siae_signup_credentials():
+            self.initial = form.get_initial()
+            return super().get(request, *args, **kwargs)
+        return redirect_to_select_siae_form(request)
+
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
+        form = forms.SiaeSignupForm(data=request.POST or None)
+        if form.check_siae_signup_credentials():
+            self.initial = form.get_initial()
+            return super().post(request, *args, **kwargs)
+        return redirect_to_select_siae_form(request)
 
 
 class JobSeekerSignupView(SignupView):
