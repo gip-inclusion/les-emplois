@@ -6,8 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval

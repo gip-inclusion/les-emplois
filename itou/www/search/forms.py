@@ -1,7 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.cities.models import City
 from itou.siaes.models import Siae

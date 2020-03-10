@@ -1,8 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS
-from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
