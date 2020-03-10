@@ -1,15 +1,13 @@
 import string
 
-from django.conf import settings
-
 import factory
 import factory.fuzzy
+from django.conf import settings
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.users.factories import SiaeStaffFactory
-
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
 
@@ -64,9 +62,7 @@ class SiaeWith2MembershipsFactory(SiaeFactory):
     """
 
     membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
-    membership2 = factory.RelatedFactory(
-        SiaeMembershipFactory, "siae", is_siae_admin=False
-    )
+    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_siae_admin=False)
 
 
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):

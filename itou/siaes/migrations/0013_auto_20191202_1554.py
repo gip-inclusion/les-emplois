@@ -17,10 +17,7 @@ class Migration(migrations.Migration):
                     ("AI", "Association intermédiaire"),
                     ("ACI", "Atelier chantier d'insertion"),
                     ("ETTI", "Entreprise de travail temporaire d'insertion"),
-                    (
-                        "GEIQ",
-                        "Groupement d'employeurs pour l'insertion et la qualification",
-                    ),
+                    ("GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"),
                 ],
                 default="EI",
                 max_length=4,
@@ -31,11 +28,7 @@ class Migration(migrations.Migration):
             model_name="siae",
             name="source",
             field=models.CharField(
-                choices=[
-                    ("ASP", "Export ASP"),
-                    ("GEIQ", "Export GEIQ"),
-                    ("USER_CREATED", "Utilisateur"),
-                ],
+                choices=[("ASP", "Export ASP"), ("GEIQ", "Export GEIQ"), ("USER_CREATED", "Utilisateur")],
                 default="ASP",
                 max_length=20,
                 verbose_name="Source de données",

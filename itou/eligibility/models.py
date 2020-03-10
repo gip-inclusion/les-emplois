@@ -7,7 +7,6 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,18 +38,11 @@ class EligibilityDiagnosis(models.Model):
         related_name="eligibility_diagnoses_made",
     )
     author_kind = models.CharField(
-        verbose_name=_("Type de l'auteur"),
-        max_length=10,
-        choices=AUTHOR_KIND_CHOICES,
-        default=AUTHOR_KIND_PRESCRIBER,
+        verbose_name=_("Type de l'auteur"), max_length=10, choices=AUTHOR_KIND_CHOICES, default=AUTHOR_KIND_PRESCRIBER
     )
     # When the author is an SIAE staff member, keep a track of his current SIAE.
     author_siae = models.ForeignKey(
-        "siaes.Siae",
-        verbose_name=_("SIAE de l'auteur"),
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
+        "siaes.Siae", verbose_name=_("SIAE de l'auteur"), null=True, blank=True, on_delete=models.CASCADE
     )
     # When the author is a prescriber, keep a track of his current organization (if any).
     author_prescriber_organization = models.ForeignKey(
@@ -61,12 +53,8 @@ class EligibilityDiagnosis(models.Model):
         on_delete=models.CASCADE,
     )
 
-    created_at = models.DateTimeField(
-        verbose_name=_("Date de création"), default=timezone.now, db_index=True
-    )
-    updated_at = models.DateTimeField(
-        verbose_name=_("Date de modification"), blank=True, null=True, db_index=True
-    )
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
 
     class Meta:
         verbose_name = _("Diagnostic d'éligibilité")

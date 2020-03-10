@@ -6,9 +6,8 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
 
-from itou.utils.address.departments import DEPARTMENTS
 from itou.cities.models import City
-
+from itou.utils.address.departments import DEPARTMENTS
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -31,12 +30,7 @@ class Command(BaseCommand):
     help = "Import the content of the French cities csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -79,9 +73,7 @@ class Command(BaseCommand):
 
                 coords = item.get("centre")
                 if coords:
-                    coords = GEOSGeometry(
-                        f"{coords}"
-                    )  # Feed `GEOSGeometry` with GeoJSON.
+                    coords = GEOSGeometry(f"{coords}")  # Feed `GEOSGeometry` with GeoJSON.
                 else:
                     self.stderr.write(f"No coordinates for {name}. Skipping…")
                     continue

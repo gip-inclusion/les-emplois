@@ -28,9 +28,7 @@ class JobsAutocompleteTest(TestCase):
         self.assertEqual(json.loads(response.content), expected)
 
     def test_search_multi_words_with_exclusion(self):
-        response = self.client.get(
-            self.url, {"term": "cariste ferroviaire", "code": "10357"}
-        )
+        response = self.client.get(self.url, {"term": "cariste ferroviaire", "code": "10357"})
         self.assertEqual(response.status_code, 200)
         expected = b"[]"
         self.assertEqual(response.content, expected)
@@ -56,10 +54,7 @@ class JobsAutocompleteTest(TestCase):
 
     def test_search_full_label(self):
         response = self.client.get(
-            self.url,
-            {
-                "term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)"
-            },
+            self.url, {"term": "Conducteur / Conductrice de chariot élévateur de l'armée (N1101)"}
         )
         self.assertEqual(response.status_code, 200)
         expected = [
@@ -74,10 +69,7 @@ class JobsAutocompleteTest(TestCase):
 
     def test_search_special_chars(self):
         response = self.client.get(
-            self.url,
-            {
-                "term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*"
-            },
+            self.url, {"term": "conducteur:* & & de:* & !chariot:* & <eleva:*>>>> & armee:* & `(((()))`):*"}
         )
         self.assertEqual(response.status_code, 200)
         expected = [

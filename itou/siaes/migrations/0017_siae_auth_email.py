@@ -11,8 +11,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="siae",
             name="auth_email",
-            field=models.EmailField(
-                blank=True, max_length=254, verbose_name="E-mail d'authentification"
-            ),
+            field=models.EmailField(blank=True, max_length=254, verbose_name="E-mail d'authentification"),
         )
     ]

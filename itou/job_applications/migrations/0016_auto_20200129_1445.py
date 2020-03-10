@@ -11,15 +11,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="hiring_end_at",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="Date de fin du contrat"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="Date de fin du contrat"),
         ),
         migrations.AlterField(
             model_name="jobapplication",
             name="hiring_start_at",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="Date de début du contrat"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="Date de début du contrat"),
         ),
     ]

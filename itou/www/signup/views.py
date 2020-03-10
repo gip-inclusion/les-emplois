@@ -2,7 +2,6 @@
 Handle multiple user types sign up with django-allauth.
 """
 from allauth.account.views import SignupView
-
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -67,11 +66,7 @@ def select_siae(request, template_name="signup/select_siae.html"):
 
 def redirect_to_select_siae_form(request):
     messages.warning(
-        request,
-        _(
-            "Ce lien d'inscription est invalide ou a expiré. "
-            "Veuillez procéder à une nouvelle inscription."
-        ),
+        request, _("Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription.")
     )
     return HttpResponseRedirect(reverse("signup:select_siae"))
 
@@ -83,10 +78,7 @@ class SiaeSignupView(SignupView):
 
     def get(self, request, *args, **kwargs):
         form = forms.SiaeSignupForm(
-            initial={
-                "encoded_siae_id": kwargs.get("encoded_siae_id"),
-                "token": kwargs.get("token"),
-            }
+            initial={"encoded_siae_id": kwargs.get("encoded_siae_id"), "token": kwargs.get("token")}
         )
         if form.check_siae_signup_credentials():
             self.initial = form.get_initial()

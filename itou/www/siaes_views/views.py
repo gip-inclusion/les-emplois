@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect, HttpResponsePermanentRedirect, Http404
+from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
@@ -31,26 +31,18 @@ def card_legacy(request, siret, template_name="siaes/card.html"):
     """
     siae = Siae.active_objects.filter(siret=siret).first()
     if siae:
-        return HttpResponsePermanentRedirect(
-            reverse_lazy("siaes_views:card", kwargs={"siae_id": siae.pk})
-        )
+        return HttpResponsePermanentRedirect(reverse_lazy("siaes_views:card", kwargs={"siae_id": siae.pk}))
     raise Http404(_("Aucune structure trouvée correspondant à ce SIRET."))
 
 
 # Public view.
-def job_description_card(
-    request, job_description_id, template_name="siaes/job_description_card.html"
-):
+def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
     """
     SIAE's job description card (or "Fiche" in French).
     """
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
-    context = {
-        "job": job_description,
-        "siae": job_description.siae,
-        "back_url": back_url,
-    }
+    context = {"job": job_description, "siae": job_description.siae, "back_url": back_url}
     return render(request, template_name, context)
 
 
@@ -60,16 +52,12 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Configure an SIAE's jobs.
     """
     pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.active_objects.prefetch_job_description_through().member_required(
-        request.user
-    )
+    queryset = Siae.active_objects.prefetch_job_description_through().member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
 
     if request.method == "POST":
 
-        current_codes = set(
-            siae.job_description_through.values_list("appellation__code", flat=True)
-        )
+        current_codes = set(siae.job_description_through.values_list("appellation__code", flat=True))
         submitted_codes = set(request.POST.getlist("code"))
 
         codes_to_create = submitted_codes - current_codes
@@ -96,9 +84,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                 siae.jobs.remove(*appellations)
 
             # Update.
-            for job_through in siae.job_description_through.filter(
-                appellation__code__in=codes_to_update
-            ):
+            for job_through in siae.job_description_through.filter(appellation__code__in=codes_to_update):
                 code = job_through.appellation.code
                 new_custom_name = request.POST.get(f"custom-name-{code}", "")
                 new_description = request.POST.get(f"description-{code}", "")
@@ -127,11 +113,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     """
     current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
     current_siae = request.user.siae_set.get(pk=current_siae_pk)
-    form = CreateSiaeForm(
-        current_siae=current_siae,
-        data=request.POST or None,
-        initial={"siret": current_siae.siret},
-    )
+    form = CreateSiaeForm(current_siae=current_siae, data=request.POST or None, initial={"siret": current_siae.siret})
 
     if request.method == "POST" and form.is_valid():
         siae = form.save(request)

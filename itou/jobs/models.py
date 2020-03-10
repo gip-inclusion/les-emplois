@@ -32,16 +32,10 @@ class Rome(models.Model):
     code = models.CharField(verbose_name=_("Code ROME"), max_length=5, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
     riasec_major = models.CharField(
-        verbose_name=_("RIASEC Majeur"),
-        max_length=1,
-        choices=RIASEC_CHOICES,
-        default=RIASEC_REALISTIC,
+        verbose_name=_("RIASEC Majeur"), max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
     )
     riasec_minor = models.CharField(
-        verbose_name=_("RIASEC Mineur"),
-        max_length=1,
-        choices=RIASEC_CHOICES,
-        default=RIASEC_REALISTIC,
+        verbose_name=_("RIASEC Mineur"), max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
     )
     code_isco = models.CharField(verbose_name=_("Code ROME"), max_length=4)
 
@@ -64,9 +58,7 @@ class AppellationQuerySet(models.QuerySet):
         words = re.sub(f"[{string.punctuation}]", " ", search_string).split()
         words = [word + ":*" for word in words]
         tsquery = " & ".join(words)
-        queryset = self.extra(
-            where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery]
-        )
+        queryset = self.extra(where=["full_text @@ to_tsquery('french_unaccent', %s)"], params=[tsquery])
         queryset = queryset.select_related("rome")
         if codes_to_exclude:
             queryset = queryset.exclude(code__in=codes_to_exclude)
@@ -95,9 +87,7 @@ class Appellation(models.Model):
 
     code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
-    rome = models.ForeignKey(
-        Rome, on_delete=models.CASCADE, null=True, related_name="appellations"
-    )
+    rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
     # A PostgreSQL trigger (defined in migrations) updates this field automatically.
     full_text = SearchVectorField(null=True)
 

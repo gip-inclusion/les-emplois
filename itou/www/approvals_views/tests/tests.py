@@ -1,14 +1,12 @@
 from unittest import mock
-from requests import exceptions as requests_exceptions
+
 from django.test import TestCase
 from django.urls import reverse
+from requests import exceptions as requests_exceptions
 
-from itou.users.factories import DEFAULT_PASSWORD
-from itou.job_applications.factories import (
-    JobApplicationWithApprovalFactory,
-    JobApplicationFactory,
-)
 from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.users.factories import DEFAULT_PASSWORD
 
 from .pdfshift_mock import BITES_FILE
 
@@ -24,10 +22,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(
-            reverse(
-                "approvals:approval_as_pdf",
-                kwargs={"job_application_id": job_application.pk},
-            )
+            reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -48,10 +43,7 @@ class TestDownloadApprovalAsPDF(TestCase):
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
         response = self.client.get(
-            reverse(
-                "approvals:approval_as_pdf",
-                kwargs={"job_application_id": job_application.pk},
-            )
+            reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
         )
         self.assertEqual(response.status_code, 404)
 
@@ -65,9 +57,4 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         with self.assertRaises(ConnectionAbortedError):
-            self.client.get(
-                reverse(
-                    "approvals:approval_as_pdf",
-                    kwargs={"job_application_id": job_application.pk},
-                )
-            )
+            self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))

@@ -1,16 +1,13 @@
+import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-        ("prescribers", "0004_initial_bis"),
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-    ]
+    dependencies = [("prescribers", "0004_initial_bis"), migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
 
     operations = [
         migrations.AddField(
@@ -27,15 +24,12 @@ class Migration(migrations.Migration):
             model_name="prescribermembership",
             name="organization",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                to="prescribers.PrescriberOrganization",
+                on_delete=django.db.models.deletion.CASCADE, to="prescribers.PrescriberOrganization"
             ),
         ),
         migrations.AddField(
             model_name="prescribermembership",
             name="user",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
     ]

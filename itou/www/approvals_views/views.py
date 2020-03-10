@@ -1,22 +1,18 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, FileResponse
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from itou.utils.pdf import HtmlToPdf
 from itou.job_applications.models import JobApplication
+from itou.utils.pdf import HtmlToPdf
 
 
 @login_required
-def approval_as_pdf(
-    request, job_application_id, template_name="approvals/approval_as_pdf.html"
-):
-    queryset = JobApplication.objects.select_related(
-        "job_seeker", "approval", "to_siae"
-    )
+def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
+    queryset = JobApplication.objects.select_related("job_seeker", "approval", "to_siae")
     job_application = get_object_or_404(queryset, pk=job_application_id)
 
     if not job_application.can_download_approval_as_pdf:
@@ -33,9 +29,7 @@ def approval_as_pdf(
 
     diagnosis = job_seeker.get_eligibility_diagnosis()
     diagnosis_author = diagnosis.author.get_full_name()
-    diagnosis_author_org = (
-        diagnosis.author_prescriber_organization or diagnosis.author_siae
-    )
+    diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
 
     diagnosis_author_org_name = None
     if diagnosis_author_org:
@@ -60,9 +54,7 @@ def approval_as_pdf(
         "user_name": user_name,
     }
 
-    html = SimpleTemplateResponse(
-        template=template_name, context=context
-    ).rendered_content
+    html = SimpleTemplateResponse(template=template_name, context=context).rendered_content
 
     filename = f"{slugify(user_name)}-pass-iae.pdf"
 

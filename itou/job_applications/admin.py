@@ -31,13 +31,9 @@ class ApprovalNumberSentByEmailFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         value = self.value()
         if value == "yes":
-            return queryset.exclude(approval=None).filter(
-                approval_number_sent_by_email=True
-            )
+            return queryset.exclude(approval=None).filter(approval_number_sent_by_email=True)
         if value == "no":
-            return queryset.exclude(approval=None).filter(
-                approval_number_sent_by_email=False
-            )
+            return queryset.exclude(approval=None).filter(approval_number_sent_by_email=False)
         return queryset
 
 
@@ -46,14 +42,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     actions = ("bulk_send_approval_by_email",)
     date_hierarchy = "created_at"
     list_display = ("id", "state", "sender_kind", "created_at")
-    raw_id_fields = (
-        "job_seeker",
-        "sender",
-        "sender_siae",
-        "sender_prescriber_organization",
-        "to_siae",
-        "approval",
-    )
+    raw_id_fields = ("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
     exclude = ("selected_jobs",)
     list_filter = (
         ApprovalNumberSentByEmailFilter,
@@ -68,13 +57,9 @@ class JobApplicationAdmin(admin.ModelAdmin):
     search_fields = ("to_siae__siret", "job_seeker__email")
 
     def bulk_send_approval_by_email(self, request, queryset):
-        queryset = queryset.exclude(approval=None).filter(
-            approval_number_sent_by_email=False
-        )
+        queryset = queryset.exclude(approval=None).filter(approval_number_sent_by_email=False)
         for job_application in queryset:
-            job_application.send_approval_number_by_email_manually(
-                deliverer=request.user
-            )
+            job_application.send_approval_number_by_email_manually(deliverer=request.user)
 
     bulk_send_approval_by_email.short_description = _("Envoyer le PASS IAE par email")
 
@@ -83,22 +68,8 @@ class JobApplicationAdmin(admin.ModelAdmin):
 class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
     actions = None
     date_hierarchy = "timestamp"
-    list_display = (
-        "job_application",
-        "transition",
-        "from_state",
-        "to_state",
-        "user",
-        "timestamp",
-    )
+    list_display = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     list_filter = ("transition",)
     raw_id_fields = ("job_application", "user")
-    readonly_fields = (
-        "job_application",
-        "transition",
-        "from_state",
-        "to_state",
-        "user",
-        "timestamp",
-    )
+    readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
     search_fields = ("transition", "user__username")

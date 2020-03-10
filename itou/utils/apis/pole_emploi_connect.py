@@ -3,9 +3,7 @@ import datetime
 import logging
 
 import requests
-
 from django.conf import settings
-
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +18,7 @@ def get_access_token(scope):
         token = TOKENS_CACHE[scope]
         now = datetime.datetime.now()
         if now < token.expiration:
-            logger.debug(
-                "Found %s in cache. Expiration = %s, now = %s.",
-                token.value,
-                token.expiration,
-                now,
-            )
+            logger.debug("Found %s in cache. Expiration = %s, now = %s.", token.value, token.expiration, now)
             return token.value
 
     auth_request = requests.post(

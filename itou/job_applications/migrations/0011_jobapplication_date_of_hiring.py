@@ -11,8 +11,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="date_of_hiring",
-            field=models.DateField(
-                blank=True, null=True, verbose_name="Date de l'embauche"
-            ),
+            field=models.DateField(blank=True, null=True, verbose_name="Date de l'embauche"),
         )
     ]

@@ -46,9 +46,7 @@ class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory)
     membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
 
 
-class AuthorizedPrescriberOrganizationWithMembershipFactory(
-    PrescriberOrganizationWithMembershipFactory
-):
+class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizationWithMembershipFactory):
     """
     Returns a PrescriberOrganization() object with a related authorized PrescriberMembership() object.
 

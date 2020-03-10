@@ -62,15 +62,7 @@ class ItouUserAdmin(UserAdmin):
 
     list_filter = UserAdmin.list_filter + (KindFilter,)
 
-    list_display = (
-        "id",
-        "email",
-        "first_name",
-        "last_name",
-        "is_staff",
-        "is_created_by_a_proxy",
-        "last_login",
-    )
+    list_display = ("id", "email", "first_name", "last_name", "is_staff", "is_created_by_a_proxy", "last_login")
 
     list_display_links = ("id", "email")
 

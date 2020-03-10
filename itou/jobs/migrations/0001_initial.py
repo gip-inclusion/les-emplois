@@ -2,8 +2,8 @@
 
 import django.contrib.postgres.indexes
 import django.contrib.postgres.search
-from django.db import migrations, models
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
@@ -16,19 +16,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Rome",
             fields=[
-                (
-                    "code",
-                    models.CharField(
-                        max_length=5,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="Code ROME",
-                    ),
-                ),
-                (
-                    "name",
-                    models.CharField(db_index=True, max_length=255, verbose_name="Nom"),
-                ),
+                ("code", models.CharField(max_length=5, primary_key=True, serialize=False, verbose_name="Code ROME")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="Nom")),
                 (
                     "riasec_major",
                     models.CharField(
@@ -68,23 +57,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Appellation",
             fields=[
-                (
-                    "code",
-                    models.CharField(
-                        max_length=6,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="Code",
-                    ),
-                ),
-                (
-                    "name",
-                    models.CharField(db_index=True, max_length=255, verbose_name="Nom"),
-                ),
-                (
-                    "full_text",
-                    django.contrib.postgres.search.SearchVectorField(null=True),
-                ),
+                ("code", models.CharField(max_length=6, primary_key=True, serialize=False, verbose_name="Code")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="Nom")),
+                ("full_text", django.contrib.postgres.search.SearchVectorField(null=True)),
                 (
                     "rome",
                     models.ForeignKey(
@@ -95,11 +70,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "verbose_name": "Appellation",
-                "verbose_name_plural": "Appellations",
-                "ordering": ["name"],
-            },
+            options={"verbose_name": "Appellation", "verbose_name_plural": "Appellations", "ordering": ["name"]},
         ),
         migrations.AddIndex(
             model_name="appellation",

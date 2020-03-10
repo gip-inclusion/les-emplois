@@ -1,6 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import get_object_or_404, render
 
 from itou.prescribers.models import PrescriberOrganization
@@ -28,21 +27,11 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
-        "job_seeker",
-        "sender",
-        "sender_siae",
-        "sender_prescriber_organization",
-        "to_siae",
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
     ).prefetch_related("selected_jobs__appellation")
-    job_applications_page = pager(
-        job_applications, request.GET.get("page"), items_per_page=10
-    )
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
-    context = {
-        "job_applications_page": job_applications_page,
-        "filters_form": filters_form,
-        "filters": filters,
-    }
+    context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
     return render(request, template_name, context)
 
 
@@ -65,9 +54,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     else:
         job_applications = request.user.job_applications_sent
 
-    filters_form = PrescriberFilterJobApplicationsForm(
-        job_applications, request.GET or None
-    )
+    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
     filters = None
 
     if filters_form.is_valid():
@@ -75,22 +62,12 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
-        "job_seeker",
-        "sender",
-        "sender_siae",
-        "sender_prescriber_organization",
-        "to_siae",
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
     ).prefetch_related("selected_jobs__appellation")
 
-    job_applications_page = pager(
-        job_applications, request.GET.get("page"), items_per_page=10
-    )
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
-    context = {
-        "job_applications_page": job_applications_page,
-        "filters_form": filters_form,
-        "filters": filters,
-    }
+    context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
     return render(request, template_name, context)
 
 
@@ -113,15 +90,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
-        "job_seeker",
-        "sender",
-        "sender_siae",
-        "sender_prescriber_organization",
-        "to_siae",
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
     ).prefetch_related("selected_jobs__appellation")
-    job_applications_page = pager(
-        job_applications, request.GET.get("page"), items_per_page=10
-    )
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
     context = {
         "siae": siae,

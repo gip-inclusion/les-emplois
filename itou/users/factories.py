@@ -6,7 +6,6 @@ import factory.fuzzy
 
 from itou.users import models
 
-
 DEFAULT_PASSWORD = "p4ssw0rd"
 
 
@@ -21,9 +20,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name", locale="fr_FR")
     email = factory.Faker("email", locale="fr_FR")
     password = factory.PostGenerationMethodCall("set_password", DEFAULT_PASSWORD)
-    birthdate = factory.fuzzy.FuzzyDate(
-        datetime.date(1968, 1, 1), datetime.date(2000, 1, 1)
-    )
+    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
 
 

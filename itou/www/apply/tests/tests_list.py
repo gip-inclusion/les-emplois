@@ -1,19 +1,18 @@
-from django.utils import timezone
-
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import (
-    PrescriberOrganizationWithMembershipFactory,
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberMembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
 )
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
-from itou.utils.widgets import DatePickerField
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.widgets import DatePickerField
 
 
 class ProcessListTest(TestCase):
@@ -45,16 +44,12 @@ class ProcessListTest(TestCase):
         laurie_pe = pole_emploi.members.get(first_name="Laurie")
 
         # L'Envol
-        l_envol = PrescriberOrganizationWithMembershipFactory(
-            name="L'Envol", membership__user__first_name="Manu"
-        )
+        l_envol = PrescriberOrganizationWithMembershipFactory(name="L'Envol", membership__user__first_name="Manu")
         PrescriberMembershipFactory(organization=l_envol, user__first_name="Audrey")
         audrey_envol = l_envol.members.get(first_name="Audrey")
 
         # Hit Pit
-        hit_pit = SiaeWithMembershipAndJobsFactory(
-            name="Hit Pit", membership__user__first_name="Eddie"
-        )
+        hit_pit = SiaeWithMembershipAndJobsFactory(name="Hit Pit", membership__user__first_name="Eddie")
         eddie_hit_pit = hit_pit.members.get(first_name="Eddie")
 
         # Now send applications
@@ -71,10 +66,7 @@ class ProcessListTest(TestCase):
         maggie = job_application.job_seeker
         maggie.save(update_fields={"first_name": "Maggie"})
         JobApplicationSentByPrescriberFactory(
-            to_siae=hit_pit,
-            sender=laurie_pe,
-            sender_prescriber_organization=pole_emploi,
-            job_seeker=maggie,
+            to_siae=hit_pit, sender=laurie_pe, sender_prescriber_organization=pole_emploi, job_seeker=maggie
         )
 
         self.prescriber_base_url = reverse("apply:list_for_prescriber")
@@ -93,7 +85,7 @@ class ProcessListTest(TestCase):
 
 
 ####################################################
-################### Job Seeker #####################
+################### Job Seeker #####################  # noqa E266
 ####################################################
 
 
@@ -134,7 +126,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
 
 
 ###################################################
-#################### SIAE #########################
+#################### SIAE #########################  # noqa E266
 ###################################################
 
 
@@ -149,9 +141,7 @@ class ProcessListSiaeTest(ProcessListTest):
         total_applications = len(response.context["job_applications_page"].object_list)
 
         # Result page should contain all SIAE's job applications.
-        self.assertEqual(
-            total_applications, self.hit_pit.job_applications_received.count()
-        )
+        self.assertEqual(total_applications, self.hit_pit.job_applications_received.count())
 
     def test_list_for_siae_view__filtered_by_one_state(self):
         """
@@ -175,10 +165,7 @@ class ProcessListSiaeTest(ProcessListTest):
         Eddie wants to see NEW and PROCESSING job applications.
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
-        job_applications_states = [
-            JobApplicationWorkflow.STATE_NEW,
-            JobApplicationWorkflow.STATE_PROCESSING,
-        ]
+        job_applications_states = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
         params = urlencode({"states": job_applications_states}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
@@ -202,12 +189,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
         # Negative indexing is not allowed in querysets
         end_date = jobs_in_range[len(jobs_in_range) - 1].created_at
-        query = urlencode(
-            {
-                "start_date": start_date.strftime(date_format),
-                "end_date": end_date.strftime(date_format),
-            }
-        )
+        query = urlencode({"start_date": start_date.strftime(date_format), "end_date": end_date.strftime(date_format)})
         url = f"{self.siae_base_url}?{query}"
         response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
@@ -229,9 +211,7 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        self.assertEqual(
-            total_applications, self.hit_pit.job_applications_received.count()
-        )
+        self.assertEqual(total_applications, self.hit_pit.job_applications_received.count())
 
     def test_view__filtered_by_sender_organization_name(self):
         """
@@ -248,9 +228,7 @@ class ProcessListSiaeTest(ProcessListTest):
         self.assertGreater(len(applications), 0)
 
         for application in applications:
-            self.assertEqual(
-                application.sender_prescriber_organization.id, sender_organization.id
-            )
+            self.assertEqual(application.sender_prescriber_organization.id, sender_organization.id)
 
     def test_view__filtered_by_sender_name(self):
         """
@@ -292,9 +270,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
-        params = urlencode(
-            {"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}, True
-        )
+        params = urlencode({"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}, True)
         url = f"{self.siae_base_url}?{params}"
         response = self.client.get(url)
 
@@ -307,7 +283,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
 
 ####################################################
-################### Prescriber #####################
+################### Prescriber #####################  # noqa E266
 ####################################################
 
 
@@ -323,9 +299,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         # Count job applications used by the template
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        self.assertEqual(
-            total_applications, self.pole_emploi.jobapplication_set.count()
-        )
+        self.assertEqual(total_applications, self.pole_emploi.jobapplication_set.count())
 
     def test_view__filtered_by_state(self):
         """

@@ -1,7 +1,6 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-
 from django.test import TestCase
 from django.urls import reverse
 
@@ -22,9 +21,7 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-        )
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -35,15 +32,11 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse(
-            "apply:process", kwargs={"job_application_id": job_application.pk}
-        )
+        url = reverse("apply:process", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-        )
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -63,17 +56,10 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "refusal_reason": job_application.REFUSAL_REASON_OTHER,
-            "answer": "",
-        }
+        post_data = {"refusal_reason": job_application.REFUSAL_REASON_OTHER, "answer": ""}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
-        self.assertIn(
-            "answer",
-            response.context["form"].errors,
-            "Answer is mandatory with REFUSAL_REASON_OTHER.",
-        )
+        self.assertIn("answer", response.context["form"].errors, "Answer is mandatory with REFUSAL_REASON_OTHER.")
 
         post_data = {
             "refusal_reason": job_application.REFUSAL_REASON_OTHER,
@@ -82,9 +68,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-        )
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -100,9 +84,7 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse(
-            "apply:postpone", kwargs={"job_application_id": job_application.pk}
-        )
+        url = reverse("apply:postpone", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -110,9 +92,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-        )
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -141,12 +121,7 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(
-            response,
-            "form_accept",
-            "hiring_start_at",
-            JobApplication.ERROR_START_IN_PAST,
-        )
+        self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
 
         # Wrong dates: end < start.
         hiring_start_at = datetime.date.today()
@@ -157,9 +132,7 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(
-            response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START
-        )
+        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
 
         # Duration too long.
         hiring_start_at = datetime.date.today()
@@ -170,9 +143,7 @@ class ProcessViewsTest(TestCase):
             "answer": "",
         }
         response = self.client.post(url, data=post_data)
-        self.assertFormError(
-            response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG
-        )
+        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG)
 
         # Good duration.
         hiring_start_at = datetime.date.today()
@@ -188,9 +159,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-        )
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -210,9 +179,7 @@ class ProcessViewsTest(TestCase):
 
         self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
 
-        url = reverse(
-            "apply:eligibility", kwargs={"job_application_id": job_application.pk}
-        )
+        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -220,9 +187,7 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
-        )
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
         self.assertTrue(job_application.job_seeker.has_eligibility_diagnosis)
@@ -236,9 +201,7 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse(
-            "apply:eligibility", kwargs={"job_application_id": job_application.pk}
-        )
+        url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -253,9 +216,7 @@ class ProcessViewsTest(TestCase):
             job_application = JobApplicationSentByJobSeekerFactory(state=state)
             siae_user = job_application.to_siae.members.first()
             self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
-            url = reverse(
-                "apply:eligibility", kwargs={"job_application_id": job_application.pk}
-            )
+            url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
             self.client.logout()
@@ -270,9 +231,7 @@ class ProcessTemplatesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         """Set up data for the whole TestCase."""
-        cls.job_application = (
-            JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
-        )
+        cls.job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         cls.siae_user = cls.job_application.to_siae.members.first()
 
         kwargs = {"job_application_id": cls.job_application.pk}

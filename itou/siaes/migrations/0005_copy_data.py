@@ -1,8 +1,4 @@
-from django.conf import settings
-import django.contrib.gis.db.models.fields
-from django.db import migrations, models
-import django.db.models.deletion
-import itou.utils.validators
+from django.db import migrations
 
 
 def copy_data(apps, schema_editor):

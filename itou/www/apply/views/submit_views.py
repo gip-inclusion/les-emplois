@@ -13,10 +13,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import CheckJobSeekerInfoForm
-from itou.www.apply.forms import CreateJobSeekerForm
-from itou.www.apply.forms import SubmitJobApplicationForm
-from itou.www.apply.forms import UserExistsForm
+from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 
 
 def valid_session_required(function=None):
@@ -39,10 +36,7 @@ def get_approvals_wrapper(request, job_seeker):
     approvals_wrapper = job_seeker.approvals_wrapper
     # Ensure that an existing approval is not in waiting period.
     # Only "authorized prescribers" can bypass an approval in waiting period.
-    if (
-        approvals_wrapper.has_in_waiting_period
-        and not user_info.is_authorized_prescriber
-    ):
+    if approvals_wrapper.has_in_waiting_period and not user_info.is_authorized_prescriber:
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         if user_info.user == job_seeker:
             error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
@@ -59,9 +53,7 @@ def start(request, siae_pk):
     siae = get_object_or_404(Siae.active_objects, pk=siae_pk)
 
     if request.user.is_siae_staff and not siae.has_member(request.user):
-        raise PermissionDenied(
-            _("Vous ne pouvez postuler pour un candidat que dans votre structure.")
-        )
+        raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
 
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
@@ -91,9 +83,7 @@ def step_sender(request, siae_pk):
     session_data["sender_kind"] = user_info.kind
 
     if user_info.prescriber_organization:
-        session_data[
-            "sender_prescriber_organization_pk"
-        ] = user_info.prescriber_organization.pk
+        session_data["sender_prescriber_organization_pk"] = user_info.prescriber_organization.pk
 
     if user_info.siae:
         session_data["sender_siae_pk"] = user_info.siae.pk
@@ -104,9 +94,7 @@ def step_sender(request, siae_pk):
 
 @login_required
 @valid_session_required
-def step_job_seeker(
-    request, siae_pk, template_name="apply/submit_step_job_seeker.html"
-):
+def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker.html"):
     """
     Determine the job seeker, in the cases where the application is sent by a proxy.
     """
@@ -140,18 +128,14 @@ def step_job_seeker(
 
 @login_required
 @valid_session_required
-def step_check_job_seeker_info(
-    request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"
-):
+def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_step_job_seeker_check_info.html"):
     """
     Ensure the job seeker has all required info.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
-    next_url = reverse(
-        "apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk}
-    )
+    next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
     # Check required info that will allow us to find a pre-existing approval.
     has_required_info = job_seeker.birthdate and (
@@ -169,20 +153,13 @@ def step_check_job_seeker_info(
         form.save()
         return HttpResponseRedirect(next_url)
 
-    context = {
-        "form": form,
-        "siae": siae,
-        "job_seeker": job_seeker,
-        "approvals_wrapper": approvals_wrapper,
-    }
+    context = {"form": form, "siae": siae, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
     return render(request, template_name, context)
 
 
 @login_required
 @valid_session_required
-def step_create_job_seeker(
-    request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"
-):
+def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeker_create.html"):
     """
     Create a job seeker if he can't be found in the DB.
     """
@@ -190,9 +167,7 @@ def step_create_job_seeker(
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
 
     form = CreateJobSeekerForm(
-        proxy_user=request.user,
-        data=request.POST or None,
-        initial={"email": request.GET.get("email")},
+        proxy_user=request.user, data=request.POST or None, initial={"email": request.GET.get("email")}
     )
 
     if request.method == "POST" and form.is_valid():
@@ -207,9 +182,7 @@ def step_create_job_seeker(
 
 @login_required
 @valid_session_required
-def step_check_prev_applications(
-    request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"
-):
+def step_check_prev_applications(request, siae_pk, template_name="apply/submit_step_check_prev_applications.html"):
     """
     Check previous job applications to avoid duplicates.
     """
@@ -222,13 +195,9 @@ def step_check_prev_applications(
     # Limit the possibility of applying to the same SIAE for 24 hours.
     if prev_applications.created_in_past_hours(24).exists():
         if request.user == job_seeker:
-            msg = _(
-                "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
-            )
+            msg = _("Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.")
         else:
-            msg = _(
-                "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
-            )
+            msg = _("Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.")
         raise PermissionDenied(msg)
 
     next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
@@ -240,10 +209,7 @@ def step_check_prev_applications(
     # where he or she has already applied.
     # Allow a new job application if the user confirm it despite the
     # duplication warning.
-    if (
-        request.method == "POST"
-        and request.POST.get("force_new_application") == "force"
-    ):
+    if request.method == "POST" and request.POST.get("force_new_application") == "force":
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -257,9 +223,7 @@ def step_check_prev_applications(
 
 @login_required
 @valid_session_required
-def step_eligibility(
-    request, siae_pk, template_name="apply/submit_step_eligibility.html"
-):
+def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibility.html"):
     """
     Check eligibility.
     """
@@ -288,19 +252,13 @@ def step_eligibility(
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
-    context = {
-        "siae": siae,
-        "job_seeker": job_seeker,
-        "approvals_wrapper": approvals_wrapper,
-    }
+    context = {"siae": siae, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
     return render(request, template_name, context)
 
 
 @login_required
 @valid_session_required
-def step_application(
-    request, siae_pk, template_name="apply/submit_step_application.html"
-):
+def step_application(request, siae_pk, template_name="apply/submit_step_application.html"):
     """
     Create and submit the job application.
     """
@@ -309,9 +267,7 @@ def step_application(
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     initial_data = {"selected_jobs": [session_data["job_description_id"]]}
-    form = SubmitJobApplicationForm(
-        data=request.POST or None, siae=siae, initial=initial_data
-    )
+    form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
@@ -326,22 +282,14 @@ def step_application(
 
         # Prevent multiple rapid clicks on the submit button to create multiple
         # job applications.
-        if (
-            job_seeker.job_applications.filter(to_siae=siae)
-            .created_in_past_hours(1)
-            .exists()
-        ):
+        if job_seeker.job_applications.filter(to_siae=siae).created_in_past_hours(1).exists():
             return HttpResponseRedirect(next_url)
 
-        sender_prescriber_organization_pk = session_data.get(
-            "sender_prescriber_organization_pk"
-        )
+        sender_prescriber_organization_pk = session_data.get("sender_prescriber_organization_pk")
         sender_siae_pk = session_data.get("sender_siae_pk")
         job_application = form.save(commit=False)
         job_application.job_seeker = job_seeker
-        job_application.sender = get_user_model().objects.get(
-            pk=session_data["sender_pk"]
-        )
+        job_application.sender = get_user_model().objects.get(pk=session_data["sender_pk"])
         job_application.sender_kind = session_data["sender_kind"]
         if sender_prescriber_organization_pk:
             job_application.sender_prescriber_organization = PrescriberOrganization.objects.get(
@@ -361,10 +309,5 @@ def step_application(
 
         return HttpResponseRedirect(next_url)
 
-    context = {
-        "siae": siae,
-        "form": form,
-        "job_seeker": job_seeker,
-        "approvals_wrapper": approvals_wrapper,
-    }
+    context = {"siae": siae, "form": form, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
     return render(request, template_name, context)

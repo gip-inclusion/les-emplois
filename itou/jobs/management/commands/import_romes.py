@@ -6,7 +6,6 @@ from django.core.management.base import BaseCommand
 
 from itou.jobs.models import Rome
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 JSON_FILE = f"{CURRENT_DIR}/data/romes.json"
@@ -27,12 +26,7 @@ class Command(BaseCommand):
     help = "Import the content of the ROMEs JSON file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """

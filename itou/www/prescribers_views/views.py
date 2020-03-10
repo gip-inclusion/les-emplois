@@ -8,8 +8,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberOrganization
-from itou.www.prescribers_views.forms import CreatePrescriberOrganizationForm
-from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
+from itou.www.prescribers_views.forms import CreatePrescriberOrganizationForm, EditPrescriberOrganizationForm
 
 
 @login_required
@@ -41,9 +40,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     queryset = PrescriberOrganization.objects.member_required(request.user)
     organization = get_object_or_404(queryset, pk=pk)
 
-    form = EditPrescriberOrganizationForm(
-        instance=organization, data=request.POST or None
-    )
+    form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()

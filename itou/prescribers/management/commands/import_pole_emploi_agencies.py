@@ -8,7 +8,6 @@ from django.core.management.base import BaseCommand
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import DEPARTMENTS
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/pole_emploi_agencies.csv"
@@ -28,17 +27,10 @@ class Command(BaseCommand):
         django-admin import_pole_emploi_agencies
     """
 
-    help = (
-        "Import the content of the prescriber organizations csv file into the database."
-    )
+    help = "Import the content of the prescriber organizations csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """

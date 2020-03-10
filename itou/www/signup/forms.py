@@ -1,3 +1,4 @@
+from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -6,13 +7,10 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
-from allauth.account.forms import SignupForm
-
-from itou.prescribers.models import PrescriberOrganization, PrescriberMembership
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
-
 
 BLANK_CHOICE = (("", "---------"),)
 
@@ -45,12 +43,8 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
     )
 
     authorized_organization = forms.ModelChoiceField(
-        label=gettext_lazy(
-            "Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"
-        ),
-        queryset=PrescriberOrganization.active_objects.filter(
-            is_authorized=True
-        ).order_by("name"),
+        label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
+        queryset=PrescriberOrganization.active_objects.filter(is_authorized=True).order_by("name"),
         required=False,
         help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
     )
@@ -67,9 +61,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         if secret_code:
             secret_code = secret_code.upper()
             try:
-                self.organization = PrescriberOrganization.objects.get(
-                    secret_code=secret_code
-                )
+                self.organization = PrescriberOrganization.objects.get(secret_code=secret_code)
             except PrescriberOrganization.DoesNotExist:
                 error = _("Ce code n'est pas valide.")
                 raise forms.ValidationError(error)
@@ -104,9 +96,7 @@ class SelectSiaeForm(forms.Form):
     """
 
     kind = forms.ChoiceField(
-        label=gettext_lazy("Type de structure"),
-        choices=BLANK_CHOICE + Siae.KIND_CHOICES,
-        required=True,
+        label=gettext_lazy("Type de structure"), choices=BLANK_CHOICE + Siae.KIND_CHOICES, required=True
     )
 
     siret = forms.CharField(
@@ -136,9 +126,7 @@ class SelectSiaeForm(forms.Form):
         email = cleaned_data.get("email")
 
         if not (siret or email):
-            error_message = _(
-                "Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services."
-            )
+            error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
             raise forms.ValidationError(mark_safe(error_message))
 
         siaes = Siae.active_objects.filter(kind=kind)
@@ -260,9 +248,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
     def check_siae_signup_credentials(self):
         siae = self.get_siae()
-        return siae_signup_token_generator.check_token(
-            siae=siae, token=self.get_token()
-        )
+        return siae_signup_token_generator.check_token(siae=siae, token=self.get_token())
 
     def get_initial(self):
         siae = self.get_siae()

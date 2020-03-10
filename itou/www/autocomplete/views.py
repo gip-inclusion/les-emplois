@@ -50,9 +50,7 @@ def jobs_autocomplete(request):
                 "rome": appellation.rome.code,
                 "name": appellation.name,
             }
-            for appellation in Appellation.objects.autocomplete(
-                term, codes_to_exclude, limit=10
-            )
+            for appellation in Appellation.objects.autocomplete(term, codes_to_exclude, limit=10)
         ]
 
     return HttpResponse(json.dumps(appellations), "application/json")

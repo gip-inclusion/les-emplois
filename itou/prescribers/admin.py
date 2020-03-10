@@ -30,19 +30,7 @@ class MembersInline(admin.TabularInline):
 @admin.register(models.PrescriberOrganization)
 class PrescriberOrganizationAdmin(admin.ModelAdmin):
     fieldsets = (
-        (
-            _("Structure"),
-            {
-                "fields": (
-                    "siret",
-                    "name",
-                    "phone",
-                    "email",
-                    "secret_code",
-                    "is_authorized",
-                )
-            },
-        ),
+        (_("Structure"), {"fields": ("siret", "name", "phone", "email", "secret_code", "is_authorized")}),
         (
             _("Adresse"),
             {

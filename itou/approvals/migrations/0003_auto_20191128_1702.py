@@ -18,8 +18,7 @@ class Migration(migrations.Migration):
                 unique=True,
                 validators=[
                     django.core.validators.RegexValidator(
-                        "^[0-9a-zA-Z]*$",
-                        "Seuls les caractères alphanumériques sont autorisés.",
+                        "^[0-9a-zA-Z]*$", "Seuls les caractères alphanumériques sont autorisés."
                     ),
                     django.core.validators.MinLengthValidator(12),
                 ],

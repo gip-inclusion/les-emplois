@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/2019_07_liste_siae_additional_data.csv"
@@ -95,12 +94,7 @@ class Command(BaseCommand):
     help = "Import the content of the SIAE csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -164,23 +158,17 @@ class Command(BaseCommand):
                         self.logger.debug(appellation_name)
                         try:
                             appellation = (
-                                Appellation.objects.filter(rome__pk=code_rome).filter(
-                                    name__icontains=appellation_name
-                                )
+                                Appellation.objects.filter(rome__pk=code_rome).filter(name__icontains=appellation_name)
                             )[0]
                         except IndexError:
-                            self.stderr.write(
-                                f"Unknown appellation: `{appellation_name}`"
-                            )
+                            self.stderr.write(f"Unknown appellation: `{appellation_name}`")
                         appellations.append(appellation)
                 self.logger.debug(appellations)
 
                 if not Siae.objects.filter(siret=siret).exists():
                     name = row[8]
                     department = row[1]
-                    self.stderr.write(
-                        f"Siret does not exist. Skipping department {department} - {siret} - {name}."
-                    )
+                    self.stderr.write(f"Siret does not exist. Skipping department {department} - {siret} - {name}.")
                     continue
 
                 if not dry_run:

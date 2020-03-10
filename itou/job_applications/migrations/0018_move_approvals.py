@@ -17,9 +17,7 @@ def move_data_forward(apps, schema_editor):
 
         if not approval.job_application:
             print("-" * 80)
-            print(
-                f"FIXME: the job application linked to this approval has been deleted: {approval.pk}"
-            )
+            print(f"FIXME: the job application linked to this approval has been deleted: {approval.pk}")
             continue
 
         job_application = JobApplication.objects.get(pk=approval.job_application.pk)
@@ -31,9 +29,6 @@ def move_data_forward(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("approvals", "0006_auto_20200130_1948"),
-        ("job_applications", "0017_jobapplication_approval"),
-    ]
+    dependencies = [("approvals", "0006_auto_20200130_1948"), ("job_applications", "0017_jobapplication_approval")]
 
     operations = [migrations.RunPython(move_data_forward, migrations.RunPython.noop)]

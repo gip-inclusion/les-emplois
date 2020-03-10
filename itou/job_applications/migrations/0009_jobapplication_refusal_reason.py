@@ -15,19 +15,13 @@ class Migration(migrations.Migration):
                 blank=True,
                 choices=[
                     ("did_not_come", "Candidat non venu ou non joignable"),
-                    (
-                        "unavailable",
-                        "Candidat indisponible ou non intéressé par le poste",
-                    ),
+                    ("unavailable", "Candidat indisponible ou non intéressé par le poste"),
                     ("non_eligible", "Candidat non éligible"),
                     (
                         "eligibility_doubt",
                         "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)",
                     ),
-                    (
-                        "incompatible",
-                        "Un des freins à l'emploi du candidat est incompatible avec le poste proposé",
-                    ),
+                    ("incompatible", "Un des freins à l'emploi du candidat est incompatible avec le poste proposé"),
                     (
                         "prevent_objectives",
                         "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",

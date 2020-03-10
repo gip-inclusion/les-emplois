@@ -1,7 +1,6 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
-
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -10,14 +9,11 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory
-from itou.approvals.factories import PoleEmploiApprovalFactory
-from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.approvals.models import ApprovalsWrapper
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.users.factories import DEFAULT_PASSWORD
-from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -149,9 +145,7 @@ class CommonApprovalMixinTest(TestCase):
         self.assertTrue(approval.is_in_waiting_period)
 
         # Ended since more than WAITING_PERIOD_YEARS.
-        end_at = datetime.date.today() - relativedelta(
-            years=Approval.WAITING_PERIOD_YEARS, days=1
-        )
+        end_at = datetime.date.today() - relativedelta(years=Approval.WAITING_PERIOD_YEARS, days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid)
@@ -263,9 +257,7 @@ class ApprovalModelTest(TestCase):
 
         user = JobSeekerFactory()
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
-            birthdate=user.birthdate,
-            number="625741810182A01",
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, number="625741810182A01"
         )
         approvals_wrapper = ApprovalsWrapper(user)
 
@@ -281,9 +273,7 @@ class ApprovalModelTest(TestCase):
         # With an existing valid `Approval`.
 
         user = JobSeekerFactory()
-        valid_approval = ApprovalFactory(
-            user=user, start_at=datetime.date.today() - relativedelta(days=1)
-        )
+        valid_approval = ApprovalFactory(user=user, start_at=datetime.date.today() - relativedelta(days=1))
         approvals_wrapper = ApprovalsWrapper(user)
 
         approval = Approval.get_or_create_from_valid(approvals_wrapper)
@@ -297,38 +287,15 @@ class PoleEmploiApprovalModelTest(TestCase):
     """
 
     def test_format_name_as_pole_emploi(self):
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi(" François"), "FRANCOIS"
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed "), "M'HAMMED"
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("     jean kevin  "),
-            "JEAN KEVIN",
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("     Jean-Kevin  "),
-            "JEAN-KEVIN",
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("Kertész István"),
-            "KERTESZ ISTVAN",
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("Backer-Grøndahl"),
-            "BACKER-GRONDAHL",
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("désirée artôt"),
-            "DESIREE ARTOT",
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("N'Guessan"), "N'GUESSAN"
-        )
-        self.assertEqual(
-            PoleEmploiApproval.format_name_as_pole_emploi("N Guessan"), "N GUESSAN"
-        )
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi(" François"), "FRANCOIS")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed "), "M'HAMMED")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("     jean kevin  "), "JEAN KEVIN")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("     Jean-Kevin  "), "JEAN-KEVIN")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("Kertész István"), "KERTESZ ISTVAN")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("Backer-Grøndahl"), "BACKER-GRONDAHL")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("désirée artôt"), "DESIREE ARTOT")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("N'Guessan"), "N'GUESSAN")
+        self.assertEqual(PoleEmploiApproval.format_name_as_pole_emploi("N Guessan"), "N GUESSAN")
 
     def test_number_with_spaces(self):
 
@@ -351,9 +318,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
     def test_find_for(self):
 
         user = JobSeekerFactory()
-        pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
-        )
+        pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         search_results = PoleEmploiApproval.objects.find_for(user)
         self.assertEqual(search_results.count(), 1)
         self.assertEqual(search_results.first(), pe_approval)
@@ -378,10 +343,7 @@ class ApprovalsWrapperTest(TestCase):
         start_at = datetime.date.today()
         end_at = start_at + relativedelta(years=2)
         pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
-            birthdate=user.birthdate,
-            start_at=start_at,
-            end_at=end_at,
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
         )
 
         # Check timeline.
@@ -402,9 +364,7 @@ class ApprovalsWrapperTest(TestCase):
 
     def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
-        approval = ApprovalFactory(
-            user=user, start_at=datetime.date.today() - relativedelta(days=1)
-        )
+        approval = ApprovalFactory(user=user, start_at=datetime.date.today() - relativedelta(days=1))
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertTrue(approvals_wrapper.has_valid)
@@ -428,18 +388,14 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(
-            approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED
-        )
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory()
-        approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
-        )
+        approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
@@ -459,8 +415,7 @@ class CustomAdminViewsTest(TestCase):
         # When a Pôle emploi ID has been forgotten, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="",
-            lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN,
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -473,9 +428,7 @@ class CustomAdminViewsTest(TestCase):
         # Delete emails sent by previous transition.
         mail.outbox = []
 
-        url = reverse(
-            "admin:approvals_approval_manually_add_approval", args=[job_application.pk]
-        )
+        url = reverse("admin:approvals_approval_manually_add_approval", args=[job_application.pk])
 
         # Not enough perms.
         response = self.client.get(url)
@@ -484,9 +437,7 @@ class CustomAdminViewsTest(TestCase):
         user.is_staff = True
         user.save()
         content_type = ContentType.objects.get_for_model(Approval)
-        permission = Permission.objects.get(
-            content_type=content_type, codename="add_approval"
-        )
+        permission = Permission.objects.get(content_type=content_type, codename="add_approval")
         user.user_permissions.add(permission)
 
         # With good perms.
@@ -510,10 +461,7 @@ class CustomAdminViewsTest(TestCase):
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertIsNotNone(job_application.approval_number_sent_at)
         self.assertEqual(job_application.approval_number_delivered_by, user)
-        self.assertEqual(
-            job_application.approval_delivery_mode,
-            job_application.APPROVAL_DELIVERY_MODE_MANUAL,
-        )
+        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
 
         approval = job_application.approval
         self.assertEqual(approval.created_by, user)

@@ -8,7 +8,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.geocoding import get_geocoding_data
 
-
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/authorized_prescribers.csv"
@@ -27,17 +26,10 @@ class Command(BaseCommand):
         django-admin import_prescribers
     """
 
-    help = (
-        "Import the content of the prescriber organizations csv file into the database."
-    )
+    help = "Import the content of the prescriber organizations csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """

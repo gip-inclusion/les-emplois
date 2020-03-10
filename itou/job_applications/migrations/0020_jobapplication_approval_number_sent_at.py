@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="approval_number_sent_at",
-            field=models.DateTimeField(
-                blank=True,
-                db_index=True,
-                null=True,
-                verbose_name="Date d'envoi du PASS IAE",
-            ),
+            field=models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'envoi du PASS IAE"),
         )
     ]

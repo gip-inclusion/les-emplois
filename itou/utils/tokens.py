@@ -1,10 +1,9 @@
-from datetime import datetime
 import secrets
+from datetime import datetime
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
-
 
 SIAE_SIGNUP_MAGIC_LINK_TIMEOUT = 2 * 7 * 24 * 3600
 
@@ -64,15 +63,11 @@ class SiaeSignupTokenGenerator:
             return False
 
         # Check that the timestamp/uid has not been tampered with
-        if not constant_time_compare(
-            self._make_token_with_timestamp(siae, timestamp), token
-        ):
+        if not constant_time_compare(self._make_token_with_timestamp(siae, timestamp), token):
             return False
 
         # Check the timestamp is within limit.
-        if (
-            self._num_seconds(self._now()) - timestamp
-        ) > SIAE_SIGNUP_MAGIC_LINK_TIMEOUT:
+        if (self._num_seconds(self._now()) - timestamp) > SIAE_SIGNUP_MAGIC_LINK_TIMEOUT:
             return False
 
         return True
