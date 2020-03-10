@@ -292,10 +292,8 @@ class SiaeSignupTest(TestCase):
         - we show an explanation that a ASP-siret or ASP-email is required
         """
         # pylint: disable=unused-variable
-        user_first_name = "Marcel"
-        user_email = "marcel.doe@siae.com"
-
-        unknown_siret = "12345678901234"
+        user_first_name = "Marcel"  # noqa F841
+        user_email = "marcel.doe@siae.com"  # noqa F841
 
         url = reverse("signup:select_siae")
         response = self.client.get(url)
@@ -318,7 +316,7 @@ class SiaeSignupTest(TestCase):
         - we show an explanation that a ASP-siret or ASP-email is required
         """
         # pylint: disable=unused-variable
-        user_first_name = "Daniela"
+        user_first_name = "Daniela"  # noqa F841
         user_email = "daniela.doe@siae.com"
 
         unknown_siret = "12345678901234"
@@ -344,14 +342,14 @@ class SiaeSignupTest(TestCase):
         - we show a message explaining why we could not decide a match
         """
         # pylint: disable=unused-variable
-        user_first_name = "Emilie"
+        user_first_name = "Emilie"  # noqa F841
         user_email = "emilie.doe@siae.com"
 
         shared_siae_kind = Siae.KIND_ACI
 
-        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
+        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
 
-        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
+        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
 
         unknown_siret = "12345678901234"
 
@@ -386,10 +384,10 @@ class SiaeSignupTest(TestCase):
         shared_siae_kind = Siae.KIND_ACI
 
         # pylint: disable=unused-variable
-        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
+        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
 
         # pylint: disable=unused-variable
-        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
+        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
 
         siae3 = SiaeWithMembershipFactory(kind=shared_siae_kind, siret="12345678901234")
 
@@ -523,7 +521,7 @@ class SiaeSignupTest(TestCase):
         shared_siae_kind = Siae.KIND_GEIQ
 
         # pylint: disable=unused-variable
-        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)
+        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
 
         siae2 = SiaeWithMembershipFactory(kind=shared_siae_kind)
 
