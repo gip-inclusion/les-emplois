@@ -27,7 +27,7 @@ def get_email_text_template(template, context):
 
 
 def get_email_message(
-    to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None,
+    to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None
 ):
     return mail.EmailMessage(
         from_email=from_email,

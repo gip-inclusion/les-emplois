@@ -193,7 +193,7 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(redirect_url, next_url)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            f"Nous venons de vous envoyer un e-mail à l'adresse {siae1.auth_email} "
+            f"Nous venons de vous envoyer un e-mail à l'adresse {siae1.obfuscated_auth_email} "
             f"pour continuer votre inscription. Veuillez consulter votre boite "
             f"de réception."
         )

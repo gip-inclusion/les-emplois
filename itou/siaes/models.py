@@ -181,6 +181,20 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     def has_members(self):
         return self.members.filter(siaemembership__user__is_active=True).exists()
 
+    @property
+    def obfuscated_auth_email(self):
+        """
+        Used during the SIAE secure signup process to avoid
+        showing the full auth_email to the new user trying
+        to signup, as a pseudo security measure.
+
+        Code from https://gist.github.com/leotada/26d863007e13fb1856cdc047110d0ed6
+
+        emailsecreto@gmail.com => e**********o@gmail.com
+        """
+        m = self.auth_email.split("@")
+        return f'{m[0][0]}{"*"*(len(m[0])-2)}{m[0][-1]}@{m[1]}'
+
     def has_member(self, user):
         return self.members.filter(
             siaemembership__user=user, siaemembership__user__is_active=True
