@@ -10,18 +10,13 @@ import itou.utils.validators
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ("siaes", "0010_auto_20191028_1143"),
-    ]
+    dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL), ("siaes", "0010_auto_20191028_1143")]
 
     operations = [
         migrations.AddField(
             model_name="siae",
             name="created_at",
-            field=models.DateTimeField(
-                default=django.utils.timezone.now, verbose_name="Date de création"
-            ),
+            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
         ),
         migrations.AddField(
             model_name="siae",
@@ -48,18 +43,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="siae",
             name="updated_at",
-            field=models.DateTimeField(
-                blank=True, null=True, verbose_name="Date de modification"
-            ),
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Date de modification"),
         ),
         migrations.AlterField(
             model_name="siae",
             name="address_line_1",
-            field=models.CharField(
-                blank=True,
-                max_length=255,
-                verbose_name="Adresse postale, boite postale",
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Adresse postale, boite postale"),
         ),
         migrations.AlterField(
             model_name="siae",
@@ -80,10 +69,7 @@ class Migration(migrations.Migration):
             model_name="siae",
             name="siret",
             field=models.CharField(
-                db_index=True,
-                max_length=14,
-                validators=[itou.utils.validators.validate_siret],
-                verbose_name="Siret",
+                db_index=True, max_length=14, validators=[itou.utils.validators.validate_siret], verbose_name="Siret"
             ),
         ),
     ]

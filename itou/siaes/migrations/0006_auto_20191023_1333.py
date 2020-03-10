@@ -14,17 +14,12 @@ class Migration(migrations.Migration):
         [ ] Step 6 - Make FK to Siae non nullable
     """
 
-    dependencies = [
-        ("jobs", "0002_create_full_text_trigger"),
-        ("siaes", "0005_copy_data"),
-    ]
+    dependencies = [("jobs", "0002_create_full_text_trigger"), ("siaes", "0005_copy_data")]
 
     operations = [
         migrations.RemoveField(model_name="siae", name="jobs"),
         migrations.RemoveField(model_name="siae", name="members"),
         migrations.RemoveField(model_name="siaemembership", name="siae"),
-        migrations.AlterUniqueTogether(
-            name="siaejobdescription", unique_together={("appellation", "new_siae")}
-        ),
+        migrations.AlterUniqueTogether(name="siaejobdescription", unique_together={("appellation", "new_siae")}),
         migrations.RemoveField(model_name="siaejobdescription", name="siae"),
     ]

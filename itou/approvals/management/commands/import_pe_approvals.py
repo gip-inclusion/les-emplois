@@ -25,9 +25,7 @@ class Command(BaseCommand):
         django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx
     """
 
-    help = (
-        "Import the content of the Pole emploi's approvals xlsx file into the database."
-    )
+    help = "Import the content of the Pole emploi's approvals xlsx file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -37,12 +35,7 @@ class Command(BaseCommand):
             action="store",
             help=f"Name of the XLSX file to import (must be located in {XLSX_FILE_PATH})",
         )
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -68,9 +61,7 @@ class Command(BaseCommand):
 
         XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
         file_size_in_bytes = os.path.getsize(XLSX_FILE)
-        self.stdout.write(
-            f"Opening a {file_size_in_bytes >> 20} MB file… (this will take some time)"
-        )
+        self.stdout.write(f"Opening a {file_size_in_bytes >> 20} MB file… (this will take some time)")
 
         bulk_create_queue = []
         chunk_size = 5000
@@ -141,31 +132,21 @@ class Command(BaseCommand):
             # that increases the length to 15 chars.
             if len(NUM_AGR_DEC) > 12:
                 suffix = NUM_AGR_DEC[12:]
-                unique_approval_suffixes[suffix] = (
-                    unique_approval_suffixes.get(suffix, 0) + 1
-                )
+                unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
-            DATE_DEB_AGR_DEC = datetime.datetime.strptime(
-                row[8].value.strip(), "%d/%m/%y"
-            ).date()
+            DATE_DEB_AGR_DEC = datetime.datetime.strptime(row[8].value.strip(), "%d/%m/%y").date()
 
-            DATE_FIN_AGR_DEC = datetime.datetime.strptime(
-                row[9].value.strip(), "%d/%m/%y"
-            ).date()
+            DATE_FIN_AGR_DEC = datetime.datetime.strptime(row[9].value.strip(), "%d/%m/%y").date()
 
             # Same start and end dates means that the approval has been canceled.
             if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
                 count_canceled_approvals += 1
                 self.logger.debug("-" * 80)
                 self.logger.debug("Canceled approval found, skipping…")
-                self.logger.debug(
-                    "%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE
-                )
+                self.logger.debug("%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE)
                 continue
 
-            DATE_NAISS_BENE = datetime.datetime.strptime(
-                row[5].value.strip(), "%d/%m/%y"
-            ).date()
+            DATE_NAISS_BENE = datetime.datetime.strptime(row[5].value.strip(), "%d/%m/%y").date()
 
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
@@ -185,16 +166,12 @@ class Command(BaseCommand):
                     # constraints such as duplicate unique values.
                     # This allows us to update the database when a new source
                     # file is available.
-                    PoleEmploiApproval.objects.bulk_create(
-                        bulk_create_queue, ignore_conflicts=True
-                    )
+                    PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
                     bulk_create_queue = []
 
         # Create any remaining objects.
         if not dry_run and bulk_create_queue:
-            PoleEmploiApproval.objects.bulk_create(
-                bulk_create_queue, ignore_conflicts=True
-            )
+            PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
 
         count_after = PoleEmploiApproval.objects.count()
 

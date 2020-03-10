@@ -62,9 +62,7 @@ class SiaeWith2MembershipsFactory(SiaeFactory):
     """
 
     membership1 = factory.RelatedFactory(SiaeMembershipFactory, "siae")
-    membership2 = factory.RelatedFactory(
-        SiaeMembershipFactory, "siae", is_siae_admin=False
-    )
+    membership2 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_siae_admin=False)
 
 
 class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):

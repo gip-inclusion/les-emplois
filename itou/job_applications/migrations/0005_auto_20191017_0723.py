@@ -11,11 +11,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="jobapplication",
             name="updated_at",
-            field=models.DateTimeField(
-                blank=True,
-                db_index=True,
-                null=True,
-                verbose_name="Date de modification",
-            ),
+            field=models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
         )
     ]

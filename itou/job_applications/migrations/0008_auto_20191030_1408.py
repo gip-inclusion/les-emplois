@@ -17,9 +17,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(model_name="jobapplication", name="prescriber"),
-        migrations.RemoveField(
-            model_name="jobapplication", name="prescriber_organization"
-        ),
+        migrations.RemoveField(model_name="jobapplication", name="prescriber_organization"),
         migrations.RemoveField(model_name="jobapplication", name="siae"),
         migrations.AddField(
             model_name="jobapplication",
@@ -101,14 +99,7 @@ class Migration(migrations.Migration):
                 workflow=django_xworkflows.models._SerializedWorkflow(
                     initial_state="new",
                     name="JobApplicationWorkflow",
-                    states=[
-                        "new",
-                        "processing",
-                        "postponed",
-                        "accepted",
-                        "refused",
-                        "obsolete",
-                    ],
+                    states=["new", "processing", "postponed", "accepted", "refused", "obsolete"],
                 ),
             ),
         ),

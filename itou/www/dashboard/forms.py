@@ -22,12 +22,7 @@ class EditUserInfoForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = [
-            "birthdate",
-            "phone",
-            "pole_emploi_id",
-            "lack_of_pole_emploi_id_reason",
-        ]
+        fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
             "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978"),
             "phone": gettext_lazy("Par exemple 0610203040"),
@@ -37,6 +32,5 @@ class EditUserInfoForm(forms.ModelForm):
         super().clean()
         if self.instance.is_job_seeker:
             self._meta.model.clean_pole_emploi_fields(
-                self.cleaned_data["pole_emploi_id"],
-                self.cleaned_data["lack_of_pole_emploi_id_reason"],
+                self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
             )

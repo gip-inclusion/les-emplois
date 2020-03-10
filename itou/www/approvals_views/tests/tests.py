@@ -22,10 +22,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         response = self.client.get(
-            reverse(
-                "approvals:approval_as_pdf",
-                kwargs={"job_application_id": job_application.pk},
-            )
+            reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
         )
 
         self.assertEqual(response.status_code, 200)
@@ -46,10 +43,7 @@ class TestDownloadApprovalAsPDF(TestCase):
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
         response = self.client.get(
-            reverse(
-                "approvals:approval_as_pdf",
-                kwargs={"job_application_id": job_application.pk},
-            )
+            reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
         )
         self.assertEqual(response.status_code, 404)
 
@@ -63,9 +57,4 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         with self.assertRaises(ConnectionAbortedError):
-            self.client.get(
-                reverse(
-                    "approvals:approval_as_pdf",
-                    kwargs={"job_application_id": job_application.pk},
-                )
-            )
+            self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))

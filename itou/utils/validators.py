@@ -2,9 +2,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils.translation import gettext_lazy as _
 
-alphanumeric = RegexValidator(
-    r"^[0-9a-zA-Z]*$", "Seuls les caractères alphanumériques sont autorisés."
-)
+alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Seuls les caractères alphanumériques sont autorisés.")
 
 
 def validate_post_code(post_code):
@@ -19,17 +17,11 @@ def validate_siret(siret):
 
 def validate_naf(naf):
     if len(naf) != 5 or not naf[:4].isdigit() or not naf[4].isalpha():
-        raise ValidationError(
-            _("Le code NAF doit être composé de de 4 chiffres et d'une lettre.")
-        )
+        raise ValidationError(_("Le code NAF doit être composé de de 4 chiffres et d'une lettre."))
 
 
 def validate_pole_emploi_id(pole_emploi_id):
-    is_valid = (
-        len(pole_emploi_id) == 8
-        and pole_emploi_id[:7].isdigit()
-        and pole_emploi_id[7:].isalnum()
-    )
+    is_valid = len(pole_emploi_id) == 8 and pole_emploi_id[:7].isdigit() and pole_emploi_id[7:].isalnum()
     if not is_valid:
         raise ValidationError(
             _(

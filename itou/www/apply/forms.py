@@ -27,14 +27,10 @@ class UserExistsForm(forms.Form):
         self.user = get_user_model().objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:
-                error = _(
-                    "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
-                )
+                error = _("Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé.")
                 raise forms.ValidationError(error)
             if not self.user.is_job_seeker:
-                error = _(
-                    "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
-                )
+                error = _("Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi.")
                 raise forms.ValidationError(error)
         return email
 
@@ -50,12 +46,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     class Meta:
         model = get_user_model()
-        fields = [
-            "birthdate",
-            "phone",
-            "pole_emploi_id",
-            "lack_of_pole_emploi_id_reason",
-        ]
+        fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
             "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978."),
             "phone": gettext_lazy("Par exemple 0610203040."),
@@ -64,8 +55,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
     def clean(self):
         super().clean()
         self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"],
-            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
         )
 
 
@@ -105,15 +95,12 @@ class CreateJobSeekerForm(forms.ModelForm):
     def clean(self):
         super().clean()
         self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"],
-            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
         )
 
     def save(self, commit=True):
         if commit:
-            return self._meta.model.create_job_seeker_by_proxy(
-                self.proxy_user, **self.cleaned_data
-            )
+            return self._meta.model.create_job_seeker_by_proxy(self.proxy_user, **self.cleaned_data)
         return super().save(commit=False)
 
 
@@ -125,9 +112,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
     def __init__(self, siae, *args, **kwargs):
         self.siae = siae
         super().__init__(*args, **kwargs)
-        self.fields["selected_jobs"].queryset = siae.job_description_through.filter(
-            is_active=True
-        )
+        self.fields["selected_jobs"].queryset = siae.job_description_through.filter(is_active=True)
         self.fields["message"].required = True
 
     class Meta:
@@ -161,9 +146,7 @@ class RefusalForm(forms.Form):
         widget=forms.Textarea(),
         strip=True,
         initial=ANSWER_INITIAL,
-        help_text=gettext_lazy(
-            "Vous pouvez modifier le texte proposé ou l'utiliser tel quel."
-        ),
+        help_text=gettext_lazy("Vous pouvez modifier le texte proposé ou l'utiliser tel quel."),
     )
 
 
@@ -172,12 +155,7 @@ class AnswerForm(forms.Form):
     Allow an SIAE to add an answer message when postponing or accepting.
     """
 
-    answer = forms.CharField(
-        label=gettext_lazy("Réponse"),
-        widget=forms.Textarea(),
-        required=False,
-        strip=True,
-    )
+    answer = forms.CharField(label=gettext_lazy("Réponse"), widget=forms.Textarea(), required=False, strip=True)
 
 
 class AcceptForm(forms.ModelForm):
@@ -195,18 +173,13 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
-            "hiring_start_at": gettext_lazy(
-                "Au format jj/mm/aaaa, par exemple  %(date)s."
-            )
+            "hiring_start_at": gettext_lazy("Au format jj/mm/aaaa, par exemple  %(date)s.")
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": gettext_lazy(
-                "Au format jj/mm/aaaa, par exemple  %(date)s."
-            )
+            "hiring_end_at": gettext_lazy("Au format jj/mm/aaaa, par exemple  %(date)s.")
             % {
-                "date": (
-                    datetime.date.today()
-                    + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
-                ).strftime("%d/%m/%Y")
+                "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
+                    "%d/%m/%Y"
+                )
             },
         }
 
@@ -231,9 +204,7 @@ class AcceptForm(forms.ModelForm):
         if self.instance.to_siae.is_subject_to_eligibility_rules:
             duration = relativedelta(hiring_end_at, hiring_start_at)
             benchmark = Approval.DEFAULT_APPROVAL_YEARS
-            if duration.years > benchmark or (
-                duration.years == benchmark and duration.days > 0
-            ):
+            if duration.years > benchmark or (duration.years == benchmark and duration.days > 0):
                 raise forms.ValidationError(JobApplication.ERROR_DURATION_TOO_LONG)
 
         return cleaned_data
@@ -247,15 +218,12 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-        help_texts = {
-            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978.")
-        }
+        help_texts = {"birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978.")}
 
     def clean(self):
         super().clean()
         self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"],
-            self.cleaned_data["lack_of_pole_emploi_id_reason"],
+            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
         )
 
 
@@ -265,9 +233,7 @@ class FilterJobApplicationsForm(forms.Form):
     """
 
     states = forms.MultipleChoiceField(
-        required=False,
-        choices=JobApplicationWorkflow.STATE_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
+        required=False, choices=JobApplicationWorkflow.STATE_CHOICES, widget=forms.CheckboxSelectMultiple
     )
     start_date = forms.DateField(
         input_formats=[DatePickerField.DATE_FORMAT],
@@ -302,9 +268,7 @@ class FilterJobApplicationsForm(forms.Form):
         """
         end_date = self.cleaned_data.get("end_date")
         if end_date:
-            end_date = datetime.datetime.combine(
-                end_date, datetime.time(hour=23, minute=59, second=59)
-            )
+            end_date = datetime.datetime.combine(end_date, datetime.time(hour=23, minute=59, second=59))
             end_date = timezone.make_aware(end_date)
         return end_date
 
@@ -344,9 +308,7 @@ class FilterJobApplicationsForm(forms.Form):
             active_filters.append([label, end_date])
 
         if states:
-            values = [
-                str(JobApplicationWorkflow.states[state].title) for state in states
-            ]
+            values = [str(JobApplicationWorkflow.states[state].title) for state in states]
             value = ", ".join(values)
             label = _("Statuts") if (len(values) > 1) else _("Statut")
             active_filters.append([label, value])
@@ -359,13 +321,9 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     Job applications filters common to SIAE and Prescribers.
     """
 
-    senders = forms.MultipleChoiceField(
-        required=False, label=_("Nom"), widget=Select2MultipleWidget
-    )
+    senders = forms.MultipleChoiceField(required=False, label=_("Nom"), widget=Select2MultipleWidget)
 
-    job_seekers = forms.MultipleChoiceField(
-        required=False, label=_("Candidat"), widget=Select2MultipleWidget
-    )
+    job_seekers = forms.MultipleChoiceField(required=False, label=_("Candidat"), widget=Select2MultipleWidget)
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
@@ -380,9 +338,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         return sorted(users, key=lambda l: l[1])
 
     def _humanize_multiple_choice_for_users(self, user_ids, field_name):
-        users = get_user_model().objects.filter(
-            pk__in=[int(user_id) for user_id in user_ids]
-        )
+        users = get_user_model().objects.filter(pk__in=[int(user_id) for user_id in user_ids])
         values = [user.get_full_name().title() for user in users]
         value = ", ".join(values)
         label = self.base_fields.get(field_name).label
@@ -415,9 +371,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
             humanized_filters.append({"label": label, "value": value})
 
         if job_seekers:
-            label, value = self._humanize_multiple_choice_for_users(
-                job_seekers, "job_seekers"
-            )
+            label, value = self._humanize_multiple_choice_for_users(job_seekers, "job_seekers")
             humanized_filters.append({"label": label, "value": value})
 
         return humanized_filters
@@ -434,9 +388,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
-        self.fields[
-            "sender_organizations"
-        ].choices += self.get_sender_organization_choices()
+        self.fields["sender_organizations"].choices += self.get_sender_organization_choices()
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
@@ -450,13 +402,9 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         return qs_list
 
     def get_sender_organization_choices(self):
-        sender_orgs = self.job_applications_qs.get_unique_fk_objects(
-            "sender_prescriber_organization"
-        )
+        sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
-        sender_orgs = [
-            (sender.id, sender.display_name.title()) for sender in sender_orgs
-        ]
+        sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
         return sorted(sender_orgs, key=lambda l: l[1])
 
     def humanize_filters(self):
@@ -465,9 +413,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
 
         if sender_organizations:
             values = [
-                PrescriberOrganization.objects.get(
-                    pk=int(organization_id)
-                ).display_name.title()
+                PrescriberOrganization.objects.get(pk=int(organization_id)).display_name.title()
                 for organization_id in sender_organizations
             ]
             value = ", ".join(values)

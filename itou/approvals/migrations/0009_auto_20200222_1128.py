@@ -17,9 +17,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="poleemploiapproval",
             name="birthdate",
-            field=models.DateField(
-                default=django.utils.timezone.now, verbose_name="Date de naissance"
-            ),
+            field=models.DateField(default=django.utils.timezone.now, verbose_name="Date de naissance"),
         ),
         migrations.AlterField(
             model_name="poleemploiapproval",
@@ -34,14 +32,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="poleemploiapproval",
             name="pole_emploi_id",
-            field=models.CharField(
-                max_length=8, verbose_name="Identifiant Pôle emploi"
-            ),
+            field=models.CharField(max_length=8, verbose_name="Identifiant Pôle emploi"),
         ),
         migrations.AddIndex(
             model_name="poleemploiapproval",
-            index=models.Index(
-                fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx"
-            ),
+            index=models.Index(fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx"),
         ),
     ]

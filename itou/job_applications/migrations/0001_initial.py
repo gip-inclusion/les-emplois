@@ -18,15 +18,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="JobApplication",
             fields=[
-                (
-                    "id",
-                    models.UUIDField(
-                        default=uuid.uuid4,
-                        editable=False,
-                        primary_key=True,
-                        serialize=False,
-                    ),
-                ),
+                ("id", models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 (
                     "state",
                     django_xworkflows.models.StateField(
@@ -36,39 +28,19 @@ class Migration(migrations.Migration):
                         workflow=django_xworkflows.models._SerializedWorkflow(
                             initial_state="new",
                             name="JobApplicationWorkflow",
-                            states=[
-                                "new",
-                                "pending_processing",
-                                "processing",
-                                "accepted",
-                                "rejected",
-                                "obsolete",
-                            ],
+                            states=["new", "pending_processing", "processing", "accepted", "rejected", "obsolete"],
                         ),
                     ),
                 ),
-                (
-                    "message",
-                    models.TextField(blank=True, verbose_name="Message de candidature"),
-                ),
-                (
-                    "answer",
-                    models.TextField(blank=True, verbose_name="Message de réponse"),
-                ),
+                ("message", models.TextField(blank=True, verbose_name="Message de candidature")),
+                ("answer", models.TextField(blank=True, verbose_name="Message de réponse")),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True,
-                        default=django.utils.timezone.now,
-                        verbose_name="Date de création",
+                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
                     ),
                 ),
-                (
-                    "updated_at",
-                    models.DateTimeField(
-                        blank=True, db_index=True, null=True, verbose_name="Updated at"
-                    ),
-                ),
+                ("updated_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Updated at")),
             ],
             options={
                 "verbose_name": "Candidature",
@@ -80,39 +52,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="JobApplicationTransitionLog",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "transition",
-                    models.CharField(
-                        db_index=True, max_length=255, verbose_name="transition"
-                    ),
-                ),
-                (
-                    "from_state",
-                    models.CharField(
-                        db_index=True, max_length=255, verbose_name="from state"
-                    ),
-                ),
-                (
-                    "to_state",
-                    models.CharField(
-                        db_index=True, max_length=255, verbose_name="to state"
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("transition", models.CharField(db_index=True, max_length=255, verbose_name="transition")),
+                ("from_state", models.CharField(db_index=True, max_length=255, verbose_name="from state")),
+                ("to_state", models.CharField(db_index=True, max_length=255, verbose_name="to state")),
                 (
                     "timestamp",
                     models.DateTimeField(
-                        db_index=True,
-                        default=django.utils.timezone.now,
-                        verbose_name="performed at",
+                        db_index=True, default=django.utils.timezone.now, verbose_name="performed at"
                     ),
                 ),
                 (

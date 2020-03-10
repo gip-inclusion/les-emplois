@@ -6,10 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("approvals", "0006_auto_20200130_1948"),
-        ("job_applications", "0016_auto_20200129_1445"),
-    ]
+    dependencies = [("approvals", "0006_auto_20200130_1948"), ("job_applications", "0016_auto_20200129_1445")]
 
     operations = [
         migrations.AddField(
@@ -26,9 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="approval_number_sent_by_email",
-            field=models.BooleanField(
-                default=False, verbose_name="PASS IAE envoyé par email"
-            ),
+            field=models.BooleanField(default=False, verbose_name="PASS IAE envoyé par email"),
         ),
         migrations.AddField(
             model_name="jobapplication",

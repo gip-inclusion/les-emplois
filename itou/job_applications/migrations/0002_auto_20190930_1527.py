@@ -22,10 +22,7 @@ class Migration(migrations.Migration):
             model_name="jobapplicationtransitionlog",
             name="user",
             field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                to=settings.AUTH_USER_MODEL,
+                blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL
             ),
         ),
         migrations.AddField(
@@ -41,9 +38,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="jobs",
-            field=models.ManyToManyField(
-                blank=True, to="jobs.Appellation", verbose_name="Métiers recherchés"
-            ),
+            field=models.ManyToManyField(blank=True, to="jobs.Appellation", verbose_name="Métiers recherchés"),
         ),
         migrations.AddField(
             model_name="jobapplication",

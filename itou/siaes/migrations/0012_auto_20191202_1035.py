@@ -7,6 +7,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("siaes", "0011_auto_20191128_1152")]
 
-    operations = [
-        migrations.AlterUniqueTogether(name="siae", unique_together={("siret", "kind")})
-    ]
+    operations = [migrations.AlterUniqueTogether(name="siae", unique_together={("siret", "kind")})]

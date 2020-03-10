@@ -30,12 +30,7 @@ class Command(BaseCommand):
     help = "Import the content of the French cities csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -78,9 +73,7 @@ class Command(BaseCommand):
 
                 coords = item.get("centre")
                 if coords:
-                    coords = GEOSGeometry(
-                        f"{coords}"
-                    )  # Feed `GEOSGeometry` with GeoJSON.
+                    coords = GEOSGeometry(f"{coords}")  # Feed `GEOSGeometry` with GeoJSON.
                 else:
                     self.stderr.write(f"No coordinates for {name}. Skipping…")
                     continue

@@ -89,9 +89,7 @@ class ApplyAsJobSeekerTest(TestCase):
         }
         self.assertDictEqual(session_data, expected_session_data)
 
-        next_url = reverse(
-            "apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}
-        )
+        next_url = reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step check job seeker info.
@@ -100,11 +98,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "birthdate": "20/12/1978",
-            "phone": "0610203040",
-            "pole_emploi_id": "1234567A",
-        }
+        post_data = {"birthdate": "20/12/1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -113,9 +107,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(user.phone, post_data["phone"])
         self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
 
-        next_url = reverse(
-            "apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk}
-        )
+        next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
 
         # Step check previous job applications.
@@ -152,23 +144,15 @@ class ApplyAsJobSeekerTest(TestCase):
         next_url = reverse("apply:list_for_job_seeker")
         self.assertEqual(response.url, next_url)
 
-        job_application = JobApplication.objects.get(
-            job_seeker=user, sender=user, to_siae=siae
-        )
-        self.assertEqual(
-            job_application.sender_kind, JobApplication.SENDER_KIND_JOB_SEEKER
-        )
+        job_application = JobApplication.objects.get(job_seeker=user, sender=user, to_siae=siae)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_JOB_SEEKER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, None)
-        self.assertEqual(
-            job_application.state, job_application.state.workflow.STATE_NEW
-        )
+        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
         self.assertEqual(job_application.selected_jobs.count(), 1)
-        self.assertEqual(
-            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
-        )
+        self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
 
     def test_apply_as_jobseeker_with_approval_in_waiting_period(self):
         """Apply as jobseeker with an approval in waiting period."""
@@ -178,10 +162,7 @@ class ApplyAsJobSeekerTest(TestCase):
         end_at = datetime.date.today() - relativedelta(days=30)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
-            birthdate=user.birthdate,
-            start_at=start_at,
-            end_at=end_at,
+            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
         )
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -192,15 +173,9 @@ class ApplyAsJobSeekerTest(TestCase):
 
         # …until the expected 403.
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(
-            response.context["exception"],
-            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER,
-        )
+        self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url,
-            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
-        )
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
 
 class ApplyAsAuthorizedPrescriberTest(TestCase):
@@ -209,9 +184,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
-            is_authorized=True
-        )
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -332,10 +305,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "selected_jobs": [
-                siae.job_description_through.first().pk,
-                siae.job_description_through.last().pk,
-            ],
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -344,28 +314,16 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         next_url = reverse("apply:list_for_prescriber")
         self.assertEqual(response.url, next_url)
 
-        job_application = JobApplication.objects.get(
-            job_seeker=new_job_seeker, sender=user, to_siae=siae
-        )
-        self.assertEqual(
-            job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER
-        )
+        job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
-        self.assertEqual(
-            job_application.sender_prescriber_organization, prescriber_organization
-        )
-        self.assertEqual(
-            job_application.state, job_application.state.workflow.STATE_NEW
-        )
+        self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
+        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
         self.assertEqual(job_application.selected_jobs.count(), 2)
-        self.assertEqual(
-            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
-        )
-        self.assertEqual(
-            job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
-        )
+        self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
+        self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
 
     def test_apply_as_authorized_prescriber_for_approval_in_waiting_period(self):
         """Apply as authorized prescriber for a job seeker with an approval in waiting period."""
@@ -379,9 +337,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=job_seeker, start_at=start_at, end_at=end_at)
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
-            is_authorized=True
-        )
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -393,9 +349,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
-        )
+        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
         post_data = {"email": job_seeker.email}
@@ -404,20 +358,14 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # …until the eligibility step which should trigger a 200 OK.
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
-        )
+        self.assertEqual(last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk}))
 
     def test_apply_to_a_geiq_as_authorized_prescriber(self):
         """Apply to a GEIC as authorized prescriber."""
 
-        siae = SiaeWithMembershipAndJobsFactory(
-            kind=Siae.KIND_GEIQ, romes=("N1101", "N1105")
-        )
+        siae = SiaeWithMembershipAndJobsFactory(kind=Siae.KIND_GEIQ, romes=("N1101", "N1105"))
 
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
-            is_authorized=True
-        )
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -533,10 +481,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "selected_jobs": [
-                siae.job_description_through.first().pk,
-                siae.job_description_through.last().pk,
-            ],
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -545,28 +490,16 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         next_url = reverse("apply:list_for_prescriber")
         self.assertEqual(response.url, next_url)
 
-        job_application = JobApplication.objects.get(
-            job_seeker=new_job_seeker, sender=user, to_siae=siae
-        )
-        self.assertEqual(
-            job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER
-        )
+        job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
-        self.assertEqual(
-            job_application.sender_prescriber_organization, prescriber_organization
-        )
-        self.assertEqual(
-            job_application.state, job_application.state.workflow.STATE_NEW
-        )
+        self.assertEqual(job_application.sender_prescriber_organization, prescriber_organization)
+        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
         self.assertEqual(job_application.selected_jobs.count(), 2)
-        self.assertEqual(
-            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
-        )
-        self.assertEqual(
-            job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
-        )
+        self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
+        self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
 
 
 class ApplyAsPrescriberTest(TestCase):
@@ -688,10 +621,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "selected_jobs": [
-                siae.job_description_through.first().pk,
-                siae.job_description_through.last().pk,
-            ],
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -700,26 +630,16 @@ class ApplyAsPrescriberTest(TestCase):
         next_url = reverse("apply:list_for_prescriber")
         self.assertEqual(response.url, next_url)
 
-        job_application = JobApplication.objects.get(
-            job_seeker=new_job_seeker, sender=user, to_siae=siae
-        )
-        self.assertEqual(
-            job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER
-        )
+        job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
         self.assertEqual(job_application.sender_siae, None)
         self.assertEqual(job_application.sender_prescriber_organization, None)
-        self.assertEqual(
-            job_application.state, job_application.state.workflow.STATE_NEW
-        )
+        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
         self.assertEqual(job_application.selected_jobs.count(), 2)
-        self.assertEqual(
-            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
-        )
-        self.assertEqual(
-            job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
-        )
+        self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
+        self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
 
     def test_apply_as_prescriber_for_approval_in_waiting_period(self):
         """Apply as prescriber for a job seeker with an approval in waiting period."""
@@ -744,9 +664,7 @@ class ApplyAsPrescriberTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
-        )
+        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
         post_data = {"email": job_seeker.email}
@@ -754,15 +672,9 @@ class ApplyAsPrescriberTest(TestCase):
 
         # …until the expected 403.
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(
-            response.context["exception"],
-            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY,
-        )
+        self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url,
-            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
-        )
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
 
 class ApplyAsSiaeTest(TestCase):
@@ -896,10 +808,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "selected_jobs": [
-                siae.job_description_through.first().pk,
-                siae.job_description_through.last().pk,
-            ],
+            "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(next_url, data=post_data)
@@ -908,26 +817,16 @@ class ApplyAsSiaeTest(TestCase):
         next_url = reverse("apply:list_for_siae")
         self.assertEqual(response.url, next_url)
 
-        job_application = JobApplication.objects.get(
-            job_seeker=new_job_seeker, sender=user, to_siae=siae
-        )
-        self.assertEqual(
-            job_application.sender_kind, JobApplication.SENDER_KIND_SIAE_STAFF
-        )
+        job_application = JobApplication.objects.get(job_seeker=new_job_seeker, sender=user, to_siae=siae)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_SIAE_STAFF)
         self.assertEqual(job_application.sender_siae, siae)
         self.assertEqual(job_application.sender_prescriber_organization, None)
-        self.assertEqual(
-            job_application.state, job_application.state.workflow.STATE_NEW
-        )
+        self.assertEqual(job_application.state, job_application.state.workflow.STATE_NEW)
         self.assertEqual(job_application.message, post_data["message"])
         self.assertEqual(job_application.answer, "")
         self.assertEqual(job_application.selected_jobs.count(), 2)
-        self.assertEqual(
-            job_application.selected_jobs.first().pk, post_data["selected_jobs"][0]
-        )
-        self.assertEqual(
-            job_application.selected_jobs.last().pk, post_data["selected_jobs"][1]
-        )
+        self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
+        self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
 
     def test_apply_as_siae_for_approval_in_waiting_period(self):
         """Apply as SIAE for a job seeker with an approval in waiting period."""
@@ -952,9 +851,7 @@ class ApplyAsSiaeTest(TestCase):
         # …until a job seeker has to be determined…
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk})
-        )
+        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
 
         # …choose one, then follow all redirections…
         post_data = {"email": job_seeker.email}
@@ -962,12 +859,6 @@ class ApplyAsSiaeTest(TestCase):
 
         # …until the expected 403.
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(
-            response.context["exception"],
-            ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY,
-        )
+        self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
         last_url = response.redirect_chain[-1][0]
-        self.assertEqual(
-            last_url,
-            reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}),
-        )
+        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))

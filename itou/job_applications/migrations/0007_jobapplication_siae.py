@@ -6,10 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("siaes", "0008_auto_20191023_1341"),
-        ("job_applications", "0006_remove_jobapplication_siae"),
-    ]
+    dependencies = [("siaes", "0008_auto_20191023_1341"), ("job_applications", "0006_remove_jobapplication_siae")]
 
     operations = [
         migrations.AddField(

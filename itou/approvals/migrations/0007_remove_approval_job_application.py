@@ -5,10 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("approvals", "0006_auto_20200130_1948"),
-        ("job_applications", "0018_move_approvals"),
-    ]
+    dependencies = [("approvals", "0006_auto_20200130_1948"), ("job_applications", "0018_move_approvals")]
 
     operations = [
         migrations.RemoveField(model_name="approval", name="job_application"),

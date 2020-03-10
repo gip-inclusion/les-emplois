@@ -44,14 +44,9 @@ class JobDescriptionCardViewTest(TestCase):
     def test_job_description_card(self):
         siae = SiaeWithMembershipAndJobsFactory()
         job_description = siae.job_description_through.first()
-        job_description.description = (
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        )
+        job_description.description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         job_description.save()
-        url = reverse(
-            "siaes_views:job_description_card",
-            kwargs={"job_description_id": job_description.pk},
-        )
+        url = reverse("siaes_views:job_description_card", kwargs={"job_description_id": job_description.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["job"], job_description)
@@ -141,9 +136,7 @@ class ConfigureJobsViewTest(TestCase):
         self.assertEqual(self.siae.jobs.count(), 5)
         self.assertEqual(self.siae.job_description_through.count(), 5)
 
-        self.assertTrue(
-            self.siae.job_description_through.get(appellation_id=10357, is_active=True)
-        )
+        self.assertTrue(self.siae.job_description_through.get(appellation_id=10357, is_active=True))
         self.assertTrue(
             self.siae.job_description_through.get(
                 appellation_id=10579,
@@ -168,9 +161,7 @@ class ConfigureJobsViewTest(TestCase):
                 description=post_data["description-10877"],
             )
         )
-        self.assertTrue(
-            self.siae.job_description_through.get(appellation_id=16361, is_active=False)
-        )
+        self.assertTrue(self.siae.job_description_through.get(appellation_id=16361, is_active=False))
 
 
 class CreateSiaeViewTest(TestCase):
@@ -238,13 +229,8 @@ class CreateSiaeViewTest(TestCase):
 
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
-    def test_can_create_siae_with_same_siret_and_different_type(
-        self, mock_call_ban_geocoding_api
-    ):
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_can_create_siae_with_same_siret_and_different_type(self, mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         siae.kind = Siae.KIND_ETTI
         siae.save()
@@ -300,10 +286,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.longitude, 2.316754)
         self.assertEqual(new_siae.geocoding_score, 0.587663373207207)
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_siae_with_different_siret(self, mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -360,10 +343,7 @@ class CreateSiaeViewTest(TestCase):
 
 
 class EditSiaeViewTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit(self, mock_call_ban_geocoding_api):
 
         siae = SiaeWithMembershipFactory()

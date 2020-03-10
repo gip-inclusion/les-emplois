@@ -13,11 +13,7 @@ class ModelTest(TestCase):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
         user_info = UserInfo(
-            user=user,
-            kind=KIND_SIAE_STAFF,
-            prescriber_organization=None,
-            is_authorized_prescriber=False,
-            siae=siae,
+            user=user, kind=KIND_SIAE_STAFF, prescriber_organization=None, is_authorized_prescriber=False, siae=siae
         )
 
         eligibility = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)

@@ -5,18 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("prescribers", "0007_prescriberorganization_code_safir_pole_emploi")
-    ]
+    dependencies = [("prescribers", "0007_prescriberorganization_code_safir_pole_emploi")]
 
     operations = [
         migrations.AlterField(
             model_name="prescriberorganization",
             name="address_line_1",
-            field=models.CharField(
-                blank=True,
-                max_length=255,
-                verbose_name="Adresse postale, boite postale",
-            ),
+            field=models.CharField(blank=True, max_length=255, verbose_name="Adresse postale, boite postale"),
         )
     ]

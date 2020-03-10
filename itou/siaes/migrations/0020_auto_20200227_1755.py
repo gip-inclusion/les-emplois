@@ -38,10 +38,7 @@ def get_siret_kind_to_data_map():
             if key in siret_kind_to_data_map:
                 assert siret_kind_to_data_map[key]["auth_email"] == auth_email
             else:
-                siret_kind_to_data_map[key] = {
-                    "auth_email": auth_email,
-                    "external_id": external_id,
-                }
+                siret_kind_to_data_map[key] = {"auth_email": auth_email, "external_id": external_id}
 
     return siret_kind_to_data_map
 
@@ -59,9 +56,7 @@ def populate_siae_external_id_and_update_auth_email(apps, schema_editor):
         auth_email = SIRET_KIND_TO_DATA_MAP[key]["auth_email"]
         external_id = SIRET_KIND_TO_DATA_MAP[key]["external_id"]
         if siae.auth_email != auth_email:
-            print(
-                f"auth_email {siae.auth_email} changed to {auth_email} (siret={siae.siret} kind={siae.kind})"
-            )
+            print(f"auth_email {siae.auth_email} changed to {auth_email} (siret={siae.siret} kind={siae.kind})")
             siae.auth_email = auth_email
             auth_email_update_counter += 1
         siae.external_id = external_id
@@ -83,8 +78,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("siaes", "0019_auto_20200210_1626")]
 
-    operations = [
-        migrations.RunPython(
-            populate_siae_external_id_and_update_auth_email, migrations.RunPython.noop
-        )
-    ]
+    operations = [migrations.RunPython(populate_siae_external_id_and_update_auth_email, migrations.RunPython.noop)]

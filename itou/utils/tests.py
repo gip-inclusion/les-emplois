@@ -97,18 +97,14 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
-        self.assertTrue(
-            user.prescribermembership_set.get(organization=organization).is_admin
-        )
+        self.assertTrue(user.prescribermembership_set.get(organization=organization).is_admin)
 
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
         middleware = SessionMiddleware()
         middleware.process_request(request)
-        request.session[
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        ] = organization.pk
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization.pk
         request.session.save()
 
         with self.assertNumQueries(1):
@@ -124,10 +120,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
 
 class UtilsAddressMixinTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_set_coords(self, mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.set_coords()`.
@@ -158,10 +151,7 @@ class UtilsAddressMixinTest(TestCase):
         self.assertEqual(prescriber.latitude, expected_latitude)
         self.assertEqual(prescriber.longitude, expected_longitude)
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_set_coords_and_address(self, mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.set_coords_and_address()`.
@@ -178,9 +168,7 @@ class UtilsAddressMixinTest(TestCase):
         self.assertEqual(prescriber.latitude, None)
         self.assertEqual(prescriber.longitude, None)
 
-        prescriber.set_coords_and_address(
-            "10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015"
-        )
+        prescriber.set_coords_and_address("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
         prescriber.save()
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
@@ -203,10 +191,7 @@ class UtilsAddressMixinTest(TestCase):
 
 
 class UtilsGeocodingTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_process_geocoding_data(self, mock_call_ban_geocoding_api):
         geocoding_data = mock_call_ban_geocoding_api()
         result = process_geocoding_data(geocoding_data)
@@ -224,9 +209,7 @@ class UtilsGeocodingTest(TestCase):
 
 
 class UtilsSiretTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.siret.call_insee_api", return_value=API_INSEE_SIRET_RESULT_MOCK
-    )
+    @mock.patch("itou.utils.apis.siret.call_insee_api", return_value=API_INSEE_SIRET_RESULT_MOCK)
     def test_process_siret_data(self, mock_call_insee_api):
         siret_data = mock_call_insee_api()
         result = process_siret_data(siret_data)
@@ -289,9 +272,7 @@ class UtilsTemplateTagsTestCase(TestCase):
 
         # Relative URL.
         context = {"url": "/siae/search?distance=50&city=metz-57"}
-        template = Template(
-            "{% load url_add_query %}" "{% url_add_query url page=22 %}"
-        )
+        template = Template("{% load url_add_query %}" "{% url_add_query url page=22 %}")
         out = template.render(Context(context))
         expected = "/siae/search?distance=50&amp;city=metz-57&amp;page=22"
         self.assertEqual(out, expected)
@@ -315,16 +296,12 @@ class UtilsEmailsTestCase(TestCase):
     def test_get_safe_url(self):
         """Test `urls.get_safe_url()`."""
 
-        request = RequestFactory().get(
-            "/?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67"
-        )
+        request = RequestFactory().get("/?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67")
         url = get_safe_url(request, "next")
         expected = "/siae/search?distance=100&city=strasbourg-67"
         self.assertEqual(url, expected)
 
-        request = RequestFactory().post(
-            "/", data={"next": "/siae/search?distance=100&city=strasbourg-67"}
-        )
+        request = RequestFactory().post("/", data={"next": "/siae/search?distance=100&city=strasbourg-67"})
         url = get_safe_url(request, "next")
         expected = "/siae/search?distance=100&city=strasbourg-67"
         self.assertEqual(url, expected)
@@ -371,9 +348,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware()
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        ] = prescriber_organization.pk
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
         request.session.save()
 
         user_info = get_user_info(request)
@@ -384,9 +359,7 @@ class PermsUserTest(TestCase):
         self.assertEqual(user_info.siae, None)
 
     def test_get_user_info_for_authorized_prescriber(self):
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
-            is_authorized=True
-        )
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()
 
         factory = RequestFactory()
@@ -395,9 +368,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware()
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        ] = prescriber_organization.pk
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
         request.session.save()
 
         user_info = get_user_info(request)
@@ -476,13 +447,9 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         siae = Siae.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
-        p1 = MockedSiaeSignupTokenGenerator(
-            datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
-        )
+        p1 = MockedSiaeSignupTokenGenerator(datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1)))
         self.assertIs(p1.check_token(siae, tk1), True)
-        p2 = MockedSiaeSignupTokenGenerator(
-            datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
-        )
+        p2 = MockedSiaeSignupTokenGenerator(datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1)))
         self.assertIs(p2.check_token(siae, tk1), False)
 
     def test_check_token_with_nonexistent_token_and_user(self):

@@ -11,12 +11,8 @@ KINDS = dict(Siae.KIND_CHOICES).keys()
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-ASP_CSV_FILE = (
-    f"{settings.APPS_DIR}/siaes/management/commands/data/2019_07_liste_siae.csv"
-)
-GEIQ_CSV_FILE = (
-    f"{settings.APPS_DIR}/siaes/management/commands/data/2019_11_21_export_bbd_geiq.csv"
-)
+ASP_CSV_FILE = f"{settings.APPS_DIR}/siaes/management/commands/data/2019_07_liste_siae.csv"
+GEIQ_CSV_FILE = f"{settings.APPS_DIR}/siaes/management/commands/data/2019_11_21_export_bbd_geiq.csv"
 
 
 def get_siret_kind_to_email_map():
@@ -81,6 +77,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("siaes", "0018_siae_external_id")]
 
-    operations = [
-        migrations.RunPython(populate_siae_auth_email, migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(populate_siae_auth_email, migrations.RunPython.noop)]

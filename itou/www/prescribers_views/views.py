@@ -40,9 +40,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     queryset = PrescriberOrganization.objects.member_required(request.user)
     organization = get_object_or_404(queryset, pk=pk)
 
-    form = EditPrescriberOrganizationForm(
-        instance=organization, data=request.POST or None
-    )
+    form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()

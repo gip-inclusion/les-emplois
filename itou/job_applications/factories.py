@@ -46,9 +46,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         if extracted:
             # A list of jobs were passed in, use them.
             for appellation in extracted:
-                siae_job_description = SiaeJobDescription.objects.create(
-                    siae=self.to_siae, appellation=appellation
-                )
+                siae_job_description = SiaeJobDescription.objects.create(siae=self.to_siae, appellation=appellation)
                 self.selected_jobs.add(siae_job_description)
 
 
@@ -79,9 +77,7 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of an organization."""
 
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
-    sender_prescriber_organization = factory.SubFactory(
-        PrescriberOrganizationWithMembershipFactory
-    )
+    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
     def set_sender(self, create, extracted, **kwargs):
@@ -92,15 +88,11 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
         self.save()
 
 
-class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-    JobApplicationFactory
-):
+class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of an authorized organization."""
 
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
-    sender_prescriber_organization = factory.SubFactory(
-        AuthorizedPrescriberOrganizationWithMembershipFactory
-    )
+    sender_prescriber_organization = factory.SubFactory(AuthorizedPrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
     def set_sender(self, create, extracted, **kwargs):

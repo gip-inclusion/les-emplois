@@ -8,9 +8,5 @@ class Migration(migrations.Migration):
     dependencies = [("job_applications", "0014_remove_jobapplication_jobs")]
 
     operations = [
-        migrations.RenameField(
-            model_name="jobapplication",
-            old_name="date_of_hiring",
-            new_name="hiring_start_at",
-        )
+        migrations.RenameField(model_name="jobapplication", old_name="date_of_hiring", new_name="hiring_start_at")
     ]

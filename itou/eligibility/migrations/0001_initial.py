@@ -21,15 +21,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="EligibilityDiagnosis",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "author_kind",
                     models.CharField(
@@ -43,40 +35,21 @@ class Migration(migrations.Migration):
                         verbose_name="Type de l'auteur",
                     ),
                 ),
-                (
-                    "form_version",
-                    models.CharField(
-                        max_length=10, verbose_name="Version du formulaire"
-                    ),
-                ),
+                ("form_version", models.CharField(max_length=10, verbose_name="Version du formulaire")),
                 (
                     "form_cleaned_data",
-                    django.contrib.postgres.fields.jsonb.JSONField(
-                        verbose_name="Données du formulaire"
-                    ),
+                    django.contrib.postgres.fields.jsonb.JSONField(verbose_name="Données du formulaire"),
                 ),
-                (
-                    "data",
-                    django.contrib.postgres.fields.jsonb.JSONField(
-                        verbose_name="Résultat du formulaire"
-                    ),
-                ),
+                ("data", django.contrib.postgres.fields.jsonb.JSONField(verbose_name="Résultat du formulaire")),
                 (
                     "created_at",
                     models.DateTimeField(
-                        db_index=True,
-                        default=django.utils.timezone.now,
-                        verbose_name="Date de création",
+                        db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
                     ),
                 ),
                 (
                     "updated_at",
-                    models.DateTimeField(
-                        blank=True,
-                        db_index=True,
-                        null=True,
-                        verbose_name="Date de modification",
-                    ),
+                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
                 ),
                 (
                     "author",

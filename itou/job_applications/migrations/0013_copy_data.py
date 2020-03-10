@@ -16,9 +16,7 @@ def copy_data(apps, schema_editor):
         for job in job_application.jobs.all():
 
             try:
-                job_description = job_application.to_siae.job_description_through.get(
-                    appellation=job
-                )
+                job_description = job_application.to_siae.job_description_through.get(appellation=job)
             except SiaeJobDescription.DoesNotExist:
                 continue
             job_application.selected_jobs.add(job_description)

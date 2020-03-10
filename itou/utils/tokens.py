@@ -63,15 +63,11 @@ class SiaeSignupTokenGenerator:
             return False
 
         # Check that the timestamp/uid has not been tampered with
-        if not constant_time_compare(
-            self._make_token_with_timestamp(siae, timestamp), token
-        ):
+        if not constant_time_compare(self._make_token_with_timestamp(siae, timestamp), token):
             return False
 
         # Check the timestamp is within limit.
-        if (
-            self._num_seconds(self._now()) - timestamp
-        ) > SIAE_SIGNUP_MAGIC_LINK_TIMEOUT:
+        if (self._num_seconds(self._now()) - timestamp) > SIAE_SIGNUP_MAGIC_LINK_TIMEOUT:
             return False
 
         return True

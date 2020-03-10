@@ -12,79 +12,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="PoleEmploiApproval",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "start_at",
-                    models.DateField(
-                        blank=True,
-                        db_index=True,
-                        null=True,
-                        verbose_name="Date de début",
-                    ),
-                ),
-                (
-                    "end_at",
-                    models.DateField(
-                        blank=True, db_index=True, null=True, verbose_name="Date de fin"
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("start_at", models.DateField(blank=True, db_index=True, null=True, verbose_name="Date de début")),
+                ("end_at", models.DateField(blank=True, db_index=True, null=True, verbose_name="Date de fin")),
                 (
                     "created_at",
-                    models.DateTimeField(
-                        default=django.utils.timezone.now,
-                        verbose_name="Date de création",
-                    ),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
                 ),
-                (
-                    "pe_structure_code",
-                    models.CharField(
-                        max_length=5, verbose_name="Code structure Pôle emploi"
-                    ),
-                ),
-                (
-                    "number",
-                    models.CharField(max_length=15, unique=True, verbose_name="Numéro"),
-                ),
+                ("pe_structure_code", models.CharField(max_length=5, verbose_name="Code structure Pôle emploi")),
+                ("number", models.CharField(max_length=15, unique=True, verbose_name="Numéro")),
                 (
                     "pole_emploi_id",
-                    models.CharField(
-                        db_index=True,
-                        max_length=8,
-                        verbose_name="Identifiant Pôle emploi",
-                    ),
+                    models.CharField(db_index=True, max_length=8, verbose_name="Identifiant Pôle emploi"),
                 ),
-                (
-                    "first_name",
-                    models.CharField(
-                        db_index=True, max_length=150, verbose_name="Prénom"
-                    ),
-                ),
-                (
-                    "last_name",
-                    models.CharField(db_index=True, max_length=150, verbose_name="Nom"),
-                ),
-                (
-                    "birth_name",
-                    models.CharField(
-                        db_index=True, max_length=150, verbose_name="Nom de naissance"
-                    ),
-                ),
+                ("first_name", models.CharField(db_index=True, max_length=150, verbose_name="Prénom")),
+                ("last_name", models.CharField(db_index=True, max_length=150, verbose_name="Nom")),
+                ("birth_name", models.CharField(db_index=True, max_length=150, verbose_name="Nom de naissance")),
                 (
                     "birthdate",
-                    models.DateField(
-                        blank=True,
-                        db_index=True,
-                        null=True,
-                        verbose_name="Date de naissance",
-                    ),
+                    models.DateField(blank=True, db_index=True, null=True, verbose_name="Date de naissance"),
                 ),
             ],
             options={
@@ -96,15 +42,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="approval",
             name="end_at",
-            field=models.DateField(
-                blank=True, db_index=True, null=True, verbose_name="Date de fin"
-            ),
+            field=models.DateField(blank=True, db_index=True, null=True, verbose_name="Date de fin"),
         ),
         migrations.AlterField(
             model_name="approval",
             name="start_at",
-            field=models.DateField(
-                blank=True, db_index=True, null=True, verbose_name="Date de début"
-            ),
+            field=models.DateField(blank=True, db_index=True, null=True, verbose_name="Date de début"),
         ),
     ]

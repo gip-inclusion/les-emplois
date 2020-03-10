@@ -16,32 +16,13 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Approval",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("number", models.CharField(max_length=30, verbose_name="Numéro")),
-                (
-                    "start_at",
-                    models.DateField(
-                        blank=True, null=True, verbose_name="Date de début"
-                    ),
-                ),
-                (
-                    "end_at",
-                    models.DateField(blank=True, null=True, verbose_name="Date de fin"),
-                ),
+                ("start_at", models.DateField(blank=True, null=True, verbose_name="Date de début")),
+                ("end_at", models.DateField(blank=True, null=True, verbose_name="Date de fin")),
                 (
                     "created_at",
-                    models.DateTimeField(
-                        default=django.utils.timezone.now,
-                        verbose_name="Date de création",
-                    ),
+                    models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
                 ),
                 (
                     "created_by",
@@ -63,10 +44,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "verbose_name": "Agrément",
-                "verbose_name_plural": "Agréments",
-                "ordering": ["-created_at"],
-            },
+            options={"verbose_name": "Agrément", "verbose_name_plural": "Agréments", "ordering": ["-created_at"]},
         )
     ]

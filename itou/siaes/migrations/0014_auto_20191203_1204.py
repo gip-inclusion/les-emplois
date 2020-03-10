@@ -14,10 +14,7 @@ class Migration(migrations.Migration):
             model_name="siae",
             name="naf",
             field=models.CharField(
-                blank=True,
-                max_length=5,
-                validators=[itou.utils.validators.validate_naf],
-                verbose_name="Naf",
+                blank=True, max_length=5, validators=[itou.utils.validators.validate_naf], verbose_name="Naf"
             ),
         )
     ]

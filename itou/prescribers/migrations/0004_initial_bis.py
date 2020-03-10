@@ -18,28 +18,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="PrescriberMembership",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "joined_at",
-                    models.DateTimeField(
-                        default=django.utils.timezone.now,
-                        verbose_name="Date d'adhésion",
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("joined_at", models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date d'adhésion")),
                 (
                     "is_admin",
-                    models.BooleanField(
-                        default=False,
-                        verbose_name="Administrateur de la structure d'accompagnement",
-                    ),
+                    models.BooleanField(default=False, verbose_name="Administrateur de la structure d'accompagnement"),
                 ),
             ],
         ),
@@ -48,30 +31,16 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "address_line_1",
-                    models.CharField(
-                        blank=True,
-                        max_length=255,
-                        verbose_name="Adresse postale, bôite postale",
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name="Adresse postale, bôite postale"),
                 ),
                 (
                     "address_line_2",
                     models.CharField(
-                        blank=True,
-                        max_length=255,
-                        verbose_name="Appartement, suite, bloc, bâtiment, etc.",
+                        blank=True, max_length=255, verbose_name="Appartement, suite, bloc, bâtiment, etc."
                     ),
                 ),
-                (
-                    "post_code",
-                    models.CharField(
-                        blank=True, max_length=10, verbose_name="Code Postal"
-                    ),
-                ),
-                (
-                    "city",
-                    models.CharField(blank=True, max_length=255, verbose_name="Ville"),
-                ),
+                ("post_code", models.CharField(blank=True, max_length=10, verbose_name="Code Postal")),
+                ("city", models.CharField(blank=True, max_length=255, verbose_name="Ville")),
                 (
                     "department",
                     models.CharField(
@@ -191,25 +160,10 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "coords",
-                    django.contrib.gis.db.models.fields.PointField(
-                        blank=True, geography=True, null=True, srid=4326
-                    ),
+                    django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
-                (
-                    "geocoding_score",
-                    models.FloatField(
-                        blank=True, null=True, verbose_name="Score du geocoding"
-                    ),
-                ),
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="Score du geocoding")),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "siret",
                     models.CharField(
@@ -220,27 +174,11 @@ class Migration(migrations.Migration):
                         verbose_name="Siret",
                     ),
                 ),
-                (
-                    "name",
-                    models.CharField(blank=True, max_length=255, verbose_name="Nom"),
-                ),
-                (
-                    "phone",
-                    models.CharField(
-                        blank=True, max_length=20, verbose_name="Téléphone"
-                    ),
-                ),
-                (
-                    "email",
-                    models.EmailField(
-                        blank=True, max_length=254, verbose_name="E-mail"
-                    ),
-                ),
+                ("name", models.CharField(blank=True, max_length=255, verbose_name="Nom")),
+                ("phone", models.CharField(blank=True, max_length=20, verbose_name="Téléphone")),
+                ("email", models.EmailField(blank=True, max_length=254, verbose_name="E-mail")),
                 ("website", models.URLField(blank=True, verbose_name="Site web")),
-                (
-                    "description",
-                    models.TextField(blank=True, verbose_name="Description"),
-                ),
+                ("description", models.TextField(blank=True, verbose_name="Description")),
                 (
                     "secret_code",
                     models.CharField(
@@ -260,9 +198,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "verbose_name": "Organisation",
-                "verbose_name_plural": "Organisations",
-            },
+            options={"verbose_name": "Organisation", "verbose_name_plural": "Organisations"},
         ),
     ]

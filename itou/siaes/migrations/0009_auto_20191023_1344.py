@@ -22,16 +22,12 @@ class Migration(migrations.Migration):
             model_name="siaejobdescription",
             name="siae",
             field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name="job_description_through",
-                to="siaes.Siae",
+                on_delete=django.db.models.deletion.CASCADE, related_name="job_description_through", to="siaes.Siae"
             ),
         ),
         migrations.AlterField(
             model_name="siaemembership",
             name="siae",
-            field=models.ForeignKey(
-                on_delete=django.db.models.deletion.CASCADE, to="siaes.Siae"
-            ),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="siaes.Siae"),
         ),
     ]

@@ -55,9 +55,7 @@ class ModelTest(TestCase):
 
         # Has valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
-        PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
-        )
+        PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
         self.assertTrue(job_seeker.has_eligibility_diagnosis)
 
         # Has expired Pôle emploi diagnosis.
@@ -65,10 +63,7 @@ class ModelTest(TestCase):
         end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.pole_emploi_id,
-            birthdate=job_seeker.birthdate,
-            start_at=start_at,
-            end_at=end_at,
+            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate, start_at=start_at, end_at=end_at
         )
         self.assertFalse(job_seeker.has_eligibility_diagnosis)
 
@@ -76,41 +71,24 @@ class ModelTest(TestCase):
 
         User = get_user_model()
 
-        job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=""
-        )
+        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
 
         # Both fields cannot be empty.
         with self.assertRaises(ValidationError):
-            User.clean_pole_emploi_fields(
-                job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
-            )
+            User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
 
         # Both fields cannot be present at the same time.
-        job_seeker = JobSeekerFactory(
-            pole_emploi_id="69970749",
-            lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
-        )
+        job_seeker = JobSeekerFactory(pole_emploi_id="69970749", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN)
         with self.assertRaises(ValidationError):
-            User.clean_pole_emploi_fields(
-                job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
-            )
+            User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
 
         # No exception should be raised for the following cases.
 
-        job_seeker = JobSeekerFactory(
-            pole_emploi_id="62723349", lack_of_pole_emploi_id_reason=""
-        )
-        User.clean_pole_emploi_fields(
-            job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
-        )
+        job_seeker = JobSeekerFactory(pole_emploi_id="62723349", lack_of_pole_emploi_id_reason="")
+        User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
 
-        job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN
-        )
-        User.clean_pole_emploi_fields(
-            job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason
-        )
+        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN)
+        User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
 
     def test_email_already_exists(self):
         JobSeekerFactory(email="foo@bar.com")

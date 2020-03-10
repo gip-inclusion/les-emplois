@@ -14,10 +14,7 @@ class Migration(migrations.Migration):
             model_name="prescriberorganization",
             name="siret",
             field=models.CharField(
-                blank=True,
-                max_length=14,
-                validators=[itou.utils.validators.validate_siret],
-                verbose_name="Siret",
+                blank=True, max_length=14, validators=[itou.utils.validators.validate_siret], verbose_name="Siret"
             ),
         )
     ]

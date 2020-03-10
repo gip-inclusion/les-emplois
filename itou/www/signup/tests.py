@@ -34,9 +34,7 @@ class SiaeSignupTest(TestCase):
         The token in the magic link can be quite flaky throughout the tests
         thus we need this helper to get the non flaky part of the url.
         """
-        return (
-            f"{reverse('signup:siae')}/{urlsafe_base64_encode(force_bytes(siae.pk))}/"
-        )
+        return f"{reverse('signup:siae')}/{urlsafe_base64_encode(force_bytes(siae.pk))}/"
 
     def assert_url_is_siae_magic_link(self, url, siae):
         non_flaky_url_prefix = self.get_siae_magic_link_non_flaky_prefix(siae)
@@ -60,8 +58,7 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(redirect_url, next_url)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            "Ce lien d'inscription est invalide ou a expiré. "
-            "Veuillez procéder à une nouvelle inscription."
+            "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
         )
         self.assertContains(response, escape(expected_message))
 
@@ -138,13 +135,8 @@ class SiaeSignupTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn(
-            "Un nouvel utilisateur vient de rejoindre votre structure", email.subject
-        )
-        self.assertIn(
-            "Si vous ne connaissez pas cette personne veuillez nous contacter",
-            email.body,
-        )
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", email.subject)
+        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
         self.assertIn(new_user.first_name, email.body)
         self.assertIn(new_user.last_name, email.body)
         self.assertIn(new_user.email, email.body)
@@ -200,13 +192,8 @@ class SiaeSignupTest(TestCase):
 
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn(
-            "Un nouvel utilisateur souhaite rejoindre votre structure", email.subject
-        )
-        self.assertIn(
-            "veuillez ouvrir le lien suivant pour continuer votre inscription",
-            email.body,
-        )
+        self.assertIn("Un nouvel utilisateur souhaite rejoindre votre structure", email.subject)
+        self.assertIn("veuillez ouvrir le lien suivant pour continuer votre inscription", email.body)
         self.assert_siae_magic_link_is_in_email_body(siae=siae1, body=email.body)
         self.assertIn(siae1.display_name, email.body)
         self.assertIn(siae1.siret, email.body)
@@ -276,8 +263,7 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(redirect_url, next_url)
         self.assertEqual(response.status_code, 200)
         expected_message = _(
-            "Ce lien d'inscription est invalide ou a expiré. "
-            "Veuillez procéder à une nouvelle inscription."
+            "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
         )
         self.assertContains(response, escape(expected_message))
 
@@ -299,9 +285,7 @@ class SiaeSignupTest(TestCase):
         post_data = {"kind": Siae.KIND_ACI}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
-        expected_message = _(
-            "Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services."
-        )
+        expected_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
         self.assertContains(response, expected_message)
 
     def test_siae_signup_story_of_daniela(self):
@@ -325,9 +309,7 @@ class SiaeSignupTest(TestCase):
         post_data = {"email": user_email, "siret": unknown_siret, "kind": Siae.KIND_ACI}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
-        expected_message = _(
-            "Votre numéro de SIRET ou votre e-mail nous sont inconnus."
-        )
+        expected_message = _("Votre numéro de SIRET ou votre e-mail nous sont inconnus.")
         self.assertContains(response, escape(expected_message))
 
     def test_siae_signup_story_of_emilie(self):
@@ -354,11 +336,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "email": user_email,
-            "siret": unknown_siret,
-            "kind": shared_siae_kind,
-        }
+        post_data = {"email": user_email, "siret": unknown_siret, "kind": shared_siae_kind}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         expected_message = _("Votre e-mail est partagé par plusieurs structures")
@@ -392,11 +370,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "email": user_email,
-            "siret": siae3.siret,
-            "kind": shared_siae_kind,
-        }
+        post_data = {"email": user_email, "siret": siae3.siret, "kind": shared_siae_kind}
         response = self.client.post(url, data=post_data, follow=True)
         redirect_url, status_code = response.redirect_chain[-1]
         self.assertEqual(status_code, 302)
@@ -526,11 +500,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "email": user_email,
-            "siret": siae2.siret,
-            "kind": shared_siae_kind,
-        }
+        post_data = {"email": user_email, "siret": siae2.siret, "kind": shared_siae_kind}
         response = self.client.post(url, data=post_data, follow=True)
         redirect_url, status_code = response.redirect_chain[-1]
         self.assertEqual(status_code, 302)
@@ -659,9 +629,7 @@ class PrescriberSignupTest(TestCase):
     def test_prescriber_signup_join_authorized_organization(self):
         """Prescriber signup who joins an authorized_organization."""
 
-        authorized_organization = PrescriberOrganizationFactory(
-            is_authorized=True, department="62"
-        )
+        authorized_organization = PrescriberOrganizationFactory(is_authorized=True, department="62")
 
         url = reverse("signup:prescriber")
         response = self.client.get(url)
@@ -687,9 +655,7 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(1, authorized_organization.members.count())
         self.assertEqual(1, user.prescriberorganization_set.count())
 
-        membership = user.prescribermembership_set.get(
-            organization=authorized_organization
-        )
+        membership = user.prescribermembership_set.get(organization=authorized_organization)
         self.assertTrue(membership.is_admin)
 
 
@@ -719,9 +685,7 @@ class PasswordResetTest(TestCase):
         # Change forgotten password.
         uidb36 = user_pk_to_url_str(user)
         key = default_token_generator.make_token(user)
-        password_change_url = reverse(
-            "account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key}
-        )
+        password_change_url = reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
         response = self.client.get(password_change_url)
         password_change_url_with_hidden_key = response.url
         post_data = {"password1": "mlkjhgfdsq2", "password2": "mlkjhgfdsq2"}
@@ -742,19 +706,13 @@ class PasswordChangeTest(TestCase):
         """
 
         user = JobSeekerFactory()
-        self.assertTrue(
-            self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        )
+        self.assertTrue(self.client.login(username=user.email, password=DEFAULT_PASSWORD))
 
         # Change password.
         url = reverse("account_change_password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        post_data = {
-            "oldpassword": DEFAULT_PASSWORD,
-            "password1": "mlkjhgfdsq2",
-            "password2": "mlkjhgfdsq2",
-        }
+        post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": "mlkjhgfdsq2", "password2": "mlkjhgfdsq2"}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("dashboard:index"))
@@ -805,9 +763,7 @@ class UserEmailUniquenessTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
 
-        self.assertContains(
-            response, "Un autre utilisateur utilise déjà cette adresse e-mail."
-        )
+        self.assertContains(response, "Un autre utilisateur utilise déjà cette adresse e-mail.")
 
         post_data = {
             "first_name": "John",
@@ -819,9 +775,7 @@ class UserEmailUniquenessTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
 
-        self.assertContains(
-            response, "Un autre utilisateur utilise déjà cette adresse e-mail."
-        )
+        self.assertContains(response, "Un autre utilisateur utilise déjà cette adresse e-mail.")
 
         post_data = {
             "first_name": "John",
@@ -833,9 +787,7 @@ class UserEmailUniquenessTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
 
-        self.assertContains(
-            response, "Un autre utilisateur utilise déjà cette adresse e-mail."
-        )
+        self.assertContains(response, "Un autre utilisateur utilise déjà cette adresse e-mail.")
 
         post_data = {
             "first_name": "John",

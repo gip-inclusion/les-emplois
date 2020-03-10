@@ -17,9 +17,7 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
 
 class ActiveManager(models.Manager):
     def get_queryset(self):
-        return (
-            super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
-        )
+        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
 
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
@@ -29,19 +27,14 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     Note: it is not required for a prescriber to be a member of an organization.
     """
 
-    siret = models.CharField(
-        verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True
-    )
+    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Membres"),
-        through="PrescriberMembership",
-        blank=True,
+        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="PrescriberMembership", blank=True
     )
     secret_code = models.CharField(
         verbose_name=_("Code secret"),
@@ -87,9 +80,5 @@ class PrescriberMembership(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(
-        verbose_name=_("Date d'adhésion"), default=timezone.now
-    )
-    is_admin = models.BooleanField(
-        verbose_name=_("Administrateur de la structure d'accompagnement"), default=False
-    )
+    joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
+    is_admin = models.BooleanField(verbose_name=_("Administrateur de la structure d'accompagnement"), default=False)

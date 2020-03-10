@@ -59,11 +59,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_POSTPONE, STATE_PROCESSING, STATE_POSTPONED),
         (TRANSITION_ACCEPT, [STATE_PROCESSING, STATE_POSTPONED], STATE_ACCEPTED),
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
-        (
-            TRANSITION_RENDER_OBSOLETE,
-            [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED],
-            STATE_OBSOLETE,
-        ),
+        (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
     )
 
     initial_state = STATE_NEW
@@ -90,20 +86,12 @@ class JobApplicationQuerySet(models.QuerySet):
         """
         Get unique foreign key objects in a single query.
         """
-        if fk_field not in [
-            "job_seeker",
-            "sender",
-            "sender_siae",
-            "sender_prescriber_organization",
-            "to_siae",
-        ]:
+        if fk_field not in ["job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"]:
             raise RuntimeError("Unauthorized fk_field")
 
         return [
             getattr(job_application, fk_field)
-            for job_application in self.order_by(fk_field)
-            .distinct(fk_field)
-            .select_related(fk_field)
+            for job_application in self.order_by(fk_field).distinct(fk_field).select_related(fk_field)
             if getattr(job_application, fk_field)
         ]
 
@@ -145,46 +133,28 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, _("Candidat non venu ou non joignable")),
-        (
-            REFUSAL_REASON_UNAVAILABLE,
-            _("Candidat indisponible ou non intéressé par le poste"),
-        ),
+        (REFUSAL_REASON_UNAVAILABLE, _("Candidat indisponible ou non intéressé par le poste")),
         (REFUSAL_REASON_NON_ELIGIBLE, _("Candidat non éligible")),
         (
             REFUSAL_REASON_ELIGIBILITY_DOUBT,
-            _(
-                "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)"
-            ),
+            _("Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)"),
         ),
         (
             REFUSAL_REASON_INCOMPATIBLE,
-            _(
-                "Un des freins à l'emploi du candidat est incompatible avec le poste proposé"
-            ),
+            _("Un des freins à l'emploi du candidat est incompatible avec le poste proposé"),
         ),
         (
             REFUSAL_REASON_PREVENT_OBJECTIVES,
-            _(
-                "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion"
-            ),
+            _("L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion"),
         ),
         (REFUSAL_REASON_NO_POSITION, _("Pas de poste ouvert en ce moment")),
-        (
-            REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE,
-            _("La date de fin du PASS IAE / agrément est trop proche"),
-        ),
+        (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, _("La date de fin du PASS IAE / agrément est trop proche")),
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
-    ERROR_START_IN_PAST = _(
-        f"La date de début du contrat ne doit pas être dans le passé."
-    )
-    ERROR_END_IS_BEFORE_START = _(
-        f"La date de fin du contrat doit être postérieure à la date de début."
-    )
-    ERROR_DURATION_TOO_LONG = _(
-        f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
-    )
+    ERROR_START_IN_PAST = _(f"La date de début du contrat ne doit pas être dans le passé.")
+    ERROR_END_IS_BEFORE_START = _(f"La date de fin du contrat doit être postérieure à la date de début.")
+    ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
 
     APPROVAL_DELIVERY_MODE_AUTOMATIC = "automatic"
     APPROVAL_DELIVERY_MODE_MANUAL = "manual"
@@ -222,11 +192,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # When the sender is an SIAE staff member, keep a track of his current SIAE.
     sender_siae = models.ForeignKey(
-        "siaes.Siae",
-        verbose_name=_("SIAE émettrice"),
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
+        "siaes.Siae", verbose_name=_("SIAE émettrice"), null=True, blank=True, on_delete=models.CASCADE
     )
 
     # When the sender is a prescriber, keep a track of his current organization (if any).
@@ -245,9 +211,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_applications_received",
     )
 
-    state = xwf_models.StateField(
-        JobApplicationWorkflow, verbose_name=_("État"), db_index=True
-    )
+    state = xwf_models.StateField(JobApplicationWorkflow, verbose_name=_("État"), db_index=True)
 
     # Jobs in which the job seeker is interested (optional).
     selected_jobs = models.ManyToManyField(
@@ -257,31 +221,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     message = models.TextField(verbose_name=_("Message de candidature"), blank=True)
     answer = models.TextField(verbose_name=_("Message de réponse"), blank=True)
     refusal_reason = models.CharField(
-        verbose_name=_("Motifs de refus"),
-        max_length=30,
-        choices=REFUSAL_REASON_CHOICES,
-        blank=True,
+        verbose_name=_("Motifs de refus"), max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
     )
 
-    hiring_start_at = models.DateField(
-        verbose_name=_("Date de début du contrat"), blank=True, null=True
-    )
-    hiring_end_at = models.DateField(
-        verbose_name=_("Date de fin du contrat"), blank=True, null=True
-    )
+    hiring_start_at = models.DateField(verbose_name=_("Date de début du contrat"), blank=True, null=True)
+    hiring_end_at = models.DateField(verbose_name=_("Date de fin du contrat"), blank=True, null=True)
 
     # Job applications sent to SIAEs subject to eligibility rules will
     # obtain an Approval after being accepted.
     approval = models.ForeignKey(
-        "approvals.Approval",
-        verbose_name=_("PASS IAE"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+        "approvals.Approval", verbose_name=_("PASS IAE"), null=True, blank=True, on_delete=models.SET_NULL
     )
-    approval_number_sent_by_email = models.BooleanField(
-        verbose_name=_("PASS IAE envoyé par email"), default=False
-    )
+    approval_number_sent_by_email = models.BooleanField(verbose_name=_("PASS IAE envoyé par email"), default=False)
     approval_number_sent_at = models.DateTimeField(
         verbose_name=_("Date d'envoi du PASS IAE"), blank=True, null=True, db_index=True
     )
@@ -300,12 +251,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="approval_numbers_sent",
     )
 
-    created_at = models.DateTimeField(
-        verbose_name=_("Date de création"), default=timezone.now, db_index=True
-    )
-    updated_at = models.DateTimeField(
-        verbose_name=_("Date de modification"), blank=True, null=True, db_index=True
-    )
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
 
     objects = models.Manager.from_queryset(JobApplicationQuerySet)()
 
@@ -349,11 +296,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def accepted_by(self):
         if not self.state.is_accepted:
             return None
-        return (
-            self.logs.select_related("user")
-            .get(to_state=JobApplicationWorkflow.STATE_ACCEPTED)
-            .user
-        )
+        return self.logs.select_related("user").get(to_state=JobApplicationWorkflow.STATE_ACCEPTED).user
 
     @property
     def can_download_approval_as_pdf(self):
@@ -376,9 +319,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         accepted_by = kwargs.get("user")
 
         # Mark other related job applications as obsolete.
-        for job_application in self.job_seeker.job_applications.exclude(
-            pk=self.pk
-        ).pending():
+        for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
             job_application.render_obsolete(*args, **kwargs)
 
         # Notification email.
@@ -389,14 +330,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
             approvals_wrapper = self.job_seeker.approvals_wrapper
 
-            if (
-                approvals_wrapper.has_in_waiting_period
-                and not self.is_sent_by_authorized_prescriber
-            ):
+            if approvals_wrapper.has_in_waiting_period and not self.is_sent_by_authorized_prescriber:
                 # Security check: it's supposed to be blocked upstream.
-                raise xwf_models.AbortTransition(
-                    "Job seeker has an approval in waiting period."
-                )
+                raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")
 
             if approvals_wrapper.has_valid:
                 # Automatically reuse an existing valid Itou or PE approval.
@@ -404,8 +340,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_approval_number(accepted_by))
             elif (
                 self.job_seeker.pole_emploi_id
-                or self.job_seeker.lack_of_pole_emploi_id_reason
-                == self.job_seeker.REASON_NOT_REGISTERED
+                or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
             ):
                 # Automatically create a new approval.
                 new_approval = Approval(
@@ -417,16 +352,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval.save()
                 self.approval = new_approval
                 emails.append(self.email_approval_number(accepted_by))
-            elif (
-                self.job_seeker.lack_of_pole_emploi_id_reason
-                == self.job_seeker.REASON_FORGOTTEN
-            ):
+            elif self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN:
                 # Trigger a manual approval creation.
                 emails.append(self.email_accept_trigger_manual_approval(accepted_by))
             else:
-                raise xwf_models.AbortTransition(
-                    "Job seeker has an invalid PE status, cannot issue approval."
-                )
+                raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 
         # Send emails in batch.
         connection = mail.get_connection()
@@ -451,9 +381,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Emails.
 
     def get_siae_recipents_email_list(self):
-        return list(
-            self.to_siae.members.filter(is_active=True).values_list("email", flat=True)
-        )
+        return list(self.to_siae.members.filter(is_active=True).values_list("email", flat=True))
 
     @property
     def email_new_for_siae(self):
@@ -531,12 +459,8 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
 
     MODIFIED_OBJECT_FIELD = "job_application"
     EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
-    job_application = models.ForeignKey(
-        JobApplication, related_name="logs", on_delete=models.CASCADE
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL
-    )
+    job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         verbose_name = _("Log des transitions de la candidature")

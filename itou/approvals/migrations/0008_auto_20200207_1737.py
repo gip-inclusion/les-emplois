@@ -12,46 +12,26 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="approval",
             name="end_at",
-            field=models.DateField(
-                db_index=True,
-                default=django.utils.timezone.now,
-                verbose_name="Date de fin",
-            ),
+            field=models.DateField(db_index=True, default=django.utils.timezone.now, verbose_name="Date de fin"),
         ),
         migrations.AlterField(
             model_name="approval",
             name="start_at",
-            field=models.DateField(
-                db_index=True,
-                default=django.utils.timezone.now,
-                verbose_name="Date de début",
-            ),
+            field=models.DateField(db_index=True, default=django.utils.timezone.now, verbose_name="Date de début"),
         ),
         migrations.AlterField(
             model_name="poleemploiapproval",
             name="birthdate",
-            field=models.DateField(
-                db_index=True,
-                default=django.utils.timezone.now,
-                verbose_name="Date de naissance",
-            ),
+            field=models.DateField(db_index=True, default=django.utils.timezone.now, verbose_name="Date de naissance"),
         ),
         migrations.AlterField(
             model_name="poleemploiapproval",
             name="end_at",
-            field=models.DateField(
-                db_index=True,
-                default=django.utils.timezone.now,
-                verbose_name="Date de fin",
-            ),
+            field=models.DateField(db_index=True, default=django.utils.timezone.now, verbose_name="Date de fin"),
         ),
         migrations.AlterField(
             model_name="poleemploiapproval",
             name="start_at",
-            field=models.DateField(
-                db_index=True,
-                default=django.utils.timezone.now,
-                verbose_name="Date de début",
-            ),
+            field=models.DateField(db_index=True, default=django.utils.timezone.now, verbose_name="Date de début"),
         ),
     ]

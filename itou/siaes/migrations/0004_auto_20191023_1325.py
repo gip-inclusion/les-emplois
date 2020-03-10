@@ -29,41 +29,19 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="NewSiae",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "address_line_1",
-                    models.CharField(
-                        blank=True,
-                        max_length=255,
-                        verbose_name="Adresse postale, bôite postale",
-                    ),
+                    models.CharField(blank=True, max_length=255, verbose_name="Adresse postale, bôite postale"),
                 ),
                 (
                     "address_line_2",
                     models.CharField(
-                        blank=True,
-                        max_length=255,
-                        verbose_name="Appartement, suite, bloc, bâtiment, etc.",
+                        blank=True, max_length=255, verbose_name="Appartement, suite, bloc, bâtiment, etc."
                     ),
                 ),
-                (
-                    "post_code",
-                    models.CharField(
-                        blank=True, max_length=10, verbose_name="Code Postal"
-                    ),
-                ),
-                (
-                    "city",
-                    models.CharField(blank=True, max_length=255, verbose_name="Ville"),
-                ),
+                ("post_code", models.CharField(blank=True, max_length=10, verbose_name="Code Postal")),
+                ("city", models.CharField(blank=True, max_length=255, verbose_name="Ville")),
                 (
                     "department",
                     models.CharField(
@@ -183,16 +161,9 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "coords",
-                    django.contrib.gis.db.models.fields.PointField(
-                        blank=True, geography=True, null=True, srid=4326
-                    ),
+                    django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
-                (
-                    "geocoding_score",
-                    models.FloatField(
-                        blank=True, null=True, verbose_name="Score du geocoding"
-                    ),
-                ),
+                ("geocoding_score", models.FloatField(blank=True, null=True, verbose_name="Score du geocoding")),
                 (
                     "siret",
                     models.CharField(
@@ -206,9 +177,7 @@ class Migration(migrations.Migration):
                 (
                     "naf",
                     models.CharField(
-                        max_length=5,
-                        validators=[itou.utils.validators.validate_naf],
-                        verbose_name="Naf",
+                        max_length=5, validators=[itou.utils.validators.validate_naf], verbose_name="Naf"
                     ),
                 ),
                 (
@@ -219,10 +188,7 @@ class Migration(migrations.Migration):
                             ("AI", "Association intermédiaire"),
                             ("ACI", "Atelier chantier d'insertion"),
                             ("ETTI", "Entreprise de travail temporaire d'insertion"),
-                            (
-                                "GEIQ",
-                                "Groupement d'employeurs pour l'insertion et la qualification",
-                            ),
+                            ("GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"),
                             ("RQ", "Régie de quartier"),
                         ],
                         default="EI",
@@ -231,45 +197,21 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("name", models.CharField(max_length=255, verbose_name="Nom")),
-                (
-                    "brand",
-                    models.CharField(
-                        blank=True, max_length=255, verbose_name="Enseigne"
-                    ),
-                ),
-                (
-                    "phone",
-                    models.CharField(
-                        blank=True, max_length=20, verbose_name="Téléphone"
-                    ),
-                ),
-                (
-                    "email",
-                    models.EmailField(
-                        blank=True, max_length=254, verbose_name="E-mail"
-                    ),
-                ),
+                ("brand", models.CharField(blank=True, max_length=255, verbose_name="Enseigne")),
+                ("phone", models.CharField(blank=True, max_length=20, verbose_name="Téléphone")),
+                ("email", models.EmailField(blank=True, max_length=254, verbose_name="E-mail")),
                 ("website", models.URLField(blank=True, verbose_name="Site web")),
-                (
-                    "description",
-                    models.TextField(blank=True, verbose_name="Description"),
-                ),
+                ("description", models.TextField(blank=True, verbose_name="Description")),
                 (
                     "jobs",
                     models.ManyToManyField(
-                        blank=True,
-                        through="siaes.SiaeJobDescription",
-                        to="jobs.Appellation",
-                        verbose_name="Métiers",
+                        blank=True, through="siaes.SiaeJobDescription", to="jobs.Appellation", verbose_name="Métiers"
                     ),
                 ),
                 (
                     "members",
                     models.ManyToManyField(
-                        blank=True,
-                        through="siaes.SiaeMembership",
-                        to=settings.AUTH_USER_MODEL,
-                        verbose_name="Membres",
+                        blank=True, through="siaes.SiaeMembership", to=settings.AUTH_USER_MODEL, verbose_name="Membres"
                     ),
                 ),
             ],
@@ -291,10 +233,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="siaemembership",
             name="new_siae",
-            field=models.ForeignKey(
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                to="siaes.NewSiae",
-            ),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to="siaes.NewSiae"),
         ),
     ]

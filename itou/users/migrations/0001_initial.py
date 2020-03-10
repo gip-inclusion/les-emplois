@@ -16,22 +16,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="User",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 ("password", models.CharField(max_length=128, verbose_name="password")),
-                (
-                    "last_login",
-                    models.DateTimeField(
-                        blank=True, null=True, verbose_name="last login"
-                    ),
-                ),
+                ("last_login", models.DateTimeField(blank=True, null=True, verbose_name="last login")),
                 (
                     "is_superuser",
                     models.BooleanField(
@@ -43,36 +30,17 @@ class Migration(migrations.Migration):
                 (
                     "username",
                     models.CharField(
-                        error_messages={
-                            "unique": "A user with that username already exists."
-                        },
+                        error_messages={"unique": "A user with that username already exists."},
                         help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
                         max_length=150,
                         unique=True,
-                        validators=[
-                            django.contrib.auth.validators.UnicodeUsernameValidator()
-                        ],
+                        validators=[django.contrib.auth.validators.UnicodeUsernameValidator()],
                         verbose_name="username",
                     ),
                 ),
-                (
-                    "first_name",
-                    models.CharField(
-                        blank=True, max_length=30, verbose_name="first name"
-                    ),
-                ),
-                (
-                    "last_name",
-                    models.CharField(
-                        blank=True, max_length=150, verbose_name="last name"
-                    ),
-                ),
-                (
-                    "email",
-                    models.EmailField(
-                        blank=True, max_length=254, verbose_name="email address"
-                    ),
-                ),
+                ("first_name", models.CharField(blank=True, max_length=30, verbose_name="first name")),
+                ("last_name", models.CharField(blank=True, max_length=150, verbose_name="last name")),
+                ("email", models.EmailField(blank=True, max_length=254, verbose_name="email address")),
                 (
                     "is_staff",
                     models.BooleanField(
@@ -89,38 +57,12 @@ class Migration(migrations.Migration):
                         verbose_name="active",
                     ),
                 ),
-                (
-                    "date_joined",
-                    models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="date joined"
-                    ),
-                ),
-                (
-                    "birthdate",
-                    models.DateField(
-                        blank=True, null=True, verbose_name="Date de naissance"
-                    ),
-                ),
-                (
-                    "phone",
-                    models.CharField(
-                        blank=True, max_length=20, verbose_name="Téléphone"
-                    ),
-                ),
-                (
-                    "is_job_seeker",
-                    models.BooleanField(
-                        default=False, verbose_name="Demandeur d'emploi"
-                    ),
-                ),
-                (
-                    "is_prescriber",
-                    models.BooleanField(default=False, verbose_name="Prescripteur"),
-                ),
-                (
-                    "is_siae_staff",
-                    models.BooleanField(default=False, verbose_name="Employeur (SIAE)"),
-                ),
+                ("date_joined", models.DateTimeField(default=django.utils.timezone.now, verbose_name="date joined")),
+                ("birthdate", models.DateField(blank=True, null=True, verbose_name="Date de naissance")),
+                ("phone", models.CharField(blank=True, max_length=20, verbose_name="Téléphone")),
+                ("is_job_seeker", models.BooleanField(default=False, verbose_name="Demandeur d'emploi")),
+                ("is_prescriber", models.BooleanField(default=False, verbose_name="Prescripteur")),
+                ("is_siae_staff", models.BooleanField(default=False, verbose_name="Employeur (SIAE)")),
                 (
                     "groups",
                     models.ManyToManyField(
@@ -144,11 +86,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "verbose_name": "user",
-                "verbose_name_plural": "users",
-                "abstract": False,
-            },
+            options={"verbose_name": "user", "verbose_name_plural": "users", "abstract": False},
             managers=[("objects", django.contrib.auth.models.UserManager())],
         )
     ]

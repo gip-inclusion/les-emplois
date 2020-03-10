@@ -39,14 +39,8 @@ def create_test_cities(selected_departments, num_per_department=None):
                 continue
 
             departments_counter[department] += 1
-            if (
-                num_per_department
-                and departments_counter[department] > num_per_department
-            ):
-                if all(
-                    value >= num_per_department
-                    for value in departments_counter.values()
-                ):
+            if num_per_department and departments_counter[department] > num_per_department:
+                if all(value >= num_per_department for value in departments_counter.values()):
                     break
                 continue
 

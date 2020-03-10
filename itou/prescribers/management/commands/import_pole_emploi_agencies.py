@@ -27,17 +27,10 @@ class Command(BaseCommand):
         django-admin import_pole_emploi_agencies
     """
 
-    help = (
-        "Import the content of the prescriber organizations csv file into the database."
-    )
+    help = "Import the content of the prescriber organizations csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """

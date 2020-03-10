@@ -29,13 +29,11 @@ def get_current_organization_and_perms(request):
             if siae is None:
                 raise PermissionDenied
 
-        prescriber_org_pk = request.session.get(
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        )
+        prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
         if prescriber_org_pk:
-            membership = request.user.prescribermembership_set.select_related(
-                "organization"
-            ).get(organization_id=prescriber_org_pk)
+            membership = request.user.prescribermembership_set.select_related("organization").get(
+                organization_id=prescriber_org_pk
+            )
             prescriber_organization = membership.organization
             user_is_prescriber_org_admin = membership.is_admin
 
