@@ -58,16 +58,25 @@
                 </span>
             </p>
             <p class="text-justify">
-                {% blocktrans with diagnosis_author=diagnosis_author|title %}
-                    Au vu du diagnostic individuel réalisé par {{ diagnosis_author }}
-                {% endblocktrans %}
+                {% if diagnosis_author %}
+                    {% blocktrans with diagnosis_author=diagnosis_author|title %}
+                        Au vu du diagnostic individuel réalisé par {{ diagnosis_author }}
+                    {% endblocktrans %}
 
-                {% if diagnosis_author_org_name %}
-                    ({% trans diagnosis_author_org_name|title %})
+                    {% if diagnosis_author_org_name %}
+                        ({% trans diagnosis_author_org_name|title %})
+                    {% endif %}
+
+                    {% trans 'portant sur ' %}
+
+                {% else %}
+
+                    {% trans 'Au vu de' %}
+
                 {% endif %}
 
                 {% blocktrans with user_name=user_name|title %}
-                    portant sur la situation sociale et professionnelle de {{ user_name }}
+                    la situation sociale et professionnelle de {{ user_name }}
                     et de votre promesse d’embauche, la Plateforme de l’Inclusion vous délivre
                     un PASS IAE pour un parcours d’insertion par l’activité économique,
                     conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
