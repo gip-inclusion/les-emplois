@@ -46,7 +46,14 @@ jobs:
         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
         tar -xvf clever-tools-latest_linux.tar.gz
         clever-tools-latest_linux/clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-
+        clever-tools-latest_linux/clever link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        clever-tools-latest_linux/clever delete --yes
+        echo 'LS'
+        ls
+        echo 'PWD'
+        pwd
+        echo 'CLEVER_DIR'
+        echo $CLEVER_DIR
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     # - uses: actions/checkout@v2
