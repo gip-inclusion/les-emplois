@@ -12,7 +12,7 @@ on:
 
 env:
   CLEVER_DIR: clever-tools-latest_linux
-  CLEVER_CLI: $CLEVER_DIR/clever
+  CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
   REVIEW_APP_NAME: itou-celinems-${{ github.sha }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
