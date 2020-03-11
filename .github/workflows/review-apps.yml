@@ -49,8 +49,6 @@ jobs:
         ls
         echo 'PWD'
         pwd
-        echo 'CLEVER_CLI'
-        echo $CLEVER_CLI
         echo 'CLEVER_DIR'
         echo $CLEVER_DIR
         clever-tools-latest_linux/clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
