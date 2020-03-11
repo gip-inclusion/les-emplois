@@ -45,6 +45,10 @@ jobs:
       run: |
         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
         tar -xvf clever-tools-latest_linux.tar.gz
+        ls
+        pwd
+        echo $CLEVER_CLI
+        echo $CLEVER_DIR
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI delete --yes
@@ -78,5 +82,4 @@ jobs:
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
         $CLEVER_CLI published-config set <variable-name> <variable-value>
         $CLEVER_CLI --branch $TRAVIS_BRANCH deploy
-      if: always()
 
