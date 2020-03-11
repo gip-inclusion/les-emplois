@@ -12,7 +12,7 @@ on:
 
 env:
   APP_NAME: itou-celinems
-  CLEVER_DIR: clever-tools-latest_linux
+  CLEVER_DIR: clever_cloud_bin/clever-tools-latest_linux
   CLEVER_CLI: ./$CLEVER_DIR/clever
   ORGANIZATION_NAME: Miimosa
   REVIEW_APP_NAME: $APP_NAME-$TRAVIS_BRANCH
@@ -29,12 +29,13 @@ jobs:
 
       - name: Download CC binaries
         run: |
-          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+          mkdir clever_cloud_bin
+          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
           tar -xvf $CLEVER_DIR.tar.gz
 
       - uses: actions/upload-artifact@v1
         with:
-          name: clever-binaries
+          name: clever_cloud_bin
           path: .
 
   delete-review-app:
@@ -50,7 +51,8 @@ jobs:
 
     - uses: actions/download-artifact@v1
       with:
-        name: clever-binaries
+        name: clever_cloud_bin
+        path: .
 
     - name: Connect to Clever Cloud
       run: |
