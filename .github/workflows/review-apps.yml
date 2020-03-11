@@ -48,7 +48,7 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI delete --yes
 
-    Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
     - uses: actions/download-artifact@v1
