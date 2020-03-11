@@ -36,7 +36,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: clever_cloud_bin
-          path: .
+          path: $CLEVER_DIR
 
   delete-review-app:
     # The type of runner that the job will run on
@@ -52,7 +52,6 @@ jobs:
     - uses: actions/download-artifact@v1
       with:
         name: clever_cloud_bin
-        path: .
 
     - name: Connect to Clever Cloud
       run: |
