@@ -36,6 +36,7 @@ env:
 
 jobs:
   delete-review-app:
+    needs: download-cc-binaries
     runs-on: ubuntu-latest
 
     steps:
