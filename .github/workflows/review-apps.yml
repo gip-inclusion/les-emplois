@@ -14,7 +14,7 @@ env:
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
-  REVIEW_APP_NAME: itou-celinems-${{ github.sha }}
+  REVIEW_APP_NAME: itou-celinems-${{ github.ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
 
