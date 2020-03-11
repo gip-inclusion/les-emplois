@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 from requests import exceptions as requests_exceptions
@@ -57,4 +58,38 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
         with self.assertRaises(ConnectionAbortedError):
+            self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))
+
+    @mock.patch("pdfshift.convert", return_value=BITES_FILE)
+    @mock.patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", False)
+    def test_download_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
+        job_application = JobApplicationWithApprovalFactory()
+        siae_member = job_application.to_siae.members.first()
+
+        # An approval has been delivered but it does not come from Itou.
+        # Therefore, the linked diagnosis exists but is not in our database.
+        # Don't create a diagnosis.
+        # EligibilityDiagnosisFactory(job_seeker=job_seeker)
+
+        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(
+            reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("pdf", response.get("Content-Type"))
+
+    @mock.patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", True)
+    def test_no_download_if_missing_diagnosis(self, *args, **kwargs):
+        job_application = JobApplicationWithApprovalFactory()
+        siae_member = job_application.to_siae.members.first()
+
+        # An approval has been delivered by Itou but there is no diagnosis.
+        # It should raise an error.
+        # EligibilityDiagnosisFactory(job_seeker=job_seeker)
+
+        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
+
+        with self.assertRaises(ObjectDoesNotExist):
             self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))
