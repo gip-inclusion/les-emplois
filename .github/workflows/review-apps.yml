@@ -20,6 +20,8 @@ jobs:
       CLEVER_DIR: clever-tools-latest_linux
       ORGANIZATION_NAME: Miimosa
       REVIEW_APP_NAME: $APP_NAME-$TRAVIS_BRANCH
+      CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+      CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
 
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -31,7 +33,6 @@ jobs:
 
     - name: Delete review app
       run: |
-        echo $CLEVER_TOKEN
         echo $APP_NAME
         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
         tar -xvf $CLEVER_DIR.tar.gz
