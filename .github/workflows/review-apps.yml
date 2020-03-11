@@ -20,44 +20,50 @@ env:
 
 
 jobs:
-  download-cc-binaries:
-    runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+  # IMPROVEMENT:
+  # https://github.com/actions/upload-artifact
+  # https://github.com/actions/download-artifact
 
-      - name: Download CC binaries
-        run: |
-          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
-          tar -xvf $CLEVER_DIR.tar.gz
+  # download-cc-binaries:
+  #   runs-on: ubuntu-latest
 
-      - uses: actions/upload-artifact@v1
-        with:
-          name: $CLEVER_DIR
-          path: .
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - run: mkdir -p clever_cloud_binaries
+
+  #     - name: Download CC binaries
+  #       run: |
+  #         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+  #         tar -xvf $CLEVER_DIR.tar.gz
+
+  #     - uses: actions/upload-artifact@v1
+  #       with:
+  #         name: clever_cloud_binaries
+  #         path: clever_cloud_binaries
 
   delete-review-app:
     needs: download-cc-binaries
     runs-on: ubuntu-latest
 
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
-    - uses: actions/download-artifact@v1
-      with:
-        name: $CLEVER_DIR
+    # - uses: actions/download-artifact@v1
+    #   with:
+    #     name: $CLEVER_DIR
 
-      #  curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
-      #  tar -xvf $CLEVER_DIR.tar.gz
     - name: Connect to Clever Cloud
       run: |
+        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI applications
     - name: Delete review app
-      # curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
-      # tar -xvf $CLEVER_DIR.tar.gz
       run: |
+        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI delete --yes
@@ -71,10 +77,10 @@ jobs:
 
     steps:
     # Runs a set of commands using the runners shell
-    #  curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
-    #  tar -xvf clever-tools-latest_linux.tar.gz
     - name: Create review app
       run: |
+        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
+        tar -xvf clever-tools-latest_linux.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
