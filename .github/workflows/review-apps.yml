@@ -21,7 +21,7 @@ env:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+
   delete-review-app:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
@@ -43,6 +43,12 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI delete --yes
 
+  create-review-app:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
     # Runs a set of commands using the runners shell
     - name: Create review app
       run: |
@@ -50,5 +56,4 @@ jobs:
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
         $CLEVER_CLI published-config set <variable-name> <variable-value>
         $CLEVER_CLI --branch $TRAVIS_BRANCH deploy
-      if: always()
 
