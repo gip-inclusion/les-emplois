@@ -19,7 +19,6 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
 
-jobs:
   # download-cc-binaries:
   #   runs-on: ubuntu-latest
 
@@ -37,7 +36,7 @@ jobs:
   #       with:
   #         name: clever_cloud_bin
   #         path: $CLEVER_DIR
-
+jobs:
   delete-review-app:
     runs-on: ubuntu-latest
 
