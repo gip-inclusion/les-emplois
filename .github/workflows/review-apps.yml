@@ -29,14 +29,13 @@ jobs:
 
       - name: Download CC binaries
         run: |
-          mkdir bin
-          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > bin/$CLEVER_DIR.tar.gz
-          tar -xvf bin/$CLEVER_DIR.tar.gz
+          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+          tar -xvf $CLEVER_DIR.tar.gz
 
       - uses: actions/upload-artifact@v1
         with:
           name: clever-binaries
-          path: bin/$CLEVER_DIR
+          path: .
 
   delete-review-app:
     # The type of runner that the job will run on
