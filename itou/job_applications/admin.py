@@ -11,7 +11,7 @@ class TransitionLogInline(admin.TabularInline):
     can_delete = False
     readonly_fields = ("transition", "from_state", "to_state", "user", "timestamp")
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
 
