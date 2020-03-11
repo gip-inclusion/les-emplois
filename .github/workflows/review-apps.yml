@@ -20,7 +20,6 @@ env:
 
 
 jobs:
-
   # IMPROVEMENT:
   # https://github.com/actions/upload-artifact
   # https://github.com/actions/download-artifact
@@ -44,7 +43,7 @@ jobs:
   #         path: clever_cloud_binaries
 
   delete-review-app:
-    needs: download-cc-binaries
+    # needs: download-cc-binaries
     runs-on: ubuntu-latest
 
     steps:
