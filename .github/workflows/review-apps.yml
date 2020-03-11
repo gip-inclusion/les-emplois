@@ -47,7 +47,13 @@ jobs:
         tar -xvf clever-tools-latest_linux.tar.gz
         clever-tools-latest_linux/clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         clever-tools-latest_linux/clever link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-
+        clever-tools-latest_linux/clever delete --yes
+        echo 'LS'
+        ls
+        echo 'PWD'
+        pwd
+        echo 'CLEVER_DIR'
+        echo $CLEVER_DIR
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     # - uses: actions/checkout@v2
@@ -72,9 +78,9 @@ jobs:
     # Runs a set of commands using the runners shell
     - name: Create review app
       run: |
-        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > ./$CLEVER_DIR.tar.gz
-        tar -xvf ./$CLEVER_DIR.tar.gz
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
+        tar -xvf clever-tools-latest_linux.tar.gz
+        clever-tools-latest_linux/clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
         $CLEVER_CLI published-config set <variable-name> <variable-value>
