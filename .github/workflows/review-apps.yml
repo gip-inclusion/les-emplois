@@ -14,27 +14,26 @@ env:
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
-  REVIEW_APP_NAME: itou-celinems-${{ github.ref }}
+  REVIEW_APP_NAME: itou-celinems-${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
 
-  # download-cc-binaries:
-  #   runs-on: ubuntu-latest
+  download-cc-binaries:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v2
+    steps:
+      - uses: actions/checkout@v2
 
-  #     - name: Download CC binaries
-  #       run: |
-  #         mkdir clever_cloud_bin
-  #         mkdir $CLEVER_DIR
-  #         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
-  #         tar -xvf $CLEVER_DIR.tar.gz
+      - name: Download CC binaries
+        run: |
+          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+          tar -xvf $CLEVER_DIR.tar.gz
 
-  #     - uses: actions/upload-artifact@v1
-  #       with:
-  #         name: clever_cloud_bin
-  #         path: $CLEVER_DIR
+      - uses: actions/upload-artifact@v1
+        with:
+          name: clever_cloud_bin
+          path: .
+
 jobs:
   delete-review-app:
     runs-on: ubuntu-latest
@@ -42,30 +41,25 @@ jobs:
     steps:
     - name: Delete review app
       run: |
-        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
-        tar -xvf clever-tools-latest_linux.tar.gz
-        clever-tools-latest_linux/clever login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        clever-tools-latest_linux/clever link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-        clever-tools-latest_linux/clever delete --yes
-        echo 'LS'
-        ls
-        echo 'PWD'
-        pwd
-        echo 'CLEVER_DIR'
-        echo $CLEVER_DIR
+        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI delete --yes
 
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     # - uses: actions/checkout@v2
 
-    # - uses: actions/download-artifact@v1
-    #   with:
-    #     name: clever_cloud_bin
+    - uses: actions/download-artifact@v1
+      with:
+        name: clever_cloud_bin
+        path: .
 
-    # - name: Connect to Clever Cloud
-    #   run: |
-    #     curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
-    #     tar -xvf $CLEVER_DIR.tar.gz
-    #     $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+    - name: Connect to Clever Cloud
+      run: |
+        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
 
 
   create-review-app:
