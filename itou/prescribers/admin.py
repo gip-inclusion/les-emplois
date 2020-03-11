@@ -30,7 +30,7 @@ class MembersInline(admin.TabularInline):
 @admin.register(models.PrescriberOrganization)
 class PrescriberOrganizationAdmin(admin.ModelAdmin):
     fieldsets = (
-        (_("Structure"), {"fields": ("siret", "name", "phone", "email", "secret_code", "is_authorized")}),
+        (_("Structure"), {"fields": ("siret", "kind", "name", "phone", "email", "secret_code", "is_authorized")}),
         (
             _("Adresse"),
             {
@@ -45,12 +45,14 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                 )
             },
         ),
+        (_("Info"), {"fields": ("created_by", "created_at", "updated_at")}),
     )
     inlines = (MembersInline,)
     list_display = ("id", "name", "post_code", "city", "department", "member_count")
     list_display_links = ("id", "name")
-    list_filter = (HasMembersFilter, "is_authorized", "department")
-    readonly_fields = ("secret_code",)
+    list_filter = (HasMembersFilter, "is_authorized", "kind", "department")
+    raw_id_fields = ("created_by",)
+    readonly_fields = ("secret_code", "created_by", "created_at", "updated_at")
     search_fields = ("siret", "name")
 
     def member_count(self, obj):
@@ -64,6 +66,8 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         return queryset
 
     def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.created_by = request.user
         if not obj.geocoding_score:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
         super().save_model(request, obj, form, change)

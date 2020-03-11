@@ -23,6 +23,8 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
     def save(self, user, commit=True):
         organization = super().save(commit=False)
 
+        organization.created_by = user
+
         siret = self.cleaned_data["siret"]
         if siret:
             siret_data = get_siret_data(self.cleaned_data["siret"])

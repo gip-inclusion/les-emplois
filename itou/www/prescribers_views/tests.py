@@ -30,6 +30,7 @@ class CreateOrganizationTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         organization = PrescriberOrganization.objects.get(siret=post_data["siret"])
+        self.assertEqual(user, organization.created_by)
         self.assertIn(user, organization.members.all())
         self.assertEqual(1, organization.members.count())
 

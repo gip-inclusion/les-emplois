@@ -27,7 +27,36 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     Note: it is not required for a prescriber to be a member of an organization.
     """
 
+    class Kind(models.TextChoices):
+        PE = "PE", _("Pôle emploi")
+        CAP_EMPLOI = "CAP_EMPLOI", _("CAP emploi")
+        ML = "ML", _("Mission locale")
+        DEPT = "DEPT", _("Service social du conseil départemental")
+        SPIP = "SPIP", _("SPIP - Service pénitentiaire d'insertion et de probation")
+        PJJ = "PJJ", _("PJJ - Protection judiciaire de la jeunesse")
+        CCAS = "CCAS", _("CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
+        PLIE = "PLIE", _("PLIE - Plan local pour l'insertion et l'emploi")
+        CHRS = "CHRS", _("CHRS - Centre d'hébergement et de réinsertion sociale")
+        CIDFF = "CIDFF", _("CIDFF - Centre d'information sur les droits des femmes et des familles")
+        PREVENTION = "PREVENTION", _("Service ou club de prévention")
+        AFPA = "AFPA", _("AFPA - Agence nationale pour la formation professionnelle des adultes")
+        PIJ_BIJ = "PIJ_BIJ", _("PIJ-BIJ - Point/Bureau information jeunesse")
+        CAF = "CAF", _("CAF - Caisse d'allocation familiale")
+        CADA = "CADA", _("CADA - Centre d'accueil de demandeurs d'asile")
+        ASE = "ASE", _("ASE - Aide sociale à l'enfance")
+        CAVA = "CAVA", _("CAVA - Centre d'adaptation à la vie active")
+        CPH = "CPH", _("CPH - Centre provisoire d'hébergement")
+        CHU = "CHU", _("CHU - Centre d'hébergement d'urgence")
+        OACAS = (
+            "OACAS",
+            _(
+                "OACAS - Structure porteuse d'un agrément national organisme d'accueil communautaire et d'activité solidaire"
+            ),
+        )
+        OTHER = "OTHER", _("Autre structure")
+
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
+    kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
     name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
@@ -55,6 +84,16 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         null=True,
         unique=True,
     )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        related_name="created_prescriber_organization_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
     active_objects = ActiveManager.from_queryset(PrescriberOrganizationQuerySet)()
@@ -65,6 +104,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     def __str__(self):
         return f"{self.name}"
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
 
     @property
     def display_name(self):
