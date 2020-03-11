@@ -12,8 +12,8 @@ on:
 
 env:
   APP_NAME: itou-celinems
-  CLEVER_CLI: ./clever-tools-latest_linux/clever
   CLEVER_DIR: clever-tools-latest_linux
+  CLEVER_CLI: ./$CLEVER_DIR/clever
   ORGANIZATION_NAME: Miimosa
   REVIEW_APP_NAME: $APP_NAME-$TRAVIS_BRANCH
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -30,13 +30,13 @@ jobs:
       - name: Download CC binaries
         run: |
           mkdir bin
-          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > bin/$CLEVER_DIR.tar.gz
-          tar -xvf bin/$CLEVER_DIR.tar.gz
+          curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+          tar -xvf $CLEVER_DIR.tar.gz
 
       - uses: actions/upload-artifact@v1
         with:
-          name: CLEVER_DIR
-          path: bin
+          name: clever-binaries
+          path: $CLEVER_DIR
 
   delete-review-app:
     # The type of runner that the job will run on
@@ -46,6 +46,10 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+
+    - uses: actions/download-artifact@v1
+      with:
+        name: clever-binaries
 
     - name: Connect to Clever Cloud
       run: |
