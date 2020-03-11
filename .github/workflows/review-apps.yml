@@ -33,8 +33,9 @@ jobs:
 
       - uses: actions/upload-artifact@v1
         with:
-          name: clever_cloud_bin
+          name: $CLEVER_DIR
           path: .
+
   delete-review-app:
     needs: download-cc-binaries
     runs-on: ubuntu-latest
@@ -45,8 +46,7 @@ jobs:
 
     - uses: actions/download-artifact@v1
       with:
-        name: clever_cloud_bin
-        path: .
+        name: $CLEVER_DIR
 
       #  curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
       #  tar -xvf $CLEVER_DIR.tar.gz
