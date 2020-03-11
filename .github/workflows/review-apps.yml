@@ -40,14 +40,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Delete review app
-      # curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
-      # tar -xvf $CLEVER_DIR.tar.gz
-      run: |
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-        $CLEVER_CLI delete --yes
-
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
 
@@ -62,6 +54,14 @@ jobs:
       run: |
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI applications
+    - name: Delete review app
+      # curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+      # tar -xvf $CLEVER_DIR.tar.gz
+      run: |
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI delete --yes
+
 
 
   create-review-app:
