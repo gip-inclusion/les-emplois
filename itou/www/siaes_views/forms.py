@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
 
+
 TEST_DEPARTMENTS = [("", "---")] + [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
 
 TEST_DEPARTMENTS_HELP_TEXT = gettext_lazy(

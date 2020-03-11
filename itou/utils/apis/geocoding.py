@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.http import urlencode
 
+
 logger = logging.getLogger(__name__)
 
 

@@ -9,6 +9,7 @@ from itou.utils.address.departments import DEPARTMENTS, REGIONS
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.validators import validate_post_code
 
+
 logger = logging.getLogger(__name__)
 
 

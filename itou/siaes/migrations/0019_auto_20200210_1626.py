@@ -7,6 +7,7 @@ from django.db import migrations
 
 from itou.siaes.models import Siae
 
+
 KINDS = dict(Siae.KIND_CHOICES).keys()
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))

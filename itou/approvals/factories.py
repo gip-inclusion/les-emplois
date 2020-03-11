@@ -9,6 +9,7 @@ from faker import Faker
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.users.factories import JobSeekerFactory
 
+
 fake = Faker("fr_FR")
 
 

@@ -2,6 +2,7 @@ from django.urls import path
 
 from itou.www.apply.views import list_views, process_views, submit_views
 
+
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
 app_name = "apply"
 

@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 
 from itou.utils.apis.pole_emploi_connect import get_access_token
 
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 

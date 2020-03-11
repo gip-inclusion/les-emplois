@@ -170,7 +170,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def siren(self):
-        # pylint: disable=unsubscriptable-object
         return self.siret[:9]
 
     @property

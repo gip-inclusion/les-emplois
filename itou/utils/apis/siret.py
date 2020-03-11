@@ -4,6 +4,7 @@ import urllib.request
 from api_insee import ApiInsee
 from django.conf import settings
 
+
 logger = logging.getLogger(__name__)
 
 

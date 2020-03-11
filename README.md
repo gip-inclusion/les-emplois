@@ -23,7 +23,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 
     $ make populate_db
 
-The following users will be created with the password `password` (*sic*):
+Les utilisateurs suivants seront créés avec le mot de passe `password`:
 
 - `admin@test.com`
 - `job@test.com`
@@ -38,15 +38,11 @@ The following users will be created with the password `password` (*sic*):
 
 ### Avant un commit
 
-    $ make check_code_quality  # Will run isort, black, flake8 and pylint.
+    $ make style  # Will run black and isort.
 
-Even better, use a pre-commit git hook, simply set it up this way:
+Ou utilisez un *pre-commit git hook* que vous pouvez mettre en place de cette manière :
 
     $ make setup_git_pre_commit_hook
-
-Note that pylint is much slower than the three other tools. For this reason,
-our pre-commit hook does not run it. But you can still manually run it
-via `make pylint` or via `make check_code_quality`.
 
 ## Front-end
 

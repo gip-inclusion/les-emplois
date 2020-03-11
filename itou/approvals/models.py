@@ -13,6 +13,7 @@ from unidecode import unidecode
 
 from itou.utils.validators import alphanumeric
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -170,9 +171,7 @@ class Approval(CommonApprovalMixin):
         """
         Insert spaces to format the number.
         """
-        # pylint: disable=unsubscriptable-object
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-        # pylint: enable=unsubscriptable-object
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -320,12 +319,10 @@ class PoleEmploiApproval(CommonApprovalMixin):
         Insert spaces to format the number as in the Pôle emploi export file
         (number is stored without spaces).
         """
-        # pylint: disable=unsubscriptable-object
         if len(self.number) == 15:
             return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
         # 12 chars.
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-        # pylint: enable=unsubscriptable-object
 
 
 class ApprovalsWrapper:

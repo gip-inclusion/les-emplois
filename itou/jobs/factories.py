@@ -3,6 +3,7 @@ import os
 
 from itou.jobs.models import Appellation, Rome
 
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 ROMES_JSON_FILE = f"{CURRENT_DIR}/management/commands/data/romes.json"

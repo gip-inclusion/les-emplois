@@ -5,6 +5,7 @@ import logging
 import requests
 from django.conf import settings
 
+
 logger = logging.getLogger(__name__)
 
 Token = collections.namedtuple("AccessToken", ["expiration", "value"])

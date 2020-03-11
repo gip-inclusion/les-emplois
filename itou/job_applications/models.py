@@ -13,6 +13,7 @@ from itou.approvals.models import Approval
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
+
 logger = logging.getLogger(__name__)
 
 

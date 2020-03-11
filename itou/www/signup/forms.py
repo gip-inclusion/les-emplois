@@ -12,6 +12,7 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
+
 BLANK_CHOICE = (("", "---------"),)
 
 

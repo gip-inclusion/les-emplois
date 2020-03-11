@@ -6,6 +6,7 @@ from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
 
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CITIES_JSON_FILE = f"{CURRENT_DIR}/management/commands/data/cities.json"

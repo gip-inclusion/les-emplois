@@ -17,6 +17,7 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.address.departments import DEPARTMENTS
 
+
 DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par département")
 
 

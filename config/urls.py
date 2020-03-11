@@ -7,6 +7,7 @@ from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
 from itou.www.signup import views as signup_views
 
+
 register_converter(SiretConverter, "siret")
 
 

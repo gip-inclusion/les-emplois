@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 
+
 KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_SIAE_STAFF = "siae_staff"

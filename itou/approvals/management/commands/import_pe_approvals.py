@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 
 from itou.approvals.models import PoleEmploiApproval
 
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # The content of `{CURRENT_DIR}/data/` must be git ignored.

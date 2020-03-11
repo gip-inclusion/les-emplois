@@ -6,6 +6,7 @@ import factory.fuzzy
 
 from itou.users import models
 
+
 DEFAULT_PASSWORD = "p4ssw0rd"
 
 
