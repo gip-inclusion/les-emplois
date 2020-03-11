@@ -15,7 +15,7 @@ env:
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: $CLEVER_DIR/clever
   ORGANIZATION_NAME: Miimosa
-  REVIEW_APP_NAME: $APP_NAME-${{ github.ref }}
+  REVIEW_APP_NAME: ${{ env.APP_NAME }}-${{ github.sha }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
 
