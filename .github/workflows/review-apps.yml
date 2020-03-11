@@ -52,9 +52,6 @@ jobs:
 
     - name: Connect to Clever Cloud
       run: |
-        echo "🛸 Build disposable staging"
-        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
-        tar -xvf $CLEVER_DIR.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
 
     - name: Delete review app
