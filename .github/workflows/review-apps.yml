@@ -2,9 +2,10 @@
 name: Review apps
 
 on:
+  push
   pull_request:
     branches: [ master ]
-    types: [ labeled ]
+    types: [ labeled, edited, synchronize ]
 
 env:
   CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
