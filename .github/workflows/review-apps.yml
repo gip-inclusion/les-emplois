@@ -2,19 +2,20 @@
 
 name: Review apps
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   pull_request:
     branches: [ master ]
 
 env:
+  CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
   REVIEW_APP_NAME: itou-celinems-${{ github.head_ref }}
+  BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  SECRETS_FILE: ${{ secrets.SECRETS_FILE }}
 
 
 jobs:
@@ -51,15 +52,9 @@ jobs:
     #   with:
     #     name: $CLEVER_DIR
 
-    - name: Connect to Clever Cloud
-      run: |
-        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
-        tar -xvf $CLEVER_DIR.tar.gz
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-
     - name: Delete review app
       run: |
-        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/$CLEVER_DIR.tar.gz > $CLEVER_DIR.tar.gz
+        curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
         tar -xvf $CLEVER_DIR.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
@@ -73,13 +68,61 @@ jobs:
     if: always()
 
     steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
+
+    - run: git fetch --prune --unshallow
+
+    # - uses: actions/upload-artifact@v1
+    #   with:
+    #     name: clever_env_vars.txt
+    #     path: clever_files/
+
     - name: Create review app
       run: |
-        curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
-        tar -xvf clever-tools-latest_linux.tar.gz
+        curl curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
-        # $CLEVER_CLI published-config set <variable-name> <variable-value>
-        # $CLEVER_CLI --branch $TRAVIS_BRANCH deploy
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
+    - name: Link database
+      run: |
+        $CLEVER_CLI service link-addon itoudb
+
+    - name: Export environment variables
+      run: |
+        echo $SECRETS_FILE | base64 -d > .env
+        # Export variables. Source does not work.
+        # cf https://stackoverflow.com/questions/15474650/unix-what-is-the-difference-between-source-and-export
+        set -a
+        . .env
+
+        # Then create a file to list all available variables
+        cat .env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
+        rm .env
+
+        cat clever_env_vars.txt | xargs $CLEVER_CLI env import-vars
+
+        # export DEPLOY_URL=$(cat .clever.json | grep -Po '(?<="deploy_url":)(.*?)(?=,)' | tr -d '"')
+        # echo "DEPLOY_URL"
+        # echo $DEPLOY_URL
+        # git remote add clever $DEPLOY_URL
+        # git push clever travis:master
+
+    - name: Deploy to Clever Cloud
+      run: $CLEVER_CLI deploy --branch $BRANCH --force --verbose
+
+    - name: Add link to pull request
+      uses: thollander/actions-comment-pull-request@master
+      with:
+        message: "🥁 Votre environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - uses: tzkhan/pr-update-action@v1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        branch-regex: '${{ env.BRANCH }}'
+        body-template: '[👉 Environnement de test 👈](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)'
