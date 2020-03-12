@@ -50,7 +50,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         OACAS = (
             "OACAS",
             _(
-                "OACAS - Structure porteuse d'un agrément national organisme d'accueil communautaire et d'activité solidaire"
+                "OACAS - Structure porteuse d'un agrément national organisme "
+                "d'accueil communautaire et d'activité solidaire"
             ),
         )
         OTHER = "OTHER", _("Autre structure")
