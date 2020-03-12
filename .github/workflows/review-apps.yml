@@ -112,10 +112,10 @@ jobs:
 
     - name: Export environment variables
       run: |
-        echo $SECRETS_FILE | base64 -d > tmp_secrets.env
-        source tmp_secrets.env
-        cat tmp_secrets.env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
-        rm tmp_secrets.env
+        echo $SECRETS_FILE | base64 -d > .env
+        source .env
+        cat .env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
+        rm .env
 
         cat clever_env_vars.txt | xargs $CLEVER_CLI env import-vars
 
@@ -124,6 +124,7 @@ jobs:
         # echo $DEPLOY_URL
         # git remote add clever $DEPLOY_URL
         # git push clever travis:master
+
     - name: Deploy to Clever Cloud
       run: $CLEVER_CLI deploy --branch $BRANCH --force --verbose
 
