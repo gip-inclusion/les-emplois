@@ -87,6 +87,7 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         # replace by clever env import-vars FOO,BAR,BAZ
         echo $SECRETS_FILE | base64 -d | $CLEVER_CLI published-config import --alias $REVIEW_APP_NAME
 
