@@ -113,7 +113,12 @@ jobs:
     - name: Export environment variables
       run: |
         echo $SECRETS_FILE | base64 -d > .env
-        source .env
+        # Export variables. Source does not work.
+        # cf https://stackoverflow.com/questions/15474650/unix-what-is-the-difference-between-source-and-export
+        set -a
+        . .env
+
+        # Then create a file to list all available variables
         cat .env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
         rm .env
 
