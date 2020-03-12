@@ -17,6 +17,6 @@
 - {% trans "SIRET" %} : {{ siae.siret }}
 - {% trans "Type" %} : {{ siae.kind }}
 
-{% trans "Vous recevez cet email en tant que propriétaire d'un compte administrateur de la structure ci-dessus." %}
+{% trans "Vous recevez cet email en tant que propriétaire d'un compte associé à la structure ci-dessus." %}
 
 {% endblock body %}

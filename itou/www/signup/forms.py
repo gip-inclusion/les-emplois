@@ -216,7 +216,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
             raise RuntimeError("This should never happen. Attack attempted.")
 
         if siae.has_members:
-            siae.new_signup_warning_email_to_admins(user).send()
+            siae.new_signup_warning_email_to_existing_members(user).send()
 
         user.is_siae_staff = True
         user.save()
