@@ -110,6 +110,10 @@ jobs:
         # replace by clever env import-vars FOO,BAR,BAZ
         # echo $SECRETS_FILE | base64 -d | $CLEVER_CLI published-config import --alias $REVIEW_APP_NAME
 
+    - name: Link database
+      run: |
+        $CLEVER_CLI service link-addon itoudb
+
     - name: Export environment variables
       run: |
         echo $SECRETS_FILE | base64 -d > .env
