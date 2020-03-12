@@ -138,10 +138,10 @@ jobs:
       run: $CLEVER_CLI deploy --branch $BRANCH --force --verbose
 
 
-    # - name: Comment PR ss
-    #   uses: thollander/actions-comment-pull-request@master
-    #   with:
-    #     message: 'Example of message !'
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Add link to pull request
+      uses: thollander/actions-comment-pull-request@master
+      with:
+        message: "🥁 Votre environnement de test est prêt ! ${{ env.REVIEW_APP_NAME }}.cleverapps.io"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
