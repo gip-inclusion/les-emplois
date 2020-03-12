@@ -44,6 +44,8 @@ The following users will be created with the password `password` (*sic*):
 Ou :
 
     $ make check_code_quality  # Will run black and pylint.
+    
+    typo
 
 ## Front-end
 
