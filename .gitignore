@@ -16,6 +16,7 @@ docker/staging/
 # Project specific
 itou/static_collected/
 itou/approvals/management/commands/data/
+itou/siaes/management/commands/data
 
 # Debian
 .bash_history
