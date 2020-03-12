@@ -1,4 +1,3 @@
-# This is a basic workflow to help you get started with Actions
 
 name: Review apps
 
@@ -11,7 +10,7 @@ env:
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
-  REVIEW_APP_NAME: itou-celinems-${{ github.head_ref }}
+  REVIEW_APP_NAME: itou-${{ github.head_ref }}
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
@@ -19,6 +18,7 @@ env:
 
 
 jobs:
+  if: contains( github.event.pull_request.labels.*.name, 'review-app')
   # IMPROVEMENT:
   # https://github.com/actions/upload-artifact
   # https://github.com/actions/download-artifact
