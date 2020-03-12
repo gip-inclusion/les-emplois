@@ -141,7 +141,12 @@ jobs:
     - name: Add link to pull request
       uses: thollander/actions-comment-pull-request@master
       with:
-        message: "🥁 Votre environnement de test est prêt ! ${{ env.REVIEW_APP_NAME }}.cleverapps.io"
+        message: "🥁 Votre environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
+    - uses: tzkhan/pr-update-action@v1
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        branch-regex: '${{ env.BRANCH }}'
+        body-template: '[Environnement de test : ](${{ env.REVIEW_APP_NAME }}.cleverapps.io)'
