@@ -81,14 +81,14 @@ jobs:
 
     - name: Export environment variables
       run: |
-      # `clever env import-vars
-      # `grep -Po ".*="`: grep everything before `=`
-      # `sed -r 's/[=]+/,/g`: substitute each `=` by `,`.
-      # `sed -r $ s/.$//`: subsitute last character of last line by nothing (aka remove it).
-      echo $SECRETS_FILE | base64 -d > tmp_secrets.env
-      source tmp_secrets.env
-      cat tmp_secrets.env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
-      rm tmp_secrets.env
+        # `clever env import-vars
+        # `grep -Po ".*="`: grep everything before `=`
+        # `sed -r 's/[=]+/,/g`: substitute each `=` by `,`.
+        # `sed -r $ s/.$//`: subsitute last character of last line by nothing (aka remove it).
+        echo $SECRETS_FILE | base64 -d > tmp_secrets.env
+        source tmp_secrets.env
+        cat tmp_secrets.env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
+        rm tmp_secrets.env
 
     # USE THIS INSTEAD: https://github.com/marketplace/actions/deploy-to-clever-cloud
     - name: Create review app
