@@ -1,17 +1,19 @@
-# This is a basic workflow to help you get started with Actions
 
 name: Review apps
 
+# Run this pipeline when a label is added and
+# when a push is made on this PR.
 on:
   pull_request:
     branches: [ master ]
+    types: [ labeled, synchronize ]
 
 env:
   CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
-  REVIEW_APP_NAME: itou-celinems-${{ github.head_ref }}
+  REVIEW_APP_NAME: itou-${{ github.head_ref }}
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
@@ -44,6 +46,7 @@ jobs:
   delete-review-app:
     # needs: download-cc-binaries
     runs-on: ubuntu-latest
+    if: contains( github.event.pull_request.labels.*.name, 'review-app')
 
     steps:
     - uses: actions/checkout@v2
@@ -118,11 +121,6 @@ jobs:
     - name: Add link to pull request
       uses: thollander/actions-comment-pull-request@master
       with:
-        message: "🥁 Votre environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
+        message: "🥁 L'environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - uses: tzkhan/pr-update-action@v1
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        branch-regex: '${{ env.BRANCH }}'
-        body-template: '[👉 Environnement de test 👈](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)'
