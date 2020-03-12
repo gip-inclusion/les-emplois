@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
-from itou.www.search.forms import SiaeSearchForm
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
+from itou.www.search.forms import SiaeSearchForm
 
 
 def search_siaes(request, template_name="search/siaes_search_results.html"):

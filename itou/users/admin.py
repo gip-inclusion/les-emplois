@@ -17,7 +17,7 @@ class SiaeMembershipInline(admin.TabularInline):
     def has_change_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
 
@@ -31,7 +31,7 @@ class PrescriberMembershipInline(admin.TabularInline):
     def has_change_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
 
@@ -62,15 +62,7 @@ class ItouUserAdmin(UserAdmin):
 
     list_filter = UserAdmin.list_filter + (KindFilter,)
 
-    list_display = (
-        "id",
-        "email",
-        "first_name",
-        "last_name",
-        "is_staff",
-        "is_created_by_a_proxy",
-        "last_login",
-    )
+    list_display = ("id", "email", "first_name", "last_name", "is_staff", "is_created_by_a_proxy", "last_login")
 
     list_display_links = ("id", "email")
 

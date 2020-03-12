@@ -4,6 +4,7 @@ https://docs.djangoproject.com/en/dev/ref/settings
 """
 import os
 
+
 # Paths.
 # ------------------------------------------------------------------------------
 
@@ -64,6 +65,7 @@ LOCAL_APPS = [
     # www.
     "itou.www.apply",
     "itou.www.autocomplete",
+    "itou.www.approvals_views",
     "itou.www.dashboard",
     "itou.www.home",
     "itou.www.search",
@@ -300,6 +302,10 @@ API_EMPLOI_STORE_SECRET = os.environ["API_EMPLOI_STORE_SECRET"]
 API_EMPLOI_STORE_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_EMPLOI_STORE_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
+# PDFShift
+PDFSHIFT_API_KEY = os.environ["PDFSHIFT_API_KEY"]
+PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
+
 # Itou.
 # ------------------------------------------------------------------------------
 
@@ -315,3 +321,8 @@ ITOU_TEST_DEPARTMENTS = ["62", "67", "93"]
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
+
+# Some external libraries, as PDF Shift, need access to static files
+# but they can't access them when working locally.
+# Use the staging domain name when this case arises.
+ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"

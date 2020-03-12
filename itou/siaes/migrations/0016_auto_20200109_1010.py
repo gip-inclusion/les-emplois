@@ -17,10 +17,7 @@ class Migration(migrations.Migration):
                     ("AI", "Association intermédiaire"),
                     ("ACI", "Atelier chantier d'insertion"),
                     ("ETTI", "Entreprise de travail temporaire d'insertion"),
-                    (
-                        "GEIQ",
-                        "Groupement d'employeurs pour l'insertion et la qualification",
-                    ),
+                    ("GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"),
                     ("EA", "Entreprise adaptée"),
                 ],
                 default="EI",

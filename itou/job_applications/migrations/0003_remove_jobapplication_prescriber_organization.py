@@ -11,8 +11,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("job_applications", "0002_auto_20190930_1527")]
 
-    operations = [
-        migrations.RemoveField(
-            model_name="jobapplication", name="prescriber_organization"
-        )
-    ]
+    operations = [migrations.RemoveField(model_name="jobapplication", name="prescriber_organization")]

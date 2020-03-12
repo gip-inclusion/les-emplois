@@ -27,6 +27,6 @@ Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktrans %}
 {% trans "Pour le compte de Pôle emploi," %}
 
 {% trans "Votre contact :" %}
-{{ itou_contact_email }}
+{{ itou_email_contact }}
 
 {% endblock body %}

@@ -27,12 +27,7 @@ class Command(BaseCommand):
     help = "Import the content of the ROMEs JSON file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """

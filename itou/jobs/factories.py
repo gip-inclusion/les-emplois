@@ -8,9 +8,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 ROMES_JSON_FILE = f"{CURRENT_DIR}/management/commands/data/romes.json"
 
-APPELLATIONS_JSON_FILE = (
-    f"{CURRENT_DIR}/management/commands/data/appellations_for_romes.json"
-)
+APPELLATIONS_JSON_FILE = f"{CURRENT_DIR}/management/commands/data/appellations_for_romes.json"
 
 
 def create_test_romes_and_appellations(rome_codes, appellations_per_rome=30):

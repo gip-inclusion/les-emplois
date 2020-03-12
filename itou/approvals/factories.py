@@ -3,7 +3,6 @@ import string
 
 import factory
 import factory.fuzzy
-
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 
@@ -21,13 +20,9 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         model = Approval
 
     user = factory.SubFactory(JobSeekerFactory)
-    number = factory.fuzzy.FuzzyText(
-        length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX
-    )
+    number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = datetime.date.today()
-    end_at = factory.LazyAttribute(
-        lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1)
-    )
+    end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
@@ -40,13 +35,9 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
     number = factory.fuzzy.FuzzyText(length=12, chars=string.digits)
     birth_name = factory.LazyAttribute(lambda obj: obj.last_name)
-    birthdate = factory.fuzzy.FuzzyDate(
-        datetime.date(1968, 1, 1), datetime.date(2000, 1, 1)
-    )
+    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     start_at = datetime.date.today()
-    end_at = factory.LazyAttribute(
-        lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1)
-    )
+    end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
 
     @factory.lazy_attribute
     def first_name(self):
@@ -62,13 +53,7 @@ class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
         If any `*_name` is passed through kwargs, ensure that it's
         formatted like it is in the Pôle emploi export file.
         """
-        kwargs["first_name"] = PoleEmploiApproval.format_name_as_pole_emploi(
-            kwargs["first_name"]
-        )
-        kwargs["last_name"] = PoleEmploiApproval.format_name_as_pole_emploi(
-            kwargs["last_name"]
-        )
-        kwargs["birth_name"] = PoleEmploiApproval.format_name_as_pole_emploi(
-            kwargs["birth_name"]
-        )
+        kwargs["first_name"] = PoleEmploiApproval.format_name_as_pole_emploi(kwargs["first_name"])
+        kwargs["last_name"] = PoleEmploiApproval.format_name_as_pole_emploi(kwargs["last_name"])
+        kwargs["birth_name"] = PoleEmploiApproval.format_name_as_pole_emploi(kwargs["birth_name"])
         return kwargs

@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
-from django.utils.translation import gettext as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval
@@ -29,7 +28,7 @@ class JobApplicationInline(admin.StackedInline):
     def has_change_permission(self, request, obj=None):
         return False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
 
@@ -51,15 +50,7 @@ class IsValidFilter(admin.SimpleListFilter):
 
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "number",
-        "user",
-        "start_at",
-        "end_at",
-        "is_valid",
-        "created_at",
-    )
+    list_display = ("id", "number", "user", "start_at", "end_at", "is_valid", "created_at")
     search_fields = ("number", "user__first_name", "user__last_name", "user__email")
     list_filter = (IsValidFilter,)
     list_display_links = ("id", "number")
@@ -109,13 +100,7 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "end_at",
         "is_valid",
     )
-    search_fields = (
-        "pole_emploi_id",
-        "number",
-        "first_name",
-        "last_name",
-        "birth_name",
-    )
+    search_fields = ("pole_emploi_id", "number", "first_name", "last_name", "birth_name")
     list_filter = (IsValidFilter,)
     date_hierarchy = "start_at"
 

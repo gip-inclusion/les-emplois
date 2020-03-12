@@ -9,8 +9,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(model_name="eligibilitydiagnosis", name="data"),
-        migrations.RemoveField(
-            model_name="eligibilitydiagnosis", name="form_cleaned_data"
-        ),
+        migrations.RemoveField(model_name="eligibilitydiagnosis", name="form_cleaned_data"),
         migrations.RemoveField(model_name="eligibilitydiagnosis", name="form_version"),
     ]

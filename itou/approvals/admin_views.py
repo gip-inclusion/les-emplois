@@ -1,25 +1,20 @@
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.approvals.models import Approval
 from itou.approvals.admin_forms import ManuallyAddApprovalForm
+from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 
 
 @transaction.atomic
 def manually_add_approval(
-    request,
-    model_admin,
-    job_application_id,
-    template_name="admin/approvals/manually_add_approval.html",
+    request, model_admin, job_application_id, template_name="admin/approvals/manually_add_approval.html"
 ):
     """
     Custom admin view to manually add an approval pre-filled with some FK.
@@ -37,17 +32,10 @@ def manually_add_approval(
         raise PermissionDenied
 
     queryset = JobApplication.objects.select_related(
-        "job_seeker",
-        "sender",
-        "sender_siae",
-        "sender_prescriber_organization",
-        "to_siae",
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
     )
     job_application = get_object_or_404(
-        queryset,
-        pk=job_application_id,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
-        approval=None,
+        queryset, pk=job_application_id, state=JobApplicationWorkflow.STATE_ACCEPTED, approval=None
     )
 
     initial = {
@@ -65,10 +53,7 @@ def manually_add_approval(
         job_application.save()
         job_application.send_approval_number_by_email_manually(deliverer=request.user)
         messages.success(
-            request,
-            _(
-                f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail."
-            ),
+            request, _(f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         )
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 

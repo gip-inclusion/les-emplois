@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
 
 
 def pager(queryset, page, items_per_page=10, pages_num=10):

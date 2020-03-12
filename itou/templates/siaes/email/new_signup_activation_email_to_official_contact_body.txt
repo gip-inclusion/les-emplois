@@ -1,0 +1,25 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% load i18n %}
+{% block body %}
+
+{% trans "Un nouvel utilisateur souhaite rejoindre votre structure sur la plateforme de l'inclusion !" %}
+
+{% trans "*Structure* :" %}
+
+- {% trans "Nom" %} : {{ siae.display_name }}
+- {% trans "SIRET" %} : {{ siae.siret }}
+- {% trans "Type" %} : {{ siae.kind }}
+- {% trans "Email de contact" %} : {{ siae.auth_email }}
+
+{% trans "Si vous êtes à l'origine de cette demande, veuillez ouvrir le lien suivant pour continuer votre inscription" %} : {{ signup_magic_link }}
+
+{% trans "Si vous n'êtes pas à l'origine de cette demande d'inscription, il est probable qu'un(e) de vos collaborateurs(trices) le soit. Veuillez lui transférer cet email afin qu'il ou elle puisse continuer son inscription." %}
+
+{% trans "Si vous êtes sûr(e) que cette demande d'inscription n'émane pas d'un(e) de vos collaborateurs(trices), veuillez simplement ignorer cet email." %}
+
+{% trans "Cet email a été envoyé à" %}
+{{ siae.auth_email }}
+{% trans "qui est l'addresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (ASP, GEIQ...)." %}
+
+{% endblock body %}

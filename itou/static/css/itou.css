@@ -229,8 +229,15 @@ section.home-search .bg-image {
 
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
+@media (min-width: 768px) {
+    .fixed-sm-bottom {
+        position: fixed !important;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1030;
+    }
 
-@media (min-width: 700px) {
     /* Set width depending on a breaking point. */
     .w-sm-25 {
         width: 25% !important;
@@ -253,4 +260,22 @@ section.home-search .bg-image {
 .bg-gray-900 {
     background-color: #212529; /* max-compatibility */
     background-color: var(--gray-900);
+}
+
+a.disabled {
+    cursor: not-allowed !important;
+    color: #495057;
+    color: var(--gray-700);
+}
+
+a.disabled button, button.disabled {
+    cursor: not-allowed !important;
+    color: var(--grey);
+    border-color: var(--grey);
+}
+
+a.disabled button:hover, button.disabled:hover {
+    background-color: transparent;
+    color: inherit;
+    border-color: inherit;
 }

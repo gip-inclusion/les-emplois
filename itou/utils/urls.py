@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.utils.http import is_safe_url
+from django.utils.http import url_has_allowed_host_and_scheme
 
 
 def get_safe_url(request, param_name, fallback_url=None):
@@ -13,11 +13,10 @@ def get_safe_url(request, param_name, fallback_url=None):
 
         if settings.DEBUG:
             # In DEBUG mode the network location part `127.0.0.1:8000` contains
-            # a port and fails the validation of `is_safe_url` since it's not a
-            # member of `allowed_hosts`:
-            # https://github.com/django/django/blob/23946bd/django/utils/http.py#L393
+            # a port and fails the validation of `url_has_allowed_host_and_scheme`
+            # since it's not a member of `allowed_hosts`:
+            # https://github.com/django/django/blob/525274f/django/utils/http.py#L413
             # As a quick fix, we build a new URL without the port.
-            # pylint: disable=C0415
             from urllib.parse import urlparse, ParseResult
 
             url_info = urlparse(url)
@@ -29,11 +28,11 @@ def get_safe_url(request, param_name, fallback_url=None):
                 query=url_info.query,
                 fragment=url_info.fragment,
             ).geturl()
-            if is_safe_url(url_without_port, allowed_hosts, require_https):
+            if url_has_allowed_host_and_scheme(url_without_port, allowed_hosts, require_https):
                 return url
 
         else:
-            if is_safe_url(url, allowed_hosts, require_https):
+            if url_has_allowed_host_and_scheme(url, allowed_hosts, require_https):
                 return url
 
     return fallback_url

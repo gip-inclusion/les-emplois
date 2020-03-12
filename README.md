@@ -23,7 +23,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 
     $ make populate_db
 
-The following users will be created with the password `password` (*sic*):
+Les utilisateurs suivants seront créés avec le mot de passe `password`:
 
 - `admin@test.com`
 - `job@test.com`
@@ -38,14 +38,11 @@ The following users will be created with the password `password` (*sic*):
 
 ### Avant un commit
 
-    $ make black
-    $ make pylint
+    $ make style  # Will run black and isort.
 
-Ou :
+Ou utilisez un *pre-commit git hook* que vous pouvez mettre en place de cette manière :
 
-    $ make check_code_quality  # Will run black and pylint.
-    
-    typo
+    $ make setup_git_pre_commit_hook
 
 ## Front-end
 

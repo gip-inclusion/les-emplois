@@ -2,18 +2,17 @@ import datetime
 
 import factory
 import factory.fuzzy
-
 from dateutil.relativedelta import relativedelta
 
+from itou.approvals.factories import ApprovalFactory
 from itou.job_applications import models
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.factories import PrescriberFactory, JobSeekerFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
@@ -47,9 +46,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         if extracted:
             # A list of jobs were passed in, use them.
             for appellation in extracted:
-                siae_job_description = SiaeJobDescription.objects.create(
-                    siae=self.to_siae, appellation=appellation
-                )
+                siae_job_description = SiaeJobDescription.objects.create(siae=self.to_siae, appellation=appellation)
                 self.selected_jobs.add(siae_job_description)
 
 
@@ -80,9 +77,7 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of an organization."""
 
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
-    sender_prescriber_organization = factory.SubFactory(
-        PrescriberOrganizationWithMembershipFactory
-    )
+    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
     def set_sender(self, create, extracted, **kwargs):
@@ -93,15 +88,11 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
         self.save()
 
 
-class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-    JobApplicationFactory
-):
+class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationFactory):
     """Generates a JobApplication() object sent by a prescriber member of an authorized organization."""
 
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
-    sender_prescriber_organization = factory.SubFactory(
-        AuthorizedPrescriberOrganizationWithMembershipFactory
-    )
+    sender_prescriber_organization = factory.SubFactory(AuthorizedPrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
     def set_sender(self, create, extracted, **kwargs):
@@ -110,3 +101,20 @@ class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             return
         self.sender = self.sender_prescriber_organization.members.first()
         self.save()
+
+
+class JobApplicationWithApprovalFactory(JobApplicationFactory):
+    """
+    Generates a Job Application and an Approval.
+    """
+
+    approval = factory.SubFactory(ApprovalFactory)
+    state = models.JobApplicationWorkflow.STATE_ACCEPTED
+
+    @factory.post_generation
+    def set_approval_user(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        self.approval.user = self.job_seeker
+        self.approval.save()

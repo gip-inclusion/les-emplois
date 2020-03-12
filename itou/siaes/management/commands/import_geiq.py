@@ -40,12 +40,7 @@ class Command(BaseCommand):
     help = "Import the content of the GEIQ csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -78,9 +73,7 @@ class Command(BaseCommand):
                 self.logger.debug("-" * 80)
 
                 name = row[0].strip()
-                name = " ".join(
-                    name.split()
-                )  # Replace multiple spaces by a single space.
+                name = " ".join(name.split())  # Replace multiple spaces by a single space.
                 self.logger.debug(name)
 
                 address_line_1 = row[1].strip()
@@ -155,43 +148,24 @@ class Command(BaseCommand):
 
                     if siae.address_on_one_line:
 
-                        geocoding_data = get_geocoding_data(
-                            siae.address_on_one_line, post_code=siae.post_code
-                        )
+                        geocoding_data = get_geocoding_data(siae.address_on_one_line, post_code=siae.post_code)
 
-                        if (
-                            not geocoding_data
-                            or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE
-                        ):
+                        if not geocoding_data or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE:
                             geocoding_data = get_geocoding_data(
-                                siae.address_on_one_line,
-                                post_code=f"{siae.post_code[:2]}000",
+                                siae.address_on_one_line, post_code=f"{siae.post_code[:2]}000"
                             )
 
-                        if (
-                            not geocoding_data
-                            or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE
-                        ):
-                            geocoding_data = get_geocoding_data(
-                                siae.address_on_one_line
-                            )
+                        if not geocoding_data or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE:
+                            geocoding_data = get_geocoding_data(siae.address_on_one_line)
 
-                        if (
-                            not geocoding_data
-                            or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE
-                        ):
+                        if not geocoding_data or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE:
                             geocoding_data = get_geocoding_data(siae.address_line_1)
 
-                        if (
-                            not geocoding_data
-                            or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE
-                        ):
+                        if not geocoding_data or geocoding_data["score"] < API_BAN_RELIABLE_MIN_SCORE:
                             geocoding_data = get_geocoding_data(siae.address_line_2)
 
                         if not geocoding_data:
-                            self.stderr.write(
-                                f"No geocoding data found for {siae_info}"
-                            )
+                            self.stderr.write(f"No geocoding data found for {siae_info}")
                             siae.save()
                             continue
 
@@ -204,9 +178,7 @@ class Command(BaseCommand):
                             siae.address_line_1 = geocoding_data["address_line_1"]
                             siae.city = geocoding_data["city"]
                         else:
-                            self.stderr.write(
-                                f"Geocoding not reliable for {siae_info}\n{siae.address_on_one_line}"
-                            )
+                            self.stderr.write(f"Geocoding not reliable for {siae_info}\n{siae.address_on_one_line}")
 
                         self.logger.debug("-" * 40)
                         self.logger.debug(siae.address_line_1)

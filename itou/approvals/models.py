@@ -1,8 +1,6 @@
 import logging
 
 from dateutil.relativedelta import relativedelta
-from unidecode import unidecode
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
@@ -11,6 +9,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
+from unidecode import unidecode
 
 from itou.utils.validators import alphanumeric
 
@@ -31,15 +30,9 @@ class CommonApprovalMixin(models.Model):
     # obtain a new one except from an "authorized prescriber".
     WAITING_PERIOD_YEARS = 2
 
-    start_at = models.DateField(
-        verbose_name=_("Date de début"), default=timezone.now, db_index=True
-    )
-    end_at = models.DateField(
-        verbose_name=_("Date de fin"), default=timezone.now, db_index=True
-    )
-    created_at = models.DateTimeField(
-        verbose_name=_("Date de création"), default=timezone.now
-    )
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
 
     class Meta:
         abstract = True
@@ -132,11 +125,7 @@ class Approval(CommonApprovalMixin):
         unique=True,
     )
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Créé par"),
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
+        settings.AUTH_USER_MODEL, verbose_name=_("Créé par"), null=True, blank=True, on_delete=models.SET_NULL
     )
 
     objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
@@ -162,19 +151,13 @@ class Approval(CommonApprovalMixin):
     def clean(self):
         try:
             if self.end_at <= self.start_at:
-                raise ValidationError(
-                    _("La date de fin doit être postérieure à la date de début.")
-                )
+                raise ValidationError(_("La date de fin doit être postérieure à la date de début."))
         except TypeError:
             # This can happen if `end_at` or `start_at` are empty or malformed
             # (e.g. when data comes from a form).
             pass
         already_exists = bool(self.pk)
-        if (
-            not already_exists
-            and hasattr(self, "user")
-            and self.user.approvals.valid().exists()
-        ):
+        if not already_exists and hasattr(self, "user") and self.user.approvals.valid().exists():
             raise ValidationError(
                 _(
                     f"Un agrément dans le futur ou en cours de validité existe déjà "
@@ -188,9 +171,7 @@ class Approval(CommonApprovalMixin):
         """
         Insert spaces to format the number.
         """
-        # pylint: disable=unsubscriptable-object
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-        # pylint: enable=unsubscriptable-object
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -206,9 +187,7 @@ class Approval(CommonApprovalMixin):
         hiring_start_at = hiring_start_at or timezone.now().date()
         year = hiring_start_at.strftime("%Y")
         last_itou_approval = (
-            Approval.objects.filter(
-                number__startswith=Approval.ASP_ITOU_PREFIX, start_at__year=year
-            )
+            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX, start_at__year=year)
             .order_by("created_at")
             .last()
         )
@@ -277,9 +256,7 @@ class PoleEmploiApprovalManager(models.Manager):
         # Save some SQL queries.
         if not user.pole_emploi_id or not user.birthdate:
             return self.none()
-        return self.filter(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate
-        ).order_by("-start_at")
+        return self.filter(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate).order_by("-start_at")
 
 
 class PoleEmploiApproval(CommonApprovalMixin):
@@ -315,9 +292,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     first_name = models.CharField(_("Prénom"), max_length=150)
     last_name = models.CharField(_("Nom"), max_length=150)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150)
-    birthdate = models.DateField(
-        verbose_name=_("Date de naissance"), default=timezone.now
-    )
+    birthdate = models.DateField(verbose_name=_("Date de naissance"), default=timezone.now)
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
@@ -325,11 +300,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
         verbose_name = _("Agrément Pôle emploi")
         verbose_name_plural = _("Agréments Pôle emploi")
         ordering = ["-start_at"]
-        indexes = [
-            models.Index(
-                fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx"
-            )
-        ]
+        indexes = [models.Index(fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx")]
 
     def __str__(self):
         return self.number
@@ -348,12 +319,10 @@ class PoleEmploiApproval(CommonApprovalMixin):
         Insert spaces to format the number as in the Pôle emploi export file
         (number is stored without spaces).
         """
-        # pylint: disable=unsubscriptable-object
         if len(self.number) == 15:
             return f"{self.number[:5]} {self.number[5:7]} {self.number[7:12]} {self.number[12:]}"
         # 12 chars.
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
-        # pylint: enable=unsubscriptable-object
 
 
 class ApprovalsWrapper:

@@ -5,19 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("siaes", "0010_auto_20191028_1143"),
-        ("job_applications", "0011_jobapplication_date_of_hiring"),
-    ]
+    dependencies = [("siaes", "0010_auto_20191028_1143"), ("job_applications", "0011_jobapplication_date_of_hiring")]
 
     operations = [
         migrations.AddField(
             model_name="jobapplication",
             name="selected_jobs",
-            field=models.ManyToManyField(
-                blank=True,
-                to="siaes.SiaeJobDescription",
-                verbose_name="Métiers recherchés",
-            ),
+            field=models.ManyToManyField(blank=True, to="siaes.SiaeJobDescription", verbose_name="Métiers recherchés"),
         )
     ]

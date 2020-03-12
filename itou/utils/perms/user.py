@@ -11,10 +11,7 @@ KIND_JOB_SEEKER = "job_seeker"
 KIND_PRESCRIBER = "prescriber"
 KIND_SIAE_STAFF = "siae_staff"
 
-UserInfo = namedtuple(
-    "UserInfo",
-    ["user", "kind", "prescriber_organization", "is_authorized_prescriber", "siae"],
-)
+UserInfo = namedtuple("UserInfo", ["user", "kind", "prescriber_organization", "is_authorized_prescriber", "siae"])
 
 
 def get_user_info(request):

@@ -2,6 +2,7 @@ import logging
 
 from .base import *  # noqa
 
+
 # `CachedStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 

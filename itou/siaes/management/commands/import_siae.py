@@ -38,12 +38,7 @@ class Command(BaseCommand):
     help = "Import the content of the SIAE csv file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -100,9 +95,7 @@ class Command(BaseCommand):
                 # Max length of `name` is 50 chars in the source file, some are truncated.
                 # Also `name` is in upper case.
                 name = row[8].strip()
-                name = " ".join(
-                    name.split()
-                )  # Replace multiple spaces by a single space.
+                name = " ".join(name.split())  # Replace multiple spaces by a single space.
                 self.logger.debug(name)
 
                 email = row[14].strip()
@@ -111,13 +104,9 @@ class Command(BaseCommand):
 
                 street_num = row[9].strip().replace(" ", "")
                 street_name = row[10].strip().lower()
-                street_name = " ".join(
-                    street_name.split()
-                )  # Replace multiple spaces by a single space.
+                street_name = " ".join(street_name.split())  # Replace multiple spaces by a single space.
                 address_line_1 = f"{street_num} {street_name}"
-                address_line_1 = " ".join(
-                    address_line_1.split()
-                )  # Replace multiple spaces by a single space.
+                address_line_1 = " ".join(address_line_1.split())  # Replace multiple spaces by a single space.
                 address_line_2 = ""
                 if " - " in address_line_1:
                     addresses = address_line_1.split(" - ")
@@ -143,9 +132,7 @@ class Command(BaseCommand):
                     department = department[1:]
                 if department in ["59L", "59V"]:
                     department = "59"
-                if department not in ["2A", "2B"] and not post_code.startswith(
-                    department
-                ):
+                if department not in ["2A", "2B"] and not post_code.startswith(department):
                     # Fix wrong departments using the post code.
                     department = post_code[: len(department)]
                 self.logger.debug(department)
@@ -183,14 +170,10 @@ class Command(BaseCommand):
 
                     if siae.address_on_one_line:
 
-                        geocoding_data = get_geocoding_data(
-                            siae.address_on_one_line, post_code=siae.post_code
-                        )
+                        geocoding_data = get_geocoding_data(siae.address_on_one_line, post_code=siae.post_code)
 
                         if not geocoding_data:
-                            self.stderr.write(
-                                f"No geocoding data found for {siae_info}"
-                            )
+                            self.stderr.write(f"No geocoding data found for {siae_info}")
                             siae.save()
                             continue
 

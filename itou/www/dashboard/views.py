@@ -1,14 +1,14 @@
+from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from allauth.account.views import PasswordChangeView
-
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
@@ -16,7 +16,17 @@ from itou.www.dashboard.forms import EditUserInfoForm
 
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
-    context = {}
+    job_applications_counter = 0
+
+    if request.user.is_siae_staff:
+        pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+        queryset = Siae.active_objects.member_required(request.user)
+        siae = get_object_or_404(queryset, pk=pk)
+        job_applications_counter = siae.job_applications_received.filter(
+            state=JobApplicationWorkflow.STATE_NEW
+        ).count()
+
+    context = {"job_applications_counter": job_applications_counter}
     return render(request, template_name, context)
 
 

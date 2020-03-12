@@ -1,0 +1,48 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Employeur solidaire - Inscription" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+<h1>
+    {% trans "Employeur solidaire" %}
+    <small class="text-muted">{% trans "Inscription" %}</small>
+</h1>
+<div class="alert alert-info" role="info">
+    Pour des raisons de sécurité, merci de compléter les informations suivantes. 
+</div>
+<div class="alert alert-info" role="info">
+    Les inscriptions sont ouvertes exclusivement aux structures du Bas-Rhin (67), Pas-de-Calais (62) et Seine Saint Denis (93), pour le moment.
+</div>
+
+
+<form method="post" action="{% url 'signup:select_siae' %}" role="form">
+
+    {% csrf_token %}
+
+    {% bootstrap_form_errors form %}
+
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+    {% endif %}
+
+    {% bootstrap_field form.kind %}
+    {% bootstrap_field form.siret %}
+    {% bootstrap_field form.email %}
+
+    {% include "signup/includes/submit_rgpd.html" %}
+
+</form>
+
+<p>
+    En cas de problèmes ou pour plus d'informations, veuillez nous contactez à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
+</p>
+
+<hr>
+
+<p>
+    <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
+</p>
+{% endblock %}

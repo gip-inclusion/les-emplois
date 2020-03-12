@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from unittest import mock
 
 from django.conf import settings
@@ -10,15 +11,17 @@ from django.test import RequestFactory, TestCase
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.users.models import User
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.perms.context_processors import get_current_organization_and_perms
-from itou.utils.perms.user import get_user_info
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
 from itou.utils.templatetags import format_filters
+from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_safe_url
 from itou.utils.validators import (
     alphanumeric,
@@ -36,7 +39,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
-        self.assertTrue(user.siaemembership_set.get(siae=siae).is_siae_admin)
+        self.assertTrue(siae.has_admin(user))
 
         factory = RequestFactory()
         request = factory.get("/")
@@ -61,15 +64,15 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         siae1 = SiaeWithMembershipFactory()
         user = siae1.members.first()
-        self.assertTrue(user.siaemembership_set.get(siae=siae1).is_siae_admin)
+        self.assertTrue(siae1.has_admin(user))
 
         siae2 = SiaeFactory()
         siae2.members.add(user)
-        self.assertFalse(user.siaemembership_set.get(siae=siae2).is_siae_admin)
+        self.assertFalse(siae2.has_admin(user))
 
         siae3 = SiaeFactory()
         siae3.members.add(user)
-        self.assertFalse(user.siaemembership_set.get(siae=siae3).is_siae_admin)
+        self.assertFalse(siae3.has_admin(user))
 
         factory = RequestFactory()
         request = factory.get("/")
@@ -94,18 +97,14 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
-        self.assertTrue(
-            user.prescribermembership_set.get(organization=organization).is_admin
-        )
+        self.assertTrue(user.prescribermembership_set.get(organization=organization).is_admin)
 
         factory = RequestFactory()
         request = factory.get("/")
         request.user = user
         middleware = SessionMiddleware()
         middleware.process_request(request)
-        request.session[
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        ] = organization.pk
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization.pk
         request.session.save()
 
         with self.assertNumQueries(1):
@@ -121,10 +120,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
 
 class UtilsAddressMixinTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_set_coords(self, mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.set_coords()`.
@@ -155,10 +151,7 @@ class UtilsAddressMixinTest(TestCase):
         self.assertEqual(prescriber.latitude, expected_latitude)
         self.assertEqual(prescriber.longitude, expected_longitude)
 
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_set_coords_and_address(self, mock_call_ban_geocoding_api):
         """
         Test `AddressMixin.set_coords_and_address()`.
@@ -175,9 +168,7 @@ class UtilsAddressMixinTest(TestCase):
         self.assertEqual(prescriber.latitude, None)
         self.assertEqual(prescriber.longitude, None)
 
-        prescriber.set_coords_and_address(
-            "10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015"
-        )
+        prescriber.set_coords_and_address("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
         prescriber.save()
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
@@ -200,10 +191,7 @@ class UtilsAddressMixinTest(TestCase):
 
 
 class UtilsGeocodingTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.geocoding.call_ban_geocoding_api",
-        return_value=BAN_GEOCODING_API_RESULT_MOCK,
-    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_process_geocoding_data(self, mock_call_ban_geocoding_api):
         geocoding_data = mock_call_ban_geocoding_api()
         result = process_geocoding_data(geocoding_data)
@@ -221,9 +209,7 @@ class UtilsGeocodingTest(TestCase):
 
 
 class UtilsSiretTest(TestCase):
-    @mock.patch(
-        "itou.utils.apis.siret.call_insee_api", return_value=API_INSEE_SIRET_RESULT_MOCK
-    )
+    @mock.patch("itou.utils.apis.siret.call_insee_api", return_value=API_INSEE_SIRET_RESULT_MOCK)
     def test_process_siret_data(self, mock_call_insee_api):
         siret_data = mock_call_insee_api()
         result = process_siret_data(siret_data)
@@ -286,9 +272,7 @@ class UtilsTemplateTagsTestCase(TestCase):
 
         # Relative URL.
         context = {"url": "/siae/search?distance=50&city=metz-57"}
-        template = Template(
-            "{% load url_add_query %}" "{% url_add_query url page=22 %}"
-        )
+        template = Template("{% load url_add_query %}" "{% url_add_query url page=22 %}")
         out = template.render(Context(context))
         expected = "/siae/search?distance=50&amp;city=metz-57&amp;page=22"
         self.assertEqual(out, expected)
@@ -312,16 +296,12 @@ class UtilsEmailsTestCase(TestCase):
     def test_get_safe_url(self):
         """Test `urls.get_safe_url()`."""
 
-        request = RequestFactory().get(
-            "/?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67"
-        )
+        request = RequestFactory().get("/?next=/siae/search%3Fdistance%3D100%26city%3Dstrasbourg-67")
         url = get_safe_url(request, "next")
         expected = "/siae/search?distance=100&city=strasbourg-67"
         self.assertEqual(url, expected)
 
-        request = RequestFactory().post(
-            "/", data={"next": "/siae/search?distance=100&city=strasbourg-67"}
-        )
+        request = RequestFactory().post("/", data={"next": "/siae/search?distance=100&city=strasbourg-67"})
         url = get_safe_url(request, "next")
         expected = "/siae/search?distance=100&city=strasbourg-67"
         self.assertEqual(url, expected)
@@ -368,9 +348,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware()
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        ] = prescriber_organization.pk
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
         request.session.save()
 
         user_info = get_user_info(request)
@@ -381,9 +359,7 @@ class PermsUserTest(TestCase):
         self.assertEqual(user_info.siae, None)
 
     def test_get_user_info_for_authorized_prescriber(self):
-        prescriber_organization = PrescriberOrganizationWithMembershipFactory(
-            is_authorized=True
-        )
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
         user = prescriber_organization.members.first()
 
         factory = RequestFactory()
@@ -392,9 +368,7 @@ class PermsUserTest(TestCase):
         middleware = SessionMiddleware()
         middleware.process_request(request)
         # Simulate ItouCurrentOrganizationMiddleware.
-        request.session[
-            settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-        ] = prescriber_organization.pk
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
         request.session.save()
 
         user_info = get_user_info(request)
@@ -437,3 +411,68 @@ class PermsUserTest(TestCase):
         self.assertEqual(user_info.prescriber_organization, None)
         self.assertEqual(user_info.is_authorized_prescriber, False)
         self.assertEqual(user_info.siae, None)
+
+
+class MockedSiaeSignupTokenGenerator(SiaeSignupTokenGenerator):
+    def __init__(self, now):
+        self._now_val = now
+
+    def _now(self):
+        return self._now_val
+
+
+class SiaeSignupTokenGeneratorTest(TestCase):
+    def test_make_token(self):
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        self.assertIs(p0.check_token(siae, tk1), True)
+
+    def test_10265(self):
+        """
+        The token generated for a siae created in the same request
+        will work correctly.
+        """
+        siae = Siae.objects.create(email="test@example.com")
+        siae_reload = Siae.objects.get(email="test@example.com")
+        p0 = MockedSiaeSignupTokenGenerator(datetime.now())
+        tk1 = p0.make_token(siae)
+        tk2 = p0.make_token(siae_reload)
+        self.assertEqual(tk1, tk2)
+
+    def test_timeout(self):
+        """The token is valid after n seconds, but no greater."""
+        # Uses a mocked version of SiaeSignupTokenGenerator so we can change
+        # the value of 'now'.
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        p1 = MockedSiaeSignupTokenGenerator(datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1)))
+        self.assertIs(p1.check_token(siae, tk1), True)
+        p2 = MockedSiaeSignupTokenGenerator(datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1)))
+        self.assertIs(p2.check_token(siae, tk1), False)
+
+    def test_check_token_with_nonexistent_token_and_user(self):
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        self.assertIs(p0.check_token(None, tk1), False)
+        self.assertIs(p0.check_token(siae, None), False)
+        self.assertIs(p0.check_token(siae, tk1), True)
+
+    def test_any_new_signup_invalidates_past_token(self):
+        """
+        Tokens are based on siae.members.count() so that
+        any new signup invalidates past tokens.
+        """
+        siae = Siae.objects.create()
+        p0 = SiaeSignupTokenGenerator()
+        tk1 = p0.make_token(siae)
+        self.assertIs(p0.check_token(siae, tk1), True)
+        user = User()
+        user.save()
+        membership = SiaeMembership()
+        membership.user = user
+        membership.siae = siae
+        membership.save()
+        self.assertIs(p0.check_token(siae, tk1), False)

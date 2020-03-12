@@ -1,9 +1,8 @@
 from django import forms
 from django.utils.translation import gettext_lazy
 
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.utils.apis.siret import get_siret_data
-from itou.prescribers.models import PrescriberMembership
 
 
 class CreatePrescriberOrganizationForm(forms.ModelForm):
@@ -18,9 +17,7 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
             "siret": gettext_lazy("Le numéro SIRET doit être composé de 14 chiffres."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "description": gettext_lazy("Texte de présentation de votre organisation."),
-            "website": gettext_lazy(
-                "Votre site web doit commencer par http:// ou https://"
-            ),
+            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }
 
     def save(self, user, commit=True):
@@ -31,9 +28,7 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
             siret_data = get_siret_data(self.cleaned_data["siret"])
             # Try to automatically gather information for the given SIRET.
             if siret_data:
-                organization.set_coords_and_address(
-                    siret_data["address"], post_code=siret_data["post_code"]
-                )
+                organization.set_coords_and_address(siret_data["address"], post_code=siret_data["post_code"])
                 organization.siret = siret
 
         if commit:
@@ -63,7 +58,5 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         help_texts = {
             "phone": gettext_lazy("Par exemple 0610203040"),
             "description": gettext_lazy("Texte de présentation de votre structure."),
-            "website": gettext_lazy(
-                "Votre site web doit commencer par http:// ou https://"
-            ),
+            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }

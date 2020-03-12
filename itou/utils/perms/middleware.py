@@ -19,13 +19,9 @@ class ItouCurrentOrganizationMiddleware:
         if user.is_authenticated:
 
             if user.is_siae_staff and user.siae_set.exists():
-                current_siae_pk = request.session.get(
-                    settings.ITOU_SESSION_CURRENT_SIAE_KEY
-                )
+                current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
                 if not user.siae_set.filter(pk=current_siae_pk).exists():
-                    request.session[
-                        settings.ITOU_SESSION_CURRENT_SIAE_KEY
-                    ] = user.siae_set.first().pk
+                    request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = user.siae_set.first().pk
 
             elif user.is_prescriber and user.prescriberorganization_set.exists():
                 request.session[

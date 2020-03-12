@@ -27,12 +27,7 @@ class Command(BaseCommand):
     help = "Import the content of the ROMEs appellations JSON file into the database."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "--dry-run",
-            dest="dry_run",
-            action="store_true",
-            help="Only print data to import",
-        )
+        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -86,9 +81,7 @@ class Command(BaseCommand):
                     self.logger.debug(name)
 
                     if not dry_run:
-                        Appellation.objects.update_or_create(
-                            code=code, defaults={"name": name, "rome": rome}
-                        )
+                        Appellation.objects.update_or_create(code=code, defaults={"name": name, "rome": rome})
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")

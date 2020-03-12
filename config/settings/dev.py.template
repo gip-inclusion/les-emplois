@@ -1,6 +1,6 @@
 from .base import *  # noqa
 
-DEBUG = os.environ.get("DJANGO_DEBUG", True)
+DEBUG = os.environ.get("DJANGO_DEBUG", True)  # noqa: F405
 
 ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "192.168.0.1"]
 

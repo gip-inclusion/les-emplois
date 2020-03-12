@@ -1,7 +1,7 @@
 # Global tasks.
 # =============================================================================
 
-.PHONY: run black clean cdsitepackages pylint check_code_quality
+.PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook
 
 # Run a local server.
 run:
@@ -13,13 +13,20 @@ clean:
 cdsitepackages:
 	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/bash
 
-black:
-	docker exec -ti itou_django black itou/
+quality:
+	docker exec -ti itou_django black --check --line-length 119 itou
+	docker exec -ti itou_django isort --check-only --recursive itou
+	docker exec -ti itou_django flake8 itou
 
-pylint:
-	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou';
+style:
+	docker exec -ti itou_django black --line-length 119 itou
+	docker exec -ti itou_django isort --recursive itou
 
-check_code_quality: black pylint
+setup_git_pre_commit_hook:
+	touch .git/hooks/pre-commit
+	chmod +x .git/hooks/pre-commit
+	echo "docker exec -t itou_django black --line-length 119 itou" >> .git/hooks/pre-commit
+	echo "docker exec -t itou_django isort --recursive itou" > .git/hooks/pre-commit
 
 prepare_cc_secrets:
 	# Merge secrets

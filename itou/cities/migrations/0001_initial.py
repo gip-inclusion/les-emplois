@@ -16,25 +16,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="City",
             fields=[
-                (
-                    "id",
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "name",
-                    models.CharField(
-                        db_index=True, max_length=255, verbose_name="Ville"
-                    ),
-                ),
-                (
-                    "slug",
-                    models.SlugField(max_length=255, unique=True, verbose_name="Slug"),
-                ),
+                ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                ("name", models.CharField(db_index=True, max_length=255, verbose_name="Ville")),
+                ("slug", models.SlugField(max_length=255, unique=True, verbose_name="Slug")),
                 (
                     "department",
                     models.CharField(
@@ -155,36 +139,21 @@ class Migration(migrations.Migration):
                 (
                     "post_codes",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=models.CharField(max_length=5),
-                        blank=True,
-                        size=None,
-                        verbose_name="Codes postaux",
+                        base_field=models.CharField(max_length=5), blank=True, size=None, verbose_name="Codes postaux"
                     ),
                 ),
-                (
-                    "code_insee",
-                    models.CharField(
-                        max_length=5, unique=True, verbose_name="Code INSEE"
-                    ),
-                ),
+                ("code_insee", models.CharField(max_length=5, unique=True, verbose_name="Code INSEE")),
                 (
                     "coords",
-                    django.contrib.gis.db.models.fields.PointField(
-                        blank=True, geography=True, null=True, srid=4326
-                    ),
+                    django.contrib.gis.db.models.fields.PointField(blank=True, geography=True, null=True, srid=4326),
                 ),
             ],
-            options={
-                "verbose_name": "Ville française",
-                "verbose_name_plural": "Villes françaises",
-            },
+            options={"verbose_name": "Ville française", "verbose_name_plural": "Villes françaises"},
         ),
         migrations.AddIndex(
             model_name="city",
             index=django.contrib.postgres.indexes.GinIndex(
-                fields=["name"],
-                name="cities_city_name_gin_trgm",
-                opclasses=["gin_trgm_ops"],
+                fields=["name"], name="cities_city_name_gin_trgm", opclasses=["gin_trgm_ops"]
             ),
         ),
     ]

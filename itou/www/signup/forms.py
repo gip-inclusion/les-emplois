@@ -1,14 +1,19 @@
+from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
-from allauth.account.forms import SignupForm
-
-from itou.prescribers.models import PrescriberOrganization, PrescriberMembership
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
+from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
+
+
+BLANK_CHOICE = (("", "---------"),)
 
 
 class FullnameFormMixin(forms.Form):
@@ -39,12 +44,8 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
     )
 
     authorized_organization = forms.ModelChoiceField(
-        label=gettext_lazy(
-            "Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"
-        ),
-        queryset=PrescriberOrganization.active_objects.filter(
-            is_authorized=True
-        ).order_by("name"),
+        label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
+        queryset=PrescriberOrganization.active_objects.filter(is_authorized=True).order_by("name"),
         required=False,
         help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
     )
@@ -61,9 +62,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         if secret_code:
             secret_code = secret_code.upper()
             try:
-                self.organization = PrescriberOrganization.objects.get(
-                    secret_code=secret_code
-                )
+                self.organization = PrescriberOrganization.objects.get(secret_code=secret_code)
             except PrescriberOrganization.DoesNotExist:
                 error = _("Ce code n'est pas valide.")
                 raise forms.ValidationError(error)
@@ -91,52 +90,176 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         return user
 
 
+class SelectSiaeForm(forms.Form):
+    """
+    First of two forms of siae signup process.
+    This first form allows the user to select which siae will be joined.
+    """
+
+    kind = forms.ChoiceField(
+        label=gettext_lazy("Type de structure"), choices=BLANK_CHOICE + Siae.KIND_CHOICES, required=True
+    )
+
+    siret = forms.CharField(
+        label=gettext_lazy("Numéro de SIRET"),
+        min_length=14,
+        max_length=14,
+        validators=[validate_siret],
+        strip=True,
+        help_text=gettext_lazy(
+            "Saisissez 14 chiffres. Numéro connu possiblement de l'Agence de services et de paiement (ASP)"
+        ),
+        required=False,
+    )
+
+    email = forms.EmailField(
+        label=gettext_lazy("E-mail"),
+        help_text=gettext_lazy(
+            "Pour les SIAE, adresse e-mail connue possiblement de l'Agence de services et de paiement (ASP)"
+        ),
+        required=False,
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        kind = cleaned_data.get("kind")
+        siret = cleaned_data.get("siret")
+        email = cleaned_data.get("email")
+
+        if not (siret or email):
+            error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
+            raise forms.ValidationError(mark_safe(error_message))
+
+        siaes = Siae.active_objects.filter(kind=kind)
+        if siret and email:
+            # We match siaes having any of the two correct fields.
+            siaes = siaes.filter(Q(siret=siret) | Q(auth_email=email))
+        elif email:
+            siaes = siaes.filter(auth_email=email)
+        else:
+            siaes = siaes.filter(siret=siret)
+        # Hit the database only once.
+        siaes = list(siaes)
+
+        siaes_matching_siret = [s for s in siaes if s.siret == siret]
+        # There can be at most one siret match due to (kind, siret) unicity.
+        siret_exists = len(siaes_matching_siret) == 1
+
+        if siret_exists:
+            self.selected_siae = siaes_matching_siret[0]
+        else:
+            siaes_matching_email = [s for s in siaes if s.auth_email == email]
+            email_exists = len(siaes_matching_email) > 0
+            several_siaes_share_same_email = len(siaes_matching_email) > 1
+
+            if several_siaes_share_same_email:
+                error_message = _(
+                    "Votre e-mail est partagé par plusieurs structures "
+                    "et votre numéro de SIRET nous est inconnu.<br>"
+                    "Merci de vous rapprocher de votre service gestion "
+                    "afin d'obtenir votre numéro de SIRET."
+                )
+                raise forms.ValidationError(mark_safe(error_message))
+
+            if not email_exists:
+                error_message = _(
+                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus.<br>"
+                    f"Merci de vérifier votre saisie ou veuillez nous contacter "
+                    f"à l'adresse suivante : {settings.ITOU_EMAIL_CONTACT}"
+                )
+                raise forms.ValidationError(mark_safe(error_message))
+
+            self.selected_siae = siaes_matching_email[0]
+
+
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
+    """
+    Second of two forms of siae signup process.
+    This is the final form where the signup actually happens
+    on the siae identified by the first form.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(SiaeSignupForm, self).__init__(*args, **kwargs)
+        self.fields["kind"].widget.attrs["readonly"] = True
+        self.fields["siret"].widget.attrs["readonly"] = True
+        self.fields["siae_name"].widget.attrs["readonly"] = True
+
+    kind = forms.CharField(
+        label=gettext_lazy("Type de votre structure"),
+        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
+        required=True,
+    )
 
     siret = forms.CharField(
         label=gettext_lazy("Numéro SIRET de votre structure"),
-        max_length=14,
-        validators=[validate_siret],
+        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
         required=True,
-        strip=True,
-        help_text=gettext_lazy("Saisissez 14 chiffres."),
     )
 
-    def clean_siret(self):
-        siret = self.cleaned_data["siret"]
+    siae_name = forms.CharField(
+        label=gettext_lazy("Nom de votre structure"),
+        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
+        required=True,
+    )
 
-        siret_exists_in_db = Siae.active_objects.filter(siret=siret).exists()
-        if siret_exists_in_db:
-            return siret
+    encoded_siae_id = forms.CharField(widget=forms.HiddenInput())
 
-        error = _(
-            "Ce SIRET ne figure pas dans notre base de données ou ne fait pas partie des "
-            "territoires d'expérimentation (Pas-de-Calais, Bas-Rhin et Seine Saint Denis).<br>"
-            "Contactez-nous si vous rencontrez des problèmes pour vous inscrire : "
-            f'<a href="mailto:{settings.ITOU_EMAIL_CONTACT}">{settings.ITOU_EMAIL_CONTACT}</a>'
-        )
-        raise forms.ValidationError(mark_safe(error))
+    token = forms.CharField(widget=forms.HiddenInput())
 
     def save(self, request):
-
         user = super().save(request)
 
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
+        if self.check_siae_signup_credentials():
+            siae = self.get_siae()
+        else:
+            raise RuntimeError("This should never happen. Attack attempted.")
+
+        if siae.has_members:
+            siae.new_signup_warning_email_to_admins(user).send()
+
         user.is_siae_staff = True
         user.save()
 
-        siaes = Siae.active_objects.filter(siret=self.cleaned_data["siret"])
-
-        for siae in siaes:
-            membership = SiaeMembership()
-            membership.user = user
-            membership.siae = siae
-            # The first member becomes an admin.
-            membership.is_siae_admin = siae.members.count() == 0
-            membership.save()
+        membership = SiaeMembership()
+        membership.user = user
+        membership.siae = siae
+        # Only the first member becomes an admin.
+        membership.is_siae_admin = siae.active_members.count() == 0
+        membership.save()
 
         return user
+
+    def get_encoded_siae_id(self):
+        if "encoded_siae_id" in self.initial:
+            return self.initial["encoded_siae_id"]
+        return self.data["encoded_siae_id"]
+
+    def get_token(self):
+        if "token" in self.initial:
+            return self.initial["token"]
+        return self.data["token"]
+
+    def get_siae(self):
+        if not self.get_encoded_siae_id():
+            return None
+        siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
+        siae = Siae.objects.get(pk=siae_id)
+        return siae
+
+    def check_siae_signup_credentials(self):
+        siae = self.get_siae()
+        return siae_signup_token_generator.check_token(siae=siae, token=self.get_token())
+
+    def get_initial(self):
+        siae = self.get_siae()
+        return {
+            "encoded_siae_id": self.get_encoded_siae_id(),
+            "token": self.get_token(),
+            "siret": siae.siret,
+            "kind": siae.kind,
+            "siae_name": siae.display_name,
+        }
 
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):

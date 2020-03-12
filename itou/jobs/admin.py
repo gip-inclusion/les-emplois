@@ -8,7 +8,7 @@ class AppellationsInline(admin.TabularInline):
     readonly_fields = ("code", "name")
     can_delete = False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
 
 

@@ -8,7 +8,7 @@ Unidecode==1.1.1  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
-django==2.2.10  # pyup: < 3.0  # https://www.djangoproject.com/
+django==3.0.4  # pyup: < 4.0  # https://www.djangoproject.com/
 
 # Django REST Framework
 djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
@@ -23,7 +23,7 @@ django-anymail==7.0  # https://github.com/anymail/django-anymail
 api-insee==1.0.1  # https://github.com/sne3ks/api_insee
 
 # Django-XWorkflows
-django-xworkflows==0.12.3  # https://github.com/rbarrois/django_xworkflows
+django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 
 # Allow basic math (e.g. A/B) in templates
 django-mathfilters==1.0.0  # https://github.com/dbrgn/django-mathfilters
@@ -40,3 +40,10 @@ django-bootstrap-datepicker-plus==3.0.5 # https://github.com/monim67/django-boot
 
 # Enhance select fields in forms with jQuery Select plugin
 django_select2==7.2.0
+
+
+# Third-party applications
+# ------------------------------------------------------------------------------
+
+# Turn HTML files into PDF
+pdfshift==1.0.4   # https://github.com/pdfshift/pdfshift-python

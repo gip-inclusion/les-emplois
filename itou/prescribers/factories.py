@@ -13,10 +13,10 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PrescriberOrganization
 
-    name = factory.Sequence(lambda n: f"prescriber{n}")
+    name = factory.Faker("name", locale="fr_FR")
     siret = factory.fuzzy.FuzzyText(length=14, chars=string.digits)
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    email = factory.LazyAttribute(lambda obj: f"{obj.name}@example.com")
+    email = factory.Faker("email", locale="fr_FR")
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
@@ -46,9 +46,7 @@ class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory)
     membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
 
 
-class AuthorizedPrescriberOrganizationWithMembershipFactory(
-    PrescriberOrganizationWithMembershipFactory
-):
+class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizationWithMembershipFactory):
     """
     Returns a PrescriberOrganization() object with a related authorized PrescriberMembership() object.
 

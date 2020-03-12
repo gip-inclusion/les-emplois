@@ -7,9 +7,7 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
 
 
-TEST_DEPARTMENTS = [("", "---")] + [
-    (d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS
-]
+TEST_DEPARTMENTS = [("", "---")] + [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
 
 TEST_DEPARTMENTS_HELP_TEXT = gettext_lazy(
     (
@@ -53,9 +51,7 @@ class CreateSiaeForm(forms.ModelForm):
             "description",
         ]
         help_texts = {
-            "brand": gettext_lazy(
-                "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
-            ),
+            "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
             "department": TEST_DEPARTMENTS_HELP_TEXT,
             "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
@@ -63,9 +59,7 @@ class CreateSiaeForm(forms.ModelForm):
                 "Saisissez 14 chiffres. "
                 "Doit être le SIRET de votre structure actuelle ou un SIRET avec le même SIREN."
             ),
-            "website": gettext_lazy(
-                "Votre site web doit commencer par http:// ou https://"
-            ),
+            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }
         error_messages = {
             NON_FIELD_ERRORS: {
@@ -77,9 +71,7 @@ class CreateSiaeForm(forms.ModelForm):
     def clean_siret(self):
         siret = self.cleaned_data["siret"]
         if not siret.startswith(self.current_siae.siren):
-            raise forms.ValidationError(
-                _(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}")
-            )
+            raise forms.ValidationError(_(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}"))
         return siret
 
     def save(self, request, commit=True):
@@ -125,15 +117,11 @@ class EditSiaeForm(forms.ModelForm):
             "department",
         ]
         help_texts = {
-            "brand": gettext_lazy(
-                "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."
-            ),
+            "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
             "department": TEST_DEPARTMENTS_HELP_TEXT,
             "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
-            "website": gettext_lazy(
-                "Votre site web doit commencer par http:// ou https://"
-            ),
+            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }
 
     def save(self, commit=True):

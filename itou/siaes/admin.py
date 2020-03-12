@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.db.models import Count
 from django.utils.translation import gettext as _
 
@@ -35,15 +35,7 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "siret",
-        "kind",
-        "name",
-        "department",
-        "geocoding_score",
-        "member_count",
-    )
+    list_display = ("id", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "source", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = ("created_by", "created_at", "updated_at")
@@ -59,6 +51,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "brand",
                     "phone",
                     "email",
+                    "auth_email",
                     "website",
                     "description",
                     "source",
@@ -106,17 +99,14 @@ class SiaeAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         if not obj.geocoding_score:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+        if not obj.auth_email:
+            messages.warning(
+                request, "Cette structure n'ayant pas d'email d'authentification il est impossible de s'y inscrire."
+            )
         super().save_model(request, obj, form, change)
 
 
 @admin.register(models.SiaeJobDescription)
 class SiaeJobDescription(admin.ModelAdmin):
-    list_display = (
-        "appellation",
-        "siae",
-        "created_at",
-        "updated_at",
-        "is_active",
-        "custom_name",
-    )
+    list_display = ("appellation", "siae", "created_at", "updated_at", "is_active", "custom_name")
     raw_id_fields = ("appellation", "siae")

@@ -3,7 +3,6 @@ import os
 import time
 
 import requests
-
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -40,9 +39,7 @@ class Command(BaseCommand):
 
                 progress = int((100 * i) / total_len)
                 if progress > last_progress + 5:
-                    self.stdout.write(
-                        f"Creating appellations for ROME codes… {progress}%"
-                    )
+                    self.stdout.write(f"Creating appellations for ROME codes… {progress}%")
                     last_progress = progress
 
                 rome_code = item["code"]
