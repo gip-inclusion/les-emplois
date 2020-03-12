@@ -1,0 +1,112 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Review apps
+
+on:
+  pull_request:
+    branches: [ master ]
+
+env:
+  CLEVER_DIR: clever-tools-latest_linux
+  CLEVER_CLI: clever-tools-latest_linux/clever
+  ORGANIZATION_NAME: Miimosa
+  REVIEW_APP_NAME: itou-celinems-${{ github.head_ref }}
+  BRANCH: ${{ github.head_ref }}
+  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  SECRETS_FILE: ${{ secrets.SECRETS_FILE }}
+
+
+jobs:
+  # IMPROVEMENT:
+  # https://github.com/actions/upload-artifact
+  # https://github.com/actions/download-artifact
+
+  # download-cc-binaries:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - run: mkdir -p clever_cloud_binaries
+
+  #     - name: Download CC binaries
+  #       run: |
+  #         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+  #         tar -xvf $CLEVER_DIR.tar.gz
+
+  #     - uses: actions/upload-artifact@v1
+  #       with:
+  #         name: clever_cloud_binaries
+  #         path: clever_cloud_binaries
+
+  delete-review-app:
+    # needs: download-cc-binaries
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # - uses: actions/download-artifact@v1
+    #   with:
+    #     name: $CLEVER_DIR
+
+    - name: Connect to Clever Cloud
+      run: |
+        curl https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+
+    - name: Delete review app
+      run: |
+        curl https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI delete --yes
+
+
+
+  create-review-app:
+    runs-on: ubuntu-latest
+    needs: delete-review-app
+    if: always()
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
+
+    - run: git fetch --prune --unshallow
+
+    # USE THIS INSTEAD: https://github.com/marketplace/actions/deploy-to-clever-cloud
+    - name: Create review app
+      run: |
+        curl https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > clever-tools-latest_linux.tar.gz
+        tar -xvf clever-tools-latest_linux.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
+        $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
+        # replace by clever env import-vars FOO,BAR,BAZ
+        echo $SECRETS_FILE | base64 -d | $CLEVER_CLI published-config import --alias $REVIEW_APP_NAME
+
+        # Try This
+        # echo $SECRETS_FILE | base64 -d > cc.env
+        # source cc.env
+        # clever env import-vars
+
+        # export DEPLOY_URL=$(cat .clever.json | grep -Po '(?<="deploy_url":)(.*?)(?=,)' | tr -d '"')
+        # echo "DEPLOY_URL"
+        # echo $DEPLOY_URL
+        # git remote add clever $DEPLOY_URL
+        # git push clever travis:master
+        $CLEVER_CLI deploy --branch $BRANCH --force --verbose
+
+
+    # - name: Comment PR
+    #   uses: thollander/actions-comment-pull-request@master
+    #   with:
+    #     message: 'Example of message !'
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

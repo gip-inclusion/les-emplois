@@ -4,7 +4,7 @@
 .PHONY: run black clean cdsitepackages pylint check_code_quality
 
 # Run a local server.
-run: 
+run:
 	docker-compose -f docker-compose-dev.yml up
 
 clean:
@@ -20,6 +20,13 @@ pylint:
 	docker exec -ti itou_django pylint --rcfile='.pylintrc' --reports=no --output-format=colorized 'itou';
 
 check_code_quality: black pylint
+
+prepare_cc_secrets:
+	# Merge secrets
+	cat envs/dev.env > envs/cc.env
+	cat envs/secrets.env > envs/cc.env
+	# Convert into Base64 files
+	base64 envs/cc.env  | tr -d \\n > envs/base64/cc.env
 
 # Django.
 # =============================================================================
