@@ -104,7 +104,7 @@ jobs:
         $CLEVER_CLI deploy --branch $BRANCH --force --verbose
 
 
-    # - name: Comment PR
+    # - name: Comment PR ss
     #   uses: thollander/actions-comment-pull-request@master
     #   with:
     #     message: 'Example of message !'
