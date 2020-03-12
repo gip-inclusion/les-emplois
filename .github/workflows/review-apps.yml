@@ -149,4 +149,4 @@ jobs:
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         branch-regex: '${{ env.BRANCH }}'
-        body-template: '[Environnement de test : ](${{ env.REVIEW_APP_NAME }}.cleverapps.io)'
+        body-template: '[👉 Environnement de test 👈](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)'
