@@ -1,0 +1,22 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% load i18n %}
+{% block body %}
+
+{% trans "Un nouvel utilisateur vient de rejoindre votre organisation sur la plateforme de l'inclusion! Si vous ne connaissez pas cette personne veuillez nous contacter par email :" %} {{ itou_email_contact }}
+
+{% trans "*Nouvel utilisateur* :" %}
+
+- {% trans "Nom" %} : {{ new_user.last_name }}
+- {% trans "Prénom" %} : {{ new_user.first_name }}
+- {% trans "Email" %} : {{ new_user.email }}
+
+{% trans "*Structure* :" %}
+
+- {% trans "Nom" %} : {{ organization.display_name }}
+- {% trans "SIRET" %} : {{ organization.siret }}
+- {% trans "Type" %} : {{ organization.kind }}
+
+{% trans "Vous recevez cet email en tant que propriétaire d'un compte associé à l'organisation ci-dessus." %}
+
+{% endblock body %}

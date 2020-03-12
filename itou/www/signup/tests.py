@@ -562,8 +562,8 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
-    def test_prescriber_signup_without_code(self):
-        """Prescriber signup without code."""
+    def test_prescriber_signup_without_code_nor_organization(self):
+        """Prescriber signup without code nor organization."""
 
         url = reverse("signup:prescriber")
         response = self.client.get(url)
@@ -585,11 +585,16 @@ class PrescriberSignupTest(TestCase):
         self.assertFalse(user.is_siae_staff)
 
         self.assertEqual(0, user.prescriberorganization_set.count())
+        self.assertEqual(len(mail.outbox), 0)
 
-    def test_prescriber_signup_with_code(self):
-        """Prescriber signup with a code to join an organization."""
+    def test_prescriber_signup_with_code_to_unauthorized_organization(self):
+        """
+        Prescriber signup with a code to join an unauthorized organization.
+        Organization has a pre-existing admin user who is notified of the signup.
+        """
 
         organization = PrescriberOrganizationWithMembershipFactory()
+        existing_user = organization.members.get()
 
         url = reverse("signup:prescriber")
         response = self.client.get(url)
@@ -606,22 +611,39 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        new_user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(new_user.is_job_seeker)
+        self.assertTrue(new_user.is_prescriber)
+        self.assertFalse(new_user.is_siae_staff)
 
-        self.assertIn(user, organization.members.all())
+        self.assertIn(new_user, organization.members.all())
         self.assertEqual(2, organization.members.count())
 
-        self.assertIn(organization, user.prescriberorganization_set.all())
-        self.assertEqual(1, user.prescriberorganization_set.count())
+        self.assertIn(organization, new_user.prescriberorganization_set.all())
+        self.assertEqual(1, new_user.prescriberorganization_set.count())
 
-        membership = user.prescribermembership_set.get(organization=organization)
+        membership = new_user.prescribermembership_set.get(organization=organization)
         self.assertFalse(membership.is_admin)
 
-    def test_prescriber_signup_join_authorized_organization(self):
-        """Prescriber signup who joins an authorized_organization."""
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email.subject)
+        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
+        self.assertIn(new_user.first_name, email.body)
+        self.assertIn(new_user.last_name, email.body)
+        self.assertIn(new_user.email, email.body)
+        self.assertIn(organization.display_name, email.body)
+        self.assertIn(organization.siret, email.body)
+        self.assertIn(organization.kind, email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], existing_user.email)
+
+    def test_two_prescribers_signup_without_code_to_authorized_organization(self):
+        """
+        Two prescribers signup to join an authorized organization.
+        First one becomes admin and is notified when second one signs up.
+        """
 
         authorized_organization = PrescriberOrganizationFactory(is_authorized=True, department="62")
 
@@ -640,17 +662,62 @@ class PrescriberSignupTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        first_user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(first_user.is_job_seeker)
+        self.assertTrue(first_user.is_prescriber)
+        self.assertFalse(first_user.is_siae_staff)
 
-        self.assertIn(user, authorized_organization.members.all())
+        self.assertIn(first_user, authorized_organization.members.all())
         self.assertEqual(1, authorized_organization.members.count())
-        self.assertEqual(1, user.prescriberorganization_set.count())
+        self.assertEqual(1, first_user.prescriberorganization_set.count())
 
-        membership = user.prescribermembership_set.get(organization=authorized_organization)
+        membership = first_user.prescribermembership_set.get(organization=authorized_organization)
         self.assertTrue(membership.is_admin)
+
+        self.assertEqual(len(mail.outbox), 0)
+
+        self.client.logout()
+
+        url = reverse("signup:prescriber")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "Jane",
+            "last_name": "Doe",
+            "email": "jane.doe@prescriber.com",
+            "password1": "!*p4ssw0rd123-",
+            "password2": "!*p4ssw0rd123-",
+            "authorized_organization": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        second_user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(second_user.is_job_seeker)
+        self.assertTrue(second_user.is_prescriber)
+        self.assertFalse(second_user.is_siae_staff)
+
+        self.assertIn(second_user, authorized_organization.members.all())
+        self.assertEqual(2, authorized_organization.members.count())
+        self.assertEqual(1, second_user.prescriberorganization_set.count())
+
+        membership = second_user.prescribermembership_set.get(organization=authorized_organization)
+        self.assertFalse(membership.is_admin)
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email.subject)
+        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
+        self.assertIn(second_user.first_name, email.body)
+        self.assertIn(second_user.last_name, email.body)
+        self.assertIn(second_user.email, email.body)
+        self.assertIn(authorized_organization.display_name, email.body)
+        self.assertIn(authorized_organization.siret, email.body)
+        self.assertIn(authorized_organization.kind, email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], first_user.email)
 
 
 class PasswordResetTest(TestCase):
