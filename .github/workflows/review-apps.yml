@@ -2,7 +2,7 @@
 name: Review apps
 
 on:
-  push
+  push:
   pull_request:
     branches: [ master ]
     types: [ labeled, edited, synchronize ]
