@@ -1,6 +1,8 @@
 
 name: Review apps
 
+# Run this pipeline when a label is added and
+# when a push is made on this PR.
 on:
   pull_request:
     branches: [ master ]
@@ -125,5 +127,5 @@ jobs:
     - uses: tzkhan/pr-update-action@v1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        branch-regex: ''
+        branch-regex: '${{ env.BRANCH }}'
         body-template: '[👉  Environnement de test  👈](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)'
