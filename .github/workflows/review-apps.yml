@@ -18,7 +18,6 @@ env:
 
 
 jobs:
-  if: contains( github.event.pull_request.labels.*.name, 'review-app')
   # IMPROVEMENT:
   # https://github.com/actions/upload-artifact
   # https://github.com/actions/download-artifact
@@ -44,6 +43,7 @@ jobs:
   delete-review-app:
     # needs: download-cc-binaries
     runs-on: ubuntu-latest
+    if: contains( github.event.pull_request.labels.*.name, 'review-app')
 
     steps:
     - uses: actions/checkout@v2
@@ -65,7 +65,7 @@ jobs:
   create-review-app:
     runs-on: ubuntu-latest
     needs: delete-review-app
-    if: always()
+    if: contains( github.event.pull_request.labels.*.name, 'review-app')
 
     steps:
     - uses: actions/checkout@v2
