@@ -217,6 +217,7 @@ def get_prescriber_stats(
     data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
 
     data["orgs_by_dpt"] = inject_table_data_from_series(data["orgs_by_dpt"])
+    data["orgs_by_kind"] = inject_table_data_from_series(data["orgs_by_kind"])
 
     data["prescriber_users_per_creation_week"] = get_total_per_week(
         nationwide_prescriber_users, date_field="date_joined", total_expression=Count("pk")
@@ -286,8 +287,19 @@ def inject_siaes_subset_total_by_dpt(data, kpi_name, siaes_subset):
 
 
 def inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset):
+    data["orgs_by_kind"] = inject_orgs_subset_total_by_kind(data["orgs_by_kind"], kpi_name, orgs_subset)
     data["orgs_by_dpt"] = inject_orgs_subset_total_by_dpt(data["orgs_by_dpt"], kpi_name, orgs_subset)
-    # TODO stats by kind as soon as we have a proper PrescriberOrganization.kind field!
+    return data
+
+
+def inject_orgs_subset_total_by_kind(data, kpi_name, orgs_subset):
+    data = _inject_subset_total_by_category(
+        data=data,
+        kpi_name=kpi_name,
+        items_subset=orgs_subset,
+        category_choices=PrescriberOrganization.Kind.choices,
+        category_field="kind",
+    )
     return data
 
 
@@ -353,8 +365,11 @@ def inject_table_data_from_series(data):
         if category[1].endswith(f"({category[0]})"):
             # Department choices already have department number as a suffix.
             category_name = category[1]
+        elif category[1].startswith(f"{category[0]}"):
+            # Some (but not all) organization choices have their acronym as a prefix.
+            category_name = category[1]
         else:
-            # Siae kind choices do not.
+            # Siae kind choices do not have any redundant prefix nor suffix.
             category_name = f"{category[1]} ({category[0]})"
         row = [category_name]
         for index_serie, serie in enumerate(data["series"]):
