@@ -204,6 +204,9 @@
         {% include "stats/includes/table.html" with data=data.orgs_by_dpt %}
     {% endif %}
 
+    <h3>{% trans "Répartition des indicateurs prescripteurs par type d'organisation" %}</h3>
+    {% include "stats/includes/table.html" with data=data.orgs_by_kind %}
+
     {% if data.prescriber_users_per_creation_week %}
         {% trans "Inscriptions de nouveaux prescripteurs" as chart_title %}
         <h3>{{ chart_title }}</h3>
