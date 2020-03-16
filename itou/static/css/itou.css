@@ -229,6 +229,7 @@ section.home-search .bg-image {
 
 /* Missing Boostrap utilities
 --------------------------------------------------------------------------- */
+
 @media (min-width: 768px) {
     .fixed-sm-bottom {
         position: fixed !important;
@@ -278,4 +279,17 @@ a.disabled button:hover, button.disabled:hover {
     background-color: transparent;
     color: inherit;
     border-color: inherit;
+}
+
+/* Old browsers.
+--------------------------------------------------------------------------- */
+
+.alert-old-browser {
+    display: none;
+}
+
+/* Target only IE 11. */
+/* https://stackoverflow.com/a/27315792 */
+_:-ms-fullscreen, :root .alert-old-browser {
+    display: block;
 }

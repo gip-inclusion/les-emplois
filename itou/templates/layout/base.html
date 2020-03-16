@@ -119,7 +119,14 @@
         <div class="layout-section layout-section-white">
             <div class="layout-messages">
                 {% block messages %}
+
                     {% bootstrap_messages %}
+
+                    {# Display an alert for old browsers #}
+                    <div class="alert alert-secondary alert-old-browser" role="alert">
+                        {% trans "La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site." %}
+                    </div>
+
                 {% endblock %}
             </div>
         </div>
