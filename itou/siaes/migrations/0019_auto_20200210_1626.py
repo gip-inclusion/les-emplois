@@ -55,7 +55,7 @@ def get_siret_kind_to_email_map():
     return siret_kind_to_email_map
 
 
-SIRET_KIND_TO_EMAIL_MAP = get_siret_kind_to_email_map()
+# SIRET_KIND_TO_EMAIL_MAP = get_siret_kind_to_email_map()
 
 
 def populate_siae_auth_email(apps, schema_editor):
@@ -78,4 +78,6 @@ class Migration(migrations.Migration):
 
     dependencies = [("siaes", "0018_siae_external_id")]
 
-    operations = [migrations.RunPython(populate_siae_auth_email, migrations.RunPython.noop)]
+    # Forward migration was deactivated on purpose following
+    # the deletion of CSV files whith sensitive data.
+    operations = [migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]

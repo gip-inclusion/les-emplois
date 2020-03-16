@@ -44,7 +44,7 @@ def get_siret_kind_to_data_map():
     return siret_kind_to_data_map
 
 
-SIRET_KIND_TO_DATA_MAP = get_siret_kind_to_data_map()
+# SIRET_KIND_TO_DATA_MAP = get_siret_kind_to_data_map()
 
 
 def populate_siae_external_id_and_update_auth_email(apps, schema_editor):
@@ -79,4 +79,6 @@ class Migration(migrations.Migration):
 
     dependencies = [("siaes", "0019_auto_20200210_1626")]
 
-    operations = [migrations.RunPython(populate_siae_external_id_and_update_auth_email, migrations.RunPython.noop)]
+    # Forward migration was deactivated on purpose following
+    # the deletion of CSV files whith sensitive data.
+    operations = [migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]
