@@ -231,7 +231,7 @@ class Approval(CommonApprovalMixin):
 class PoleEmploiApprovalManager(models.Manager):
     def find_for(self, user):
         """
-        Find an existing valid Pôle emploi's approval for the given user.
+        Find existing Pôle emploi's approvals for the given user.
 
         We were told to check on `first_name` + `last_name` + `birthdate`
         but it's far from ideal:
