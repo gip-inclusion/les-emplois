@@ -79,10 +79,13 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 
         # Join organization.
         authorized_organization = self.cleaned_data["authorized_organization"]
-        if authorized_organization or self.organization:
+        organization = self.organization or authorized_organization
+        if organization:
+            if organization.has_members:
+                organization.new_signup_warning_email_to_existing_members(user).send()
             membership = PrescriberMembership()
             membership.user = user
-            membership.organization = self.organization or authorized_organization
+            membership.organization = organization
             # The first member becomes an admin.
             membership.is_admin = membership.organization.members.count() == 0
             membership.save()
@@ -216,7 +219,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
             raise RuntimeError("This should never happen. Attack attempted.")
 
         if siae.has_members:
-            siae.new_signup_warning_email_to_admins(user).send()
+            siae.new_signup_warning_email_to_existing_members(user).send()
 
         user.is_siae_staff = True
         user.save()

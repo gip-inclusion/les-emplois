@@ -2,6 +2,7 @@ import string
 
 import factory
 import factory.fuzzy
+from django.conf import settings
 
 from itou.prescribers import models
 from itou.users.factories import PrescriberFactory
@@ -14,9 +15,11 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
         model = models.PrescriberOrganization
 
     name = factory.Faker("name", locale="fr_FR")
-    siret = factory.fuzzy.FuzzyText(length=14, chars=string.digits)
+    # Don't start a SIRET with 0.
+    siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
+    kind = models.PrescriberOrganization.Kind.PE
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):

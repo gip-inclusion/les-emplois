@@ -144,7 +144,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def has_members(self):
-        return self.members.filter(siaemembership__user__is_active=True).exists()
+        return self.active_members.exists()
 
     @property
     def obfuscated_auth_email(self):
@@ -161,12 +161,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return f'{m[0][0]}{"*"*(len(m[0])-2)}{m[0][-1]}@{m[1]}'
 
     def has_member(self, user):
-        return self.members.filter(siaemembership__user=user, siaemembership__user__is_active=True).exists()
+        return self.active_members.filter(pk=user.pk).exists()
 
     def has_admin(self, user):
-        return self.members.filter(
-            siaemembership__user=user, siaemembership__user__is_active=True, siaemembership__is_siae_admin=True
-        ).exists()
+        return self.active_admin_members.filter(pk=user.pk).exists()
 
     @property
     def siren(self):
@@ -181,11 +179,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def active_members(self):
-        return self.members.filter(siaemembership__user__is_active=True)
+        return self.members.filter(is_active=True)
 
     @property
     def active_admin_members(self):
-        return self.active_members.filter(siaemembership__is_siae_admin=True)
+        return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self)
 
     @property
     def signup_magic_link(self):
@@ -199,15 +197,15 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     def get_token(self):
         return siae_signup_token_generator.make_token(self)
 
-    def new_signup_warning_email_to_admins(self, user):
+    def new_signup_warning_email_to_existing_members(self, user):
         """
-        Send a warning fyi-only email to all existing admins of siae
+        Send a warning fyi-only email to all existing users of the siae
         about a new user signup.
         """
-        to = [u.email for u in self.active_admin_members]
+        to = [u.email for u in self.active_members]
         context = {"new_user": user, "siae": self}
-        subject = "siaes/email/new_signup_warning_email_to_admins_subject.txt"
-        body = "siaes/email/new_signup_warning_email_to_admins_body.txt"
+        subject = "siaes/email/new_signup_warning_email_to_existing_members_subject.txt"
+        body = "siaes/email/new_signup_warning_email_to_existing_members_body.txt"
         return get_email_message(to, context, subject, body)
 
     def new_signup_activation_email_to_official_contact(self, request):

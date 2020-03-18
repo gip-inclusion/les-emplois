@@ -3,6 +3,7 @@ from django.test import TestCase
 from itou.siaes.factories import (
     SiaeFactory,
     SiaeWith2MembershipsFactory,
+    SiaeWith4MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
@@ -23,6 +24,7 @@ class FactoriesTest(TestCase):
     def test_siae_with_2_memberships_factory(self):
         siae = SiaeWith2MembershipsFactory()
         self.assertEqual(siae.members.count(), 2)
+        self.assertEqual(siae.active_members.count(), 2)
         self.assertEqual(siae.active_admin_members.count(), 1)
         admin_user = siae.active_admin_members.get()
         self.assertTrue(siae.has_admin(admin_user))
@@ -32,6 +34,12 @@ class FactoriesTest(TestCase):
         self.assertEqual(len(all_users), 1)
         regular_user = all_users[0]
         self.assertFalse(siae.has_admin(regular_user))
+
+    def test_siae_with_4_memberships_factory(self):
+        siae = SiaeWith4MembershipsFactory()
+        self.assertEqual(siae.members.count(), 4)
+        self.assertEqual(siae.active_members.count(), 2)
+        self.assertEqual(siae.active_admin_members.count(), 1)
 
 
 class ModelTest(TestCase):
@@ -53,11 +61,48 @@ class ModelTest(TestCase):
         siae1 = SiaeWithMembershipFactory()
         siae2 = SiaeWithMembershipFactory()
 
-        user1 = siae1.members.first()
-        user2 = siae2.members.first()
+        user1 = siae1.members.get()
+        user2 = siae2.members.get()
 
         self.assertTrue(siae1.has_member(user1))
         self.assertFalse(siae1.has_member(user2))
 
         self.assertTrue(siae2.has_member(user2))
         self.assertFalse(siae2.has_member(user1))
+
+    def test_active_members(self):
+        siae = SiaeWith2MembershipsFactory(membership2__user__is_active=False)
+        self.assertEqual(siae.members.count(), 2)
+        self.assertEqual(siae.active_members.count(), 1)
+
+    def test_active_admin_members(self):
+        """
+        Test that if a user is admin of siae1 and regular user
+        of siae2 it does not get considered as admin of siae2.
+        """
+        siae1 = SiaeWith4MembershipsFactory()
+        siae1_admin_user = siae1.active_admin_members.get()
+        siae2 = SiaeWith4MembershipsFactory(membership2__user=siae1_admin_user)
+
+        self.assertEqual(siae1.members.count(), 4)
+        self.assertEqual(siae1.active_members.count(), 2)
+        self.assertEqual(siae1.active_admin_members.count(), 1)
+
+        self.assertEqual(siae2.members.count(), 4)
+        self.assertEqual(siae2.active_members.count(), 2)
+        self.assertEqual(siae2.active_admin_members.count(), 1)
+
+    def test_has_admin(self):
+        siae1 = SiaeWith2MembershipsFactory()
+        siae1_admin_user = siae1.active_admin_members.get()
+        siae1_regular_user = siae1.active_members.exclude(pk=siae1_admin_user.pk).get()
+        siae2 = SiaeWith4MembershipsFactory(membership2__user=siae1_admin_user)
+
+        self.assertTrue(siae1.has_member(siae1_admin_user))
+        self.assertTrue(siae1.has_admin(siae1_admin_user))
+
+        self.assertTrue(siae1.has_member(siae1_regular_user))
+        self.assertFalse(siae1.has_admin(siae1_regular_user))
+
+        self.assertTrue(siae2.has_member(siae1_admin_user))
+        self.assertFalse(siae2.has_admin(siae1_admin_user))
