@@ -136,3 +136,7 @@ ENV/
 
 # Editors
 .tm_properties
+
+# Jetbrains / Pycharm
+*.iml
+.idea

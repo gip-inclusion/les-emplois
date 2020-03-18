@@ -2,19 +2,27 @@ $(document).ready(() => {
 
   let citySearchInput = $('.js-city-autocomplete-input')
   let hiddenCityInput = $('.js-city-autocomplete-hidden')
-
+  let searchButton = $('.js-search-button')
   let loading = $('.js-city-autocomplete-loading')
   let noLoading = $('.js-city-autocomplete-no-loading')
+
+  function clearInput() {
+    citySearchInput.val('')
+    hiddenCityInput.val('')
+    searchButton.prop("disabled", true)
+  }
 
   citySearchInput
     // https://api.jqueryui.com/autocomplete/
     .autocomplete({
-      delay: 300,
+      delay: 150,
       minLength: 1,
       source: citySearchInput.data('autocomplete-source-url'),
       autoFocus: true,
+      created: clearInput(),
       // Make a selection on focus.
       focus: (event, ui) => {
+        searchButton.prop("disabled", true)
         hiddenCityInput.val(ui.item.slug)  // Store city slug.
         hiddenCityInput.data('title', ui.item.value)  // Store city name.
       },
@@ -23,8 +31,11 @@ $(document).ready(() => {
       // of the querystring.
       close: (event, ui) => {
         let value = hiddenCityInput.data('title')
-        if (value) {
+        if (value && citySearchInput.val()) {
+          searchButton.prop("disabled", false)
           citySearchInput.val(value)
+        } else {
+          clearInput()
         }
       },
       // Allow to submit the parent form when the enter key is pressed.
@@ -36,22 +47,19 @@ $(document).ready(() => {
         }
       },
       search: (event, ui) => {
-          loading.addClass('d-block')
-          noLoading.addClass('d-none')
+        loading.addClass('d-block')
+        noLoading.addClass('d-none')
       },
       response: (event, ui) => {
-          loading.removeClass('d-block')
-          noLoading.removeClass('d-none')
-      },
+        loading.removeClass('d-block')
+        noLoading.removeClass('d-none')
+      }
     })
     .keypress(e => {
       if (e.keyCode === 27) {
         citySearchInput.val('')
       }
     })
-    .focus(() => {
-      citySearchInput.val('')
-      hiddenCityInput.val('')
-    })
+    .focus(clearInput)
 
-})
+});
