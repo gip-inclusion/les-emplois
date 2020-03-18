@@ -46,7 +46,7 @@ class AddressMixin(models.Model):
     )
     city = models.CharField(verbose_name=gettext_lazy("Ville"), max_length=255, blank=True)
     department = models.CharField(
-        verbose_name=gettext_lazy("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True
+        verbose_name=gettext_lazy("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True, db_index=True
     )
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
