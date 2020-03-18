@@ -2,7 +2,7 @@ $(document).ready(() => {
 
   let citySearchInput = $('.js-city-autocomplete-input')
   let hiddenCityInput = $('.js-city-autocomplete-hidden')
-  let searchButton = $('.btn')
+  let searchButton = $('.js-search-button')
   let loading = $('.js-city-autocomplete-loading')
   let noLoading = $('.js-city-autocomplete-no-loading')
 
