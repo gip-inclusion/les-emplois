@@ -92,12 +92,15 @@ class User(AbstractUser):
     def has_eligibility_diagnosis(self):
         """
         Returns True if a diagnosis exists, False otherwise.
-        The existence of a valid `PoleEmploiApproval` implies that a diagnosis
-        has been made outside of Itou.
         """
-        return self.is_job_seeker and (
-            self.eligibility_diagnoses.exists() or PoleEmploiApproval.objects.find_for(self).valid().exists()
-        )
+        if not self.is_job_seeker:
+            return False
+        if self.eligibility_diagnoses.exists():
+            return True
+        # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
+        # has been made outside of Itou.
+        latest_approval = self.approvals_wrapper.latest_approval
+        return latest_approval and latest_approval.is_valid and not latest_approval.originates_from_itou
 
     def get_eligibility_diagnosis(self):
         if not self.is_job_seeker:
