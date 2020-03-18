@@ -2,13 +2,14 @@ $(document).ready(() => {
 
   let citySearchInput = $('.js-city-autocomplete-input')
   let hiddenCityInput = $('.js-city-autocomplete-hidden')
-
+  let searchButton = $('.btn')
   let loading = $('.js-city-autocomplete-loading')
   let noLoading = $('.js-city-autocomplete-no-loading')
 
   function clearInput() {
     citySearchInput.val('')
     hiddenCityInput.val('')
+    searchButton.prop("disabled", true)
   }
 
   citySearchInput
@@ -18,8 +19,10 @@ $(document).ready(() => {
       minLength: 1,
       source: citySearchInput.data('autocomplete-source-url'),
       autoFocus: true,
+      created: clearInput(),
       // Make a selection on focus.
       focus: (event, ui) => {
+        searchButton.prop("disabled", true)
         hiddenCityInput.val(ui.item.slug)  // Store city slug.
         hiddenCityInput.data('title', ui.item.value)  // Store city name.
       },
@@ -29,6 +32,7 @@ $(document).ready(() => {
       close: (event, ui) => {
         let value = hiddenCityInput.data('title')
         if (value && citySearchInput.val()) {
+          searchButton.prop("disabled", false)
           citySearchInput.val(value)
         } else {
           clearInput()
