@@ -183,7 +183,7 @@ STATIC_ROOT = os.path.join(APPS_DIR, "static_collected")
 
 STATIC_URL = "/static/"
 
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.CachedStaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
