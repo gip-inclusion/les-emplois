@@ -387,4 +387,5 @@ class ApprovalsWrapper:
             if pe_approval not in approvals_numbers
         ]
         merged_approvals = approvals + pe_approvals
-        return sorted(merged_approvals, key=lambda x: x.start_at, reverse=True)
+        # Sort by start_at, then by end_at, most recent dates first.
+        return sorted(merged_approvals, key=lambda x: (x.start_at, x.end_at), reverse=True)

@@ -334,25 +334,33 @@ class ApprovalsWrapperTest(TestCase):
 
         user = JobSeekerFactory()
 
-        # Create Approval.
-        start_at = datetime.date.today() - relativedelta(years=4)
-        end_at = start_at + relativedelta(years=2)
-        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        # Approval.
+        approval = ApprovalFactory(user=user, start_at=datetime.date(2016, 12, 20), end_at=datetime.date(2018, 12, 20))
 
-        # Create PoleEmploiApproval.
-        start_at = datetime.date.today()
-        end_at = start_at + relativedelta(years=2)
-        pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
+        # PoleEmploiApproval 1.
+        pe_approval_1 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2018, 12, 20),
+            end_at=datetime.date(2020, 12, 20),
+        )
+
+        # PoleEmploiApproval 2.
+        # Same `start_at` as PoleEmploiApproval 1.
+        # But `end_at` earlier than PoleEmploiApproval 1.
+        pe_approval_2 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2018, 12, 20),
+            end_at=datetime.date(2019, 12, 19),
         )
 
         # Check timeline.
-        self.assertTrue(approval.start_at < pe_approval.start_at)
-
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(len(approvals_wrapper.merged_approvals), 2)
-        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval)
-        self.assertEqual(approvals_wrapper.merged_approvals[1], approval)
+        self.assertEqual(len(approvals_wrapper.merged_approvals), 3)
+        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_1)
+        self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_2)
+        self.assertEqual(approvals_wrapper.merged_approvals[2], approval)
 
     def test_status_without_approval(self):
         user = JobSeekerFactory()
