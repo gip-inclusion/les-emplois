@@ -56,6 +56,7 @@ def get_siret_kind_to_email_map():
 
 
 # SIRET_KIND_TO_EMAIL_MAP = get_siret_kind_to_email_map()
+SIRET_KIND_TO_EMAIL_MAP = {}
 
 
 def populate_siae_auth_email(apps, schema_editor):
