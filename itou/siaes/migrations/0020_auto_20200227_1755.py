@@ -49,7 +49,6 @@ SIRET_KIND_TO_DATA_MAP = {}
 
 
 def populate_siae_external_id_and_update_auth_email(apps, schema_editor):
-    print()  # New line so that logs below are more readable.
     auth_email_update_counter = 0
     for siae in Siae.objects.all():
         key = (siae.siret, siae.kind)
@@ -73,7 +72,8 @@ def populate_siae_external_id_and_update_auth_email(apps, schema_editor):
             )
             print(msg)
 
-    print(f"A total of {auth_email_update_counter} auth_emails were updated.")
+    if auth_email_update_counter:
+        print(f"A total of {auth_email_update_counter} auth_emails were updated.")
 
 
 class Migration(migrations.Migration):

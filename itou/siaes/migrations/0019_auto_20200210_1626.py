@@ -60,7 +60,6 @@ SIRET_KIND_TO_EMAIL_MAP = {}
 
 
 def populate_siae_auth_email(apps, schema_editor):
-    print()  # New line so that logs below are more readable.
     for siae in Siae.objects.all():
         key = (siae.siret, siae.kind)
         if key in SIRET_KIND_TO_EMAIL_MAP:
