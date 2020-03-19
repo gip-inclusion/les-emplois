@@ -36,76 +36,79 @@
                     </div>
                 </a>
                 <div class="layout-header-content">
-                    {% if user.is_authenticated %}
+                    <nav class="d-flex align-content-stretch flex-wrap">
+                        <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://forum.inclusion.beta.gouv.fr" target="_blank">
+                            {% trans "Accéder au forum" %}
+                        </a>
 
-                        <div class="dropdown">
-                            {% include "includes/icon.html" with icon="user" %}
-                            <a
-                                href="#"
-                                class="dropdown-toggle"
-                                data-toggle="dropdown"
-                                data-display="static"
-                                aria-expanded="false">{{ user.email|truncatechars:25 }}</a>
-                            <div class="dropdown-menu dropdown-menu-lg-right">
-                                <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
-                                    {% trans "Tableau de bord" %}
-                                </a>
-                                <div class="dropdown-divider"></div>
+                        {% if user.is_authenticated %}
+                            <div class="align-self-center">
+                                <div class="dropdown">
+                                    {% include "includes/icon.html" with icon="user" %}
+                                    <a
+                                        href="#"
+                                        class="dropdown-toggle"
+                                        data-toggle="dropdown"
+                                        data-display="static"
+                                        aria-expanded="false">{{ user.email|truncatechars:25 }}</a>
+                                    <div class="dropdown-menu dropdown-menu-lg-right">
+                                        <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
+                                            {% trans "Tableau de bord" %}
+                                        </a>
+                                        <div class="dropdown-divider"></div>
 
-                                <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                    {% trans "Modifier votre mot de passe" %}
-                                </a>
-                                <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                                    {% trans "Modifier votre profil" %}
-                                </a>
+                                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
+                                            {% trans "Modifier votre mot de passe" %}
+                                        </a>
+                                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
+                                            {% trans "Modifier votre profil" %}
+                                        </a>
 
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
-                                    <i>{% trans "Déconnexion" %}</i>
-                                </a>
-                            </div>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
+                                            <i>{% trans "Déconnexion" %}</i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                            {% if user.is_siae_staff and user_siae_set|length > 1 %}
+                                <div class="dropdown">
+                                    {% include "includes/icon.html" with icon="home" %}
+                                    <a
+                                        href="#"
+                                        class="dropdown-toggle"
+                                        data-toggle="dropdown"
+                                        data-display="static"
+                                        aria-expanded="false">{{ current_siae.display_name|truncatechars:25 }}</a>
+                                    <div class="dropdown-menu dropdown-menu-lg-right">
+                                        <span class="dropdown-item-text">
+                                            <small>{% trans "Vos structures :" %}</small>
+                                        </span>
+                                        <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                                            {% csrf_token %}
+                                            {% for s in user.siae_set.all %}
+                                                {% if current_siae.id != s.pk %}
+                                                    <button
+                                                        class="dropdown-item"
+                                                        type="submit"
+                                                        name="siae_id"
+                                                        value="{{ s.pk }}">{{ s.display_name }}
+                                                    </button>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
                         </div>
 
-                        {% if user.is_siae_staff and user_siae_set|length > 1 %}
-                            <div class="dropdown">
-                                {% include "includes/icon.html" with icon="home" %}
-                                <a
-                                    href="#"
-                                    class="dropdown-toggle"
-                                    data-toggle="dropdown"
-                                    data-display="static"
-                                    aria-expanded="false">{{ current_siae.display_name|truncatechars:25 }}</a>
-                                <div class="dropdown-menu dropdown-menu-lg-right">
-                                    <span class="dropdown-item-text">
-                                        <small>{% trans "Vos structures :" %}</small>
-                                    </span>
-                                    <form action="{% url 'dashboard:switch_siae' %}" method="post">
-                                        {% csrf_token %}
-                                        {% for s in user.siae_set.all %}
-                                            {% if current_siae.id != s.pk %}
-                                                <button
-                                                    class="dropdown-item"
-                                                    type="submit"
-                                                    name="siae_id"
-                                                    value="{{ s.pk }}">{{ s.display_name }}
-                                                </button>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </form>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                    {% else %}
-                        <nav>
-                            <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://forum.inclusion.beta.gouv.fr" target="_blank">
-                                {% trans "Accéder au forum" %}
-                            </a>
+                        {% else %}
                             <a class="btn btn-primary w-100 w-sm-auto my-1" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                 {% trans "Se connecter" %}
                             </a>
-                        </nav>
-                    {% endif %}
+                        {% endif %}
+
+                    </nav>
                 </div>
             </div>
         </header>
