@@ -98,7 +98,10 @@
 
                     {% else %}
                         <nav>
-                            <a class="btn btn-outline-primary w-100" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                            <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://forum.inclusion.beta.gouv.fr" target="_blank">
+                                {% trans "Accéder au forum" %}
+                            </a>
+                            <a class="btn btn-primary w-100 w-sm-auto my-1" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                                 {% trans "Se connecter" %}
                             </a>
                         </nav>
