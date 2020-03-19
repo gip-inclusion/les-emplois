@@ -45,9 +45,11 @@ def get_shuffled_rank():
 
     Note that we have about 3K siaes.
 
-    We produce a large pseudo-random integer on the fly from id
-    with the static PG expression `(A+id)*(B+id)`
-    which has the advantage of still be using index scan by PG.
+    We produce a large pseudo-random integer on the fly from `id`
+    with the static PG expression `(A+id)*(B+id)`. From the point of view of PG,
+    this expression only varies with `id` as A and B are constants,
+    and thus index scan will be used.
+
     It is important that this large integer is far from zero to avoid
     that id=1,2,3 always stay on the top of the list.
     Thus we choose rather large A and B.
@@ -56,7 +58,12 @@ def get_shuffled_rank():
     """
     # Seed changes every day at midnight.
     random.seed(datetime.date.today())
+    # a*b should always be larger than the largest possible value of c,
+    # so that id=1,2,3 do not always stay on top of the list.
+    # ( 1K * 1K = 1M > 10K )
     a = random.randint(1000, 10000)
     b = random.randint(1000, 10000)
-    modulo = random.randint(100, 1000)
-    return (a + F("id")) * (b + F("id")) % modulo
+    # As we generally have about 100 results to shuffle, we choose c larger
+    # than this so as to avoid collisions as much as possible.
+    c = random.randint(1000, 10000)
+    return (a + F("id")) * (b + F("id")) % c
