@@ -287,6 +287,11 @@ a.disabled button:hover, button.disabled:hover {
     border-color: inherit;
 }
 
+/* Overrides opacity for disabled button (search cities) */
+.js-search-button {
+    opacity: 100% !important;
+}
+
 /* Old browsers.
 --------------------------------------------------------------------------- */
 
