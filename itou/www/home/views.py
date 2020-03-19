@@ -4,7 +4,7 @@ from itou.www.search.forms import SiaeSearchForm
 
 
 def home(request, template_name="home/home.html"):
-    context = {"siae_search_form": SiaeSearchForm(initial={"distance": SiaeSearchForm.DISTANCE_DEFAULT})}
+    context = {"siae_search_form": SiaeSearchForm()}
     return render(request, template_name, context)
 
 

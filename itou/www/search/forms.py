@@ -40,6 +40,10 @@ class SiaeSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["distance"].initial = self.DISTANCE_DEFAULT
+
     def clean_city(self):
         slug = self.cleaned_data["city"]
         try:
