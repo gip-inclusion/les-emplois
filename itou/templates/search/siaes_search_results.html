@@ -68,7 +68,7 @@
                 </div>
 
                 <div class="card-footer">
-                    {% if siae.has_members %}
+                    {% if siae.num_active_members %}
                         <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                         </a>

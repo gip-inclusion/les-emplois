@@ -1,3 +1,4 @@
+from django.db.models import Count, Q
 from django.shortcuts import render
 
 from itou.siaes.models import Siae
@@ -19,6 +20,7 @@ def search_siaes(request, template_name="search/siaes_search_results.html"):
         siaes = (
             Siae.active_objects.within(city.coords, distance_km)
             .shuffle()
+            .annotate(num_active_members=Count("members", filter=Q(members__is_active=True)))
             .prefetch_job_description_through(is_active=True)
             .prefetch_related("members")
         )
