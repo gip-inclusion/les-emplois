@@ -18,6 +18,7 @@ def search_siaes(request, template_name="search/siaes_search_results.html"):
 
         siaes = (
             Siae.active_objects.within(city.coords, distance_km)
+            .shuffle()
             .prefetch_job_description_through(is_active=True)
             .prefetch_related("members")
         )

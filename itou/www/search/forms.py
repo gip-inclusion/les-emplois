@@ -10,6 +10,7 @@ class SiaeSearchForm(forms.Form):
 
     DISTANCES = [100, 75, 50, 25, 15, 10, 5]
     DISTANCE_CHOICES = [(i, gettext_lazy(f"{i} Km")) for i in DISTANCES]
+    DISTANCE_DEFAULT = 25
 
     CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
@@ -38,6 +39,10 @@ class SiaeSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["distance"].initial = self.DISTANCE_DEFAULT
 
     def clean_city(self):
         slug = self.cleaned_data["city"]

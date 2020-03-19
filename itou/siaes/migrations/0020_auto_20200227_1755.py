@@ -45,6 +45,7 @@ def get_siret_kind_to_data_map():
 
 
 # SIRET_KIND_TO_DATA_MAP = get_siret_kind_to_data_map()
+SIRET_KIND_TO_DATA_MAP = {}
 
 
 def populate_siae_external_id_and_update_auth_email(apps, schema_editor):
