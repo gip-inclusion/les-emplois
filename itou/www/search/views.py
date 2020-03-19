@@ -7,7 +7,7 @@ from itou.www.search.forms import SiaeSearchForm
 
 def search_siaes(request, template_name="search/siaes_search_results.html"):
 
-    form = SiaeSearchForm(data=request.GET)
+    form = SiaeSearchForm(data=request.GET, initial={"distance": SiaeSearchForm.DISTANCE_DEFAULT})
     siaes_page = None
 
     if form.is_valid():
