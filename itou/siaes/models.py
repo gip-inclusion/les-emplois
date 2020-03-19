@@ -1,8 +1,11 @@
+import datetime
+import random
+
 from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import F, Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -34,6 +37,40 @@ class SiaeQuerySet(models.QuerySet):
         if user.is_superuser:
             return self
         return self.filter(members=user, members__is_active=True)
+
+    def shuffle(self):
+        """
+        Quick and dirty solution to shuffle results with a
+        determistic seed which changes every day.
+
+        We may later implement a more rigorous shuffling but this will
+        need an extra column in db.
+
+        Note that we have about 3K siaes.
+
+        We produce a large pseudo-random integer on the fly from `id`
+        with the static PG expression `(A+id)*(B+id)`. From the point of view of PG,
+        this expression only varies with `id` as A and B are constants,
+        and thus index scan will be used.
+
+        It is important that this large integer is far from zero to avoid
+        that id=1,2,3 always stay on the top of the list.
+        Thus we choose rather large A and B.
+
+        We then take a modulo which changes everyday.
+        """
+        # Seed changes every day at midnight.
+        random.seed(datetime.date.today())
+        # a*b should always be larger than the largest possible value of c,
+        # so that id=1,2,3 do not always stay on top of the list.
+        # ( 1K * 1K = 1M > 10K )
+        a = random.randint(1000, 10000)
+        b = random.randint(1000, 10000)
+        # As we generally have about 100 results to shuffle, we choose c larger
+        # than this so as to avoid collisions as much as possible.
+        c = random.randint(1000, 10000)
+        shuffle_expression = (a + F("id")) * (b + F("id")) % c
+        return self.annotate(shuffled_rank=shuffle_expression).order_by("shuffled_rank")
 
 
 class SiaeActiveManager(models.Manager):
