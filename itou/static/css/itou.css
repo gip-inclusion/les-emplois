@@ -251,6 +251,12 @@ section.home-search .bg-image {
     .w-sm-75 {
         width: 75% !important;
     }
+
+    /* Reset width */
+    /* To be used with, for example, w-100 to have a with: 100%; only on mobile. */
+    .w-sm-auto {
+        width: auto !important;
+    }
 }
 
 .bg-gray-700 {

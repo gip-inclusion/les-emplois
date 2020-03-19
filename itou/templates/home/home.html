@@ -7,6 +7,31 @@
 
 {% block content %}
 
+    <div class="alert alert-danger my-3" role="alert">
+        <strong class="d-block">Information spéciale Covid-19</strong>
+        Découvrez notre
+        <a class="alert-link"
+           href="https://forum.inclusion.beta.gouv.fr"
+           target="_blank">
+           forum de l'inclusion</a>
+        ouvert à toutes et à tous.
+        Retrouvez des informations pratiques et un espace d'échange pour la communauté :
+        <a class="alert-link"
+           href="https://www.interieur.gouv.fr/content/download/121663/976885/file/Attestation_de_deplacement_derogatoire.pdf"
+           target="_blank">
+           téléchargez l'attestation de déplacement</a>,
+        découvrez
+        <a class="alert-link"
+           href="https://forum.inclusion.beta.gouv.fr/c/covid19-informations-crise-sanitaire/outils-de-teletravail/17"
+           target="_blank">
+           les outils</a>
+        dans cette actualité, partagez vos retours pour
+        <a class="alert-link"
+           href="https://forum.inclusion.beta.gouv.fr/c/covid19-informations-crise-sanitaire/entraide/19"
+           target="_blank">
+           aider la communauté</a>, ...
+    </div>
+
     <section class="layout-section home-search">
         <div class="layout layout-column-full">
             <h2 class="text-center mt-5 mb-3 mx-4 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
@@ -23,17 +48,17 @@
 
     {% if not user.is_authenticated %}
         <section class="layout-section bg-light py-5 text-center">
-            <h3 class="h4 font-weight-bold">{% trans "Vous êtes un professionnel de l'insertion" %}</h3>
-            <h3 class="h4 pt-2 font-weight-light">{% trans "Découvrez la plateforme de l'inclusion" %}</h4>
+            <h3 class="h4 font-weight-bold">{% trans "Vous découvrez l’inclusion ?" %}</h3>
+            <h3 class="h4 pt-2 font-weight-light">{% trans "Nos outils sont à votre disposition" %}</h4>
 
             <div class="card-deck my-5 justify-content-between text-center">
                 <div class="card p-4" style="flex: 0 0 23%;">
                     <div class="card-body">
                         <h5 class="card-title font-weight-light mb-4">
-                            <span class="d-block">{% trans "Vous êtes un employeur solidaire" %}</span>
-                            <span class="d-block">{% trans "(SIAE, GEIQ, EA, ...)" %}</span>
+                            <span class="d-block">{% trans "Pour commencer," %}</span>
+                            <span class="d-block">{% trans "inscrivez-vous sur la plateforme" %}</span>
                         </h5>
-                        <a href="{% url 'signup:select_siae' %}">
+                        <a href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                             <button class="btn btn-primary">
                                 {% trans "Créer un compte" %}
                             </button>
@@ -44,11 +69,11 @@
                 <div class="card p-4" style="flex: 0 0 23%;">
                     <div class="card-body">
                         <h5 class="card-title font-weight-light mb-4">
-                            {% trans "Vous êtes prescripteur ou un orienteur de l'inclusion" %}
+                            {% trans "Discutez entre professionnels sur le forum de l'inclusion" %}
                         </h5>
-                        <a class="card-link" href="{% url 'signup:prescriber' %}">
+                        <a class="card-link" href="https://forum.inclusion.beta.gouv.fr">
                             <button class="btn btn-primary">
-                                {% trans "Créer un compte" %}
+                                {% trans "Accéder au forum" %}
                             </button>
                         </a>
                     </div>
@@ -59,7 +84,7 @@
                         <h5 class="card-title font-weight-light mb-4">
                             {% trans "Découvrez l’inclusion par l’activité économique" %}
                         </h5>
-                        <a class="card-link" href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" target=_blank>
+                        <a class="card-link" href="https://doc.inclusion.beta.gouv.fr/presentation" target=_blank>
                             <button class="btn btn-primary">
                                 {% trans "En savoir plus" %}
                             </button>
