@@ -32,9 +32,10 @@ services:
     volumes:
       # Mount the current directory into `/app` inside the running container.
       - .:/app
+      # - /Users/vermeer/lbb/itou-site-packages:/usr/local/lib/python3.7/site-packages
     restart: always
     ports:
-      - "${DJANGO_PORT_ON_DOCKER_HOST:-8000}:8000"
+      - "${DJANGO_PORT_ON_DOCKER_HOST:-8080}:8080"
 
 volumes:
   postgres_data:

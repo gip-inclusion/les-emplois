@@ -31,8 +31,15 @@ urlpatterns = [
     # https://github.com/pennersr/django-allauth/issues/468
     re_path(r"^accounts/password/change/$", dashboard_views.password_change),
     # --------------------------------------------------------------------------------------
-    # Other allauth URLs.
+    # Override allauth `account_logout` URL.
+    # /accounts/logout/ <=> account_logout
+    # We need custom code to process PEAMU logout.
+    re_path(r"^accounts/logout/$", dashboard_views.logout),
+    # --------------------------------------------------------------------------------------    # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
+    # --------------------------------------------------------------------------------------
+    # PEAMU URLs.
+    path("accounts/", include("itou.peamu.urls")),
     # --------------------------------------------------------------------------------------
 
     # www.

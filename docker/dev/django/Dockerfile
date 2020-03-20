@@ -15,12 +15,16 @@ RUN set -ex \
     && addgroup app \
     && adduser --ingroup app --home $APP_DIR --disabled-password app;
 
+# Vim is useful when you want to add a debugger in an external library
+# e.g. sudo vim /usr/local/lib/python3.7/site-packages/allauth/socialaccount/providers/oauth2/client.py
 RUN set -ex; \
     if ! command -v gpg > /dev/null; then \
         apt-get update; \
         apt-get install -y --no-install-recommends \
             gnupg \
             dirmngr \
+            sudo \
+            vim \
         ; \
         rm -rf /var/lib/apt/lists/*; \
     fi

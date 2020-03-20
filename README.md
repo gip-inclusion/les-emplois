@@ -12,7 +12,7 @@
 
 Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le fichier `README.md`, puis y configurer les variables d'environnement suivantes :
 
-    DJANGO_PORT_ON_DOCKER_HOST=8000
+    DJANGO_PORT_ON_DOCKER_HOST=8080
     POSTGRES_PORT_ON_DOCKER_HOST=5433
 
 ### Lancer le serveur de développement
@@ -58,3 +58,8 @@ Ou utilisez un *pre-commit git hook* que vous pouvez mettre en place de cette ma
 > https://django-bootstrap4.readthedocs.io/en/latest/index.html
 
 > https://feathericons.com
+
+## WIP PEAMU
+
+...
+

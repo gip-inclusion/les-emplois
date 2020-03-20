@@ -60,16 +60,20 @@
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
                                             {% trans "Tableau de bord" %}
                                         </a>
+                                        
                                         <div class="dropdown-divider"></div>
 
-                                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                            {% trans "Modifier votre mot de passe" %}
-                                        </a>
+                                        {% if not user.is_peamu_user %}
+                                            <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
+                                                {% trans "Modifier votre mot de passe" %}
+                                            </a>
+                                        {% endif %}
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
                                             {% trans "Modifier votre profil" %}
                                         </a>
 
                                         <div class="dropdown-divider"></div>
+
                                         <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
                                             <i>{% trans "Déconnexion" %}</i>
                                         </a>

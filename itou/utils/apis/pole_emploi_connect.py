@@ -1,3 +1,5 @@
+# Wtf is this file? It is used to fetch ROME and OGR data from the ESD.
+# AFAIU this is just about the ESD APIs in general, nothing to do with PE Connect / PEAMU.
 import collections
 import datetime
 import logging

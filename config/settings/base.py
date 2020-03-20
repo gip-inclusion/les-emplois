@@ -268,6 +268,21 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_USER_DISPLAY = "itou.users.models.get_allauth_account_user_display"
 
+# WIP PEAMU
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_PROVIDERS={
+    "peamu": {
+        "APP": {
+            "client_id": "app123id",
+            "key": "peamu",
+            "secret": "dummy"
+        }
+    },
+}
+# Override default allauth.socialaccount.adapter.DefaultSocialAccountAdapter
+# FIXME move in adapter.py file
+SOCIALACCOUNT_ADAPTER = "itou.peamu.views.PEAMUSocialAccountAdapter"
+
 # django-bootstrap4.
 # https://django-bootstrap4.readthedocs.io/en/latest/settings.html
 # ------------------------------------------------------------------------------
