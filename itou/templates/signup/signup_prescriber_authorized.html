@@ -8,8 +8,8 @@
 
 {% block content %}
 <h1>
-    {% trans "Prescripteur habilité" %}
-    <small class="text-muted">{% trans "Inscription" %}</small>
+    {% trans "Inscription" %}
+    <small class="text-muted">{% trans "Prescripteur habilité" %}</small>
 </h1>
 
 <form method="post" action="{% url 'signup:prescriber_authorized' %}" role="form" class="js-prevent-multiple-submit">

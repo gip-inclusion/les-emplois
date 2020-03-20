@@ -313,12 +313,28 @@ API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 API_INSEE_KEY = os.environ["API_INSEE_KEY"]
 API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
 
-# Pôle emploi.
+# Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
+# Note that the `EMPLOI_STORE` naming below is incorrect,
+# as the Emploi Store is a totally different beast than the ESD.
 API_EMPLOI_STORE_KEY = os.environ["API_EMPLOI_STORE_KEY"]
 API_EMPLOI_STORE_SECRET = os.environ["API_EMPLOI_STORE_SECRET"]
 API_EMPLOI_STORE_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_EMPLOI_STORE_BASE_URL = "https://api.emploi-store.fr/partenaire"
+
+# PE Connect aka PEAMU - technically one of ESD's APIs.
+PEAMU_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
+SOCIALACCOUNT_PROVIDERS={
+    "peamu": {
+        "APP": {
+            "key": "peamu",
+            "client_id": API_EMPLOI_STORE_KEY,
+            "secret": API_EMPLOI_STORE_SECRET
+        },
+    },
+}
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ADAPTER = "itou.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # PDFShift
 PDFSHIFT_API_KEY = os.environ["PDFSHIFT_API_KEY"]

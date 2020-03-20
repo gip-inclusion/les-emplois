@@ -1,0 +1,41 @@
+{# django-allauth template override. #}
+
+{% extends "layout/content_small.html" %}
+
+{% comment %}
+    Hijacking this template is the simplest, most elegant and less intrusive way
+    to manage the case when a PEAMU user has not verified their email yet.
+    Otherwise we would have to overload the method
+    allauth.socialaccount.helpers.complete_social_login
+    and this would result in yet more ugly duplicated code from the dependency.
+
+    Unverified PEAMU users are redirected to this template by django-allauth
+    most likely because the email data is missing and django-allauth thus
+    prompts the user to enter his email manually on this form.
+{% endcomment %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Votre compte Pôle emploi doit être validé" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Votre compte Pôle emploi doit être validé" %}</h1>
+
+<p>
+	{% trans "Vous devez valider votre compte Pôle emploi pour pouvoir vous connecter ici. Veuillez vous identifier chez Pôle emploi et suivre les instructions pour valider votre compte." %}
+</p>
+<p>
+	<a href="{% url 'account_login' %}?account_type=job_seeker">
+		<button class="btn btn-secondary">
+			{% trans "Retour" %}
+		</button>
+	</a>
+	<a href="https://www.pole-emploi.fr">
+		<button class="btn btn-primary">
+            {% trans "S'identifier chez Pôle emploi pour valider son compte" %}
+        </button>
+    </a>
+</p>
+
+{% endblock %}
