@@ -44,14 +44,13 @@ class SiaeQuerySet(models.QuerySet):
         determistic seed which changes every day.
 
         We may later implement a more rigorous shuffling but this will
-        need an extra column in db.
+        require setting up a daily cronjob to rebuild the shuffling index
+        with new random values.
 
         Note that we have about 3K siaes.
 
         We produce a large pseudo-random integer on the fly from `id`
-        with the static PG expression `(A+id)*(B+id)`. From the point of view of PG,
-        this expression only varies with `id` as A and B are constants,
-        and thus index scan will be used.
+        with the static PG expression `(A+id)*(B+id)`.
 
         It is important that this large integer is far from zero to avoid
         that id=1,2,3 always stay on the top of the list.
