@@ -81,6 +81,10 @@ class CreateJobSeekerForm(forms.ModelForm):
             "last_name",
             "birthdate",
             "phone",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
         ]
