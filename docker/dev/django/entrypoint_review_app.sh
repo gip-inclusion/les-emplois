@@ -30,7 +30,7 @@ EOSQL
 django-admin migrate
 django-admin import_cities
 
-echo "################## Cities imported successfully. Now import all fixtures. #######################"
+echo "################# Cities imported successfully. Now import all fixtures. #######################"
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
 ls -d ~/itou/fixtures/* | xargs django-admin loaddata
