@@ -66,11 +66,13 @@ class CreateJobSeekerForm(forms.ModelForm):
 
     city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
     city_name = forms.CharField(
+        label=gettext_lazy("Ville"),
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": gettext_lazy("TBD: placeholder"),
+                "placeholder": gettext_lazy("Nom de la ville"),
                 "autocomplete": "off",
             }
         )
