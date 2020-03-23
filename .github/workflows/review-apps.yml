@@ -97,6 +97,7 @@ jobs:
 
     - name: Create and link database
       run: |
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_NAME-db --region eu --link $REVIEW_APP_NAME --yes --org $ORGANIZATION_NAME
 
     - name: Export environment variables
