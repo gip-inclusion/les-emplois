@@ -16,7 +16,9 @@ django-admin migrate
 # django-admin import_cities
 
 echo "################## Cities imported successfully. Now import all fixtures. #######################"
-ls ~/itou/fixtures/ | xargs django-admin loaddata
+# `ls $APP_HOME` does not work as the current user
+# does not have execution rights on the $APP_HOME directory.
+# ls ~/itou/fixtures/ | xargs django-admin loaddata
 # django-admin loaddata $APP_HOME/itou/fixtures/*.json
 # django-admin loaddata $APP_HOME/itou/fixtures/jobs.json
 # django-admin loaddata $APP_HOME/itou/fixtures/siaes.json
