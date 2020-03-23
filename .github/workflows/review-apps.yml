@@ -14,7 +14,7 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Itou
   CONFIGURATION_FILE: review-apps-config
-  REVIEW_APP_NAME: itou-${{ github.head_ref }}
+  REVIEW_APP_NAME: review-${{ github.head_ref }}
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
