@@ -13,7 +13,14 @@ done
 # tail -f /dev/null & wait
 
 django-admin migrate
-make -C $APP_HOME populate_db
+django_admin import_cities
+django_admin loaddata itou/fixtures/jobs.json
+django_admin loaddata itou/fixtures/siaes.json
+django_admin loaddata itou/fixtures/prescribers.json
+django_admin loaddata itou/fixtures/test_users.json
+django_admin loaddata itou/fixtures/prescriber_memberships.json
+django_admin loaddata itou/fixtures/siae_memberships.json
+
 django-admin runserver_plus 0.0.0.0:8000
 
 exec "$@"
