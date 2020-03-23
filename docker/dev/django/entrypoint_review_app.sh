@@ -12,20 +12,27 @@ done
 # trap : TERM INT
 # tail -f /dev/null & wait
 
+# Update database to match our settings
+# TODO: when Clever Cloud will be available for all environment,
+# remove this and create a file for all the environments.
+psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+  CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  CREATE EXTENSION IF NOT EXISTS postgis;
+  CREATE EXTENSION IF NOT EXISTS unaccent;
+  DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
+  CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
+  ALTER TEXT SEARCH CONFIGURATION french_unaccent
+    ALTER MAPPING FOR hword, hword_part, word
+    WITH unaccent, french_stem;
+EOSQL
+
 django-admin migrate
 # django-admin import_cities
 
 echo "################## Cities imported successfully. Now import all fixtures. #######################"
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
-# ls ~/itou/fixtures/ | xargs django-admin loaddata
-# django-admin loaddata $APP_HOME/itou/fixtures/*.json
-# django-admin loaddata $APP_HOME/itou/fixtures/jobs.json
-# django-admin loaddata $APP_HOME/itou/fixtures/siaes.json
-# django-admin loaddata $APP_HOME/itou/fixtures/prescribers.json
-# django-admin loaddata $APP_HOME/itou/fixtures/test_users.json
-# django-admin loaddata $APP_HOME/itou/fixtures/prescriber_memberships.json
-# django-admin loaddata $APP_HOME/itou/fixtures/siae_memberships.json
+ls -d ~/itou/fixtures/* | xargs django-admin loaddata
 
 django-admin runserver_plus 0.0.0.0:8000
 
