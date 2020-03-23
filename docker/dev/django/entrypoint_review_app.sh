@@ -15,19 +15,20 @@ done
 # Update database to match our settings
 # TODO: when Clever Cloud will be available for all environment,
 # remove this and create a file for all the environments.
-# psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-#   # CREATE EXTENSION IF NOT EXISTS pg_trgm;
-#   # CREATE EXTENSION IF NOT EXISTS postgis;
-#   # CREATE EXTENSION IF NOT EXISTS unaccent;
-#   # DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
-#   # CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
-#   ALTER TEXT SEARCH CONFIGURATION french_unaccent
-#     ALTER MAPPING FOR hword, hword_part, word
-#     WITH unaccent, french_stem;
-# EOSQL
+
+  # CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  # CREATE EXTENSION IF NOT EXISTS postgis;
+  # CREATE EXTENSION IF NOT EXISTS unaccent;
+  # DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
+  # CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
+psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+  ALTER TEXT SEARCH CONFIGURATION french_unaccent
+    ALTER MAPPING FOR hword, hword_part, word
+    WITH unaccent, french_stem;
+EOSQL
 
 django-admin migrate
-# django-admin import_cities
+django-admin import_cities
 
 echo "################## Cities imported successfully. Now import all fixtures. #######################"
 # `ls $APP_HOME` does not work as the current user
