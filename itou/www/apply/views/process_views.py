@@ -12,6 +12,11 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm
+from itou.www.eligibility_views.forms import (
+    AdministrativeCriteriaLevel1Form,
+    AdministrativeCriteriaLevel2Form,
+    ConfirmEligibilityForm,
+)
 
 
 def check_waiting_period(approvals_wrapper, job_application):
@@ -198,7 +203,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 @login_required
 def eligibility(request, job_application_id, template_name="apply/process_eligibility.html"):
     """
-    Check eligibility.
+    Check eligibility (as an SIAE).
     """
 
     queryset = JobApplication.objects.siae_member_required(request.user)
@@ -207,15 +212,57 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     if not job_application.to_siae.is_subject_to_eligibility_rules:
         raise Http404()
 
-    if request.method == "POST":
-        if not request.POST.get("confirm-eligibility") == "1":
-            messages.error(request, _("Vous devez confirmer l'éligibilité du candidat."))
+    form_administrative_criteria_level1 = AdministrativeCriteriaLevel1Form(data=request.POST or None)
+    form_administrative_criteria_level2 = AdministrativeCriteriaLevel2Form(data=request.POST or None)
+    form_confirm_eligibility = ConfirmEligibilityForm(data=request.POST or None)
+
+    if request.method == "POST" and all(
+        [
+            form_confirm_eligibility.is_valid(),
+            form_administrative_criteria_level1.is_valid(),
+            form_administrative_criteria_level2.is_valid(),
+        ]
+    ):
+
+        level1_true_count = sum(
+            1 for criteria in form_administrative_criteria_level1.cleaned_data.values() if criteria
+        )
+        level2_true_count = sum(
+            1 for criteria in form_administrative_criteria_level2.cleaned_data.values() if criteria
+        )
+
+        is_valid = level1_true_count or level2_true_count >= 3
+
+        if not is_valid:
+            messages.error(
+                request,
+                _(
+                    "Vous devez sélectionner au moins un critère administratif de niveau 1 "
+                    "ou le cumul d'au moins trois critères de niveau 2."
+                ),
+            )
         else:
+
             user_info = get_user_info(request)
-            EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
+            eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
+
+            administrative_criteria_level1 = form_administrative_criteria_level1.save(commit=False)
+            administrative_criteria_level1.eligibility_diagnosis = eligibility_diagnosis
+            administrative_criteria_level1.save()
+
+            administrative_criteria_level2 = form_administrative_criteria_level2.save(commit=False)
+            administrative_criteria_level2.eligibility_diagnosis = eligibility_diagnosis
+            administrative_criteria_level2.save()
+
             messages.success(request, _("Éligibilité confirmée !"))
             next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
             return HttpResponseRedirect(next_url)
 
-    context = {"approvals_wrapper": job_application.job_seeker.approvals_wrapper, "job_application": job_application}
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "job_application": job_application,
+        "form_administrative_criteria_level1": form_administrative_criteria_level1,
+        "form_administrative_criteria_level2": form_administrative_criteria_level2,
+        "form_confirm_eligibility": form_confirm_eligibility,
+    }
     return render(request, template_name, context)

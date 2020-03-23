@@ -11,63 +11,48 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-<form method="post" action="" class="js-prevent-multiple-submit">
+<form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
-    {% if request.user.is_prescriber %}
-        <div class="alert alert-warning" role="alert">
-            {% blocktrans %}La prescription d'un parcours IAE implique la réalisation préalable d'un diagnostic socio-professionnel permettant d'identifier les raisons, tenant compte <a href="#criteres_administratifs">des critères administratifs</a> et des freins sociaux, pour lesquelles la personne relève d'un parcours d'insertion par l'IAE. Ce diagnostic devra reprendre a minima les éléments présents dans <a href="#diagnostic_de_reference">le diagnostic de référence</a>{% endblocktrans %}
-        </div>
-    {% endif %}
+    <h2>{% trans "Critères d'éligibilité" %}</h2>
 
-    {% if request.user.is_siae_staff %}
-        <div class="alert alert-warning" role="alert">
-            <p>{% trans "Pour valider une éligibilité la personne doit relever :" %}</p>
-            <ul>
-                <li>{% trans "d'au moins un besoin d'accompagnement" %}</li>
-                <li><b>{% trans "et" %}</b></li>
-                <li>
-                    {% trans "de critères administratifs :" %}
-                    <ul>
-                        <li>{% trans "au moins un critère administratif de niveau 1" %}</li>
-                        <li><b>{% trans "ou" %}</b></li>
-                        <li>{% trans "le cumul d'au moins trois critères de niveau 2" %}</li>
-                    </ul>
-                </li>
-            </ul>
-            <p class="mb-0">
-                {% trans "Les personnes, qui ne répondraient pas aux critères d'éligibilité administratifs requis, pourront être orientées vers un prescripteur habilité (exemples des personnes sans ressource ou sans emploi de longue durée) qui pourra passer outre ces critères pour prescrire un parcours IAE." %}
-            </p>
-        </div>
-    {% endif %}
+    {% bootstrap_form_errors form_confirm_eligibility %}
 
-    {% include "eligibility/includes/criteria.html" %}
+    <h2 id="criteres_administratifs">
+        <span class="badge badge-secondary">{% trans "Critères administratifs" %}</span>
+    </h2>
 
-    <hr>
+    <h3>
+        {% trans "Critères administratifs de niveau 1" %}
+    </h3>
 
-    {% if request.user.is_siae_staff %}
-        <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input" name="confirm-eligibility" value="1" required>
-            <label class="form-check-label">
-                {% trans "Je confirme que le candidat remplit les critères d'éligibilité à l'IAE et m'engage à fournir les justificatifs correspondants en cas de contrôle a posteriori." %}
-            </label>
-        </div>
-    {% endif %}
+    {% for field in form_administrative_criteria_level1 %}
+        {% bootstrap_field field %}
+    {% endfor %}
+
+    <h3>
+        {% trans "Critères administratifs de niveau 2" %}
+    </h3>
+
+    {% for field in form_administrative_criteria_level2 %}
+        {% bootstrap_field field %}
+    {% endfor %}
+
+    {% include "eligibility/includes/reference_diagnosis.html" %}
+
+    {% bootstrap_form form_confirm_eligibility %}
 
     <div class="alert alert-warning" role="alert">
-
         <p>
             {% blocktrans %}En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.{% endblocktrans %}
         </p>
-
         {% buttons %}
             {% if cancel_url %}
                 <a class="btn btn-secondary" href="{{ cancel_url }}">{% trans "Annuler" %}</a>
             {% endif %}
             <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
         {% endbuttons %}
-
     </div>
 
 </form>

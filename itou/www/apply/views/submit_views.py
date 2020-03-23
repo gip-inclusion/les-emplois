@@ -14,6 +14,11 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
+from itou.www.eligibility_views.forms import (
+    AdministrativeCriteriaLevel1Form,
+    AdministrativeCriteriaLevel2Form,
+    ConfirmEligibilityForm,
+)
 
 
 def valid_session_required(function=None):
@@ -225,7 +230,7 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
 @valid_session_required
 def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibility.html"):
     """
-    Check eligibility.
+    Check eligibility (as an authorized prescriber).
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
@@ -247,12 +252,48 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     if skip:
         return HttpResponseRedirect(next_url)
 
-    if request.method == "POST":
-        EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
+    form_administrative_criteria_level1 = AdministrativeCriteriaLevel1Form(data=request.POST or None)
+    form_administrative_criteria_level2 = AdministrativeCriteriaLevel2Form(data=request.POST or None)
+    form_confirm_eligibility = ConfirmEligibilityForm(data=request.POST or None)
+
+    if request.method == "POST" and all(
+        [
+            form_confirm_eligibility.is_valid(),
+            form_administrative_criteria_level1.is_valid(),
+            form_administrative_criteria_level2.is_valid(),
+        ]
+    ):
+
+        level1_true_count = sum(
+            1 for criteria in form_administrative_criteria_level1.cleaned_data.values() if criteria
+        )
+        level2_true_count = sum(
+            1 for criteria in form_administrative_criteria_level2.cleaned_data.values() if criteria
+        )
+
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
+
+        if level1_true_count:
+            administrative_criteria_level1 = form_administrative_criteria_level1.save(commit=False)
+            administrative_criteria_level1.eligibility_diagnosis = eligibility_diagnosis
+            administrative_criteria_level1.save()
+
+        if level2_true_count:
+            administrative_criteria_level2 = form_administrative_criteria_level2.save(commit=False)
+            administrative_criteria_level2.eligibility_diagnosis = eligibility_diagnosis
+            administrative_criteria_level2.save()
+
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
+    context = {
+        "siae": siae,
+        "job_seeker": job_seeker,
+        "approvals_wrapper": approvals_wrapper,
+        "form_administrative_criteria_level1": form_administrative_criteria_level1,
+        "form_administrative_criteria_level2": form_administrative_criteria_level2,
+        "form_confirm_eligibility": form_confirm_eligibility,
+    }
     return render(request, template_name, context)
 
 

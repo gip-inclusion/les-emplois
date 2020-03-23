@@ -1,0 +1,76 @@
+{% load i18n %}
+
+<h2 id="diagnostic_de_reference">
+    <span class="badge badge-secondary">
+        {% trans "Diagnostic socio-professionnel de référence" %}
+    </span>
+</h2>
+
+<hr>
+
+<table class="table table-striped table-bordered table-responsive-sm">
+  <thead>
+    <tr>
+      <th> </th>
+      <th class="text-center" colspan="4">{% trans "Vulnérable" %} ========================> {% trans "Disponible" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>{% trans "Maitrise de la langue française" %}</th>
+      <td>{% trans "Analphabète à illettré" %}</td>
+      <td>{% trans "Relève d'une formation FLE et/ou savoirs de base" %}</td>
+      <td>{% trans "Laborieuse à limitée" %}</td>
+      <td>{% trans "Bonne à parfaite" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Capacité à occuper un poste de travail" %}</th>
+      <td>{% trans "Est dans l'incapacité immédiate d'occuper un poste de travail" %}</td>
+      <td>{% trans "A besoin d'un accompagnement avant de pouvoir occuper un poste de travail" %}</td>
+      <td>{% trans "Peut occuper un poste de travail dans des conditions aménagées" %}</td>
+      <td>{% trans "Peut occuper un poste de travail dans des conditions ordinaires" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Logement" %}</th>
+      <td>{% trans "SDF" %}</td>
+      <td>{% trans "Hébergement collectif de type CHRS, CADA" %}...</td>
+      <td>{% trans "Hébergement hors structure sociale, logement insalubre, risque de perte de logement" %}</td>
+      <td>{% trans "Logement stable" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Accès au droit" %}</th>
+      <td>{% trans "Ne connait pas ses droits, en situation de non recours" %}</td>
+      <td>{% trans "Renoncement ou en rupture ou difficulté de renouvellement de droits" %}</td>
+      <td>{% trans "Connait ses droits et démarches en cours" %}</td>
+      <td>{% trans "Bénéficie des droits afférents à sa situation" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Mobilité" %}</th>
+      <td>{% trans "Ne sait pas se rendre seul à son lieu de travail" %}</td>
+      <td>{% trans "Sait organiser son covoiturage et/ou possède un véhicule mais problème de mise en règle (assurance, contrôle technique…" %})</td>
+      <td>{% trans "Sait utiliser les transports en commun et/ou possède un véhicule 2 roues" %}</td>
+      <td>{% trans "Possède un véhicule et permis de conduire conformes et covoitureur possible" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Ressources financières" %}</th>
+      <td>{% trans "Situation de surendettement sans dépôt de dossier et/ou sans ressources" %}</td>
+      <td>{% trans "Surendettement avec dossier déposé et suivi" %}</td>
+      <td>{% trans "Besoins primaires assurés au jour le jour et/ou mesure de protection type curatelle" %}</td>
+      <td>{% trans "Sait gérer son budget, avec capacité de financer par exemple un permis de conduire" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Justice" %}</th>
+      <td>{% trans "Exécution de peine en cours" %}</td>
+      <td>{% trans "Suivi SPIP/PJJ après exécution de peine" %}</td>
+      <td>{% trans "Aucun suivi en cours" %}</td>
+      <td>{% trans "Aucun suivi en cours" %}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Disponibilité" %}</th>
+      <td>{% trans "Faible voire difficile (garde d'enfant, ascendant, famille" %})</td>
+      <td>{% trans "A organiser" %}</td>
+      <td>{% trans "Immédiate avec des contraintes horaires" %}</td>
+      <td>{% trans "Immédiate et sans contraintes horaires" %}</td>
+    </tr>
+  </tbody>
+</table>

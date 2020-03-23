@@ -64,12 +64,13 @@ LOCAL_APPS = [
     "itou.eligibility",
     # www.
     "itou.www.apply",
-    "itou.www.autocomplete",
     "itou.www.approvals_views",
+    "itou.www.autocomplete",
     "itou.www.dashboard",
+    "itou.www.eligibility_views",
     "itou.www.home",
-    "itou.www.search",
     "itou.www.prescribers_views",
+    "itou.www.search",
     "itou.www.siaes_views",
     "itou.www.signup",
 ]

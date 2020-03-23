@@ -5,7 +5,30 @@
 
     {{ block.super }}
 
-    <h2>{% trans "Critères d'éligibilité" %}</h2>
+    <div class="alert alert-warning" role="alert">
+        <p>{% trans "Pour valider une éligibilité la personne doit relever :" %}</p>
+        <ul>
+            <li>{% trans "d'au moins un besoin d'accompagnement" %}</li>
+            <li><b>{% trans "et" %}</b></li>
+            <li>
+                {% trans "de critères administratifs :" %}
+                <ul>
+                    <li>{% trans "au moins un critère administratif de niveau 1" %}</li>
+                    <li><b>{% trans "ou" %}</b></li>
+                    <li>{% trans "le cumul d'au moins trois critères de niveau 2" %}</li>
+                </ul>
+            </li>
+        </ul>
+        <p class="mb-0">
+            {% trans "Les personnes, qui ne répondraient pas aux critères d'éligibilité administratifs requis, pourront être orientées vers un prescripteur habilité (exemples des personnes sans ressource ou sans emploi de longue durée) qui pourra passer outre ces critères pour prescrire un parcours IAE." %}
+        </p>
+    </div>
+
+    <hr>
+
+    <div class="alert alert-warning" role="alert">
+        <i>{% trans "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
+    </div>
 
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}

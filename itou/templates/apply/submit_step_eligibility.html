@@ -5,7 +5,15 @@
 
     {{ block.super }}
 
-    <h2>{% trans "Critères d'éligibilité" %}</h2>
+    <div class="alert alert-warning" role="alert">
+        {% blocktrans %}La prescription d'un parcours IAE implique la réalisation préalable d'un diagnostic socio-professionnel permettant d'identifier les raisons, tenant compte <a href="#criteres_administratifs">des critères administratifs</a> et des freins sociaux, pour lesquelles la personne relève d'un parcours d'insertion par l'IAE. Ce diagnostic devra reprendre a minima les éléments présents dans <a href="#diagnostic_de_reference">le diagnostic de référence</a>{% endblocktrans %}
+    </div>
+
+    <hr>
+
+    <div class="alert alert-warning" role="alert">
+        <i>{% trans "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
+    </div>
 
     {% include "eligibility/includes/form.html" %}
 
