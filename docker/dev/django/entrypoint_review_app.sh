@@ -13,13 +13,16 @@ done
 # tail -f /dev/null & wait
 
 django-admin migrate
-# django_admin import_cities
-# django_admin loaddata $APP_HOME/itou/fixtures/jobs.json
-# django_admin loaddata $APP_HOME/itou/fixtures/siaes.json
-# django_admin loaddata $APP_HOME/itou/fixtures/prescribers.json
-# django_admin loaddata $APP_HOME/itou/fixtures/test_users.json
-# django_admin loaddata $APP_HOME/itou/fixtures/prescriber_memberships.json
-# django_admin loaddata $APP_HOME/itou/fixtures/siae_memberships.json
+django-admin import_cities
+
+echo "################## Cities imported successfully. Now import all fixtures. #######################"
+django-admin loaddata $APP_HOME/itou/fixtures/*.json
+# django-admin loaddata $APP_HOME/itou/fixtures/jobs.json
+# django-admin loaddata $APP_HOME/itou/fixtures/siaes.json
+# django-admin loaddata $APP_HOME/itou/fixtures/prescribers.json
+# django-admin loaddata $APP_HOME/itou/fixtures/test_users.json
+# django-admin loaddata $APP_HOME/itou/fixtures/prescriber_memberships.json
+# django-admin loaddata $APP_HOME/itou/fixtures/siae_memberships.json
 
 django-admin runserver_plus 0.0.0.0:8000
 
