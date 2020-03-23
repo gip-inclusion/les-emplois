@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _, gettext_lazy
 from django_select2.forms import Select2MultipleWidget
+from django.urls import reverse_lazy
 
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -60,6 +61,21 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
 
 class CreateJobSeekerForm(forms.ModelForm):
+
+    ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
+
+    city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
+    city_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-city-autocomplete-input form-control",
+                "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
+                "placeholder": gettext_lazy("TBD: placeholder"),
+                "autocomplete": "off",
+            }
+        )
+    )
+
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
@@ -84,6 +100,7 @@ class CreateJobSeekerForm(forms.ModelForm):
             "address_line_1",
             "address_line_2",
             "post_code",
+            "city_name",
             "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
