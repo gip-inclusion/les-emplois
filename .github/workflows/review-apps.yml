@@ -13,6 +13,7 @@ env:
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Miimosa
+  CONFIGURATION_FILE: review-app-config
   REVIEW_APP_NAME: itou-${{ github.head_ref }}
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -63,6 +64,9 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI delete --yes
 
+    - name: Delete review app database
+      run: |
+        $CLEVER_CLI addon delete $REVIEW_APP_NAME-db --org $ORGANIZATION_NAME --yes
 
 
   create-review-app:
@@ -91,23 +95,24 @@ jobs:
         $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
-    - name: Link database
+    - name: Create and link database
       run: |
-        $CLEVER_CLI service link-addon itoudb
+        $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_NAME-db --region eu --link $REVIEW_APP_NAME --yes --org $ORGANIZATION_NAME
 
     - name: Export environment variables
       run: |
-        echo $SECRETS_FILE | base64 -d > .env
+        $CLEVER_CLI service link-addon $CONFIGURATION_FILE
+        # echo $SECRETS_FILE | base64 -d > .env
         # Export variables. Source does not work.
         # cf https://stackoverflow.com/questions/15474650/unix-what-is-the-difference-between-source-and-export
-        set -a
-        . .env
+        # set -a
+        # . .env
 
         # Then create a file to list all available variables
-        cat .env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
-        rm .env
+        # cat .env | grep -Po ".*=" |  sed -r 's/[=]+/,/g; $ s/.$//' |  tr -d '\n' > clever_env_vars.txt
+        # rm .env
 
-        cat clever_env_vars.txt | xargs $CLEVER_CLI env import-vars
+        # cat clever_env_vars.txt | xargs $CLEVER_CLI env import-vars
 
         # export DEPLOY_URL=$(cat .clever.json | grep -Po '(?<="deploy_url":)(.*?)(?=,)' | tr -d '"')
         # echo "DEPLOY_URL"
