@@ -13,7 +13,7 @@ done
 # tail -f /dev/null & wait
 
 django-admin migrate
-make populate_db
+make -c $APP_HOME populate_db
 django-admin runserver_plus 0.0.0.0:8000
 
 exec "$@"
