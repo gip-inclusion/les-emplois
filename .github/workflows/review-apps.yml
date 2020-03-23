@@ -12,8 +12,8 @@ env:
   CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
-  ORGANIZATION_NAME: Miimosa
-  CONFIGURATION_FILE: review-app-config
+  ORGANIZATION_NAME: Itou
+  CONFIGURATION_FILE: review-apps-config
   REVIEW_APP_NAME: itou-${{ github.head_ref }}
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
