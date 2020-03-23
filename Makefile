@@ -1,4 +1,4 @@
-# Global tasks.
+    # Global tasks.
 # =============================================================================
 
 .PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook

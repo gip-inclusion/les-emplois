@@ -4,10 +4,10 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext as _, gettext_lazy
 from django_select2.forms import Select2MultipleWidget
-from django.urls import reverse_lazy
 
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow

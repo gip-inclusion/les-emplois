@@ -24,7 +24,8 @@
 
         <div class="form-group row">
             {% bootstrap_field form.post_code form_group_class="col-md-3 col-sm-12 form-group"%}
-            {% bootstrap_field form.city form_group_class="col form-group"%}
+            {% bootstrap_field form.city_name form_group_class="col form-group"%}
+            {% bootstrap_field form.city %}
         </div>
 
         {% bootstrap_field form.pole_emploi_id %}
