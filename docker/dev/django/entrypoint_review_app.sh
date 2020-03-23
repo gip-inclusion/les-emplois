@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-while ! pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT; do
+while ! pg_isready -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT; do
     >&2 echo "Postgres is unavailable - sleeping"
     sleep 1
 done
@@ -13,6 +13,7 @@ done
 # tail -f /dev/null & wait
 
 django-admin migrate
+make populate_db
 django-admin runserver_plus 0.0.0.0:8000
 
 exec "$@"

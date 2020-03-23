@@ -76,4 +76,11 @@ ENV PYTHONPATH=.
 
 EXPOSE 8000
 
-ENTRYPOINT ["./docker/dev/django/entrypoint.sh"]
+# Get current environment to load the correct entrypoint
+RUN if [ -z "$REALM" ] ; then \
+    $ENTRYPOINT_FILE="./docker/dev/django/entrypoint.sh"; \
+  else \
+    $ENTRYPOINT_FILE="./docker/dev/django/entrypoint_$REALM"; \
+  fi
+
+ENTRYPOINT [$ENTRYPOINT_FILE]
