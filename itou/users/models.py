@@ -6,10 +6,11 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
+from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_pole_emploi_id
 
 
-class User(AbstractUser):
+class User(AbstractUser, AddressMixin):
     """
     Custom user model.
 
