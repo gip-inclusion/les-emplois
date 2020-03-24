@@ -11,13 +11,19 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
+<div class="alert alert-warning" role="alert">
+    <i>{% trans "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
+</div>
+
 <form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
     <h2>{% trans "Critères d'éligibilité" %}</h2>
 
-    {% bootstrap_form_errors form_confirm_eligibility %}
+    {% if form_confirm_eligibility and request.user.is_siae_staff %}
+        {% bootstrap_form_errors form_confirm_eligibility %}
+    {% endif %}
 
     <h2 id="criteres_administratifs">
         <span class="badge badge-secondary">{% trans "Critères administratifs" %}</span>
@@ -41,7 +47,9 @@
 
     {% include "eligibility/includes/reference_diagnosis.html" %}
 
-    {% bootstrap_form form_confirm_eligibility %}
+    {% if form_confirm_eligibility and request.user.is_siae_staff %}
+        {% bootstrap_form form_confirm_eligibility %}
+    {% endif %}
 
     <div class="alert alert-warning" role="alert">
         <p>

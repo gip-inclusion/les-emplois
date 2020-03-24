@@ -4,13 +4,10 @@ from django.utils.translation import gettext as _, gettext_lazy
 from itou.eligibility.models import AdministrativeCriteria
 
 
-SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR = gettext_lazy(
-    "Vous devez sélectionner au moins un critère administratif de niveau 1 "
-    "ou le cumul d'au moins trois critères de niveau 2."
-)
-
-
 class ConfirmEligibilityForm(forms.Form):
+    """
+    Confirmation is currently required only for SIAEs.
+    """
 
     confirm = forms.BooleanField(
         label=gettext_lazy(
@@ -23,6 +20,12 @@ class ConfirmEligibilityForm(forms.Form):
         if not self.cleaned_data["confirm"]:
             error = _("Vous devez confirmer l'éligibilité du candidat.")
             raise forms.ValidationError(error)
+
+
+ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE = gettext_lazy(
+    "Vous devez sélectionner au moins un critère administratif de niveau 1 "
+    "ou le cumul d'au moins trois critères de niveau 2."
+)
 
 
 class AdministrativeCriteriaLevel1Form(forms.Form):

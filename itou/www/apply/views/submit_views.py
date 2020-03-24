@@ -14,11 +14,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
-from itou.www.eligibility_views.forms import (
-    AdministrativeCriteriaLevel1Form,
-    AdministrativeCriteriaLevel2Form,
-    ConfirmEligibilityForm,
-)
+from itou.www.eligibility_views.forms import AdministrativeCriteriaLevel1Form, AdministrativeCriteriaLevel2Form
 
 
 def valid_session_required(function=None):
@@ -252,18 +248,17 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     if skip:
         return HttpResponseRedirect(next_url)
 
-    form_administrative_criteria_level1 = AdministrativeCriteriaLevel1Form(data=request.POST or None)
-    form_administrative_criteria_level2 = AdministrativeCriteriaLevel2Form(data=request.POST or None)
-    form_confirm_eligibility = ConfirmEligibilityForm(data=request.POST or None)
+    data = request.POST if request.method == "POST" else None
+    form_administrative_criteria_level1 = AdministrativeCriteriaLevel1Form(data=data)
+    form_administrative_criteria_level2 = AdministrativeCriteriaLevel2Form(data=data)
 
-    if request.method == "POST" and all(
-        [
-            form_confirm_eligibility.is_valid(),
-            form_administrative_criteria_level1.is_valid(),
-            form_administrative_criteria_level2.is_valid(),
-        ]
+    if (
+        request.method == "POST"
+        and form_administrative_criteria_level1.is_valid()
+        and form_administrative_criteria_level2.is_valid()
     ):
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
+        # Administrative criteria are optional for authorized prescribers.
         selected_level1 = form_administrative_criteria_level1.cleaned_data
         selected_level2 = form_administrative_criteria_level2.cleaned_data
         for criteria in selected_level1 + selected_level2:
@@ -278,7 +273,6 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         "approvals_wrapper": approvals_wrapper,
         "form_administrative_criteria_level1": form_administrative_criteria_level1,
         "form_administrative_criteria_level2": form_administrative_criteria_level2,
-        "form_confirm_eligibility": form_confirm_eligibility,
     }
     return render(request, template_name, context)
 

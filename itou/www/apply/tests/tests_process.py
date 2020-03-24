@@ -13,7 +13,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.www.eligibility_views.forms import (
-    SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR,
+    ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE,
     AdministrativeCriteriaLevel1Form,
     AdministrativeCriteriaLevel2Form,
 )
@@ -202,7 +202,7 @@ class ProcessViewsTest(TestCase):
         post_data = {"confirm": "true"}
         response = self.client.post(url, data=post_data)
         messages = [str(message) for message in response.context["messages"]]
-        self.assertIn(SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR, messages)
+        self.assertIn(ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE, messages)
         self.assertEqual(response.status_code, 200)
 
         # At least 1 level1 criteria or 3 level2 criteria.
@@ -212,7 +212,7 @@ class ProcessViewsTest(TestCase):
             "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
-        self.assertIn(SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR, messages)
+        self.assertIn(ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE, messages)
         self.assertEqual(response.status_code, 200)
 
         # Good data.

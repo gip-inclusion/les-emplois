@@ -26,10 +26,6 @@
 
     <hr>
 
-    <div class="alert alert-warning" role="alert">
-        <i>{% trans "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
-    </div>
-
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 

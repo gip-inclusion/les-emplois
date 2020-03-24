@@ -13,7 +13,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm
 from itou.www.eligibility_views.forms import (
-    SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR,
+    ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE,
     AdministrativeCriteriaLevel1Form,
     AdministrativeCriteriaLevel2Form,
     ConfirmEligibilityForm,
@@ -231,7 +231,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         is_valid = len(selected_level1) or len(selected_level2) >= 3
 
         if not is_valid:
-            messages.error(request, SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR)
+            messages.error(request, ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE)
 
         else:
             user_info = get_user_info(request)
