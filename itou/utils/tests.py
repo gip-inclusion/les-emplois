@@ -20,7 +20,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
-from itou.utils.templatetags import format_filters
+from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_safe_url
 from itou.utils.validators import (
@@ -265,21 +265,21 @@ class UtilsTemplateTagsTestCase(TestCase):
         context = {
             "url": "https://inclusion.beta.gouv.fr/siae/search?distance=100&city=aubervilliers-93&page=55&page=1"
         }
-        template = Template("{% load url_add_query %}" "{% url_add_query url page=2 %}")
+        template = Template("{% load url_add_query %}{% url_add_query url page=2 %}")
         out = template.render(Context(context))
         expected = "https://inclusion.beta.gouv.fr/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2"
         self.assertEqual(out, expected)
 
         # Relative URL.
         context = {"url": "/siae/search?distance=50&city=metz-57"}
-        template = Template("{% load url_add_query %}" "{% url_add_query url page=22 %}")
+        template = Template("{% load url_add_query %}{% url_add_query url page=22 %}")
         out = template.render(Context(context))
         expected = "/siae/search?distance=50&amp;city=metz-57&amp;page=22"
         self.assertEqual(out, expected)
 
         # Empty URL.
         context = {"url": ""}
-        template = Template("{% load url_add_query %}" "{% url_add_query url page=1 %}")
+        template = Template("{% load url_add_query %}{% url_add_query url page=1 %}")
         out = template.render(Context(context))
         expected = "?page=1"
         self.assertEqual(out, expected)
@@ -290,6 +290,12 @@ class UtilsTemplateFiltersTestCase(TestCase):
         """Test `format_phone` template filter."""
         self.assertEqual(format_filters.format_phone(""), "")
         self.assertEqual(format_filters.format_phone("0102030405"), "01 02 03 04 05")
+
+    def test_get_dict_item(self):
+        """Test `get_dict_item` template filter."""
+        my_dict = {"key1": "value1", "key2": "value2"}
+        self.assertEqual(dict_filters.get_dict_item(my_dict, "key1"), "value1")
+        self.assertEqual(dict_filters.get_dict_item(my_dict, "key2"), "value2")
 
 
 class UtilsEmailsTestCase(TestCase):

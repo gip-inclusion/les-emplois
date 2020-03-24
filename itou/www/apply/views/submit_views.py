@@ -263,26 +263,12 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
             form_administrative_criteria_level2.is_valid(),
         ]
     ):
-
-        level1_true_count = sum(
-            1 for criteria in form_administrative_criteria_level1.cleaned_data.values() if criteria
-        )
-        level2_true_count = sum(
-            1 for criteria in form_administrative_criteria_level2.cleaned_data.values() if criteria
-        )
-
         eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
-
-        if level1_true_count:
-            administrative_criteria_level1 = form_administrative_criteria_level1.save(commit=False)
-            administrative_criteria_level1.eligibility_diagnosis = eligibility_diagnosis
-            administrative_criteria_level1.save()
-
-        if level2_true_count:
-            administrative_criteria_level2 = form_administrative_criteria_level2.save(commit=False)
-            administrative_criteria_level2.eligibility_diagnosis = eligibility_diagnosis
-            administrative_criteria_level2.save()
-
+        selected_level1 = form_administrative_criteria_level1.cleaned_data
+        selected_level2 = form_administrative_criteria_level2.cleaned_data
+        for criteria in selected_level1 + selected_level2:
+            eligibility_diagnosis.administrative_criteria.add(criteria)
+        eligibility_diagnosis.save()
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 

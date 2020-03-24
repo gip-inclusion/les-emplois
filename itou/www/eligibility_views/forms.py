@@ -1,7 +1,13 @@
 from django import forms
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.eligibility.models import AdministrativeCriteriaLevel1, AdministrativeCriteriaLevel2
+from itou.eligibility.models import AdministrativeCriteria
+
+
+SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR = gettext_lazy(
+    "Vous devez sélectionner au moins un critère administratif de niveau 1 "
+    "ou le cumul d'au moins trois critères de niveau 2."
+)
 
 
 class ConfirmEligibilityForm(forms.Form):
@@ -19,25 +25,33 @@ class ConfirmEligibilityForm(forms.Form):
             raise forms.ValidationError(error)
 
 
-class AdministrativeCriteriaLevel1Form(forms.ModelForm):
-    class Meta:
-        model = AdministrativeCriteriaLevel1
-        fields = ["is_beneficiaire_du_rsa", "is_allocataire_ass", "is_allocataire_aah", "is_detld_24_mois"]
+class AdministrativeCriteriaLevel1Form(forms.Form):
+
+    FIELD_PREFIX = "level_1_"
+    OBJECTS = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for criterion in AdministrativeCriteria.objects.level1():
+            key = f"{self.FIELD_PREFIX}{criterion.pk}"
+            self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
+            self.OBJECTS[key] = criterion
+
+    def clean(self):
+        return [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]
 
 
-class AdministrativeCriteriaLevel2Form(forms.ModelForm):
-    class Meta:
-        model = AdministrativeCriteriaLevel2
-        fields = [
-            "is_niveau_detude_3_infra",
-            "is_senior_50_ans",
-            "is_jeune_26_ans",
-            "is_sortant_de_lase",
-            "is_deld",
-            "is_travailleur_handicape",
-            "is_parent_isole",
-            "is_sans_hebergement",
-            "is_primo_arrivant",
-            "is_resident_zrr",
-            "is_resident_qpv",
-        ]
+class AdministrativeCriteriaLevel2Form(forms.Form):
+
+    FIELD_PREFIX = "level_2_"
+    OBJECTS = {}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for criterion in AdministrativeCriteria.objects.level2():
+            key = f"{self.FIELD_PREFIX}{criterion.pk}"
+            self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
+            self.OBJECTS[key] = criterion
+
+    def clean(self):
+        return [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]

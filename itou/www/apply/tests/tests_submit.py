@@ -290,7 +290,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         self.assertFalse(new_job_seeker.has_eligibility_diagnosis)
 
-        response = self.client.post(next_url)
+        post_data = {"confirm": "true"}
+        response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         self.assertTrue(new_job_seeker.has_eligibility_diagnosis)

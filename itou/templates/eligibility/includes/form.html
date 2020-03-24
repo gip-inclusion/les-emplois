@@ -28,7 +28,7 @@
     </h3>
 
     {% for field in form_administrative_criteria_level1 %}
-        {% bootstrap_field field %}
+        {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria_level1.OBJECTS %}
     {% endfor %}
 
     <h3>
@@ -36,7 +36,7 @@
     </h3>
 
     {% for field in form_administrative_criteria_level2 %}
-        {% bootstrap_field field %}
+        {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria_level2.OBJECTS %}
     {% endfor %}
 
     {% include "eligibility/includes/reference_diagnosis.html" %}

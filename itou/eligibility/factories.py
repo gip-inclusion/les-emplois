@@ -13,3 +13,12 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
     job_seeker = factory.SubFactory(JobSeekerFactory)
     author = factory.SubFactory(PrescriberFactory)
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+
+
+class AdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
+    """
+    The AdministrativeCriteria table is automatically populated with a fixture at the end of
+    eligibility's migration #0003.
+    """
+
+    pass

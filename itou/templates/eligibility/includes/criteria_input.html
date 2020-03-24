@@ -1,0 +1,36 @@
+{% load i18n %}
+{% load dict_filters %}
+
+<div class="form-group">
+    <div class="form-check">
+
+        <input type="checkbox" class="form-check-input" name="{{ field.html_name }}" id="{{ field.auto_id }}">
+
+        <label for="{{ field.id_for_label }}" class="form-check-label">
+
+            {{ field.label }}
+
+            {% if field.help_text %}
+                <small class="form-text text-muted">{{ field.help_text }}</small>
+            {% endif %}
+
+            {% with objects_dict|get_dict_item:field.name as criteria %}
+                 {% if criteria.written_proof %}
+                     <small class="form-text text-muted">
+                         {% trans "Pièce justificative :" %}
+                         <i>{{ criteria.written_proof }}</i>
+                     </small>
+                 {% endif %}
+                 {% if criteria.written_proof_url %}
+                     <small class="form-text text-muted">
+                         <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank">
+                             {{ criteria.written_proof_url }}
+                         </a>
+                     </small>
+                 {% endif %}
+            {% endwith %}
+
+        </label>
+
+    </div>
+</div>

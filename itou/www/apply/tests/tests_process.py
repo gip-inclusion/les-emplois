@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -11,6 +12,11 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.www.eligibility_views.forms import (
+    SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR,
+    AdministrativeCriteriaLevel1Form,
+    AdministrativeCriteriaLevel2Form,
+)
 
 
 class ProcessViewsTest(TestCase):
@@ -179,11 +185,46 @@ class ProcessViewsTest(TestCase):
 
         self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
 
+        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
+        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
+        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
+
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"confirm-eligibility": "1"}
+        # Ensure that a manual confirmation is mandatory.
+        post_data = {"confirm": "false"}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        # At least 1 level1 criteria or 3 level2 criteria.
+        post_data = {"confirm": "true"}
+        response = self.client.post(url, data=post_data)
+        messages = [str(message) for message in response.context["messages"]]
+        self.assertIn(SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR, messages)
+        self.assertEqual(response.status_code, 200)
+
+        # At least 1 level1 criteria or 3 level2 criteria.
+        post_data = {
+            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion2.pk}": "true",
+            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion3.pk}": "true",
+            "confirm": "true",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertIn(SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR, messages)
+        self.assertEqual(response.status_code, 200)
+
+        # Good data.
+        post_data = {
+            # Administrative criteria level 1.
+            f"{AdministrativeCriteriaLevel1Form.FIELD_PREFIX}{criterion1.pk}": "true",
+            # Administrative criteria level 2.
+            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion2.pk}": "true",
+            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion3.pk}": "true",
+            # Confirm.
+            "confirm": "true",
+        }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -191,6 +232,17 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         self.assertTrue(job_application.job_seeker.has_eligibility_diagnosis)
+        # Check diagnosis.
+        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
+        self.assertEqual(eligibility_diagnosis.author, siae_user)
+        self.assertEqual(eligibility_diagnosis.author_kind, EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF)
+        self.assertEqual(eligibility_diagnosis.author_siae, job_application.to_siae)
+        # Check administrative criteria.
+        administrative_criteria = eligibility_diagnosis.administrative_criteria.all()
+        self.assertEqual(3, administrative_criteria.count())
+        self.assertIn(criterion1, administrative_criteria)
+        self.assertIn(criterion2, administrative_criteria)
+        self.assertIn(criterion3, administrative_criteria)
 
     def test_eligibility_for_siae_not_subject_to_eligibility_rules(self):
         """Test eligibility for an Siae not subject to eligibility rules."""

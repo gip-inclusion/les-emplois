@@ -13,6 +13,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm
 from itou.www.eligibility_views.forms import (
+    SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR,
     AdministrativeCriteriaLevel1Form,
     AdministrativeCriteriaLevel2Form,
     ConfirmEligibilityForm,
@@ -224,36 +225,20 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         ]
     ):
 
-        level1_true_count = sum(
-            1 for criteria in form_administrative_criteria_level1.cleaned_data.values() if criteria
-        )
-        level2_true_count = sum(
-            1 for criteria in form_administrative_criteria_level2.cleaned_data.values() if criteria
-        )
+        selected_level1 = form_administrative_criteria_level1.cleaned_data
+        selected_level2 = form_administrative_criteria_level2.cleaned_data
 
-        is_valid = level1_true_count or level2_true_count >= 3
+        is_valid = len(selected_level1) or len(selected_level2) >= 3
 
         if not is_valid:
-            messages.error(
-                request,
-                _(
-                    "Vous devez sélectionner au moins un critère administratif de niveau 1 "
-                    "ou le cumul d'au moins trois critères de niveau 2."
-                ),
-            )
-        else:
+            messages.error(request, SIAE_INVALID_ADMINISTRATIVE_CRITERIA_ERROR)
 
+        else:
             user_info = get_user_info(request)
             eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
-
-            administrative_criteria_level1 = form_administrative_criteria_level1.save(commit=False)
-            administrative_criteria_level1.eligibility_diagnosis = eligibility_diagnosis
-            administrative_criteria_level1.save()
-
-            administrative_criteria_level2 = form_administrative_criteria_level2.save(commit=False)
-            administrative_criteria_level2.eligibility_diagnosis = eligibility_diagnosis
-            administrative_criteria_level2.save()
-
+            for criteria in selected_level1 + selected_level2:
+                eligibility_diagnosis.administrative_criteria.add(criteria)
+            eligibility_diagnosis.save()
             messages.success(request, _("Éligibilité confirmée !"))
             next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
             return HttpResponseRedirect(next_url)

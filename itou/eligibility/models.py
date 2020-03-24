@@ -53,6 +53,13 @@ class EligibilityDiagnosis(models.Model):
         blank=True,
         on_delete=models.CASCADE,
     )
+    # Administrative criteria are mandatory only when an SIAE is performing an eligibility diagnosis.
+    administrative_criteria = models.ManyToManyField(
+        "eligibility.AdministrativeCriteria",
+        verbose_name=_("Critères administratifs"),
+        through="SelectedAdministrativeCriteria",
+        blank=True,
+    )
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
@@ -85,91 +92,72 @@ class EligibilityDiagnosis(models.Model):
         )
 
 
-class AdministrativeCriteriaLevel1(models.Model):
+class AdministrativeCriteriaQuerySet(models.QuerySet):
+    def level1(self, **kwargs):
+        return self.filter(level=AdministrativeCriteria.Level.LEVEL_1)
 
-    EXTRA_DATA = {
-        "is_beneficiaire_du_rsa": {"written_proof": _("Attestation RSA")},
-        "is_allocataire_ass": {"written_proof": _("Attestation ASS")},
-        "is_allocataire_aah": {"written_proof": _("Attestation AAH")},
-        "is_detld_24_mois": {"written_proof": _("Attestation Pôle emploi")},
-    }
+    def level2(self, **kwargs):
+        return self.filter(level=AdministrativeCriteria.Level.LEVEL_2)
 
-    eligibility_diagnosis = models.OneToOneField(EligibilityDiagnosis, on_delete=models.CASCADE)
-    is_beneficiaire_du_rsa = models.BooleanField(
-        verbose_name=_("Bénéficiaire du RSA"), default=False, help_text=_("Revenu de solidarité active")
+
+class AdministrativeCriteria(models.Model):
+    """
+    List of administrative criteria.
+    They can be created and updated using the admin.
+
+    The table is automatically populated with a fixture at the end of
+    eligibility's migration #0003.
+    """
+
+    MAX_UI_RANK = 32767
+
+    class Level(models.TextChoices):
+        LEVEL_1 = "1", _("Niveau 1")
+        LEVEL_2 = "2", _("Niveau 2")
+
+    level = models.CharField(verbose_name=_("Niveau"), max_length=1, choices=Level.choices, default=Level.LEVEL_1)
+    name = models.CharField(verbose_name=_("Nom"), max_length=255)
+    desc = models.CharField(verbose_name=_("Description"), max_length=255, blank=True)
+    written_proof = models.CharField(verbose_name=_("Justificatif"), max_length=255, blank=True)
+    written_proof_url = models.URLField(
+        verbose_name=_("Lien d'aide à propos du justificatif"), max_length=200, blank=True
     )
-    is_allocataire_ass = models.BooleanField(
-        verbose_name=_("Allocataire ASS"), default=False, help_text=_("Allocation de solidarité spécifique")
+    # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
+    # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
+    ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("Créé par"), null=True, blank=True, on_delete=models.SET_NULL
     )
-    is_allocataire_aah = models.BooleanField(
-        verbose_name=_("Allocataire AAH"), default=False, help_text=_("Allocation aux adultes handicapés")
-    )
-    is_detld_24_mois = models.BooleanField(
-        verbose_name=_("DETLD (+ 24 mois)"),
-        default=False,
-        help_text=_("Demandeur d'emploi de très longue durée (inscrit à Pôle emploi)"),
-    )
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
+
+    objects = models.Manager.from_queryset(AdministrativeCriteriaQuerySet)()
 
     class Meta:
-        verbose_name = _("Critères administratifs de niveau 1")
-        verbose_name_plural = _("Critères administratifs de niveau 1")
+        verbose_name = _("Critère administratif")
+        verbose_name_plural = _("Critères administratifs")
+        ordering = ["ui_rank"]
 
     def __str__(self):
-        return str(self.id)
+        return f"{self.name} - {self.get_level_display()}"
 
 
-class AdministrativeCriteriaLevel2(models.Model):
+class SelectedAdministrativeCriteria(models.Model):
+    """
+    Selected administrative criteria of an eligibility diagnosis.
+    Intermediary model between `EligibilityDiagnosis` and `AdministrativeCriteria`.
+    https://docs.djangoproject.com/en/dev/ref/models/relations/
+    """
 
-    EXTRA_DATA = {
-        "is_niveau_detude_3_infra": {"written_proof": _("Diplôme et/ou attestation sur l'honneur")},
-        "is_senior_50_ans": {"written_proof": _("Pièce d'identité")},
-        "is_jeune_26_ans": {"written_proof": _("Pièce d'identité")},
-        "is_sortant_de_lase": {"written_proof": _("Attestation ASE")},
-        "is_deld": {"written_proof": _("Attestation Pôle emploi")},
-        "is_travailleur_handicape": {"written_proof": _("Attestation reconnaissance qualité TH")},
-        "is_parent_isole": {"written_proof": _("Attestation CAF")},
-        "is_sans_hebergement": {"written_proof": _("Attestation sur l'honneur")},
-        "is_primo_arrivant": {"written_proof": _("Contrat d'intégration républicaine de moins de 24 mois")},
-        "is_resident_zrr": {
-            "written_proof": _("Justificatif de domicile"),
-            "written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr/​",
-        },
-        "is_resident_qpv": {
-            "written_proof": _("Justificatif de domicile"),
-            "written_proof_url": "https://sig.ville.gouv.fr/​",
-        },
-    }
-
-    eligibility_diagnosis = models.OneToOneField(EligibilityDiagnosis, on_delete=models.CASCADE)
-    is_niveau_detude_3_infra = models.BooleanField(verbose_name=_("Niveau d'étude 3 ou infra"), default=False)
-    is_senior_50_ans = models.BooleanField(verbose_name=_("Senior (+50 ans)"), default=False)
-    is_jeune_26_ans = models.BooleanField(verbose_name=_("Jeunes (-26 ans)"), default=False)
-    is_sortant_de_lase = models.BooleanField(
-        verbose_name=_("Sortant de l'ASE"), default=False, help_text=_("Aide sociale à l'enfance")
+    eligibility_diagnosis = models.ForeignKey(EligibilityDiagnosis, on_delete=models.CASCADE)
+    administrative_criteria = models.ForeignKey(
+        AdministrativeCriteria, on_delete=models.CASCADE, related_name="administrative_criteria_through"
     )
-    is_deld = models.BooleanField(
-        verbose_name=_("DELD (12-24 mois)"),
-        default=False,
-        help_text=_("Demandeur d'emploi de très longue durée (inscrit à Pôle emploi)"),
-    )
-    is_travailleur_handicape = models.BooleanField(verbose_name=_("Travailleur handicapé"), default=False)
-    is_parent_isole = models.BooleanField(verbose_name=_("Parent isolé"), default=False)
-    is_sans_hebergement = models.BooleanField(
-        verbose_name=_("Personne sans hébergement ou hébergée ou ayant un parcours de rue"), default=False
-    )
-    is_primo_arrivant = models.BooleanField(verbose_name=_("Primo arrivant"), default=False)
-    is_resident_zrr = models.BooleanField(
-        verbose_name=_("Résident ZRR"), default=False, help_text=_("Zone de revitalisation rurale")
-    )
-    is_resident_qpv = models.BooleanField(
-        verbose_name=_("Résident QPV"), default=False, help_text=_("Quartier prioritaire de la politique de la ville")
-    )
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
 
     class Meta:
-        verbose_name = _("Critères administratifs de niveau 2")
-        verbose_name_plural = _("Critères administratifs de niveau 2")
+        verbose_name = _("Critère administratif sélectionné")
+        verbose_name_plural = _("Critères administratifs sélectionnés")
+        unique_together = ("eligibility_diagnosis", "administrative_criteria")
 
     def __str__(self):
-        return str(self.id)
+        return f"{self.id}"
