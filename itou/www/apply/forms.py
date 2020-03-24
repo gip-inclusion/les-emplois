@@ -13,6 +13,7 @@ from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.widgets import DatePickerField
+from itou.cities.models import City
 
 
 class UserExistsForm(forms.Form):
@@ -118,6 +119,13 @@ class CreateJobSeekerForm(forms.ModelForm):
             raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
         return email
 
+    def clean_city(self):
+        slug = self.cleaned_data["city"]
+        try:
+            return City.objects.get(slug=slug)
+        except City.DoesNotExist:
+            raise forms.ValidationError(_("Cette ville n'existe pas."))
+
     def clean(self):
         super().clean()
         self._meta.model.clean_pole_emploi_fields(
@@ -125,8 +133,12 @@ class CreateJobSeekerForm(forms.ModelForm):
         )
 
     def save(self, commit=True):
+        # Exclude 'city_name' form field (not mapped to model)
+        partial_fields = self.cleaned_data
+        del partial_fields["city_name"]
+
         if commit:
-            return self._meta.model.create_job_seeker_by_proxy(self.proxy_user, **self.cleaned_data)
+            return self._meta.model.create_job_seeker_by_proxy(self.proxy_user, **partial_fields)
         return super().save(commit=False)
 
 
