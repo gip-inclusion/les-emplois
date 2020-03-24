@@ -146,9 +146,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     # This will ensure a smooth Approval delivery.
     form_pe_status = None
     if job_application.to_siae.is_subject_to_eligibility_rules:
-        form_pe_status = form_pe_status = JobSeekerPoleEmploiStatusForm(
-            instance=job_application.job_seeker, data=request.POST or None
-        )
+        form_pe_status = JobSeekerPoleEmploiStatusForm(instance=job_application.job_seeker, data=request.POST or None)
         forms.append(form_pe_status)
 
     form_accept = AcceptForm(instance=job_application, data=request.POST or None)

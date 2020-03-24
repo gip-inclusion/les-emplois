@@ -2,7 +2,6 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
@@ -171,18 +170,19 @@ class AcceptForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].required = True
-            self.fields[field].input_formats = settings.DATE_INPUT_FORMATS
+            self.fields[field].widget = DatePickerField()
+            self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
-            "hiring_start_at": gettext_lazy("Au format jj/mm/aaaa, par exemple  %(date)s.")
-            % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": gettext_lazy("Au format jj/mm/aaaa, par exemple  %(date)s.")
+            "hiring_start_at": gettext_lazy("Au format jj-mm-aaaa, par exemple  %(date)s.")
+            % {"date": datetime.date.today().strftime("%d-%m-%Y")},
+            "hiring_end_at": gettext_lazy("Au format jj-mm-aaaa, par exemple  %(date)s.")
             % {
                 "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
-                    "%d/%m/%Y"
+                    "%d-%m-%Y"
                 )
             },
         }
@@ -219,10 +219,15 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     Info that will be used to find an existing Pôle emploi approval.
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["birthdate"].widget = DatePickerField()
+        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
+
     class Meta:
         model = get_user_model()
         fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-        help_texts = {"birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978.")}
+        help_texts = {"birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978.")}
 
     def clean(self):
         super().clean()
