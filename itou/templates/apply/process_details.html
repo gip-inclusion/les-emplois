@@ -70,6 +70,30 @@
                     <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
                 </p>
 
+                {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
+                    {% if administrative_criteria %}
+                        <p>
+                            <span class="badge badge-secondary">
+                                {% trans "Critères administratifs" %}
+                            </span>
+                        </p>
+                        {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
+                        {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
+                        <ul>
+                            {% for level in levels %}
+                                <li>
+                                    <span class="badge badge-secondary">{{ level.grouper }}</span>
+                                    <ul>
+                                        {% for criteria in level.list %}
+                                            <li>{{ criteria.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+
             {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
 
                 {# The existence of a valid `PoleEmploiApproval` implies that #}
