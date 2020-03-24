@@ -93,10 +93,10 @@ class EligibilityDiagnosis(models.Model):
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
-    def level1(self, **kwargs):
+    def level1(self):
         return self.filter(level=AdministrativeCriteria.Level.LEVEL_1)
 
-    def level2(self, **kwargs):
+    def level2(self):
         return self.filter(level=AdministrativeCriteria.Level.LEVEL_2)
 
 
