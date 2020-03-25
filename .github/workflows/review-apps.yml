@@ -1,4 +1,5 @@
-
+# See https://help.github.com/en/actions
+# and https://developer.github.com/v3/
 name: Review apps
 
 # Run this pipeline when a label is added and
@@ -60,7 +61,7 @@ jobs:
   create-review-app:
     runs-on: ubuntu-latest
     needs: delete-review-app
-    if: always()
+    if: github.pull_request.state == "open"
 
     steps:
     - name: DEBUG ONLY
