@@ -40,3 +40,12 @@ class AdministrativeCriteriaLevel1FormTest(TestCase):
             AdministrativeCriteria.objects.get(pk=14),
         ]
         self.assertEqual(form.cleaned_data, expected_cleaned_data)
+
+        # Ensure a user cannot select both "Senior (+50 ans)" and "Jeunes (-26 ans)".
+        form_data = {
+            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}6": "true",
+            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}7": "true",
+        }
+        form = AdministrativeCriteriaLevel2Form(data=form_data)
+        form.is_valid()
+        self.assertIn(form.ERROR_SENIOR_JUNIOR, form.errors["__all__"])

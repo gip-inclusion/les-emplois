@@ -49,6 +49,8 @@ class AdministrativeCriteriaLevel2Form(forms.Form):
     FIELD_PREFIX = "level_2_"
     OBJECTS = {}
 
+    ERROR_SENIOR_JUNIOR = gettext_lazy("Vous ne pouvez pas sélectionner en même temps les critères Senior et Jeunes.")
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for criterion in AdministrativeCriteria.objects.level2():
@@ -57,4 +59,10 @@ class AdministrativeCriteriaLevel2Form(forms.Form):
             self.OBJECTS[key] = criterion
 
     def clean(self):
-        return [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]
+        selected_objects = [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]
+
+        selected_names = {obj.name for obj in selected_objects}
+        if {"Senior (+50 ans)", "Jeunes (-26 ans)"}.issubset(selected_names):
+            raise forms.ValidationError(self.ERROR_SENIOR_JUNIOR)
+
+        return selected_objects
