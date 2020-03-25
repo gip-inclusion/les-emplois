@@ -15,7 +15,6 @@ env:
   ORGANIZATION_NAME: Itou
   ROOT_DB_NAME: discourse-db-obsolete
   CONFIGURATION_FILE: review-apps-config
-  REVIEW_APP_NAME: review_${{ github.head_ref }}
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
@@ -57,6 +56,9 @@ jobs:
     #   with:
     #     name: $CLEVER_DIR
 
+    - name: Set review app name
+      run: echo ::set-env name=REVIEW_APP_NAME::$(echo review_$BRANCH | sed -r 's/[;\/-. ]+/_/g; $ s/.$//')
+
     - name: Delete review app
       run: |
         curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
@@ -86,6 +88,9 @@ jobs:
     #   with:
     #     name: clever_env_vars.txt
     #     path: clever_files/
+
+    - name: Set review app name
+      run: echo ::set-env name=REVIEW_APP_NAME::$(echo review_$BRANCH | sed -r 's/[;\/-. ]+/_/g; $ s/.$//')
 
     - name: Create review app
       run: |
