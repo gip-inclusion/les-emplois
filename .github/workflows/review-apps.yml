@@ -45,13 +45,13 @@ jobs:
     - name: Set DB schema name
       run: echo ::set-env name=REVIEW_APP_DB_SCHEMA::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
-    - name: Delete review app database
+    - name: Delete review app schema
       run: |
-        echo "Deleting database $REVIEW_APP_DB_SCHEMA"
+        echo "Deleting schema $REVIEW_APP_DB_SCHEMA"
         psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
           DROP SCHEMA IF EXISTS $REVIEW_APP_DB_SCHEMA;
         EOSQL
-        echo "Database deleted successfully!"
+        echo "Schema deleted successfully!"
 
     - name: Delete review app
       run: |

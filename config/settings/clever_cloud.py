@@ -49,7 +49,7 @@ DATABASES = {
         "USER": os.environ.get("POSTGRESQL_ADDON_USER"),
         "PASSWORD": os.environ.get("POSTGRESQL_ADDON_PASSWORD"),
         'OPTIONS': {
-            'options': f'-c search_path={DB_SCHEMA}',
+            'options': f'-c search_path={DB_SCHEMA},public',
         },
     }
 }
