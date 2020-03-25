@@ -10,10 +10,11 @@ from django.utils.translation import gettext as _, gettext_lazy
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
+from itou.cities.models import City
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.validators import validate_birthdate
 from itou.utils.widgets import DatePickerField
-from itou.cities.models import City
 
 
 class UserExistsForm(forms.Form):
@@ -65,7 +66,8 @@ class CreateJobSeekerForm(forms.ModelForm):
 
     ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
-    city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
+    city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
+
     city_name = forms.CharField(
         label=gettext_lazy("Ville"),
         required=False,
@@ -76,7 +78,7 @@ class CreateJobSeekerForm(forms.ModelForm):
                 "placeholder": gettext_lazy("Nom de la ville"),
                 "autocomplete": "off",
             }
-        )
+        ),
     )
 
     def __init__(self, proxy_user, *args, **kwargs):
@@ -90,7 +92,11 @@ class CreateJobSeekerForm(forms.ModelForm):
         # Birth date
         self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DatePickerField()
+<<<<<<< HEAD
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
+=======
+        self.fields["birthdate"].validators = [validate_birthdate]
+>>>>>>> 188f55f... Added a (basic) birthdate validator
 
     class Meta:
         model = get_user_model()
@@ -121,10 +127,13 @@ class CreateJobSeekerForm(forms.ModelForm):
 
     def clean_city(self):
         slug = self.cleaned_data["city"]
-        try:
-            return City.objects.get(slug=slug)
-        except City.DoesNotExist:
-            raise forms.ValidationError(_("Cette ville n'existe pas."))
+        # Addresses are optional: check only if smth is entered
+        if slug:
+            try:
+                return City.objects.get(slug=slug).name
+            except City.DoesNotExist:
+                raise forms.ValidationError(gettext_lazy("Cette ville n'existe pas."))
+        return ""
 
     def clean(self):
         super().clean()

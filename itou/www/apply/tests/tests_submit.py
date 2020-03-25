@@ -98,14 +98,34 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
+<<<<<<< HEAD
         post_data = {"birthdate": "20-12-1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
+=======
+        post_data = {
+            "birthdate": "20/12/1978",
+            "phone": "0610203040",
+            "pole_emploi_id": "1234567A",
+            "address_line_1": "55, avenue de la Rose",
+            "address_line_2": "7e étage",
+            "post_code": "13014",
+            "city": "marseille-13",
+        }
+
+>>>>>>> 188f55f... Added a (basic) birthdate validator
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.birthdate.strftime("%d-%m-%Y"), post_data["birthdate"])
         self.assertEqual(user.phone, post_data["phone"])
+
         self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
+
+        self.assertEqual(user.address_line_1, post_data["address_line_1"])
+        self.assertEqual(user.address_line_2, post_data["address_line_2"])
+
+        self.assertEqual(user.post_code, post_data["post_code"])
+        self.assertEqual(user.city, post_data["city"])
 
         next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)

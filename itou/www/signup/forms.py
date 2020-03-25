@@ -3,10 +3,12 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
+from itou.cities.models import City
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.tokens import siae_signup_token_generator
@@ -31,6 +33,54 @@ class FullnameFormMixin(forms.Form):
         required=True,
         strip=True,
     )
+
+
+class AddressFormMixin(forms.Form):
+
+    ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:all_cities")
+
+    city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
+
+    city_name = forms.CharField(
+        label=gettext_lazy("Ville"),
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-city-autocomplete-input form-control",
+                "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
+                "placeholder": gettext_lazy("Nom de la ville"),
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+    address_line_1 = forms.CharField(
+        required=False,
+        max_length=get_user_model()._meta.get_field("address_line_1").max_length,
+        label=gettext_lazy("Adresse"),
+    )
+
+    address_line_2 = forms.CharField(
+        required=False,
+        max_length=get_user_model()._meta.get_field("address_line_2").max_length,
+        label=gettext_lazy("Complément d'adresse"),
+    )
+
+    post_code = forms.CharField(
+        required=False,
+        max_length=get_user_model()._meta.get_field("post_code").max_length,
+        label=gettext_lazy("Code postal"),
+    )
+
+    def clean_city(self):
+        slug = self.cleaned_data["city"]
+        # Addresses are optional: check only if smth is entered
+        if slug:
+            try:
+                return City.objects.get(slug=slug).name
+            except City.DoesNotExist:
+                raise forms.ValidationError(gettext_lazy("Cette ville n'existe pas."))
+        return ""
 
 
 class PrescriberSignupForm(FullnameFormMixin, SignupForm):
@@ -77,7 +127,8 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         user.is_prescriber = True
         user.save()
 
-        # Join organization.
+        # Join organization.        max_length=get_user_model()._meta.get_field("first_name").max_length,
+
         authorized_organization = self.cleaned_data["authorized_organization"]
         organization = self.organization or authorized_organization
         if organization:
@@ -86,7 +137,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
             membership = PrescriberMembership()
             membership.user = user
             membership.organization = organization
-            # The first member becomes an admin.
+            # The first member becomes an adikariusmin.
             membership.is_admin = membership.organization.members.count() == 0
             membership.save()
 
@@ -265,13 +316,20 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         }
 
 
-class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
+class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin):
     def save(self, request):
 
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
+
+        # Optional address part
+        user.address_line_1 = self.cleaned_data["address_line_1"]
+        user.address_line_2 = self.cleaned_data["address_line_2"]
+        user.post_code = self.cleaned_data["post_code"]
+        user.city = self.cleaned_data["city"]
+
         user.is_job_seeker = True
         user.save()
 

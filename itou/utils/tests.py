@@ -25,6 +25,7 @@ from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGen
 from itou.utils.urls import get_safe_url
 from itou.utils.validators import (
     alphanumeric,
+    validate_birthdate,
     validate_naf,
     validate_pole_emploi_id,
     validate_post_code,
@@ -255,6 +256,13 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_pole_emploi_id, "A234567É")
         validate_pole_emploi_id("12345678")
         validate_pole_emploi_id("1234567E")
+
+    def test_validate_birthdate(self):
+        current_date = datetime.now().date()
+        self.assertRaises(ValidationError, validate_birthdate, current_date + timedelta(days=1))
+        self.assertRaises(ValidationError, validate_birthdate, current_date + timedelta(days=365))
+        self.assertRaises(ValidationError, validate_birthdate, current_date)
+        validate_birthdate(current_date - timedelta(days=3600))
 
 
 class UtilsTemplateTagsTestCase(TestCase):
