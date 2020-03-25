@@ -101,10 +101,10 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
     - name: Create and link database
       run: |
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $ROOT_DB_NAME --org $ORGANIZATION_NAME
         # $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_NAME-db --region eu --link $REVIEW_APP_NAME --yes --org $ORGANIZATION_NAME
 
