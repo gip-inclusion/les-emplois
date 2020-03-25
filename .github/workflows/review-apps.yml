@@ -3,7 +3,7 @@
 name: Review apps
 
 # Run this pipeline when a label is added and
-# when a push is made on this PR.
+# when a push is made on this PR. truc muche
 on:
   pull_request:
     branches: [ master ]
