@@ -65,7 +65,7 @@ jobs:
 
     steps:
     - name: DEBUG ONLY
-      run: echo ${{ github.head_ref }}
+      run: echo ${{ github.event.pull_request.state }}
     # - uses: actions/checkout@v2
     #   with:
     #     ref: ${{ github.head_ref }}
