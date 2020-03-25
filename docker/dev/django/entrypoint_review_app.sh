@@ -8,24 +8,44 @@ done
 
 >&2 echo "Postgres is up - continuing"
 
-# # https://github.com/docker/compose/issues/1926#issuecomment-422351028
-# trap : TERM INT
-# tail -f /dev/null & wait
+###################################################################
+# Review apps share the same Clever Cloud Postgresql add-on,
+# root_db, creating a new database for each one.
+# This is a workaround and may change in the future when
+# it will be possible to pay add-ons when we use it,(per usage),
+# and not in advance (per month).
+# See
+###################################################################
 
-# Update database to match our settings
-# TODO: when Clever Cloud will be available for all environment,
-# remove this and create a file for all the environments.
+# CREATE DATABASE actually works by copying an existing database.
+# By default, it copies the standard system database named template1.
+# cf https://www.postgresql.org/docs/current/manage-ag-templatedbs.html
 
-  # CREATE EXTENSION IF NOT EXISTS pg_trgm;
-  # CREATE EXTENSION IF NOT EXISTS postgis;
-  # CREATE EXTENSION IF NOT EXISTS unaccent;
+# /!\ The following instructions were added manually to the
+# configured addon:
+
+#   \c template1;
+
+#   CREATE EXTENSION IF NOT EXISTS pg_trgm;
+#   CREATE EXTENSION IF NOT EXISTS postgis;
+#   CREATE EXTENSION IF NOT EXISTS unaccent;
+
+#   DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
+#   CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
+#   ALTER TEXT SEARCH CONFIGURATION french_unaccent
+#   ALTER MAPPING FOR hword, hword_part, word
+#   WITH unaccent, french_stem;
+
+
+>&2 echo "Recreating database $REVIEW_APP_NAME"
 psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-  DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
-  CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
-  ALTER TEXT SEARCH CONFIGURATION french_unaccent
-    ALTER MAPPING FOR hword, hword_part, word
-    WITH unaccent, french_stem;
+  DROP DATABASE IF EXISTS $REVIEW_APP_NAME;
+  CREATE DATABASE $REVIEW_APP_NAME OWNER POSTGRESQL_ADDON_USER;
 EOSQL
+
+>&2 echo "Database $REVIEW_APP_NAME was successfully created!"
+
+export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
 
 django-admin migrate
 django-admin import_cities
