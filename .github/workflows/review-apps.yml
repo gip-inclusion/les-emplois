@@ -90,7 +90,7 @@ jobs:
     #     path: clever_files/
 
     - name: Set review app name
-      run: echo ::set-env name=REVIEW_APP_NAME::$(echo review_$BRANCH | sed -r 's/[;\/-. ]+/_/g; $ s/.$//')
+      run: echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
 
     - name: Create review app
       run: |
