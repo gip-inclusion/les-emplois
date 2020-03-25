@@ -77,7 +77,7 @@ jobs:
     - name: Delete review app database
       run: |
         echo "Deleting database $REVIEW_APP_DB_NAME"
-        psql -v ON_ERROR_STOP=1 $DB_URI <<-EOSQL
+        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
           DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
         EOSQL
         echo "Database deleted successfully!"
@@ -128,7 +128,7 @@ jobs:
     - name: Create database
       run: |
         echo "Recreating database $REVIEW_APP_DB_NAME"
-        psql -v ON_ERROR_STOP=1 $DB_URI <<-EOSQL
+        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
           CREATE DATABASE $REVIEW_APP_DB_NAME OWNER $POSTGRESQL_ADDON_USER;
         EOSQL
         echo "Database created successfully!"
