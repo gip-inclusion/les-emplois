@@ -116,8 +116,9 @@ jobs:
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $CONFIGURATION_FILE
-        export REVIEW_APP_DB_NAME=$(echo $REVIEW_APP_NAME | sed -r 's/[;\/-. ]+/_/g; $ s/.$//')
-        set -a
+        export REVIEW_APP_DB_NAME=$(echo $REVIEW_APP_NAME | sed -r 's/[-]+/_/g; $ s/.$//')
+        echo $REVIEW_APP_DB_NAME
+        # set -a
         $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
         # echo $SECRETS_FILE | base64 -d > .env
         # Export variables. Source does not work.
@@ -137,11 +138,11 @@ jobs:
         # git remote add clever $DEPLOY_URL
         # git push clever travis:master
 
-    - name: Deploy to Clever Cloud
-      run: $CLEVER_CLI deploy --branch $BRANCH --force --verbose
+    # - name: Deploy to Clever Cloud
+    #   run: $CLEVER_CLI deploy --branch $BRANCH --force --verbose
 
-    - name: Add link to pull request
-      uses: thollander/actions-comment-pull-request@master
-      with:
-        message: "🥁 L'environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Add link to pull request
+    #   uses: thollander/actions-comment-pull-request@master
+    #   with:
+    #     message: "🥁 L'environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
