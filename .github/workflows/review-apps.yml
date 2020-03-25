@@ -90,7 +90,9 @@ jobs:
     #     path: clever_files/
 
     - name: Set review app name
-      run: echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
+      run:
+        echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
+        echo ::set-env name=DEPLOY_URL::$(echo "$REVIEW_APP_NAME.cleverapps.io" | sed -r 's/[_]+/-/g')
 
     - name: Create review app
       run: |
@@ -98,7 +100,7 @@ jobs:
         tar -xvf $CLEVER_DIR.tar.gz
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
-        $CLEVER_CLI domain add $REVIEW_APP_NAME.cleverapps.io --alias $REVIEW_APP_NAME
+        $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
 
     - name: Create and link database
       run: |
