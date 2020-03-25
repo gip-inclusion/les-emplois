@@ -64,7 +64,7 @@ jobs:
 
     steps:
     - name: DEBUG ONLY
-      run: echo ${{ github.pull_request.merged }}
+      run: echo ${{ github.pull_request.state }}
     # - uses: actions/checkout@v2
     #   with:
     #     ref: ${{ github.head_ref }}
