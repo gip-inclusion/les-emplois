@@ -49,7 +49,7 @@ jobs:
       run: |
         echo "Deleting schema $REVIEW_APP_DB_SCHEMA"
         psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-          DROP SCHEMA IF EXISTS $REVIEW_APP_DB_SCHEMA;
+          DROP SCHEMA IF EXISTS $REVIEW_APP_DB_SCHEMA CASCADE;
         EOSQL
         echo "Schema deleted successfully!"
 
