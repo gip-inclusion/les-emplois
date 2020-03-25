@@ -36,7 +36,7 @@ done
 #   ALTER MAPPING FOR hword, hword_part, word
 #   WITH unaccent, french_stem;
 
-export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
+# export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
 
 django-admin migrate
 django-admin import_cities

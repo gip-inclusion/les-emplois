@@ -45,17 +45,17 @@ jobs:
     - name: Set DB name
       run: echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
+    - name: Delete review app database
+      run: |
+        echo "Deleting database $REVIEW_APP_DB_SCHEMA"
+        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+          DROP SCHEMA IF EXISTS $REVIEW_APP_DB_SCHEMA;
+        EOSQL
+        echo "Database deleted successfully!"
+
     - name: Delete review app
       run: |
         $CLEVER_CLI delete --yes
-
-    - name: Delete review app database
-      run: |
-        echo "Deleting database $REVIEW_APP_DB_NAME"
-        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-          DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
-        EOSQL
-        echo "Database deleted successfully!"
 
 
   create-review-app:
@@ -93,23 +93,23 @@ jobs:
         $CLEVER_CLI service link-addon $ADDON_DB_NAME
 
     - name: Set DB name
-      run: echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+      run: echo ::set-env name=REVIEW_APP_DB_SCHEMA::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
-    - name: Create database
+    - name: Create schema
       run: |
-        echo "Recreating database $REVIEW_APP_DB_NAME"
+        echo "Creating schema $REVIEW_APP_DB_SCHEMA"
         psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-          CREATE DATABASE $REVIEW_APP_DB_NAME OWNER $POSTGRESQL_ADDON_USER;
+          CREATE SCHEMA $REVIEW_APP_DB_SCHEMA;
         EOSQL
-        echo "Database created successfully!"
+        echo "Schema created successfully!"
         # $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_NAME-db --region eu --link $REVIEW_APP_NAME --yes --org $ORGANIZATION_NAME
 
     - name: Export environment variables
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $CONFIGURATION_FILE
-        export REVIEW_APP_DB_NAME=$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
-        $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
+        export REVIEW_APP_DB_SCHEMA=$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+        $CLEVER_CLI env import-vars REVIEW_APP_DB_SCHEMA
         # echo $SECRETS_FILE | base64 -d > .env
         # Export variables. Source does not work.
         # cf https://stackoverflow.com/questions/15474650/unix-what-is-the-difference-between-source-and-export

@@ -39,6 +39,7 @@ DEBUG_TOOLBAR_CONFIG = {
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 
+DB_SCHEMA = os.environ.get("REVIEW_APP_DB_SCHEMA")
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
@@ -47,5 +48,8 @@ DATABASES = {
         "NAME": os.environ.get("POSTGRESQL_ADDON_DB"),
         "USER": os.environ.get("POSTGRESQL_ADDON_USER"),
         "PASSWORD": os.environ.get("POSTGRESQL_ADDON_PASSWORD"),
+        'OPTIONS': {
+            'options': f'-c search_path={DB_SCHEMA}',
+        },
     }
 }
