@@ -60,11 +60,11 @@ jobs:
   create-review-app:
     runs-on: ubuntu-latest
     needs: delete-review-app
-    if: always()
+    if: github.pull_request.merged == 'false'
 
     steps:
     - name: DEBUG ONLY
-      run: echo ${{ github.event.pull_request }}
+      run: echo ${{ github.pull_request.merged }}
     # - uses: actions/checkout@v2
     #   with:
     #     ref: ${{ github.head_ref }}
