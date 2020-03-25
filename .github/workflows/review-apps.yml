@@ -13,7 +13,7 @@ env:
   CLEVER_DIR: clever-tools-latest_linux
   CLEVER_CLI: clever-tools-latest_linux/clever
   ORGANIZATION_NAME: Itou
-  ROOT_DB_NAME: discourse-db-obsolete
+  ADDON_DB_NAME: discourse-db-obsolete
   CONFIGURATION_FILE: review-apps-config
   BRANCH: ${{ github.head_ref }}
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -21,44 +21,19 @@ env:
   SECRETS_FILE: ${{ secrets.SECRETS_FILE }}
   POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
   POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
+  GENERATE_REVIEW_APP_NAME: $(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
 
 
 jobs:
-  # IMPROVEMENT:
-  # https://github.com/actions/upload-artifact
-  # https://github.com/actions/download-artifact
-
-  # download-cc-binaries:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - uses: actions/checkout@v2
-
-  #     - run: mkdir -p clever_cloud_binaries
-
-  #     - name: Download CC binaries
-  #       run: |
-  #         curl https://clever-tools.cellar.services.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz > $CLEVER_DIR.tar.gz
-  #         tar -xvf $CLEVER_DIR.tar.gz
-
-  #     - uses: actions/upload-artifact@v1
-  #       with:
-  #         name: clever_cloud_binaries
-  #         path: clever_cloud_binaries
-
   delete-review-app:
-    # needs: download-cc-binaries
     runs-on: ubuntu-latest
     if: contains( github.event.pull_request.labels.*.name, 'review-app')
 
     steps:
     - uses: actions/checkout@v2
 
-    # - uses: actions/download-artifact@v1
-    #   with:
-    #     name: $CLEVER_DIR
     - name: Set review app name
-      run: echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
+      run: echo ::set-env name=REVIEW_APP_NAME::$GENERATE_REVIEW_APP_NAME
 
     - name: Link application
       run: |
@@ -120,7 +95,7 @@ jobs:
     - name: Link DB addon
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-        $CLEVER_CLI service link-addon $ROOT_DB_NAME
+        $CLEVER_CLI service link-addon $ADDON_DB_NAME
 
     - name: Set DB name
       run: echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
