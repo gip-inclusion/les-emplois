@@ -34,3 +34,12 @@
     </form>
 
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ form_accept.media }}
+    {% if form_pe_status %}
+        {{ form_pe_status.media }}
+    {% endif %}
+{% endblock %}

@@ -1,7 +1,8 @@
 from django import forms
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy
+
+from itou.utils.widgets import DatePickerField
 
 
 class EditUserInfoForm(forms.ModelForm):
@@ -18,13 +19,14 @@ class EditUserInfoForm(forms.ModelForm):
         else:
             self.fields["phone"].required = True
             self.fields["birthdate"].required = True
-            self.fields["birthdate"].input_formats = settings.DATE_INPUT_FORMATS
+            self.fields["birthdate"].widget = DatePickerField()
+            self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = get_user_model()
         fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
-            "birthdate": gettext_lazy("Au format jj/mm/aaaa, par exemple 20/12/1978"),
+            "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978"),
             "phone": gettext_lazy("Par exemple 0610203040"),
         }
 
