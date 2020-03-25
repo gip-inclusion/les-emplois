@@ -21,7 +21,7 @@ env:
   SECRETS_FILE: ${{ secrets.SECRETS_FILE }}
   POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
   POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
-  REVIEW_APP_NAME: ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
+  REVIEW_APP_NAME: ${{ ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//') }}
 
 jobs:
   delete-review-app:
@@ -32,7 +32,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set review app name
-      run: echo $($REVIEW_APP_NAME)
+      run: echo $REVIEW_APP_NAME
 
     - name: Link application
       run: |
