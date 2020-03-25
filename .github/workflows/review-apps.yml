@@ -130,11 +130,11 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $ROOT_DB_NAME
 
-    - name: Get DB URI
-      run: echo ::set-env name=DB_URI::$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
+    # - name: Get DB URI
+      # run: echo ::set-env name=DB_URI::$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
 
-    - name: Set DB name
-      run:  echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+    # - name: Set DB name
+      # run:  echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
     - name: Create database
       run: |
@@ -144,6 +144,9 @@ jobs:
         EOSQL
         echo "Database created successfully!"
         # $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_NAME-db --region eu --link $REVIEW_APP_NAME --yes --org $ORGANIZATION_NAME
+      env:
+        DB_URI: $($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
+        REVIEW_APP_DB_NAME: $(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
     - name: Export environment variables
       run: |
