@@ -56,6 +56,13 @@ jobs:
     #   with:
     #     name: $CLEVER_DIR
 
+    - name: Link application
+      run: |
+        curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+
     - name: Set review app name
       run: echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
 
@@ -75,10 +82,6 @@ jobs:
 
     - name: Delete review app
       run: |
-        curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
-        tar -xvf $CLEVER_DIR.tar.gz
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI delete --yes
 
       # export DB_URI=$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
