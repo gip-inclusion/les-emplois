@@ -34,12 +34,12 @@ jobs:
     - name: Set review app name
       run: echo $($REVIEW_APP_NAME)
 
-    # - name: Link application
-    #   run: |
-    #     curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
-    #     tar -xvf $CLEVER_DIR.tar.gz
-    #     $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-    #     $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+    - name: Link application
+      run: |
+        curl $CLEVER_DOWNLOAD_URL > $CLEVER_DIR.tar.gz
+        tar -xvf $CLEVER_DIR.tar.gz
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
     # - name: Set DB name
     #   run: echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
