@@ -95,7 +95,7 @@ jobs:
 
     - name: Set deploy url
       run:
-        echo ::set-env name=DEPLOY_URL::$(echo "$REVIEW_APP_NAME.cleverapps.io" | sed -r 's/[_]+/-/g')
+        echo ::set-env name=DEPLOY_URL::$(echo "$REVIEW_APP_NAME.cleverapps.io" | sed -r 's/_/-/g')
 
     - name: Create review app
       run: |
@@ -116,7 +116,7 @@ jobs:
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $CONFIGURATION_FILE
-        export REVIEW_APP_DB_NAME=$(echo $REVIEW_APP_NAME | sed -r 's/[-]+/_/g; $ s/.$//')
+        export REVIEW_APP_DB_NAME=$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
         echo $REVIEW_APP_DB_NAME
         # set -a
         $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
