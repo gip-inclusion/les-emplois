@@ -36,25 +36,14 @@ done
 #   ALTER MAPPING FOR hword, hword_part, word
 #   WITH unaccent, french_stem;
 
-
-# >&2 echo "Recreating database $REVIEW_APP_DB_NAME"
-# psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-#   DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
-#   CREATE DATABASE $REVIEW_APP_DB_NAME OWNER $POSTGRESQL_ADDON_USER;
-# EOSQL
-
-# >&2 echo "Database $REVIEW_APP_DB_NAME was successfully created!"
-
 export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
 
-django-admin inspectdb
-# django-admin migrate
-# django-admin import_cities
+django-admin migrate
+django-admin import_cities
 
-echo "################# Cities imported successfully. Now import all fixtures. #######################"
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
-# ls -d ~/itou/fixtures/* | xargs django-admin loaddata
+ls -d ~/itou/fixtures/* | xargs django-admin loaddata
 
 django-admin runserver_plus 0.0.0.0:8000
 
