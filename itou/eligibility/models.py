@@ -77,19 +77,26 @@ class EligibilityDiagnosis(models.Model):
         return super().save(*args, **kwargs)
 
     @classmethod
-    def create_diagnosis(cls, job_seeker, user_info, **fields):
+    def create_diagnosis(cls, job_seeker, user_info, administrative_criteria=None):
         """
-        Keyword arguments:
+        Arguments:
             job_seeker: User() object
             user_info: UserInfo namedtuple (itou.utils.perms.user.get_user_info)
+        Keyword arguments:
+            administrative_criteria: an optional list of AdministrativeCriteria() objects
         """
-        return cls.objects.create(
+        diagnosis = cls.objects.create(
             job_seeker=job_seeker,
             author=user_info.user,
             author_kind=user_info.kind,
             author_siae=user_info.siae,
             author_prescriber_organization=user_info.prescriber_organization,
         )
+        if administrative_criteria:
+            for criteria in administrative_criteria:
+                diagnosis.administrative_criteria.add(criteria)
+            diagnosis.save()
+        return diagnosis
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):

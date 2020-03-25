@@ -235,10 +235,9 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
 
         else:
             user_info = get_user_info(request)
-            eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_application.job_seeker, user_info)
-            for criteria in selected_level1 + selected_level2:
-                eligibility_diagnosis.administrative_criteria.add(criteria)
-            eligibility_diagnosis.save()
+            eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+                job_application.job_seeker, user_info, administrative_criteria=selected_level1 + selected_level2
+            )
             messages.success(request, _("Éligibilité confirmée !"))
             next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
             return HttpResponseRedirect(next_url)

@@ -257,13 +257,12 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         and form_administrative_criteria_level1.is_valid()
         and form_administrative_criteria_level2.is_valid()
     ):
-        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(job_seeker, user_info)
         # Administrative criteria are optional for authorized prescribers.
         selected_level1 = form_administrative_criteria_level1.cleaned_data
         selected_level2 = form_administrative_criteria_level2.cleaned_data
-        for criteria in selected_level1 + selected_level2:
-            eligibility_diagnosis.administrative_criteria.add(criteria)
-        eligibility_diagnosis.save()
+        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
+            job_seeker, user_info, administrative_criteria=selected_level1 + selected_level2
+        )
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
 
