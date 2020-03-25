@@ -36,13 +36,12 @@ done
 #   ALTER MAPPING FOR hword, hword_part, word
 #   WITH unaccent, french_stem;
 
-# export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
-
 django-admin migrate
 django-admin import_cities
 
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
+echo "Loading fixtures"
 ls -d ~/itou/fixtures/* | xargs django-admin loaddata
 
 django-admin runserver_plus 0.0.0.0:8000
