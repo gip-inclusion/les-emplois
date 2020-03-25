@@ -117,6 +117,7 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $CONFIGURATION_FILE
         export REVIEW_APP_DB_NAME=$(echo $REVIEW_APP_NAME | sed -r 's/[;\/-. ]+/_/g; $ s/.$//')
+        set -a
         $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
         # echo $SECRETS_FILE | base64 -d > .env
         # Export variables. Source does not work.
