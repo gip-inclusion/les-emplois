@@ -61,7 +61,8 @@ jobs:
   create-review-app:
     runs-on: ubuntu-latest
     needs: delete-review-app
-    if: (github.event.pull_request.state == 'open')
+    # if: (github.event.pull_request.state == 'open')
+    if: always()
 
     steps:
     - uses: actions/checkout@v2
