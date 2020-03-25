@@ -55,6 +55,8 @@ jobs:
     # - uses: actions/download-artifact@v1
     #   with:
     #     name: $CLEVER_DIR
+    - name: Set review app name
+      run: ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
 
     - name: Link application
       run: |
@@ -63,14 +65,11 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
-    - name: Set review app name
-      run: echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/.]+/_/g; $ s/.$//')
-
     - name: Get DB URI
-      run: echo ::set-env name=DB_URI::$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
+      run: ::set-env name=DB_URI::$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
 
     - name: Set DB name
-      run:  echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+      run: ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
     - name: Delete review app database
       run: |
