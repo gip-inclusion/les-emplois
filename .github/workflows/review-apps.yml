@@ -144,3 +144,6 @@ jobs:
       with:
         message: "🥁 L'environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.REVIEW_APP_NAME }}.cleverapps.io)"
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+# On PR closed, delete app and DB!!!
