@@ -19,6 +19,8 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   SECRETS_FILE: ${{ secrets.SECRETS_FILE }}
+  POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
+  POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
 
 
 jobs:
@@ -65,11 +67,9 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
-    # - name: Get DB URI
-      # run: ::set-env name=DB_URI::$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
+    - name: Set DB name
+      run: ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
-    # - name: Set DB name
-    #   run: ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
     - name: Delete review app
       run: |
         $CLEVER_CLI delete --yes
@@ -81,9 +81,6 @@ jobs:
           DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
         EOSQL
         echo "Database deleted successfully!"
-      env:
-        DB_URI: ${{ $CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"' }}
-        REVIEW_APP_DB_NAME: ${{ echo $REVIEW_APP_NAME | sed -r 's/-/_/g' }}
 
 
       # export DB_URI=$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
@@ -133,8 +130,8 @@ jobs:
     # - name: Get DB URI
       # run: echo ::set-env name=DB_URI::$($CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"')
 
-    # - name: Set DB name
-      # run:  echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+    - name: Set DB name
+      run:  echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
 
     - name: Create database
       run: |
@@ -144,10 +141,6 @@ jobs:
         EOSQL
         echo "Database created successfully!"
         # $CLEVER_CLI addon create postgresql-addon $REVIEW_APP_NAME-db --region eu --link $REVIEW_APP_NAME --yes --org $ORGANIZATION_NAME
-      env:
-        DB_URI: ${{ $CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_DIRECT_URI=)[^ ]*' | tr -d '"' }}
-        REVIEW_APP_DB_NAME: ${{ echo $REVIEW_APP_NAME | sed -r 's/-/_/g' }}
-        POSTGRESQL_ADDON_USER: ${{ $CLEVER_CLI env | grep -Po '(?<=POSTGRESQL_ADDON_USER=)[^ ]*' | tr -d '"' }}
 
     - name: Export environment variables
       run: |
