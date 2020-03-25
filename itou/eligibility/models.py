@@ -135,7 +135,7 @@ class AdministrativeCriteria(models.Model):
     class Meta:
         verbose_name = _("Critère administratif")
         verbose_name_plural = _("Critères administratifs")
-        ordering = ["ui_rank"]
+        ordering = ["level", "ui_rank"]
 
     def __str__(self):
         return f"{self.name} - {self.get_level_display()}"

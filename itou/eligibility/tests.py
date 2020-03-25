@@ -26,12 +26,15 @@ class EligibilityDiagnosisModelTest(TestCase):
 
 
 class AdministrativeCriteriaModelTest(TestCase):
-    def test_level1(self):
-        expected = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
-        qs = AdministrativeCriteria.objects.level1()
-        self.assertIn(expected, qs)
+    def test_levels_queryset(self):
 
-    def test_level2(self):
-        expected = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+        level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_1).first()
+        level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteria.Level.LEVEL_2).first()
+
+        qs = AdministrativeCriteria.objects.level1()
+        self.assertIn(level1_criterion, qs)
+        self.assertNotIn(level2_criterion, qs)
+
         qs = AdministrativeCriteria.objects.level2()
-        self.assertIn(expected, qs)
+        self.assertIn(level2_criterion, qs)
+        self.assertNotIn(level1_criterion, qs)
