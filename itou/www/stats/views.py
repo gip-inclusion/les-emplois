@@ -20,7 +20,7 @@ from itou.utils.address.departments import DEPARTMENTS
 DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par département")
 
 
-@cache_page(60 * 30)
+@cache_page(60 * 60 * 2)
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
