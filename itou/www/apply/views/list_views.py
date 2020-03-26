@@ -78,7 +78,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
 
     pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.active_objects.member_required(request.user)
+    queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     job_applications = siae.job_applications_received
 

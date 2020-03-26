@@ -45,7 +45,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 
     authorized_organization = forms.ModelChoiceField(
         label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
-        queryset=PrescriberOrganization.active_objects.filter(is_authorized=True).order_by("name"),
+        queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by("name"),
         required=False,
         help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
     )
@@ -133,7 +133,7 @@ class SelectSiaeForm(forms.Form):
             error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
             raise forms.ValidationError(mark_safe(error_message))
 
-        siaes = Siae.active_objects.filter(kind=kind)
+        siaes = Siae.objects.filter(kind=kind)
         if siret and email:
             # We match siaes having any of the two correct fields.
             siaes = siaes.filter(Q(siret=siret) | Q(auth_email=email))

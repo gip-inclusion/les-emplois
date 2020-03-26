@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.gis.db import models as gis_models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
@@ -8,11 +7,6 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
-
-
-class ActiveCityManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
 
 
 class City(models.Model):
@@ -36,7 +30,6 @@ class City(models.Model):
     coords = gis_models.PointField(geography=True, blank=True, null=True)
 
     objects = models.Manager()  # The default manager.
-    active_objects = ActiveCityManager()
 
     class Meta:
         verbose_name = _("Ville française")

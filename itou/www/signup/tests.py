@@ -130,7 +130,7 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(new_user.email, user_email)
 
         # siae2 is left untouched even though it has the same siret as siae1.
-        siae2 = Siae.active_objects.get(siret=siae2.siret, kind=siae2.kind)
+        siae2 = Siae.objects.get(siret=siae2.siret, kind=siae2.kind)
         self.assertEqual(0, siae2.members.count())
 
         self.assertEqual(len(mail.outbox), 1)
@@ -250,7 +250,7 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(new_user.email, user_secondary_email)
 
         # siae2 is left untouched even though it has the same siret as siae1.
-        siae2 = Siae.active_objects.get(siret=siae2.siret, kind=siae2.kind)
+        siae2 = Siae.objects.get(siret=siae2.siret, kind=siae2.kind)
         self.assertEqual(0, siae2.members.count())
 
         self.client.logout()

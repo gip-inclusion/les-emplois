@@ -16,11 +16,6 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
         return self.filter(members=user, members__is_active=True)
 
 
-class ActiveManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
-
-
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
@@ -98,7 +93,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
-    active_objects = ActiveManager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
         verbose_name = _("Organisation")

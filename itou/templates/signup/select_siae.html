@@ -11,12 +11,8 @@
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
 <div class="alert alert-info" role="info">
-    Pour des raisons de sécurité, merci de compléter les informations suivantes. 
+    {% trans "Pour des raisons de sécurité, merci de compléter les informations suivantes." %}
 </div>
-<div class="alert alert-info" role="info">
-    Les inscriptions sont ouvertes exclusivement aux structures du Bas-Rhin (67), Pas-de-Calais (62) et Seine Saint Denis (93), pour le moment.
-</div>
-
 
 <form method="post" action="{% url 'signup:select_siae' %}" role="form">
 
@@ -37,7 +33,7 @@
 </form>
 
 <p>
-    En cas de problèmes ou pour plus d'informations, veuillez nous contactez à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>
+    {% blocktrans %}En cas de problèmes ou pour plus d'informations, veuillez nous contactez à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>{% endblocktrans %}
 </p>
 
 <hr>

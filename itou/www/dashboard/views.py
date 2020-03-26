@@ -20,7 +20,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     if request.user.is_siae_staff:
         pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-        queryset = Siae.active_objects.member_required(request.user)
+        queryset = Siae.objects.member_required(request.user)
         siae = get_object_or_404(queryset, pk=pk)
         job_applications_counter = siae.job_applications_received.filter(
             state=JobApplicationWorkflow.STATE_NEW
@@ -71,7 +71,7 @@ def switch_siae(request):
     dashboard_url = reverse_lazy("dashboard:index")
 
     pk = request.POST["siae_id"]
-    queryset = Siae.active_objects.member_required(request.user)
+    queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
     messages.success(request, _(f"Vous travaillez sur {siae.display_name}"))

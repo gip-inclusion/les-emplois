@@ -51,7 +51,7 @@ def start(request, siae_pk):
     Entry point.
     """
 
-    siae = get_object_or_404(Siae.active_objects, pk=siae_pk)
+    siae = get_object_or_404(Siae, pk=siae_pk)
 
     if request.user.is_siae_staff and not siae.has_member(request.user):
         raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
@@ -107,7 +107,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
         session_data["job_seeker_pk"] = request.user.pk
         return HttpResponseRedirect(next_url)
 
-    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
     form = UserExistsForm(data=request.POST or None)
 
@@ -146,7 +146,7 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     if has_required_info:
         return HttpResponseRedirect(next_url)
 
-    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
     form = CheckJobSeekerInfoForm(instance=job_seeker, data=request.POST or None)
 
@@ -165,7 +165,7 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     Create a job seeker if he can't be found in the DB.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
     form = CreateJobSeekerForm(
         proxy_user=request.user, data=request.POST or None, initial={"email": request.GET.get("email")}
@@ -188,7 +188,7 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     Check previous job applications to avoid duplicates.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
     job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
@@ -229,7 +229,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     Check eligibility (as an authorized prescriber).
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae.active_objects, pk=session_data["to_siae_pk"])
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
     next_url = reverse("apply:step_application", kwargs={"siae_pk": siae_pk})
 
     if not siae.is_subject_to_eligibility_rules:
@@ -273,7 +273,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     """
     Create and submit the job application.
     """
-    queryset = Siae.active_objects.prefetch_job_description_through()
+    queryset = Siae.objects.prefetch_job_description_through()
     siae = get_object_or_404(queryset, pk=siae_pk)
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
@@ -307,7 +307,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
                 pk=sender_prescriber_organization_pk
             )
         if sender_siae_pk:
-            job_application.sender_siae = Siae.active_objects.get(pk=sender_siae_pk)
+            job_application.sender_siae = Siae.objects.get(pk=sender_siae_pk)
         job_application.to_siae = siae
         job_application.save()
 

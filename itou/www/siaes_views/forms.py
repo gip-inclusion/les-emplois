@@ -1,5 +1,4 @@
 from django import forms
-from django.conf import settings
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -7,15 +6,7 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
 
 
-TEST_DEPARTMENTS = [("", "---")] + [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
-
-TEST_DEPARTMENTS_HELP_TEXT = gettext_lazy(
-    (
-        "Seuls les départements du Bas-Rhin (67), du Pas-de-Calais (62) "
-        "et de la Seine Saint Denis (93) sont disponibles pendant la phase actuelle "
-        "d'expérimentation de la plateforme de l'inclusion."
-    )
-)
+DEPARTMENTS_CHOICES = [("", "---")] + list(DEPARTMENTS.items())
 
 
 class CreateSiaeForm(forms.ModelForm):
@@ -27,7 +18,7 @@ class CreateSiaeForm(forms.ModelForm):
         self.current_siae = current_siae
         super().__init__(*args, **kwargs)
 
-        self.fields["department"].choices = TEST_DEPARTMENTS
+        self.fields["department"].choices = DEPARTMENTS_CHOICES
 
         required_fields = ["address_line_1", "post_code", "city", "department", "phone"]
         for required_field in required_fields:
@@ -52,7 +43,6 @@ class CreateSiaeForm(forms.ModelForm):
         ]
         help_texts = {
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "department": TEST_DEPARTMENTS_HELP_TEXT,
             "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "siret": gettext_lazy(
@@ -96,7 +86,7 @@ class EditSiaeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["department"].choices = TEST_DEPARTMENTS
+        self.fields["department"].choices = DEPARTMENTS_CHOICES
 
         required_fields = ["address_line_1", "post_code", "city", "department"]
         for required_field in required_fields:
@@ -118,7 +108,6 @@ class EditSiaeForm(forms.ModelForm):
         ]
         help_texts = {
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "department": TEST_DEPARTMENTS_HELP_TEXT,
             "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),

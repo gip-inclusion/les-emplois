@@ -15,7 +15,7 @@ from itou.utils.pdf import HtmlToPdf
 def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
 
     siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-    queryset = Siae.active_objects.member_required(request.user)
+    queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=siae_pk)
 
     queryset = JobApplication.objects.select_related("job_seeker", "approval", "to_siae")

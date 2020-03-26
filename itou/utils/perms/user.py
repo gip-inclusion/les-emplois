@@ -39,7 +39,7 @@ def get_user_info(request):
     if request.user.is_siae_staff:
         kind = KIND_SIAE_STAFF
         pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-        queryset = Siae.active_objects.member_required(user)
+        queryset = Siae.objects.member_required(user)
         siae = get_object_or_404(queryset, pk=pk)
 
     return UserInfo(user, kind, prescriber_organization, is_authorized_prescriber, siae)

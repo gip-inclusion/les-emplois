@@ -2,7 +2,6 @@ from collections import OrderedDict, defaultdict
 from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
-from django.conf import settings
 from django.db.models import Avg, Count, DateTimeField, ExpressionWrapper, F, Q
 from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 from django.shortcuts import render
@@ -28,13 +27,13 @@ def stats(request, template_name="stats/stats.html"):
     departments = get_department_choices()
     current_department = get_current_department(request, departments)
 
-    current_departments = settings.ITOU_TEST_DEPARTMENTS
+    current_departments = DEPARTMENTS.keys()
     department_filter_is_selected = False
     if current_department:
         current_departments = [current_department]
         department_filter_is_selected = True
 
-    siaes = Siae.active_objects.filter(department__in=current_departments)
+    siaes = Siae.objects.filter(department__in=current_departments)
     job_applications = JobApplication.objects.filter(to_siae__department__in=current_departments)
     # This is needed so that we can deliver at least some nationwide stats
     # for prescribers even if they have no organization or an unauthorized one.
@@ -48,7 +47,7 @@ def stats(request, template_name="stats/stats.html"):
     ).distinct()
     # Note that filtering by departement here also filters out unauthorized
     # organizations as they do not have geolocation in practice.
-    authorized_prescriber_orgs = PrescriberOrganization.active_objects.filter(
+    authorized_prescriber_orgs = PrescriberOrganization.objects.filter(
         department__in=current_departments, is_authorized=True
     ).distinct()
 
@@ -87,9 +86,9 @@ def stats(request, template_name="stats/stats.html"):
 
 
 def get_department_choices():
-    all_departments_text = _(f"Tous les départements ({ ', '.join(settings.ITOU_TEST_DEPARTMENTS) })")
+    all_departments_text = _(f"Tous les départements ({ ', '.join(DEPARTMENTS.keys()) })")
     departments = [(None, all_departments_text)]
-    departments += [(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS]
+    departments += [(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()]
     return departments
 
 
@@ -280,7 +279,7 @@ def inject_siaes_subset_total_by_dpt(data, kpi_name, siaes_subset):
         data=data,
         kpi_name=kpi_name,
         items_subset=siaes_subset,
-        category_choices=[(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS],
+        category_choices=[(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()],
         category_field="department",
     )
     return data
@@ -308,7 +307,7 @@ def inject_orgs_subset_total_by_dpt(data, kpi_name, orgs_subset):
         data=data,
         kpi_name=kpi_name,
         items_subset=orgs_subset,
-        category_choices=[(d, DEPARTMENTS[d]) for d in settings.ITOU_TEST_DEPARTMENTS],
+        category_choices=[(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()],
         category_field="department",
     )
     return data

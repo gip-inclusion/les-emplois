@@ -47,6 +47,6 @@ class SiaeSearchForm(forms.Form):
     def clean_city(self):
         slug = self.cleaned_data["city"]
         try:
-            return City.active_objects.get(slug=slug)
+            return City.objects.get(slug=slug)
         except City.DoesNotExist:
             raise forms.ValidationError(_("Cette ville n'existe pas."))

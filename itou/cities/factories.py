@@ -21,7 +21,6 @@ def create_test_cities(selected_departments, num_per_department=None):
 
     The number of cities in each department can be limited:
         create_test_cities(['54', '57'], num_per_department=2)
-        create_test_cities(settings.ITOU_TEST_DEPARTMENTS, num_per_department=10)
     """
     departments_counter = {department: 0 for department in selected_departments}
 

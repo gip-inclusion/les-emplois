@@ -72,11 +72,6 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(shuffled_rank=shuffle_expression).order_by("shuffled_rank")
 
 
-class SiaeActiveManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(department__in=settings.ITOU_TEST_DEPARTMENTS)
-
-
 class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
@@ -157,7 +152,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
-    active_objects = SiaeActiveManager.from_queryset(SiaeQuerySet)()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")

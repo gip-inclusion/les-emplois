@@ -17,7 +17,7 @@ def card(request, siae_id, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
     """
-    queryset = Siae.active_objects.prefetch_job_description_through(is_active=True)
+    queryset = Siae.objects.prefetch_job_description_through(is_active=True)
     siae = get_object_or_404(queryset, pk=siae_id)
     back_url = get_safe_url(request, "back_url")
     context = {"siae": siae, "back_url": back_url}
@@ -29,7 +29,7 @@ def card_legacy(request, siret, template_name="siaes/card.html"):
     """
     Legacy route via SIRET for SIAE's card (or "Fiche" in French).
     """
-    siae = Siae.active_objects.filter(siret=siret).first()
+    siae = Siae.objects.filter(siret=siret).first()
     if siae:
         return HttpResponsePermanentRedirect(reverse_lazy("siaes_views:card", kwargs={"siae_id": siae.pk}))
     raise Http404(_("Aucune structure trouvée correspondant à ce SIRET."))
@@ -52,7 +52,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Configure an SIAE's jobs.
     """
     pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.active_objects.prefetch_job_description_through().member_required(request.user)
+    queryset = Siae.objects.prefetch_job_description_through().member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
 
     if request.method == "POST":
@@ -131,7 +131,7 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
     Edit an SIAE.
     """
     pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.active_objects.member_required(request.user)
+    queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)

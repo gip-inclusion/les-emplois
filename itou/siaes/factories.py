@@ -2,12 +2,12 @@ import string
 
 import factory
 import factory.fuzzy
-from django.conf import settings
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models
 from itou.users.factories import SiaeStaffFactory
+from itou.utils.address.departments import DEPARTMENTS
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
@@ -27,7 +27,7 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     auth_email = factory.Faker("email", locale="fr_FR")
-    department = factory.fuzzy.FuzzyChoice(settings.ITOU_TEST_DEPARTMENTS)
+    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")

@@ -1,6 +1,7 @@
-from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
+
+from itou.utils.address.departments import DEPARTMENTS
 
 
 class StatsViewTest(TestCase):
@@ -10,7 +11,7 @@ class StatsViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        for department in settings.ITOU_TEST_DEPARTMENTS:
+        for department in DEPARTMENTS.keys():
             url = reverse("stats:index")
             response = self.client.post(url, data={"department": department})
             self.assertEqual(response.status_code, 200)

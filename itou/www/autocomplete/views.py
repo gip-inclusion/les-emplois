@@ -21,7 +21,7 @@ def cities_autocomplete(request):
     if term and slugify(term) not in get_city_swear_words_slugs():
 
         cities = (
-            City.active_objects.annotate(similarity=TrigramSimilarity("name", term))
+            City.objects.annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
             .order_by("-similarity")
         )
