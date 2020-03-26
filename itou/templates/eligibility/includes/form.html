@@ -25,8 +25,7 @@
         {% bootstrap_form_errors form_confirm_eligibility %}
     {% endif %}
 
-    {% bootstrap_form_errors form_administrative_criteria_level1 %}
-    {% bootstrap_form_errors form_administrative_criteria_level2 %}
+    {% bootstrap_form_errors form_administrative_criteria %}
 
     <h2 id="criteres_administratifs">
         <span class="badge badge-secondary">{% trans "Critères administratifs" %}</span>
@@ -36,16 +35,20 @@
         {% trans "Critères administratifs de niveau 1" %}
     </h3>
 
-    {% for field in form_administrative_criteria_level1 %}
-        {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria_level1.OBJECTS %}
+    {% for field in form_administrative_criteria %}
+        {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+        {% endif %}
     {% endfor %}
 
     <h3>
         {% trans "Critères administratifs de niveau 2" %}
     </h3>
 
-    {% for field in form_administrative_criteria_level2 %}
-        {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria_level2.OBJECTS %}
+    {% for field in form_administrative_criteria %}
+        {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+        {% endif %}
     {% endfor %}
 
     {% include "eligibility/includes/reference_diagnosis.html" %}

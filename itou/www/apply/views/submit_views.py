@@ -14,7 +14,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
-from itou.www.eligibility_views.forms import AdministrativeCriteriaLevel1Form, AdministrativeCriteriaLevel2Form
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 def valid_session_required(function=None):
@@ -249,19 +249,11 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         return HttpResponseRedirect(next_url)
 
     data = request.POST if request.method == "POST" else None
-    form_administrative_criteria_level1 = AdministrativeCriteriaLevel1Form(data=data)
-    form_administrative_criteria_level2 = AdministrativeCriteriaLevel2Form(data=data)
+    form_administrative_criteria = AdministrativeCriteriaForm(request.user, data=data)
 
-    if (
-        request.method == "POST"
-        and form_administrative_criteria_level1.is_valid()
-        and form_administrative_criteria_level2.is_valid()
-    ):
-        # Administrative criteria are optional for authorized prescribers.
-        selected_level1 = form_administrative_criteria_level1.cleaned_data
-        selected_level2 = form_administrative_criteria_level2.cleaned_data
-        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, user_info, administrative_criteria=selected_level1 + selected_level2
+    if request.method == "POST" and form_administrative_criteria.is_valid():
+        EligibilityDiagnosis.create_diagnosis(
+            job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
         )
         messages.success(request, _("Éligibilité confirmée !"))
         return HttpResponseRedirect(next_url)
@@ -270,8 +262,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         "siae": siae,
         "job_seeker": job_seeker,
         "approvals_wrapper": approvals_wrapper,
-        "form_administrative_criteria_level1": form_administrative_criteria_level1,
-        "form_administrative_criteria_level2": form_administrative_criteria_level2,
+        "form_administrative_criteria": form_administrative_criteria,
     }
     return render(request, template_name, context)
 

@@ -12,11 +12,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
-from itou.www.eligibility_views.forms import (
-    ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE,
-    AdministrativeCriteriaLevel1Form,
-    AdministrativeCriteriaLevel2Form,
-)
+from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
 class ProcessViewsTest(TestCase):
@@ -198,30 +194,12 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
 
-        # At least 1 level1 criteria or 3 level2 criteria.
-        post_data = {"confirm": "true"}
-        response = self.client.post(url, data=post_data)
-        messages = [str(message) for message in response.context["messages"]]
-        self.assertIn(ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE, messages)
-        self.assertEqual(response.status_code, 200)
-
-        # At least 1 level1 criteria or 3 level2 criteria.
-        post_data = {
-            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion2.pk}": "true",
-            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion3.pk}": "true",
-            "confirm": "true",
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertIn(ADMINISTRATIVE_CRITERIA_ERROR_FOR_SIAE, messages)
-        self.assertEqual(response.status_code, 200)
-
-        # Good data.
         post_data = {
             # Administrative criteria level 1.
-            f"{AdministrativeCriteriaLevel1Form.FIELD_PREFIX}{criterion1.pk}": "true",
+            f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "true",
             # Administrative criteria level 2.
-            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion2.pk}": "true",
-            f"{AdministrativeCriteriaLevel2Form.FIELD_PREFIX}{criterion3.pk}": "true",
+            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion2.pk}": "true",
+            f"{AdministrativeCriteriaForm.LEVEL_2_PREFIX}{criterion3.pk}": "true",
             # Confirm.
             "confirm": "true",
         }
