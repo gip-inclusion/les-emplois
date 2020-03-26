@@ -92,11 +92,8 @@ class CreateJobSeekerForm(forms.ModelForm):
         # Birth date
         self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DatePickerField()
-<<<<<<< HEAD
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
-=======
         self.fields["birthdate"].validators = [validate_birthdate]
->>>>>>> 188f55f... Added a (basic) birthdate validator
 
     class Meta:
         model = get_user_model()

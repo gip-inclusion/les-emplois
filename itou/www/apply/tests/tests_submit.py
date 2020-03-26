@@ -9,12 +9,12 @@ from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
+from itou.cities.factories import create_test_cities
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
-from itou.cities.factories import create_test_cities
 
 
 class ApplyAsJobSeekerTest(TestCase):
@@ -99,15 +99,8 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-<<<<<<< HEAD
         post_data = {"birthdate": "20-12-1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
-=======
-        post_data = {
-            "birthdate": "20-12-1978",
-            "phone": "0610203040",
-            "pole_emploi_id": "1234567A",}
 
->>>>>>> 188f55f... Added a (basic) birthdate validator
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -513,7 +506,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
 
 class ApplyAsPrescriberTest(TestCase):
-
     def setUp(self):
         create_test_cities(["67"], num_per_department=10)
 

@@ -539,7 +539,6 @@ class SiaeSignupTest(TestCase):
 
 
 class JobSeekerSignupTest(TestCase):
-
     def setUp(self):
         create_test_cities(["67"], num_per_department=10)
 
@@ -578,9 +577,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertEquals(user.city, "Sommerau")
 
 
-
 class PrescriberSignupTest(TestCase):
-
     def test_prescriber_signup_without_code_nor_organization(self):
         """Prescriber signup without code nor organization."""
 
