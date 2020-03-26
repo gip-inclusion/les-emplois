@@ -14,6 +14,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
+from itou.cities.factories import create_test_cities
 
 
 class ApplyAsJobSeekerTest(TestCase):
@@ -102,14 +103,9 @@ class ApplyAsJobSeekerTest(TestCase):
         post_data = {"birthdate": "20-12-1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
 =======
         post_data = {
-            "birthdate": "20/12/1978",
+            "birthdate": "20-12-1978",
             "phone": "0610203040",
-            "pole_emploi_id": "1234567A",
-            "address_line_1": "55, avenue de la Rose",
-            "address_line_2": "7e étage",
-            "post_code": "13014",
-            "city": "marseille-13",
-        }
+            "pole_emploi_id": "1234567A",}
 
 >>>>>>> 188f55f... Added a (basic) birthdate validator
         response = self.client.post(next_url, data=post_data)
@@ -120,12 +116,6 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(user.phone, post_data["phone"])
 
         self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
-
-        self.assertEqual(user.address_line_1, post_data["address_line_1"])
-        self.assertEqual(user.address_line_2, post_data["address_line_2"])
-
-        self.assertEqual(user.post_code, post_data["post_code"])
-        self.assertEqual(user.city, post_data["city"])
 
         next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -523,6 +513,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
 
 class ApplyAsPrescriberTest(TestCase):
+
+    def setUp(self):
+        create_test_cities(["67"], num_per_department=10)
+
     def test_apply_as_prescriber(self):
         """Apply as prescriber."""
 
@@ -603,7 +597,13 @@ class ApplyAsPrescriberTest(TestCase):
             "birthdate": "20-12-1978",
             "phone": "0610200305",
             "pole_emploi_id": "12345678",
+            "address_line_1": "55, avenue de la Rose",
+            "address_line_2": "7e étage",
+            "post_code": "67200",
+            "city_name": "Sommerau (67)",
+            "city": "sommerau-67",
         }
+
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
