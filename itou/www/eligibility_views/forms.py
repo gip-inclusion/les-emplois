@@ -26,22 +26,30 @@ class AdministrativeCriteriaForm(forms.Form):
 
     LEVEL_1_PREFIX = "level_1_"
     LEVEL_2_PREFIX = "level_2_"
+
     OBJECTS = {}
+
+    NAME_SENIOR = "Senior (+50 ans)"
+    NAME_JUNIOR = "Jeunes (-26 ans)"
+    NAME_DETLD_24 = "DETLD (+ 24 mois)"
+    NAME_DELD_12 = "DELD (12-24 mois)"
+    NAMES = [NAME_SENIOR, NAME_JUNIOR, NAME_DETLD_24, NAME_DELD_12]
 
     ERROR_CRITERIA_NUMBER = gettext_lazy(
         "Vous devez sélectionner au moins un critère administratif de niveau 1 "
         "ou le cumul d'au moins trois critères de niveau 2."
     )
     ERROR_SENIOR_JUNIOR = gettext_lazy(
-        "Vous ne pouvez pas sélectionner en même temps les critères Senior (+50 ans) et Jeunes (-26 ans)."
+        f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_SENIOR} et {NAME_JUNIOR}."
     )
     ERROR_LONG_TERM_JOB_SEEKER = gettext_lazy(
-        "Vous ne pouvez pas sélectionner en même temps les critères DETLD (+ 24 mois) et DELD (12-24 mois)."
+        f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
     def __init__(self, user, *args, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
+
         for criterion in AdministrativeCriteria.objects.all():
 
             if criterion.level == AdministrativeCriteria.Level.LEVEL_1:
@@ -49,22 +57,28 @@ class AdministrativeCriteriaForm(forms.Form):
             elif criterion.level == AdministrativeCriteria.Level.LEVEL_2:
                 prefix = self.LEVEL_2_PREFIX
             else:
-                raise RuntimeError(_("Unknown level."))
+                raise RuntimeError(f"Unknown level: {criterion.level}.")
 
             key = f"{prefix}{criterion.pk}"
             self.fields[key] = forms.BooleanField(required=False, label=criterion.name, help_text=criterion.desc)
             self.fields[key].widget.attrs["class"] = "form-check-input"  # Bootstrap CSS class.
             self.OBJECTS[key] = criterion
 
+        # Ensure that `NAME_*` exist in DB.
+        existing_names_in_db = [obj.name for obj in self.OBJECTS.values()]
+        for name in self.NAMES:
+            if name not in existing_names_in_db:
+                raise RuntimeError(f"Unknown name: {name}.")
+
     def clean(self):
         selected_objects = [self.OBJECTS[key] for key, selected in self.cleaned_data.items() if selected]
 
         selected_names = {obj.name for obj in selected_objects}
 
-        if {"Senior (+50 ans)", "Jeunes (-26 ans)"}.issubset(selected_names):
+        if {self.NAME_SENIOR, self.NAME_JUNIOR}.issubset(selected_names):
             raise forms.ValidationError(self.ERROR_SENIOR_JUNIOR)
 
-        if {"DETLD (+ 24 mois)", "DELD (12-24 mois)"}.issubset(selected_names):
+        if {self.NAME_DETLD_24, self.NAME_DELD_12}.issubset(selected_names):
             raise forms.ValidationError(self.ERROR_LONG_TERM_JOB_SEEKER)
 
         if self.user.is_siae_staff:
