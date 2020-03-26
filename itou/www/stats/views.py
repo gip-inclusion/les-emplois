@@ -86,7 +86,7 @@ def stats(request, template_name="stats/stats.html"):
 
 
 def get_department_choices():
-    all_departments_text = _(f"Tous les départements ({ ', '.join(DEPARTMENTS.keys()) })")
+    all_departments_text = _(f"Tous les départements")
     departments = [(None, all_departments_text)]
     departments += [(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()]
     return departments

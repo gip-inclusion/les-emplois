@@ -110,13 +110,6 @@
         <li>
             {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique: ACI, AI, EI, ETTI ou EITI." %}
         </li>
-        {% for entry in data.siaes_by_dpt.categories %}
-            <li>
-                {% blocktrans with abbreviation=entry.0 description=entry.1 %}
-                    <b>{{ abbreviation }}</b> : {{ description }}.
-                {% endblocktrans %}
-            </li>
-        {% endfor %}
         <li>
             {% trans "<b>EITI</b> : Entreprise d’insertion par le travail indépendant." %}
         </li>
