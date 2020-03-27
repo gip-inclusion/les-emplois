@@ -1,0 +1,125 @@
+# See https://developer.github.com/v3/
+# and https://help.github.com/en/actions
+name: 🕵 Review apps
+
+# Run this pipeline when a label is added and when a push is made on this PR.
+on:
+  pull_request:
+    branches: [ master ]
+    types: [ labeled, synchronize ]
+
+env:
+  CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
+  CLEVER_CLI: clever-tools-latest_linux/clever
+  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  ORGANIZATION_NAME: Itou
+  DB_ADDON: review_apps_databases_DO_NOT_DELETE
+  CONFIGURATION_ADDON: review_apps_config
+  BRANCH: ${{ github.head_ref }}
+  POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
+  POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    if: contains( github.event.pull_request.labels.*.name, 'review-app')
+
+    steps:
+    - name: 📥 Checkout to the PR branch
+      uses: actions/checkout@v2
+
+    - name: 🏷 Set review app name
+      run:
+        echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
+
+    - name: 🏷 Set database name
+      run:
+        echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+
+    - name: 🤝 Try to find the application on Clever Cloud
+      run: |
+        curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        tar -xvf $CLEVER_TAR_FILE
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+
+    - name: 🔪 Delete the review app database
+      run: |
+        echo "Deleting database $REVIEW_APP_DB_NAME"
+        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+          DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
+        EOSQL
+        echo "Database deleted successfully!"
+
+    - name: 🔪 Delete the review app
+      run: |
+        $CLEVER_CLI delete --yes
+
+
+  create:
+    runs-on: ubuntu-latest
+    needs: delete
+    if: always()
+
+    steps:
+    - name: 📥 Checkout to the PR branch
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
+
+    - name: 📥 Fetch git branches
+      run: git fetch --prune --unshallow
+
+    # Environment variables
+    - name: 🏷 Set review app name
+      run:
+        echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
+
+    - name: 🏷 Set database name
+      run:
+        echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+
+    - name: 🏷 Set deploy url
+      run:
+        echo ::set-env name=DEPLOY_URL::$(echo "$REVIEW_APP_NAME.cleverapps.io")
+    # End of environment variables
+
+    - name: 🧫 Create a review app on Clever Cloud
+      run: |
+        curl curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        tar -xvf $CLEVER_TAR_FILE
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
+        $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+
+    - name: 🤝 Link databases addon
+      run: |
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $DB_ADDON
+
+
+    - name: 🗃 Create a brand new database
+      run: |
+        echo "Creating database $REVIEW_APP_DB_NAME"
+        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+          CREATE DATABASE $REVIEW_APP_DB_NAME WITH OWNER $POSTGRESQL_ADDON_USER TEMPLATE template1;
+        EOSQL
+        echo "Database created successfully!"
+
+    - name: 🗺 Add environment variables to the review app
+      run: |
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $CONFIGURATION_ADDON
+        $CLEVER_CLI env import-vars REVIEW_APP_DB_NAME
+
+    - name: 🚀 Deploy to Clever Cloud
+      run: $CLEVER_CLI deploy --branch $BRANCH --force --verbose
+
+    - name: 🍻 Add link to pull request
+      uses: thollander/actions-comment-pull-request@master
+      with:
+        message: "🥁 L'environnement de test est prêt ! [👉 Je veux tester cette PR !](https://${{ env.DEPLOY_URL }})"
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
