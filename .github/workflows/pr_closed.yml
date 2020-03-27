@@ -41,14 +41,18 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
+    - name: 🔪 Delete the review app
+      run: |
+        $CLEVER_CLI delete --yes
+
     - name: 🔪 Delete the review app database
       run: |
         echo "Deleting database $REVIEW_APP_DB_NAME"
         psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+          SELECT pg_terminate_backend(pg_stat_activity.pid)
+          FROM pg_stat_activity
+          WHERE pg_stat_activity.datname = '$REVIEW_APP_DB_NAME'
+            AND pid <> pg_backend_pid();
           DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
         EOSQL
         echo "Database deleted successfully!"
-
-    - name: 🔪 Delete the review app
-      run: |
-        $CLEVER_CLI delete --yes
