@@ -37,7 +37,7 @@ class FullnameFormMixin(forms.Form):
 
 class AddressFormMixin(forms.Form):
 
-    ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:all_cities")
+    ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
     city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
 
