@@ -292,6 +292,19 @@ a.disabled button:hover, button.disabled:hover {
     opacity: 100% !important;
 }
 
+/* Browser-specific issues
+--------------------------------------------------------------------------- */
+/* Firefox applies `:-moz-ui-invalid` as soon as it considers
+an input field being invalid, generating an uncontrolled red box-shadow. */
+
+.home-search :not(output):-moz-ui-invalid:not(:focus) {
+  box-shadow: none;
+}
+
+.home-search :not(output):-moz-ui-invalid:-moz-focusring:not(:focus) {
+  box-shadow: none;
+}
+
 /* Old browsers.
 --------------------------------------------------------------------------- */
 
