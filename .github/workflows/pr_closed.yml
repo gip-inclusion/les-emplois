@@ -1,6 +1,6 @@
 name: 🔪 Delete review app
 
-# Run this pipeline when a label is added and when a push is made on this PR.
+# Run this pipeline when a pull request having the label "review-app" is closed.
 on:
   pull_request:
     types: [ closed ]
