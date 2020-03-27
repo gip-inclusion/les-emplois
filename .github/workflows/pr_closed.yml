@@ -6,7 +6,7 @@ on:
     types: [ closed ]
 
 env:
-  CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
   CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -36,7 +36,7 @@ jobs:
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
-        curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME

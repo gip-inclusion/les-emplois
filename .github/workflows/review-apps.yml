@@ -29,6 +29,8 @@ jobs:
     steps:
     - name: 📥 Checkout to the PR branch
       uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
 
     - name: 🏷 Set review app name
       run:
@@ -88,7 +90,7 @@ jobs:
 
     - name: 🧫 Create a review app on Clever Cloud
       run: |
-        curl curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
