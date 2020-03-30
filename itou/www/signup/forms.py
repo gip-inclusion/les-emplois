@@ -131,7 +131,7 @@ class SelectSiaeForm(forms.Form):
 
         if not (siret or email):
             error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
-            raise forms.ValidationError(mark_safe(error_message))
+            raise forms.ValidationError(error_message)
 
         siaes = Siae.objects.filter(kind=kind)
         if siret and email:

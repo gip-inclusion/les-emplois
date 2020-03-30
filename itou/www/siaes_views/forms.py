@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
@@ -92,6 +93,27 @@ class EditSiaeForm(forms.ModelForm):
         for required_field in required_fields:
             self.fields[required_field].required = True
 
+        # Following COVID-19 pandemic, we opened Itou for all ETTIs to encourage hiring.
+        # The "description" field is made required for ETTIs during this time.
+        if self.instance and (self.instance.kind == self.instance.KIND_ETTI):
+            desc_example = _(
+                "<p><b>Exemple de description :</b></p>"
+                "<p>L'ETTi XXXXX, intervient sur le territoire XXXXX et met à disposition "
+                "des intérimaires et notamment pour 5 missions récurrentes :</p>"
+                "<ul>"
+                "<li>Mission 1</li>"
+                "<li>Mission 2</li>"
+                "<li>Mission 3</li>"
+                "<li>Mission 4</li>"
+                "<li>Mission 5</li>"
+                "</ul>"
+                "<p>Nous sommes disponibles pour étudier avec les entreprises utilisatrices "
+                "toutes les missions de premier niveau de qualification."
+            )
+            self.fields["description"].help_text = mark_safe(desc_example)
+            if not self.instance.description:
+                self.fields["description"].required = True
+
     class Meta:
         model = Siae
         fields = [
@@ -108,7 +130,7 @@ class EditSiaeForm(forms.ModelForm):
         ]
         help_texts = {
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "description": gettext_lazy("Texte de présentation de votre structure."),
+            "description": gettext_lazy("Texte de présentation de votre structure de ouf."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }
