@@ -12,10 +12,11 @@ from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import CreateSiaeForm, EditSiaeForm
 
 
-@login_required
 def card(request, siae_id, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
+
+    Public view (previously private, made public during COVID-19).
     """
     queryset = Siae.objects.prefetch_job_description_through(is_active=True)
     siae = get_object_or_404(queryset, pk=siae_id)
@@ -24,10 +25,11 @@ def card(request, siae_id, template_name="siaes/card.html"):
     return render(request, template_name, context)
 
 
-@login_required
 def card_legacy(request, siret, template_name="siaes/card.html"):
     """
     Legacy route via SIRET for SIAE's card (or "Fiche" in French).
+
+    Public view (previously private, made public during COVID-19).
     """
     siae = Siae.objects.filter(siret=siret).first()
     if siae:
@@ -35,10 +37,11 @@ def card_legacy(request, siret, template_name="siaes/card.html"):
     raise Http404(_("Aucune structure trouvée correspondant à ce SIRET."))
 
 
-# Public view.
 def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
     """
     SIAE's job description card (or "Fiche" in French).
+
+    Public view.
     """
     job_description = get_object_or_404(SiaeJobDescription, pk=job_description_id)
     back_url = get_safe_url(request, "back_url")

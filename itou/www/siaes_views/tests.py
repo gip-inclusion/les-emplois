@@ -15,8 +15,6 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 class CardViewTest(TestCase):
     def test_card(self):
         siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -27,8 +25,6 @@ class CardViewTest(TestCase):
 
     def test_card_legacy_route(self):
         siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:card_legacy", kwargs={"siret": siae.siret})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 301)
