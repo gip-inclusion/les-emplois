@@ -25,18 +25,6 @@ def card(request, siae_id, template_name="siaes/card.html"):
     return render(request, template_name, context)
 
 
-def card_legacy(request, siret, template_name="siaes/card.html"):
-    """
-    Legacy route via SIRET for SIAE's card (or "Fiche" in French).
-
-    Public view (previously private, made public during COVID-19).
-    """
-    siae = Siae.objects.filter(siret=siret).first()
-    if siae:
-        return HttpResponsePermanentRedirect(reverse_lazy("siaes_views:card", kwargs={"siae_id": siae.pk}))
-    raise Http404(_("Aucune structure trouvée correspondant à ce SIRET."))
-
-
 def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
     """
     SIAE's job description card (or "Fiche" in French).

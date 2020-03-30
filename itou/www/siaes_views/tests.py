@@ -23,18 +23,6 @@ class CardViewTest(TestCase):
         self.assertContains(response, siae.email)
         self.assertContains(response, siae.phone)
 
-    def test_card_legacy_route(self):
-        siae = SiaeWithMembershipFactory()
-        url = reverse("siaes_views:card_legacy", kwargs={"siret": siae.siret})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 301)
-
-        siret_without_siae = "12345678901234"
-        self.assertFalse(Siae.objects.filter(siret=siret_without_siae).exists())
-        url = reverse("siaes_views:card_legacy", kwargs={"siret": siret_without_siae})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
-
 
 class JobDescriptionCardViewTest(TestCase):
     def test_job_description_card(self):
