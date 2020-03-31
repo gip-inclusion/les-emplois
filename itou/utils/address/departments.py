@@ -1,3 +1,6 @@
+from django.core.exceptions import ValidationError
+
+
 REGIONS = {
     "Auvergne-Rhône-Alpes": ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"],
     "Bourgogne-Franche-Comté": ["21", "25", "39", "58", "70", "71", "89", "90"],
@@ -129,3 +132,22 @@ DEPARTMENTS = {
     "987": "Polynésie française (987)",
     "988": "Nouvelle-Calédonie (988)",
 }
+
+
+def department_from_postcode(post_code):
+    """
+    Extract the department from the postal code (if possible)
+    """
+    if post_code:
+        if post_code.startswith("20"):
+            if post_code.startswith("200") or post_code.startswith("201"):
+                department = "2A"
+            elif post_code.startswith("202"):
+                department = "2B"
+        elif post_code.startswith("97") or post_code.startswith("98"):
+            department = post_code[:3]
+        else:
+            department = post_code[:2]
+        return department
+
+    return ""

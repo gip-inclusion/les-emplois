@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
+from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
 
@@ -83,6 +84,10 @@ class User(AbstractUser, AddressMixin):
         # authenticate against something else, e.g. username/password.
         if not already_exists and hasattr(self, "email") and User.email_already_exists(self.email):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
+
+        # Update department from postal code (if possible)
+        self.department = department_from_postcode(self.post_code)
+
         super().save(*args, **kwargs)
 
     @property
