@@ -35,4 +35,5 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/refuse", process_views.refuse, name="refuse"),
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.accept, name="accept"),
+    path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
 ]

@@ -227,6 +227,15 @@ class Approval(CommonApprovalMixin):
         approval_from_pe.save()
         return approval_from_pe
 
+    @property
+    def can_be_deleted(self):
+        state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
+
+        job_applications = self.jobapplication_set
+        if job_applications.count() != 1:
+            return False
+        return self.jobapplication_set.get().state == state_accepted
+
 
 class PoleEmploiApprovalManager(models.Manager):
     def find_for(self, user):
