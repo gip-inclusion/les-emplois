@@ -13,7 +13,7 @@ from itou.approvals.models import Approval
 from itou.cities.models import City
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.validators import validate_birthdate
+from itou.utils.address.forms import AddressFormMixin
 from itou.utils.widgets import DatePickerField
 
 
@@ -62,28 +62,12 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         )
 
 
-class CreateJobSeekerForm(forms.ModelForm):
-
-    ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
-
-    city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
-
-    city_name = forms.CharField(
-        label=gettext_lazy("Ville"),
-        required=False,
-        widget=forms.TextInput(
-            attrs={
-                "class": "js-city-autocomplete-input form-control",
-                "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": gettext_lazy("Nom de la ville"),
-                "autocomplete": "off",
-            }
-        ),
-    )
+class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
 
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
+        #AddressFormMixin.__init__(self, *args, **kwargs)
         self.fields["email"].required = True
         self.fields["email"].widget.attrs["readonly"] = True
         self.fields["first_name"].required = True
@@ -120,16 +104,6 @@ class CreateJobSeekerForm(forms.ModelForm):
         if get_user_model().email_already_exists(email):
             raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
         return email
-
-    def clean_city(self):
-        slug = self.cleaned_data["city"]
-        # Addresses are optional: check only if smth is entered
-        if slug:
-            try:
-                return City.objects.get(slug=slug).name
-            except City.DoesNotExist:
-                raise forms.ValidationError(gettext_lazy("Cette ville n'existe pas."))
-        return ""
 
     def clean(self):
         super().clean()
