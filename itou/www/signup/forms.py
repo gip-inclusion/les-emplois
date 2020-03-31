@@ -78,7 +78,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         user.is_prescriber = True
         user.save()
 
-        # Join organization.        max_length=get_user_model()._meta.get_field("first_name").max_length,
+        # Join organization.
 
         authorized_organization = self.cleaned_data["authorized_organization"]
         organization = self.organization or authorized_organization
