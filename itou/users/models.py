@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
 from itou.utils.address.models import AddressMixin
-from itou.utils.validators import validate_pole_emploi_id
+from itou.utils.validators import validate_pole_emploi_id, validate_birthdate
 
 
 class User(AbstractUser, AddressMixin):
@@ -37,7 +37,7 @@ class User(AbstractUser, AddressMixin):
 
     ERROR_EMAIL_ALREADY_EXISTS = _(f"Cet e-mail existe déjà.")
 
-    birthdate = models.DateField(verbose_name=_("Date de naissance"), null=True, blank=True)
+    birthdate = models.DateField(verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate])
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
 
     is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)

@@ -35,4 +35,4 @@ def validate_pole_emploi_id(pole_emploi_id):
 
 def validate_birthdate(birthdate):
     if birthdate >= timezone.now().date():
-        raise ValidationError(_("Cette date de naissance n'est pas valide"))
+        raise ValidationError(_("Cette date de naissance n'est pas valide (date future)"))

@@ -93,7 +93,6 @@ class CreateJobSeekerForm(forms.ModelForm):
         self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DatePickerField()
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
-        self.fields["birthdate"].validators = [validate_birthdate]
 
     class Meta:
         model = get_user_model()
