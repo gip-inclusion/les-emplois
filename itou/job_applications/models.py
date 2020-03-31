@@ -34,8 +34,8 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (STATE_NEW, _("Nouvelle candidature")),
         (STATE_PROCESSING, _("Candidature à l'étude")),
         (STATE_POSTPONED, _("Embauche pour plus tard")),
-        (STATE_ACCEPTED, _("Embauche acceptée")),
-        (STATE_REFUSED, _("Embauche déclinée")),
+        (STATE_ACCEPTED, _("Candidature acceptée")),
+        (STATE_REFUSED, _("Candidature déclinée")),
         (STATE_OBSOLETE, _("Embauché ailleurs")),
     )
 
@@ -50,7 +50,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_CHOICES = (
         (TRANSITION_PROCESS, _("Étudier la candidature")),
         (TRANSITION_POSTPONE, _("Reporter la candidature")),
-        (TRANSITION_ACCEPT, _("Accepter l'embauche")),
+        (TRANSITION_ACCEPT, _("Accepter la candidature")),
         (TRANSITION_REFUSE, _("Décliner la candidature")),
         (TRANSITION_RENDER_OBSOLETE, _("Rendre obsolete la candidature")),
     )
