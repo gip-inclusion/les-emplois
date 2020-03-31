@@ -1,6 +1,9 @@
+import datetime
 import logging
 import uuid
+from collections import namedtuple
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
@@ -28,6 +31,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_POSTPONED = "postponed"
     STATE_ACCEPTED = "accepted"
     STATE_REFUSED = "refused"
+    STATE_CANCELLED = "cancelled"
     STATE_OBSOLETE = "obsolete"
 
     STATE_CHOICES = (
@@ -36,6 +40,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (STATE_POSTPONED, _("Embauche pour plus tard")),
         (STATE_ACCEPTED, _("Candidature acceptée")),
         (STATE_REFUSED, _("Candidature déclinée")),
+        (STATE_CANCELLED, _("Candidature annulée")),
         (STATE_OBSOLETE, _("Embauché ailleurs")),
     )
 
@@ -45,6 +50,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_POSTPONE = "postpone"
     TRANSITION_ACCEPT = "accept"
     TRANSITION_REFUSE = "refuse"
+    TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
 
     TRANSITION_CHOICES = (
@@ -52,6 +58,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_POSTPONE, _("Reporter la candidature")),
         (TRANSITION_ACCEPT, _("Accepter la candidature")),
         (TRANSITION_REFUSE, _("Décliner la candidature")),
+        (TRANSITION_CANCEL, _("Annuler la candidature")),
         (TRANSITION_RENDER_OBSOLETE, _("Rendre obsolete la candidature")),
     )
 
@@ -60,6 +67,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_POSTPONE, STATE_PROCESSING, STATE_POSTPONED),
         (TRANSITION_ACCEPT, [STATE_PROCESSING, STATE_POSTPONED], STATE_ACCEPTED),
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
+        (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
     )
 
@@ -164,6 +172,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (APPROVAL_DELIVERY_MODE_AUTOMATIC, _("Automatique")),
         (APPROVAL_DELIVERY_MODE_MANUAL, _("Manuel")),
     )
+
+    CANCELLATION_DAYS_BEFORE_HIRING_STARTED = 15
+    CANCELLATION_DAYS_AFTER_HIRING_STARTED = 1
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -308,6 +319,20 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and self.approval.is_valid
         )
 
+    @property
+    def cancellation_delay(self):
+        delay_starts_at = self.hiring_start_at - relativedelta(days=self.CANCELLATION_DAYS_BEFORE_HIRING_STARTED)
+        delay_ends_at = self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+        Delay = namedtuple("Delay", "start end")
+        return Delay(delay_starts_at, delay_ends_at)
+
+    @property
+    def can_be_cancelled(self):
+        if self.hiring_start_at:
+            cancellation_delay = self.cancellation_delay
+            today = datetime.date.today()
+            return cancellation_delay.start <= today <= cancellation_delay.end
+
     # Workflow transitions.
 
     @xwf_models.transition()
@@ -374,6 +399,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         connection = mail.get_connection()
         emails = [self.email_refuse]
         connection.send_messages(emails)
+
+    @xwf_models.transition()
+    def cancel(self, *args, **kwargs):
+        if self.approval and self.approval.can_be_deleted:
+            self.approval.delete()
+            self.refresh_from_db()
+
+        if not self.can_be_cancelled:
+            raise xwf_models.AbortTransition(_("Cette candidature n'a pu être annulée."))
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):

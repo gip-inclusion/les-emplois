@@ -1,6 +1,7 @@
 import datetime
 
 from dateutil.relativedelta import relativedelta
+from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 
@@ -8,6 +9,7 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
+    JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
@@ -241,6 +243,7 @@ class ProcessViewsTest(TestCase):
             JobApplicationWorkflow.STATE_POSTPONED,
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_CANCELLED,
             JobApplicationWorkflow.STATE_OBSOLETE,
         ]:
             job_application = JobApplicationSentByJobSeekerFactory(state=state)
@@ -250,6 +253,37 @@ class ProcessViewsTest(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
             self.client.logout()
+
+    def test_cancel(self):
+        # Hiring date is today: cancellation should be possible.
+        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        message = list(get_messages(response.wsgi_request))[0]
+        self.assertEqual(message.level_tag, "success")
+        self.assertEqual(response.status_code, 302)
+        job_application.refresh_from_db()
+        self.assertTrue(job_application.state.is_cancelled)
+
+    def test_cannot_cancel(self):
+        cancellation_period_end = datetime.date.today() - relativedelta(
+            days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
+        )
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            hiring_start_at=(cancellation_period_end - relativedelta(days=1)),
+        )
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        message = list(get_messages(response.wsgi_request))[0]
+        self.assertEqual(message.level_tag, "error")
+        self.assertEqual(response.status_code, 302)
+        job_application.refresh_from_db()
+        self.assertFalse(job_application.state.is_cancelled)
 
 
 class ProcessTemplatesTest(TestCase):

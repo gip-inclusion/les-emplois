@@ -25,7 +25,6 @@
                 </div>
             {% endif %}
         </div>
-
     </h1>
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
@@ -40,6 +39,55 @@
                     {% trans "PASS IAE en cours de délivrance." %}
                 {% endif %}
             </div>
+
+            <div class="row">
+                <div class="col-sm">
+                    <button type="button" class="btn {% if job_application.can_be_cancelled %}btn-outline-danger{% else %}btn-outline-secondary{% endif %}" data-toggle="modal" data-target="#cancellationModal">{% trans "Annuler la candidature" %}</button>
+                </div>
+
+                <!-- This is hidden by default -->
+                <div class="modal fade" id="cancellationModal" tabindex="-1" role="dialog" aria-labelledby="cancellationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">{% trans "Annulation de la candidature" %}</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="{% trans 'Fermer' %}">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    {% blocktrans with cancellation_days_in_past=cancellation_days_in_past %}
+                                        Le délai permettant l'annulation de cette candidature commence {{ cancellation_days_in_past }} jours avant le début du contrat et se termine le lendemain.
+                                    {% endblocktrans %}
+                                </p>
+                                <p>
+                                    {% trans "Cette annulation est irréversible. Toutefois, la personne reste éligible." %}
+                                </p>
+
+                                {% if job_application.can_be_cancelled %}
+                                    <div class="font-weight-bold">
+                                        {% trans "Confirmez-vous l'annulation de cette candidature ?" %}
+                                    </div>
+                                {% else %}
+                                    <div class="font-weight-bold">
+                                        {% trans "A ce stade, l'annulation de cette candidature est impossible." %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>
+                                {% if job_application.can_be_cancelled %}
+                                    <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">
+                                        <button type="submit" class="btn btn-primary">{% trans "Confirmer l'annulation" %}</button>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div> <!-- .modal-content -->
+                    </div> <!-- .modal-dialog -->
+                </div> <!-- .modal -->
+            </div>
+
         {% else %}
             {% if approvals_wrapper.latest_approval %}
                 <div class="alert border">
