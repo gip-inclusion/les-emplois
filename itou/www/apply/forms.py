@@ -66,7 +66,6 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
-        # AddressFormMixin.__init__(self, *args, **kwargs)
         self.fields["email"].required = True
         self.fields["email"].widget.attrs["readonly"] = True
         self.fields["first_name"].required = True
