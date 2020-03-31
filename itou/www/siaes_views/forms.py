@@ -93,7 +93,7 @@ class EditSiaeForm(forms.ModelForm):
         for required_field in required_fields:
             self.fields[required_field].required = True
 
-        # Following COVID-19 pandemic, we opened Itou for all ETTIs to encourage hiring.
+        # COVID-19 "Operation ETTI".
         # The "description" field is made required for ETTIs during this time.
         if self.instance and (self.instance.kind == self.instance.KIND_ETTI):
             desc_example = _(
@@ -130,7 +130,7 @@ class EditSiaeForm(forms.ModelForm):
         ]
         help_texts = {
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "description": gettext_lazy("Texte de présentation de votre structure de ouf."),
+            "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }

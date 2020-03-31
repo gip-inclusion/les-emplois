@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
@@ -16,6 +16,7 @@ def card(request, siae_id, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
 
+    # COVID-19 "Operation ETTI".
     Public view (previously private, made public during COVID-19).
     """
     queryset = Siae.objects.prefetch_job_description_through(is_active=True)
