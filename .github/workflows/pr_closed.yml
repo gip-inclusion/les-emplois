@@ -41,11 +41,11 @@ jobs:
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
-    - name: 🔪 Delete the review app
+    - name: 🗑 Delete the review app
       run: |
         $CLEVER_CLI delete --yes
 
-    - name: 🔪 Delete the review app database
+    - name: 🗑 Delete the review app database
       run: |
         echo "Deleting database $REVIEW_APP_DB_NAME"
         psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL

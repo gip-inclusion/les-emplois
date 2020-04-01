@@ -3,13 +3,14 @@
 name: 🕵 Review apps
 
 # Run this pipeline when a label is added and when a push is made on this PR.
+# `types: [ synchronize ]` targets a push event made on a PR.
 on:
   pull_request:
     branches: [ master ]
     types: [ labeled, synchronize ]
 
 env:
-  CLEVER_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
   CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
@@ -42,16 +43,16 @@ jobs:
 
     - name: 🤝 Try to find the application on Clever Cloud
       run: |
-        curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 
-    - name: 🔪 Delete the review app
+    - name: 🗑 Delete the review app
       run: |
         $CLEVER_CLI delete --yes
 
-    - name: 🔪 Delete the review app database
+    - name: 🗑 Delete the review app database
       run: |
         echo "Deleting database $REVIEW_APP_DB_NAME"
         psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
@@ -93,7 +94,7 @@ jobs:
 
     - name: 🧫 Create a review app on Clever Cloud
       run: |
-        curl $CLEVER_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
