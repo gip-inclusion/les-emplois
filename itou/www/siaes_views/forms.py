@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import NON_FIELD_ERRORS
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
@@ -91,6 +92,27 @@ class EditSiaeForm(forms.ModelForm):
         required_fields = ["address_line_1", "post_code", "city", "department"]
         for required_field in required_fields:
             self.fields[required_field].required = True
+
+        # COVID-19 "Operation ETTI".
+        # The "description" field is made required for ETTIs during this time.
+        if self.instance and (self.instance.kind == self.instance.KIND_ETTI):
+            desc_example = _(
+                "<p><b>Exemple de description :</b></p>"
+                "<p>L'ETTi XXXXX, intervient sur le territoire XXXXX et met à disposition "
+                "des intérimaires et notamment pour 5 missions récurrentes :</p>"
+                "<ul>"
+                "<li>Mission 1</li>"
+                "<li>Mission 2</li>"
+                "<li>Mission 3</li>"
+                "<li>Mission 4</li>"
+                "<li>Mission 5</li>"
+                "</ul>"
+                "<p>Nous sommes disponibles pour étudier avec les entreprises utilisatrices "
+                "toutes les missions de premier niveau de qualification."
+            )
+            self.fields["description"].help_text = mark_safe(desc_example)
+            if not self.instance.description:
+                self.fields["description"].required = True
 
     class Meta:
         model = Siae

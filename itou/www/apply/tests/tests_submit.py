@@ -9,6 +9,7 @@ from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
+from itou.cities.factories import create_test_cities
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
@@ -99,12 +100,14 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {"birthdate": "20-12-1978", "phone": "0610203040", "pole_emploi_id": "1234567A"}
+
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(pk=user.pk)
         self.assertEqual(user.birthdate.strftime("%d-%m-%Y"), post_data["birthdate"])
         self.assertEqual(user.phone, post_data["phone"])
+
         self.assertEqual(user.pole_emploi_id, post_data["pole_emploi_id"])
 
         next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae.pk})
@@ -503,6 +506,9 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
 
 class ApplyAsPrescriberTest(TestCase):
+    def setUp(self):
+        create_test_cities(["67"], num_per_department=10)
+
     def test_apply_as_prescriber(self):
         """Apply as prescriber."""
 
@@ -583,7 +589,13 @@ class ApplyAsPrescriberTest(TestCase):
             "birthdate": "20-12-1978",
             "phone": "0610200305",
             "pole_emploi_id": "12345678",
+            "address_line_1": "55, avenue de la Rose",
+            "address_line_2": "7e étage",
+            "post_code": "67200",
+            "city_name": "Sommerau (67)",
+            "city": "sommerau-67",
         }
+
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 

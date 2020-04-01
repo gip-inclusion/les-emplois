@@ -15,8 +15,6 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 class CardViewTest(TestCase):
     def test_card(self):
         siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:card", kwargs={"siae_id": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -24,20 +22,6 @@ class CardViewTest(TestCase):
         self.assertContains(response, escape(siae.display_name))
         self.assertContains(response, siae.email)
         self.assertContains(response, siae.phone)
-
-    def test_card_legacy_route(self):
-        siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        url = reverse("siaes_views:card_legacy", kwargs={"siret": siae.siret})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 301)
-
-        siret_without_siae = "12345678901234"
-        self.assertFalse(Siae.objects.filter(siret=siret_without_siae).exists())
-        url = reverse("siaes_views:card_legacy", kwargs={"siret": siret_without_siae})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
 
 
 class JobDescriptionCardViewTest(TestCase):

@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
+from itou.utils.address.forms import AddressFormMixin
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
@@ -78,6 +79,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         user.save()
 
         # Join organization.
+
         authorized_organization = self.cleaned_data["authorized_organization"]
         organization = self.organization or authorized_organization
         if organization:
@@ -131,7 +133,7 @@ class SelectSiaeForm(forms.Form):
 
         if not (siret or email):
             error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
-            raise forms.ValidationError(mark_safe(error_message))
+            raise forms.ValidationError(error_message)
 
         siaes = Siae.objects.filter(kind=kind)
         if siret and email:
@@ -265,13 +267,20 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         }
 
 
-class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
+class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin):
     def save(self, request):
 
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
+
+        # Optional address part
+        user.address_line_1 = self.cleaned_data["address_line_1"]
+        user.address_line_2 = self.cleaned_data["address_line_2"]
+        user.post_code = self.cleaned_data["post_code"]
+        user.city = self.cleaned_data["city"]
+
         user.is_job_seeker = True
         user.save()
 
