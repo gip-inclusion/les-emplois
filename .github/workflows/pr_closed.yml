@@ -1,0 +1,58 @@
+name: 🔪 Delete review app
+
+# Run this pipeline when a pull request having the label "review-app" is closed.
+on:
+  pull_request:
+    types: [ closed ]
+
+env:
+  CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
+  CLEVER_TAR_FILE: clever-tools-latest_linux.tar.gz
+  CLEVER_CLI: clever-tools-latest_linux/clever
+  CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
+  CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
+  ORGANIZATION_NAME: Itou
+  DB_ADDON: review_apps_databases_DO_NOT_DELETE
+  BRANCH: ${{ github.head_ref }}
+  POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
+
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    if: contains( github.event.pull_request.labels.*.name, 'review-app')
+
+    steps:
+    - name: 📥 Checkout to the PR branch
+      uses: actions/checkout@v2
+
+    - name: 🏷 Set review app name
+      run:
+        echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
+
+    - name: 🏷 Set database name
+      run:
+        echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+
+    - name: 🤝 Find the application on Clever Cloud
+      run: |
+        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
+        tar -xvf $CLEVER_TAR_FILE
+        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+
+    - name: 🗑 Delete the review app
+      run: |
+        $CLEVER_CLI delete --yes
+
+    - name: 🗑 Delete the review app database
+      run: |
+        echo "Deleting database $REVIEW_APP_DB_NAME"
+        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
+          SELECT pg_terminate_backend(pg_stat_activity.pid)
+          FROM pg_stat_activity
+          WHERE pg_stat_activity.datname = '$REVIEW_APP_DB_NAME'
+            AND pid <> pg_backend_pid();
+          DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
+        EOSQL
+        echo "Database deleted successfully!"

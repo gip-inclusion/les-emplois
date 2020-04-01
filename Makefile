@@ -4,7 +4,7 @@
 .PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook
 
 # Run a local server.
-run: 
+run:
 	docker-compose -f docker-compose-dev.yml up
 
 clean:
@@ -44,12 +44,7 @@ django_admin:
 
 populate_db:
 	make django_admin COMMAND="import_cities"
-	make django_admin COMMAND="loaddata itou/fixtures/jobs.json"
-	make django_admin COMMAND="loaddata itou/fixtures/siaes.json"
-	make django_admin COMMAND="loaddata itou/fixtures/prescribers.json"
-	make django_admin COMMAND="loaddata itou/fixtures/test_users.json"
-	make django_admin COMMAND="loaddata itou/fixtures/prescriber_memberships.json"
-	make django_admin COMMAND="loaddata itou/fixtures/siae_memberships.json"
+	docker exec -ti itou_django bash -c "ls -d itou/fixtures/* | xargs django-admin loaddata"
 
 # Tests.
 # =============================================================================
