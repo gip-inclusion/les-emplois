@@ -10,6 +10,7 @@ from django.utils.html import escape
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
+from itou.cities.factories import create_test_cities
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
@@ -538,6 +539,9 @@ class SiaeSignupTest(TestCase):
 
 
 class JobSeekerSignupTest(TestCase):
+    def setUp(self):
+        create_test_cities(["67"], num_per_department=10)
+
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
 
@@ -551,7 +555,13 @@ class JobSeekerSignupTest(TestCase):
             "email": "john.doe@siae.com",
             "password1": "!*p4ssw0rd123-",
             "password2": "!*p4ssw0rd123-",
+            "address_line_1": "Test adresse",
+            "address_line_2": "Test adresse complémentaire",
+            "post_code": "67100",
+            "city_name": "Sommerau (67)",
+            "city": "sommerau-67",
         }
+
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
@@ -559,6 +569,12 @@ class JobSeekerSignupTest(TestCase):
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+
+        # Address
+        self.assertEquals(user.address_line_1, post_data["address_line_1"])
+        self.assertEquals(user.address_line_2, post_data["address_line_2"])
+        self.assertEquals(user.post_code, post_data["post_code"])
+        self.assertEquals(user.city, "Sommerau")
 
 
 class PrescriberSignupTest(TestCase):

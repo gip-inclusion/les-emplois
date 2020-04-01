@@ -87,6 +87,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_ETTI = "ETTI"
     KIND_GEIQ = "GEIQ"
     KIND_EA = "EA"
+    KIND_EATT = "EATT"
 
     KIND_CHOICES = (
         (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
@@ -95,6 +96,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
         (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
         (KIND_EA, _("Entreprise adaptée")),
+        (KIND_EATT, _("Entreprise adaptée de travail temporaire")),
     )
 
     SOURCE_ASP = "ASP"

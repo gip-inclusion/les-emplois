@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
@@ -30,3 +31,8 @@ def validate_pole_emploi_id(pole_emploi_id):
                 "7 chiffres suivis d'une 1 lettre ou d'un chiffre."
             )
         )
+
+
+def validate_birthdate(birthdate):
+    if birthdate >= timezone.now().date():
+        raise ValidationError(_("Cette date de naissance n'est pas valide (date future)"))

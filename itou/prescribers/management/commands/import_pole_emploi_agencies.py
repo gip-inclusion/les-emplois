@@ -6,7 +6,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 
 from itou.prescribers.models import PrescriberOrganization
-from itou.utils.address.departments import DEPARTMENTS
+from itou.utils.address.departments import DEPARTMENTS, department_from_postcode
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -90,15 +90,9 @@ class Command(BaseCommand):
                 post_code = row[9].strip()
                 self.logger.debug(post_code)
 
-                if post_code.startswith("20"):
-                    if post_code.startswith("200") or post_code.startswith("201"):
-                        department = "2A"
-                    elif post_code.startswith("202"):
-                        department = "2B"
-                elif post_code.startswith("97") or post_code.startswith("98"):
-                    department = post_code[:3]
-                else:
-                    department = post_code[:2]
+                # See address.utils.departement
+                department = department_from_postcode(post_code)
+
                 self.logger.debug(department)
                 assert department in DEPARTMENTS
 

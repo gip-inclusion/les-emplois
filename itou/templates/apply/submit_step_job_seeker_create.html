@@ -14,7 +14,24 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {% bootstrap_form_errors form %}
+
+        {% bootstrap_field form.email %}
+        {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.last_name %}
+        {% bootstrap_field form.birthdate %}
+        {% bootstrap_field form.phone %}
+        {% bootstrap_field form.address_line_1 %}
+        {% bootstrap_field form.address_line_2 %}
+
+        <div class="form-group row">
+            {% bootstrap_field form.post_code form_group_class="col-md-3 col-sm-12 form-group"%}
+            {% bootstrap_field form.city_name form_group_class="col form-group"%}
+            {% bootstrap_field form.city %}
+        </div>
+
+        {% bootstrap_field form.pole_emploi_id %}
+        {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">{% trans "Continuer" %}</button>
