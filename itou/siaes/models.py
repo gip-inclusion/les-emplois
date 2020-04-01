@@ -168,6 +168,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    # COVID-19 "Operation ETTI".
+    @property
+    def is_permitted_to_hire(self):
+        return self.department in ["62", "67", "93"]
+
     @property
     def display_name(self):
         if self.brand:
