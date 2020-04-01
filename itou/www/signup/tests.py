@@ -12,10 +12,12 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
 from itou.cities.factories import create_test_cities
+from itou.cities.models import City
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.utils.address.departments import department_from_postcode
 
 
 class SignupTest(TestCase):
@@ -541,7 +543,7 @@ class SiaeSignupTest(TestCase):
 
 class JobSeekerSignupTest(TestCase):
     def setUp(self):
-        create_test_cities(["67"], num_per_department=10)
+        create_test_cities(["67"], num_per_department=1)
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""
@@ -551,6 +553,10 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         password = "!*p4ssw0rd123-"
+        address_line_1 = "Test adresse"
+        address_line_2 = "Test adresse complémentaire"
+        city = City.objects.first()
+        post_code = city.post_codes[0]
 
         post_data = {
             "first_name": "John",
@@ -558,11 +564,11 @@ class JobSeekerSignupTest(TestCase):
             "email": "john.doe@siae.com",
             "password1": password,
             "password2": password,
-            "address_line_1": "Test adresse",
-            "address_line_2": "Test adresse complémentaire",
-            "post_code": "67100",
-            "city_name": "Sommerau (67)",
-            "city": "sommerau-67",
+            "address_line_1": address_line_1,
+            "address_line_2": address_line_2,
+            "post_code": post_code,
+            "city_name": city.name,
+            "city": city.slug,
         }
 
         response = self.client.post(url, data=post_data)
@@ -574,6 +580,11 @@ class JobSeekerSignupTest(TestCase):
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+        self.assertEquals(user.address_line_1, address_line_1)
+        self.assertEquals(user.address_line_2, address_line_2)
+        self.assertEquals(user.post_code, post_code)
+        self.assertEquals(user.city, city.name)
+        self.assertEquals(user.department, department_from_postcode(post_code))
         # Check `EmailAddress` state.
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
@@ -610,12 +621,6 @@ class JobSeekerSignupTest(TestCase):
         response = self.client.post(reverse("account_login"), data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("dashboard:index"))
-
-        # Address
-        self.assertEquals(user.address_line_1, post_data["address_line_1"])
-        self.assertEquals(user.address_line_2, post_data["address_line_2"])
-        self.assertEquals(user.post_code, post_data["post_code"])
-        self.assertEquals(user.city, "Sommerau")
 
 
 class PrescriberSignupTest(TestCase):
