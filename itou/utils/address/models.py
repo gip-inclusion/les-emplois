@@ -111,7 +111,7 @@ class AddressMixin(models.Model):
         self.city = geocoding_data["city"]
 
     def clean(self):
-        if self.post_code:
-            if not self.post_code.startswith(self.department):
-                raise ValidationError(_("Le département doit correspondre au code postal."))
+        if self.department != department_from_postcode(self.post_code):
+            raise ValidationError(_("Le département doit correspondre au code postal."))
+
         super().clean()
