@@ -1,4 +1,5 @@
 from allauth.account.forms import default_token_generator
+from allauth.account.models import EmailConfirmationHMAC
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -549,12 +550,14 @@ class JobSeekerSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        password = "!*p4ssw0rd123-"
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@siae.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
+            "password1": password,
+            "password2": password,
             "address_line_1": "Test adresse",
             "address_line_2": "Test adresse complémentaire",
             "post_code": "67100",
@@ -564,11 +567,49 @@ class JobSeekerSignupTest(TestCase):
 
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
 
+        # Check `User` state.
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check sent email.
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": EmailConfirmationHMAC(user_email).key})
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
+        self.assertIn(confirm_email_url, email.body)
+
+        # User cannot log in until confirmation.
+        post_data = {"login": user.email, "password": password}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # Confirm email.
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": EmailConfirmationHMAC(user_email).key})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_login"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
+
+        # User can log in after confirmation.
+        post_data = {"login": user.email, "password": password}
+        response = self.client.post(reverse("account_login"), data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
 
         # Address
         self.assertEquals(user.address_line_1, post_data["address_line_1"])
