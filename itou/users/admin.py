@@ -80,6 +80,7 @@ class ItouUserAdmin(UserAdmin):
                     "address_line_1",
                     "address_line_2",
                     "post_code",
+                    "department",
                     "city",
                     "is_job_seeker",
                     "is_prescriber",
