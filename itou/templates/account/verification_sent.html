@@ -1,0 +1,14 @@
+{# django-allauth template override. #}
+{% extends "layout/content_small.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Vérifiez votre adresse e-mail" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Vérifiez votre adresse e-mail" %}</h1>
+
+<p>{% trans "Nous vous avons envoyé un e-mail avec un lien pour validation. Cliquez sur le lien fourni pour terminer votre inscription." %}</p>
+
+{% endblock %}

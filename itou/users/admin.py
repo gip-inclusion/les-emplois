@@ -60,15 +60,12 @@ class KindFilter(admin.SimpleListFilter):
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
 
-    list_filter = UserAdmin.list_filter + (KindFilter,)
-
-    list_display = ("id", "email", "first_name", "last_name", "is_staff", "is_created_by_a_proxy", "last_login")
-
-    list_display_links = ("id", "email")
-
-    raw_id_fields = ("created_by",)
-
     inlines = UserAdmin.inlines + [SiaeMembershipInline, PrescriberMembershipInline]
+    list_display = ("id", "email", "first_name", "last_name", "is_staff", "is_created_by_a_proxy", "last_login")
+    list_display_links = ("id", "email")
+    list_filter = UserAdmin.list_filter + (KindFilter,)
+    ordering = ("-id",)
+    raw_id_fields = ("created_by",)
 
     fieldsets = UserAdmin.fieldsets + (
         (

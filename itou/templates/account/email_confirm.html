@@ -1,0 +1,42 @@
+{# django-allauth template override. #}
+{% extends "layout/content_small.html" %}
+
+{% load i18n %}
+{% load account %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Confirmer l'adresse e-mail" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Confirmer l'adresse e-mail" %}</h1>
+
+{% if confirmation %}
+
+    <p>{% blocktrans with email=confirmation.email_address.email %}Merci de confirmer que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail.{% endblocktrans %}</p>
+
+    <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+
+        {% csrf_token %}
+
+        {% buttons %}
+                <button type="submit" class="btn btn-primary">{% trans "Confirmer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% else %}
+
+    {% url 'account_email' as email_url %}
+
+    <div class="alert alert-danger" role="alert">
+        {% blocktrans %}
+            Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.
+            <br>
+            Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
+        {% endblocktrans %}
+    </div>
+
+{% endif %}
+
+{% endblock %}
