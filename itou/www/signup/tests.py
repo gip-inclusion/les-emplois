@@ -631,23 +631,60 @@ class PrescriberSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        password = "!*p4ssw0rd123-"
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@prescriber.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
+            "password1": password,
+            "password2": password,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
 
+        # Check `User` state.
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
 
-        self.assertEqual(0, user.prescriberorganization_set.count())
-        self.assertEqual(len(mail.outbox), 0)
+        # Check sent email.
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": EmailConfirmationHMAC(user_email).key})
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
+        self.assertIn(confirm_email_url, email.body)
+
+        # User cannot log in until confirmation.
+        post_data = {"login": user.email, "password": password}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # Confirm email.
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": EmailConfirmationHMAC(user_email).key})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_login"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
+
+        # User can log in after confirmation.
+        post_data = {"login": user.email, "password": password}
+        response = self.client.post(reverse("account_login"), data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
 
     def test_prescriber_signup_with_code_to_unauthorized_organization(self):
         """
@@ -662,44 +699,66 @@ class PrescriberSignupTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        password = "!*p4ssw0rd123-"
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@prescriber.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
+            "password1": password,
+            "password2": password,
             "secret_code": organization.secret_code,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        new_user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(new_user.is_job_seeker)
-        self.assertTrue(new_user.is_prescriber)
-        self.assertFalse(new_user.is_siae_staff)
-
-        self.assertIn(new_user, organization.members.all())
+        # Check `User` state.
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        self.assertIn(user, organization.members.all())
         self.assertEqual(2, organization.members.count())
-
-        self.assertIn(organization, new_user.prescriberorganization_set.all())
-        self.assertEqual(1, new_user.prescriberorganization_set.count())
-
-        membership = new_user.prescribermembership_set.get(organization=organization)
+        membership = user.prescribermembership_set.get(organization=organization)
         self.assertFalse(membership.is_admin)
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
 
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
-        self.assertIn(new_user.first_name, email.body)
-        self.assertIn(new_user.last_name, email.body)
-        self.assertIn(new_user.email, email.body)
-        self.assertIn(organization.display_name, email.body)
-        self.assertIn(organization.siret, email.body)
-        self.assertIn(organization.kind, email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], existing_user.email)
+        # Check sent emails.
+        self.assertEqual(len(mail.outbox), 2)
+        email1 = mail.outbox[0]
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email1.subject)
+        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email1.body)
+        self.assertIn(user.first_name, email1.body)
+        self.assertIn(user.last_name, email1.body)
+        self.assertIn(user.email, email1.body)
+        self.assertIn(organization.display_name, email1.body)
+        self.assertIn(organization.siret, email1.body)
+        self.assertIn(organization.kind, email1.body)
+        self.assertEqual(email1.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email1.to), 1)
+        self.assertEqual(email1.to[0], existing_user.email)
+        email2 = mail.outbox[1]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email2.subject)
+        self.assertEqual(len(email2.to), 1)
+        self.assertEqual(email2.to[0], user.email)
+
+        # Confirm email.
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": EmailConfirmationHMAC(user_email).key})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_login"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
+
+        # User can log in after confirmation.
+        post_data = {"login": user.email, "password": password}
+        response = self.client.post(reverse("account_login"), data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
 
     def test_two_prescribers_signup_without_code_to_authorized_organization(self):
         """
@@ -709,36 +768,45 @@ class PrescriberSignupTest(TestCase):
 
         authorized_organization = PrescriberOrganizationFactory(is_authorized=True, department="62")
 
+        # First user.
+
         url = reverse("signup:prescriber")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        password = "!*p4ssw0rd123-"
 
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@prescriber.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
+            "password1": password,
+            "password2": password,
             "authorized_organization": authorized_organization.pk,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
 
+        # Check `User` state.
         first_user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(first_user.is_job_seeker)
         self.assertTrue(first_user.is_prescriber)
         self.assertFalse(first_user.is_siae_staff)
-
+        # Check `Membership` state.
         self.assertIn(first_user, authorized_organization.members.all())
         self.assertEqual(1, authorized_organization.members.count())
         self.assertEqual(1, first_user.prescriberorganization_set.count())
-
         membership = first_user.prescribermembership_set.get(organization=authorized_organization)
         self.assertTrue(membership.is_admin)
 
-        self.assertEqual(len(mail.outbox), 0)
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        mail.outbox = []  # Delete emails.
 
-        self.client.logout()
+        # Second user.
 
         url = reverse("signup:prescriber")
         response = self.client.get(url)
@@ -748,26 +816,28 @@ class PrescriberSignupTest(TestCase):
             "first_name": "Jane",
             "last_name": "Doe",
             "email": "jane.doe@prescriber.com",
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
+            "password1": password,
+            "password2": password,
             "authorized_organization": authorized_organization.pk,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
 
+        # Check `User` state.
         second_user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(second_user.is_job_seeker)
         self.assertTrue(second_user.is_prescriber)
         self.assertFalse(second_user.is_siae_staff)
-
+        # Check `Membership` state.
         self.assertIn(second_user, authorized_organization.members.all())
         self.assertEqual(2, authorized_organization.members.count())
         self.assertEqual(1, second_user.prescriberorganization_set.count())
-
         membership = second_user.prescribermembership_set.get(organization=authorized_organization)
         self.assertFalse(membership.is_admin)
 
-        self.assertEqual(len(mail.outbox), 1)
+        # Check sent emails.
+        # self.assertEqual(len(mail.outbox), 2)
         email = mail.outbox[0]
         self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email.subject)
         self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
