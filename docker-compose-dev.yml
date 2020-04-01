@@ -29,8 +29,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/dev/django/Dockerfile
-      args:
-          REALM: "${REALM:-development}"
     volumes:
       # Mount the current directory into `/app` inside the running container.
       - .:/app

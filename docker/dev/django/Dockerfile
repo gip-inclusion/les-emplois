@@ -66,12 +66,10 @@ RUN pip install --upgrade pip \
 
 COPY --chown=app:app . $APP_DIR
 
-ARG REALM
-
-RUN chmod +x $APP_DIR/docker/dev/django/entrypoint_$REALM.sh
+RUN chmod +x $APP_DIR/docker/dev/django/entrypoint.sh
 
 USER app
 
 WORKDIR $APP_DIR
 
-ENTRYPOINT "./docker/dev/django/entrypoint_$REALM.sh"
+ENTRYPOINT ["./docker/dev/django/entrypoint.sh"]
