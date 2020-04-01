@@ -3,7 +3,7 @@ from .base import *  # noqa
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-ALLOWED_HOSTS = [".cleverapps.io"]
+ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io"]
 
 DATABASES = {
     "default": {
