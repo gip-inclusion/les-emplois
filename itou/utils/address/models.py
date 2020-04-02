@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.utils.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
+from itou.utils.address.departments import DEPARTMENTS, REGIONS
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.validators import validate_post_code
 
