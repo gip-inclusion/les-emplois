@@ -13,7 +13,7 @@
 
 {% if confirmation %}
 
-    <p>{% blocktrans with email=confirmation.email_address.email %}Merci de confirmer que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail.{% endblocktrans %}</p>
+    <p>{% blocktrans with email=confirmation.email_address.email %}Confirmez que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous :{% endblocktrans %}</p>
 
     <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 
