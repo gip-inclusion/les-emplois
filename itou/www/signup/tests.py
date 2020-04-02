@@ -45,14 +45,9 @@ class SiaeSignupTest(TestCase):
         """
         return f"{reverse('signup:siae')}/{urlsafe_base64_encode(force_bytes(siae.pk))}/"
 
-    def assert_url_is_siae_magic_link(self, url, siae):
+    def _assert_url_is_siae_magic_link(self, url, siae):
         non_flaky_url_prefix = self.get_siae_magic_link_non_flaky_prefix(siae)
         self.assertTrue(url.startswith(non_flaky_url_prefix))
-
-    def assert_siae_magic_link_is_in_email_body(self, siae, body):
-        non_flaky_url_prefix = self.get_siae_magic_link_non_flaky_prefix(siae)
-        url_domain = "http://testserver"
-        self.assertIn(f"{url_domain}{non_flaky_url_prefix}", body)
 
     def test_select_siae_form_errors(self):
         """
@@ -128,7 +123,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data, follow=True)
         redirect_url, status_code = response.redirect_chain[-1]
         self.assertEqual(status_code, 302)
-        self.assert_url_is_siae_magic_link(url=redirect_url, siae=siae1)
+        self._assert_url_is_siae_magic_link(url=redirect_url, siae=siae1)
         self.assertEqual(response.status_code, 200)
 
         url = reverse("signup:siae")
@@ -173,16 +168,6 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", email.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
-        self.assertIn(new_user.first_name, email.body)
-        self.assertIn(new_user.last_name, email.body)
-        self.assertIn(new_user.email, email.body)
-        self.assertIn(siae1.display_name, email.body)
-        self.assertIn(siae1.siret, email.body)
-        self.assertIn(siae1.kind, email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], existing_admin_user.email)
 
     def test_siae_signup_story_of_jacques(self):
         """
@@ -230,16 +215,6 @@ class SiaeSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Un nouvel utilisateur souhaite rejoindre votre structure", email.subject)
-        self.assertIn("veuillez ouvrir le lien suivant pour continuer votre inscription", email.body)
-        self.assert_siae_magic_link_is_in_email_body(siae=siae1, body=email.body)
-        self.assertIn(siae1.display_name, email.body)
-        self.assertIn(siae1.siret, email.body)
-        self.assertIn(siae1.kind, email.body)
-        self.assertIn(siae1.auth_email, email.body)
-        self.assertNotIn(siae1.email, email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], siae1.auth_email)
 
         response = self.client.get(magic_link)
         self.assertEqual(response.status_code, 200)
@@ -334,7 +309,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data, follow=True)
         redirect_url, status_code = response.redirect_chain[-1]
         self.assertEqual(status_code, 302)
-        self.assert_url_is_siae_magic_link(url=redirect_url, siae=siae3)
+        self._assert_url_is_siae_magic_link(url=redirect_url, siae=siae3)
         self.assertEqual(response.status_code, 200)
 
         url = reverse("signup:siae")
@@ -397,7 +372,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data, follow=True)
         redirect_url, status_code = response.redirect_chain[-1]
         self.assertEqual(status_code, 302)
-        self.assert_url_is_siae_magic_link(url=redirect_url, siae=siae)
+        self._assert_url_is_siae_magic_link(url=redirect_url, siae=siae)
         self.assertEqual(response.status_code, 200)
 
         url = reverse("signup:siae")
@@ -463,7 +438,7 @@ class SiaeSignupTest(TestCase):
         response = self.client.post(url, data=post_data, follow=True)
         redirect_url, status_code = response.redirect_chain[-1]
         self.assertEqual(status_code, 302)
-        self.assert_url_is_siae_magic_link(url=redirect_url, siae=siae2)
+        self._assert_url_is_siae_magic_link(url=redirect_url, siae=siae2)
         self.assertEqual(response.status_code, 200)
 
         url = reverse("signup:siae")

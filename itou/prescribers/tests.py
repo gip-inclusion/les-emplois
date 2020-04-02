@@ -8,9 +8,6 @@ from itou.users.factories import PrescriberFactory
 
 class ModelTest(TestCase):
     def test_new_signup_warning_email_to_existing_members(self):
-        """
-        Test `new_signup_warning_email_to_existing_members`.
-        """
         authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
 
         self.assertEqual(1, authorized_organization.members.count())

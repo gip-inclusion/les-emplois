@@ -1,4 +1,8 @@
-from django.test import TestCase
+from unittest import mock
+
+from django.conf import settings
+from django.core import mail
+from django.test import RequestFactory, TestCase
 
 from itou.siaes.factories import (
     SiaeFactory,
@@ -8,6 +12,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.siaes.models import Siae
+from itou.users.factories import SiaeStaffFactory
 
 
 class FactoriesTest(TestCase):
@@ -106,3 +111,51 @@ class ModelTest(TestCase):
 
         self.assertTrue(siae2.has_member(siae1_admin_user))
         self.assertFalse(siae2.has_admin(siae1_admin_user))
+
+    @mock.patch("itou.siaes.models.Siae.get_token", return_value="a1pnsu-fefa1a71531175b21b4b")
+    def test_new_signup_activation_email_to_official_contact(self, mock_get_token):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        factory = RequestFactory()
+        request = factory.get("/")
+
+        message = siae.new_signup_activation_email_to_official_contact(request)
+        message.send()
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Un nouvel utilisateur souhaite rejoindre votre structure", email.subject)
+        self.assertIn("veuillez ouvrir le lien suivant pour continuer votre inscription", email.body)
+        self.assertIn(siae.signup_magic_link, email.body)
+        self.assertIn(siae.display_name, email.body)
+        self.assertIn(siae.siret, email.body)
+        self.assertIn(siae.kind, email.body)
+        self.assertIn(siae.auth_email, email.body)
+        self.assertNotIn(siae.email, email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], siae.auth_email)
+
+    def test_new_signup_warning_email_to_existing_members(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        new_user = SiaeStaffFactory()
+
+        message = siae.new_signup_warning_email_to_existing_members(new_user)
+        message.send()
+
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", email.subject)
+        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
+        self.assertIn(new_user.first_name, email.body)
+        self.assertIn(new_user.last_name, email.body)
+        self.assertIn(new_user.email, email.body)
+        self.assertIn(siae.display_name, email.body)
+        self.assertIn(siae.siret, email.body)
+        self.assertIn(siae.kind, email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
