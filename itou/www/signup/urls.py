@@ -8,6 +8,7 @@ app_name = "signup"
 
 urlpatterns = [
     path("prescriber", views.PrescriberSignupView.as_view(), name="prescriber"),
+    path("select_prescriber_type", views.select_prescriber_type, name="select_prescriber_type"),
     path("select_siae", views.select_siae, name="select_siae"),
     path("siae/<str:encoded_siae_id>/<str:token>", views.SiaeSignupView.as_view(), name="siae"),
     path("siae", views.SiaeSignupView.as_view(), name="siae"),

@@ -27,6 +27,9 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
     return render(request, template_name, context)
 
 
+# class PrescriberSignupStep1()
+
+
 class PrescriberSignupView(SignupView):
 
     form_class = forms.PrescriberSignupForm
@@ -104,3 +107,7 @@ class JobSeekerSignupView(SignupView):
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
         return super().post(request, *args, **kwargs)
+
+
+def select_prescriber_type(request):
+    return render(request, "signup/select_prescriber_type.html")
