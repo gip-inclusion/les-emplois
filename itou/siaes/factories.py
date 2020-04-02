@@ -27,7 +27,9 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     auth_email = factory.Faker("email", locale="fr_FR")
-    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
+    # COVID-19 "Operation ETTI".
+    # department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
+    department = factory.fuzzy.FuzzyChoice(["62", "67", "93"])
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")
