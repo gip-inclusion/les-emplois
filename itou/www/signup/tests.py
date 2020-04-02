@@ -1,3 +1,5 @@
+from unittest import mock
+
 from allauth.account.forms import default_token_generator
 from allauth.account.models import EmailConfirmationHMAC
 from allauth.account.utils import user_pk_to_url_str
@@ -38,15 +40,8 @@ class SignupTest(TestCase):
 
 
 class SiaeSignupTest(TestCase):
-    def get_siae_magic_link_non_flaky_prefix(self, siae):
-        """
-        The token in the magic link can be quite flaky throughout the tests
-        thus we need this helper to get the non flaky part of the url.
-        """
-        return f"{reverse('signup:siae')}/{urlsafe_base64_encode(force_bytes(siae.pk))}/"
-
     def _assert_url_is_siae_magic_link(self, url, siae):
-        non_flaky_url_prefix = self.get_siae_magic_link_non_flaky_prefix(siae)
+        non_flaky_url_prefix = f"{reverse('signup:siae')}/{urlsafe_base64_encode(force_bytes(siae.pk))}/"
         self.assertTrue(url.startswith(non_flaky_url_prefix))
 
     def test_select_siae_form_errors(self):
@@ -94,80 +89,82 @@ class SiaeSignupTest(TestCase):
         )
         self.assertContains(response, escape(expected_message))
 
-    def test_siae_signup_story_of_jessica(self):
+    def test_join_an_siae_with_one_admin(self):
         """
-        Test the following SIAE signup case:
-        - email does not match any siae
-        - siret matches two siaes
-        - (siret, kind) matches one siae
-        - existing siae already has an (admin) user
-        Story and expected results:
-        - new user is created, active and redirected to dashboard
-        - a warning fyi-only email is sent to the admin user
+        A user joins an SIAE with an existing admin.
         """
+
         user_first_name = "Jessica"
         user_email = "jessica.doe@siae.com"
 
+        # Same SIRET used for 2 SIAEs.
         siae1 = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
-
-        self.assertEqual(len(siae1.active_admin_members), 1)
-        existing_admin_user = siae1.active_admin_members[0]
-
         siae2 = SiaeFactory(kind=Siae.KIND_ACI, siret=siae1.siret)
 
-        url = reverse("signup:select_siae")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        token = siae1.get_token()
+        with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
 
-        post_data = {"email": user_email, "siret": siae1.siret, "kind": siae1.kind}
-        response = self.client.post(url, data=post_data, follow=True)
-        redirect_url, status_code = response.redirect_chain[-1]
-        self.assertEqual(status_code, 302)
-        self._assert_url_is_siae_magic_link(url=redirect_url, siae=siae1)
-        self.assertEqual(response.status_code, 200)
+            self.assertEqual(len(siae1.active_admin_members), 1)
+            existing_admin_user = siae1.active_admin_members[0]
 
-        url = reverse("signup:siae")
-        post_data = {
-            # hidden fields
-            "encoded_siae_id": siae1.get_encoded_siae_id(),
-            "token": siae1.get_token(),
-            # readonly fields
-            "siret": siae1.siret,
-            "kind": siae1.kind,
-            "siae_name": siae1.display_name,
-            # regular fields
-            "first_name": user_first_name,
-            "last_name": "Doe",
-            "email": user_email,
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
-        }
-        response = self.client.post(url, data=post_data, follow=True)
-        redirect_url, status_code = response.redirect_chain[-1]
-        self.assertEqual(status_code, 302)
-        next_url = reverse("dashboard:index")
-        self.assertEqual(redirect_url, next_url)
-        self.assertEqual(response.status_code, 200)
-        new_user = get_user_model().objects.get(email=user_email)
+            url = reverse("signup:select_siae")
 
-        self.assertFalse(new_user.is_job_seeker)
-        self.assertFalse(new_user.is_prescriber)
-        self.assertTrue(new_user.is_siae_staff)
-        self.assertTrue(new_user.is_active)
-        self.assertFalse(siae1.has_admin(new_user))
-        self.assertEqual(2, siae1.members.count())
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
-        self.assertEqual(new_user.first_name, user_first_name)
-        self.assertEqual(new_user.last_name, "Doe")
-        self.assertEqual(new_user.email, user_email)
+            # Find an SIAE: (siret, kind) matches one SIAE.
+            post_data = {"email": user_email, "siret": siae1.siret, "kind": siae1.kind}
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, siae1.signup_magic_link)
 
-        # siae2 is left untouched even though it has the same siret as siae1.
-        siae2 = Siae.objects.get(siret=siae2.siret, kind=siae2.kind)
-        self.assertEqual(0, siae2.members.count())
+            # Second step: create user.
+            url = reverse("signup:siae")
+            post_data = {
+                # Hidden fields.
+                "encoded_siae_id": siae1.get_encoded_siae_id(),
+                "token": siae1.get_token(),
+                # Readonly fields.
+                "siret": siae1.siret,
+                "kind": siae1.kind,
+                "siae_name": siae1.display_name,
+                # Regular fields.
+                "first_name": user_first_name,
+                "last_name": "Doe",
+                "email": user_email,
+                "password1": "!*p4ssw0rd123-",
+                "password2": "!*p4ssw0rd123-",
+            }
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", email.subject)
+            # Check `User` state.
+            new_user = get_user_model().objects.get(email=user_email)
+            self.assertFalse(new_user.is_job_seeker)
+            self.assertFalse(new_user.is_prescriber)
+            self.assertTrue(new_user.is_siae_staff)
+            self.assertTrue(new_user.is_active)
+            self.assertEqual(new_user.first_name, user_first_name)
+            self.assertEqual(new_user.last_name, post_data["last_name"])
+            self.assertEqual(new_user.email, user_email)
+            # Check `Membership` state.
+            self.assertFalse(siae1.has_admin(new_user))
+            self.assertEqual(2, siae1.members.count())
+            # Check `EmailAddress` state.
+            self.assertEqual(new_user.emailaddress_set.count(), 1)
+            user_email = new_user.emailaddress_set.first()
+            self.assertFalse(user_email.verified)
+
+            # siae2 is left untouched even though it has the same siret as siae1.
+            siae2 = Siae.objects.get(siret=siae2.siret, kind=siae2.kind)
+            self.assertEqual(0, siae2.members.count())
+
+            # Check sent emails.
+            self.assertEqual(len(mail.outbox), 2)
+            subjects = [email.subject for email in mail.outbox]
+            self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", subjects)
+            self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
     def test_siae_signup_story_of_jacques(self):
         """
