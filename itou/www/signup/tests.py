@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.html import escape
 from django.utils.http import urlsafe_base64_encode
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
@@ -22,6 +22,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.address.departments import department_from_postcode
+from itou.www.signup.forms import SelectSiaeForm
 
 
 class SignupTest(TestCase):
@@ -52,6 +53,34 @@ class SiaeSignupTest(TestCase):
         non_flaky_url_prefix = self.get_siae_magic_link_non_flaky_prefix(siae)
         url_domain = "http://testserver"
         self.assertIn(f"{url_domain}{non_flaky_url_prefix}", body)
+
+    def test_select_siae_form_errors(self):
+        """
+        Test SelectSiaeForm errors.
+        """
+
+        # Missing email and SIRET.
+        post_data = {"kind": Siae.KIND_ACI}
+        form = SelectSiaeForm(data=post_data)
+        form.is_valid()
+        expected_error = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
+        self.assertIn(expected_error, form.errors["__all__"])
+
+        # (email, kind) or (siret, kind) does not match any siae.
+        post_data = {"email": "daniela.doe@siae.com", "siret": "12345678901234", "kind": Siae.KIND_ACI}
+        form = SelectSiaeForm(data=post_data)
+        form.is_valid()
+        expected_error = _("Votre numéro de SIRET ou votre e-mail nous sont inconnus.")
+        self.assertTrue(form.errors["__all__"][0].startswith(expected_error))
+
+        # (email, kind) matches two siaes, (siret, kind) does not match any siae.
+        user_email = "emilie.doe@siae.com"
+        SiaeFactory.create_batch(2, kind=Siae.KIND_ACI, auth_email=user_email)
+        post_data = {"email": user_email, "siret": "12345678901234", "kind": Siae.KIND_ACI}
+        form = SelectSiaeForm(data=post_data)
+        form.is_valid()
+        expected_error = _("Votre e-mail est partagé par plusieurs structures")
+        self.assertTrue(form.errors["__all__"][0].startswith(expected_error))
 
     def test_legacy_route(self):
         """
@@ -273,78 +302,6 @@ class SiaeSignupTest(TestCase):
         expected_message = _(
             "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
         )
-        self.assertContains(response, escape(expected_message))
-
-    def test_siae_signup_story_of_marcel(self):
-        """
-        Test the following SIAE signup case:
-        - user did not even input an email nor a siret
-        Story and expected results:
-        - we show an explanation that a ASP-siret or ASP-email is required
-        """
-        user_first_name = "Marcel"  # noqa F841
-        user_email = "marcel.doe@siae.com"  # noqa F841
-
-        url = reverse("signup:select_siae")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {"kind": Siae.KIND_ACI}
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        expected_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
-        self.assertContains(response, expected_message)
-
-    def test_siae_signup_story_of_daniela(self):
-        """
-        Test the following SIAE signup case:
-        - (email, kind) does not match any siae
-        - (siret, kind) does not match any siae
-        Story and expected results:
-        - we show an explanation that a ASP-siret or ASP-email is required
-        """
-        user_first_name = "Daniela"  # noqa F841
-        user_email = "daniela.doe@siae.com"
-
-        unknown_siret = "12345678901234"
-
-        url = reverse("signup:select_siae")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {"email": user_email, "siret": unknown_siret, "kind": Siae.KIND_ACI}
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        expected_message = _("Votre numéro de SIRET ou votre e-mail nous sont inconnus.")
-        self.assertContains(response, escape(expected_message))
-
-    def test_siae_signup_story_of_emilie(self):
-        """
-        Test the following SIAE signup case:
-        - (email, kind) matches two siaes
-        - (siret, kind) does not match any siae
-        Story and expected results:
-        - we show a message explaining why we could not decide a match
-        """
-        user_first_name = "Emilie"  # noqa F841
-        user_email = "emilie.doe@siae.com"
-
-        shared_siae_kind = Siae.KIND_ACI
-
-        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
-
-        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
-
-        unknown_siret = "12345678901234"
-
-        url = reverse("signup:select_siae")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {"email": user_email, "siret": unknown_siret, "kind": shared_siae_kind}
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        expected_message = _("Votre e-mail est partagé par plusieurs structures")
         self.assertContains(response, escape(expected_message))
 
     def test_siae_signup_story_of_david(self):
