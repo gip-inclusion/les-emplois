@@ -72,6 +72,22 @@ class SiaeSignupTest(TestCase):
         expected_error = _("Votre e-mail est partagé par plusieurs structures")
         self.assertTrue(form.errors["__all__"][0].startswith(expected_error))
 
+    def test_select_siae_form_priority(self):
+        """
+        Test SelectSiaeForm priority.
+        """
+
+        user_email = "david.doe@siae.com"
+        siae1 = SiaeFactory(kind=Siae.KIND_ACI, auth_email=user_email)
+        siae2 = SiaeFactory(kind=Siae.KIND_ACI, auth_email=user_email)
+        siae3 = SiaeWithMembershipFactory(kind=Siae.KIND_ACI, siret="12345678901234")
+
+        # Priority is given to siret match over email match.
+        post_data = {"email": user_email, "siret": siae3.siret, "kind": Siae.KIND_ACI}
+        form = SelectSiaeForm(data=post_data)
+        form.is_valid()
+        self.assertEqual(form.selected_siae, siae3)
+
     def test_legacy_route(self):
         """
         Opening the old route without any magic link credentials
@@ -275,74 +291,6 @@ class SiaeSignupTest(TestCase):
             "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
         )
         self.assertContains(response, escape(expected_message))
-
-    def test_siae_signup_story_of_david(self):
-        """
-        Test the following SIAE signup case:
-        - (email, kind) matches two siaes
-        - (siret, kind) matches one siae, different from the two above
-        - existing siae already has a user
-        Story and expected results:
-        - priority is given to siret match over email match
-        - new user is created, active and redirected to dashboard
-        - user is associated to siae matching siret
-        """
-        user_first_name = "David"
-        user_email = "david.doe@siae.com"
-
-        shared_siae_kind = Siae.KIND_ACI
-
-        siae1 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
-
-        siae2 = SiaeFactory(kind=shared_siae_kind, auth_email=user_email)  # noqa F841
-
-        siae3 = SiaeWithMembershipFactory(kind=shared_siae_kind, siret="12345678901234")
-
-        url = reverse("signup:select_siae")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        post_data = {"email": user_email, "siret": siae3.siret, "kind": shared_siae_kind}
-        response = self.client.post(url, data=post_data, follow=True)
-        redirect_url, status_code = response.redirect_chain[-1]
-        self.assertEqual(status_code, 302)
-        self._assert_url_is_siae_magic_link(url=redirect_url, siae=siae3)
-        self.assertEqual(response.status_code, 200)
-
-        url = reverse("signup:siae")
-        post_data = {
-            # hidden fields
-            "encoded_siae_id": siae3.get_encoded_siae_id(),
-            "token": siae3.get_token(),
-            # readonly fields
-            "siret": siae3.siret,
-            "kind": shared_siae_kind,
-            "siae_name": siae3.display_name,
-            # regular fields
-            "first_name": user_first_name,
-            "last_name": "Doe",
-            "email": user_email,
-            "password1": "!*p4ssw0rd123-",
-            "password2": "!*p4ssw0rd123-",
-        }
-        response = self.client.post(url, data=post_data, follow=True)
-        redirect_url, status_code = response.redirect_chain[-1]
-        self.assertEqual(status_code, 302)
-        next_url = reverse("dashboard:index")
-        self.assertEqual(redirect_url, next_url)
-        self.assertEqual(response.status_code, 200)
-        new_user = get_user_model().objects.get(email=user_email)
-
-        self.assertFalse(new_user.is_job_seeker)
-        self.assertFalse(new_user.is_prescriber)
-        self.assertTrue(new_user.is_siae_staff)
-        self.assertTrue(new_user.is_active)
-        self.assertFalse(siae3.has_admin(new_user))
-        self.assertEqual(2, siae3.members.count())
-
-        self.assertEqual(new_user.first_name, user_first_name)
-        self.assertEqual(new_user.last_name, "Doe")
-        self.assertEqual(new_user.email, user_email)
 
     def test_siae_signup_story_of_bernadette(self):
         """
