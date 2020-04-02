@@ -1,0 +1,55 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Inscription | Connexion" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+    <div class="card-deck my-5 justify-content-between text-center">
+        <div class="card p-4" style="flex: 0 0 23%;">
+            <div class="card-body">
+                <div class="h-50">
+                    <h5 class="card-title font-weight-light mb-4">
+                        {% trans "Vous êtes orienteur" %}
+                    </h5>
+                </div>
+                <div class="h-50">
+                    <a href="{% url 'signup:prescriber' %}" class="card-link btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4" style="flex: 0 0 23%;">
+            <div class="card-body">
+                <div class="h-50">
+                    <h5 class="card-title font-weight-light mb-4">
+                        {% trans "Vous travaillez pour Pôle emploi" %}
+                    </h5>
+                </div>
+                <div class="h-50">
+                    <a href="{% url 'signup:prescriber' %}" class="card-link btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4" style="flex: 0 0 23%;">
+            <div class="card-body">
+                <div class="h-50">
+                    <h5 class="card-title font-weight-light mb-4">
+                        {% trans "Vous êtes prescripteur habilité" %}
+                    </h5>
+                </div>
+                <div class="h-50">
+                    <a href="{% url 'signup:prescriber' %}" class="card-link btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
