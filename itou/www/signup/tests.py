@@ -13,7 +13,11 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
@@ -729,22 +733,9 @@ class PrescriberSignupTest(TestCase):
 
         # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
-        email1 = mail.outbox[0]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email1.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email1.body)
-        self.assertIn(user.first_name, email1.body)
-        self.assertIn(user.last_name, email1.body)
-        self.assertIn(user.email, email1.body)
-        self.assertIn(organization.display_name, email1.body)
-        self.assertIn(organization.siret, email1.body)
-        self.assertIn(organization.kind, email1.body)
-        self.assertEqual(email1.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email1.to), 1)
-        self.assertEqual(email1.to[0], existing_user.email)
-        email2 = mail.outbox[1]
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email2.subject)
-        self.assertEqual(len(email2.to), 1)
-        self.assertEqual(email2.to[0], user.email)
+        subjects = [email.subject for email in mail.outbox]
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", subjects)
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
         # Confirm email.
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": EmailConfirmationHMAC(user_email).key})
@@ -760,57 +751,25 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("dashboard:index"))
 
-    def test_two_prescribers_signup_without_code_to_authorized_organization(self):
+    def test_second_member_signup_without_code_to_authorized_organization(self):
         """
-        Two prescribers signup to join an authorized organization.
-        First one becomes admin and is notified when second one signs up.
+        A second user signup to join an authorized organization.
+        First one is notified when second one signs up.
         """
 
-        authorized_organization = PrescriberOrganizationFactory(is_authorized=True, department="62")
+        # Create an authorized organization with one admin.
+        authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        self.assertEqual(1, authorized_organization.members.count())
+        first_user = authorized_organization.members.first()
+        membership = first_user.prescribermembership_set.get(organization=authorized_organization)
+        self.assertTrue(membership.is_admin)
 
-        # First user.
-
+        # A second user wants to join the authorized organization.
         url = reverse("signup:prescriber")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         password = "!*p4ssw0rd123-"
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@prescriber.com",
-            "password1": password,
-            "password2": password,
-            "authorized_organization": authorized_organization.pk,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # Check `User` state.
-        first_user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(first_user.is_job_seeker)
-        self.assertTrue(first_user.is_prescriber)
-        self.assertFalse(first_user.is_siae_staff)
-        # Check `Membership` state.
-        self.assertIn(first_user, authorized_organization.members.all())
-        self.assertEqual(1, authorized_organization.members.count())
-        self.assertEqual(1, first_user.prescriberorganization_set.count())
-        membership = first_user.prescribermembership_set.get(organization=authorized_organization)
-        self.assertTrue(membership.is_admin)
-
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
-        mail.outbox = []  # Delete emails.
-
-        # Second user.
-
-        url = reverse("signup:prescriber")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
 
         post_data = {
             "first_name": "Jane",
@@ -827,8 +786,8 @@ class PrescriberSignupTest(TestCase):
         # Check `User` state.
         second_user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(second_user.is_job_seeker)
-        self.assertTrue(second_user.is_prescriber)
         self.assertFalse(second_user.is_siae_staff)
+        self.assertTrue(second_user.is_prescriber)
         # Check `Membership` state.
         self.assertIn(second_user, authorized_organization.members.all())
         self.assertEqual(2, authorized_organization.members.count())
@@ -837,19 +796,10 @@ class PrescriberSignupTest(TestCase):
         self.assertFalse(membership.is_admin)
 
         # Check sent emails.
-        # self.assertEqual(len(mail.outbox), 2)
-        email = mail.outbox[0]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
-        self.assertIn(second_user.first_name, email.body)
-        self.assertIn(second_user.last_name, email.body)
-        self.assertIn(second_user.email, email.body)
-        self.assertIn(authorized_organization.display_name, email.body)
-        self.assertIn(authorized_organization.siret, email.body)
-        self.assertIn(authorized_organization.kind, email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], first_user.email)
+        self.assertEqual(len(mail.outbox), 2)
+        subjects = [email.subject for email in mail.outbox]
+        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", subjects)
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
 
 class PasswordResetTest(TestCase):
