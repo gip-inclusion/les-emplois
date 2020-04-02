@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -22,7 +22,7 @@ DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par dé
 
 
 @cache_page(60 * 60 * 2)
-@csrf_protect
+@csrf_exempt
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
