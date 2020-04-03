@@ -22,7 +22,7 @@
 
         <header class="layout-section layout-section-white">
             <div class="layout-header px-3 py-2">
-                <a href="/" class="text-decoration-none text-reset">
+                <a href="/{% if is_version_achat_enabled%}achat{% endif %}" class="text-decoration-none text-reset">
                     <div class="row layout-header-logo pt-1">
                         <div class="col-4">
                             <img src="{% static "img/logo_rf.svg" %}" alt="inclusion.beta.gouv.fr" width="85">
@@ -37,6 +37,12 @@
                 </a>
                 <div class="layout-header-content">
                     <nav class="d-flex align-content-stretch flex-wrap">
+                        {% if is_version_achat_enabled %}
+                            <h2>VERSION ACHAT</h2>
+                        {% else %}
+                            <h2>VERSION CLASSIQUE</h2>
+                        {% endif %}
+
                         <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://forum.inclusion.beta.gouv.fr" target="_blank">
                             {% trans "Accéder au forum" %}
                         </a>
@@ -113,14 +119,18 @@
             </div>
         </header>
 
-        {% if user.is_authenticated %}
         <div class="layout-section layout-section-white border-bottom">
             <nav class="nav">
-                <a class="nav-link" href="/">{% trans "Rechercher un employeur solidaire" %}</a>
-                <a class="nav-link" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+                {% if is_version_achat_enabled %}
+                    <a class="nav-link" href="/">{% trans "Rechercher un employeur solidaire" %}</a>
+                {% else %}
+                    <a class="nav-link" href="/achat">{% trans "Rechercher un partenaire de l'emploi solidaire" %}</a>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    <a class="nav-link" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+                {% endif %}
             </nav>
         </div>
-        {% endif %}
 
         <div class="layout-section layout-section-white">
             <div class="layout-messages">

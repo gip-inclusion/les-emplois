@@ -65,7 +65,11 @@
         <hr>
         <p class="mb-2">
             {% include "includes/icon.html" with icon="briefcase" %}
-            {% trans "Métiers proposés" %}
+            {% if is_version_achat_enabled %}
+                {% trans "FIXME Nouveau wording version achat" %}
+            {% else %}
+                {% trans "Métiers proposés" %}
+            {% endif %}
         </p>
         <ul>
         {% for job in siae.job_description_through.all %}
@@ -77,7 +81,7 @@
     {% endif %}
 
     {# COVID-19 "Operation ETTI". #}
-    {% if siae.is_permitted_to_hire %}
+    {% if siae.is_permitted_to_hire and not is_version_achat_enabled%}
         {% if siae.has_members %}
             <hr>
             <p>

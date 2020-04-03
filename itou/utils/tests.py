@@ -116,6 +116,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_is_prescriber_org_admin": True,
                 "user_is_siae_admin": False,
                 "user_siae_set": [],
+                "is_version_achat_enabled": False,
             }
             self.assertDictEqual(expected, result)
 

@@ -3,12 +3,13 @@ from django.shortcuts import render
 
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
+from itou.utils.version_achat import is_version_achat_enabled
 from itou.www.search.forms import SiaeSearchForm
 
 
 def search_siaes(request, template_name="search/siaes_search_results.html"):
 
-    form = SiaeSearchForm(data=request.GET)
+    form = SiaeSearchForm(is_version_achat_enabled=is_version_achat_enabled(request), data=request.GET)
     siaes_page = None
 
     if form.is_valid():

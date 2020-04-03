@@ -23,7 +23,7 @@
     </div>
 
     {# COVID-19 "Operation ETTI". #}
-    {% if siae.is_permitted_to_hire %}
+    {% if siae.is_permitted_to_hire and not is_version_achat_enabled %}
         {% if siae.has_members %}
             <p>
                 <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}">

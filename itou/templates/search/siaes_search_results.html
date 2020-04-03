@@ -54,7 +54,13 @@
                         de votre lieu de recherche
                     </p>
                     {% if siae.job_description_through.exists %}
-                        <h6 class="border-bottom border-gray pb-2">{% trans "Métiers proposés" %}</h6>
+                        <h6 class="border-bottom border-gray pb-2">
+                            {% if is_version_achat_enabled %}
+                                {% trans "FIXME Nouveau wording version achat" %}
+                            {% else %}
+                                {% trans "Métiers proposés" %}
+                            {% endif %}
+                        </h6>
                         <ul class="mb-0">
                         {% for job in siae.job_description_through.all %}
                             <li>
@@ -68,7 +74,7 @@
                 </div>
 
                 {# COVID-19 "Operation ETTI". #}
-                {% if siae.is_permitted_to_hire %}
+                {% if siae.is_permitted_to_hire and not is_version_achat_enabled %}
                     <div class="card-footer">
                         {% if siae.num_active_members %}
                             <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">

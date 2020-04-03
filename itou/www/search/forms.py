@@ -4,6 +4,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
+from itou.utils.version_achat import get_version_achat_default_siae_kind
 
 
 class SiaeSearchForm(forms.Form):
@@ -40,8 +41,10 @@ class SiaeSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, is_version_achat_enabled, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if is_version_achat_enabled:
+            self.fields["kind"].initial = get_version_achat_default_siae_kind()
         self.fields["distance"].initial = self.DISTANCE_DEFAULT
 
     def clean_city(self):

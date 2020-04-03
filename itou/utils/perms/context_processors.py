@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
+from itou.utils.version_achat import is_version_achat_enabled
+
 
 def get_current_organization_and_perms(request):
     """
@@ -43,4 +45,6 @@ def get_current_organization_and_perms(request):
         "user_is_prescriber_org_admin": user_is_prescriber_org_admin,
         "user_is_siae_admin": user_is_siae_admin,
         "user_siae_set": user_siae_set,
+        # FIXME put in properly named method
+        "is_version_achat_enabled": is_version_achat_enabled(request),
     }

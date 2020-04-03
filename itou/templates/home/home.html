@@ -34,7 +34,13 @@
 
     <section class="layout-section home-search pb-5 pb-sm-0">
         <div class="layout layout-column-full">
-            <h2 class="text-center mt-5 mb-3 mx-4 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
+            <h2 class="text-center mt-5 mb-3 mx-4 text-light">
+                {% if is_version_achat_enabled %}
+                    {% trans "FIXME Nouveau wording version achat" %}
+                {% else %}
+                    {% trans "Prenez contact avec un employeur solidaire" %}
+                {% endif %}
+            </h3>
 
             <div class="layout-column-main">
                 <form method="get" action="{% url 'search:siaes' %}" class="my-3 mx-auto">
