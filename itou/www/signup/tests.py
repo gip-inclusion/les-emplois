@@ -195,26 +195,20 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
+            # Confirm email.
             confirmation_token = EmailConfirmationHMAC(user_email).key
-            with mock.patch(
-                "allauth.account.models.EmailConfirmationHMAC.key",
-                new_callable=mock.PropertyMock,
-                return_value=confirmation_token,
-            ):
+            confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+            response = self.client.post(confirm_email_url)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, reverse("account_login"))
+            user_email = user.emailaddress_set.first()
+            self.assertTrue(user_email.verified)
 
-                # Confirm email.
-                confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-                response = self.client.post(confirm_email_url)
-                self.assertEqual(response.status_code, 302)
-                self.assertRedirects(response, reverse("account_login"))
-                user_email = user.emailaddress_set.first()
-                self.assertTrue(user_email.verified)
-
-                # User can log in after confirmation.
-                post_data = {"login": user.email, "password": password}
-                response = self.client.post(reverse("account_login"), data=post_data)
-                self.assertEqual(response.status_code, 302)
-                self.assertEqual(response.url, reverse("dashboard:index"))
+            # User can log in after confirmation.
+            post_data = {"login": user.email, "password": password}
+            response = self.client.post(reverse("account_login"), data=post_data)
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.url, reverse("dashboard:index"))
 
     def test_join_an_siae_with_one_member(self):
         """
@@ -355,44 +349,36 @@ class JobSeekerSignupTest(TestCase):
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
 
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
+
+        # User cannot log in until confirmation.
+        post_data = {"login": user.email, "password": password}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # Confirm email.
         confirmation_token = EmailConfirmationHMAC(user_email).key
-        with mock.patch(
-            "allauth.account.models.EmailConfirmationHMAC.key",
-            new_callable=mock.PropertyMock,
-            return_value=confirmation_token,
-        ):
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_login"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
 
-            # Check sent email.
-            confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-            self.assertEqual(len(mail.outbox), 1)
-            email = mail.outbox[0]
-            self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
-            self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
-            self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-            self.assertEqual(len(email.to), 1)
-            self.assertEqual(email.to[0], user.email)
-            self.assertIn(confirm_email_url, email.body)
-
-            # User cannot log in until confirmation.
-            post_data = {"login": user.email, "password": password}
-            url = reverse("account_login")
-            response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, reverse("account_email_verification_sent"))
-
-            # Confirm email.
-            confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-            response = self.client.post(confirm_email_url)
-            self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, reverse("account_login"))
-            user_email = user.emailaddress_set.first()
-            self.assertTrue(user_email.verified)
-
-            # User can log in after confirmation.
-            post_data = {"login": user.email, "password": password}
-            response = self.client.post(reverse("account_login"), data=post_data)
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, reverse("dashboard:index"))
+        # User can log in after confirmation.
+        post_data = {"login": user.email, "password": password}
+        response = self.client.post(reverse("account_login"), data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
 
 
 class PrescriberSignupTest(TestCase):
@@ -431,44 +417,36 @@ class PrescriberSignupTest(TestCase):
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
 
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
+
+        # User cannot log in until confirmation.
+        post_data = {"login": user.email, "password": password}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # Confirm email.
         confirmation_token = EmailConfirmationHMAC(user_email).key
-        with mock.patch(
-            "allauth.account.models.EmailConfirmationHMAC.key",
-            new_callable=mock.PropertyMock,
-            return_value=confirmation_token,
-        ):
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_login"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
 
-            # Check sent email.
-            confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-            self.assertEqual(len(mail.outbox), 1)
-            email = mail.outbox[0]
-            self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
-            self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
-            self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-            self.assertEqual(len(email.to), 1)
-            self.assertEqual(email.to[0], user.email)
-            self.assertIn(confirm_email_url, email.body)
-
-            # User cannot log in until confirmation.
-            post_data = {"login": user.email, "password": password}
-            url = reverse("account_login")
-            response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, reverse("account_email_verification_sent"))
-
-            # Confirm email.
-            confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-            response = self.client.post(confirm_email_url)
-            self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, reverse("account_login"))
-            user_email = user.emailaddress_set.first()
-            self.assertTrue(user_email.verified)
-
-            # User can log in after confirmation.
-            post_data = {"login": user.email, "password": password}
-            response = self.client.post(reverse("account_login"), data=post_data)
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, reverse("dashboard:index"))
+        # User can log in after confirmation.
+        post_data = {"login": user.email, "password": password}
+        response = self.client.post(reverse("account_login"), data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
 
     def test_prescriber_signup_with_code_to_unauthorized_organization(self):
         """
