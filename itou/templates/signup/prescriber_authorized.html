@@ -2,16 +2,16 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Prescripteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Prescripteur habilité - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Prescripteur" %}
+    {% trans "Prescripteur habilité" %}
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
 
-<form method="post" action="{% url 'signup:prescriber' %}" role="form" class="js-prevent-multiple-submit">
+<form method="post" action="{% url 'signup:prescriber_authorized' %}" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
@@ -37,6 +37,7 @@
             </a>
         </div>
     </nav>
+
     <div class="tab-content mb-3">
         <div class="tab-pane show active" id="form-org" role="tabpanel" aria-labelledby="nav-home-tab">
             <div class="p-3 border-right border-bottom border-left">

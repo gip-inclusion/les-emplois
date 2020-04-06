@@ -1,0 +1,42 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Orienteur - Inscription" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+<h1>
+    {% trans "Orienteur" %}
+    <small class="text-muted">{% trans "Inscription" %}</small>
+</h1>
+
+<form method="post" action="{% url 'signup:prescriber_orienter' %}" role="form" class="js-prevent-multiple-submit">
+
+    {% csrf_token %}
+
+    {% bootstrap_form_errors form %}
+
+    {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+    {% endif %}
+
+    {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.last_name %}
+    {% bootstrap_field form.email %}
+    {% bootstrap_field form.password1 %}
+    {% bootstrap_field form.password2 %}
+
+    {% bootstrap_field form.secret_code %}
+
+
+    {% include "signup/includes/submit_rgpd.html" %}
+
+</form>
+
+<hr>
+
+<p>
+    <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
+</p>
+{% endblock %}
