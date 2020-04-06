@@ -33,7 +33,7 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
 class PrescriberSignupView(SignupView):
 
     form_class = forms.PrescriberSignupForm
-    template_name = "signup/signup_prescriber.html"
+    template_name = "signup/prescriber_orienter.html"
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -110,4 +110,28 @@ class JobSeekerSignupView(SignupView):
 
 
 def select_prescriber_type(request):
+    """
+    New signup process for prescribers, can be one of:
+    * orienter
+    * Pole Emploi prescriber
+    * authorized prescriber
+    """
     return render(request, "signup/select_prescriber_type.html")
+
+
+# TBD: implement view classes
+
+
+class OrienterPrescriberView(SignupView):
+    template_name = "signup/prescriber_orienter.html"
+    form_class = forms.OrienterPrescriberForm
+
+
+class PoleEmploiPrescriberView(SignupView):
+    template_name = "signup/prescriber_poleemploi.html"
+    form_class = forms.PoleEmploiPrescriberForm
+
+
+class AuthorizedPrescriberView(SignupView):
+    template_name = "signup/prescriber_authorized.html"
+    form_class = forms.AuthorizedPrescriberForm

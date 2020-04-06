@@ -2,6 +2,8 @@ from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db.models import Q
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
@@ -34,6 +36,7 @@ class FullnameFormMixin(forms.Form):
     )
 
 
+# FIXME: Remove once finished, will ease rebase too
 class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 
     secret_code = forms.CharField(
@@ -93,6 +96,108 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
             membership.save()
 
         return user
+
+
+class PrescriberMixin(FullnameFormMixin, SignupForm):
+
+    secret_code = forms.CharField(
+        label=gettext_lazy("Code de l'organisation"),
+        max_length=6,
+        required=False,
+        strip=True,
+        help_text=gettext_lazy("Le code est composé de 6 caractères."),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.organization = None
+
+    def clean_secret_code(self):
+        """
+        Retrieve a PrescriberOrganization instance from the `secret_code` field.
+        """
+        secret_code = self.cleaned_data["secret_code"]
+        if secret_code:
+            secret_code = secret_code.upper()
+            try:
+                self.organization = PrescriberOrganization.objects.get(secret_code=secret_code)
+            except PrescriberOrganization.DoesNotExist:
+                error = _("Ce code n'est pas valide.")
+                raise forms.ValidationError(error)
+        return secret_code
+
+    def save(self, request):
+        self.clean()
+        user = super().save(request)
+
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+        user.is_prescriber = True
+        user.save()
+
+        # Join organization.
+
+        # FIXME: authorized_organization = self.cleaned_data["authorized_organization"]
+        organization = self.organization  # or authorized_organization
+        if organization:
+            if organization.has_members:
+                organization.new_signup_warning_email_to_existing_members(user).send()
+            membership = PrescriberMembership()
+            membership.user = user
+            membership.organization = organization
+            # The first member becomes an admin.
+            membership.is_admin = membership.organization.members.count() == 0
+            membership.save()
+
+        return user
+
+
+class OrienterPrescriberForm(PrescriberMixin):
+
+    secret_code = forms.CharField(
+        label=gettext_lazy("Vous avez un code d'organisation? Entrez le code qui vous a été transmis"),
+        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Code d'organisation")}),
+        max_length=6,
+        required=False,
+        strip=True,
+        help_text=gettext_lazy("Le code est composé de 6 caractères."),
+    )
+
+
+class PoleEmploiPrescriberForm(PrescriberMixin):
+
+    safir_code = forms.CharField(
+        max_length=5,
+        label=gettext_lazy("Code SAFIR"),
+        validators=[RegexValidator("^[0-9]{5}$", message=gettext_lazy("Le code SAFIR est erroné"))],
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if not email.endswith("@pole-emploi.fr"):
+            raise ValidationError(gettext_lazy("L'adresse email doit etre une adresse Pole-Emploi"))
+        return email
+
+    def clean_safir_code(self):
+        safir_code = self.cleaned_data["safir_code"]
+        self.organization = PrescriberOrganization.by_safir_code(safir_code)
+        if not self.organization:
+            raise ValidationError(gettext_lazy("Ce code SAFIR est inconnu"))
+        return safir_code
+
+
+class AuthorizedPrescriberForm(PrescriberMixin):
+
+    authorized_organization = forms.ModelChoiceField(
+        label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
+        queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by("name"),
+        required=False,
+        help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
+    )
+
+    def save(self, request):
+        self.organization = self.cleaned_data["authorized_organization"]
+        return super().save(request)
 
 
 class SelectSiaeForm(forms.Form):

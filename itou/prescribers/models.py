@@ -129,6 +129,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/new_signup_warning_email_to_existing_members_body.txt"
         return get_email_message(to, context, subject, body)
 
+    @classmethod
+    def by_safir_code(cls, safir_code):
+        return PrescriberOrganization.objects.filter(code_safir_pole_emploi=safir_code).first()
+
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""
