@@ -7,7 +7,7 @@ name: 🕵 Review apps
 on:
   pull_request:
     branches: [ master ]
-    types: [ labeled, synchronize ]
+    types: [ labeled ]
 
 env:
   CLEVER_TOOLS_DOWNLOAD_URL: https://clever-tools.clever-cloud.com/releases/latest/clever-tools-latest_linux.tar.gz
@@ -67,7 +67,7 @@ jobs:
   create:
     runs-on: ubuntu-latest
     needs: delete
-    if: contains( github.event.pull_request.labels.*.name, 'review-app')
+    if: always()
 
     steps:
     - name: 📥 Checkout to the PR branch
