@@ -49,12 +49,14 @@ export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
 
 django-admin migrate --noinput
 django-admin collectstatic --noinput --clear
-django-admin import_cities
+
+echo "Loading cities"
+PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD pg_restore -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER -d $POSTGRESQL_ADDON_DB --clean --if-exists --no-acl --no-owner --verbose ~/itou/fixtures/postgres/cities.dump
 
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
 echo "Loading fixtures"
-ls -d ~/itou/fixtures/* | xargs django-admin loaddata
+ls -d ~/itou/fixtures/django/* | xargs django-admin loaddata
 
 uwsgi --ini docker/review_apps/uwsgi.ini
 
