@@ -15,6 +15,7 @@ from itou.utils.address.forms import AddressFormMixin
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
+
 BLANK_CHOICE = (("", "---------"),)
 
 
@@ -178,7 +179,7 @@ class PoleEmploiPrescriberForm(PrescriberMixin):
 
 class AuthorizedPrescriberForm(PrescriberMixin):
     PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescribers_organizations")
-    #PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = ""
+    # PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = ""
 
     authorized_organization = forms.ModelChoiceField(
         label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
@@ -187,12 +188,17 @@ class AuthorizedPrescriberForm(PrescriberMixin):
         help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
     )
 
-    auto_organization = forms.CharField(label=gettext_lazy("Test autocomplete"),
-                                        widget=forms.TextInput(
-                                            attrs={"class": "js-city-autocomplete-input form-control",
-                                                   "data-autocomplete-source-url": PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL,
-                                                   "placeholder": gettext_lazy("Choisissez une organisation"),
-                                                   "autocomplete": "off", }))
+    auto_organization = forms.CharField(
+        label=gettext_lazy("Test autocomplete"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-city-autocomplete-input form-control",
+                "data-autocomplete-source-url": PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL,
+                "placeholder": gettext_lazy("Choisissez une organisation"),
+                "autocomplete": "off",
+            }
+        ),
+    )
 
     def save(self, request):
         self.organization = self.cleaned_data["authorized_organization"]

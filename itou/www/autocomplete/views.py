@@ -22,8 +22,8 @@ def cities_autocomplete(request):
     if term and slugify(term) not in get_city_swear_words_slugs():
         cities = (
             City.objects.annotate(similarity=TrigramSimilarity("name", term))
-                .filter(similarity__gt=0.1)
-                .order_by("-similarity")
+            .filter(similarity__gt=0.1)
+            .order_by("-similarity")
         )
         cities = cities[:10]
 
@@ -59,8 +59,10 @@ def jobs_autocomplete(request):
 def prescriber_organizations_autocomplete(request):
     term = request.GET.get("term", "").strip()
 
-    organizations = [{"value": org.name,
-                      "name": org.name}
-                     for org in PrescriberOrganization.objects.autocomplete(term)] if term else []
+    organizations = (
+        [{"value": org.name, "name": org.name} for org in PrescriberOrganization.objects.autocomplete(term)]
+        if term
+        else []
+    )
 
     return HttpResponse(json.dumps(organizations), "application/json")
