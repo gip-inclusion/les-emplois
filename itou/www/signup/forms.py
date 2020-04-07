@@ -3,8 +3,8 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.core.validators import RegexValidator
 from django.db.models import Q
+from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
@@ -15,12 +15,10 @@ from itou.utils.address.forms import AddressFormMixin
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
-
 BLANK_CHOICE = (("", "---------"),)
 
 
 class FullnameFormMixin(forms.Form):
-
     first_name = forms.CharField(
         label=gettext_lazy("Prénom"),
         max_length=get_user_model()._meta.get_field("first_name").max_length,
@@ -38,7 +36,6 @@ class FullnameFormMixin(forms.Form):
 
 # FIXME: Remove once finished, will ease rebase too
 class PrescriberSignupForm(FullnameFormMixin, SignupForm):
-
     secret_code = forms.CharField(
         label=gettext_lazy("Code de l'organisation"),
         max_length=6,
@@ -99,7 +96,6 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
 
 
 class PrescriberMixin(FullnameFormMixin, SignupForm):
-
     secret_code = forms.CharField(
         label=gettext_lazy("Code de l'organisation"),
         max_length=6,
@@ -153,7 +149,6 @@ class PrescriberMixin(FullnameFormMixin, SignupForm):
 
 
 class OrienterPrescriberForm(PrescriberMixin):
-
     secret_code = forms.CharField(
         label=gettext_lazy("Vous avez un code d'organisation? Entrez le code qui vous a été transmis"),
         widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Code d'organisation")}),
@@ -165,7 +160,6 @@ class OrienterPrescriberForm(PrescriberMixin):
 
 
 class PoleEmploiPrescriberForm(PrescriberMixin):
-
     safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
 
     def clean_email(self):
@@ -183,6 +177,8 @@ class PoleEmploiPrescriberForm(PrescriberMixin):
 
 
 class AuthorizedPrescriberForm(PrescriberMixin):
+    PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescribers_organizations")
+    #PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = ""
 
     authorized_organization = forms.ModelChoiceField(
         label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
@@ -190,6 +186,13 @@ class AuthorizedPrescriberForm(PrescriberMixin):
         required=False,
         help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
     )
+
+    auto_organization = forms.CharField(label=gettext_lazy("Test autocomplete"),
+                                        widget=forms.TextInput(
+                                            attrs={"class": "js-city-autocomplete-input form-control",
+                                                   "data-autocomplete-source-url": PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL,
+                                                   "placeholder": gettext_lazy("Choisissez une organisation"),
+                                                   "autocomplete": "off", }))
 
     def save(self, request):
         self.organization = self.cleaned_data["authorized_organization"]
@@ -369,7 +372,6 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin):
     def save(self, request):
-
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]

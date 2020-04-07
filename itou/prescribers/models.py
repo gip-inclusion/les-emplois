@@ -1,4 +1,8 @@
+import re
+import string
+
 from django.conf import settings
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
@@ -11,10 +15,15 @@ from itou.utils.validators import validate_siret
 
 
 class PrescriberOrganizationQuerySet(models.QuerySet):
+
     def member_required(self, user):
         if user.is_superuser:
             return self
         return self.filter(members=user, members__is_active=True)
+
+    def autocomplete(self, search_string, limit=10):
+        queryset = self.annotate(similarity=TrigramSimilarity("name", search_string)).filter(similarity__gt=0.1).order_by("-similarity")
+        return queryset[:limit]
 
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
