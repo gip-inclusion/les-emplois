@@ -16,7 +16,6 @@ def card(request, siae_id, template_name="siaes/card.html"):
     """
     SIAE's card (or "Fiche" in French).
 
-    # COVID-19 "Operation ETTI".
     Public view (previously private, made public during COVID-19).
     """
     queryset = Siae.objects.prefetch_job_description_through(is_active=True)

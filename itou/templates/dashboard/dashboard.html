@@ -170,17 +170,14 @@
                         {% endif %}
                     </p>
                     <p class="card-text">
-                        {# COVID-19 "Operation ETTI". #}
-                        {% if current_siae.is_permitted_to_hire %}
-                            {% include "includes/icon.html" with icon="user-check" %}
-                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
-                                {% if current_siae.is_subject_to_eligibility_rules %}
-                                    {% trans "Obtenir un numéro d'agrément (candidature spontanée)" %}
-                                {% else %}
-                                    {% trans "Candidature spontanée" %}
-                                {% endif %}
-                            </a>
-                        {% endif %}
+                        {% include "includes/icon.html" with icon="user-check" %}
+                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
+                            {% if current_siae.is_subject_to_eligibility_rules %}
+                                {% trans "Obtenir un numéro d'agrément (candidature spontanée)" %}
+                            {% else %}
+                                {% trans "Candidature spontanée" %}
+                            {% endif %}
+                        </a>
                     </p>
                 </div>
             </div>

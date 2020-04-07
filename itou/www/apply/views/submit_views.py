@@ -53,10 +53,6 @@ def start(request, siae_pk):
 
     siae = get_object_or_404(Siae, pk=siae_pk)
 
-    # COVID-19 "Operation ETTI".
-    if not siae.is_permitted_to_hire:
-        raise Http404()
-
     if request.user.is_siae_staff and not siae.has_member(request.user):
         raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
 

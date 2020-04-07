@@ -76,16 +76,13 @@
         </ul>
     {% endif %}
 
-    {# COVID-19 "Operation ETTI". #}
-    {% if siae.is_permitted_to_hire %}
-        {% if siae.has_members %}
-            <hr>
-            <p>
-                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                    {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                </a>
-            </p>
-        {% endif %}
+    {% if siae.has_members %}
+        <hr>
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+            </a>
+        </p>
     {% endif %}
 
     {% if back_url %}
