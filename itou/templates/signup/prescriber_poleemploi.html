@@ -7,7 +7,7 @@
 
 {% block content %}
 <h1>
-    {% trans "Orienteur" %}
+    {% trans "Prescripteur Pole-Emploi" %}
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
 
@@ -26,10 +26,7 @@
     {% bootstrap_field form.email %}
     {% bootstrap_field form.password1 %}
     {% bootstrap_field form.password2 %}
-
     {% bootstrap_field form.safir_code %}
-
-
 
     {% include "signup/includes/submit_rgpd.html" %}
 
