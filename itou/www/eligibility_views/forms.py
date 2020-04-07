@@ -40,7 +40,8 @@ class AdministrativeCriteriaForm(forms.Form):
         "ou le cumul d'au moins trois critères de niveau 2."
     )
     ERROR_CRITERIA_NUMBER_ETTI = gettext_lazy(
-        "Erreur dans la sélection des critères administratif, reportez-vous au texte d'aide."
+        "Erreur dans la sélection des critères administratif, reportez-vous au texte d'aide "
+        "\"Règle de validation spéciale pour les ETTI\"."
     )
     ERROR_SENIOR_JUNIOR = gettext_lazy(
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_SENIOR} et {NAME_JUNIOR}."

@@ -24,6 +24,42 @@
         </p>
     </div>
 
+    <div class="alert alert-info" role="alert">
+        <h4>
+            {% trans "Pendant la période de crise sanitaire" %}
+            <br>
+            {% trans "Règle de validation spéciale pour les ETTI" %}
+        </h4>
+        <p>{% trans "A partir du 8 avril, et jusqu'au 30 avril, les critères sont simplifiés pour les ETTI." %}</p>
+        <p>{% trans "La validation des critères administratifs obéit à la règle suivante :" %}</p>
+        <ul class="mb-0">
+            <li>{% trans "1 critère niveau 1" %}</li>
+            <li><b>{% trans "ou" %}</b></li>
+            <li>
+                {% trans "1 critère de niveau 2 parmi ceux-ci :" %}
+                <ul>
+                    <li>{% trans "Sortant de l'ASE - Aide sociale à l'enfance" %}</li>
+                    <li>{% trans "DELD (12-24 mois)" %}</li>
+                    <li>{% trans "Travailleur handicapé" %}</li>
+                    <li>{% trans "Personne sans hébergement ou hébergée ou ayant un parcours de rue" %}</li>
+                    <li>{% trans "Primo arrivant" %}</li>
+                    <li>{% trans "Résident ZRR" %}</li>
+                    <li>{% trans "Résident QPV" %}</li>
+                </ul>
+            </li>
+            <li><b>{% trans "ou" %}</b></li>
+            <li>
+                {% trans "3 critères de niveau 2 parmi ceux-ci :" %}
+                <ul>
+                    <li>{% trans "Niveau d'étude 3 ou infra" %}</li>
+                    <li>{% trans "Senior (+50 ans)" %}</li>
+                    <li>{% trans "Jeunes (-26 ans)" %}</li>
+                    <li>{% trans "Parent isolé" %}</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
     <hr>
 
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
