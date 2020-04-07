@@ -8,4 +8,4 @@ Afin de finaliser votre inscription, cliquez sur le lien suivant :{% endblocktr
 
 {% blocktrans %}Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.{% endblocktrans %}
 
-{% blocktrans %}Plateforme de l'Inclusion{% endblocktrans %}{% endautoescape %}
+inclusion.beta.gouv.fr{% endautoescape %}
