@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -77,6 +78,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     code_safir_pole_emploi = models.CharField(
         verbose_name=_("Code Safir"),
         help_text=_("Code unique d'une agence Pole emploi."),
+        validators=[RegexValidator("^[0-9]{5}$", message=_("Le code SAFIR est erroné"))],
         max_length=5,
         null=True,
         unique=True,
