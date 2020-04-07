@@ -166,11 +166,7 @@ class OrienterPrescriberForm(PrescriberMixin):
 
 class PoleEmploiPrescriberForm(PrescriberMixin):
 
-    safir_code = forms.CharField(
-        max_length=5,
-        label=gettext_lazy("Code SAFIR"),
-        validators=[RegexValidator("^[0-9]{5}$", message=gettext_lazy("Le code SAFIR est erroné"))],
-    )
+    safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -250,7 +246,6 @@ class SelectSiaeForm(forms.Form):
             siaes = siaes.filter(siret=siret)
         # Hit the database only once.
         siaes = list(siaes)
-
         siaes_matching_siret = [s for s in siaes if s.siret == siret]
         # There can be at most one siret match due to (kind, siret) unicity.
         siret_exists = len(siaes_matching_siret) == 1
