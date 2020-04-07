@@ -1,9 +1,11 @@
-{% load account %}{% load i18n %}{% autoescape off %}{% blocktrans with full_name=user.get_full_name email=user.email %}Bonjour,
+{% load account %}{% load i18n %}{% autoescape off %}{% blocktrans %}Bonjour,
 
-Vous recevez cet e-mail car {{ full_name }} a associé l'adresse {{ email }} à son compte.
+Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
 
-Pour confirmer que vous en êtes bien le propriétaire, cliquez sur le lien ci-dessous.{% endblocktrans %}
+Afin de finaliser votre inscription, cliquez sur le lien suivant :{% endblocktrans %}
 
 {{ activate_url }}
+
+{% blocktrans %}Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.{% endblocktrans %}
 
 {% blocktrans %}Plateforme de l'Inclusion{% endblocktrans %}{% endautoescape %}

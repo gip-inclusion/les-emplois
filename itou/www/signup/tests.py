@@ -353,7 +353,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
-        self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
+        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
@@ -421,7 +421,7 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
-        self.assertIn("Pour confirmer que vous en êtes bien le propriétaire", email.body)
+        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
