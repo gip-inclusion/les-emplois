@@ -195,20 +195,14 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
-            # Confirm email.
+            # Confirm email + auto login.
             confirmation_token = EmailConfirmationHMAC(user_email).key
             confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
             response = self.client.post(confirm_email_url)
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, reverse("account_login"))
+            self.assertEqual(response.url, reverse("dashboard:index"))
             user_email = user.emailaddress_set.first()
             self.assertTrue(user_email.verified)
-
-            # User can log in after confirmation.
-            post_data = {"login": user.email, "password": password}
-            response = self.client.post(reverse("account_login"), data=post_data)
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.url, reverse("dashboard:index"))
 
     def test_join_an_siae_with_one_member(self):
         """
@@ -365,20 +359,14 @@ class JobSeekerSignupTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
-        # Confirm email.
+        # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_login"))
+        self.assertEqual(response.url, reverse("dashboard:index"))
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
-
-        # User can log in after confirmation.
-        post_data = {"login": user.email, "password": password}
-        response = self.client.post(reverse("account_login"), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("dashboard:index"))
 
 
 class PrescriberSignupTest(TestCase):
@@ -433,20 +421,14 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("account_email_verification_sent"))
 
-        # Confirm email.
+        # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_login"))
+        self.assertEqual(response.url, reverse("dashboard:index"))
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
-
-        # User can log in after confirmation.
-        post_data = {"login": user.email, "password": password}
-        response = self.client.post(reverse("account_login"), data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("dashboard:index"))
 
     def test_prescriber_signup_with_code_to_unauthorized_organization(self):
         """
