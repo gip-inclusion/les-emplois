@@ -60,7 +60,7 @@ def prescriber_organizations_autocomplete(request):
     term = request.GET.get("term", "").strip()
 
     organizations = (
-        [{"value": org.name, "name": org.name} for org in PrescriberOrganization.objects.autocomplete(term)]
+        [{"value": org.name, "id": org.id} for org in PrescriberOrganization.objects.autocomplete(term)]
         if term
         else []
     )
