@@ -43,8 +43,9 @@ django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 
 populate_db:
-	make django_admin COMMAND="import_cities"
-	docker exec -ti itou_django bash -c "ls -d itou/fixtures/* | xargs django-admin loaddata"
+	docker cp itou/fixtures/postgres/* itou_postgres:/backups/
+	docker exec -ti itou_postgres bash -c "pg_restore --clean --if-exists --no-acl --no-owner --verbose -d itou backups/cities.dump"
+	docker exec -ti itou_django bash -c "ls -d itou/fixtures/django/* | xargs django-admin loaddata"
 
 # Tests.
 # =============================================================================
@@ -109,6 +110,10 @@ postgres_backup_restore:
 
 postgres_backups_clean:
 	docker-compose -f docker-compose-dev.yml exec postgres clean
+
+postgres_dump_cities:
+	docker exec -ti itou_postgres bash -c "pg_dump -Fc -d itou -t cities_city > /backups/cities.dump"
+	docker cp itou_postgres:/backups/cities.dump itou/fixtures/postgres/
 
 # Delete and recreate the DB manually.
 # =============================================================================
