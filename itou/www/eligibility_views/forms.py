@@ -39,6 +39,9 @@ class AdministrativeCriteriaForm(forms.Form):
         "Vous devez sélectionner au moins un critère administratif de niveau 1 "
         "ou le cumul d'au moins trois critères de niveau 2."
     )
+    ERROR_CRITERIA_NUMBER_ETTI = gettext_lazy(
+        "Erreur dans la sélection des critères administratif, reportez-vous au texte d'aide."
+    )
     ERROR_SENIOR_JUNIOR = gettext_lazy(
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_SENIOR} et {NAME_JUNIOR}."
     )
@@ -46,9 +49,10 @@ class AdministrativeCriteriaForm(forms.Form):
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, siae=None, **kwargs):
         self.user = user
-        super().__init__(*args, **kwargs)
+        self.siae = siae
+        super().__init__(**kwargs)
 
         for criterion in AdministrativeCriteria.objects.all():
 
@@ -81,11 +85,51 @@ class AdministrativeCriteriaForm(forms.Form):
         if {self.NAME_DETLD_24, self.NAME_DELD_12}.issubset(selected_names):
             raise forms.ValidationError(self.ERROR_LONG_TERM_JOB_SEEKER)
 
-        if self.user.is_siae_staff:
-            level_1 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_1]
-            level_2 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_2]
+        # No required criterion for authorized prescribers. Stop here.
+        if self.user.is_prescriber or not self.siae:
+            return selected_objects
+
+        level_1 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_1]
+        level_2 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_2]
+
+        # From 8 April, and until 30 April or beyond: 2 scenarios depending on the type of SIAE.
+        # https://docs.google.com/document/d/1PtQHmhe5DaHhG0ud5EHwSMUMBplTvm7WKRNm_AX056Y/edit
+
+        # For EI, AI, ACI:
+        # 1 criterion level 1
+        #   OR
+        # 3 level 2 criteria
+        if self.siae.kind != self.siae.KIND_ETTI:
             len_valid = len(level_1) or len(level_2) >= 3
             if not len_valid:
                 raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER)
+
+        # For ETTI:
+        # 1 criterion level
+        #   OR
+        # 1 level 2 criterion in ETTI_LEVEL_2_ONE_REQUIRED
+        #   OR
+        # 3 level 2 criteria in ETTI_LEVEL_2_THREE_REQUIRED:
+        if self.siae.kind == self.siae.KIND_ETTI:
+            ETTI_LEVEL_2_ONE_REQUIRED = [
+                "Sortant de l'ASE",
+                "DELD (12-24 mois)",
+                "Travailleur handicapé",
+                "Personne sans hébergement ou hébergée ou ayant un parcours de rue",
+                "Primo arrivant",
+                "Résident ZRR",
+                "Résident QPV",
+            ]
+            ETTI_LEVEL_2_THREE_REQUIRED = [
+                "Niveau d'étude 3 ou infra",
+                "Senior (+50 ans)",
+                "Jeunes (-26 ans)",
+                "Parent isolé",
+            ]
+            level_2_one_required = [obj for obj in selected_objects if obj.name in ETTI_LEVEL_2_ONE_REQUIRED]
+            level_2_three_required = [obj for obj in selected_objects if obj.name in ETTI_LEVEL_2_THREE_REQUIRED]
+            len_valid = len(level_1) or len(level_2_one_required) or len(level_2_three_required) >= 3
+            if not len_valid:
+                raise forms.ValidationError(self.ERROR_CRITERIA_NUMBER_ETTI)
 
         return selected_objects
