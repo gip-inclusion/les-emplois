@@ -27,17 +27,6 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
     return render(request, template_name, context)
 
 
-class PrescriberSignupView(SignupView):
-
-    form_class = forms.PrescriberSignupForm
-    template_name = "signup/prescriber_orienter.html"
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
-
-
 def select_siae(request, template_name="signup/select_siae.html"):
     """
     Select an existing SIAE (Agence / Etablissement in French) to join.

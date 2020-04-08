@@ -35,67 +35,6 @@ class FullnameFormMixin(forms.Form):
     )
 
 
-# FIXME: DEprecated, remove once tests finished
-class PrescriberSignupForm(FullnameFormMixin, SignupForm):
-    secret_code = forms.CharField(
-        label=gettext_lazy("Code de l'organisation"),
-        max_length=6,
-        required=False,
-        strip=True,
-        help_text=gettext_lazy("Le code est composé de 6 caractères."),
-    )
-
-    authorized_organization = forms.ModelChoiceField(
-        label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
-        queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by("name"),
-        required=False,
-        help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.organization = None
-
-    def clean_secret_code(self):
-        """
-        Retrieve a PrescriberOrganization instance from the `secret_code` field.
-        """
-        secret_code = self.cleaned_data["secret_code"]
-        if secret_code:
-            secret_code = secret_code.upper()
-            try:
-                self.organization = PrescriberOrganization.objects.get(secret_code=secret_code)
-            except PrescriberOrganization.DoesNotExist:
-                error = _("Ce code n'est pas valide.")
-                raise forms.ValidationError(error)
-        return secret_code
-
-    def save(self, request):
-
-        user = super().save(request)
-
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
-        user.save()
-
-        # Join organization.
-
-        authorized_organization = self.cleaned_data["authorized_organization"]
-        organization = self.organization or authorized_organization
-        if organization:
-            if organization.has_members:
-                organization.new_signup_warning_email_to_existing_members(user).send()
-            membership = PrescriberMembership()
-            membership.user = user
-            membership.organization = organization
-            # The first member becomes an admin.
-            membership.is_admin = membership.organization.members.count() == 0
-            membership.save()
-
-        return user
-
-
 class PrescriberMixin(FullnameFormMixin, SignupForm):
     secret_code = forms.CharField(
         label=gettext_lazy("Code de l'organisation"),
@@ -124,7 +63,6 @@ class PrescriberMixin(FullnameFormMixin, SignupForm):
         return secret_code
 
     def save(self, request):
-        self.clean()
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]
@@ -180,7 +118,7 @@ class AuthorizedPrescriberForm(PrescriberMixin):
     PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescribers_organizations")
 
     authorized_organization_id = forms.CharField(
-        widget=forms.HiddenInput(attrs={"class": "js-prescriber-organization-autocomplete-hidden"})
+        required=False, widget=forms.HiddenInput(attrs={"class": "js-prescriber-organization-autocomplete-hidden"})
     )
 
     authorized_organization = forms.CharField(
