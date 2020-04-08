@@ -58,6 +58,10 @@ populate_db:
 test:
 	docker exec -ti itou_django django-admin test --settings=config.settings.test --noinput --failfast --parallel=2 $(TARGET)
 
+# Lets you add a debugger.
+test-interactive:
+	docker exec -ti itou_django django-admin test --settings=config.settings.test --failfast $(TARGET)
+
 # Docker shell.
 # =============================================================================
 
