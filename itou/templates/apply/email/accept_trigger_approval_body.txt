@@ -3,7 +3,7 @@
 {% block body %}
 Nouvelle embauche sur Itou.
 
-Informations pour l'obtention d'un numéro d'agrément.
+Informations pour l'obtention d'un PASS IAE.
 
 {% trans "*Candidat* :" %}
 
