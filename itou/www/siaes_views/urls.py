@@ -12,4 +12,5 @@ urlpatterns = [
     path("configure_jobs", views.configure_jobs, name="configure_jobs"),
     path("create_siae", views.create_siae, name="create_siae"),
     path("edit_siae", views.edit_siae, name="edit_siae"),
+    path("members", views.members, name="members"),
 ]

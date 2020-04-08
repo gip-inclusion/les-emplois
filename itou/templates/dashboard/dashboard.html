@@ -28,7 +28,10 @@
 
 {% block content %}
 
-    <h1>{% trans "Tableau de bord" %}</h1>
+    <h1>
+        {% trans "Tableau de bord" %}
+        {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
+    </h1>
 
     <div class="card-deck mt-3">
 
@@ -144,6 +147,12 @@
                         <small>
                             (<a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans "Voir la fiche" %}</a>)
                         </small>
+                    </p>
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="users" %}
+                        <a href="{% url 'siaes_views:members' %}">
+                            {% trans "Membres" %}
+                        </a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}

@@ -373,3 +373,13 @@ class EditSiaeViewTest(TestCase):
         self.assertEqual(siae.latitude, 48.838411)
         self.assertEqual(siae.longitude, 2.316754)
         self.assertEqual(siae.geocoding_score, 0.587663373207207)
+
+
+class MembersTest(TestCase):
+    def test_members(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:members")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

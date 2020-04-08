@@ -135,3 +135,18 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
 
     context = {"form": form, "siae": siae}
     return render(request, template_name, context)
+
+
+@login_required
+def members(request, template_name="siaes/members.html"):
+    """
+    List members of an SIAE.
+    """
+    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+    queryset = Siae.objects.member_required(request.user)
+    siae = get_object_or_404(queryset, pk=pk)
+
+    members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
+
+    context = {"siae": siae, "members": members}
+    return render(request, template_name, context)
