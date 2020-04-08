@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
@@ -27,6 +28,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         ).count()
 
     context = {"job_applications_counter": job_applications_counter}
+
+    # Display message while authorized organisation is being validated (prescriber path)
+    if request.user.is_prescriber:
+        context["organizations_on_hold"] = request.user.prescriberorganization_set.filter(is_validated=False)
+
     return render(request, template_name, context)
 
 

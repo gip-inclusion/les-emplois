@@ -105,6 +105,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    is_validated = models.BooleanField(
+        verbose_name=_("Habilitation vérifiée"),
+        default=True,
+        help_text=_("Précise l'habilitation de l'organisation habilitée a été validée."),
+    )
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
 
@@ -142,6 +147,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         subject = "prescribers/email/new_signup_warning_email_to_existing_members_subject.txt"
         body = "prescribers/email/new_signup_warning_email_to_existing_members_body.txt"
         return get_email_message(to, context, subject, body)
+
+    def validated_prescriber_organization_email(self, user):
+        """
+        Send an email to the user who asked for the validation
+        of a new prescriber organizattion
+        """
+        pass
 
     @classmethod
     def by_safir_code(cls, safir_code):

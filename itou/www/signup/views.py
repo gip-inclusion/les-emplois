@@ -27,9 +27,6 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
     return render(request, template_name, context)
 
 
-# class PrescriberSignupStep1()
-
-
 class PrescriberSignupView(SignupView):
 
     form_class = forms.PrescriberSignupForm

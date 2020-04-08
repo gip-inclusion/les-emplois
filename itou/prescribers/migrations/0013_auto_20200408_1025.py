@@ -6,19 +6,28 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('prescribers', '0012_auto_20200318_1623'),
-    ]
+    dependencies = [("prescribers", "0012_auto_20200318_1623")]
 
     operations = [
         migrations.AddField(
-            model_name='prescriberorganization',
-            name='is_validated',
-            field=models.BooleanField(default=True, help_text="Précise l'habilitation de l'organisation habilitée a été validée.", verbose_name='Habilitation vérifiée'),
+            model_name="prescriberorganization",
+            name="is_validated",
+            field=models.BooleanField(
+                default=True,
+                help_text="Précise l'habilitation de l'organisation habilitée a été validée.",
+                verbose_name="Habilitation vérifiée",
+            ),
         ),
         migrations.AlterField(
-            model_name='prescriberorganization',
-            name='code_safir_pole_emploi',
-            field=models.CharField(help_text="Code unique d'une agence Pole emploi.", max_length=5, null=True, unique=True, validators=[django.core.validators.RegexValidator('^[0-9]{5}$', message='Le code SAFIR est erroné')], verbose_name='Code Safir'),
+            model_name="prescriberorganization",
+            name="code_safir_pole_emploi",
+            field=models.CharField(
+                help_text="Code unique d'une agence Pole emploi.",
+                max_length=5,
+                null=True,
+                unique=True,
+                validators=[django.core.validators.RegexValidator("^[0-9]{5}$", message="Le code SAFIR est erroné")],
+                verbose_name="Code Safir",
+            ),
         ),
     ]
