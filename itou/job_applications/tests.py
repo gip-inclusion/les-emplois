@@ -391,7 +391,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Numéro d'agrément requis sur Itou", mail.outbox[1].subject)
+        self.assertIn("PASS IAE requis sur Itou", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_prescriber(self):
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
