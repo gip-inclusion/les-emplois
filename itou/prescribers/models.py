@@ -148,12 +148,16 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/new_signup_warning_email_to_existing_members_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def validated_prescriber_organization_email(self, user):
+    def validated_prescriber_organization_email(self):
         """
         Send an email to the user who asked for the validation
-        of a new prescriber organizattion
+        of a new prescriber organization
         """
-        pass
+        to = [u.email for u in self.active_members]
+        context = {"organization": self}
+        subject = "prescribers/email/new_validated_prescriber_organization_email_subject.txt"
+        body = "prescribers/email/new_validated_prescriber_organization_email_body.txt"
+        return get_email_message(to, context, subject, body)
 
     @classmethod
     def by_safir_code(cls, safir_code):
