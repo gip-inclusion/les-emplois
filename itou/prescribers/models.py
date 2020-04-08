@@ -108,8 +108,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     is_validated = models.BooleanField(
         verbose_name=_("Habilitation vérifiée"),
         default=True,
-        help_text=_("Précise l'habilitation de l'organisation habilitée a été validée."),
+        help_text=_("Précise si l'habilitation de l'organisation été vérifiée."),
     )
+    validated_at = models.DateTimeField(verbose_name=_("Date de validation"), null=True)
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
 
@@ -155,8 +156,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         """
         to = [u.email for u in self.active_members]
         context = {"organization": self}
-        subject = "prescribers/email/new_validated_prescriber_organization_email_subject.txt"
-        body = "prescribers/email/new_validated_prescriber_organization_email_body.txt"
+        subject = "prescribers/email/validated_prescriber_organization_email_subject.txt"
+        body = "prescribers/email/validated_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     @classmethod
