@@ -19,6 +19,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     kind = models.PrescriberOrganization.Kind.PE
+    is_validated = True
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
@@ -56,3 +57,13 @@ class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizati
     """
 
     is_authorized = True
+
+
+class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
+
+    safir_code = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
+
+
+class PrescriberUnregistered(PrescriberOrganizationFactory):
+
+    is_validated = False

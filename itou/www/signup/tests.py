@@ -15,14 +15,14 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
-    PrescriberOrganizationWithMembershipFactory,
-)
+    PrescriberPoleEmploiFactory,
+    PrescriberOrganizationWithMembershipFactory)
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.address.departments import department_from_postcode
 from itou.www.signup.forms import SelectSiaeForm
-
+from itou.prescribers.models import PrescriberOrganization
 
 class SignupTest(TestCase):
     def test_allauth_signup_url_override(self):
@@ -370,15 +370,90 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
+
+    def test_poleemploi_prescriber(self):
+        url = reverse("signup:prescriber_poleemploi")
+        response = self.client.get(url)
+
+        organization = PrescriberPoleEmploiFactory()
+
+        password = "!*p4ssw0rd123-"
+
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@pole-emploi.fr",
+            "password1": password,
+            "password2": password,
+            "safir_code": organization.safir_code,
+        }
+
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
+
+    def test_authorized_prescriber_with_organization(self):
+        url = reverse("signup:prescriber_authorized")
+
+    def test_authorized_prescriber_without_registered_organization(self):
+        url = reverse("signup:prescriber_authorized")
+        response = self.client.get(url)
+
+        organization_name = "UNREGISTERED_INC"
+        password = "!*p4ssw0rd123-"
+
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": password,
+            "password2": password,
+            "unregistered_organisation": organization_name,
+        }
+
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
+
+        # Check if a new organization is created
+        new_org = PrescriberOrganization.objects.get(name=organization_name)
+        self.assertFalse(new_org.is_validated)
+        self.assertIsNone(new_org.validated_at)
+
+
     def test_prescriber_signup_without_code_nor_organization(self):
         """
-        Prescriber signup without code nor organization.
+        Prescriber signup (orienter) without code nor organization.
 
         The full "email confirmation process" is tested here.
         Further Prescriber's signup tests doesn't have to fully test it again.
         """
 
-        url = reverse("signup:prescriber")
+        url = reverse("signup:prescriber_orienter")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -432,13 +507,13 @@ class PrescriberSignupTest(TestCase):
 
     def test_prescriber_signup_with_code_to_unauthorized_organization(self):
         """
-        Prescriber signup with a code to join an unauthorized organization.
+        Prescriber signup (orienter) with a code to join an unauthorized organization.
         Organization has a pre-existing admin user who is notified of the signup.
         """
 
         organization = PrescriberOrganizationWithMembershipFactory()
 
-        url = reverse("signup:prescriber")
+        url = reverse("signup:prescriber_orienter")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -490,7 +565,7 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(membership.is_admin)
 
         # A second user wants to join the authorized organization.
-        url = reverse("signup:prescriber")
+        url = reverse("signup:prescriber_orienter")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
