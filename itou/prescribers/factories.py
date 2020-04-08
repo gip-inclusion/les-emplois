@@ -20,6 +20,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email", locale="fr_FR")
     kind = models.PrescriberOrganization.Kind.PE
     is_validated = True
+    updated_at = None
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):

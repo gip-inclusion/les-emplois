@@ -15,14 +15,16 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiFactory,
-    PrescriberOrganizationWithMembershipFactory)
+)
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.address.departments import department_from_postcode
 from itou.www.signup.forms import SelectSiaeForm
-from itou.prescribers.models import PrescriberOrganization
+
 
 class SignupTest(TestCase):
     def test_allauth_signup_url_override(self):
@@ -370,7 +372,6 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
-
     def test_poleemploi_prescriber(self):
         url = reverse("signup:prescriber_poleemploi")
         response = self.client.get(url)
@@ -443,7 +444,6 @@ class PrescriberSignupTest(TestCase):
         new_org = PrescriberOrganization.objects.get(name=organization_name)
         self.assertFalse(new_org.is_validated)
         self.assertIsNone(new_org.validated_at)
-
 
     def test_prescriber_signup_without_code_nor_organization(self):
         """
