@@ -1,0 +1,54 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% load i18n %}
+{% block body %}
+
+{% trans "Candidature annulée" %}
+
+{% blocktrans with job_seeker_name=job_application.job_seeker.get_full_name %}
+    La candidature de {{ job_seeker_name }} a bien été annulée.
+{% endblocktrans %}
+
+----------------------------------------------------------
+
+{% trans "*Candidat* :" %}
+
+- Nom : {{ job_application.job_seeker.last_name }}
+- Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
+- Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
+- Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.birthdate %}
+- Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}{% endif %}
+
+{% if job_application.message %}
+
+{% trans "*Message du candidat* :" %}
+
+{{ job_application.message }}
+
+{% endif %}
+
+{% if job_application.selected_jobs.exists %}
+
+{% trans "*Métier(s) recherché(s)* :" %}
+
+{% for job in job_application.selected_jobs.all %}
+- {{ job.display_name }}{% endfor %}
+
+{% endif %}
+
+{% trans "*Candidature envoyée par :*" %}
+
+{% if job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
+{% trans "Le candidat lui même." %}
+{% endif %}
+
+{% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}
+
+- {{ job_application.sender.get_full_name }}{% if job_application.sender_prescriber_organization %}
+- {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
+- {{ job_application.sender.email }}{% if job_application.sender.phone %}
+- {{ job_application.sender.phone|format_phone }}{% endif %}
+
+{% endif %}
+
+{% endblock body %}

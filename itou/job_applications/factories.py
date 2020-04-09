@@ -103,7 +103,7 @@ class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplication
         self.save()
 
 
-class JobApplicationWithApprovalFactory(JobApplicationFactory):
+class JobApplicationWithApprovalFactory(JobApplicationSentByPrescriberFactory):
     """
     Generates a Job Application and an Approval.
     """

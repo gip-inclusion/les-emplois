@@ -353,6 +353,37 @@ class JobApplicationEmailTest(TestCase):
         self.assertEqual(job_application.approval_number_delivered_by, staff_member)
         self.assertEqual(len(mail.outbox), 1)
 
+    def test_cancel(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+
+        job_application.cancel()
+
+        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_CANCELLED)
+
+        email = job_application.email_cancel
+        # To.
+        recipients = job_application.get_siae_recipents_email_list()
+        for recipient in recipients:
+            self.assertIn(recipient, email.to)
+        self.assertIn(job_application.sender.email, email.bcc)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(len(email.bcc), 1)
+        # Body.
+        self.assertIn("annulée", email.body)
+        self.assertIn(job_application.sender.first_name, email.body)
+        self.assertIn(job_application.sender.last_name, email.body)
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+
+        # When sent by jobseeker.
+        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application.cancel()
+        email = job_application.email_cancel
+        # To.
+        self.assertFalse(email.bcc)
+
 
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""

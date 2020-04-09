@@ -409,6 +409,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.can_be_cancelled:
             raise xwf_models.AbortTransition(_("Cette candidature n'a pu être annulée."))
 
+        # Send notification.
+        connection = mail.get_connection()
+        emails = [self.email_cancel]
+        connection.send_messages(emails)
+
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
         pass
@@ -446,6 +451,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "apply/email/refuse_subject.txt"
         body = "apply/email/refuse_body.txt"
+        return get_email_message(to, context, subject, body, bcc=bcc)
+
+    @property
+    def email_cancel(self):
+        to = self.get_siae_recipents_email_list()
+        bcc = []
+        if self.is_sent_by_proxy:
+            bcc.append(self.sender.email)
+        context = {"job_application": self}
+        subject = "apply/email/cancel_subject.txt"
+        body = "apply/email/cancel_body.txt"
         return get_email_message(to, context, subject, body, bcc=bcc)
 
     def email_accept_trigger_manual_approval(self, accepted_by):
