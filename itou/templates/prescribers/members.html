@@ -1,0 +1,35 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Collaborateurs" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Collaborateurs" %}</h1>
+
+<h2 class="text-muted">
+    {{ organization.display_name }}
+</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">{% trans "Nom" %}</th>
+            <th scope="col">{% trans "Email" %}</th>
+            <th scope="col">{% trans "Date d'inscription" %}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for member in members %}
+            <tr>
+                <th scope="row">{{ forloop.counter }}</th>
+                <td>{{ member.user.get_full_name }}</td>
+                <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
+                <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

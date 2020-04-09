@@ -49,3 +49,18 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
 
     context = {"form": form, "organization": organization}
     return render(request, template_name, context)
+
+
+@login_required
+def members(request, template_name="prescribers/members.html"):
+    """
+    List members of a prescriber organization.
+    """
+    pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
+    queryset = PrescriberOrganization.objects.member_required(request.user)
+    organization = get_object_or_404(queryset, pk=pk)
+
+    members = organization.prescribermembership_set.select_related("user").all().order_by("joined_at")
+
+    context = {"organization": organization, "members": members}
+    return render(request, template_name, context)

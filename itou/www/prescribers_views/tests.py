@@ -69,3 +69,13 @@ class EditOrganizationTest(TestCase):
         self.assertEqual(organization.email, post_data["email"])
         self.assertEqual(organization.phone, post_data["phone"])
         self.assertEqual(organization.website, post_data["website"])
+
+
+class MembersTest(TestCase):
+    def test_members(self):
+        organization = PrescriberOrganizationWithMembershipFactory()
+        user = organization.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:members")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

@@ -31,6 +31,7 @@
     <h1>
         {% trans "Tableau de bord" %}
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
+        {% if current_prescriber_organization %} - <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>{% endif %}
     </h1>
 
     <div class="card-deck mt-3">
@@ -115,6 +116,12 @@
                                 <b><code>{{ current_prescriber_organization.secret_code }}</code></b>
                             </p>
                         {% endif %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="users" %}
+                            <a href="{% url 'prescribers_views:members' %}">
+                                {% trans "Collaborateurs" %}
+                            </a>
+                        </p>
                     {% endif %}
                 </div>
             </div>
