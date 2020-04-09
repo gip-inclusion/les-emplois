@@ -53,7 +53,6 @@ def start(request, siae_pk):
 
     siae = get_object_or_404(Siae, pk=siae_pk)
 
-    # COVID-19 "Operation ETTI".
     if not siae.is_permitted_to_hire:
         raise Http404()
 
