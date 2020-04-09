@@ -372,6 +372,7 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
+    
     def test_poleemploi_prescriber(self):
         url = reverse("signup:prescriber_poleemploi")
         response = self.client.get(url)
@@ -387,7 +388,7 @@ class PrescriberSignupTest(TestCase):
             "email": "john.doe@pole-emploi.fr",
             "password1": password,
             "password2": password,
-            "safir_code": organization.safir_code,
+            "safir_code": organization.code_safir_pole_emploi,
         }
 
         response = self.client.post(url, data=post_data)
@@ -407,6 +408,43 @@ class PrescriberSignupTest(TestCase):
 
     def test_authorized_prescriber_with_organization(self):
         url = reverse("signup:prescriber_authorized")
+        response = self.client.get(url)
+
+        authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        password = "!*p4ssw0rd123-"
+
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": password,
+            "password2": password,
+            "authorized_organization_id": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # User checks
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check membership
+        self.assertIn(user, authorized_organization.members.all())
+        self.assertEqual(2, authorized_organization.members.count())
+        self.assertEqual(1, user.prescriberorganization_set.count())
+        membership = user.prescribermembership_set.get(organization=authorized_organization)
+        self.assertFalse(membership.is_admin)
+
+        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
 
     def test_authorized_prescriber_without_registered_organization(self):
         url = reverse("signup:prescriber_authorized")
@@ -422,10 +460,11 @@ class PrescriberSignupTest(TestCase):
             "email": "john.doe+unregistered@prescriber.com",
             "password1": password,
             "password2": password,
-            "unregistered_organisation": organization_name,
+            "unregistered_organization": organization_name,
         }
 
         response = self.client.post(url, data=post_data)
+
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
@@ -510,7 +549,6 @@ class PrescriberSignupTest(TestCase):
         Prescriber signup (orienter) with a code to join an unauthorized organization.
         Organization has a pre-existing admin user who is notified of the signup.
         """
-
         organization = PrescriberOrganizationWithMembershipFactory()
 
         url = reverse("signup:prescriber_orienter")
@@ -577,8 +615,9 @@ class PrescriberSignupTest(TestCase):
             "email": "jane.doe@prescriber.com",
             "password1": password,
             "password2": password,
-            "authorized_organization": authorized_organization.pk,
+            "secret_code": authorized_organization.secret_code,
         }
+
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))

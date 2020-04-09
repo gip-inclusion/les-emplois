@@ -61,10 +61,8 @@ class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizati
 
 
 class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
-
-    safir_code = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
+    code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
 
 
 class PrescriberUnregistered(PrescriberOrganizationFactory):
-
     is_validated = False

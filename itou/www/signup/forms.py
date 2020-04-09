@@ -174,7 +174,7 @@ class AuthorizedPrescriberForm(PrescriberMixin):
                     )
                 )
             new_organization = PrescriberOrganization(name=unregistered_organization)
-            # TODO: 'validated' flag
+            new_organization.is_validated = False
             new_organization.save()
             self.organization = new_organization
         elif authorized_organization_id:
