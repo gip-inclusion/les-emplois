@@ -1,6 +1,3 @@
-import re
-import string
-
 from django.conf import settings
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.validators import RegexValidator

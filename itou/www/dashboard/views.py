@@ -9,7 +9,6 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
