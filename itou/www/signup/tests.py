@@ -372,7 +372,6 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
-    
     def test_poleemploi_prescriber(self):
         url = reverse("signup:prescriber_poleemploi")
         response = self.client.get(url)
@@ -399,10 +398,15 @@ class PrescriberSignupTest(TestCase):
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+
         # Check `EmailAddress` state.
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
+
+        # Check membership
+        self.assertIn(user, organization.members.all())
+        self.assertEqual(1, user.prescriberorganization_set.count())
 
         # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
 
