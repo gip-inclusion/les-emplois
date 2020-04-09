@@ -106,7 +106,6 @@ class AdministrativeCriteriaFormTest(TestCase):
 
         criterion1 = AdministrativeCriteria.objects.get(pk=1)
         criterion2 = AdministrativeCriteria.objects.get(pk=5)
-        criterion3 = AdministrativeCriteria.objects.get(pk=9)
 
         # No level 1 criterion.
         form_data = {f"{AdministrativeCriteriaForm.LEVEL_1_PREFIX}{criterion1.pk}": "false"}
