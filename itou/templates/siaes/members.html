@@ -1,11 +1,11 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Membres" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Collaborateurs" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Membres" %}</h1>
+<h1>{% trans "Collaborateurs" %}</h1>
 
 <h2 class="text-muted">{{ siae.display_name }}</h2>
 
@@ -23,7 +23,7 @@
             <tr>
                 <th scope="row">{{ forloop.counter }}</th>
                 <td>{{ member.user.get_full_name }}</td>
-                <td>{{ member.user.email }}</td>
+                <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
                 <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
             </tr>
         {% endfor %}
