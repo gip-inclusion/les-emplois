@@ -4,6 +4,12 @@ from django.db import migrations
 
 from itou.prescribers.models import PrescriberOrganization
 
+"""
+Careful with this one:
+Search/filters on PrescriberOrganization without being in sync with the model (code) will crash,
+as the SQL produced will seek for potentially non-existent table fields.
+"""
+
 
 def move_data_forward(apps, schema_editor):
     """
@@ -48,6 +54,6 @@ def move_data_forward(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("prescribers", "0010_auto_20200311_1404")]
+    dependencies = [("prescribers", "0011_auto_20200408_2250")]
 
     operations = [migrations.RunPython(move_data_forward, migrations.RunPython.noop)]
