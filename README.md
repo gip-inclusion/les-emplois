@@ -27,6 +27,12 @@ Tous les utilisateurs ont le mot de passe `password`.
 | EI Garage Martinet         | Route d'Altaves, 13103 Saint-Étienne-du-Grès | - Chef de garage - Mécanicien / Mécanicienne de garage automobile | EI |
 | ETTI Une nouvelle chance   | 14 Avenue de la Plaine, 30300 Beaucaire      | - Figurant / Figurante                                            | ETTI                              |
 
+### Candidatures
+
+Deux candidatures (une en attente, l'autre à l'étude) pour l'organisation ETTI Une nouvelle chance :
+- une en auto-prescription,
+- l'autre provenant d'un DE.
+
 
 ## Environnement de développement
 
