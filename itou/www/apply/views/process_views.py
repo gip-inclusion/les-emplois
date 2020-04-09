@@ -222,7 +222,9 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     if not job_application.to_siae.is_subject_to_eligibility_rules:
         raise Http404()
 
-    form_administrative_criteria = AdministrativeCriteriaForm(request.user, data=request.POST or None)
+    form_administrative_criteria = AdministrativeCriteriaForm(
+        request.user, siae=job_application.to_siae, data=request.POST or None
+    )
     form_confirm_eligibility = ConfirmEligibilityForm(data=request.POST or None)
 
     if request.method == "POST" and form_confirm_eligibility.is_valid() and form_administrative_criteria.is_valid():

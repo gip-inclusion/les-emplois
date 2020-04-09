@@ -24,6 +24,24 @@
         </p>
     </div>
 
+    <div class="alert alert-info" role="alert">
+        <h4>
+            {% trans "Pendant la période de crise sanitaire" %}
+            <br>
+            {% trans "Règle de validation spéciale pour les ETTI" %}
+        </h4>
+        <p>{% trans "A partir du 8 avril, et jusqu'au 30 avril, les critères sont simplifiés pour les ETTI." %}</p>
+        <p>{% trans "La validation des critères administratifs obéit à la règle suivante :" %}
+        <ul>
+            <li>{% trans "un critère de niveau 1" %}</li>
+            <li><b>{% trans "ou" %}</b></li>
+            <li>{% trans "deux critères de niveau 2" %}</li>
+        </ul>
+        <p class="mb-0">
+            {% blocktrans %}<b>Attention :</b> En confirmant l'éligibilité du candidat grâce à ces critères simplifiés pour la période de crise sanitaire, vous vous engagez à positionner le salarié en insertion sur des missions auprès d'entreprises intervenant dans un des 8 secteurs essentiels.{% endblocktrans %}
+        </p>
+    </div>
+
     <hr>
 
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}

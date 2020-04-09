@@ -253,7 +253,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         return HttpResponseRedirect(next_url)
 
     data = request.POST if request.method == "POST" else None
-    form_administrative_criteria = AdministrativeCriteriaForm(request.user, data=data)
+    form_administrative_criteria = AdministrativeCriteriaForm(request.user, siae=None, data=data)
 
     if request.method == "POST" and form_administrative_criteria.is_valid():
         EligibilityDiagnosis.create_diagnosis(
