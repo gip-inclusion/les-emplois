@@ -4,6 +4,7 @@ from django.db import migrations
 
 from itou.prescribers.models import PrescriberOrganization
 
+
 """
 Careful with this one:
 Search/filters on PrescriberOrganization without being in sync with the model (code) will crash,
