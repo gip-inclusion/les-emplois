@@ -11,6 +11,6 @@
 - {% trans "SIRET" %} : {{ organization.siret }}
 - {% trans "Type" %} : {{ organization.kind }}
 
-{% trans "Vous recevez cet email en tant que propriétaire d'un compte associé à l'organisation ci-dessus." %}
+{% trans "Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus." %}
 
 {% endblock body %}

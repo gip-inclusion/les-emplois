@@ -124,6 +124,7 @@ class PoleEmploiPrescriberView(SignupView):
         """Enforce atomicity."""
         return super().post(request, *args, **kwargs)
 
+
 class AuthorizedPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberFormForm
