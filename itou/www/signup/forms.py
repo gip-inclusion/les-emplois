@@ -109,7 +109,7 @@ class PoleEmploiPrescriberFormForm(PrescriberFormMixin):
 
 class AuthorizedPrescriberFormForm(PrescriberFormMixin):
 
-    PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescribers_organizations")
+    PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescriber_authorized_organizations")
 
     authorized_organization_id = forms.CharField(
         required=False, widget=forms.HiddenInput(attrs={"class": "js-prescriber-organization-autocomplete-hidden"})
@@ -159,7 +159,7 @@ class AuthorizedPrescriberFormForm(PrescriberFormMixin):
             )
 
         if unregistered_organization:
-            # check if exists ?
+            # check if exists?
             if PrescriberOrganization.objects.filter(name=unregistered_organization.strip()).exists():
                 raise ValidationError(
                     gettext_lazy(
