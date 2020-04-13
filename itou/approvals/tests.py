@@ -90,6 +90,10 @@ class CommonApprovalQuerySetTest(TestCase):
         approval = job_app.approval
         self.assertTrue(approval.can_be_deleted)
 
+        # An approval exists without a Job Application
+        approval = ApprovalFactory()
+        self.assertFalse(approval.can_be_deleted)
+
         job_app.state = JobApplicationWorkflow.STATE_REFUSED
         job_app.save()
         self.assertFalse(approval.can_be_deleted)

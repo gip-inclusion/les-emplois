@@ -79,12 +79,12 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def can_be_deleted(self):
-        # pylint: disable=import-outside-toplevel
-        from itou.job_applications.models import JobApplicationWorkflow
+        state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
 
         job_applications = self.jobapplication_set
-        states = job_applications.values_list("state", flat=True)
-        return JobApplicationWorkflow.STATE_ACCEPTED in states and job_applications.count() == 1
+        if job_applications.count() != 1:
+            return False
+        return self.jobapplication_set.get().state == state_accepted
 
 
 class CommonApprovalQuerySet(models.QuerySet):
