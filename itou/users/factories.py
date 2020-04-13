@@ -3,6 +3,7 @@ import string
 
 import factory
 import factory.fuzzy
+
 from itou.users import models
 
 

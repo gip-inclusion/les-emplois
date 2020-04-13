@@ -1,5 +1,8 @@
 from unittest import mock
 
+from allauth.account.forms import default_token_generator
+from allauth.account.models import EmailConfirmationHMAC
+from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -8,9 +11,6 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 
-from allauth.account.forms import default_token_generator
-from allauth.account.models import EmailConfirmationHMAC
-from allauth.account.utils import user_pk_to_url_str
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.prescribers.factories import (
@@ -485,8 +485,8 @@ class PrescriberSignupTest(TestCase):
 
         # Check if a new organization is created
         new_org = PrescriberOrganization.objects.get(name=organization_name)
-        self.assertFalse(new_org.is_validated)
-        self.assertIsNone(new_org.validated_at)
+        self.assertFalse(new_org.authorization_is_validated)
+        self.assertIsNone(new_org.authorization_validated_at)
 
     def test_prescriber_signup_without_code_nor_organization(self):
         """

@@ -1,6 +1,7 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
+from allauth.account.views import SignupView
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -9,7 +10,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
-from allauth.account.views import SignupView
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -107,14 +107,14 @@ def select_prescriber_type(request):
 
 class OrienterPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_orienter.html"
-    form_class = forms.OrienterPrescriberForm
+    form_class = forms.OrienterPrescriberFormForm
 
 
 class PoleEmploiPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_poleemploi.html"
-    form_class = forms.PoleEmploiPrescriberForm
+    form_class = forms.PoleEmploiPrescriberFormForm
 
 
 class AuthorizedPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_authorized.html"
-    form_class = forms.AuthorizedPrescriberForm
+    form_class = forms.AuthorizedPrescriberFormForm
