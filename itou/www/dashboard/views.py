@@ -26,14 +26,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             state=JobApplicationWorkflow.STATE_NEW
         ).count()
 
-    # Display message while authorized organization is being validated (prescriber path)
-    organizations_on_hold = (
-        request.user.prescriberorganization_set.filter(authorization_is_validated=False).exists()
-        if request.user.is_prescriber
-        else False
-    )
+    # See template for display message while authorized organization is being validated (prescriber path)
 
-    context = {"job_applications_counter": job_applications_counter, "organizations_on_hold": organizations_on_hold}
+    context = {"job_applications_counter": job_applications_counter}
 
     return render(request, template_name, context)
 
