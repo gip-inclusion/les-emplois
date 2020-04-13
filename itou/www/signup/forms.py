@@ -1,3 +1,4 @@
+from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -8,7 +9,6 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
-from allauth.account.forms import SignupForm
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.forms import AddressFormMixin
@@ -35,7 +35,8 @@ class FullnameFormMixin(forms.Form):
     )
 
 
-class PrescriberMixin(FullnameFormMixin, SignupForm):
+class PrescriberFormMixin(FullnameFormMixin, SignupForm):
+
     secret_code = forms.CharField(
         label=gettext_lazy("Code de l'organisation"),
         max_length=6,
@@ -71,7 +72,7 @@ class PrescriberMixin(FullnameFormMixin, SignupForm):
         user.save()
 
         # Join organization.
-        organization = self.organization  # or authorized_organization
+        organization = self.organization
         if organization:
             if organization.has_members:
                 organization.new_signup_warning_email_to_existing_members(user).send()
@@ -85,35 +86,28 @@ class PrescriberMixin(FullnameFormMixin, SignupForm):
         return user
 
 
-class OrienterPrescriberForm(PrescriberMixin):
-    secret_code = forms.CharField(
-        label=gettext_lazy("Vous avez un code d'organisation? Entrez le code qui vous a été transmis"),
-        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Code d'organisation")}),
-        max_length=6,
-        required=False,
-        strip=True,
-        help_text=gettext_lazy("Le code est composé de 6 caractères."),
-    )
+class OrienterPrescriberFormForm(PrescriberFormMixin):
+    pass
 
 
-class PoleEmploiPrescriberForm(PrescriberMixin):
+class PoleEmploiPrescriberFormForm(PrescriberFormMixin):
     safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
         if not email.endswith("@pole-emploi.fr"):
-            raise ValidationError(gettext_lazy("L'adresse email doit etre une adresse Pole-Emploi"))
+            raise ValidationError(gettext_lazy("L'adresse email doit etre une adresse Pôle emploi"))
         return email
 
     def clean_safir_code(self):
         safir_code = self.cleaned_data["safir_code"]
-        self.organization = PrescriberOrganization.by_safir_code(safir_code)
+        self.organization = PrescriberOrganization.objects.by_safir_code(safir_code)
         if not self.organization:
             raise ValidationError(gettext_lazy("Ce code SAFIR est inconnu"))
         return safir_code
 
 
-class AuthorizedPrescriberForm(PrescriberMixin):
+class AuthorizedPrescriberFormForm(PrescriberFormMixin):
 
     PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescribers_organizations")
 
@@ -174,7 +168,7 @@ class AuthorizedPrescriberForm(PrescriberMixin):
                     )
                 )
             new_organization = PrescriberOrganization(name=unregistered_organization)
-            new_organization.is_validated = False
+            new_organization.authorization_is_validated = False
             new_organization.save()
             self.organization = new_organization
         elif authorized_organization_id:
