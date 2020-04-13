@@ -170,7 +170,7 @@ class AuthorizedPrescriberForm(PrescriberMixin):
                 raise ValidationError(
                     gettext_lazy(
                         f"Cette organisation existe ({unregistered_organization})."
-                        "Veuillez la selectionner dans la liste des organisations habilitées"
+                        "Veuillez la sélectionner dans la liste des organisations habilitées"
                     )
                 )
             new_organization = PrescriberOrganization(name=unregistered_organization)

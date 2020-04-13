@@ -28,7 +28,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     context = {"job_applications_counter": job_applications_counter}
 
-    # Display message while authorized organisation is being validated (prescriber path)
+    # Display message while authorized organization is being validated (prescriber path)
     if request.user.is_prescriber:
         context["organizations_on_hold"] = request.user.prescriberorganization_set.filter(is_validated=False)
 

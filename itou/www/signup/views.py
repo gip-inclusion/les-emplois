@@ -105,9 +105,6 @@ def select_prescriber_type(request):
     return render(request, "signup/select_prescriber_type.html")
 
 
-# TBD: implement view classes
-
-
 class OrienterPrescriberView(SignupView):
     template_name = "signup/prescriber_orienter.html"
     form_class = forms.OrienterPrescriberForm
