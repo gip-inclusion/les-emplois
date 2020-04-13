@@ -27,7 +27,7 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
     return render(request, template_name, context)
 
 
-def select_siae(request, template_name="signup/select_siae.html"):
+def select_siae(request, template_name="signup/signup_select_siae.html"):
     """
     Select an existing SIAE (Agence / Etablissement in French) to join.
     This is the first of the two forms of the siae signup process.
@@ -102,19 +102,19 @@ def select_prescriber_type(request):
     * Pole Emploi prescriber
     * authorized prescriber
     """
-    return render(request, "signup/select_prescriber_type.html")
+    return render(request, "signup/signup_select_prescriber_type.html")
 
 
 class OrienterPrescriberView(SignupView):
-    template_name = "signup/prescriber_orienter.html"
+    template_name = "signup/signup_prescriber_orienter.html"
     form_class = forms.OrienterPrescriberForm
 
 
 class PoleEmploiPrescriberView(SignupView):
-    template_name = "signup/prescriber_poleemploi.html"
+    template_name = "signup/signup_prescriber_poleemploi.html"
     form_class = forms.PoleEmploiPrescriberForm
 
 
 class AuthorizedPrescriberView(SignupView):
-    template_name = "signup/prescriber_authorized.html"
+    template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberForm
