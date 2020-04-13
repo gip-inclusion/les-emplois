@@ -2,7 +2,6 @@ import string
 
 import factory
 import factory.fuzzy
-
 from itou.prescribers import models
 from itou.users.factories import PrescriberFactory
 

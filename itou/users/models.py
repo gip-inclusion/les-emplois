@@ -1,10 +1,10 @@
-from allauth.utils import generate_unique_username
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from allauth.utils import generate_unique_username
 from itou.approvals.models import ApprovalsWrapper
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin

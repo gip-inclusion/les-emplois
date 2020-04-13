@@ -4,8 +4,9 @@ import uuid
 
 import django.db.models.deletion
 import django.utils.timezone
-import django_xworkflows.models
 from django.db import migrations, models
+
+import django_xworkflows.models
 
 
 class Migration(migrations.Migration):

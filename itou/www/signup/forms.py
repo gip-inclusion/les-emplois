@@ -1,4 +1,3 @@
-from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,6 +8,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
+from allauth.account.forms import SignupForm
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.forms import AddressFormMixin
@@ -166,7 +166,7 @@ class AuthorizedPrescriberForm(PrescriberMixin):
 
         if unregistered_organization:
             # check if exists ?
-            if PrescriberOrganization.objects.filter(name=unregistered_organization.strip()):
+            if PrescriberOrganization.objects.filter(name=unregistered_organization.strip()).exists():
                 raise ValidationError(
                     gettext_lazy(
                         f"Cette organisation existe ({unregistered_organization})."
