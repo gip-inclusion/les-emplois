@@ -1,3 +1,4 @@
+from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,6 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from allauth.account.views import PasswordChangeView
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
@@ -28,15 +28,12 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     # Display message while authorized organization is being validated (prescriber path)
     organizations_on_hold = (
-        request.user.prescriberorganization_set.filter(is_validated=False).exists()
+        request.user.prescriberorganization_set.filter(authorization_is_validated=False).exists()
         if request.user.is_prescriber
         else False
     )
 
-    context = {
-        "job_applications_counter": job_applications_counter,
-        "organizations_on_hold": organizations_on_hold,
-    }
+    context = {"job_applications_counter": job_applications_counter, "organizations_on_hold": organizations_on_hold}
 
     return render(request, template_name, context)
 
