@@ -55,6 +55,6 @@ def move_data_forward(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("prescribers", "0011_auto_20200408_2250")]
+    dependencies = [("prescribers")]
 
     operations = [migrations.RunPython(move_data_forward, migrations.RunPython.noop)]

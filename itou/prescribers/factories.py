@@ -2,6 +2,7 @@ import string
 
 import factory
 import factory.fuzzy
+
 from itou.prescribers import models
 from itou.users.factories import PrescriberFactory
 
@@ -18,7 +19,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     kind = models.PrescriberOrganization.Kind.PE
-    is_validated = True
+    authorization_is_validated = True
     updated_at = None
 
 
@@ -64,4 +65,4 @@ class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
 
 
 class PrescriberUnregistered(PrescriberOrganizationFactory):
-    is_validated = False
+    authorization_is_validated = False
