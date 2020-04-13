@@ -25,6 +25,9 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
         )
         return queryset[:limit]
 
+    def by_safir_code(self, safir_code):
+        return self.filter(code_safir_pole_emploi=safir_code).first()
+
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
@@ -102,12 +105,20 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
-    is_validated = models.BooleanField(
+    authorization_is_validated = models.BooleanField(
         verbose_name=_("Habilitation vérifiée"),
         default=True,
-        help_text=_("Précise si l'habilitation de l'organisation été vérifiée."),
+        help_text=_("Précise si l'habilitation de l'organisation a été vérifiée."),
     )
-    validated_at = models.DateTimeField(verbose_name=_("Date de validation"), null=True)
+    authorization_validated_at = models.DateTimeField(verbose_name=_("Date de validation"), null=True)
+    authorization_validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Autorisation validée par"),
+        related_name="authorization_validated_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
 
@@ -156,10 +167,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         subject = "prescribers/email/validated_prescriber_organization_email_subject.txt"
         body = "prescribers/email/validated_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
-
-    @classmethod
-    def by_safir_code(cls, safir_code):
-        return PrescriberOrganization.objects.filter(code_safir_pole_emploi=safir_code).first()
 
 
 class PrescriberMembership(models.Model):
