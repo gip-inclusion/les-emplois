@@ -1,12 +1,12 @@
 import datetime
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.http import urlencode
 
+from dateutil.relativedelta import relativedelta
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
 from itou.cities.factories import create_test_cities

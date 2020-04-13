@@ -1,10 +1,10 @@
 import datetime
 
-from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from dateutil.relativedelta import relativedelta
 from itou.approvals.factories import PoleEmploiApprovalFactory
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory

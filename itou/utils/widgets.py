@@ -2,8 +2,9 @@
 Specific widgets used in forms.
 """
 
-from bootstrap_datepicker_plus import DatePickerInput
 from django.utils.translation import gettext_lazy
+
+from bootstrap_datepicker_plus import DatePickerInput
 
 
 class DatePickerField(DatePickerInput):

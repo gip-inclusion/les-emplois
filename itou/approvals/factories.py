@@ -5,7 +5,6 @@ import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
-
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.users.factories import JobSeekerFactory
 

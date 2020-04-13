@@ -1,6 +1,5 @@
 import logging
 
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
@@ -9,9 +8,10 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
-from unidecode import unidecode
 
+from dateutil.relativedelta import relativedelta
 from itou.utils.validators import alphanumeric
+from unidecode import unidecode
 
 
 logger = logging.getLogger(__name__)

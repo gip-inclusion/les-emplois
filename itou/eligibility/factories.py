@@ -1,5 +1,4 @@
 import factory
-
 from itou.eligibility import models
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 

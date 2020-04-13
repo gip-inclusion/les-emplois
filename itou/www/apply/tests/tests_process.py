@@ -1,9 +1,9 @@
 import datetime
 
-from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 
+from dateutil.relativedelta import relativedelta
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,

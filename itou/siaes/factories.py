@@ -2,7 +2,6 @@ import string
 
 import factory
 import factory.fuzzy
-
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes import models

@@ -2,9 +2,9 @@ import datetime
 import logging
 import os
 
-import openpyxl
 from django.core.management.base import BaseCommand
 
+import openpyxl
 from itou.approvals.models import PoleEmploiApproval
 
 
