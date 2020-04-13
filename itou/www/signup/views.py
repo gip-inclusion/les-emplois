@@ -109,12 +109,26 @@ class OrienterPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_orienter.html"
     form_class = forms.OrienterPrescriberFormForm
 
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)
+
 
 class PoleEmploiPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_poleemploi.html"
     form_class = forms.PoleEmploiPrescriberFormForm
 
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)
 
 class AuthorizedPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberFormForm
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)

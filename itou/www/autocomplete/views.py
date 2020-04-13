@@ -60,9 +60,13 @@ def prescriber_authorized_organizations_autocomplete(request):
     term = request.GET.get("term", "").strip()
 
     organizations = (
-        [{"value": org.name, "id": org.id} for org in PrescriberOrganization.objects.autocomplete(term)
-         if org.is_authorized and org.kind != PrescriberOrganization.Kind.PE]
-        if term else []
+        [
+            {"value": org.name, "id": org.id}
+            for org in PrescriberOrganization.objects.autocomplete(term)
+            if org.is_authorized and org.kind != PrescriberOrganization.Kind.PE
+        ]
+        if term
+        else []
     )
 
     return HttpResponse(json.dumps(organizations), "application/json")
