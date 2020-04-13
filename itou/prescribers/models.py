@@ -107,7 +107,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
     authorization_is_validated = models.BooleanField(
         verbose_name=_("Habilitation vérifiée"),
-        default=True,
+        default=False,
         help_text=_("Précise si l'habilitation de l'organisation a été vérifiée."),
     )
     authorization_validated_at = models.DateTimeField(verbose_name=_("Date de validation"), null=True)
