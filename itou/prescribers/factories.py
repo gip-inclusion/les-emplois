@@ -19,8 +19,6 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     kind = models.PrescriberOrganization.Kind.PE
-    authorization_is_validated = True
-    updated_at = None
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
