@@ -10,6 +10,8 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 JSON_FILE = f"{CURRENT_DIR}/data/deleted_siae.json"
 
+DEPARTMENTS_TO_OPEN_ON_14_04_2020 = ["75", "77", "78", "91", "92", "93", "94", "95"]
+
 
 class Command(BaseCommand):
     """
@@ -45,6 +47,13 @@ class Command(BaseCommand):
     Since the `pk` looks mandatory in Django's fixtures and `loaddata`
     overwrites all existing data while synchronizing database, we use
     this management command to restore the fixture with new `pk`s.
+
+    # Open Itou gradually.
+
+    13/04/2020: it was decided to gradually restore SIAE according to
+    the deployment schedule.
+
+    14/04/2020: open Île-de-France (75, 77, 78, 91, 92, 93, 94, 95)
     """
 
     help = "Restore deleted SIAEs data into the database."
@@ -67,8 +76,12 @@ class Command(BaseCommand):
                     self.stdout.write(f"Restoring SIAEs… {progress}%")
                     last_progress = progress
 
+                siae = Siae(**item["fields"])
+
+                if not siae.department in DEPARTMENTS_TO_OPEN_ON_14_04_2020:
+                    continue
+
                 if not dry_run:
-                    siae = Siae(**item["fields"])
                     siae.save()
                 else:
                     self.stdout.write(f'{item["fields"]}')
