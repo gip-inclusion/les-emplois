@@ -5,14 +5,16 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('prescribers', '0013_auto_20200413_1446'),
-    ]
+    dependencies = [("prescribers", "0013_auto_20200413_1446")]
 
     operations = [
         migrations.AlterField(
-            model_name='prescriberorganization',
-            name='authorization_is_validated',
-            field=models.BooleanField(default=False, help_text="Précise si l'habilitation de l'organisation a été vérifiée.", verbose_name='Habilitation vérifiée'),
-        ),
+            model_name="prescriberorganization",
+            name="authorization_is_validated",
+            field=models.BooleanField(
+                default=False,
+                help_text="Précise si l'habilitation de l'organisation a été vérifiée.",
+                verbose_name="Habilitation vérifiée",
+            ),
+        )
     ]
