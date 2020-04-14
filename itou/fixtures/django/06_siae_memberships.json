@@ -1,42 +1,52 @@
 [
-  {
+{
     "model": "siaes.siaemembership",
     "pk": 1,
     "fields": {
-      "user": 4,
-      "siae": 2653,
-      "joined_at": "2019-10-31T14:56:50Z",
-      "is_siae_admin": true
+        "user": 4,
+        "siae": 2653,
+        "joined_at": "2019-10-31T14:56:50Z",
+        "is_siae_admin": true
     }
-  },
-  {
+},
+{
     "model": "siaes.siaemembership",
     "pk": 2,
     "fields": {
-      "user": 6,
-      "siae": 3850,
-      "joined_at": "2020-04-09T13:32:00Z",
-      "is_siae_admin": true
+        "user": 6,
+        "siae": 3850,
+        "joined_at": "2020-04-09T13:32:00Z",
+        "is_siae_admin": true
     }
-  },
-  {
+},
+{
     "model": "siaes.siaemembership",
     "pk": 3,
     "fields": {
-      "user": 4,
-      "siae": 3850,
-      "joined_at": "2020-04-09T13:38:13Z",
-      "is_siae_admin": false
+        "user": 4,
+        "siae": 3850,
+        "joined_at": "2020-04-09T13:38:13Z",
+        "is_siae_admin": false
     }
-  },
-  {
+},
+{
     "model": "siaes.siaemembership",
     "pk": 4,
     "fields": {
-      "user": 6,
-      "siae": 2653,
-      "joined_at": "2020-04-09T13:38:41Z",
-      "is_siae_admin": false
+        "user": 6,
+        "siae": 2653,
+        "joined_at": "2020-04-09T13:38:41Z",
+        "is_siae_admin": false
     }
-  }
+},
+{
+    "model": "siaes.siaemembership",
+    "pk": 5,
+    "fields": {
+        "user": 9,
+        "siae": 3851,
+        "joined_at": "2020-04-14T16:09:20Z",
+        "is_siae_admin": false
+    }
+}
 ]

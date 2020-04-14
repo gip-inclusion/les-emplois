@@ -9,13 +9,14 @@
 | Id | Prénom     |    Nom    |                                        E-mail | Organisation(s)                              | Créé par     | Description                                                    |
 |----|------------|:---------:|----------------------------------------------:|----------------------------------------------|--------------|----------------------------------------------------------------|
 | 1  |            |           |                                admin@test.com |                                              |              | Administrateur Django                                          |
-| 2  | Jacques    |   Henry   |             contact+de@inclusion.beta.gouv.fr |                                              |              | Demandeur d'emploi                                             |
-| 3  | Sylvie     |   Martin  |       contact+de-proxy@inclusion.beta.gouv.fr |                                              | André Dufour | Demandeur d'emploi - compte créé par un prescripteur habilité. |
-| 4  | André      | Dufour    | contact+prescripteur@inclusion.beta.gouv.fr   | PE Arles, PE 93                               |              | Prescripteur habilité administrateur de ses deux structures.   |
-| 5  | Olivier    | Dupuy     | contact+orienteur@inclusion.beta.gouv.fr      | Association La Belle Verte                   |              | Prescripteur non habilité, administrateur de sa structure.     |
-| 6  | Emmanuelle | Dubreuil  | contact+orienteur-solo@inclusion.beta.gouv.fr |                                              |              | Prescripteur non habilité                                      |
-| 7  | Daphnée    | Delavigne | contact+etti@inclusion.beta.gouv.fr           | ETTI Une nouvelle chance, EI Garage Martinet |              | Employeur administrateur d'une ETTI et membre d'une EI.        |
-| 8  | Victor     | Lacoste   | contact+ei@inclusion.beta.gouv.fr             | EI Garage Martinet, ETTI Une nouvelle chance |              | Employeur administrateur d'une EI et membre d'une ETTI.        |
+| 2  | Jacques    |   Henry   |             test+de@inclusion.beta.gouv.fr |                                              |              | Demandeur d'emploi                                             |
+| 3  | Sylvie     |   Martin  |       test+de-proxy@inclusion.beta.gouv.fr |                                              | André Dufour | Demandeur d'emploi - compte créé par un prescripteur habilité. |
+| 4  | André      | Dufour    | test+prescripteur@inclusion.beta.gouv.fr   | PE Arles, PE 93                               |              | Prescripteur habilité administrateur de ses deux structures.   |
+| 5  | Olivier    | Dupuy     | test+orienteur@inclusion.beta.gouv.fr      | Association La Belle Verte                   |              | Prescripteur non habilité, administrateur de sa structure.     |
+| 6  | Emmanuelle | Dubreuil  | test+orienteur-solo@inclusion.beta.gouv.fr |                                              |              | Prescripteur non habilité                                      |
+| 7  | Daphnée    | Delavigne | test+etti@inclusion.beta.gouv.fr           | ETTI Une nouvelle chance, EI Garage Martinet |              | Employeur administrateur d'une ETTI et membre d'une EI.        |
+| 8  | Victor     | Lacoste   | test+ei@inclusion.beta.gouv.fr             | EI Garage Martinet, ETTI Une nouvelle chance |              | Employeur administrateur d'une EI et membre d'une ETTI.        |
+| 9  | Laura     | Morans   | test+geiq@inclusion.beta.gouv.fr             | GEIQ Vertigo Films |              | Employeur administrateur d'un GEIQ    |
 
 Tous les utilisateurs ont le mot de passe `password`.
 
@@ -26,12 +27,15 @@ Tous les utilisateurs ont le mot de passe `password`.
 | Association La Belle Verte | 10 place de l'Eglise, 13113 Lamanon          |                                                                   | Organisation prescripteur (autre) |
 | EI Garage Martinet         | Route d'Altaves, 13103 Saint-Étienne-du-Grès | - Chef de garage - Mécanicien / Mécanicienne de garage automobile | EI |
 | ETTI Une nouvelle chance   | 14 Avenue de la Plaine, 30300 Beaucaire      | - Figurant / Figurante                                            | ETTI                              |
+| GEIQ Vertigo Films  | Quartier du roubian - RN 570, 13150 Tarascon      | - Machiniste cinéma                                            | GEIQ                              |
 
 ### Candidatures
 
 Deux candidatures (une en attente, l'autre à l'étude) pour l'organisation ETTI Une nouvelle chance :
 - une en auto-prescription,
 - l'autre provenant d'un DE.
+
+Une candidature pour le GEIQ Vertigo Films.
 
 
 ## Environnement de développement
