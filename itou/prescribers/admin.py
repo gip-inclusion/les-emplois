@@ -43,7 +43,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "secret_code",
                     "is_authorized",
                     "authorization_is_validated",
-                    "authorization_validated_by",
                 )
             },
         ),
@@ -61,14 +60,32 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        (_("Info"), {"fields": ("created_by", "created_at", "updated_at", "authorization_validated_at")}),
+        (
+            _("Info"),
+            {
+                "fields": (
+                    "created_by",
+                    "created_at",
+                    "updated_at",
+                    "authorization_validated_at",
+                    "authorization_validated_by",
+                )
+            },
+        ),
     )
     inlines = (MembersInline,)
     list_display = ("id", "name", "post_code", "city", "department", "member_count")
     list_display_links = ("id", "name")
     list_filter = (HasMembersFilter, "is_authorized", "kind", "department")
     raw_id_fields = ("created_by",)
-    readonly_fields = ("secret_code", "created_by", "created_at", "updated_at", "authorization_validated_at")
+    readonly_fields = (
+        "secret_code",
+        "created_by",
+        "created_at",
+        "updated_at",
+        "authorization_validated_at",
+        "authorization_validated_by",
+    )
     search_fields = ("siret", "name")
 
     def member_count(self, obj):
@@ -87,7 +104,9 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         if not obj.geocoding_score and obj.address_on_one_line:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
         if obj.authorization_is_validated and not obj.authorization_validated_at:
+            # Validation of the authorization & created at/by
             obj.authorization_validated_at = now()
+            obj.authorization_validated_by = request.user
             obj.validated_prescriber_organization_email().send()
 
         super().save_model(request, obj, form, change)
