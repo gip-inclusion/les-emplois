@@ -44,6 +44,7 @@ def move_data_forward(apps, schema_editor):
     #         prescriber_org.kind = PrescriberOrganization.Kind.SPIP
     #
     #     prescriber_org.save()
+    pass
 
 
 class Migration(migrations.Migration):
