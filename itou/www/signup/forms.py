@@ -86,11 +86,11 @@ class PrescriberFormMixin(FullnameFormMixin, SignupForm):
         return user
 
 
-class OrienterPrescriberFormForm(PrescriberFormMixin):
+class OrienterPrescriberForm(PrescriberFormMixin):
     pass
 
 
-class PoleEmploiPrescriberFormForm(PrescriberFormMixin):
+class PoleEmploiPrescriberForm(PrescriberFormMixin):
     safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
 
     def clean_email(self):
@@ -107,7 +107,7 @@ class PoleEmploiPrescriberFormForm(PrescriberFormMixin):
         return safir_code
 
 
-class AuthorizedPrescriberFormForm(PrescriberFormMixin):
+class AuthorizedPrescriberForm(PrescriberFormMixin):
 
     PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescriber_authorized_organizations")
 
