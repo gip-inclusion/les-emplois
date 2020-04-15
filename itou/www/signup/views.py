@@ -107,7 +107,7 @@ def select_prescriber_type(request):
 
 class OrienterPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_orienter.html"
-    form_class = forms.OrienterPrescriberFormForm
+    form_class = forms.OrienterPrescriberForm
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -117,7 +117,7 @@ class OrienterPrescriberView(SignupView):
 
 class PoleEmploiPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_poleemploi.html"
-    form_class = forms.PoleEmploiPrescriberFormForm
+    form_class = forms.PoleEmploiPrescriberForm
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -127,7 +127,7 @@ class PoleEmploiPrescriberView(SignupView):
 
 class AuthorizedPrescriberView(SignupView):
     template_name = "signup/signup_prescriber_authorized.html"
-    form_class = forms.AuthorizedPrescriberFormForm
+    form_class = forms.AuthorizedPrescriberForm
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
