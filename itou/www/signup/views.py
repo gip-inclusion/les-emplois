@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url
@@ -108,7 +108,7 @@ def select_prescriber_type(request):
 
 
 class PrescriberSignupMixin(SignupView):
-    @method_decorator(csrf_protect)
+    @method_decorator(requires_csrf_token)
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
