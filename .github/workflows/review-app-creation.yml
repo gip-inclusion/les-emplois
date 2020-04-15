@@ -24,7 +24,7 @@ env:
 jobs:
   create:
     runs-on: ubuntu-latest
-    if: contains( github.event.pull_request.labels.*.name, 'review-app')
+    if: github.event.label.name == 'recette-jetable'
 
     steps:
     - name: 📥 Checkout to the PR branch
