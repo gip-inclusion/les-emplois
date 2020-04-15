@@ -78,7 +78,7 @@ class Command(BaseCommand):
 
                 siae = Siae(**item["fields"])
 
-                if not siae.department in DEPARTMENTS_TO_OPEN_ON_14_04_2020:
+                if siae.department not in DEPARTMENTS_TO_OPEN_ON_14_04_2020:
                     continue
 
                 if not dry_run:
