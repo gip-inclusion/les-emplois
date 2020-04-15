@@ -9,7 +9,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Possibilité d'annuler un agrément
 - Possibilité de se connecter avec PE Connect
 
-## [0.0.1] - 2020-04-13
+## [1.0.0] - 2020-04-13
 
 ### Ajouté
 - Création de ce changelog
