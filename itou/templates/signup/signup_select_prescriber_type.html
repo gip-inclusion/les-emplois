@@ -7,29 +7,15 @@
 
 {% block content %}
     <div class="card-deck my-5 justify-content-between text-center">
-        <div class="card p-4" style="flex: 0 0 23%;">
-            <div class="card-body">
-                <div class="h-50">
-                    <h5 class="card-title font-weight-light mb-4">
-                        {% trans "Vous êtes orienteur" %}
-                    </h5>
-                </div>
-                <div class="h-50 mt-3">
-                    <a href="{% url 'signup:prescriber_orienter' %}" class="card-link btn btn-primary">
-                        {% trans "Créer un compte" %}
-                    </a>
-                </div>
-            </div>
-        </div>
 
-        <div class="card p-4" style="flex: 0 0 23%;">
+        <div class="card p-4" style="flex: 0 0 30%;">
             <div class="card-body">
-                <div class="h-50">
+                <div class="h-75 pt-4">
                     <h5 class="card-title font-weight-light mb-4">
-                        {% trans "Vous travaillez pour Pôle emploi" %}
+                        {% trans "Je travaille pour Pôle emploi" %}
                     </h5>
                 </div>
-                <div class="h-50 mt-3">
+                <div class="h-25 pt-2">
                     <a href="{% url 'signup:prescriber_poleemploi' %}" class="card-link btn btn-primary">
                         {% trans "Créer un compte" %}
                     </a>
@@ -37,19 +23,41 @@
             </div>
         </div>
 
-        <div class="card p-4" style="flex: 0 0 23%;">
+        <div class="card p-4" style="flex: 0 0 30%;">
             <div class="card-body">
                 <div class="h-50">
                     <h5 class="card-title font-weight-light mb-4">
-                        {% trans "Vous êtes prescripteur habilité" %}
+                        {% trans "Je travaille dans une organisation habilitée par le Préfet" %}
                     </h5>
                 </div>
-                <div class="h-50 mt-3">
+                <div class="h6 h-25">
+                    Cap emploi, mission locale, CCAS, SPIP, PLIE... (voir liste)
+                </div>
+                <div class="h-25 pt-2">
                     <a href="{% url 'signup:prescriber_authorized' %}" class="card-link btn btn-primary">
                         {% trans "Créer un compte" %}
                     </a>
                 </div>
             </div>
         </div>
+
+        <div class="card p-4" style="flex: 0 0 30%;">
+            <div class="card-body">
+                <div class="h-50">
+                    <h5 class="card-title font-weight-light mb-4">
+                        {% trans "J’aide à orienter des candidats en recherche d’un emploi" %}
+                    </h5>
+                </div>
+                <div class="h6 h-25">
+                    Centre d'hébergement, association de chômeurs, bénévole associatif...
+                </div>
+                <div class="h-25 pt-2">
+                    <a href="{% url 'signup:prescriber_orienter' %}" class="card-link btn btn-primary">
+                        {% trans "Créer un compte" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
 {% endblock %}
