@@ -7,7 +7,9 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url
@@ -105,31 +107,27 @@ def select_prescriber_type(request):
     return render(request, "signup/signup_select_prescriber_type.html")
 
 
-class OrienterPrescriberView(SignupView):
+class PrescriberSignupMixin(SignupView):
+    @method_decorator(csrf_protect)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)
+
+
+class OrienterPrescriberView(PrescriberSignupMixin):
     template_name = "signup/signup_prescriber_orienter.html"
     form_class = forms.OrienterPrescriberForm
 
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
 
-
-class PoleEmploiPrescriberView(SignupView):
+class PoleEmploiPrescriberView(PrescriberSignupMixin):
     template_name = "signup/signup_prescriber_poleemploi.html"
     form_class = forms.PoleEmploiPrescriberForm
 
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
 
-
-class AuthorizedPrescriberView(SignupView):
+class AuthorizedPrescriberView(PrescriberSignupMixin):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberForm
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
