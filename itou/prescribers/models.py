@@ -67,7 +67,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
+    name = models.CharField(verbose_name=_("Nom"), max_length=255)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
