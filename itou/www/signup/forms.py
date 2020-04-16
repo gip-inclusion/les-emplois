@@ -96,7 +96,7 @@ class PoleEmploiPrescriberForm(PrescriberFormMixin):
     def clean_email(self):
         email = self.cleaned_data["email"]
         if not email.endswith("@pole-emploi.fr"):
-            raise ValidationError(gettext_lazy("L'adresse email doit etre une adresse Pôle emploi"))
+            raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi"))
         return email
 
     def clean_safir_code(self):
