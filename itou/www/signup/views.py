@@ -108,10 +108,6 @@ def select_prescriber_type(request):
 
 
 class PrescriberSignupMixin(SignupView):
-    @method_decorator(requires_csrf_token)
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
