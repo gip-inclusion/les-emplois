@@ -68,6 +68,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not obj.pk:
             obj.created_by = request.user
-        if not obj.geocoding_score:
+        if not obj.geocoding_score and obj.address_on_one_line:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
         super().save_model(request, obj, form, change)
