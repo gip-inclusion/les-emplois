@@ -64,7 +64,7 @@ def prescriber_authorized_organizations_autocomplete(request):
             {"value": org.name, "id": org.id}
             for org in PrescriberOrganization.objects.exclude(is_authorized=False)
             .exclude(kind=PrescriberOrganization.Kind.PE)
-            .autocomplete(term)
+            .autocomplete(term, limit=20)
         ]
         if term
         else []
