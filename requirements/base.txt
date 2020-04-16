@@ -42,6 +42,13 @@ django-bootstrap-datepicker-plus==3.0.5 # https://github.com/monim67/django-boot
 django_select2==7.2.0
 
 
+# Data management
+# ------------------------------------------------------------------------------
+
+# Manipulate ASP CSV exports having 30+ (!) columns easily
+pandas==1.0.3
+
+
 # Third-party applications
 # ------------------------------------------------------------------------------
 

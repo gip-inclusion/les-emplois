@@ -85,7 +85,9 @@ class AddressMixin(models.Model):
 
     @property
     def address_on_one_line(self):
-        if not all([self.address_line_1, self.post_code, self.city]):
+        if not all([self.post_code, self.city]):
+            return None
+        if not any([self.address_line_1, self.address_line_2]):
             return None
         fields = [self.address_line_1, self.address_line_2, f"{self.post_code} {self.city}"]
         return ", ".join([field for field in fields if field])

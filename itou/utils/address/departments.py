@@ -139,7 +139,7 @@ def department_from_postcode(post_code):
         if post_code.startswith("20"):
             if post_code.startswith("200") or post_code.startswith("201"):
                 department = "2A"
-            elif post_code.startswith("202"):
+            elif post_code.startswith("202") or post_code.startswith("206"):
                 department = "2B"
         elif post_code.startswith("97") or post_code.startswith("98"):
             department = post_code[:3]
