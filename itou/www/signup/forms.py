@@ -42,7 +42,11 @@ class PrescriberFormMixin(FullnameFormMixin, SignupForm):
         max_length=6,
         required=False,
         strip=True,
-        help_text=gettext_lazy("Le code est composé de 6 caractères."),
+        widget=forms.TextInput(attrs={"placeholder": "Code composé de 6 caractères"}),
+        help_text=gettext_lazy(
+            "Si vous avez été invité par un collègue travaillant dans la même structure que vous,"
+            " saisissez le code de l'organisation qu'il vous a transmis. "
+        ),
     )
 
     def __init__(self, *args, **kwargs):
@@ -110,15 +114,17 @@ class PoleEmploiPrescriberForm(PrescriberFormMixin):
 class AuthorizedPrescriberForm(PrescriberFormMixin):
 
     PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescriber_authorized_organizations")
+    AUTHORIZED_PRESCRIBER_LIST_URL = "https://doc.inclusion.beta.gouv.fr/presentation/prescripteurs-habilites"
+    _authorized_organization_helt_text = gettext_lazy("Liste des prescripteurs habilités par le Préfet.")
 
     authorized_organization_id = forms.CharField(
         required=False, widget=forms.HiddenInput(attrs={"class": "js-prescriber-organization-autocomplete-hidden"})
     )
 
     authorized_organization = forms.CharField(
-        label=gettext_lazy("Si vous êtes un prescripteur habilité par le Préfet, saisissez votre organisation"),
+        label=gettext_lazy("Si vous êtes un prescripteur habilité, saisissez votre organisation"),
         required=False,
-        help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
+        help_text=mark_safe(f"<a href='{AUTHORIZED_PRESCRIBER_LIST_URL}'>{_authorized_organization_helt_text}</a>"),
         widget=forms.TextInput(
             attrs={
                 "class": "js-prescriber-organization-autocomplete-input form-control",
@@ -131,7 +137,7 @@ class AuthorizedPrescriberForm(PrescriberFormMixin):
 
     unregistered_organization = forms.CharField(
         label=gettext_lazy(
-            "Si vous faites partie d'une organisation habilitée par le Préfet qui ne figure pas dans la liste, "
+            "Si vous faites partie d'une organisation habilitée qui ne figure pas dans la liste, "
             "saisissez son nom dans le bloc ci-dessous"
         ),
         required=False,
