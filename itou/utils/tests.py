@@ -6,7 +6,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.template import Context, Template
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
@@ -18,6 +18,7 @@ from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
+from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
 from itou.utils.templatetags import dict_filters, format_filters
@@ -490,3 +491,35 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         membership.siae = siae
         membership.save()
         self.assertIs(p0.check_token(siae, tk1), False)
+
+
+class CnilCompositionPasswordValidatorTest(SimpleTestCase):
+    def test_validate(self):
+
+        # Good passwords.
+
+        # lower + upper + special char
+        self.assertIsNone(CnilCompositionPasswordValidator().validate("!*pAssWOrD"))
+        # lower + upper + digit
+        self.assertIsNone(CnilCompositionPasswordValidator().validate("MYp4ssW0rD"))
+        # lower + upper + digit + special char
+        self.assertIsNone(CnilCompositionPasswordValidator().validate("M+p4ssW0rD"))
+
+        # Wrong passwords.
+
+        expected_error = CnilCompositionPasswordValidator.HELP_MSG
+
+        with self.assertRaises(ValidationError) as error:
+            # Only lower + upper
+            CnilCompositionPasswordValidator().validate("MYpAssWOrD")
+        self.assertEqual(error.exception.messages, [expected_error])
+        self.assertEqual(error.exception.error_list[0].code, "cnil_composition")
+
+        with self.assertRaises(ValidationError) as error:
+            # Only lower + digit
+            CnilCompositionPasswordValidator().validate("myp4ssw0rd")
+        self.assertEqual(error.exception.messages, [expected_error])
+        self.assertEqual(error.exception.error_list[0].code, "cnil_composition")
+
+    def test_help_text(self):
+        self.assertEqual(CnilCompositionPasswordValidator().get_help_text(), CnilCompositionPasswordValidator.HELP_MSG)
