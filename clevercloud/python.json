@@ -1,0 +1,10 @@
+{ "deploy": {
+    "module": "itou.config.wsgi:application",
+    "managetasks":
+        [
+            "migrate --no-input",
+            "collectstatic --no-input"
+
+        ]
+    }
+}
