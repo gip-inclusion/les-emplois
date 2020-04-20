@@ -36,28 +36,10 @@
 # ```
 # -----------------------------------------------------------------
 
-set -e
-
-while ! pg_isready -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT; do
-    >&2 echo "Postgres is unavailable - sleeping"
-    sleep 1
-done
-
->&2 echo "Postgres is up - continuing"
-
-export POSTGRESQL_ADDON_DB=$REVIEW_APP_DB_NAME
-
-django-admin migrate --noinput
-django-admin collectstatic --noinput --clear
-
 echo "Loading cities"
-PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD psql -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER -d $POSTGRESQL_ADDON_DB -f ~/itou/fixtures/postgres/cities.sql
+PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD psql -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER -d $REVIEW_APP_DB_NAME -f $APP_HOME/itou/fixtures/postgres/cities.sql
 
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
 echo "Loading fixtures"
-ls -d ~/itou/fixtures/django/* | xargs django-admin loaddata
-
-uwsgi --ini docker/review_apps/uwsgi.ini
-
-exec "$@"
+ls -d $APP_HOME/itou/fixtures/django/* | xargs django-admin loaddata

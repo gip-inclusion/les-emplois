@@ -3,5 +3,5 @@
         "404": "404/"
     },
     "force_https": true,
-    "charset": "latin-1"
+    "charset": "utf-8"
 }
