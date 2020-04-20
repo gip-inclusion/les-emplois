@@ -11,7 +11,7 @@ from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
-from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
+from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
@@ -84,6 +84,24 @@ class CommonApprovalQuerySetTest(TestCase):
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(Approval.objects.filter(id=approval.id).valid().exists())
+
+    def test_can_be_deleted(self):
+        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        approval = job_app.approval
+        self.assertTrue(approval.can_be_deleted)
+
+        # An approval exists without a Job Application
+        approval = ApprovalFactory()
+        self.assertFalse(approval.can_be_deleted)
+
+        job_app.state = JobApplicationWorkflow.STATE_REFUSED
+        job_app.save()
+        self.assertFalse(approval.can_be_deleted)
+
+        JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED, job_seeker=job_app.job_seeker, approval=job_app.approval
+        )
+        self.assertFalse(approval.can_be_deleted)
 
 
 class CommonApprovalMixinTest(TestCase):

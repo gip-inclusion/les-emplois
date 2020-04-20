@@ -30,13 +30,6 @@ Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/is
 
     $ make populate_db
 
-Les utilisateurs suivants seront créés avec le mot de passe `password`:
-
-- `admin@test.com`
-- `job@test.com`
-- `prescriber@test.com`
-- `siae@test.com`
-- `prescriber-solo@test.com`
 
 ### Créer un compte admin
 
@@ -50,6 +43,10 @@ Les utilisateurs suivants seront créés avec le mot de passe `password`:
 Ou utilisez un *pre-commit git hook* que vous pouvez mettre en place de cette manière :
 
     $ make setup_git_pre_commit_hook
+
+## Données de test
+
+Voir notre [documentation interne](https://team.inclusion.beta.gouv.fr/les-procedures/recette-test).
 
 ## Front-end
 

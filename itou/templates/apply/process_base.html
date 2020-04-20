@@ -25,7 +25,6 @@
                 </div>
             {% endif %}
         </div>
-
     </h1>
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
@@ -40,6 +39,7 @@
                     {% trans "PASS IAE en cours de délivrance." %}
                 {% endif %}
             </div>
+
         {% else %}
             {% if approvals_wrapper.latest_approval %}
                 <div class="alert border">

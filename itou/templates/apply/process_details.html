@@ -255,6 +255,46 @@
 
     {% endif %}
 
+    {# Job application accepted: details -------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_accepted %}
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">{% trans "Détails du contrat de travail"%}</h3>
+        <p>
+            <ul>
+                <li>{% trans "Début" %} : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
+                <li>{% trans "Fin" %} : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
+            </ul>
+        </p>
+
+        {# Job application cancellation -------------------------------------------------------------------------- #}
+        {% if job_application.can_be_cancelled %}
+            <hr>
+
+            <h3 class="font-weight-normal text-muted">{% trans "Rétractation" %}</h3>
+            <p>
+                {% blocktrans with cancellation_date=job_application.cancellation_delay_end %}
+                    Vous pouvez vous rétracter jusqu'au lendemain du début du contrat, soit le {{ cancellation_date }} inclus.
+                {% endblocktrans %}
+            </p>
+            {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                <p>
+                    {% blocktrans with user_name=job_application.job_seeker.get_full_name|title %}
+                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                    {% endblocktrans %}
+                </p>
+            {% endif %}
+            <p>
+                <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">
+                    <button class="btn btn-danger btn-block">{% trans "Annuler l'embauche" %}</button>
+                </a>
+            </p>
+        {% endif %}
+
+    {% endif %}
+
+
     {# History ------------------------------------------------------ #}
 
     {% if transition_logs %}

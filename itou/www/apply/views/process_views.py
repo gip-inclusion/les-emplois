@@ -211,6 +211,21 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
 
 @login_required
+def cancel(request, job_application_id):
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    if job_application.can_be_cancelled:
+        job_application.cancel(user=request.user)
+        messages.success(request, _("L'embauche a bien été annulée."))
+    else:
+        messages.error(request, _("Vous ne pouvez pas annuler cette embauche."))
+
+    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    return HttpResponseRedirect(next_url)
+
+
+@login_required
 def eligibility(request, job_application_id, template_name="apply/process_eligibility.html"):
     """
     Check eligibility (as an SIAE).

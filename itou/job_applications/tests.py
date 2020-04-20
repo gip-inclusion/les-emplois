@@ -102,6 +102,19 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationWithApprovalFactory(approval=ended_approval)
         self.assertFalse(job_application.can_download_approval_as_pdf)
 
+    def test_can_be_cancelled(self):
+        today = datetime.date.today()
+        cancellation_days_in_future = relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+        cancellation_period_end = today - cancellation_days_in_future
+
+        job_application_future_ok = JobApplicationWithApprovalFactory(hiring_start_at=cancellation_period_end)
+        self.assertTrue(job_application_future_ok.can_be_cancelled)
+
+        job_application_future_not_ok = JobApplicationWithApprovalFactory(
+            hiring_start_at=(cancellation_period_end - relativedelta(days=365))
+        )
+        self.assertFalse(job_application_future_not_ok.can_be_cancelled)
+
 
 class JobApplicationQuerySetTest(TestCase):
     def test_created_in_past_hours(self):
@@ -330,6 +343,31 @@ class JobApplicationEmailTest(TestCase):
         self.assertEqual(job_application.approval_number_delivered_by, staff_member)
         self.assertEqual(len(mail.outbox), 1)
 
+    def test_cancel(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+
+        cancellation_user = job_application.to_siae.active_members.first()
+        email = job_application.email_cancel(cancelled_by=cancellation_user)
+        # To.
+        self.assertIn(cancellation_user.email, email.to)
+        self.assertIn(job_application.sender.email, email.bcc)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(len(email.bcc), 1)
+        # Body.
+        self.assertIn("annulée", email.body)
+        self.assertIn(job_application.sender.first_name, email.body)
+        self.assertIn(job_application.sender.last_name, email.body)
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+
+        # When sent by jobseeker.
+        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        email = job_application.email_cancel(cancelled_by=cancellation_user)
+        # To.
+        self.assertFalse(email.bcc)
+
 
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
@@ -506,3 +544,53 @@ class JobApplicationWorkflowTest(TestCase):
             self.assertEqual(len(mail.outbox), 1)
             self.assertIn("Candidature déclinée", mail.outbox[0].subject)
             mail.outbox = []
+
+    def test_cancel_delete_linked_approval(self):
+        job_application = JobApplicationWithApprovalFactory()
+        self.assertEqual(job_application.job_seeker.approvals.count(), 1)
+        self.assertEqual(JobApplication.objects.filter(approval=job_application.approval).count(), 1)
+
+        cancellation_user = job_application.to_siae.active_members.first()
+        job_application.cancel(user=cancellation_user)
+
+        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_CANCELLED)
+
+        job_application.refresh_from_db()
+        self.assertFalse(job_application.approval)
+
+    def test_cancel_do_not_delete_linked_approval(self):
+
+        # The approval is linked to two accepted job applications
+        job_application = JobApplicationWithApprovalFactory()
+        approval = job_application.approval
+        JobApplicationWithApprovalFactory(approval=approval, job_seeker=job_application.job_seeker)
+
+        self.assertEqual(job_application.job_seeker.approvals.count(), 1)
+        self.assertEqual(JobApplication.objects.filter(approval=approval).count(), 2)
+
+        cancellation_user = job_application.to_siae.active_members.first()
+        job_application.cancel(user=cancellation_user)
+
+        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_CANCELLED)
+
+        job_application.refresh_from_db()
+        self.assertTrue(job_application.approval)
+
+    def test_cancellation_not_allowed(self):
+        today = datetime.date.today()
+
+        # Outside cancellation delay
+        job_application = JobApplicationWithApprovalFactory(hiring_start_at=(today - relativedelta(days=365)))
+        cancellation_user = job_application.to_siae.active_members.first()
+
+        # xworkflows.base.AbortTransition
+        with self.assertRaises(xwf_models.AbortTransition):
+            job_application.cancel(user=cancellation_user)
+
+        # Wrong state
+        job_application = JobApplicationWithApprovalFactory(
+            hiring_start_at=today, state=JobApplicationWorkflow.STATE_NEW
+        )
+        cancellation_user = job_application.to_siae.active_members.first()
+        with self.assertRaises(xwf_models.AbortTransition):
+            job_application.cancel(user=cancellation_user)

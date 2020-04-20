@@ -9,6 +9,8 @@
         badge-success
     {% elif job_application.state.is_refused %}
         badge-danger
+    {% elif job_application.state.is_cancelled %}
+        badge-dark
     {% elif job_application.state.is_obsolete %}
         badge-dark
     {% endif %}">{{ job_application.get_state_display }}</span>

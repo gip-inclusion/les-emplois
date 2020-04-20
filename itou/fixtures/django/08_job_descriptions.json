@@ -1,0 +1,58 @@
+[
+{
+    "model": "siaes.siaejobdescription",
+    "pk": 1,
+    "fields": {
+        "appellation": "16464",
+        "siae": 3850,
+        "created_at": "2020-04-09T13:36:58Z",
+        "updated_at": "2020-04-09T14:44:59.861Z",
+        "is_active": true,
+        "custom_name": "",
+        "description": "",
+        "ui_rank": 32767
+    }
+},
+{
+    "model": "siaes.siaejobdescription",
+    "pk": 2,
+    "fields": {
+        "appellation": "12150",
+        "siae": 3850,
+        "created_at": "2020-04-09T13:36:58Z",
+        "updated_at": "2020-04-09T14:44:59.870Z",
+        "is_active": true,
+        "custom_name": "",
+        "description": "",
+        "ui_rank": 32767
+    }
+},
+{
+    "model": "siaes.siaejobdescription",
+    "pk": 3,
+    "fields": {
+        "appellation": "15078",
+        "siae": 2653,
+        "created_at": "2020-04-09T13:38:41Z",
+        "updated_at": "2020-04-09T14:39:32.610Z",
+        "is_active": true,
+        "custom_name": "",
+        "description": "",
+        "ui_rank": 32767
+    }
+},
+{
+    "model": "siaes.siaejobdescription",
+    "pk": 4,
+    "fields": {
+        "appellation": "16235",
+        "siae": 3851,
+        "created_at": "2020-04-14T16:09:20Z",
+        "updated_at": null,
+        "is_active": true,
+        "custom_name": "",
+        "description": "",
+        "ui_rank": 32767
+    }
+}
+]

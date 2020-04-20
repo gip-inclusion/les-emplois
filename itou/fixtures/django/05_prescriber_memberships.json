@@ -1,12 +1,32 @@
 [
-   {
-      "model" : "prescribers.prescribermembership",
-      "fields" : {
-         "is_admin" : true,
-         "user" : 3,
-         "joined_at" : "2019-10-31T15:01:06Z",
-         "organization" : 41
-      },
-      "pk" : 1
-   }
+{
+    "model": "prescribers.prescribermembership",
+    "pk": 1,
+    "fields": {
+        "user": 3,
+        "organization": 41,
+        "joined_at": "2019-10-31T15:01:06Z",
+        "is_admin": true
+    }
+},
+{
+    "model": "prescribers.prescribermembership",
+    "pk": 2,
+    "fields": {
+        "user": 3,
+        "organization": 115,
+        "joined_at": "2020-04-09T13:46:54Z",
+        "is_admin": true
+    }
+},
+{
+    "model": "prescribers.prescribermembership",
+    "pk": 3,
+    "fields": {
+        "user": 7,
+        "organization": 121,
+        "joined_at": "2020-04-09T13:49:51Z",
+        "is_admin": true
+    }
+}
 ]
