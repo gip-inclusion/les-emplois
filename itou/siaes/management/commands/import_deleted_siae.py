@@ -10,7 +10,11 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 JSON_FILE = f"{CURRENT_DIR}/data/deleted_siae.json"
 
+# Ile-de-France - note that department 93 was already open.
 DEPARTMENTS_TO_OPEN_ON_14_04_2020 = ["75", "77", "78", "91", "92", "93", "94", "95"]
+
+# Grand Est - note that department 67 was already open.
+DEPARTMENTS_TO_OPEN_ON_20_04_2020 = ["08", "10", "51", "52", "54", "55", "57", "67", "68", "88"]
 
 
 class Command(BaseCommand):
@@ -54,6 +58,8 @@ class Command(BaseCommand):
     the deployment schedule.
 
     14/04/2020: open Île-de-France (75, 77, 78, 91, 92, 93, 94, 95)
+
+    20/04/2020: open Grand Est (08, 10, 51, 52, 54, 55, 57, 67, 68, 88)
     """
 
     help = "Restore deleted SIAEs data into the database."
@@ -62,6 +68,8 @@ class Command(BaseCommand):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def handle(self, dry_run=False, **options):
+
+        total_new_siaes = 0
 
         with open(JSON_FILE, "r") as raw_json_data:
 
@@ -78,13 +86,22 @@ class Command(BaseCommand):
 
                 siae = Siae(**item["fields"])
 
-                if siae.department not in DEPARTMENTS_TO_OPEN_ON_14_04_2020:
+                if siae.department not in DEPARTMENTS_TO_OPEN_ON_20_04_2020:
                     continue
+
+                total_new_siaes += 1
 
                 if not dry_run:
                     siae.save()
                 else:
                     self.stdout.write(f'{item["fields"]}')
+
+        self.stdout.write("-" * 80)
+
+        if not dry_run:
+            self.stdout.write(f"{total_new_siaes} siaes have been created.")
+        else:
+            self.stdout.write(f"{total_new_siaes} siaes would have been created.")
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
