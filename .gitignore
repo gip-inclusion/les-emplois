@@ -7,7 +7,6 @@ envs/staging.env
 # Config
 config/settings/dev.py
 config/settings/prod.py
-config/settings/staging.py
 docker-compose-prod.yml
 docker-compose-staging.yml
 docker/prod/
@@ -141,5 +140,5 @@ ENV/
 *.iml
 .idea
 
-# Clever
+# Clever Cloud
 .clever.json
