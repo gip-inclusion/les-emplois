@@ -556,13 +556,13 @@ class PasswordResetTest(TestCase):
         password_change_url = reverse("account_reset_password_from_key", kwargs={"uidb36": uidb36, "key": key})
         response = self.client.get(password_change_url)
         password_change_url_with_hidden_key = response.url
-        post_data = {"password1": "mlkjhgfdsq2", "password2": "mlkjhgfdsq2"}
+        post_data = {"password1": "Mlkjhgf!sq2", "password2": "Mlkjhgf!sq2"}
         response = self.client.post(password_change_url_with_hidden_key, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_reset_password_from_key_done"))
 
         # User can log in with his new password.
-        self.assertTrue(self.client.login(username=user.email, password="mlkjhgfdsq2"))
+        self.assertTrue(self.client.login(username=user.email, password="Mlkjhgf!sq2"))
         self.client.logout()
 
 
@@ -580,12 +580,12 @@ class PasswordChangeTest(TestCase):
         url = reverse("account_change_password")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": "mlkjhgfdsq2", "password2": "mlkjhgfdsq2"}
+        post_data = {"oldpassword": DEFAULT_PASSWORD, "password1": "Mlkjhgf!sq2", "password2": "Mlkjhgf!sq2"}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("dashboard:index"))
 
         # User can log in with his new password.
         self.client.logout()
-        self.assertTrue(self.client.login(username=user.email, password="mlkjhgfdsq2"))
+        self.assertTrue(self.client.login(username=user.email, password="Mlkjhgf!sq2"))
         self.client.logout()
