@@ -1,5 +1,8 @@
 from unittest import mock
 
+from allauth.account.forms import default_token_generator
+from allauth.account.models import EmailConfirmationHMAC
+from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
@@ -8,9 +11,6 @@ from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext as _
 
-from allauth.account.forms import default_token_generator
-from allauth.account.models import EmailConfirmationHMAC
-from allauth.account.utils import user_pk_to_url_str
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.prescribers.factories import (

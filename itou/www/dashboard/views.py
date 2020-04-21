@@ -1,3 +1,4 @@
+from allauth.account.views import PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,7 +8,6 @@ from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from allauth.account.views import PasswordChangeView
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url

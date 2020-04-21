@@ -1,9 +1,8 @@
 import logging
 import urllib.request
 
-from django.conf import settings
-
 from api_insee import ApiInsee
+from django.conf import settings
 
 
 logger = logging.getLogger(__name__)

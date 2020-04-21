@@ -3,6 +3,7 @@ import datetime
 import factory
 import factory.fuzzy
 from dateutil.relativedelta import relativedelta
+
 from itou.approvals.factories import ApprovalFactory
 from itou.job_applications import models
 from itou.prescribers.factories import (

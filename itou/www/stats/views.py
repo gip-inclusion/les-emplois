@@ -1,6 +1,7 @@
 from collections import OrderedDict, defaultdict
 from datetime import timedelta
 
+from dateutil.relativedelta import relativedelta
 from django.db.models import Avg, Count, DateTimeField, ExpressionWrapper, F, Q
 from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 from django.shortcuts import render
@@ -9,7 +10,6 @@ from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
 from django.views.decorators.csrf import csrf_exempt
 
-from dateutil.relativedelta import relativedelta
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
