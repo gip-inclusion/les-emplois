@@ -1,12 +1,11 @@
 # See https://developer.github.com/v3/
 # and https://help.github.com/en/actions
-name: 🕵 Review apps
+name: 🕵 Review app creation
 
 # Run this pipeline when a label is added and when a push is made on this PR.
 # `types: [ synchronize ]` targets a push event made on a PR.
 on:
   pull_request:
-    branches: [ master ]
     types: [ labeled ]
 
 env:
@@ -23,51 +22,9 @@ env:
   POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
 
 jobs:
-  delete:
-    runs-on: ubuntu-latest
-    if: contains( github.event.pull_request.labels.*.name, 'review-app')
-
-    steps:
-    - name: 📥 Checkout to the PR branch
-      uses: actions/checkout@v2
-      with:
-        ref: ${{ github.head_ref }}
-
-    - name: 🏷 Set review app name
-      run:
-        echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
-
-    - name: 🏷 Set database name
-      run:
-        echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
-
-    - name: 🤝 Try to find the application on Clever Cloud
-      run: |
-        curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
-        tar -xvf $CLEVER_TAR_FILE
-        $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
-
-    - name: 🗑 Delete the review app
-      run: |
-        $CLEVER_CLI delete --yes
-
-    - name: 🗑 Delete the review app database
-      run: |
-        echo "Deleting database $REVIEW_APP_DB_NAME"
-        psql -v ON_ERROR_STOP=1 $POSTGRESQL_ADDON_URI <<-EOSQL
-          SELECT pg_terminate_backend(pg_stat_activity.pid)
-          FROM pg_stat_activity
-          WHERE pg_stat_activity.datname = '$REVIEW_APP_DB_NAME'
-            AND pid <> pg_backend_pid();
-          DROP DATABASE IF EXISTS $REVIEW_APP_DB_NAME;
-        EOSQL
-        echo "Database deleted successfully!"
-
   create:
     runs-on: ubuntu-latest
-    needs: delete
-    if: always()
+    if: github.event.label.name == 'recette-jetable'
 
     steps:
     - name: 📥 Checkout to the PR branch
@@ -97,7 +54,7 @@ jobs:
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
-        $CLEVER_CLI create $REVIEW_APP_NAME -t docker --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
+        $CLEVER_CLI create $REVIEW_APP_NAME -t python --org $ORGANIZATION_NAME --region par --alias $REVIEW_APP_NAME
         $CLEVER_CLI domain add $DEPLOY_URL --alias $REVIEW_APP_NAME
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
 

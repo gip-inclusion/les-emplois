@@ -1,0 +1,7 @@
+{
+    "error_pages": {
+        "404": "404/"
+    },
+    "force_https": true,
+    "charset": "utf-8"
+}
