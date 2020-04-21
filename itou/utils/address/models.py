@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.utils.address.departments import DEPARTMENTS, REGIONS
+from itou.utils.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.validators import validate_post_code
 
@@ -111,7 +111,7 @@ class AddressMixin(models.Model):
         self.city = geocoding_data["city"]
 
     def clean(self):
-        if self.post_code:
-            if not self.post_code.startswith(self.department):
-                raise ValidationError(_("Le département doit correspondre au code postal."))
+        if self.department != department_from_postcode(self.post_code):
+            raise ValidationError(_("Le département doit correspondre au code postal."))
+
         super().clean()
