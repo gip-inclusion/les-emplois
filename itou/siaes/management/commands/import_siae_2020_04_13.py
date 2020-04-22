@@ -247,7 +247,7 @@ class Command(BaseCommand):
                 # Tricky decision since our users may have updated their data
                 # themselves and we have no record of that.
             else:
-                if not siae.members.count() == 0:
+                if siae.members.count():
                     self.log(
                         f"siae.id={siae.id} has members but no longer exists "
                         f"in latest export (should eventually be deleted "
