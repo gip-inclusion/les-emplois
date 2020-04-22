@@ -33,6 +33,31 @@ MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_04_13_fluxIAE_Structure_130420
 
 SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_02_siae_auth_email_and_external_id.csv"
 
+SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
+
+SIAE_CREATION_ALLOWED_DEPARTMENTS = [
+    "62",
+    "67",
+    "75",
+    "77",
+    "78",
+    "91",
+    "92",
+    "93",
+    "94",
+    "95",
+    "08",
+    "10",
+    "51",
+    "52",
+    "54",
+    "55",
+    "57",
+    "67",
+    "68",
+    "88",
+]
+
 EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
 
 
@@ -162,30 +187,9 @@ def get_secondary_df_rows_as_dict(external_id):
 
 
 def should_siae_be_created(siae):
-    if siae.kind == Siae.KIND_ETTI:
+    if siae.kind in SIAE_CREATION_ALLOWED_KINDS:
         return True
-    return siae.department in [
-        "62",
-        "67",
-        "75",
-        "77",
-        "78",
-        "91",
-        "92",
-        "93",
-        "94",
-        "95",
-        "08",
-        "10",
-        "51",
-        "52",
-        "54",
-        "55",
-        "57",
-        "67",
-        "68",
-        "88",
-    ]
+    return siae.department in SIAE_CREATION_ALLOWED_DEPARTMENTS
 
 
 class Command(BaseCommand):
