@@ -683,6 +683,18 @@ class PasswordResetTest(TestCase):
         self.assertTrue(self.client.login(username=user.email, password="Mlkjhgf!sq2"))
         self.client.logout()
 
+    def test_password_reset_with_nonexistent_email(self):
+        """
+        Avoid user enumeration: redirect to the success page even with a nonexistent email.
+        """
+        url = reverse("account_reset_password")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        post_data = {"email": "nonexistent@email.com"}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_reset_password_done"))
+
 
 class PasswordChangeTest(TestCase):
     def test_password_change_flow(self):

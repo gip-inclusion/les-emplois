@@ -1,7 +1,7 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
-from allauth.account.views import SignupView
+from allauth.account.views import PasswordResetView, SignupView
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
@@ -14,6 +14,16 @@ from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
+
+
+class ItouPasswordResetView(PasswordResetView):
+    def form_invalid(self, form):
+        """
+        Avoid user enumeration: django-allauth displays an error message to the user
+        when an email does not exist. We deliberately hide it by redirecting to the
+        success page in all cases.
+        """
+        return HttpResponseRedirect(self.get_success_url())
 
 
 @require_GET
