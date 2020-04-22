@@ -306,7 +306,7 @@ class Command(BaseCommand):
         if len(siae.phone) != 10:  # As we have faulty 9 digits phones.
             siae.phone = ""  # siae.phone cannot be null in db
 
-        siae.email = secondary_df_row["auth_email"]
+        siae.email = None  # Do not make the authentification email public!
         siae.auth_email = secondary_df_row["auth_email"]
 
         street_num = main_df_row["street_num"]
