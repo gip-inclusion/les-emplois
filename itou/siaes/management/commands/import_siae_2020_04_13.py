@@ -230,7 +230,7 @@ class Command(BaseCommand):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
             if row:
                 if row["siret"] == siae.siret:
-                    pass
+                    continue
                 else:
                     assert siae.siret[:9] == row["siret"][:9]
                     assert siae.kind in EXPECTED_KINDS
