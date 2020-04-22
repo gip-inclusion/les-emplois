@@ -29,10 +29,14 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_04_13_fluxIAE_Structure_13042020_073724.csv"
+
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_02_siae_auth_email_and_external_id.csv"
+
 EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
 
 
-def get_main_df():
+def get_main_df(filename=MAIN_DATASET_FILENAME):
     """
     The main dataset is very recent (April 2020) and has those fields:
     - external_id
@@ -49,7 +53,7 @@ def get_main_df():
     have auth_email and kind.
     """
     df = pd.read_csv(
-        f"{CURRENT_DIR}/data/2020_04_13_fluxIAE_Structure_13042020_073724.csv",
+        filename,
         sep="|",
         converters={
             "structure_siret_actualise": str,
@@ -95,7 +99,7 @@ def get_main_df():
 MAIN_DF = get_main_df()
 
 
-def get_secondary_df():
+def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     """
     The secondary dataset is older (February 2020) and only has 5 columns:
     - siret (WARNING : this siret is outdated by MAIN_DF.siret)
@@ -105,11 +109,7 @@ def get_secondary_df():
     - auth_email
     When joined with the first dataset, it somehow constitutes a complete dataset.
     """
-    df = pd.read_csv(
-        f"{CURRENT_DIR}/data/2020_02_siae_auth_email_and_external_id.csv",
-        converters={"siret": str, "auth_email": str},
-        sep=";",
-    )
+    df = pd.read_csv(filename, converters={"siret": str, "auth_email": str}, sep=";")
 
     # Filter out rows with irrelevant data.
     df = df[df.kind != "FDI"]
