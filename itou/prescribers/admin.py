@@ -83,6 +83,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "created_by",
         "created_at",
         "updated_at",
+        "is_authorized",
         "authorization_validated_at",
         "authorization_validated_by",
     )
@@ -105,6 +106,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
         if obj.authorization_is_validated and not obj.authorization_validated_at:
             # Validation of the authorization & created at/by
+            obj.is_authorized = True
             obj.authorization_validated_at = now()
             obj.authorization_validated_by = request.user
             obj.validated_prescriber_organization_email().send()
