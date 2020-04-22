@@ -138,10 +138,6 @@ SECONDARY_DF = get_secondary_df()
 API_BAN_RELIABLE_MIN_SCORE = 0.6
 
 
-def get_intersection(set1, set2):
-    return set1 & set2
-
-
 def get_df_rows_as_dict(df, external_id):
     rows = df[df.external_id == external_id].to_dict("records")
     return rows
@@ -335,7 +331,7 @@ class Command(BaseCommand):
     def create_new_siaes(self, dry_run):
         external_ids_from_main_df = set(MAIN_DF.external_id.to_list())
         external_ids_from_secondary_df = set(SECONDARY_DF.external_id.to_list())
-        external_ids_with_complete_data = get_intersection(external_ids_from_main_df, external_ids_from_secondary_df)
+        external_ids_with_complete_data = external_ids_from_main_df.intersection(external_ids_from_secondary_df)
 
         creatable_siaes_by_key = {}
 
