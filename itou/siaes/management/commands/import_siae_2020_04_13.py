@@ -322,6 +322,11 @@ class Command(BaseCommand):
         address_line_2 = " ".join(address_line_2.split())  # Replace multiple spaces by a single space.
         siae.address_line_2 = address_line_2.strip()
 
+        # Avoid confusing case where line1 is empty and line2 is not.
+        if not siae.address_line_1:
+            siae.address_line_1 = siae.address_line_2
+            siae.address_line_2 = None
+
         siae.city = main_df_row["city"]
         siae.post_code = main_df_row["zipcode"]
         siae.department = department_from_postcode(siae.post_code)
