@@ -222,44 +222,43 @@ class Command(BaseCommand):
         self.logger.debug(message)
 
     def update_existing_siaes(self, dry_run):
-        for siae in Siae.objects.all():
-            if siae.external_id:
-                row = get_main_df_row_as_dict(external_id=siae.external_id)
-                if row:
-                    if row["siret"] == siae.siret:
-                        pass
-                    else:
-                        assert siae.siret[:9] == row["siret"][:9]
-                        assert siae.kind in EXPECTED_KINDS
-                        assert siae.source == Siae.SOURCE_ASP
-                        assert siae.members.count() == 0
-                        self.log(
-                            f"siae.id={siae.id} has changed siret from "
-                            f"{siae.siret} to {row['siret']} (will be updated)"
-                        )
-                        if not dry_run:
-                            siae.siret = row["siret"]
-                            siae.save()
-                    # FIXME update other fields as well. Or not?
-                    # Tricky decision since our users may have updated their data
-                    # themselves and we have no record of that.
+        for siae in Siae.objects.exclude(external_id__isnull=True):
+            row = get_main_df_row_as_dict(external_id=siae.external_id)
+            if row:
+                if row["siret"] == siae.siret:
+                    pass
                 else:
-                    if not siae.members.count() == 0:
-                        self.log(
-                            f"siae.id={siae.id} has members but no longer exists "
-                            f"in latest export (should eventually be deleted "
-                            f"but not this time)"
-                        )
-                        # if not dry_run:
-                        #     siae.delete()
-                    else:
-                        self.log(
-                            f"siae.id={siae.id} no longer exists "
-                            f"in latest export (should eventually be deleted "
-                            f"but not this time)"
-                        )
-                        # if not dry_run:
-                        #     siae.delete()
+                    assert siae.siret[:9] == row["siret"][:9]
+                    assert siae.kind in EXPECTED_KINDS
+                    assert siae.source == Siae.SOURCE_ASP
+                    assert siae.members.count() == 0
+                    self.log(
+                        f"siae.id={siae.id} has changed siret from "
+                        f"{siae.siret} to {row['siret']} (will be updated)"
+                    )
+                    if not dry_run:
+                        siae.siret = row["siret"]
+                        siae.save()
+                # FIXME update other fields as well. Or not?
+                # Tricky decision since our users may have updated their data
+                # themselves and we have no record of that.
+            else:
+                if not siae.members.count() == 0:
+                    self.log(
+                        f"siae.id={siae.id} has members but no longer exists "
+                        f"in latest export (should eventually be deleted "
+                        f"but not this time)"
+                    )
+                    # if not dry_run:
+                    #     siae.delete()
+                else:
+                    self.log(
+                        f"siae.id={siae.id} no longer exists "
+                        f"in latest export (should eventually be deleted "
+                        f"but not this time)"
+                    )
+                    # if not dry_run:
+                    #     siae.delete()
 
     def geocode_siae(self, siae):
         assert siae.address_on_one_line
