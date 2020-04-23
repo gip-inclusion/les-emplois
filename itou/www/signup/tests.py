@@ -404,6 +404,10 @@ class PrescriberSignupTest(TestCase):
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
 
+        # Check org.
+        self.assertTrue(organization.is_authorized)
+        self.assertFalse(organization.authorization_validation_required)
+
         # Check membership
         self.assertIn(user, organization.members.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
@@ -440,6 +444,10 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
         self.assertFalse(user_email.verified)
+
+        # Check org.
+        self.assertTrue(authorized_organization.is_authorized)
+        self.assertFalse(authorized_organization.authorization_validation_required)
 
         # Check membership
         self.assertIn(user, authorized_organization.members.all())
@@ -485,7 +493,8 @@ class PrescriberSignupTest(TestCase):
 
         # Check if a new organization is created
         new_org = PrescriberOrganization.objects.get(name=organization_name)
-        self.assertFalse(new_org.authorization_is_validated)
+        self.assertFalse(new_org.is_authorized)
+        self.assertTrue(new_org.authorization_validation_required)
         self.assertIsNone(new_org.authorization_validated_at)
         self.assertEqual(new_org.created_by, user)
 

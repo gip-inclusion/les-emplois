@@ -64,4 +64,4 @@ class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
 
 
 class PrescriberUnregistered(PrescriberOrganizationFactory):
-    authorization_is_validated = False
+    authorization_validation_required = False

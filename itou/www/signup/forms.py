@@ -181,7 +181,9 @@ class AuthorizedPrescriberForm(PrescriberForm):
                         "Veuillez la sélectionner dans la liste des organisations habilitées"
                     )
                 )
-            self.new_organization = PrescriberOrganization(name=unregistered_organization)
+            self.new_organization = PrescriberOrganization(
+                name=unregistered_organization, authorization_validation_required=True
+            )
         elif authorized_organization_id:
             authorized_organization = PrescriberOrganization.objects.get(
                 pk=self.cleaned_data["authorized_organization_id"]
