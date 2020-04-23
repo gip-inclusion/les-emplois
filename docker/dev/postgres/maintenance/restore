@@ -43,6 +43,6 @@ message_info "Creating a new database..."
 createdb --owner="${ITOU_POSTGRES_USER}"
 
 message_info "Applying the backup to the new database..."
-gunzip -c "${backup_filename}" | psql "${ITOU_POSTGRES_DATABASE_NAME}"
+gunzip -c "${backup_filename}" | pg_restore --format=c --dbname="${ITOU_POSTGRES_DATABASE_NAME}"
 
 message_success "The '${ITOU_POSTGRES_DATABASE_NAME}' database has been restored from the '${backup_filename}' backup."
