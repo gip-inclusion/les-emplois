@@ -24,6 +24,17 @@
             {% endblocktrans %}
         </div>
     {% endif %}
+    {% if current_prescriber_organization and not current_prescriber_organization.authorization_is_validated %}
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div>
+                Vous êtes membre d'une organisation dont l'habilitation est en cours de vérification.
+                Vous serez notifié par e-mail lorsque cette vérification sera terminée.
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}

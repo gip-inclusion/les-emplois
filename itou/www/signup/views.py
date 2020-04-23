@@ -7,7 +7,9 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url
@@ -27,18 +29,7 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
     return render(request, template_name, context)
 
 
-class PrescriberSignupView(SignupView):
-
-    form_class = forms.PrescriberSignupForm
-    template_name = "signup/signup_prescriber.html"
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
-
-
-def select_siae(request, template_name="signup/select_siae.html"):
+def select_siae(request, template_name="signup/signup_select_siae.html"):
     """
     Select an existing SIAE (Agence / Etablissement in French) to join.
     This is the first of the two forms of the siae signup process.
@@ -104,3 +95,35 @@ class JobSeekerSignupView(SignupView):
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
         return super().post(request, *args, **kwargs)
+
+
+def select_prescriber_type(request):
+    """
+    New signup process for prescribers, can be one of:
+    * orienter
+    * Pole Emploi prescriber
+    * authorized prescriber
+    """
+    return render(request, "signup/signup_select_prescriber_type.html")
+
+
+class PrescriberSignupMixin(SignupView):
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)
+
+
+class OrienterPrescriberView(PrescriberSignupMixin):
+    template_name = "signup/signup_prescriber_orienter.html"
+    form_class = forms.OrienterPrescriberForm
+
+
+class PoleEmploiPrescriberView(PrescriberSignupMixin):
+    template_name = "signup/signup_prescriber_poleemploi.html"
+    form_class = forms.PoleEmploiPrescriberForm
+
+
+class AuthorizedPrescriberView(PrescriberSignupMixin):
+    template_name = "signup/signup_prescriber_authorized.html"
+    form_class = forms.AuthorizedPrescriberForm

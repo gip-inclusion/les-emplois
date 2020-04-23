@@ -1,17 +1,18 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
+{% load static %}
 
-{% block title %}{% trans "Prescripteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% trans "Prescripteur habilité - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Prescripteur" %}
+    {% trans "Prescripteur habilité" %}
     <small class="text-muted">{% trans "Inscription" %}</small>
 </h1>
 
-<form method="post" action="{% url 'signup:prescriber' %}" role="form" class="js-prevent-multiple-submit">
+<form method="post" action="{% url 'signup:prescriber_authorized' %}" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
@@ -33,21 +34,30 @@
                 {% trans "Votre organisation" %}
             </a>
             <a class="nav-item nav-link" id="form-code-tab" data-toggle="tab" href="#form-code" role="tab" aria-controls="form-code" aria-selected="false">
-                {% trans "Vous avez un code ?" %}
+                {% trans "Vous ne trouvez pas votre organisation ?" %}
             </a>
         </div>
     </nav>
+
     <div class="tab-content mb-3">
         <div class="tab-pane show active" id="form-org" role="tabpanel" aria-labelledby="nav-home-tab">
             <div class="p-3 border-right border-bottom border-left">
                 {% bootstrap_field form.authorized_organization %}
-                <small>{% blocktrans %}Si vous faites partie d'une organisation habilitée par le Préfet qui ne figure pas dans cette liste, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a>.{% endblocktrans %}</small>
+                {% bootstrap_field form.authorized_organization_id %}
             </div>
         </div>
         <div class="tab-pane" id="form-code" role="tabpanel" aria-labelledby="form-code-tab">
             <div class="p-3 border-right border-bottom border-left">
-                <i>{% bootstrap_label "Entrez le code qui vous a été transmis :" label_for=form.secret_code.auto_id %}</i>
-                {% bootstrap_field form.secret_code show_label=False %}
+
+                {% bootstrap_field form.unregistered_organization %}
+
+                <small>
+                 {% blocktrans %}
+                    Votre organisation est actuellement en cours de vérification par notre équipe. Les fonctionnalités réservées aux organisations habilitées ne vous sont pas encore accessibles, mais vous pouvez tout de même utiliser la plateforme.
+                {% endblocktrans %}
+                </small>
+
+
             </div>
         </div>
     </div>
@@ -61,4 +71,10 @@
 <p>
     <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
 </p>
+{% endblock %}
+
+
+{% block script %}
+ {{ block.super }}
+    <script src="{% static "js/prescriber_organization_autocomplete_field.js" %}"></script>
 {% endblock %}

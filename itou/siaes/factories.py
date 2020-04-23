@@ -1,6 +1,5 @@
 import string
 
-import factory
 import factory.fuzzy
 
 from itou.jobs.factories import create_test_romes_and_appellations

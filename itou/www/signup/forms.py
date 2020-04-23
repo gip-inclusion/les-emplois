@@ -2,7 +2,9 @@ from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db.models import Q
+from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
@@ -18,7 +20,6 @@ BLANK_CHOICE = (("", "---------"),)
 
 
 class FullnameFormMixin(forms.Form):
-
     first_name = forms.CharField(
         label=gettext_lazy("Prénom"),
         max_length=get_user_model()._meta.get_field("first_name").max_length,
@@ -34,21 +35,18 @@ class FullnameFormMixin(forms.Form):
     )
 
 
-class PrescriberSignupForm(FullnameFormMixin, SignupForm):
+class PrescriberFormMixin(FullnameFormMixin, SignupForm):
 
     secret_code = forms.CharField(
         label=gettext_lazy("Code de l'organisation"),
         max_length=6,
         required=False,
         strip=True,
-        help_text=gettext_lazy("Le code est composé de 6 caractères."),
-    )
-
-    authorized_organization = forms.ModelChoiceField(
-        label=gettext_lazy("Organisation (obligatoire seulement si vous êtes un prescripteur habilité par le Préfet)"),
-        queryset=PrescriberOrganization.objects.filter(is_authorized=True).order_by("name"),
-        required=False,
-        help_text=gettext_lazy("Liste des prescripteurs habilités par le Préfet."),
+        widget=forms.TextInput(attrs={"placeholder": "Code composé de 6 caractères"}),
+        help_text=gettext_lazy(
+            "Si vous avez été invité par un collègue travaillant dans la même structure que vous,"
+            " saisissez le code de l'organisation qu'il vous a transmis. "
+        ),
     )
 
     def __init__(self, *args, **kwargs):
@@ -70,7 +68,6 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         return secret_code
 
     def save(self, request):
-
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]
@@ -79,9 +76,7 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
         user.save()
 
         # Join organization.
-
-        authorized_organization = self.cleaned_data["authorized_organization"]
-        organization = self.organization or authorized_organization
+        organization = self.organization
         if organization:
             if organization.has_members:
                 organization.new_signup_warning_email_to_existing_members(user).send()
@@ -93,6 +88,107 @@ class PrescriberSignupForm(FullnameFormMixin, SignupForm):
             membership.save()
 
         return user
+
+
+class OrienterPrescriberForm(PrescriberFormMixin):
+    pass
+
+
+class PoleEmploiPrescriberForm(PrescriberFormMixin):
+    safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if not email.endswith("@pole-emploi.fr"):
+            raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi"))
+        return email
+
+    def clean_safir_code(self):
+        safir_code = self.cleaned_data["safir_code"]
+        self.organization = PrescriberOrganization.objects.by_safir_code(safir_code)
+        if not self.organization:
+            raise ValidationError(gettext_lazy("Ce code SAFIR est inconnu"))
+        return safir_code
+
+
+class AuthorizedPrescriberForm(PrescriberFormMixin):
+
+    PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescriber_authorized_organizations")
+    AUTHORIZED_PRESCRIBER_LIST_URL = "https://doc.inclusion.beta.gouv.fr/presentation/prescripteurs-habilites"
+    _authorized_organization_helt_text = gettext_lazy("Liste des prescripteurs habilités par le Préfet.")
+
+    authorized_organization_id = forms.CharField(
+        required=False, widget=forms.HiddenInput(attrs={"class": "js-prescriber-organization-autocomplete-hidden"})
+    )
+
+    authorized_organization = forms.CharField(
+        label=gettext_lazy("Si vous êtes un prescripteur habilité, saisissez votre organisation"),
+        required=False,
+        help_text=mark_safe(f"<a href='{AUTHORIZED_PRESCRIBER_LIST_URL}'>{_authorized_organization_helt_text}</a>"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-prescriber-organization-autocomplete-input form-control",
+                "data-autocomplete-source-url": PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL,
+                "placeholder": gettext_lazy("Saisissez une organisation"),
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+    unregistered_organization = forms.CharField(
+        label=gettext_lazy(
+            "Si vous faites partie d'une organisation habilitée qui ne figure pas dans la liste, "
+            "saisissez son nom dans le bloc ci-dessous"
+        ),
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Saisissez le nom d'une organisation habilitée")}),
+    )
+
+    def clean(self):
+        """
+        User must enter one of:
+        * an unregistered organization
+        * a registered one in the auto-complete list
+        Not both or none
+        """
+        unregistered_organization = self.cleaned_data["unregistered_organization"]
+        authorized_organization_id = self.cleaned_data["authorized_organization_id"]
+
+        if (unregistered_organization and authorized_organization_id) or not (
+            unregistered_organization or authorized_organization_id
+        ):
+            raise ValidationError(
+                gettext_lazy(
+                    "Vous devez choisir entre une organisation déjà habilitée "
+                    "et une organisation habilitée à valider ultérieurement"
+                )
+            )
+
+        if unregistered_organization:
+            # check if exists?
+            if PrescriberOrganization.objects.filter(name=unregistered_organization.strip()).exists():
+                raise ValidationError(
+                    gettext_lazy(
+                        f"Cette organisation existe ({unregistered_organization})."
+                        "Veuillez la sélectionner dans la liste des organisations habilitées"
+                    )
+                )
+            new_organization = PrescriberOrganization(name=unregistered_organization)
+            new_organization.authorization_is_validated = False
+            new_organization.save()
+            self.organization = new_organization
+        elif authorized_organization_id:
+            authorized_organization = PrescriberOrganization.objects.get(
+                pk=self.cleaned_data["authorized_organization_id"]
+            )
+            if not authorized_organization:
+                raise ValidationError(
+                    gettext_lazy(
+                        f"Impossible de trouver cette organisation (id: {authorized_organization_id}). "
+                        "Veuillez contacter le support"
+                    )
+                )
+            self.organization = authorized_organization
 
 
 class SelectSiaeForm(forms.Form):
@@ -145,7 +241,6 @@ class SelectSiaeForm(forms.Form):
             siaes = siaes.filter(siret=siret)
         # Hit the database only once.
         siaes = list(siaes)
-
         siaes_matching_siret = [s for s in siaes if s.siret == siret]
         # There can be at most one siret match due to (kind, siret) unicity.
         siret_exists = len(siaes_matching_siret) == 1
@@ -269,7 +364,6 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin):
     def save(self, request):
-
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]

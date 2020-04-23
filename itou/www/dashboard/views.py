@@ -26,7 +26,10 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             state=JobApplicationWorkflow.STATE_NEW
         ).count()
 
+    # See template for display message while authorized organization is being validated (prescriber path)
+
     context = {"job_applications_counter": job_applications_counter}
+
     return render(request, template_name, context)
 
 

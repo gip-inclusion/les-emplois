@@ -10,40 +10,41 @@ def move_data_forward(apps, schema_editor):
     Set `kind`.
     """
 
-    for prescriber_org in PrescriberOrganization.objects.filter(is_authorized=True):
-
-        if prescriber_org.code_safir_pole_emploi:
-            prescriber_org.kind = PrescriberOrganization.Kind.PE
-            prescriber_org.save()
-            continue
-
-        name = prescriber_org.name.lower()
-
-        if name.startswith("c.h.r.s"):
-            prescriber_org.kind = PrescriberOrganization.Kind.CHRS
-
-        elif name.startswith("cap emploi"):
-            prescriber_org.kind = PrescriberOrganization.Kind.CAP_EMPLOI
-
-        elif name.startswith("conseil départemental"):
-            prescriber_org.kind = PrescriberOrganization.Kind.DEPT
-
-        elif name.startswith("direction territoriale de la protection judiciaire de la jeunesse"):
-            prescriber_org.kind = PrescriberOrganization.Kind.PJJ
-
-        elif name.startswith("mission locale"):
-            prescriber_org.kind = PrescriberOrganization.Kind.ML
-
-        elif name.startswith("mission locale") or name.startswith("adefi"):
-            prescriber_org.kind = PrescriberOrganization.Kind.ML
-
-        elif name.startswith("plie"):
-            prescriber_org.kind = PrescriberOrganization.Kind.PLIE
-
-        elif name.startswith("spip") or name.startswith("service penitentiaire d'insertion et de probation"):
-            prescriber_org.kind = PrescriberOrganization.Kind.SPIP
-
-        prescriber_org.save()
+    # for prescriber_org in PrescriberOrganization.objects.filter(is_authorized=True):
+    #
+    #     if prescriber_org.code_safir_pole_emploi:
+    #         prescriber_org.kind = PrescriberOrganization.Kind.PE
+    #         prescriber_org.save()
+    #         continue
+    #
+    #     name = prescriber_org.name.lower()
+    #
+    #     if name.startswith("c.h.r.s"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.CHRS
+    #
+    #     elif name.startswith("cap emploi"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.CAP_EMPLOI
+    #
+    #     elif name.startswith("conseil départemental"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.DEPT
+    #
+    #     elif name.startswith("direction territoriale de la protection judiciaire de la jeunesse"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.PJJ
+    #
+    #     elif name.startswith("mission locale"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.ML
+    #
+    #     elif name.startswith("mission locale") or name.startswith("adefi"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.ML
+    #
+    #     elif name.startswith("plie"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.PLIE
+    #
+    #     elif name.startswith("spip") or name.startswith("service penitentiaire d'insertion et de probation"):
+    #         prescriber_org.kind = PrescriberOrganization.Kind.SPIP
+    #
+    #     prescriber_org.save()
+    pass
 
 
 class Migration(migrations.Migration):

@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.postgres.search import TrigramSimilarity
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -14,6 +16,17 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
         if user.is_superuser:
             return self
         return self.filter(members=user, members__is_active=True)
+
+    def autocomplete(self, search_string, limit=10):
+        queryset = (
+            self.annotate(similarity=TrigramSimilarity("name", search_string))
+            .filter(similarity__gt=0.1)
+            .order_by("-similarity")
+        )
+        return queryset[:limit]
+
+    def by_safir_code(self, safir_code):
+        return self.filter(code_safir_pole_emploi=safir_code).first()
 
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
@@ -54,7 +67,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255, blank=True)
+    name = models.CharField(verbose_name=_("Nom"), max_length=255)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
@@ -77,6 +90,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     code_safir_pole_emploi = models.CharField(
         verbose_name=_("Code Safir"),
         help_text=_("Code unique d'une agence Pole emploi."),
+        validators=[RegexValidator("^[0-9]{5}$", message=_("Le code SAFIR est erroné"))],
         max_length=5,
         null=True,
         unique=True,
@@ -91,6 +105,20 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    authorization_is_validated = models.BooleanField(
+        verbose_name=_("Habilitation vérifiée"),
+        default=False,
+        help_text=_("Précise si l'habilitation de l'organisation a été vérifiée."),
+    )
+    authorization_validated_at = models.DateTimeField(verbose_name=_("Date de validation"), null=True)
+    authorization_validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Autorisation validée par"),
+        related_name="authorization_validated_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
 
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
 
@@ -127,6 +155,17 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         context = {"new_user": user, "organization": self}
         subject = "prescribers/email/new_signup_warning_email_to_existing_members_subject.txt"
         body = "prescribers/email/new_signup_warning_email_to_existing_members_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def validated_prescriber_organization_email(self):
+        """
+        Send an email to the user who asked for the validation
+        of a new prescriber organization
+        """
+        to = [u.email for u in self.active_members]
+        context = {"organization": self}
+        subject = "prescribers/email/validated_prescriber_organization_email_subject.txt"
+        body = "prescribers/email/validated_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 

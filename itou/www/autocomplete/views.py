@@ -6,6 +6,7 @@ from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
 from itou.jobs.models import Appellation
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.swear_words import get_city_swear_words_slugs
 
 
@@ -19,7 +20,6 @@ def cities_autocomplete(request):
     cities = []
 
     if term and slugify(term) not in get_city_swear_words_slugs():
-
         cities = (
             City.objects.annotate(similarity=TrigramSimilarity("name", term))
             .filter(similarity__gt=0.1)
@@ -54,3 +54,20 @@ def jobs_autocomplete(request):
         ]
 
     return HttpResponse(json.dumps(appellations), "application/json")
+
+
+def prescriber_authorized_organizations_autocomplete(request):
+    term = request.GET.get("term", "").strip()
+
+    organizations = (
+        [
+            {"value": org.name, "id": org.id}
+            for org in PrescriberOrganization.objects.exclude(is_authorized=False)
+            .exclude(kind=PrescriberOrganization.Kind.PE)
+            .autocomplete(term, limit=20)
+        ]
+        if term
+        else []
+    )
+
+    return HttpResponse(json.dumps(organizations), "application/json")

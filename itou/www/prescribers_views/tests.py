@@ -23,7 +23,14 @@ class CreateOrganizationTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        post_data = {"siret": "12000015300011", "phone": "", "email": "", "website": "", "description": ""}
+        post_data = {
+            "siret": "12000015300011",
+            "phone": "",
+            "email": "",
+            "website": "",
+            "description": "",
+            "name": "foo",
+        }
         response = self.client.post(url, data=post_data)
         mock_call_insee_api.assert_called_once_with(post_data["siret"])
         mock_call_ban_geocoding_api.assert_called_once()
@@ -55,6 +62,7 @@ class EditOrganizationTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "name": "foo",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "email": "",
             "phone": "0610203050",
