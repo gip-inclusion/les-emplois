@@ -22,6 +22,20 @@ class HasMembersFilter(admin.SimpleListFilter):
         return queryset
 
 
+class AuthorizationValidationRequired(admin.SimpleListFilter):
+    title = _("Vérification de l'habilitation nécessaire")
+    parameter_name = "authorization_validation_required"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(authorization_validation_required=True, is_authorized=False)
+        return queryset
+
+
 class MembersInline(admin.TabularInline):
     model = models.PrescriberOrganization.members.through
     extra = 1
@@ -42,7 +56,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "email",
                     "secret_code",
                     "is_authorized",
-                    "authorization_is_validated",
+                    "authorization_validation_required",
                 )
             },
         ),
@@ -76,14 +90,14 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     inlines = (MembersInline,)
     list_display = ("id", "name", "post_code", "city", "department", "member_count")
     list_display_links = ("id", "name")
-    list_filter = ("authorization_is_validated", HasMembersFilter, "is_authorized", "kind", "department")
+    list_filter = (AuthorizationValidationRequired, HasMembersFilter, "is_authorized", "kind", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = (
         "secret_code",
         "created_by",
         "created_at",
         "updated_at",
-        "is_authorized",
+        "authorization_validation_required",
         "authorization_validated_at",
         "authorization_validated_by",
     )
@@ -104,9 +118,10 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         if not obj.geocoding_score and obj.address_on_one_line:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
-        if obj.authorization_is_validated and not obj.authorization_validated_at:
-            # Validation of the authorization & created at/by
+        if obj.authorization_validation_required and obj.is_authorized and not obj.authorization_validated_at:
+            # Validation of the authorization & created at/by.
             obj.is_authorized = True
+            obj.authorization_validation_required = False
             obj.authorization_validated_at = now()
             obj.authorization_validated_by = request.user
             obj.validated_prescriber_organization_email().send()
