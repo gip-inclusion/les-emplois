@@ -226,7 +226,7 @@ class Command(BaseCommand):
         self.logger.debug(message)
 
     def update_existing_siaes(self, dry_run):
-        for siae in Siae.objects.exclude(external_id__isnull=True):
+        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
             if row:
                 if row["siret"] == siae.siret:
@@ -234,7 +234,6 @@ class Command(BaseCommand):
                 else:
                     assert siae.siret[:9] == row["siret"][:9]
                     assert siae.kind in EXPECTED_KINDS
-                    assert siae.source == Siae.SOURCE_ASP
                     assert siae.members.count() == 0
                     self.log(
                         f"siae.id={siae.id} has changed siret from "
@@ -358,7 +357,7 @@ class Command(BaseCommand):
             for secondary_df_row in secondary_df_rows:
 
                 kind = secondary_df_row["kind"]
-                for siae in Siae.objects.filter(siret=siret).all():
+                for siae in Siae.objects.filter(siret=siret, source=Siae.SOURCE_ASP):
                     if siae.external_id:
                         assert siae.external_id == external_id
                         assert siae.kind in EXPECTED_KINDS
