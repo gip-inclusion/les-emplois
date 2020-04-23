@@ -7,9 +7,7 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.csrf import requires_csrf_token
 from django.views.decorators.http import require_GET
 
 from itou.utils.urls import get_safe_url

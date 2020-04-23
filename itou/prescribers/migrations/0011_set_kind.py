@@ -2,7 +2,8 @@
 
 from django.db import migrations
 
-from itou.prescribers.models import PrescriberOrganization
+
+# from itou.prescribers.models import PrescriberOrganization
 
 
 def move_data_forward(apps, schema_editor):

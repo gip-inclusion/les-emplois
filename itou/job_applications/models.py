@@ -1,7 +1,6 @@
 import datetime
 import logging
 import uuid
-from collections import namedtuple
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
