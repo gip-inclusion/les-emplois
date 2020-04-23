@@ -35,7 +35,7 @@ class FullnameFormMixin(forms.Form):
     )
 
 
-class PrescriberFormMixin(FullnameFormMixin, SignupForm):
+class PrescriberForm(FullnameFormMixin, SignupForm):
 
     secret_code = forms.CharField(
         label=gettext_lazy("Code de l'organisation"),
@@ -97,11 +97,11 @@ class PrescriberFormMixin(FullnameFormMixin, SignupForm):
         return user
 
 
-class OrienterPrescriberForm(PrescriberFormMixin):
+class OrienterPrescriberForm(PrescriberForm):
     pass
 
 
-class PoleEmploiPrescriberForm(PrescriberFormMixin):
+class PoleEmploiPrescriberForm(PrescriberForm):
     safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
 
     def clean_email(self):
@@ -118,7 +118,7 @@ class PoleEmploiPrescriberForm(PrescriberFormMixin):
         return safir_code
 
 
-class AuthorizedPrescriberForm(PrescriberFormMixin):
+class AuthorizedPrescriberForm(PrescriberForm):
 
     PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescriber_authorized_organizations")
     AUTHORIZED_PRESCRIBER_LIST_URL = "https://doc.inclusion.beta.gouv.fr/presentation/prescripteurs-habilites"

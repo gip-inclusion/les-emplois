@@ -115,23 +115,23 @@ def select_prescriber_type(request):
     return render(request, "signup/signup_select_prescriber_type.html")
 
 
-class PrescriberSignupMixin(SignupView):
+class PrescriberSignup(SignupView):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
         return super().post(request, *args, **kwargs)
 
 
-class OrienterPrescriberView(PrescriberSignupMixin):
+class OrienterPrescriberView(PrescriberSignup):
     template_name = "signup/signup_prescriber_orienter.html"
     form_class = forms.OrienterPrescriberForm
 
 
-class PoleEmploiPrescriberView(PrescriberSignupMixin):
+class PoleEmploiPrescriberView(PrescriberSignup):
     template_name = "signup/signup_prescriber_poleemploi.html"
     form_class = forms.PoleEmploiPrescriberForm
 
 
-class AuthorizedPrescriberView(PrescriberSignupMixin):
+class AuthorizedPrescriberView(PrescriberSignup):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberForm
