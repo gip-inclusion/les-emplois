@@ -52,6 +52,7 @@ class PrescriberFormMixin(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = None
+        self.new_organization = None
 
     def clean_secret_code(self):
         """
@@ -76,7 +77,13 @@ class PrescriberFormMixin(FullnameFormMixin, SignupForm):
         user.save()
 
         # Join organization.
-        organization = self.organization
+        if self.new_organization:
+            self.new_organization.created_by = user
+            self.new_organization.save()
+            organization = self.new_organization
+        else:
+            organization = self.organization
+
         if organization:
             if organization.has_members:
                 organization.new_signup_warning_email_to_existing_members(user).send()
@@ -133,6 +140,7 @@ class AuthorizedPrescriberForm(PrescriberFormMixin):
                 "autocomplete": "off",
             }
         ),
+        strip=True,
     )
 
     unregistered_organization = forms.CharField(
@@ -142,6 +150,7 @@ class AuthorizedPrescriberForm(PrescriberFormMixin):
         ),
         required=False,
         widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Saisissez le nom d'une organisation habilitée")}),
+        strip=True,
     )
 
     def clean(self):
@@ -165,18 +174,14 @@ class AuthorizedPrescriberForm(PrescriberFormMixin):
             )
 
         if unregistered_organization:
-            # check if exists?
-            if PrescriberOrganization.objects.filter(name=unregistered_organization.strip()).exists():
+            if PrescriberOrganization.objects.filter(name=unregistered_organization).exists():
                 raise ValidationError(
                     gettext_lazy(
                         f"Cette organisation existe ({unregistered_organization})."
                         "Veuillez la sélectionner dans la liste des organisations habilitées"
                     )
                 )
-            new_organization = PrescriberOrganization(name=unregistered_organization)
-            new_organization.authorization_is_validated = False
-            new_organization.save()
-            self.organization = new_organization
+            self.new_organization = PrescriberOrganization(name=unregistered_organization)
         elif authorized_organization_id:
             authorized_organization = PrescriberOrganization.objects.get(
                 pk=self.cleaned_data["authorized_organization_id"]

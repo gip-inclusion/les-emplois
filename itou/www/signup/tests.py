@@ -487,6 +487,7 @@ class PrescriberSignupTest(TestCase):
         new_org = PrescriberOrganization.objects.get(name=organization_name)
         self.assertFalse(new_org.authorization_is_validated)
         self.assertIsNone(new_org.authorization_validated_at)
+        self.assertEqual(new_org.created_by, user)
 
     def test_prescriber_signup_without_code_nor_organization(self):
         """
