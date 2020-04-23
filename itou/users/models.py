@@ -70,11 +70,13 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
 
-    resume_link = models.CharField(max_length=150,
-                                   blank=True,
-                                   validators=[URLValidator],
-                                   help_text=_("Vous pouvez saisir un lien vers un C.V. de votre choix (LinkedIn, ...)"),
-                                   verbose_name=_("Lien vers un C.V."))
+    resume_link = models.CharField(
+        max_length=150,
+        blank=True,
+        validators=[URLValidator],
+        help_text=_("Vous pouvez saisir un lien vers un C.V. de votre choix (LinkedIn, ...)"),
+        verbose_name=_("Lien vers un C.V."),
+    )
 
     created_by = models.ForeignKey(
         "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True
