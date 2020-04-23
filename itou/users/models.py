@@ -1,7 +1,7 @@
 from allauth.utils import generate_unique_username
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, URLValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -69,6 +69,12 @@ class User(AbstractUser, AddressMixin):
         choices=REASON_CHOICES,
         blank=True,
     )
+
+    resume_link = models.CharField(max_length=150,
+                                   blank=True,
+                                   validators=[URLValidator],
+                                   help_text=_("Vous pouvez saisir un lien vers un C.V. de votre choix (LinkedIn, ...)"),
+                                   verbose_name=_("Lien vers un C.V."))
 
     created_by = models.ForeignKey(
         "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True
