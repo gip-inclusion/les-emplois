@@ -324,7 +324,7 @@ class Command(BaseCommand):
         # Avoid confusing case where line1 is empty and line2 is not.
         if not siae.address_line_1:
             siae.address_line_1 = siae.address_line_2
-            siae.address_line_2 = None
+            siae.address_line_2 = ""
 
         siae.city = main_df_row["city"]
         siae.post_code = main_df_row["zipcode"]
