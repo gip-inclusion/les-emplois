@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             model_name="prescriberorganization",
             name="authorization_is_validated",
             field=models.BooleanField(
-                default=False,
+                default=True,
                 help_text="Précise si l'habilitation de l'organisation a été vérifiée.",
                 verbose_name="Habilitation vérifiée",
             ),
