@@ -22,7 +22,7 @@ export PGPASSWORD="${ITOU_POSTGRES_PASSWORD}"
 export PGDATABASE="${ITOU_POSTGRES_DATABASE_NAME}"
 
 backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').sql.gz"
-pg_dump | gzip > "${BACKUP_DIR_PATH}/${backup_filename}"
+pg_dump --format=c | gzip > "${BACKUP_DIR_PATH}/${backup_filename}"
 
 # https://www.postgresql.org/docs/11/app-pgdump.html
 # Make a second dump in a custom-format archive suitable for input into pg_restore.
