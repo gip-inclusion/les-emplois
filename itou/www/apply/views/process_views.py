@@ -161,22 +161,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         job_application = form_accept.save()
         job_application.accept(user=request.user)
 
-        # COVID-19 "Operation ETTI".
-        # Some text is added temporarily after "Embauche acceptée !".
-        messages.success(
-            request,
-            mark_safe(
-                _(
-                    "Embauche acceptée !"
-                    "<br>"
-                    "Vous pouvez embaucher immédiatement la personne si vous le souhaitez. "
-                    "Merci d'informer votre interlocuteur Pôle emploi habituel de cette embauche."
-                    "<br>"
-                    "Vous trouverez ci-dessous le numéro d'agrément temporaire en attendant "
-                    "de recevoir le numéro d'agrément définitif de la part de Pôle emploi."
-                )
-            ),
-        )
+        messages.success(request, mark_safe(_("Embauche acceptée !")))
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
             if job_application.approval:
