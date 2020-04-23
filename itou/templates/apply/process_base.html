@@ -39,16 +39,6 @@
                     {% trans "PASS IAE en cours de délivrance." %}
                 {% endif %}
             </div>
-
-        {% else %}
-            {% if approvals_wrapper.latest_approval %}
-                <div class="alert border">
-                    {# Hide approval number while the job application hasn't been accepted. #}
-                    {% trans "Agrément existant" %}
-                    <br>
-                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
-                </div>
-            {% endif %}
         {% endif %}
 
     {% endif %}
