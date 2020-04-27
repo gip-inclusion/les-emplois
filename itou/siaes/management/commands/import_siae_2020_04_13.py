@@ -22,6 +22,11 @@ import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
 
+from itou.siaes.management.commands.import_deleted_siae import (
+    DEPARTMENTS_TO_OPEN_ON_14_04_2020,
+    DEPARTMENTS_TO_OPEN_ON_20_04_2020,
+    DEPARTMENTS_TO_OPEN_ON_27_04_2020,
+)
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -35,28 +40,9 @@ SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_02_siae_auth_email_and_ex
 
 SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
 
-SIAE_CREATION_ALLOWED_DEPARTMENTS = [
-    "62",
-    "67",
-    "75",
-    "77",
-    "78",
-    "91",
-    "92",
-    "93",
-    "94",
-    "95",
-    "08",
-    "10",
-    "51",
-    "52",
-    "54",
-    "55",
-    "57",
-    "67",
-    "68",
-    "88",
-]
+SIAE_CREATION_ALLOWED_DEPARTMENTS = (
+    DEPARTMENTS_TO_OPEN_ON_14_04_2020 + DEPARTMENTS_TO_OPEN_ON_20_04_2020 + DEPARTMENTS_TO_OPEN_ON_27_04_2020
+)
 
 EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
 
