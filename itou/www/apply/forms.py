@@ -89,6 +89,7 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
             "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
+            "resume_link",
         ]
         help_texts = {
             "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978."),
