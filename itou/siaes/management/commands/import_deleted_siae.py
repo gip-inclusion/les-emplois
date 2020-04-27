@@ -16,6 +16,9 @@ DEPARTMENTS_TO_OPEN_ON_14_04_2020 = ["75", "77", "78", "91", "92", "93", "94", "
 # Grand Est - note that department 67 was already open.
 DEPARTMENTS_TO_OPEN_ON_20_04_2020 = ["08", "10", "51", "52", "54", "55", "57", "67", "68", "88"]
 
+# Hauts-de-France - note that department 62 was already open.
+DEPARTMENTS_TO_OPEN_ON_27_04_2020 = ["02", "59", "60", "62", "80"]
+
 
 class Command(BaseCommand):
     """
@@ -60,6 +63,8 @@ class Command(BaseCommand):
     14/04/2020: open Île-de-France (75, 77, 78, 91, 92, 93, 94, 95)
 
     20/04/2020: open Grand Est (08, 10, 51, 52, 54, 55, 57, 67, 68, 88)
+
+    27/04/2020: open Hauts-de-France (02, 59, 60, 62, 80)
     """
 
     help = "Restore deleted SIAEs data into the database."
@@ -86,7 +91,7 @@ class Command(BaseCommand):
 
                 siae = Siae(**item["fields"])
 
-                if siae.department not in DEPARTMENTS_TO_OPEN_ON_20_04_2020:
+                if siae.department not in DEPARTMENTS_TO_OPEN_ON_27_04_2020:
                     continue
 
                 total_new_siaes += 1
