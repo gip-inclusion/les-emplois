@@ -5,8 +5,6 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
 ## [Non publié]
-- Nouveau mécanisme d'inscription orienteur/prescripteur
-- Possibilité d'annuler un agrément
 - Possibilité de se connecter avec PE Connect
 
 ## [1.0.1] - 2020-04-27
