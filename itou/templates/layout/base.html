@@ -211,34 +211,34 @@
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
 
     {% block script %}
-    <script src="{% static "js/logout.js" %}"></script>
-    <script src="{% static "js/city_autocomplete_field.js" %}"></script>
-    <script src="{% static "js/configure_jobs.js" %}"></script>
-    <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
+        <script src="{% static "js/logout.js" %}"></script>
+        <script src="{% static "js/city_autocomplete_field.js" %}"></script>
+        <script src="{% static "js/configure_jobs.js" %}"></script>
+        <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
     {% endblock %}
 
     {% if "inclusion.beta.gouv.fr" in ALLOWED_HOSTS %}
-    {# Matomo/Piwik open source web analytics #}
-    <script>
-        var _paq = window._paq || [];
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-          var u = "//stats.data.gouv.fr/";
-          _paq.push(['setTrackerUrl', u + 'piwik.php']);
-          _paq.push(['setSiteId', '117']);
-          var d = document,
-            g = d.createElement('script'),
-            s = d.getElementsByTagName('script')[0];
-          g.type = 'text/javascript';
-          g.async = true;
-          g.defer = true;
-          g.src = u + 'piwik.js';
-          s.parentNode.insertBefore(g, s);
-        })();
-    </script>
-    <script src="{% static "js/matomo.js" %}"></script>
+        {# Matomo/Piwik open source web analytics #}
+        <script>
+            var _paq = window._paq || [];
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+              var u = "//stats.data.gouv.fr/";
+              _paq.push(['setTrackerUrl', u + 'piwik.php']);
+              _paq.push(['setSiteId', '117']);
+              var d = document,
+                g = d.createElement('script'),
+                s = d.getElementsByTagName('script')[0];
+              g.type = 'text/javascript';
+              g.async = true;
+              g.defer = true;
+              g.src = u + 'piwik.js';
+              s.parentNode.insertBefore(g, s);
+            })();
+        </script>
+        <script src="{% static "js/matomo.js" %}"></script>
     {% endif %}
 
     <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
