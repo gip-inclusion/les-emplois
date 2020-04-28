@@ -146,8 +146,8 @@
                                 {% trans "Collaborateurs" %}
                             </a>
                         </p>
-                        <hr>
                         {% if current_prescriber_organization.is_authorized %}
+                            <hr>
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
                                 <span>
