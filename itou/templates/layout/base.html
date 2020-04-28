@@ -238,6 +238,11 @@
         {# Matomo/Piwik open source web analytics #}
         <script>
             var _paq = window._paq || [];
+            /* Custom variables: https://matomo.org/docs/custom-variables/ */
+            /* Fields are, in order: index, name, value, scope. */
+            _paq.push(['setCustomVariable', 1, 'IsAuthenticated', '{{ matomo_custom_var_is_authenticated }}', 'page']);
+            _paq.push(['setCustomVariable', 2, 'AccountType', '{{ matomo_custom_var_account_type }}', 'page']);
+            _paq.push(['setCustomVariable', 3, 'AccountSubType', '{{ matomo_custom_var_account_sub_type }}', 'page']);
             /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
             _paq.push(['trackPageView']);
             _paq.push(['enableLinkTracking']);
