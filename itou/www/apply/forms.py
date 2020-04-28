@@ -1,8 +1,12 @@
 import datetime
+import urllib
+from urllib import request
 
+import requests
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib.auth import get_user_model
+from django.core.validators import URLValidator
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _, gettext_lazy
@@ -74,6 +78,10 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
         self.fields["birthdate"].widget = DatePickerField()
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
+        # Resume URL
+        self.fields["resume_link"].widget.attrs["placeholder"] = gettext_lazy("Entrez l'adresse de votre CV")
+        self.fields["resume_link"].required = False
+
     class Meta:
         model = get_user_model()
         fields = [
@@ -101,6 +109,23 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
         if get_user_model().email_already_exists(email):
             raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
         return email
+
+    def clean_resume_link(self):
+        resume_link = self.cleaned_data["resume_link"]
+
+        if resume_link:
+            # Check if valid (also on model)
+            validator = URLValidator(schemes=["https"])
+            validator(resume_link)
+
+            # Check if exists ?
+            try:
+                requests.head(resume_link, allow_redirects=True)
+            except requests.exceptions.RequestException:
+                # Catch all
+                raise forms.ValidationError(gettext_lazy("Cette URL n'est pas accessible"))
+
+        return resume_link
 
     def clean(self):
         super().clean()
