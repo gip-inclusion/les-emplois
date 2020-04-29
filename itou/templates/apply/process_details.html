@@ -27,6 +27,10 @@
             <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a></li>
         {% endif %}
 
+        {% if job_application.job_seeker.resume_link %}
+            <li>{% trans "Lien vers CV :" %} <a href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a> </li>
+        {% endif %}
+
         {% if job_application.selected_jobs.exists %}
             <li>
                 {% trans "Métier(s) recherché(s) :" %}

@@ -13,9 +13,9 @@ class Migration(migrations.Migration):
             model_name="user",
             name="resume_link",
             field=models.CharField(
-                blank=True,
                 help_text="Vous pouvez saisir un lien vers un C.V. de votre choix (LinkedIn, ...)",
                 max_length=150,
+                null=True,
                 validators=[django.core.validators.URLValidator],
                 verbose_name="Lien vers un C.V.",
             ),
