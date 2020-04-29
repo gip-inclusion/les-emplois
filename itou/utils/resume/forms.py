@@ -10,7 +10,10 @@ class ResumeFormMixin(forms.Form):
     """
 
     resume_link = forms.CharField(
-        required=False, widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Entrez l'adresse de votre CV")})
+        label=gettext_lazy("Lien vers un CV"),
+        help_text=gettext_lazy("Vous pouvez saisir un lien vers un CV de votre choix (LinkedIn, ...)"),
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Entrez l'adresse de votre CV")}),
     )
 
     def clean_resume_link(self):

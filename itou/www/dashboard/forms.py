@@ -3,10 +3,11 @@ from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy
 
 from itou.utils.address.forms import AddressFormMixin
+from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField
 
 
-class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
+class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     """
     Edit a user profile.
     """
@@ -35,6 +36,7 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
             "city_name",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
+            "resume_link",
         ]
         help_texts = {
             "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978"),

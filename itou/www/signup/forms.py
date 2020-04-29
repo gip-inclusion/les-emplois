@@ -12,6 +12,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.forms import AddressFormMixin
+from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
@@ -362,7 +363,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         }
 
 
-class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin):
+class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin, ResumeFormMixin):
     def save(self, request):
         user = super().save(request)
 

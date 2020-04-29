@@ -11,7 +11,20 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form form %}
+    {% bootstrap_form_errors form %}
+
+    {% bootstrap_field form.birthdate %}
+    {% bootstrap_field form.phone %}
+    {% bootstrap_field form.address_line_1 %}
+    {% bootstrap_field form.address_line_2 %}
+    {% bootstrap_field form.post_code %}
+    {% bootstrap_field form.city %}
+    {% bootstrap_field form.pole_emploi_id %}
+    {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
+
+    {% if user.is_job_seeker %}
+        {% bootstrap_field form.resume_link %}
+    {% endif %}
 
     {% buttons %}
         <a class="btn btn-secondary" href="{{ prev_url }}">{% trans "Annuler" %}</a>
