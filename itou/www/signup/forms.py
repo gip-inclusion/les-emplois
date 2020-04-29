@@ -376,6 +376,8 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm, AddressFormMixin, Resum
         user.post_code = self.cleaned_data["post_code"]
         user.city = self.cleaned_data["city"]
 
+        user.resume_link = self.cleaned_data["resume_link"]
+
         user.is_job_seeker = True
         user.save()
 
