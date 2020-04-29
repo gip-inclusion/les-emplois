@@ -246,6 +246,22 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
         )
 
 
+class UserAddressForm(AddressFormMixin, forms.ModelForm):
+    """
+    Add job seeker address in the job application process.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in ["address_line_1", "post_code", "city_name"]:
+            self.fields[field].required = True
+
+    class Meta:
+        model = get_user_model()
+        fields = ["address_line_1", "address_line_2", "post_code", "city_name", "city"]
+
+
 class FilterJobApplicationsForm(forms.Form):
     """
     Allow users to filter job applications based on specific fields.

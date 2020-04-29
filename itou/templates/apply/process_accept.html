@@ -6,25 +6,39 @@
 
     {{ block.super }}
 
-    <form method="post" action="" class="js-prevent-multiple-submit">
+
+    <div class="alert alert-info" role="alert">
+        {% trans "Confirmez votre choix en renseignant quelques informations supplémentaires." %}
+    </div>
+
+    <form method="post" action="" class="js-prevent-multiple-submit mt-5">
 
         {% csrf_token %}
 
-        {% if form_pe_status %}
+        {% if form_address or form_pe_status %}
+            <h3>{% trans "Candidat" %}</h3>
+        {% endif %}
 
+        {% if form_pe_status %}
             <div class="alert alert-warning" role="alert">
                 {% trans "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
             </div>
 
             {% bootstrap_form form_pe_status %}
-
         {% endif %}
 
-        <div class="alert alert-warning" role="alert">
-            {% trans "Confirmez votre choix." %}
+        {% if form_user_address %}
+            <div class="mt-5">
+                {% bootstrap_form form_user_address %}
+            </div>
+        {% endif %}
+
+        <div class="mt-5">
+            <h3>{% trans "Embauche" %}</h3>
+
+            {% bootstrap_form form_accept %}
         </div>
 
-        {% bootstrap_form form_accept %}
 
         {% buttons %}
             <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
