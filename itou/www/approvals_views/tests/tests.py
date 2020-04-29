@@ -1,4 +1,4 @@
-from unittest import mock
+from unittest.mock import PropertyMock, patch
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -7,13 +7,15 @@ from requests import exceptions as requests_exceptions
 
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.models import JobApplication
 from itou.users.factories import DEFAULT_PASSWORD
 
 from .pdfshift_mock import BITES_FILE
 
 
+@patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
 class TestDownloadApprovalAsPDF(TestCase):
-    @mock.patch("pdfshift.convert", return_value=BITES_FILE)
+    @patch("pdfshift.convert", return_value=BITES_FILE)
     def test_download_job_app_approval_as_pdf(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
@@ -29,7 +31,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("pdf", response.get("Content-Type"))
 
-    def test_impossible_download_when_approval_is_missing(self):
+    def test_impossible_download_when_approval_is_missing(self, *args, **kwargs):
         """
         The button to download an approval is show only when
         certain conditions are met.
@@ -48,7 +50,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    @mock.patch("pdfshift.convert", side_effect=requests_exceptions.ConnectionError)
+    @patch("pdfshift.convert", side_effect=requests_exceptions.ConnectionError)
     def test_pdfshift_api_is_down(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
@@ -60,8 +62,8 @@ class TestDownloadApprovalAsPDF(TestCase):
         with self.assertRaises(ConnectionAbortedError):
             self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))
 
-    @mock.patch("pdfshift.convert", return_value=BITES_FILE)
-    @mock.patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", False)
+    @patch("pdfshift.convert", return_value=BITES_FILE)
+    @patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", False)
     def test_download_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
@@ -80,7 +82,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("pdf", response.get("Content-Type"))
 
-    @mock.patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", True)
+    @patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", True)
     def test_no_download_if_missing_diagnosis(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
