@@ -202,6 +202,10 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.members.first().email, email.to)
         self.assertEqual(len(email.to), 1)
 
+        # BCC.
+        self.assertIn(job_application.sender.email, email.bcc)
+        self.assertEqual(len(email.bcc), 1)
+
         # Body.
         self.assertIn(job_application.job_seeker.first_name, email.body)
         self.assertIn(job_application.job_seeker.last_name, email.body)

@@ -425,10 +425,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_new_for_siae(self):
         to = self.get_siae_recipents_email_list()
+        bcc = []
+        if self.is_sent_by_proxy:
+            bcc.append(self.sender.email)
         context = {"job_application": self}
         subject = "apply/email/new_for_siae_subject.txt"
         body = "apply/email/new_for_siae_body.txt"
-        return get_email_message(to, context, subject, body)
+        return get_email_message(to, context, subject, body, bcc=bcc)
 
     @property
     def email_accept(self):
