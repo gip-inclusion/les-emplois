@@ -72,7 +72,6 @@ class User(AbstractUser, AddressMixin):
 
     resume_link = models.URLField(
         max_length=150,
-        help_text=_("Vous pouvez saisir un lien vers un CV de votre choix (LinkedIn, ...)"),
         verbose_name=_("Lien vers un CV"),
         null=True,
     )
