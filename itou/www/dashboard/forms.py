@@ -18,6 +18,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             del self.fields["birthdate"]
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
+            del self.fields["resume_link"]
         else:
             self.fields["phone"].required = True
             self.fields["birthdate"].required = True
