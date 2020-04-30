@@ -70,9 +70,8 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
 
-    resume_link = models.CharField(
+    resume_link = models.URLField(
         max_length=150,
-        validators=[URLValidator(schemes=["https"])],
         help_text=_("Vous pouvez saisir un lien vers un CV de votre choix (LinkedIn, ...)"),
         verbose_name=_("Lien vers un CV"),
         null=True,
