@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0006_auto_20200407_1523'),
-    ]
+    dependencies = [("users", "0006_auto_20200407_1523")]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='resume_link',
-            field=models.URLField(help_text='Vous pouvez saisir un lien vers un CV de votre choix (LinkedIn, ...)', max_length=150, null=True, verbose_name='Lien vers un CV'),
-        ),
+            model_name="user",
+            name="resume_link",
+            field=models.URLField(
+                help_text="Vous pouvez saisir un lien vers un CV de votre choix (LinkedIn, ...)",
+                max_length=150,
+                null=True,
+                verbose_name="Lien vers un CV",
+            ),
+        )
     ]
