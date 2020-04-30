@@ -180,7 +180,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     def display_name(self):
         if self.brand:
             return self.brand
-        return self.name.title()
+        return self.name.capitalize()
 
     @property
     def has_members(self):
