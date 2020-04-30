@@ -318,6 +318,10 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
             job_application.selected_jobs.add(job)
 
         job_application.email_new_for_siae.send()
+        job_application.email_new_for_job_seeker.send()
+
+        if job_application.is_sent_by_proxy:
+            job_application.email_new_for_prescriber.send()
 
         messages.success(request, _("Candidature bien envoyée !"))
 
