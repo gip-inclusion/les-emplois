@@ -138,7 +138,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     @property
     def display_name(self):
-        return self.name.title()
+        return self.name.capitalize()
 
     @property
     def has_members(self):
