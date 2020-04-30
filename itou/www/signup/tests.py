@@ -337,12 +337,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
-        self.assertEquals(user.address_line_1, address_line_1)
-        self.assertEquals(user.address_line_2, address_line_2)
-        self.assertEquals(user.post_code, post_code)
-        self.assertEquals(user.city, city.name)
-        self.assertEquals(user.department, department_from_postcode(post_code))
-        self.assertEquals(user.resume_link, resume_link)
+
         # Check `EmailAddress` state.
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
