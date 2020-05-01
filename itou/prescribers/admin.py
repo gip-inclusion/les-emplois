@@ -55,6 +55,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "phone",
                     "email",
                     "secret_code",
+                    "code_safir_pole_emploi",
                     "is_authorized",
                     "authorization_validation_required",
                 )
@@ -94,6 +95,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     raw_id_fields = ("created_by",)
     readonly_fields = (
         "secret_code",
+        "code_safir_pole_emploi",
         "created_by",
         "created_at",
         "updated_at",
