@@ -21,6 +21,17 @@ REGIONS = {
     "Anciens territoires d'outre-mer": ["986", "987", "988"],
 }
 
+
+def get_department_to_region():
+    department_to_region = {}
+    for region, dpts in REGIONS.items():
+        for dpt in dpts:
+            department_to_region[dpt] = region
+    return department_to_region
+
+
+DEPARTMENT_TO_REGION = get_department_to_region()
+
 DEPARTMENTS = {
     "01": "Ain (01)",
     "02": "Aisne (02)",

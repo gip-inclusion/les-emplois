@@ -15,7 +15,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
-from itou.utils.address.departments import DEPARTMENTS
+from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
 DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par département")
@@ -61,6 +61,7 @@ def stats(request, template_name="stats/stats.html"):
     data.update(get_siae_stats(siaes))
     if department_filter_is_selected:
         data["siaes_by_dpt"] = None
+        data["siaes_by_region"] = None
 
     data.update(get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users))
     if department_filter_is_selected:
@@ -77,6 +78,7 @@ def stats(request, template_name="stats/stats.html"):
         data["total_unauthorized_prescriber_users"] = DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE
         data["prescriber_users_per_creation_week"] = None
         data["orgs_by_dpt"] = None
+        data["orgs_by_region"] = None
 
     context = {
         "data": data,
@@ -90,7 +92,7 @@ def stats(request, template_name="stats/stats.html"):
 def get_department_choices():
     all_departments_text = _(f"Tous les départements")
     departments = [(None, all_departments_text)]
-    departments += [(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()]
+    departments += list(DEPARTMENTS.items())
     return departments
 
 
@@ -102,15 +104,15 @@ def get_current_department(request, departments):
 
 
 def get_siae_stats(siaes):
-    data = {"siaes_by_kind": {}, "siaes_by_dpt": {}}
+    data = {"siaes_by_kind": {}, "siaes_by_region": {}, "siaes_by_dpt": {}}
 
     kpi_name = _("Structures connues à ce jour")
     siaes_subset = siaes
-    data = inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset)
+    data = inject_siaes_subset_total_by_kind_region_and_dpt(data, kpi_name, siaes_subset)
 
     kpi_name = _("Structures inscrites à ce jour")
     siaes_subset = siaes.filter(siaemembership__user__is_active=True).distinct()
-    data = inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset)
+    data = inject_siaes_subset_total_by_kind_region_and_dpt(data, kpi_name, siaes_subset)
 
     kpi_name = _("Structures actives à ce jour")
     today = get_today()
@@ -128,9 +130,10 @@ def get_siae_stats(siaes):
         | Q(job_applications_received__created_at__date__gte=some_time_ago)
         | Q(job_applications_received__updated_at__date__gte=some_time_ago)
     ).distinct()
-    data = inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset)
+    data = inject_siaes_subset_total_by_kind_region_and_dpt(data, kpi_name, siaes_subset)
 
     data["siaes_by_kind"] = inject_table_data_from_series(data["siaes_by_kind"])
+    data["siaes_by_region"] = inject_table_data_from_series(data["siaes_by_region"])
     data["siaes_by_dpt"] = inject_table_data_from_series(data["siaes_by_dpt"])
 
     return data
@@ -190,7 +193,7 @@ def get_candidate_stats(job_applications, hirings, nationwide_job_seeker_users):
 def get_prescriber_stats(
     nationwide_prescriber_users, authorized_prescriber_users, authorized_prescriber_orgs, job_applications
 ):
-    data = {"orgs_by_kind": {}, "orgs_by_dpt": {}}
+    data = {"orgs_by_kind": {}, "orgs_by_region": {}, "orgs_by_dpt": {}}
     data["total_prescriber_users"] = nationwide_prescriber_users.count()
 
     data["total_authorized_prescriber_users"] = authorized_prescriber_users.count()
@@ -202,11 +205,11 @@ def get_prescriber_stats(
 
     kpi_name = _("Organisations connues à ce jour")
     orgs_subset = authorized_prescriber_orgs
-    data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
+    data = inject_orgs_subset_total_by_kind_region_and_dpt(data, kpi_name, orgs_subset)
 
     kpi_name = _("Organisations inscrites à ce jour")
     orgs_subset = authorized_prescriber_orgs.filter(members__is_active=True)
-    data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
+    data = inject_orgs_subset_total_by_kind_region_and_dpt(data, kpi_name, orgs_subset)
 
     kpi_name = _("Organisations actives à ce jour")
     today = get_today()
@@ -215,10 +218,11 @@ def get_prescriber_stats(
     orgs_subset = authorized_prescriber_orgs.filter(
         members__job_applications_sent__created_at__date__gte=some_time_ago
     )
-    data = inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset)
+    data = inject_orgs_subset_total_by_kind_region_and_dpt(data, kpi_name, orgs_subset)
 
-    data["orgs_by_dpt"] = inject_table_data_from_series(data["orgs_by_dpt"])
     data["orgs_by_kind"] = inject_table_data_from_series(data["orgs_by_kind"])
+    data["orgs_by_region"] = inject_table_data_from_series(data["orgs_by_region"])
+    data["orgs_by_dpt"] = inject_table_data_from_series(data["orgs_by_dpt"])
 
     data["prescriber_users_per_creation_week"] = get_total_per_week(
         nationwide_prescriber_users, date_field="date_joined", total_expression=Count("pk")
@@ -259,8 +263,9 @@ def get_total_per_week(queryset, date_field, total_expression):
     return result
 
 
-def inject_siaes_subset_total_by_kind_and_by_dpt(data, kpi_name, siaes_subset):
+def inject_siaes_subset_total_by_kind_region_and_dpt(data, kpi_name, siaes_subset):
     data["siaes_by_kind"] = inject_siaes_subset_total_by_kind(data["siaes_by_kind"], kpi_name, siaes_subset)
+    data["siaes_by_region"] = inject_siaes_subset_total_by_region(data["siaes_by_region"], kpi_name, siaes_subset)
     data["siaes_by_dpt"] = inject_siaes_subset_total_by_dpt(data["siaes_by_dpt"], kpi_name, siaes_subset)
     return data
 
@@ -276,19 +281,34 @@ def inject_siaes_subset_total_by_kind(data, kpi_name, siaes_subset):
     return data
 
 
+# FIXME DNRY
+def inject_siaes_subset_total_by_region(data, kpi_name, siaes_subset):
+    data = _inject_subset_total_by_category(
+        data=data,
+        kpi_name=kpi_name,
+        items_subset=siaes_subset,
+        category_choices=list(DEPARTMENT_TO_REGION.items()),
+        category_field="department",
+        group_categories=True,
+    )
+    return data
+
+
+# FIXME DNRY
 def inject_siaes_subset_total_by_dpt(data, kpi_name, siaes_subset):
     data = _inject_subset_total_by_category(
         data=data,
         kpi_name=kpi_name,
         items_subset=siaes_subset,
-        category_choices=[(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()],
+        category_choices=list(DEPARTMENTS.items()),
         category_field="department",
     )
     return data
 
 
-def inject_orgs_subset_total_by_kind_and_by_dpt(data, kpi_name, orgs_subset):
+def inject_orgs_subset_total_by_kind_region_and_dpt(data, kpi_name, orgs_subset):
     data["orgs_by_kind"] = inject_orgs_subset_total_by_kind(data["orgs_by_kind"], kpi_name, orgs_subset)
+    data["orgs_by_region"] = inject_orgs_subset_total_by_region(data["orgs_by_region"], kpi_name, orgs_subset)
     data["orgs_by_dpt"] = inject_orgs_subset_total_by_dpt(data["orgs_by_dpt"], kpi_name, orgs_subset)
     return data
 
@@ -304,35 +324,72 @@ def inject_orgs_subset_total_by_kind(data, kpi_name, orgs_subset):
     return data
 
 
+# FIXME DNRY
+def inject_orgs_subset_total_by_region(data, kpi_name, orgs_subset):
+    data = _inject_subset_total_by_category(
+        data=data,
+        kpi_name=kpi_name,
+        items_subset=orgs_subset,
+        category_choices=list(DEPARTMENT_TO_REGION.items()),
+        category_field="department",
+        group_categories=True,
+    )
+    return data
+
+
+# FIXME DNRY
 def inject_orgs_subset_total_by_dpt(data, kpi_name, orgs_subset):
     data = _inject_subset_total_by_category(
         data=data,
         kpi_name=kpi_name,
         items_subset=orgs_subset,
-        category_choices=[(d, DEPARTMENTS[d]) for d in DEPARTMENTS.keys()],
+        category_choices=list(DEPARTMENTS.items()),
         category_field="department",
     )
     return data
 
 
-def _inject_subset_total_by_category(data, kpi_name, items_subset, category_choices, category_field):
-    if data == {}:
-        data["categories"] = category_choices
-        data["series"] = []
+def _inject_subset_total_by_category(
+    data, kpi_name, items_subset, category_choices, category_field, group_categories=False
+):
+    """
+    This method can be used for both structures and organizations.
 
+    There are 3 possible uses of this method:
+    1) grouping by kind
+    category_choices : kind => kind human readable name
+    2) grouping by region
+    category_choices : dpt => region name
+    3) grouping by department
+    The only case using group_categories=True.
+    category_choices : dpt => dpt human readable name
+
+    Note that in case 2) several keys (dpts) have the same value (region name).
+    """
     items_by_category_as_list = (
         items_subset.values(category_field).annotate(total=Count("pk", distinct=True)).order_by(category_field)
     )
 
-    items_by_category_as_dict = defaultdict(
-        int, {item[category_field]: item["total"] for item in items_by_category_as_list}
-    )
+    items_by_category_as_dict = defaultdict(int)
+    for item in items_by_category_as_list:
+        key = item[category_field]
+        if group_categories:
+            key = dict(category_choices)[key]
+        items_by_category_as_dict[key] += item["total"]
+
+    if group_categories:
+        category_groups = sorted(set([item[1] for item in category_choices]))
+        category_choices = [[group, group] for group in category_groups]
 
     serie_values = [items_by_category_as_dict[choice[0]] for choice in category_choices]
 
     total = items_subset.count()
     if sum(serie_values) != total:
         raise ValueError("Inconsistent results.")
+
+    if data == {}:
+        data["categories"] = category_choices
+        data["series"] = []
 
     data["series"].append({"name": kpi_name, "values": serie_values, "total": total})
     return data
