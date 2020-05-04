@@ -5,6 +5,7 @@ import factory
 import factory.fuzzy
 
 from itou.users import models
+from itou.utils.address.departments import DEPARTMENTS
 
 
 DEFAULT_PASSWORD = "p4ssw0rd"
@@ -28,6 +29,13 @@ class UserFactory(factory.django.DjangoModelFactory):
 class JobSeekerFactory(UserFactory):
     is_job_seeker = True
     pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
+
+
+class JobSeekerWithAddressFactory(JobSeekerFactory):
+    address_line_1 = factory.Faker("street_address", locale="fr_FR")
+    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
+    post_code = factory.Faker("postalcode")
+    city = factory.Faker("city", locale="fr_FR")
 
 
 class PrescriberFactory(UserFactory):
