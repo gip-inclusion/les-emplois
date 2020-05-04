@@ -39,16 +39,15 @@
                     {% trans "PASS IAE en cours de délivrance." %}
                 {% endif %}
             </div>
+        {% elif not job_application.state.is_cancelled and approvals_wrapper.latest_approval %}
+            <div class="alert border">
+                {# Employers need to know the expiration date of an approval #}
+                {# to decide whether they may accept a job application or not. #}
 
-        {% else %}
-            {% if approvals_wrapper.latest_approval %}
-                <div class="alert border">
-                    {# Hide approval number while the job application hasn't been accepted. #}
-                    {% trans "Agrément existant" %}
-                    <br>
-                    {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
-                </div>
-            {% endif %}
+                {% trans "Agrément existant" %}
+                <br>
+                {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+            </div>
         {% endif %}
 
     {% endif %}

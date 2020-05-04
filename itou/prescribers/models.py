@@ -105,12 +105,14 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
-    authorization_is_validated = models.BooleanField(
-        verbose_name=_("Habilitation vérifiée"),
+    authorization_validation_required = models.BooleanField(
+        verbose_name=_("Habilitation à vérifier"),
         default=False,
-        help_text=_("Précise si l'habilitation de l'organisation a été vérifiée."),
+        help_text=_("Précise si l'habilitation de l'organisation nécessite une validation."),
     )
-    authorization_validated_at = models.DateTimeField(verbose_name=_("Date de validation"), null=True)
+    authorization_validated_at = models.DateTimeField(
+        verbose_name=_("Date de validation de l'autorisation"), null=True
+    )
     authorization_validated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Autorisation validée par"),
@@ -136,7 +138,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     @property
     def display_name(self):
-        return self.name.title()
+        return self.name.capitalize()
 
     @property
     def has_members(self):

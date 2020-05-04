@@ -19,7 +19,6 @@ $(document).ready(() => {
       minLength: 1,
       source: citySearchInput.data('autocomplete-source-url'),
       autoFocus: true,
-      created: clearInput(),
       // Make a selection on focus.
       focus: (event, ui) => {
         searchButton.prop("disabled", true)

@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm
+from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
 
@@ -146,9 +146,14 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     # Ask the SIAE to verify the job seeker's Pôle emploi status.
     # This will ensure a smooth Approval delivery.
     form_pe_status = None
+    form_user_address = None
+
     if job_application.to_siae.is_subject_to_eligibility_rules:
         form_pe_status = JobSeekerPoleEmploiStatusForm(instance=job_application.job_seeker, data=request.POST or None)
         forms.append(form_pe_status)
+
+        form_user_address = UserAddressForm(instance=job_application.job_seeker, data=request.POST or None)
+        forms.append(form_user_address)
 
     form_accept = AcceptForm(instance=job_application, data=request.POST or None)
     forms.append(form_accept)
@@ -157,6 +162,9 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         if form_pe_status:
             form_pe_status.save()
+
+        if form_user_address:
+            form_user_address.save()
 
         job_application = form_accept.save()
         job_application.accept(user=request.user)
@@ -189,6 +197,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "form_accept": form_accept,
+        "form_user_address": form_user_address,
         "form_pe_status": form_pe_status,
         "job_application": job_application,
     }

@@ -24,14 +24,16 @@
             {% endblocktrans %}
         </div>
     {% endif %}
-    {% if current_prescriber_organization and not current_prescriber_organization.authorization_is_validated %}
+    {% if current_prescriber_organization and current_prescriber_organization.authorization_validation_required %}
         <div class="alert alert-success alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
                 <span aria-hidden="true">&times;</span>
             </button>
             <div>
-                Vous êtes membre d'une organisation dont l'habilitation est en cours de vérification.
-                Vous serez notifié par e-mail lorsque cette vérification sera terminée.
+                {% blocktrans %}
+                    Vous êtes membre d'une organisation dont l'habilitation est en cours de vérification.
+                    Vous serez notifié par e-mail lorsque cette vérification sera terminée.
+                {% endblocktrans %}
             </div>
         </div>
     {% endif %}
@@ -42,8 +44,19 @@
     <h1>
         {% trans "Tableau de bord" %}
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
-        {% if current_prescriber_organization %} - <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>{% endif %}
+        {% if current_prescriber_organization %} -
+            <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
+            {% if current_prescriber_organization.is_authorized %}
+                {% include "includes/icon.html" with icon="award" class="h1 align-middle" size=30 %}
+            {% endif %}
+        {% endif %}
     </h1>
+
+    {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
+        <p class="text-muted">
+            <span class="badge badge-warning">{% trans "Prescripteur habilité" %}</span>
+        </p>
+    {% endif %}
 
     <div class="card-deck mt-3">
 
@@ -133,6 +146,17 @@
                                 {% trans "Collaborateurs" %}
                             </a>
                         </p>
+                        {% if current_prescriber_organization.is_authorized %}
+                            <hr>
+                            <p class="card-text">
+                                {% include "includes/icon.html" with icon="award" %}
+                                <span>
+                                    {% blocktrans with name=current_prescriber_organization.display_name %}
+                                        {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://app.gitbook.com/@itou/s/doc-inclusion-beta-gouv-fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                    {% endblocktrans %}
+                                </span>
+                            </p>
+                        {% endif %}
                     {% endif %}
                 </div>
             </div>

@@ -43,7 +43,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DatePickerField()
+        self.fields["birthdate"].widget = DatePickerField({"viewMode": "years"})
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
@@ -72,7 +72,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
         # Birth date
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DatePickerField()
+        self.fields["birthdate"].widget = DatePickerField({"viewMode": "years"})
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
@@ -246,6 +246,22 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(
             self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
         )
+
+
+class UserAddressForm(AddressFormMixin, forms.ModelForm):
+    """
+    Add job seeker address in the job application process.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field in ["address_line_1", "post_code", "city_name"]:
+            self.fields[field].required = True
+
+    class Meta:
+        model = get_user_model()
+        fields = ["address_line_1", "address_line_2", "post_code", "city_name", "city"]
 
 
 class FilterJobApplicationsForm(forms.Form):

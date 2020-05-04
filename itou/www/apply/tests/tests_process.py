@@ -4,6 +4,8 @@ from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.cities.factories import create_test_cities
+from itou.cities.models import City
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -12,7 +14,7 @@ from itou.job_applications.factories import (
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
-from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -103,9 +105,18 @@ class ProcessViewsTest(TestCase):
 
     def test_accept(self):
         """Test the `accept` transition."""
+        create_test_cities(["54", "57"], num_per_department=2)
+        city = City.objects.first()
 
+        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        address = {
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city_name": city.name,
+            "city": city.slug,
+        }
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
+            state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker
         )
         self.assertTrue(job_application.state.is_processing)
         siae_user = job_application.to_siae.members.first()
@@ -122,6 +133,7 @@ class ProcessViewsTest(TestCase):
             "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
             "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
             "answer": "",
+            **address,
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
@@ -133,6 +145,7 @@ class ProcessViewsTest(TestCase):
             "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
             "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
             "answer": "",
+            **address,
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
@@ -144,6 +157,7 @@ class ProcessViewsTest(TestCase):
             "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
             "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
             "answer": "",
+            **address,
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG)
@@ -158,6 +172,7 @@ class ProcessViewsTest(TestCase):
             "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
             "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
             "answer": "",
+            **address,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -169,6 +184,23 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(job_application.hiring_start_at, hiring_start_at)
         self.assertEqual(job_application.hiring_end_at, hiring_end_at)
         self.assertTrue(job_application.state.is_accepted)
+
+        # No address provided
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = hiring_start_at + relativedelta(years=2)
+        post_data = {
+            # Data for `JobSeekerPoleEmploiStatusForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            # Data for `AcceptForm`.
+            "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
+            "answer": "",
+        }
+        with self.assertRaises(KeyError):
+            response = self.client.post(url, data=post_data)
 
     def test_eligibility(self):
         """Test eligibility."""

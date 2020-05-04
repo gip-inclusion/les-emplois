@@ -1,4 +1,5 @@
 import datetime
+from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -66,7 +67,8 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         self.assertTrue(job_application.is_sent_by_authorized_prescriber)
 
-    def test_can_download_approval_as_pdf(self):
+    @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
+    def test_can_download_approval_as_pdf(self, mock_can_be_cancelled):
         """
         A user can download an approval only when certain conditions
         are met:

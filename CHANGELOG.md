@@ -5,9 +5,27 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
 ## [Non publié]
-- Nouveau mécanisme d'inscription orienteur/prescripteur
-- Possibilité d'annuler un agrément
 - Possibilité de se connecter avec PE Connect
+
+## [1.0.1] - 2020-04-27
+
+### Ajouté
+- Possibilité d'annuler un agrément
+- Déploiement - Ile-de-France (14 Avril)
+- Déploiement - Grand Est (20 Avril)
+- Renforcement de la politique de mots de passe conformément aux recommandations de la CNIL (au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux)
+- Nouveau mode d'inscription des prescripteurs (contrôle de l'email et du code Safir pour Pôle emploi, demande de vérification d'habilitation manuelle pour les structures non existantes)
+- Système de blocage du compte pendant 5 minutes au bout de 5 tentatives d'authentifications échouées
+- Injection de 151 nouvelles SIAE obtenues en combinant deux nouveaux exports ASP de février et avril 2020
+
+### Modifié
+- Correction d'une erreur 500 lors de la création de `Siae` ou `PrescriberOrganization` dans l'admin dans les cas où on ne renseigne pas l'adresse
+- Empêchement de l'énumération d'utilisateurs par le formulaire de réinitialisation de mots de passe
+- Rétablissement du message de succès "simple" après l'acceptation d'une candidature (celui d'avant l'Opération ETTI)
+- Correction d'un bug de code postal lors de l'ajout d'une structure en Corse
+- Correction d'un bug de lien non cliquable à cause du widget "Je donne mon avis"
+
+### Supprimé
 
 ## [1.0.0] - 2020-04-13
 

@@ -44,5 +44,6 @@ class DatePickerField(DatePickerInput):
         },
     }
 
-    def __init__(self):
-        super().__init__(options=self.OPTIONS)
+    def __init__(self, options={}):
+        options = {**self.OPTIONS, **options}
+        super().__init__(options=options)
