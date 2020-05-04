@@ -44,18 +44,22 @@ class AddressFormMixin(forms.Form):
         label=gettext_lazy("Code postal"),
     )
 
-    def clean_city(self):
-        slug = self.cleaned_data["city"]
-        # Addresses are optional: check only if smth is entered
-        if slug:
-            try:
-                return City.objects.get(slug=slug).name
-            except City.DoesNotExist:
-                raise forms.ValidationError(gettext_lazy("Cette ville n'existe pas."))
-        return ""
-
     def clean(self):
         cleaned_data = super().clean()
+
+        # Autocomplete
+        city = cleaned_data["city"]
+        city_name = cleaned_data["city_name"]
+
+        if city != city_name:
+            # Auto-completion field was used
+            try:
+                cleaned_data["city"] = City.objects.get(slug=city).name
+            except City.DoesNotExist:
+                raise forms.ValidationError(gettext_lazy("Cette ville n'existe pas."))
+        else:
+            cleaned_data["city"] = city_name
+
         # Basic check of address fields
         addr1, addr2, zip, city = (
             cleaned_data["address_line_1"],
@@ -67,3 +71,9 @@ class AddressFormMixin(forms.Form):
 
         if not valid:
             raise (ValidationError(gettext_lazy("Adresse incomplète")))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Needed for proper auto-completion when existing in DB
+        # Reverted back on clean
+        self.initial["city_name"] = self.initial.get("city")
