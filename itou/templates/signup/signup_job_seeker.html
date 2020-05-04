@@ -21,19 +21,10 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
     {% endif %}
 
-    {% bootstrap_field form.first_name %}
-    {% bootstrap_field form.last_name %}
-    {% bootstrap_field form.email %}
-    {% bootstrap_field form.password1 %}
-    {% bootstrap_field form.password2 %}
+    {% bootstrap_form form %}
 
-    {% bootstrap_field form.address_line_1 %}
-    {% bootstrap_field form.address_line_2 %}
-
-    <div class="form-group row">
-        {% bootstrap_field form.post_code form_group_class="col-md-3 col-sm-12 form-group"%}
-        {% bootstrap_field form.city_name form_group_class="col form-group"%}
-        {% bootstrap_field form.city %}
+    <div class="small pb-4 text-secondary">
+        {% trans "Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord." %}
     </div>
 
     {% include "signup/includes/submit_rgpd.html" %}

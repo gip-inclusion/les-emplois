@@ -29,6 +29,10 @@
 
         {% if job_application.job_seeker.address_on_one_line %}
             <li>{% trans "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
+        {% endif %}      
+      
+        {% if job_application.job_seeker.resume_link %}
+            <li>{% trans "Lien vers CV :" %} <a href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a> </li>
         {% endif %}
 
         {% if job_application.selected_jobs.exists %}

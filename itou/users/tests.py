@@ -23,6 +23,7 @@ class ModelTest(TestCase):
             "last_name": "Doe",
             "birthdate": "1978-12-20",
             "phone": "0610101010",
+            "resume_link": "https://urlseemslegit.com/my-cv",
         }
         user = User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
@@ -37,6 +38,7 @@ class ModelTest(TestCase):
         self.assertEqual(user.phone, user_data["phone"])
         self.assertEqual(user.created_by, proxy_user)
         self.assertEqual(user.last_login, None)
+        self.assertEqual(user.resume_link, user_data["resume_link"])
 
         # E-mail already exists, this should raise an error.
         with self.assertRaises(ValidationError):

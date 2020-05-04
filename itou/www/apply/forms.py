@@ -12,6 +12,7 @@ from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.forms import AddressFormMixin
+from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField
 
 
@@ -60,7 +61,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         )
 
 
-class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
+class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
@@ -89,6 +90,7 @@ class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
             "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
+            "resume_link",
         ]
         help_texts = {
             "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978."),
