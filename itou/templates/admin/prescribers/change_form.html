@@ -1,0 +1,11 @@
+{% extends 'admin/change_form.html' %}
+{% load i18n %}
+
+{% block submit_buttons_bottom %}
+    <div class="submit-row">
+            <input class="deletelink-box" type="submit" value="{% trans "Refuser l'habilitation" %}" name="_authorization_action_refuse">
+            <input type="submit" value="{% trans "Valider l'habilitation" %}" name="_authorization_action_validate">
+    </div>
+
+    {{ block.super }}
+{% endblock %}

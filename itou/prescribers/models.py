@@ -122,6 +122,18 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         on_delete=models.SET_NULL,
     )
 
+    authorization_refused_at = models.DateTimeField(
+        verbose_name=_("Date de refus de validation de l'habilitation"), null=True
+    )
+    authorization_refused_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Validation de l'habilitation refusée par"),
+        related_name="authorization_refused_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
     objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
@@ -168,6 +180,17 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         context = {"organization": self}
         subject = "prescribers/email/validated_prescriber_organization_email_subject.txt"
         body = "prescribers/email/validated_prescriber_organization_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def refused_prescriber_organization_email(self):
+        """
+        Send an email to the user who asked for the validation
+        of a new prescriber organization when refused
+        """
+        to = [u.email for u in self.active_members]
+        context = {"organization": self}
+        subject = "prescribers/email/refused_prescriber_organization_email_subject.txt"
+        body = "prescribers/email/refused_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 
