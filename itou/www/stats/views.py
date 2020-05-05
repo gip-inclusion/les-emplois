@@ -23,18 +23,17 @@ DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par dé
 @cache_page(60 * 60 * 2)
 def stats(request, template_name="stats/stats.html"):
     data = {}
+    selected_department = get_selected_department(request)
+    department_filter_is_selected = bool(selected_department)
+    department_choices = get_department_choices()
 
-    departments = get_department_choices()
-    current_department = get_current_department(request, departments)
+    if department_filter_is_selected:
+        selected_departments = [selected_department]
+    else:
+        selected_departments = DEPARTMENTS.keys()
 
-    current_departments = DEPARTMENTS.keys()
-    department_filter_is_selected = False
-    if current_department:
-        current_departments = [current_department]
-        department_filter_is_selected = True
-
-    siaes = Siae.objects.filter(department__in=current_departments)
-    job_applications = JobApplication.objects.filter(to_siae__department__in=current_departments)
+    siaes = Siae.objects.filter(department__in=selected_departments)
+    job_applications = JobApplication.objects.filter(to_siae__department__in=selected_departments)
     # This is needed so that we can deliver at least some nationwide stats
     # for prescribers even if they have no organization or an unauthorized one.
     nationwide_prescriber_users = User.objects.filter(is_prescriber=True, is_active=True).distinct()
@@ -43,12 +42,12 @@ def stats(request, template_name="stats/stats.html"):
     # out prescribers with unauthorized organizations, as those also do
     # not have geolocation in practice.
     authorized_prescriber_users = nationwide_prescriber_users.filter(
-        prescriberorganization__department__in=current_departments, prescriberorganization__is_authorized=True
+        prescriberorganization__department__in=selected_departments, prescriberorganization__is_authorized=True
     ).distinct()
     # Note that filtering by departement here also filters out unauthorized
     # organizations as they do not have geolocation in practice.
     authorized_prescriber_orgs = PrescriberOrganization.objects.filter(
-        department__in=current_departments, is_authorized=True
+        department__in=selected_departments, is_authorized=True
     ).distinct()
 
     hirings = job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
@@ -80,25 +79,25 @@ def stats(request, template_name="stats/stats.html"):
 
     context = {
         "data": data,
-        "departments": departments,
-        "current_department": current_department,
-        "current_department_name": dict(departments)[current_department],
+        "department_choices": department_choices,
+        "selected_department": selected_department,
+        "selected_department_name": dict(department_choices)[selected_department],
     }
     return render(request, template_name, context)
 
 
 def get_department_choices():
     all_departments_text = _(f"Tous les départements")
-    departments = [(None, all_departments_text)]
-    departments += list(DEPARTMENTS.items())
-    return departments
+    department_choices = [(None, all_departments_text)]
+    department_choices += list(DEPARTMENTS.items())
+    return department_choices
 
 
-def get_current_department(request, departments):
-    current_department = request.GET.get("department", None)
-    if current_department not in dict(departments):
-        current_department = None
-    return current_department
+def get_selected_department(request):
+    selected_department = request.GET.get("department", None)
+    if selected_department not in dict(DEPARTMENTS):
+        selected_department = None
+    return selected_department
 
 
 def get_siae_stats(siaes):
@@ -263,8 +262,8 @@ def get_total_per_week(queryset, date_field, total_expression):
 
 def inject_siaes_subset_total_by_kind_region_and_dpt(data, kpi_name, siaes_subset):
     data["siaes_by_kind"] = inject_siaes_subset_total_by_kind(data["siaes_by_kind"], kpi_name, siaes_subset)
-    data["siaes_by_region"] = inject_siaes_subset_total_by_region(data["siaes_by_region"], kpi_name, siaes_subset)
-    data["siaes_by_dpt"] = inject_siaes_subset_total_by_dpt(data["siaes_by_dpt"], kpi_name, siaes_subset)
+    data["siaes_by_region"] = inject_items_subset_total_by_region(data["siaes_by_region"], kpi_name, siaes_subset)
+    data["siaes_by_dpt"] = inject_items_subset_total_by_dpt(data["siaes_by_dpt"], kpi_name, siaes_subset)
     return data
 
 
@@ -279,35 +278,10 @@ def inject_siaes_subset_total_by_kind(data, kpi_name, siaes_subset):
     return data
 
 
-# FIXME DNRY
-def inject_siaes_subset_total_by_region(data, kpi_name, siaes_subset):
-    data = _inject_subset_total_by_category(
-        data=data,
-        kpi_name=kpi_name,
-        items_subset=siaes_subset,
-        category_choices=list(DEPARTMENT_TO_REGION.items()),
-        category_field="department",
-        group_categories=True,
-    )
-    return data
-
-
-# FIXME DNRY
-def inject_siaes_subset_total_by_dpt(data, kpi_name, siaes_subset):
-    data = _inject_subset_total_by_category(
-        data=data,
-        kpi_name=kpi_name,
-        items_subset=siaes_subset,
-        category_choices=list(DEPARTMENTS.items()),
-        category_field="department",
-    )
-    return data
-
-
 def inject_orgs_subset_total_by_kind_region_and_dpt(data, kpi_name, orgs_subset):
     data["orgs_by_kind"] = inject_orgs_subset_total_by_kind(data["orgs_by_kind"], kpi_name, orgs_subset)
-    data["orgs_by_region"] = inject_orgs_subset_total_by_region(data["orgs_by_region"], kpi_name, orgs_subset)
-    data["orgs_by_dpt"] = inject_orgs_subset_total_by_dpt(data["orgs_by_dpt"], kpi_name, orgs_subset)
+    data["orgs_by_region"] = inject_items_subset_total_by_region(data["orgs_by_region"], kpi_name, orgs_subset)
+    data["orgs_by_dpt"] = inject_items_subset_total_by_dpt(data["orgs_by_dpt"], kpi_name, orgs_subset)
     return data
 
 
@@ -322,12 +296,11 @@ def inject_orgs_subset_total_by_kind(data, kpi_name, orgs_subset):
     return data
 
 
-# FIXME DNRY
-def inject_orgs_subset_total_by_region(data, kpi_name, orgs_subset):
+def inject_items_subset_total_by_region(data, kpi_name, items_subset):
     data = _inject_subset_total_by_category(
         data=data,
         kpi_name=kpi_name,
-        items_subset=orgs_subset,
+        items_subset=items_subset,
         category_choices=list(DEPARTMENT_TO_REGION.items()),
         category_field="department",
         group_categories=True,
@@ -335,12 +308,11 @@ def inject_orgs_subset_total_by_region(data, kpi_name, orgs_subset):
     return data
 
 
-# FIXME DNRY
-def inject_orgs_subset_total_by_dpt(data, kpi_name, orgs_subset):
+def inject_items_subset_total_by_dpt(data, kpi_name, items_subset):
     data = _inject_subset_total_by_category(
         data=data,
         kpi_name=kpi_name,
-        items_subset=orgs_subset,
+        items_subset=items_subset,
         category_choices=list(DEPARTMENTS.items()),
         category_field="department",
     )
