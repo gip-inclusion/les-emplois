@@ -13,8 +13,7 @@
                 <span class="dropdown-item-text">
                     <small>{% trans "Départements :" %}</small>
                 </span>
-                <form action="{% url 'stats:index' %}" method="post">
-                    {% csrf_token %}
+                <form action="{% url 'stats:index' %}" method="get">
                     {% for d in departments %}
                         {% if d.0 != current_department %}
                             <button

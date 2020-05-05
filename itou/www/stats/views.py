@@ -8,7 +8,6 @@ from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.views.decorators.cache import cache_page
-from django.views.decorators.csrf import csrf_exempt
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -22,7 +21,6 @@ DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par dé
 
 
 @cache_page(60 * 60 * 2)
-@csrf_exempt
 def stats(request, template_name="stats/stats.html"):
     data = {}
 
@@ -97,7 +95,7 @@ def get_department_choices():
 
 
 def get_current_department(request, departments):
-    current_department = request.POST.get("department", None)
+    current_department = request.GET.get("department", None)
     if current_department not in dict(departments):
         current_department = None
     return current_department
