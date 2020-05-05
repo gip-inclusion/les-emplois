@@ -6,7 +6,7 @@
 {% trans "Candidature annulée" %}
 
 {% blocktrans with job_seeker_name=job_application.job_seeker.get_full_name %}
-    La candidature de {{ job_seeker_name }} a bien été annulée.
+La candidature de {{ job_seeker_name }} a bien été annulée.
 {% endblocktrans %}
 
 ----------------------------------------------------------
