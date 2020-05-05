@@ -215,6 +215,58 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
 
+    def test_new_for_prescriber(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            selected_jobs=Appellation.objects.all()
+        )
+        email = job_application.email_new_for_prescriber
+        # To.
+        self.assertIn(job_application.sender.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_PRESCRIBER)
+
+        # Subject
+        self.assertIn(job_application.job_seeker.get_full_name(), email.subject)
+
+        # Body.
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.job_seeker.email, email.body)
+        self.assertIn(format_filters.format_phone(job_application.job_seeker.phone), email.body)
+        self.assertIn(job_application.message, email.body)
+        for job in job_application.selected_jobs.all():
+            self.assertIn(job.display_name, email.body)
+        self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertNotIn(job_application.sender.email, email.body)
+        self.assertNotIn(format_filters.format_phone(job_application.sender.phone), email.body)
+
+    def test_new_for_job_seeker(self):
+        job_application = JobApplicationSentByJobSeekerFactory(selected_jobs=Appellation.objects.all())
+        email = job_application.email_new_for_job_seeker
+        # To.
+        self.assertIn(job_application.sender.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(job_application.sender_kind, JobApplication.SENDER_KIND_JOB_SEEKER)
+
+        # Subject
+        self.assertIn(job_application.to_siae.display_name, email.subject)
+
+        # Body.
+        self.assertIn(job_application.job_seeker.first_name, email.body)
+        self.assertIn(job_application.job_seeker.last_name, email.body)
+        self.assertIn(job_application.job_seeker.birthdate.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.job_seeker.email, email.body)
+        self.assertIn(format_filters.format_phone(job_application.job_seeker.phone), email.body)
+        self.assertIn(job_application.message, email.body)
+        for job in job_application.selected_jobs.all():
+            self.assertIn(job.display_name, email.body)
+        self.assertIn(job_application.sender.first_name, email.body)
+        self.assertIn(job_application.sender.last_name, email.body)
+        self.assertIn(job_application.sender.email, email.body)
+        self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+
     def test_accept(self):
 
         # When sent by authorized prescriber.
