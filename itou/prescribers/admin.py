@@ -44,6 +44,9 @@ class MembersInline(admin.TabularInline):
 
 @admin.register(models.PrescriberOrganization)
 class PrescriberOrganizationAdmin(admin.ModelAdmin):
+
+    change_form_template = "admin/prescribers/change_form.html"
+
     fieldsets = (
         (
             _("Structure"),
@@ -84,6 +87,8 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "updated_at",
                     "authorization_validated_at",
                     "authorization_validated_by",
+                    "authorization_refused_at",
+                    "authorization_refused_by",
                 )
             },
         ),
@@ -99,9 +104,12 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "created_by",
         "created_at",
         "updated_at",
+        "is_authorized",
         "authorization_validation_required",
         "authorization_validated_at",
         "authorization_validated_by",
+        "authorization_refused_at",
+        "authorization_refused_by",
     )
     search_fields = ("siret", "name")
 
@@ -129,3 +137,32 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             obj.validated_prescriber_organization_email().send()
 
         super().save_model(request, obj, form, change)
+
+    def response_change(self, request, obj):
+        # Override for custom "actions" in the admin change form for:
+        # * refusing authorization
+        # * validating authorization
+
+        if "_authorization_action_refuse" in request.POST:
+            obj.is_authorized = False
+            obj.authorization_validation_required = False
+            obj.authorization_refused_at = now()
+            obj.authorization_refused_by = request.user
+            obj.save()
+            obj.refused_prescriber_organization_email().send()
+
+        if "_authorization_action_validate" in request.POST:
+            obj.is_authorized = True
+            obj.authorization_validation_required = False
+            obj.authorization_validated_at = now()
+            obj.authorization_validated_by = request.user
+            obj.save()
+            obj.validated_prescriber_organization_email().send()
+
+        return super().response_change(request, obj)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        obj = models.PrescriberOrganization.objects.get(pk=object_id)
+        extra_context = extra_context or {}
+        extra_context["authorization_validation_required"] = obj.authorization_validation_required
+        return super().change_view(request, object_id, form_url, extra_context)
