@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% trans "La vérification de l'habilitation de l'organisation que vous avez saisie lors de votre inscription a été refusée." %}
+{% trans "Après vérification, l'habilitation de l'organisation que vous avez saisi lors de votre inscription n'a pas pu être validée." %}
 
 {% trans "Merci de recontacter l'équipe support." %}
 
