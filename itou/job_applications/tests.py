@@ -238,6 +238,13 @@ class JobApplicationEmailTest(TestCase):
         for job in job_application.selected_jobs.all():
             self.assertIn(job.display_name, email.body)
         self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertIn(job_application.sender.email, email.body)
+        self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
+
+        # Assert the Job Seeker does not have access to confidential information.
+        email = job_application.email_new_for_job_seeker
+        self.assertIn(job_application.sender.get_full_name(), email.body)
+        self.assertIn(job_application.sender_prescriber_organization.display_name, email.body)
         self.assertNotIn(job_application.sender.email, email.body)
         self.assertNotIn(format_filters.format_phone(job_application.sender.phone), email.body)
 
