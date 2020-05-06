@@ -58,31 +58,44 @@ class Command(BaseCommand):
         ]
         self.stdout.write(f"{len(org_duplicates)} organizations have duplicates!")
 
-        if not dry_run:
+        for org in org_duplicates:
+            name = org["name"]
+            orgs = PrescriberOrganization.objects.filter(name=name)
+            fields = ["id", "email", "post_code", "is_authorized", "phone"]
+            for field in fields:
+                self.stdout.write(f"{field}: {[getattr(o, field) for o in orgs]}")
 
-            prescriber_organization = PrescriberOrganization()
+            # There are cases where one org is authorized and the other is not.
+            is_authorized = any(o.is_authorized for o in orgs)
 
-            prescriber_organization.is_authorized = True
-            prescriber_organization.name = name
-            prescriber_organization.phone = phone
-            prescriber_organization.email = email
-            prescriber_organization.website = website
-            prescriber_organization.address_line_1 = address_line_1
-            prescriber_organization.address_line_2 = address_line_2
-            prescriber_organization.post_code = post_code
-            prescriber_organization.city = city
-            prescriber_organization.department = department
+            # Detect cases of conflicting phones.
+            assert len(set(o.phone for o in orgs if o.phone != '')) <= 1
 
-            geocoding_data = get_geocoding_data(
-                "{}, {} {}".format(
-                    prescriber_organization.address_line_1,
-                    prescriber_organization.post_code,
-                    prescriber_organization.city,
+            if not dry_run:
+
+                prescriber_organization = PrescriberOrganization()
+
+                prescriber_organization.is_authorized = is_authorized
+                prescriber_organization.name = name
+                prescriber_organization.phone = phone
+                prescriber_organization.email = email
+                prescriber_organization.website = website
+                prescriber_organization.address_line_1 = address_line_1
+                prescriber_organization.address_line_2 = address_line_2
+                prescriber_organization.post_code = post_code
+                prescriber_organization.city = city
+                prescriber_organization.department = department
+
+                geocoding_data = get_geocoding_data(
+                    "{}, {} {}".format(
+                        prescriber_organization.address_line_1,
+                        prescriber_organization.post_code,
+                        prescriber_organization.city,
+                    )
                 )
-            )
-            prescriber_organization.coords = geocoding_data["coords"]
+                prescriber_organization.coords = geocoding_data["coords"]
 
-            prescriber_organization.save()
+                prescriber_organization.save()
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
