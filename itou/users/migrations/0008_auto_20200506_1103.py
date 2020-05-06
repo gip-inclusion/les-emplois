@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('users', '0007_user_resume_link'),
-    ]
+    dependencies = [("users", "0007_user_resume_link")]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='resume_link',
-            field=models.URLField(max_length=150, null=True, verbose_name='Lien vers un CV'),
-        ),
+            model_name="user",
+            name="resume_link",
+            field=models.URLField(max_length=150, null=True, verbose_name="Lien vers un CV"),
+        )
     ]
