@@ -65,6 +65,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         )
         OTHER = "OTHER", _("Autre structure")
 
+    class AuthorizationStatus(models.TextChoices):
+        NOT_SET = "NOT_SET", _("Habiliation en attente de validation")
+        VALIDATED = "VALIDATED", _("Habilitation validée")
+        REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
+
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
@@ -105,30 +110,20 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
-    authorization_validation_required = models.BooleanField(
-        verbose_name=_("Habilitation à vérifier"),
-        default=False,
-        help_text=_("Précise si l'habilitation de l'organisation nécessite une validation."),
-    )
-    authorization_validated_at = models.DateTimeField(
-        verbose_name=_("Date de validation de l'autorisation"), null=True
-    )
-    authorization_validated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Autorisation validée par"),
-        related_name="authorization_validated_set",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
 
-    authorization_refused_at = models.DateTimeField(
-        verbose_name=_("Date de refus de validation de l'habilitation"), null=True
+    authorization_status = models.CharField(
+        verbose_name=_("Statut de l'habilitation"),
+        max_length=20,
+        choices=AuthorizationStatus.choices,
+        default=AuthorizationStatus.NOT_SET,
     )
-    authorization_refused_by = models.ForeignKey(
+    authorization_updated_at = models.DateTimeField(
+        verbose_name=_("Date de MAJ du statut de l'habilitation"), null=True
+    )
+    authorization_updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Validation de l'habilitation refusée par"),
-        related_name="authorization_refused_set",
+        verbose_name=_("Dernière MAJ de l'habilitation par"),
+        related_name="authorization_status_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,

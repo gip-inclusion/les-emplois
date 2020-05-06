@@ -60,7 +60,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "secret_code",
                     "code_safir_pole_emploi",
                     "is_authorized",
-                    "authorization_validation_required",
                 )
             },
         ),
@@ -85,10 +84,9 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "created_by",
                     "created_at",
                     "updated_at",
-                    "authorization_validated_at",
-                    "authorization_validated_by",
-                    "authorization_refused_at",
-                    "authorization_refused_by",
+                    "authorization_status",
+                    "authorization_updated_at",
+                    "authorization_updated_by",
                 )
             },
         ),
@@ -105,11 +103,9 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "is_authorized",
-        "authorization_validation_required",
-        "authorization_validated_at",
-        "authorization_validated_by",
-        "authorization_refused_at",
-        "authorization_refused_by",
+        "authorization_status",
+        "authorization_updated_at",
+        "authorization_updated_by",
     )
     search_fields = ("siret", "name")
 
@@ -128,13 +124,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         if not obj.geocoding_score and obj.address_on_one_line:
             obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
-        if obj.authorization_validation_required and obj.is_authorized and not obj.authorization_validated_at:
-            # Validation of the authorization & created at/by.
-            obj.is_authorized = True
-            obj.authorization_validation_required = False
-            obj.authorization_validated_at = now()
-            obj.authorization_validated_by = request.user
-            obj.validated_prescriber_organization_email().send()
 
         super().save_model(request, obj, form, change)
 
@@ -145,17 +134,17 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
 
         if "_authorization_action_refuse" in request.POST:
             obj.is_authorized = False
-            obj.authorization_validation_required = False
-            obj.authorization_refused_at = now()
-            obj.authorization_refused_by = request.user
+            obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.REFUSED
+            obj.authorization_updated_at = now()
+            obj.authorization_updated_by = request.user
             obj.save()
             obj.refused_prescriber_organization_email().send()
 
         if "_authorization_action_validate" in request.POST:
             obj.is_authorized = True
-            obj.authorization_validation_required = False
-            obj.authorization_validated_at = now()
-            obj.authorization_validated_by = request.user
+            obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
+            obj.authorization_updated_at = now()
+            obj.authorization_updated_by = request.user
             obj.save()
             obj.validated_prescriber_organization_email().send()
 
@@ -164,5 +153,5 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url="", extra_context=None):
         obj = models.PrescriberOrganization.objects.get(pk=object_id)
         extra_context = extra_context or {}
-        extra_context["authorization_validation_required"] = obj.authorization_validation_required
+        extra_context["authorization_validation_required"] = (obj.authorization_status == models.PrescriberOrganization.AuthorizationStatus.NOT_SET)
         return super().change_view(request, object_id, form_url, extra_context)
