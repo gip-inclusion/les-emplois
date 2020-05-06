@@ -34,10 +34,14 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
         queryset = PrescriberOrganization.objects.member_required(request.user)
         prescriber = get_object_or_404(queryset, pk=pk)
-        prescriber_authorization_status_not_set = prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+        prescriber_authorization_status_not_set = (
+            prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+        )
 
-    context = {"job_applications_counter": job_applications_counter,
-               "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,}
+    context = {
+        "job_applications_counter": job_applications_counter,
+        "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
+    }
 
     return render(request, template_name, context)
 
