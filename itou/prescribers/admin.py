@@ -23,17 +23,23 @@ class HasMembersFilter(admin.SimpleListFilter):
 
 
 class AuthorizationValidationRequired(admin.SimpleListFilter):
-    title = _("Vérification de l'habilitation nécessaire")
+    title = _("statut de l'habilitation")
     parameter_name = "authorization_validation_required"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("not_set", _("En attente")), ("validated", _("Validé")), ("refused", _("Refusé")))
 
     def queryset(self, request, queryset):
         value = self.value()
-        if value == "yes":
-            return queryset.filter(authorization_validation_required=True, is_authorized=False)
-        return queryset
+
+        statuses = {
+            "not_set": models.PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            "validated": models.PrescriberOrganization.AuthorizationStatus.VALIDATED,
+            "refused": models.PrescriberOrganization.AuthorizationStatus.REFUSED,
+        }
+
+        return queryset.filter(authorization_status=statuses.get(value)) \
+            if statuses.get(value) else queryset
 
 
 class MembersInline(admin.TabularInline):
