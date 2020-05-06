@@ -69,7 +69,7 @@ class Command(BaseCommand):
             is_authorized = any(o.is_authorized for o in orgs)
 
             # Detect cases of conflicting phones.
-            assert len(set(o.phone for o in orgs if o.phone != '')) <= 1
+            assert len(set(o.phone for o in orgs if o.phone != "")) <= 1
 
             if not dry_run:
 
