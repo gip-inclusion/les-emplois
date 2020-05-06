@@ -153,5 +153,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     def change_view(self, request, object_id, form_url="", extra_context=None):
         obj = models.PrescriberOrganization.objects.get(pk=object_id)
         extra_context = extra_context or {}
-        extra_context["authorization_validation_required"] = (obj.authorization_status == models.PrescriberOrganization.AuthorizationStatus.NOT_SET)
+        extra_context["authorization_validation_required"] = (
+            obj.authorization_status == models.PrescriberOrganization.AuthorizationStatus.NOT_SET
+        )
         return super().change_view(request, object_id, form_url, extra_context)
