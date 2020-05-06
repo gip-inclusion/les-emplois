@@ -9,6 +9,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.geocoding import get_geocoding_data
 
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 CSV_FILE = f"{CURRENT_DIR}/data/authorized_prescribers.csv"
@@ -50,7 +51,11 @@ class Command(BaseCommand):
 
         self.set_logger(options.get("verbosity"))
 
-        org_duplicates = [org for org in PrescriberOrganization.objects.values('name').annotate(cnt=Count('id')).filter(cnt__gte=2) if org['name'] != '']
+        org_duplicates = [
+            org
+            for org in PrescriberOrganization.objects.values("name").annotate(cnt=Count("id")).filter(cnt__gte=2)
+            if org["name"] != ""
+        ]
         self.stdout.write(f"{len(org_duplicates)} organizations have duplicates!")
 
         if not dry_run:
