@@ -24,7 +24,7 @@
             {% endblocktrans %}
         </div>
     {% endif %}
-    {% if current_prescriber_organization and current_prescriber_organization.authorization_validation_required %}
+    {% if current_prescriber_organization and prescriber_authorization_status_not_set %}
         <div class="alert alert-success alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
                 <span aria-hidden="true">&times;</span>

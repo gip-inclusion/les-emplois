@@ -38,8 +38,7 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
             "refused": models.PrescriberOrganization.AuthorizationStatus.REFUSED,
         }
 
-        return queryset.filter(authorization_status=statuses.get(value)) \
-            if statuses.get(value) else queryset
+        return queryset.filter(authorization_status=statuses.get(value)) if statuses.get(value) else queryset
 
 
 class MembersInline(admin.TabularInline):
