@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+import datetime
 from unittest import mock
 
 from django.conf import settings
@@ -259,11 +259,15 @@ class UtilsValidatorsTest(TestCase):
         validate_pole_emploi_id("1234567E")
 
     def test_validate_birthdate(self):
-        current_date = datetime.now().date()
-        self.assertRaises(ValidationError, validate_birthdate, current_date + timedelta(days=1))
-        self.assertRaises(ValidationError, validate_birthdate, current_date + timedelta(days=365))
+        # Min.
+        self.assertRaises(ValidationError, validate_birthdate, datetime.date(1899, 12, 31))
+        validate_birthdate(datetime.date(1900, 1, 1))
+        # Max.
+        current_date = datetime.datetime.now().date()
+        self.assertRaises(ValidationError, validate_birthdate, current_date + datetime.timedelta(days=1))
+        self.assertRaises(ValidationError, validate_birthdate, current_date + datetime.timedelta(days=365))
         self.assertRaises(ValidationError, validate_birthdate, current_date)
-        validate_birthdate(current_date - timedelta(days=3600))
+        validate_birthdate(current_date - datetime.timedelta(days=3600))
 
 
 class UtilsTemplateTagsTestCase(TestCase):
@@ -450,7 +454,7 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         """
         siae = Siae.objects.create(email="test@example.com")
         siae_reload = Siae.objects.get(email="test@example.com")
-        p0 = MockedSiaeSignupTokenGenerator(datetime.now())
+        p0 = MockedSiaeSignupTokenGenerator(datetime.datetime.now())
         tk1 = p0.make_token(siae)
         tk2 = p0.make_token(siae_reload)
         self.assertEqual(tk1, tk2)
@@ -462,9 +466,13 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         siae = Siae.objects.create()
         p0 = SiaeSignupTokenGenerator()
         tk1 = p0.make_token(siae)
-        p1 = MockedSiaeSignupTokenGenerator(datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1)))
+        p1 = MockedSiaeSignupTokenGenerator(
+            datetime.datetime.now() + datetime.timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
+        )
         self.assertIs(p1.check_token(siae, tk1), True)
-        p2 = MockedSiaeSignupTokenGenerator(datetime.now() + timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1)))
+        p2 = MockedSiaeSignupTokenGenerator(
+            datetime.datetime.now() + datetime.timedelta(seconds=(SIAE_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
+        )
         self.assertIs(p2.check_token(siae, tk1), False)
 
     def test_check_token_with_nonexistent_token_and_user(self):

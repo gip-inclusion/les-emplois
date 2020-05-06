@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
@@ -33,6 +35,16 @@ def validate_pole_emploi_id(pole_emploi_id):
         )
 
 
+def get_min_birthdate():
+    return datetime.date(1900, 1, 1)
+
+
+def get_max_birthdate():
+    return timezone.now().date()
+
+
 def validate_birthdate(birthdate):
-    if birthdate >= timezone.now().date():
-        raise ValidationError(_("Cette date de naissance n'est pas valide (date future)"))
+    if birthdate < get_min_birthdate():
+        raise ValidationError(_("La date de naissance doit être postérieure à 1900."))
+    if birthdate >= get_max_birthdate():
+        raise ValidationError(_("Cette date de naissance n'est pas valide (date future)."))
