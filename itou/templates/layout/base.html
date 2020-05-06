@@ -38,9 +38,11 @@
                 <div class="layout-header-content">
                     <nav class="d-flex align-content-stretch flex-wrap">
 
-                        <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://entreprise.inclusion.beta.gouv.fr" target="_blank">
-                            {% trans "Vous êtes une entreprise (hors IAE) avec un besoin de recrutement" %}
-                        </a>
+                        {% if not user.is_authenticated %}
+                            <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://entreprise.inclusion.beta.gouv.fr" target="_blank">
+                                {% trans "Vous êtes une entreprise (hors IAE) avec un besoin de recrutement" %}
+                            </a>
+                        {% endif %}
 
                         <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://forum.inclusion.beta.gouv.fr" target="_blank">
                             {% trans "Accéder au forum" %}
