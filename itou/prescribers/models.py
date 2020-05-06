@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.validators import RegexValidator
 from django.db import models
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -204,6 +205,15 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @classmethod
+    def get_current_org_or_404(cls, request, return_none_if_not_set=False):
+        pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        if return_none_if_not_set and not pk:
+            return None
+        queryset = cls.objects.member_required(request.user)
+        organization = get_object_or_404(queryset, pk=pk)
+        return organization
 
 
 class PrescriberMembership(models.Model):

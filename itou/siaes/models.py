@@ -6,6 +6,7 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
 from django.db.models import F, Prefetch
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -255,6 +256,16 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         subject = "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @classmethod
+    def get_current_siae_or_404(cls, request, prefetch_job_description_through=False):
+        pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+        queryset = cls.objects
+        if prefetch_job_description_through:
+            queryset = queryset.prefetch_job_description_through()
+        queryset = queryset.member_required(request.user)
+        siae = get_object_or_404(queryset, pk=pk)
+        return siae
 
 
 class SiaeMembership(models.Model):

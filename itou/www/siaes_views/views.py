@@ -43,9 +43,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     """
     Configure an SIAE's jobs.
     """
-    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.objects.prefetch_job_description_through().member_required(request.user)
-    siae = get_object_or_404(queryset, pk=pk)
+    siae = Siae.get_current_siae_or_404(request, prefetch_job_description_through=True)
 
     if request.method == "POST":
 
@@ -103,8 +101,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     """
     Create a new SIAE (Agence / Etablissement in French).
     """
-    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-    current_siae = request.user.siae_set.get(pk=current_siae_pk)
+    current_siae = Siae.get_current_siae_or_404(request)
     form = CreateSiaeForm(current_siae=current_siae, data=request.POST or None, initial={"siret": current_siae.siret})
 
     if request.method == "POST" and form.is_valid():
@@ -122,9 +119,7 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
     Edit an SIAE.
     """
-    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.objects.member_required(request.user)
-    siae = get_object_or_404(queryset, pk=pk)
+    siae = Siae.get_current_siae_or_404(request)
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)
 
@@ -142,9 +137,7 @@ def members(request, template_name="siaes/members.html"):
     """
     List members of an SIAE.
     """
-    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.objects.member_required(request.user)
-    siae = get_object_or_404(queryset, pk=pk)
+    siae = Siae.get_current_siae_or_404(request)
 
     members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
 

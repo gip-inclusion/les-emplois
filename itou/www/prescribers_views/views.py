@@ -1,9 +1,8 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 
@@ -36,9 +35,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     """
     Edit a prescriber organization.
     """
-    pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
-    queryset = PrescriberOrganization.objects.member_required(request.user)
-    organization = get_object_or_404(queryset, pk=pk)
+    organization = PrescriberOrganization.get_current_org_or_404(request)
 
     form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 
@@ -56,9 +53,7 @@ def members(request, template_name="prescribers/members.html"):
     """
     List members of a prescriber organization.
     """
-    pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
-    queryset = PrescriberOrganization.objects.member_required(request.user)
-    organization = get_object_or_404(queryset, pk=pk)
+    organization = PrescriberOrganization.get_current_org_or_404(request)
 
     members = organization.prescribermembership_set.select_related("user").all().order_by("joined_at")
 
