@@ -1,9 +1,10 @@
 """
 Specific widgets used in forms.
 """
-
 from bootstrap_datepicker_plus import DatePickerInput
 from django.utils.translation import gettext_lazy
+
+from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
 
 class DatePickerField(DatePickerInput):
@@ -47,3 +48,13 @@ class DatePickerField(DatePickerInput):
     def __init__(self, options={}):
         options = {**self.OPTIONS, **options}
         super().__init__(options=options)
+
+    @classmethod
+    def max_birthdate(cls):
+        # http://eonasdan.github.io/bootstrap-datetimepicker/Options/#minmaxdate
+        # Takes a moment.js format string.
+        return get_max_birthdate().strftime("%d/%m/%Y")
+
+    @classmethod
+    def min_birthdate(cls):
+        return get_min_birthdate().strftime("%d/%m/%Y")

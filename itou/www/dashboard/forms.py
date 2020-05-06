@@ -22,7 +22,13 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
         else:
             self.fields["phone"].required = True
             self.fields["birthdate"].required = True
-            self.fields["birthdate"].widget = DatePickerField({"viewMode": "years"})
+            self.fields["birthdate"].widget = DatePickerField(
+                {
+                    "viewMode": "years",
+                    "minDate": DatePickerField.min_birthdate(),
+                    "maxDate": DatePickerField.max_birthdate(),
+                }
+            )
             self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:

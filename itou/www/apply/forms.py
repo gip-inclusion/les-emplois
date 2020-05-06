@@ -43,7 +43,13 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DatePickerField({"viewMode": "years"})
+        self.fields["birthdate"].widget = DatePickerField(
+            {
+                "viewMode": "years",
+                "minDate": DatePickerField.min_birthdate(),
+                "maxDate": DatePickerField.max_birthdate(),
+            }
+        )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
@@ -72,7 +78,13 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
         # Birth date
         self.fields["birthdate"].required = True
-        self.fields["birthdate"].widget = DatePickerField({"viewMode": "years"})
+        self.fields["birthdate"].widget = DatePickerField(
+            {
+                "viewMode": "years",
+                "minDate": DatePickerField.min_birthdate(),
+                "maxDate": DatePickerField.max_birthdate(),
+            }
+        )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
