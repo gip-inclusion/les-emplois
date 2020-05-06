@@ -4,7 +4,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
 
-ALLOWED_HOSTS = ["127.0.0.1", "itou-staging.cleverapps.io", "staging.inclusion.beta.gouv.fr"]
+ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr"]
 
 DATABASES = {
     "default": {
