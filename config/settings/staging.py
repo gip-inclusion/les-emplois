@@ -4,14 +4,14 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
 
-ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io"]
+ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr"]
 
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
-        "HOST": os.environ.get("POSTGRESQL_ADDON_HOST"),
-        "PORT": os.environ.get("POSTGRESQL_ADDON_PORT"),
-        "NAME": os.environ.get("REVIEW_APP_DB_NAME"),
+        "HOST": os.environ.get("POSTGRESQL_ADDON_DIRECT_HOST"),
+        "PORT": os.environ.get("POSTGRESQL_ADDON_DIRECT_PORT"),
+        "NAME": os.environ.get("POSTGRESQL_ADDON_DB"),
         "USER": os.environ.get("POSTGRESQL_ADDON_USER"),
         "PASSWORD": os.environ.get("POSTGRESQL_ADDON_PASSWORD"),
     }

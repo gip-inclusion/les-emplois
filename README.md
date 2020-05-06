@@ -30,7 +30,6 @@ Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/is
 
     $ make populate_db
 
-
 ### Créer un compte admin
 
     $ make shell_on_django_container
