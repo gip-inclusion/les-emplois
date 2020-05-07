@@ -12,8 +12,8 @@ DATABASES = {
         "HOST": os.environ.get("POSTGRESQL_ADDON_DIRECT_HOST"),
         "PORT": os.environ.get("POSTGRESQL_ADDON_DIRECT_PORT"),
         "NAME": os.environ.get("POSTGRESQL_ADDON_DB"),
-        "USER": os.environ.get("POSTGRESQL_ADDON_USER"),
-        "PASSWORD": os.environ.get("POSTGRESQL_ADDON_PASSWORD"),
+        "USER": os.environ.get("POSTGRESQL_ADDON_CUSTOM_USER"),
+        "PASSWORD": os.environ.get("POSTGRESQL_ADDON_CUSTOM_PASSWORD"),
     }
 }
 
