@@ -5,7 +5,7 @@
 
     {% if authorization_validation_required %}
     <div class="submit-row">
-        <input class="" type="submit" value="{% trans "Refuser l'habilitation" %}"
+        <input class="danger" type="submit" value="{% trans "Refuser l'habilitation" %}"
                name="_authorization_action_refuse">
         <input class="default" type="submit" value="{% trans "Valider l'habilitation" %}" name="_authorization_action_validate">
     </div>
