@@ -404,8 +404,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check org.
         self.assertTrue(organization.is_authorized)
-        self.assertEqual(organization.authorization_status,
-                         PrescriberOrganization.AuthorizationStatus.VALIDATED)
+        self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
 
         # Check membership
         self.assertIn(user, organization.members.all())
@@ -446,7 +445,9 @@ class PrescriberSignupTest(TestCase):
 
         # Check org.
         self.assertTrue(authorized_organization.is_authorized)
-        self.assertEqual(authorized_organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
+        self.assertEqual(
+            authorized_organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED
+        )
 
         # Check membership
         self.assertIn(user, authorized_organization.members.all())

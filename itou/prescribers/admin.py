@@ -49,6 +49,8 @@ class MembersInline(admin.TabularInline):
 
 @admin.register(models.PrescriberOrganization)
 class PrescriberOrganizationAdmin(admin.ModelAdmin):
+    class Media:
+        css = {"all": ("css/admin/custom.css",)}
 
     change_form_template = "admin/prescribers/change_form.html"
 
