@@ -6,7 +6,6 @@ envs/staging.env
 
 # Config
 config/settings/dev.py
-config/settings/prod.py
 docker-compose-prod.yml
 docker-compose-staging.yml
 docker/prod/
