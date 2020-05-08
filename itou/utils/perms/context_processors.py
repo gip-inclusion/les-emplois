@@ -60,7 +60,7 @@ def get_matomo_context(user, prescriber_organization, user_is_siae_admin):
         matomo_custom_var_account_sub_type = "anonymous"
     elif user.is_job_seeker:
         matomo_custom_var_account_type = "job_seeker"
-        matomo_custom_var_account_sub_type = "peconnect" if user.is_peamu_user else "not_peconnect"
+        matomo_custom_var_account_sub_type = "peconnect" if user.is_peamu else "not_peconnect"
     elif user.is_prescriber:
         matomo_custom_var_account_type = "prescriber"
         if prescriber_organization:

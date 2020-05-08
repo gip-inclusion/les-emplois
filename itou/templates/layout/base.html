@@ -65,7 +65,7 @@
                                         
                                         <div class="dropdown-divider"></div>
 
-                                        {% if not user.is_peamu_user %}
+                                        {% if not user.is_peamu %}
                                             <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
                                                 {% trans "Modifier votre mot de passe" %}
                                             </a>

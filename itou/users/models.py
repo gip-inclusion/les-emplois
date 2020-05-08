@@ -120,12 +120,12 @@ class User(AbstractUser, AddressMixin):
         ).latest("-created_at")
 
     @property
-    def is_peamu_user(self):
+    def is_peamu(self):
         return self.socialaccount_set.exists()
 
     @property
     def peamu_id_token(self):
-        if not self.is_peamu_user:
+        if not self.is_peamu:
             return None
         return self.socialaccount_set.get().extra_data["id_token"]
 
