@@ -9,11 +9,34 @@
         {% include "search/includes/siaes_search_form.html" with form=form %}
     </form>
 
-    <h1 class="font-weight-normal">
-        {% with request.GET.city_name as city and request.GET.distance as distance %}
-            {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
-        {% endwith %}
-    </h1>
+    <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
+        <h1 class="font-weight-normal">
+            {% with request.GET.city_name as city and request.GET.distance as distance %}
+                {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
+            {% endwith %}
+        </h1>
+
+        {% if siaes_page %}
+            <button type="button" class="btn btn-success my-3 m-sm-0 mb-sm-2" data-toggle="modal" data-target="#mapModal">{% include "includes/icon.html" with icon="map-pin" %} Voir la carte</button>
+
+            <!-- Modal to test that a map is really needed by users -->
+            <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModal" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body p-4">
+                            <h5 class="modal-title" id="mapModalLabel">En cours de conception 💡</h5>
+                            <p class="py-2">Nous réfléchissons à afficher les résultats sur une carte.
+                            Un peu de patience, c'est peut-être pour bientôt...</p>
+                            <button type="button" class="btn btn-primary w-100 w-sm-auto" data-dismiss="modal" aria-label="Close">Fermer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal end -->
+        {% endif %}
+
+    </div>
+
 
     {% if not siaes_page %}
 
