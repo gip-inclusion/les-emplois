@@ -13,5 +13,5 @@ class StatsViewTest(TestCase):
 
         for department in DEPARTMENTS.keys():
             url = reverse("stats:index")
-            response = self.client.post(url, data={"department": department})
+            response = self.client.get(url, {"department": department})
             self.assertEqual(response.status_code, 200)

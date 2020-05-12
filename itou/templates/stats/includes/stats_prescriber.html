@@ -1,0 +1,148 @@
+{% load i18n %}
+<div class="accordion" id="accordion-3">
+    <div class="card">
+        <div class="card-header" id="heading-3-1">
+            <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-3-1" aria-expanded="true" aria-controls="collapse-3-1">
+                    {% trans "Lexique prescripteurs" %}
+                </button>
+            </h5>
+        </div>
+
+        <div id="collapse-3-1" class="collapse" aria-labelledby="heading-3-1" data-parent="#accordion-3">
+            <div class="card-body">
+                <ul>
+                    <li>
+                        {% trans "<b>Prescripteur</b> : compte utilisateur de type prescripteur." %}
+                    </li>
+                    <li>
+                        {% blocktrans with days=data.days_for_orgs_to_be_considered_active %}
+                            <b>Prescripteur actif</b> : prescripteur ayant créé au moins une candidature sur la période considérée, ou bien sur les {{ days }} derniers jours.
+                        {% endblocktrans %}
+                    </li>
+                    <li>
+                        {% trans "<b>Prescripteur habilité</b> : prescripteur appartenant à une organisation." %}
+                    </li>
+                    <li>
+                        {% trans "<b>Organisation</b> : organisation habilitée." %}
+                    </li>
+                    <li>
+                        {% trans "<b>Organisation inscrite</b> : organisation ayant au moins un compte créé sur la plateforme." %}
+                    </li>
+                    <li>
+                        {% trans "<b>Organisation active</b> : organisation ayant au moins un compte prescripteur actif." %}
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="heading-3-2">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3-2" aria-expanded="false" aria-controls="collapse-3-2">
+                    {% trans "Indicateurs prescripteurs" %}
+                </button>
+            </h5>
+        </div>
+        <div id="collapse-3-2" class="collapse" aria-labelledby="heading-3-2" data-parent="#accordion-3">
+            <div class="card-body">
+                <ul>
+                    <li>
+                        {% trans "Prescripteurs à ce jour" %} : <b>{{ data.total_prescriber_users }}</b>
+                    </li>
+                    <li>
+                        {% trans "Prescripteurs habilités à ce jour" %} : <b>{{ data.total_authorized_prescriber_users }}</b>
+                    </li>
+                    <li>
+                        {% trans "Prescripteurs non habilités (aussi appelés \"Orienteurs\") à ce jour" %} : <b>{{ data.total_unauthorized_prescriber_users }}</b>
+                    </li>
+                    {% for entry in data.orgs_by_dpt.series %}
+                        <li>
+                            {{ entry.name }} : <b>{{ entry.total }}</b>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header" id="heading-3-3">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3-3" aria-expanded="false" aria-controls="collapse-3-3">
+                    {% trans "Répartition des indicateurs prescripteurs par type d'organisation" %}
+                </button>
+            </h5>
+        </div>
+        <div id="collapse-3-3" class="collapse" aria-labelledby="heading-3-3" data-parent="#accordion-3">
+            <div class="card-body">
+                {% include "stats/includes/table.html" with data=data.orgs_by_kind %}
+            </div>
+        </div>
+    </div>
+    {% if data.orgs_by_region %}
+        <div class="card">
+            <div class="card-header" id="heading-3-4">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3-4" aria-expanded="false" aria-controls="collapse-3-4">
+                        {% trans "Répartition des indicateurs prescripteurs par région" %}
+                    </button>
+                    <small><span class="badge badge-info">{% trans "Nouveau" %}</span></small>
+                </h5>
+            </div>
+            <div id="collapse-3-4" class="collapse" aria-labelledby="heading-3-4" data-parent="#accordion-3">
+                <div class="card-body">
+                    {% include "stats/includes/table.html" with data=data.orgs_by_region %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if data.orgs_by_dpt %}
+        <div class="card">
+            <div class="card-header" id="heading-3-5">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3-5" aria-expanded="false" aria-controls="collapse-3-5">
+                        {% trans "Répartition des indicateurs prescripteurs par département" %}
+                    </button>
+                </h5>
+            </div>
+            <div id="collapse-3-5" class="collapse" aria-labelledby="heading-3-5" data-parent="#accordion-3">
+                <div class="card-body">
+                    {% include "stats/includes/table.html" with data=data.orgs_by_dpt %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if data.prescriber_users_per_creation_week %}
+        <div class="card">
+            <div class="card-header" id="heading-3-6">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3-6" aria-expanded="false" aria-controls="collapse-3-6">
+                        {% trans "Inscriptions de nouveaux prescripteurs" as chart_title %}
+                        {{ chart_title }}
+                    </button>
+                </h5>
+            </div>
+            <div id="collapse-3-6" class="collapse" aria-labelledby="heading-3-6" data-parent="#accordion-3">
+                <div class="card-body">
+                    {% include "stats/includes/basic_column_chart.html" with chart_id="prescriber_users" data=data.prescriber_users_per_creation_week title=chart_title %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="card">
+        <div class="card-header" id="heading-3-7">
+            <h5 class="mb-0">
+                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3-7" aria-expanded="false" aria-controls="collapse-3-7">
+                    {% trans "Evolution des prescripteurs actifs dans le temps" %}
+                </button>
+            </h5>
+        </div>
+        <div id="collapse-3-7" class="collapse" aria-labelledby="heading-3-7" data-parent="#accordion-3">
+            <div class="card-body">
+                {% trans "Prescripteur actifs" as chart_title %}
+                {% include "stats/includes/basic_column_chart.html" with chart_id="active_prescriber_users" data=data.active_prescriber_users_per_week title=chart_title %}
+            </div>
+        </div>
+    </div>
+</div>
