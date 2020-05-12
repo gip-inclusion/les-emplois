@@ -17,7 +17,17 @@
         </h1>
 
         {% if siaes_page %}
-            <button type="button" class="btn btn-success my-3 m-sm-0 mb-sm-2" data-toggle="modal" data-target="#mapModal">{% include "includes/icon.html" with icon="map-pin" %} Voir la carte</button>
+            <button
+                type="button"
+                class="btn btn-success my-3 m-sm-0 mb-sm-2 matomo-event"
+                data-toggle="modal"
+                data-target="#mapModal"
+                data-matomo-category="experimentation"
+                data-matomo-action="clic"
+                data-matomo-option="carte-recherche"
+                >
+                    {% include "includes/icon.html" with icon="map-pin" %} Voir la carte
+            </button>
 
             <!-- Modal to test that a map is really needed by users -->
             <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModal" aria-hidden="true">
