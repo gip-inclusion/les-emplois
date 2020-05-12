@@ -11,6 +11,7 @@ REGIONS = {
     "Île-de-France": ["75", "77", "78", "91", "92", "93", "94", "95"],
     "La Réunion": ["974"],
     "Martinique": ["972"],
+    "Mayotte": ["976"],
     "Normandie": ["14", "27", "50", "61", "76"],
     "Nouvelle-Aquitaine": ["16", "17", "19", "23", "24", "33", "40", "47", "64", "79", "86", "87"],
     "Occitanie": ["09", "11", "12", "30", "31", "32", "34", "46", "48", "65", "66", "81", "82"],
@@ -19,6 +20,17 @@ REGIONS = {
     "Collectivités d'outre-mer": ["975", "977", "978"],
     "Anciens territoires d'outre-mer": ["986", "987", "988"],
 }
+
+
+def get_department_to_region():
+    department_to_region = {}
+    for region, dpts in REGIONS.items():
+        for dpt in dpts:
+            department_to_region[dpt] = region
+    return department_to_region
+
+
+DEPARTMENT_TO_REGION = get_department_to_region()
 
 DEPARTMENTS = {
     "01": "Ain (01)",
