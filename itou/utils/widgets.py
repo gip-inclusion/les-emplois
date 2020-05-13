@@ -51,10 +51,8 @@ class DatePickerField(DatePickerInput):
 
     @classmethod
     def max_birthdate(cls):
-        # http://eonasdan.github.io/bootstrap-datetimepicker/Options/#minmaxdate
-        # Takes a moment.js format string.
-        return get_max_birthdate().strftime("%d/%m/%Y")
+        return get_max_birthdate()
 
     @classmethod
     def min_birthdate(cls):
-        return get_min_birthdate().strftime("%d/%m/%Y")
+        return get_min_birthdate()
