@@ -2,7 +2,6 @@
 {% load i18n %}
 
 {% block submit_buttons_bottom %}
-
     {% if authorization_validation_required %}
         <div class="submit-row">
             <input class="danger" type="submit" value="{% trans "Refuser l'habilitation" %}"
@@ -11,6 +10,5 @@
                    name="_authorization_action_validate">
         </div>
     {% endif %}
-
     {{ block.super }}
 {% endblock %}

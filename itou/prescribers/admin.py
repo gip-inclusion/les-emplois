@@ -36,6 +36,7 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
             "not_set": models.PrescriberOrganization.AuthorizationStatus.NOT_SET,
             "validated": models.PrescriberOrganization.AuthorizationStatus.VALIDATED,
             "refused": models.PrescriberOrganization.AuthorizationStatus.REFUSED,
+            "not_required": models.PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED,
         }
 
         return queryset.filter(authorization_status=statuses.get(value)) if statuses.get(value) else queryset
@@ -50,7 +51,7 @@ class MembersInline(admin.TabularInline):
 @admin.register(models.PrescriberOrganization)
 class PrescriberOrganizationAdmin(admin.ModelAdmin):
     class Media:
-        css = {"all": ("css/admin/custom.css",)}
+        css = {"all": ("css/itou-admin.css",)}
 
     change_form_template = "admin/prescribers/change_form.html"
 
