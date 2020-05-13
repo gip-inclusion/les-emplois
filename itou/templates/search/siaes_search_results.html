@@ -34,10 +34,25 @@
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
                         <div class="modal-body p-4">
-                            <h5 class="modal-title" id="mapModalLabel">En cours de conception 💡</h5>
-                            <p class="py-2">Nous réfléchissons à afficher les résultats sur une carte.
-                            Un peu de patience, c'est peut-être pour bientôt...</p>
-                            <button type="button" class="btn btn-primary w-100 w-sm-auto" data-dismiss="modal" aria-label="Close">Fermer</button>
+                            <h5 class="modal-title text-center" id="mapModalLabel">En cours de conception 💡</h5>
+                            <p class="pt-2">Nous réfléchissons à afficher les résultats sur une carte.
+                            Votez pour nous donner votre avis !</p>
+                            <div id="mapPoll">
+                                <div class="row buttonsContainer">
+                                    <div class="col-sm pr-sm-2">
+                                        <button type="button" class="btn btn-outline-primary w-100">
+                                            <span class="h4">👍</span> <span class="d-block">Je veux voir</span> la carte !
+                                        </button>
+                                    </div>
+                                    <div class="col-sm pl-sm-2">
+                                        <button type="button" class="btn btn-outline-primary w-100">
+                                            <span class="h4">👎</span> <span class="d-block">La carte ne</span> m'intéresse pas.
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <button type="button" class="btn btn-primary w-100 mt-3 mb-2" data-dismiss="modal" aria-label="Close">Fermer</button>
                         </div>
                     </div>
                 </div>
@@ -122,4 +137,16 @@
 
     {% endif %}
 
+{% endblock %}
+
+{% block script %}
+    {{ super }}
+    <script type="text/javascript">
+        // Related to the search results map experiment.
+        $( "#mapPoll button" ).click(function() {
+            $( "#mapPoll .buttonsContainer" ).fadeOut(function() {
+                $("#mapPoll").append("<div class='col-sm text-center'>Merci !</div>");
+            });
+        });
+    </script>
 {% endblock %}
