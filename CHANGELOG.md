@@ -4,8 +4,26 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
-## [Non publié]
-- Possibilité de se connecter avec PE Connect
+## [1.0.2] - 2020-05-12
+
+### Ajouté
+- Déploiement - Hauts-de-France (27 Avril)
+- Nouveau design en accordéons et nouveaux tableaux par région sur la page stats
+- Bornes minimum et maximum des années dans le datepicker
+- Contrôle sur la date de naissance (pas avant 1900)
+- Lorsqu'un prescripteur envoie une candidature, toute la chaîne est notifiée (SIAE, prescripteur, candidat)
+- Affichage du caractère habilité d'un prescripteur sur le tableau de bord le cas échéant
+- Possibilité pour un candidat de rajouter un lien vers un CV dans son profil
+- Ajout du champ "CV" à une candidature
+
+### Modifié
+- L'adresse candidat devient obligatoire à la validation de l'embauche si la structure de l'employeur est soumise aux règles de l'éligibilité
+- Correction d'un bug du champ ville non mémorisé dans la recherche
+- Affichage du bouton "Vous êtes une entreprise (hors IAE) avec un besoin de recrutement" uniquement aux utilisateurs non connectés
+- Le bouton "Télécharger l'attestation" ne s'affiche pas si l'annulation d'une candidature est possible
+
+### Supprimé
+- Message concernant la crise sanitaire
 
 ## [1.0.1] - 2020-04-27
 
