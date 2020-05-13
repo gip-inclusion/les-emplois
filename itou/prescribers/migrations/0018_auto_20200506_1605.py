@@ -17,6 +17,7 @@ def update_authorization_status(apps, schema_editor):
     for org in PrescriberOrganization.objects.filter(is_authorized=False):
         # Orgs that are not PE and with no habilitation
         org.authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
+        org.save()
 
     for org in PrescriberOrganization.objects.filter(is_authorized=True):
         if org.kind == PrescriberOrganization.Kind.PE:
@@ -37,3 +38,4 @@ class Migration(migrations.Migration):
     dependencies = [("prescribers", "0017_auto_20200506_1516")]
 
     operations = [migrations.RunPython(update_authorization_status)]
+

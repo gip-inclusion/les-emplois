@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
@@ -17,6 +18,7 @@ from itou.www.dashboard.forms import EditUserInfoForm
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_counter = 0
+    prescriber_authorization_status_not_set = None
 
     if request.user.is_siae_staff:
         pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
@@ -28,7 +30,18 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     # See template for display message while authorized organization is being validated (prescriber path)
 
-    context = {"job_applications_counter": job_applications_counter}
+    if request.user.is_prescriber:
+        pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
+        queryset = PrescriberOrganization.objects.member_required(request.user)
+        prescriber = get_object_or_404(queryset, pk=pk)
+        prescriber_authorization_status_not_set = (
+            prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+        )
+
+    context = {
+        "job_applications_counter": job_applications_counter,
+        "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
+    }
 
     return render(request, template_name, context)
 

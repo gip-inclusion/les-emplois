@@ -65,6 +65,12 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         )
         OTHER = "OTHER", _("Autre structure")
 
+    class AuthorizationStatus(models.TextChoices):
+        NOT_SET = "NOT_SET", _("Habilitation en attente de validation")
+        VALIDATED = "VALIDATED", _("Habilitation validée")
+        REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
+        NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
+
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
@@ -105,18 +111,20 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
-    authorization_validation_required = models.BooleanField(
-        verbose_name=_("Habilitation à vérifier"),
-        default=False,
-        help_text=_("Précise si l'habilitation de l'organisation nécessite une validation."),
+
+    authorization_status = models.CharField(
+        verbose_name=_("Statut de l'habilitation"),
+        max_length=20,
+        choices=AuthorizationStatus.choices,
+        default=AuthorizationStatus.NOT_SET,
     )
-    authorization_validated_at = models.DateTimeField(
-        verbose_name=_("Date de validation de l'autorisation"), null=True
+    authorization_updated_at = models.DateTimeField(
+        verbose_name=_("Date de MAJ du statut de l'habilitation"), null=True
     )
-    authorization_validated_by = models.ForeignKey(
+    authorization_updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Autorisation validée par"),
-        related_name="authorization_validated_set",
+        verbose_name=_("Dernière MAJ de l'habilitation par"),
+        related_name="authorization_status_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -148,6 +156,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def active_members(self):
         return self.members.filter(is_active=True)
 
+    @property
+    def has_unset_authorization(self):
+        return self.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+
     def new_signup_warning_email_to_existing_members(self, user):
         """
         Send a warning fyi-only email to all existing users of the organization
@@ -168,6 +180,17 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         context = {"organization": self}
         subject = "prescribers/email/validated_prescriber_organization_email_subject.txt"
         body = "prescribers/email/validated_prescriber_organization_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def refused_prescriber_organization_email(self):
+        """
+        Send an email to the user who asked for the validation
+        of a new prescriber organization when refused
+        """
+        to = [u.email for u in self.active_members]
+        context = {"organization": self}
+        subject = "prescribers/email/refused_prescriber_organization_email_subject.txt"
+        body = "prescribers/email/refused_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 

@@ -1,0 +1,5 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% load i18n %}
+{% block subject %}
+{% blocktrans %}L'habilitation de votre organisation n'a pas pu être validée.{% endblocktrans %}
+{% endblock %}
