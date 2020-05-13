@@ -56,12 +56,14 @@ class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizati
     """
 
     is_authorized = True
+    authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
 
 
 class PrescriberPoleEmploiFactory(PrescriberOrganizationFactory):
     code_safir_pole_emploi = factory.fuzzy.FuzzyText(length=5, chars=string.digits)
     is_authorized = True
+    authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
 
 
 class PrescriberUnregistered(PrescriberOrganizationFactory):
-    authorization_validation_required = False
+    authorization_status = models.PrescriberOrganization.AuthorizationStatus.NOT_SET
