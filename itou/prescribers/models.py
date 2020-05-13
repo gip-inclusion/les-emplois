@@ -69,6 +69,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         NOT_SET = "NOT_SET", _("Habilitation en attente de validation")
         VALIDATED = "VALIDATED", _("Habilitation validée")
         REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
+        NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
@@ -154,6 +155,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     @property
     def active_members(self):
         return self.members.filter(is_active=True)
+
+    @property
+    def has_unset_authorization(self):
+        return self.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
 
     def new_signup_warning_email_to_existing_members(self, user):
         """
