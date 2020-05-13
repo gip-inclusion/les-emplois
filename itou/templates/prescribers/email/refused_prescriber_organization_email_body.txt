@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% trans "Après vérification, l'habilitation de l'organisation que vous avez saisi lors de votre inscription n'a pas pu être validée." %}
+{% trans "Nous sommes au regret de vous informer que nous n'avons pas pu vérifier l'habilitation de votre organisation. Nous vous recontacterons dès que possible afin d'obtenir les renseignements qui nous manquent. N'hésitez pas à contacter notre équipe Support à l'adresse "%}{{ itou_email_contact }}{% trans " si toutefois notre réponse venait à tarder." %}
 
 {% trans "Merci de recontacter l'équipe support." %}
 
