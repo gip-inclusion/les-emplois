@@ -35,7 +35,6 @@ def update_authorization_status(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("prescribers", "0017_auto_20200506_1516")]
+    dependencies = [("prescribers", "0016_auto_20200513_1955")]
 
-    operations = [migrations.RunPython(update_authorization_status)]
-
+    operations = [migrations.RunPython(update_authorization_status, migrations.RunPython.noop)]
