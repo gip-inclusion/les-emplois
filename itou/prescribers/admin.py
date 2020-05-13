@@ -23,7 +23,7 @@ class HasMembersFilter(admin.SimpleListFilter):
 
 
 class AuthorizationValidationRequired(admin.SimpleListFilter):
-    title = _("statut de l'habilitation")
+    title = _("Statut de l'habilitation")
     parameter_name = "authorization_validation_required"
 
     def lookups(self, request, model_admin):

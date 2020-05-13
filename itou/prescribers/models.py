@@ -66,7 +66,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         OTHER = "OTHER", _("Autre structure")
 
     class AuthorizationStatus(models.TextChoices):
-        NOT_SET = "NOT_SET", _("Habiliation en attente de validation")
+        NOT_SET = "NOT_SET", _("Habilitation en attente de validation")
         VALIDATED = "VALIDATED", _("Habilitation validée")
         REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
 
