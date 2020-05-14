@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -52,9 +52,6 @@ def start(request, siae_pk):
     """
 
     siae = get_object_or_404(Siae, pk=siae_pk)
-
-    if not siae.is_permitted_to_hire:
-        raise Http404()
 
     if request.user.is_siae_staff and not siae.has_member(request.user):
         raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
