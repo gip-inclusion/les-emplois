@@ -80,6 +80,7 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
             self.new_organization.created_by = user
             self.new_organization.save()
             organization = self.new_organization
+            organization.must_validate_prescriber_organization_email().send()
         else:
             organization = self.organization
 

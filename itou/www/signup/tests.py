@@ -498,6 +498,11 @@ class PrescriberSignupTest(TestCase):
         self.assertIsNone(new_org.authorization_updated_by)
         self.assertEqual(new_org.created_by, user)
 
+        # Check email has been sent to support (validation/refusal of authorisation needed)
+        self.assertEqual(len(mail.outbox), 2)
+        subject = mail.outbox[0].subject
+        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
+
     def test_prescriber_signup_without_code_nor_organization(self):
         """
         Prescriber signup (orienter) without code nor organization.

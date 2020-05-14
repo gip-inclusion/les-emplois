@@ -127,7 +127,7 @@
                                 {% trans "Modifier votre organisation" %}
                             </a>
                         </p>
-                        {% if user_is_prescriber_org_admin %}
+                        {% if user_is_prescriber_org_admin and prescriber_is_orienter %}
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="user-plus" %}
                                 <i>{% trans "Inviter des utilisateurs" %}</i>
