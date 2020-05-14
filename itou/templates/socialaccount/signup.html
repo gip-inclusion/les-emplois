@@ -11,7 +11,7 @@
 
     Unverified PEAMU users are redirected to this template by django-allauth
     most likely because the email data is missing and django-allauth thus
-    prompts the user to enter his email manually on this form.
+    prompts the user to enter his email manually on this form to complete the signup process.
 {% endcomment %}
 
 {% load i18n %}
@@ -23,17 +23,15 @@
 <h1>{% trans "Votre compte Pôle emploi doit être validé" %}</h1>
 
 <p>
-	{% trans "Vous devez valider votre compte Pôle emploi pour pouvoir vous connecter ici. Veuillez vous identifier chez Pôle emploi et suivre les instructions pour valider votre compte." %}
+    {% trans "Vous devez valider votre compte Pôle emploi pour pouvoir vous connecter ici." %}
 </p>
 <p>
-	<a href="{% url 'account_login' %}?account_type=job_seeker">
-		<button class="btn btn-secondary">
-			{% trans "Retour" %}
-		</button>
-	</a>
-	<a href="https://www.pole-emploi.fr">
-		<button class="btn btn-primary">
-            {% trans "S'identifier chez Pôle emploi pour valider son compte" %}
+    {% trans "Veuillez retrouver l'email &laquo; <i>Confirmation de votre adresse électronique</i> &raquo; que Pôle emploi vous a envoyé le jour de la création de votre compte et y cliquer sur le lien &laquo; <i>Je confirme mon adresse électronique</i> &raquo;." %}
+</p>
+<p>
+    <a href="{% url 'account_login' %}?account_type=job_seeker">
+        <button class="btn btn-secondary">
+            {% trans "Retour" %}
         </button>
     </a>
 </p>
