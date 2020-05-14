@@ -40,7 +40,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
             )
             # This is to hide the "secret code", except for orienter orgs
-            prescriber_is_orienter = prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
+            prescriber_is_orienter = (
+                prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
+            )
 
     context = {
         "job_applications_counter": job_applications_counter,

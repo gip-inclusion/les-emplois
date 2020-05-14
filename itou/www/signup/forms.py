@@ -80,6 +80,7 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
             self.new_organization.created_by = user
             self.new_organization.save()
             organization = self.new_organization
+            organization.must_validate_prescriber_organization_email().send()
         else:
             organization = self.organization
 
@@ -278,7 +279,7 @@ class SelectSiaeForm(forms.Form):
 
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
     """
-    Second of two forms of siae signup process.
+    Second of two forms of siae signup process.aussi le code d'invitation qui apparaît dans le dashboard après le rattachement du premier membre d'une orga en attente de vérification d'habilitation. Le code d'invitation n'est plus nécessaire, car pour se rattacher à une structure ayant déjà un membre il suffit de la sélectionner dans le menu déroulant
     This is the final form where the signup actually happens
     on the siae identified by the first form.
     """
