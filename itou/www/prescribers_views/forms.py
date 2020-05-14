@@ -24,6 +24,7 @@ class CreatePrescriberOrganizationForm(forms.ModelForm):
         organization = super().save(commit=False)
 
         organization.created_by = user
+        organization.authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
 
         siret = self.cleaned_data["siret"]
         if siret:
