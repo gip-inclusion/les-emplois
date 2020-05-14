@@ -27,6 +27,8 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
                     "viewMode": "years",
                     "minDate": DatePickerField.min_birthdate().strftime("%Y"),
                     "maxDate": DatePickerField.max_birthdate().strftime("%Y"),
+                    "useCurrent": False,
+                    "allowInputToggle": False,
                 }
             )
             self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
@@ -46,7 +48,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "resume_link",
         ]
         help_texts = {
-            "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978"),
+            "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978"),
             "phone": gettext_lazy("Par exemple 0610203040"),
         }
 

@@ -172,8 +172,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (APPROVAL_DELIVERY_MODE_MANUAL, _("Manuel")),
     )
 
-    CANCELLATION_DAYS_BEFORE_HIRING_STARTED = 365
-    CANCELLATION_DAYS_AFTER_HIRING_STARTED = 1
+    CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 

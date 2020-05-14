@@ -28,7 +28,7 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "birthdate": "20-12-1978",
+            "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
         }
@@ -37,7 +37,7 @@ class EditUserInfoViewTest(TestCase):
 
         user = get_user_model().objects.get(id=user.id)
         self.assertEqual(user.phone, post_data["phone"])
-        self.assertEqual(user.birthdate.strftime("%d-%m-%Y"), post_data["birthdate"])
+        self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 
 
 class SwitchSiaeTest(TestCase):

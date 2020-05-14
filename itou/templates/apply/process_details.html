@@ -29,8 +29,8 @@
 
         {% if job_application.job_seeker.address_on_one_line %}
             <li>{% trans "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
-        {% endif %}      
-      
+        {% endif %}
+
         {% if job_application.job_seeker.resume_link %}
             <li>{% trans "Lien vers CV :" %} <a href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a> </li>
         {% endif %}
@@ -282,8 +282,8 @@
 
             <h3 class="font-weight-normal text-muted">{% trans "Rétractation" %}</h3>
             <p>
-                {% blocktrans with cancellation_date=job_application.cancellation_delay_end %}
-                    Vous pouvez vous rétracter jusqu'au lendemain du début du contrat, soit le {{ cancellation_date }} inclus.
+                {% blocktrans with cancellation_date=job_application.cancellation_delay_end cancellation_days=cancellation_days %}
+                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit le {{ cancellation_date }} inclus.
                 {% endblocktrans %}
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}

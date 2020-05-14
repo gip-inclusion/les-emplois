@@ -18,11 +18,11 @@ class DatePickerField(DatePickerInput):
     """
 
     # /!\ Make sure it matches OPTIONS['format']!!
-    DATE_FORMAT = "%d-%m-%Y"
+    DATE_FORMAT = "%d/%m/%Y"
 
     # http://eonasdan.github.io/bootstrap-datetimepicker/Options/
     OPTIONS = {
-        "format": "DD-MM-YYYY",  # moment date-time format
+        "format": "DD/MM/YYYY",  # moment date-time format
         "showClose": True,
         "showClear": True,
         "showTodayButton": True,
@@ -47,7 +47,7 @@ class DatePickerField(DatePickerInput):
 
     def __init__(self, options={}):
         options = {**self.OPTIONS, **options}
-        super().__init__(options=options)
+        super().__init__(attrs={"placeholder": "JJ/MM/AAAA"}, options=options)
 
     @classmethod
     def max_birthdate(cls):
