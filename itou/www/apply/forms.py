@@ -56,7 +56,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         model = get_user_model()
         fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
-            "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978."),
+            "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
             "phone": gettext_lazy("Par exemple 0610203040."),
         }
 
@@ -105,7 +105,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "resume_link",
         ]
         help_texts = {
-            "birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978."),
+            "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
             "phone": gettext_lazy("Par exemple 0610203040."),
         }
 
@@ -201,12 +201,12 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer"]
         help_texts = {
-            "hiring_start_at": gettext_lazy("Au format jj-mm-aaaa, par exemple  %(date)s.")
-            % {"date": datetime.date.today().strftime("%d-%m-%Y")},
-            "hiring_end_at": gettext_lazy("Au format jj-mm-aaaa, par exemple  %(date)s.")
+            "hiring_start_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
+            % {"date": datetime.date.today().strftime("%d/%m/%Y")},
+            "hiring_end_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
             % {
                 "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
-                    "%d-%m-%Y"
+                    "%d/%m/%Y"
                 )
             },
         }
@@ -251,7 +251,7 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-        help_texts = {"birthdate": gettext_lazy("Au format jj-mm-aaaa, par exemple 20-12-1978.")}
+        help_texts = {"birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978.")}
 
     def clean(self):
         super().clean()

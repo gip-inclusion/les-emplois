@@ -18,11 +18,11 @@ class DatePickerField(DatePickerInput):
     """
 
     # /!\ Make sure it matches OPTIONS['format']!!
-    DATE_FORMAT = "%d-%m-%Y"
+    DATE_FORMAT = "%d/%m/%Y"
 
     # http://eonasdan.github.io/bootstrap-datetimepicker/Options/
     OPTIONS = {
-        "format": "DD-MM-YYYY",  # moment date-time format
+        "format": "DD/MM/YYYY",  # moment date-time format
         "showClose": True,
         "showClear": True,
         "showTodayButton": True,
