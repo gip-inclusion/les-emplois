@@ -47,7 +47,7 @@ class DatePickerField(DatePickerInput):
 
     def __init__(self, options={}):
         options = {**self.OPTIONS, **options}
-        super().__init__(options=options)
+        super().__init__(attrs={"placeholder": "JJ/MM/AAAA"}, options=options)
 
     @classmethod
     def max_birthdate(cls):
