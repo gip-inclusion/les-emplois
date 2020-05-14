@@ -41,9 +41,11 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+    cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "cancellation_days": cancellation_days,
         "job_application": job_application,
         "transition_logs": transition_logs,
     }
