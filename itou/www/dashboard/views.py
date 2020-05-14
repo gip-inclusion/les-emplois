@@ -31,12 +31,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     # See template for display message while authorized organization is being validated (prescriber path)
 
     if request.user.is_prescriber:
-        pk = request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
-        queryset = PrescriberOrganization.objects.member_required(request.user)
-        prescriber = get_object_or_404(queryset, pk=pk)
-        prescriber_authorization_status_not_set = (
-            prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
-        )
+        pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+        if pk:
+            queryset = PrescriberOrganization.objects.member_required(request.user)
+            prescriber = get_object_or_404(queryset, pk=pk)
+            prescriber_authorization_status_not_set = (
+                prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+            )
 
     context = {
         "job_applications_counter": job_applications_counter,

@@ -18,10 +18,10 @@ name instead of hardcoding row numbers as in `field = row[42]`.
 import logging
 import os
 
-import numpy as np
-import pandas as pd
 from django.core.management.base import BaseCommand
 
+import numpy as np
+import pandas as pd
 from itou.siaes.management.commands.import_deleted_siae import (
     DEPARTMENTS_TO_OPEN_ON_14_04_2020,
     DEPARTMENTS_TO_OPEN_ON_20_04_2020,
