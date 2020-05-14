@@ -19,7 +19,7 @@ from itou.www.dashboard.forms import EditUserInfoForm
 def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_counter = 0
     prescriber_authorization_status_not_set = None
-    prescriber_org_is_kind_pe = False
+    prescriber_is_orienter = False
 
     if request.user.is_siae_staff:
         pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
@@ -39,14 +39,13 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             prescriber_authorization_status_not_set = (
                 prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
             )
-            # This is useful to hide the "secret code" for PE orgs which may be confusing:
-            # PE prescriber signup / link can only be made via SAFIR code
-            prescriber_org_is_kind_pe = prescriber.kind == PrescriberOrganization.Kind.PE
+            # This is to hide the "secret code", except for orienter orgs
+            prescriber_is_orienter = prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
 
     context = {
         "job_applications_counter": job_applications_counter,
         "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
-        "prescriber_org_is_kind_pe": prescriber_org_is_kind_pe,
+        "prescriber_is_orienter": prescriber_is_orienter,
     }
 
     return render(request, template_name, context)
