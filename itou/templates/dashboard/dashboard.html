@@ -7,10 +7,7 @@
     {{ block.super }}
     {% if current_siae %}
         <div class="alert alert-warning" role="alert">
-            Retrouvez les entreprises proches de chez vous en recherche de personnel dans les secteurs essentiels [ Santé, Agriculture, Agro-alimentaire, Transports, Logistique, Aide à domicile, Énergie, Télécommunication ] sur <a href="https://mobilisationemploi.gouv.fr/#/rechercher-offre" target="_blank">mobilisationemploi.gouv.fr</a>.
-        </div>
-        <div class="alert alert-warning" role="alert">
-            Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
+            {% trans "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
         </div>
     {% endif %}
     {% if current_siae and not current_siae.has_reliable_coords %}
