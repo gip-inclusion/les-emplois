@@ -334,7 +334,7 @@ SOCIALACCOUNT_PROVIDERS={
     },
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ADAPTER = "itou.peamu.adapter.PEAMUSocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "itou.allauth.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # PDFShift
 PDFSHIFT_API_KEY = os.environ["PDFSHIFT_API_KEY"]

@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 
-from itou.peamu.provider import PEAMUProvider
-from itou.peamu.views import oauth2_callback as callback_view, oauth2_login as login_view
+from itou.allauth.peamu.provider import PEAMUProvider
+from itou.allauth.peamu.views import oauth2_callback as callback_view, oauth2_login as login_view
 
 
 def default_urlpatterns(provider):

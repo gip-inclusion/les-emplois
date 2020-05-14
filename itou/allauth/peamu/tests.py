@@ -11,7 +11,7 @@ from allauth.tests import MockedResponse, TestCase
 from django.contrib.auth import get_user_model
 from django.core import mail
 
-from itou.peamu.provider import PEAMUProvider
+from itou.allauth.peamu.provider import PEAMUProvider
 
 
 class PEAMUTests(OAuth2TestsMixin, TestCase):

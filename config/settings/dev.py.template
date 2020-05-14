@@ -57,6 +57,6 @@ DEBUG_TOOLBAR_CONFIG = {
 # - Alter field provider on socialaccount
 # - Alter field provider on socialapp
 MIGRATION_MODULES = {
-    'socialaccount': 'itou.peamu.migrations',
+    'socialaccount': 'itou.allauth.migrations',
 }
 

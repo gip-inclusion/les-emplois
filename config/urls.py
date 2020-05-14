@@ -53,7 +53,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
     # PEAMU URLs.
-    path("accounts/", include("itou.peamu.urls")),
+    path("accounts/", include("itou.allauth.peamu.urls")),
     # --------------------------------------------------------------------------------------
 
     # www.
