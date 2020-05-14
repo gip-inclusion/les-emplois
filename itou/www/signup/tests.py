@@ -403,7 +403,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check org.
         self.assertTrue(organization.is_authorized)
-        self.assertFalse(organization.authorization_validation_required)
+        self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
 
         # Check membership
         self.assertIn(user, organization.members.all())
@@ -444,7 +444,9 @@ class PrescriberSignupTest(TestCase):
 
         # Check org.
         self.assertTrue(authorized_organization.is_authorized)
-        self.assertFalse(authorized_organization.authorization_validation_required)
+        self.assertEqual(
+            authorized_organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED
+        )
 
         # Check membership
         self.assertIn(user, authorized_organization.members.all())
@@ -491,9 +493,15 @@ class PrescriberSignupTest(TestCase):
         # Check if a new organization is created
         new_org = PrescriberOrganization.objects.get(name=organization_name)
         self.assertFalse(new_org.is_authorized)
-        self.assertTrue(new_org.authorization_validation_required)
-        self.assertIsNone(new_org.authorization_validated_at)
+        self.assertEqual(new_org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
+        self.assertIsNone(new_org.authorization_updated_at)
+        self.assertIsNone(new_org.authorization_updated_by)
         self.assertEqual(new_org.created_by, user)
+
+        # Check email has been sent to support (validation/refusal of authorisation needed)
+        self.assertEqual(len(mail.outbox), 2)
+        subject = mail.outbox[0].subject
+        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
 
     def test_prescriber_signup_without_code_nor_organization(self):
         """

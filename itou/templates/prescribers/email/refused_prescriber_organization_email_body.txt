@@ -1,0 +1,18 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% load i18n %}
+{% block body %}
+
+{% trans "Nous sommes au regret de vous informer que nous n'avons pas pu vérifier l'habilitation de votre organisation. Nous vous recontacterons dès que possible afin d'obtenir les renseignements qui nous manquent. N'hésitez pas à contacter notre équipe Support à l'adresse "%}{{ itou_email_contact }}{% trans " si toutefois notre réponse venait à tarder." %}
+
+{% trans "Merci de recontacter l'équipe support." %}
+
+{% trans "*Structure* :" %}
+
+- {% trans "Nom" %} : {{ organization.display_name }}
+- {% trans "SIRET" %} : {{ organization.siret }}
+- {% trans "Type" %} : {{ organization.kind }}
+
+{% trans "Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus." %}
+
+{% endblock body %}

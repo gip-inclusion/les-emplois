@@ -5,6 +5,8 @@ from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.jobs.factories import create_test_romes_and_appellations
+from itou.prescribers.factories import PrescriberOrganizationFactory
+from itou.prescribers.models import PrescriberOrganization
 
 
 class JobsAutocompleteTest(TestCase):
@@ -110,3 +112,57 @@ class CitiesAutocompleteTest(TestCase):
         self.assertEqual(response.status_code, 200)
         expected = b"[]"
         self.assertEqual(response.content, expected)
+
+
+class PrescriberAuthorizedOrganizationsAutocompleteTest(TestCase):
+    def test_autocomplete(self):
+
+        org_pe_validated = PrescriberOrganizationFactory(
+            is_authorized=True,
+            authorization_status=PrescriberOrganization.AuthorizationStatus.VALIDATED,
+            kind=PrescriberOrganization.Kind.PE,
+            name="Pôle emploi",
+        )
+
+        org_cap_emploi_validated = PrescriberOrganizationFactory(
+            is_authorized=True,
+            authorization_status=PrescriberOrganization.AuthorizationStatus.VALIDATED,
+            kind=PrescriberOrganization.Kind.CAP_EMPLOI,
+            name="Cap emploi",
+        )
+
+        org_spip_not_set = PrescriberOrganizationFactory(
+            is_authorized=True,
+            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+            kind=PrescriberOrganization.Kind.CAP_EMPLOI,
+            name="SPIP",
+        )
+
+        org_orientator = PrescriberOrganizationFactory(
+            is_authorized=True,
+            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED,
+            kind=PrescriberOrganization.Kind.OTHER,
+            name="Orienteur",
+        )
+
+        url = reverse("autocomplete:prescriber_authorized_organizations")
+
+        response = self.client.get(url, {"term": "Pôle"})
+        self.assertEqual(response.status_code, 200)
+        expected = []
+        self.assertEqual(json.loads(response.content), expected)
+
+        response = self.client.get(url, {"term": "Cap"})
+        self.assertEqual(response.status_code, 200)
+        expected = [{"value": org_cap_emploi_validated.name, "id": org_cap_emploi_validated.pk}]
+        self.assertEqual(json.loads(response.content), expected)
+
+        response = self.client.get(url, {"term": "spip"})
+        self.assertEqual(response.status_code, 200)
+        expected = [{"value": org_spip_not_set.name, "id": org_spip_not_set.pk}]
+        self.assertEqual(json.loads(response.content), expected)
+
+        response = self.client.get(url, {"term": "Orienteur"})
+        self.assertEqual(response.status_code, 200)
+        expected = []
+        self.assertEqual(json.loads(response.content), expected)

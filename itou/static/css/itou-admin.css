@@ -1,0 +1,6 @@
+/* Custom Django admin parts
+---------------------------------------------------------------------------*/
+
+.submit-row input.danger {
+    background: #ba2121;
+}

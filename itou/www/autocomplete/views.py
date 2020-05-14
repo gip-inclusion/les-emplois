@@ -62,8 +62,13 @@ def prescriber_authorized_organizations_autocomplete(request):
     organizations = (
         [
             {"value": org.name, "id": org.id}
-            for org in PrescriberOrganization.objects.exclude(is_authorized=False)
-            .exclude(kind=PrescriberOrganization.Kind.PE)
+            for org in PrescriberOrganization.objects.exclude(kind=PrescriberOrganization.Kind.PE)
+            .filter(
+                authorization_status__in=[
+                    PrescriberOrganization.AuthorizationStatus.NOT_SET,
+                    PrescriberOrganization.AuthorizationStatus.VALIDATED,
+                ]
+            )
             .autocomplete(term, limit=20)
         ]
         if term

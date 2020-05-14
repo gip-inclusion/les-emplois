@@ -169,14 +169,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return super().save(*args, **kwargs)
 
     @property
-    def is_permitted_to_hire(self):
-        """
-        Pending the publication of a new decree allowing Itou to issue PASS IAE countrywide,
-        not all SIAEs are permitted to hire.
-        """
-        return self.department in ["62", "67", "93"] or self.kind == self.KIND_ETTI
-
-    @property
     def display_name(self):
         if self.brand:
             return self.brand

@@ -130,8 +130,8 @@ class ProcessViewsTest(TestCase):
         hiring_start_at = datetime.date.today() - relativedelta(days=1)
         hiring_end_at = hiring_start_at + relativedelta(years=2)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
             "answer": "",
             **address,
         }
@@ -142,8 +142,8 @@ class ProcessViewsTest(TestCase):
         hiring_start_at = datetime.date.today()
         hiring_end_at = hiring_start_at - relativedelta(days=1)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
             "answer": "",
             **address,
         }
@@ -154,8 +154,8 @@ class ProcessViewsTest(TestCase):
         hiring_start_at = datetime.date.today()
         hiring_end_at = hiring_start_at + relativedelta(years=2, days=1)
         post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
             "answer": "",
             **address,
         }
@@ -169,8 +169,8 @@ class ProcessViewsTest(TestCase):
             # Data for `JobSeekerPoleEmploiStatusForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
             "answer": "",
             **address,
         }
@@ -195,8 +195,8 @@ class ProcessViewsTest(TestCase):
             # Data for `JobSeekerPoleEmploiStatusForm`.
             "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
             # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime("%d-%m-%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d-%m-%Y"),
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
             "answer": "",
         }
         with self.assertRaises(KeyError):

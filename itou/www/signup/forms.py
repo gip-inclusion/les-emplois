@@ -80,6 +80,7 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
             self.new_organization.created_by = user
             self.new_organization.save()
             organization = self.new_organization
+            organization.must_validate_prescriber_organization_email().send()
         else:
             organization = self.organization
 
@@ -180,9 +181,7 @@ class AuthorizedPrescriberForm(PrescriberForm):
                         "Veuillez la sélectionner dans la liste des organisations habilitées"
                     )
                 )
-            self.new_organization = PrescriberOrganization(
-                name=unregistered_organization, authorization_validation_required=True
-            )
+            self.new_organization = PrescriberOrganization(name=unregistered_organization)
         elif authorized_organization_id:
             authorized_organization = PrescriberOrganization.objects.get(
                 pk=self.cleaned_data["authorized_organization_id"]

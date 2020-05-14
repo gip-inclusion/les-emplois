@@ -115,20 +115,18 @@
                     {% endif %}
                 </div>
 
-                {% if siae.is_permitted_to_hire %}
-                    <div class="card-footer">
-                        {% if siae.num_active_members %}
-                            <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                            </a>
-                        {% else %}
-                            <a class="btn btn-sm btn-outline-secondary disabled" href="">
-                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                            </a>
-                            <small>{% trans "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
-                        {% endif %}
-                    </div>
-                {% endif %}
+                <div class="card-footer">
+                    {% if siae.num_active_members %}
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                        </a>
+                    {% else %}
+                        <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                        </a>
+                        <small>{% trans "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
+                    {% endif %}
+                </div>
 
             </div>
         {% endfor %}

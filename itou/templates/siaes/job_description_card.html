@@ -22,14 +22,12 @@
         {% endif %}
     </div>
 
-    {% if siae.is_permitted_to_hire %}
-        {% if siae.has_members %}
-            <p>
-                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}">
-                    {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                </a>
-            </p>
-        {% endif %}
+    {% if siae.has_members %}
+        <p>
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}">
+                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+            </a>
+        </p>
     {% endif %}
 
     <hr>

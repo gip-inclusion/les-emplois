@@ -7,10 +7,7 @@
     {{ block.super }}
     {% if current_siae %}
         <div class="alert alert-warning" role="alert">
-            Retrouvez les entreprises proches de chez vous en recherche de personnel dans les secteurs essentiels [ Santé, Agriculture, Agro-alimentaire, Transports, Logistique, Aide à domicile, Énergie, Télécommunication ] sur <a href="https://mobilisationemploi.gouv.fr/#/rechercher-offre" target="_blank">mobilisationemploi.gouv.fr</a>.
-        </div>
-        <div class="alert alert-warning" role="alert">
-            Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
+            {% trans "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
         </div>
     {% endif %}
     {% if current_siae and not current_siae.has_reliable_coords %}
@@ -24,7 +21,7 @@
             {% endblocktrans %}
         </div>
     {% endif %}
-    {% if current_prescriber_organization and current_prescriber_organization.authorization_validation_required %}
+    {% if current_prescriber_organization and prescriber_authorization_status_not_set %}
         <div class="alert alert-success alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
                 <span aria-hidden="true">&times;</span>
@@ -130,7 +127,7 @@
                                 {% trans "Modifier votre organisation" %}
                             </a>
                         </p>
-                        {% if user_is_prescriber_org_admin %}
+                        {% if user_is_prescriber_org_admin and prescriber_is_orienter %}
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="user-plus" %}
                                 <i>{% trans "Inviter des utilisateurs" %}</i>
@@ -152,7 +149,7 @@
                                 {% include "includes/icon.html" with icon="award" %}
                                 <span>
                                     {% blocktrans with name=current_prescriber_organization.display_name %}
-                                        {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://app.gitbook.com/@itou/s/doc-inclusion-beta-gouv-fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                        {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                                     {% endblocktrans %}
                                 </span>
                             </p>
@@ -221,16 +218,14 @@
                         {% endif %}
                     </p>
                     <p class="card-text">
-                        {% if current_siae.is_permitted_to_hire %}
-                            {% include "includes/icon.html" with icon="user-check" %}
-                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
-                                {% if current_siae.is_subject_to_eligibility_rules %}
-                                    {% trans "Obtenir un PASS IAE (candidature spontanée)" %}
-                                {% else %}
-                                    {% trans "Candidature spontanée" %}
-                                {% endif %}
-                            </a>
-                        {% endif %}
+                        {% include "includes/icon.html" with icon="user-check" %}
+                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
+                            {% if current_siae.is_subject_to_eligibility_rules %}
+                                {% trans "Obtenir un PASS IAE (candidature spontanée)" %}
+                            {% else %}
+                                {% trans "Candidature spontanée" %}
+                            {% endif %}
+                        </a>
                     </p>
                 </div>
             </div>
