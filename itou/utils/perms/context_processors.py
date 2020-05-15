@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 
@@ -53,31 +55,33 @@ def get_current_organization_and_perms(request):
 
 
 def get_matomo_context(user, prescriber_organization, user_is_siae_admin):
-    matomo_custom_var_is_authenticated = "yes" if user.is_authenticated else "no"
+    is_authenticated = "yes" if user.is_authenticated else "no"
 
     if not user.is_authenticated:
-        matomo_custom_var_account_type = "anonymous"
-        matomo_custom_var_account_sub_type = "anonymous"
+        account_type = "anonymous"
+        account_sub_type = "anonymous"
     elif user.is_job_seeker:
-        matomo_custom_var_account_type = "job_seeker"
-        matomo_custom_var_account_sub_type = "peconnect" if user.is_peamu else "not_peconnect"
+        account_type = "job_seeker"
+        account_sub_type = "peconnect" if user.is_peamu else "not_peconnect"
     elif user.is_prescriber:
-        matomo_custom_var_account_type = "prescriber"
+        account_type = "prescriber"
         if prescriber_organization:
-            matomo_custom_var_account_sub_type = (
-                "authorized_org" if prescriber_organization.is_authorized else "unauthorized_org"
-            )
+            account_sub_type = "authorized_org" if prescriber_organization.is_authorized else "unauthorized_org"
         else:
-            matomo_custom_var_account_sub_type = "without_org"
+            account_sub_type = "without_org"
     elif user.is_siae_staff:
-        matomo_custom_var_account_type = "employer"
-        matomo_custom_var_account_sub_type = "admin" if user_is_siae_admin else "not_admin"
+        account_type = "employer"
+        account_sub_type = "admin" if user_is_siae_admin else "not_admin"
     else:
-        matomo_custom_var_account_type = "unknown"
-        matomo_custom_var_account_sub_type = "unknown"
+        account_type = "unknown"
+        account_sub_type = "unknown"
 
-    return {
-        "matomo_custom_var_is_authenticated": matomo_custom_var_is_authenticated,
-        "matomo_custom_var_account_type": matomo_custom_var_account_type,
-        "matomo_custom_var_account_sub_type": matomo_custom_var_account_sub_type,
-    }
+    matomo_custom_variables = OrderedDict(
+        [
+            ("is_authenticated", is_authenticated),
+            ("account_type", account_type),
+            ("account_sub_type", account_sub_type),
+        ]
+    )
+
+    return {"matomo_custom_variables": matomo_custom_variables}
