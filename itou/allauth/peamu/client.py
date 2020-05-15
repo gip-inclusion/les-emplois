@@ -15,7 +15,7 @@ class PEAMUOAuth2Client(OAuth2Client):
         """
         This whole method is unchanged except for the
         `params = {"realm": "/individu"}` hack.
-        Original code visible here:
+        Original code:
         https://github.com/pennersr/django-allauth/blob/6a6d3c618ab018234dde8701173093274710ee0a/allauth/socialaccount/providers/oauth2/client.py#L44
         """
         data = {"redirect_uri": self.callback_url, "grant_type": "authorization_code", "code": code}

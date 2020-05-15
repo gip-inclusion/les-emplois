@@ -21,7 +21,7 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
         This whole method is unchanged except for the
         custom `PEAMUOAuth2Client` required to load the
         `params = {"realm": "/individu"}` hack.
-        Original code visible here:
+        Original code:
         https://github.com/pennersr/django-allauth/blob/6a6d3c618ab018234dde8701173093274710ee0a/allauth/socialaccount/providers/oauth2/views.py#L78
         """
         callback_url = self.adapter.get_callback_url(request, app)
