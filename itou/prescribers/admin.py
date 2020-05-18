@@ -115,7 +115,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "authorization_updated_at",
         "authorization_updated_by",
     )
-    search_fields = ("siret", "name")
+    search_fields = ("siret", "name", "code_safir_pole_emploi")
 
     def member_count(self, obj):
         return obj._member_count
