@@ -1,13 +1,13 @@
 """
 
 This script updates existing SIAEs and injects new ones
-by joining two different ASP datasets, as each one is missing
-some critical fields.
+by joining the following two ASP datasets:
+- Vue Structure (main dataset)
+- Liste Correspondants Techniques (secondary dataset)
+to build a complete SIAE dataset.
 
 It should be played again after each upcoming Opening (HDF, the whole country...)
-
-In the future we should have a single clean ASP export which will allow
-simplifying this script a lot.
+and each time we received a new export from the ASP.
 
 Note that we use dataframes instead of csv reader mainly
 because the main CSV has a large number of columns (30+)
@@ -34,9 +34,9 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_04_13_fluxIAE_Structure_13042020_073724.csv"
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_05_11_fluxIAE_Structure_11052020_073452.csv"
 
-SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_02_siae_auth_email_and_external_id.csv"
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_05_07_siae_auth_email_and_external_id.csv"
 
 SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
 
@@ -46,10 +46,15 @@ SIAE_CREATION_ALLOWED_DEPARTMENTS = (
 
 EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
 
+# Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
+# This score is arbitrarily set based on general observation.
+API_BAN_RELIABLE_MIN_SCORE = 0.6
+
 
 def get_main_df(filename=MAIN_DATASET_FILENAME):
     """
-    The main dataset is very recent (April 2020) and has those fields:
+    The main dataset is called "Vue Structure" by the ASP
+    and has those fields:
     - external_id
     - siret
     - name
@@ -58,7 +63,7 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
     but does *not* have those fields:
     - auth_email
     - kind
-    - website
+    - website (nor is it present in the secondary dataset)
     The fact it does not have auth_email nor kind makes it quite difficult
     to exploit. We have to join it with the secondary dataset, which does
     have auth_email and kind.
@@ -112,10 +117,11 @@ MAIN_DF = get_main_df()
 
 def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     """
-    The secondary dataset is older (February 2020) and only has 5 columns:
-    - siret (WARNING : this siret is outdated by MAIN_DF.siret)
+    The secondary dataset is called "Liste correspondants techniques" by the ASP
+    and only has 5 meaningful columns for us:
+    - siret (WARNING : this siret is superseded by MAIN_DF.siret so we don't use it)
     - external_id
-    - name
+    - name (we don't use it though)
     - kind
     - auth_email
     When joined with the first dataset, it somehow constitutes a complete dataset.
@@ -126,8 +132,14 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     df = df[df.kind != "FDI"]
     df = df[df.auth_email != "#N/A"]
 
-    # Delete potentially outdated siret field to avoid confusion
+    # Ignore structure kinds we have not implemented yet.
+    df = df[df.kind != "EITI"]
+
+    # Delete superseded siret field to avoid confusion.
     del df["siret"]
+
+    # Delete unused field to avoid confusion.
+    del df["name"]
 
     for kind in df.kind:
         assert kind in EXPECTED_KINDS
@@ -143,10 +155,6 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
 
 
 SECONDARY_DF = get_secondary_df()
-
-# Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
-# This score is arbitrarily set based on general observation.
-API_BAN_RELIABLE_MIN_SCORE = 0.6
 
 
 def get_df_rows_as_dict(df, external_id):
@@ -183,10 +191,10 @@ class Command(BaseCommand):
     Update and sync SIAE data based on latest ASP exports.
 
     To debug:
-        django-admin import_siae_2020_04_13 --verbosity=2 --dry-run
+        django-admin import_siae --verbosity=2 --dry-run
 
     When ready:
-        django-admin import_siae_2020_04_13 --verbosity=2
+        django-admin import_siae --verbosity=2
     """
 
     help = "Update and sync SIAE data based on latest ASP exports."
@@ -220,7 +228,6 @@ class Command(BaseCommand):
                 else:
                     assert siae.siret[:9] == row["siret"][:9]
                     assert siae.kind in EXPECTED_KINDS
-                    assert siae.members.count() == 0
                     self.log(
                         f"siae.id={siae.id} has changed siret from "
                         f"{siae.siret} to {row['siret']} (will be updated)"
