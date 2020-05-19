@@ -39,7 +39,7 @@
             data: [
                 {% for entry in data %}
                     {
-                        name: '{{ entry.name }} ({{ entry.value }})',
+                        name: "{{ entry.name | safe }} ({{ entry.value }})",
                         y: {{ entry.value }},
                         color: '{{ entry.color }}'
                     }
