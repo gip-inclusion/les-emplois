@@ -2,12 +2,12 @@ from collections import OrderedDict, defaultdict
 from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
+from django.core.cache import cache
 from django.db.models import Avg, Count, DateTimeField, ExpressionWrapper, F, Q
 from django.db.models.functions import ExtractWeek, ExtractYear, TruncWeek
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from django.views.decorators.cache import cache_page
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -19,11 +19,21 @@ from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 DATA_UNAVAILABLE_BY_DEPARTMENT_ERROR_MESSAGE = _("donnée non disponible par département")
 
+CACHE_DURATION_IN_SECONDS = 2 * 60 * 60
 
-@cache_page(60 * 60 * 2)
+
 def stats(request, template_name="stats/stats.html"):
-    data = {}
     selected_department = get_selected_department(request)
+    cache_key = f"stats.{selected_department}"
+    context = cache.get(cache_key)
+    if not context:
+        context = get_stats(selected_department)
+        cache.set(cache_key, context, CACHE_DURATION_IN_SECONDS)
+    return render(request, template_name, context)
+
+
+def get_stats(selected_department):
+    data = {}
     department_filter_is_selected = bool(selected_department)
     department_choices = get_department_choices()
 
@@ -83,7 +93,7 @@ def stats(request, template_name="stats/stats.html"):
         "selected_department": selected_department,
         "selected_department_name": dict(department_choices)[selected_department],
     }
-    return render(request, template_name, context)
+    return context
 
 
 def get_department_choices():

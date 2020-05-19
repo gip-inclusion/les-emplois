@@ -117,7 +117,7 @@ class CitiesAutocompleteTest(TestCase):
 class PrescriberAuthorizedOrganizationsAutocompleteTest(TestCase):
     def test_autocomplete(self):
 
-        org_pe_validated = PrescriberOrganizationFactory(
+        org_pe_validated = PrescriberOrganizationFactory(  # noqa F841
             is_authorized=True,
             authorization_status=PrescriberOrganization.AuthorizationStatus.VALIDATED,
             kind=PrescriberOrganization.Kind.PE,
@@ -138,7 +138,7 @@ class PrescriberAuthorizedOrganizationsAutocompleteTest(TestCase):
             name="SPIP",
         )
 
-        org_orientator = PrescriberOrganizationFactory(
+        org_orientator = PrescriberOrganizationFactory(  # noqa F841
             is_authorized=True,
             authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED,
             kind=PrescriberOrganization.Kind.OTHER,
