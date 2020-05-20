@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
+from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
@@ -41,9 +41,8 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     List of applications for a prescriber.
     """
 
-    prescriber_organization = PrescriberOrganization.get_current_org_or_404(request, return_none_if_not_set=True)
-
-    if prescriber_organization:
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
         # Show all applications organization-wide.
         job_applications = prescriber_organization.jobapplication_set
     else:

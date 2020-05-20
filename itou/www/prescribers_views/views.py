@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
 
-from itou.prescribers.models import PrescriberOrganization
+from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.prescribers_views.forms import CreatePrescriberOrganizationForm, EditPrescriberOrganizationForm
 
 
@@ -35,7 +35,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     """
     Edit a prescriber organization.
     """
-    organization = PrescriberOrganization.get_current_org_or_404(request)
+    organization = get_current_org_or_404(request)
 
     form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 
@@ -53,7 +53,7 @@ def members(request, template_name="prescribers/members.html"):
     """
     List members of a prescriber organization.
     """
-    organization = PrescriberOrganization.get_current_org_or_404(request)
+    organization = get_current_org_or_404(request)
 
     members = organization.prescribermembership_set.select_related("user").all().order_by("joined_at")
 

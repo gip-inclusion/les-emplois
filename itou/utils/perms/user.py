@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.perms.prescriber import get_current_org_or_404
 
 
 KIND_JOB_SEEKER = "job_seeker"
@@ -29,7 +29,8 @@ def get_user_info(request):
 
     if request.user.is_prescriber:
         kind = KIND_PRESCRIBER
-        prescriber_organization = PrescriberOrganization.get_current_org_or_404(request, return_none_if_not_set=True)
+        if request.user.is_prescriber_with_org:
+            prescriber_organization = get_current_org_or_404(request)
 
     is_authorized_prescriber = prescriber_organization.is_authorized if prescriber_organization else False
 
