@@ -30,7 +30,13 @@ EXPORT_FORMATS = ["stream", "file"]
 
 def _approval_line(approval):
     assert approval
+
+    # Fix: some approval do not have job applications linked (staging)
+    if not approval.jobapplication_set.exists():
+        return None
+
     siae = approval.jobapplication_set.latest("created_at").to_siae
+    
     return [
         approval.user.pole_emploi_id,
         approval.user.first_name,
@@ -69,7 +75,9 @@ def export_approvals(export_format="file"):
     data = [FIELDS]
 
     for approval in Approval.objects.valid():
-        data.append(_approval_line(approval))
+        new_line = _approval_line(approval)
+        if new_line:
+            data.append(_approval_line(approval))
 
     # Getting the column to auto-adjust to max field size
     max_width = [0] * (len(FIELDS) + 1)
