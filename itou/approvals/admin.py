@@ -1,10 +1,12 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval
 from itou.job_applications.models import JobApplication
+from itou.utils.exports.export_approvals import export_approvals
 
 
 class JobApplicationInline(admin.StackedInline):
@@ -58,6 +60,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "created_by")
     date_hierarchy = "start_at"
     inlines = (JobApplicationInline,)
+    actions = ["export_approvals"]
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -82,9 +85,16 @@ class ApprovalAdmin(admin.ModelAdmin):
                 "<uuid:job_application_id>/add_approval",
                 self.admin_site.admin_view(self.manually_add_approval),
                 name="approvals_approval_manually_add_approval",
-            )
+            ),
+            path("export_approvals", self.export_approvals),
         ]
         return additional_urls + super().get_urls()
+
+    def export_approvals(self, request):
+        filename, file_content = export_approvals(export_format="stream")
+        response = HttpResponse(content=file_content, content_type="application/ms-excel")
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        return response
 
 
 @admin.register(models.PoleEmploiApproval)
