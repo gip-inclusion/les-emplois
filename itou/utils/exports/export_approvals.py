@@ -43,7 +43,7 @@ def _approval_line(approval):
     ]
 
 
-def export_approvals(export_format=None):
+def export_approvals(export_format="file"):
     """
     Main entry point. Currently used by admin site and an admin command (`itou/approvals/management/commands/export_approvals.py`)
 
@@ -55,8 +55,6 @@ def export_approvals(export_format=None):
         * a path for `file`
         * a pair with filename and object for `stream`
     """
-    export_format = "file" if not export_format else export_format
-
     assert export_format in EXPORT_FORMATS, f"Unknown export format '{export_format}'"
 
     wb = Workbook()
