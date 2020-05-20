@@ -1,10 +1,9 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import render
 
-from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae
 from itou.utils.pagination import pager
+from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
@@ -42,13 +41,8 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     List of applications for a prescriber.
     """
 
-    prescriber_organization = None
-    pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
-    if pk:
-        queryset = PrescriberOrganization.objects.member_required(request.user)
-        prescriber_organization = get_object_or_404(queryset, pk=pk)
-
-    if prescriber_organization:
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
         # Show all applications organization-wide.
         job_applications = prescriber_organization.jobapplication_set
     else:
@@ -76,10 +70,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
     """
-
-    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-    queryset = Siae.objects.member_required(request.user)
-    siae = get_object_or_404(queryset, pk=pk)
+    siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received
 
     filters_form = SiaeFilterJobApplicationsForm(job_applications, request.GET or None)

@@ -161,6 +161,10 @@ class User(AbstractUser, AddressMixin):
         ):
             raise ValidationError(_("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."))
 
+    @property
+    def is_prescriber_with_org(self):
+        return self.is_prescriber and self.prescriberorganization_set.exists()
+
 
 def get_allauth_account_user_display(user):
     return user.email
