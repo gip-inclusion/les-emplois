@@ -23,6 +23,8 @@ FIELDS = [
     "date_fin_pass_iae",
     "code_postal",
     "code_postal_employeur",
+    "numero_siret",
+    "raison_sociale"
 ]
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -30,6 +32,7 @@ EXPORT_FORMATS = ["stream", "file"]
 
 def _approval_line(approval):
     assert approval
+    siae  = approval.jobapplication_set.latest("created_at").to_siae
     return [
         approval.user.pole_emploi_id,
         approval.user.first_name,
@@ -39,7 +42,9 @@ def _approval_line(approval):
         approval.start_at.strftime(DATE_FMT),
         approval.end_at.strftime(DATE_FMT),
         approval.user.post_code,
-        approval.jobapplication_set.latest("created_at").to_siae.post_code,
+        siae.post_code,
+        siae.siret,
+        siae.name,
     ]
 
 
