@@ -1,21 +1,22 @@
 import logging
 
 from django.core.management.base import BaseCommand
+
 from itou.utils.exports.export_approvals import export_approvals
 
 
 class Command(BaseCommand):
+    """
+    Export all valid approvals (PASS IAE, not Pole emploi) to an Excel file.
+
+    This file is:
+    * named 'export_pass_iae_MMDDYYY_HHMINSEC.xslx' (datetime of export)
+    * put in the 'exports' folder
+
+    There is no optional argument at the moment.
+    """
 
     help = "Export the content of the approvals from the database into a xlsx file or an output stream."
-
-    def add_arguments(self, parser):
-        parser.add_argument(
-            "--format",
-            dest="export_format",
-            required=False,
-            action="store",
-            help="Choose between 'stream' and 'file' export type",
-        )
 
     def set_logger(self, verbosity):
         """
@@ -31,14 +32,11 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def handle(self, export_format, **options):
-        chosen_format = export_format or "file"
+    def handle(self, **options):
+
         self.set_logger(options.get("verbosity"))
-        self.logger.info(f"Exporting approvals (export to '{export_format}')")
+        self.logger.info(f"Exporting approvals")
 
-        result = export_approvals(chosen_format)
+        result = export_approvals()
 
-        if chosen_format == "stream":
-            self.stdout.write(result)
-        else:
-            self.logger.info(f"Done! Approvals export file written to: '{result}'")
+        self.logger.info(f"Done!\nApprovals / PASS IAE export file written to: '{result}'")

@@ -1,14 +1,15 @@
 import datetime
-import os
 
+from django.conf import settings
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 from openpyxl.writer.excel import save_virtual_workbook
 
-from django.conf import settings
-
-
 from itou.approvals.models import Approval
+
+
+# XLS export of currently valid approvals
+# Currently used by admin site and admin command (export_approvals)
 
 EXPORT_DIR = f"{settings.ROOT_DIR}/exports"
 
@@ -43,6 +44,17 @@ def _approval_line(approval):
 
 
 def export_approvals(export_format=None):
+    """
+    Main entry point. Currently used by admin site and an admin command (`itou/approvals/management/commands/export_approvals.py`)
+
+    `export_format` can be either:
+        * `file` : for the admin command, export result as a file
+        * `stream` : for the admin site (to be bundled in a HTTP response object)
+
+    Returns:
+        * a path for `file`
+        * a pair with filename and object for `stream`
+    """
     export_format = "file" if not export_format else export_format
 
     assert export_format in EXPORT_FORMATS, f"Unknown export format '{export_format}'"
@@ -55,9 +67,10 @@ def export_approvals(export_format=None):
 
     data = [FIELDS]
 
-    for approval in Approval.objects.all():
+    for approval in Approval.objects.valid():
         data.append(_approval_line(approval))
 
+    # Getting the column to auto-adjust to max field size
     max_width = [0] * (len(FIELDS) + 1)
 
     for i, row in enumerate(data, 1):
@@ -66,10 +79,12 @@ def export_approvals(export_format=None):
             ws.cell(i, j).value = cell_value
             ws.column_dimensions[get_column_letter(j)].width = max_width[j]
 
+    suffix = current_dt.strftime("%d%m%Y_%H%M%S")
+    filename = f"export_pass_iae_{suffix}.xslx"
+
     if export_format == "file":
-        suffix = current_dt.strftime("%d%m%Y_%H%M%S")
-        path = f"{EXPORT_DIR}/export_pass_iae_{suffix}.xslx"
+        path = f"{EXPORT_DIR}/{filename}"
         wb.save(path)
         return path
     elif export_format == "stream":
-        return save_virtual_workbook(wb)
+        return filename, save_virtual_workbook(wb)
