@@ -78,7 +78,7 @@ def export_approvals(export_format="file"):
             ws.column_dimensions[get_column_letter(j)].width = max_width[j]
 
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
-    filename = f"export_pass_iae_{suffix}.xslx"
+    filename = f"export_pass_iae_{suffix}.xlsx"
 
     if export_format == "file":
         path = f"{EXPORT_DIR}/{filename}"
