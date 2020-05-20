@@ -11,8 +11,6 @@ from itou.approvals.models import Approval
 # XLS export of currently valid approvals
 # Currently used by admin site and admin command (export_approvals)
 
-EXPORT_DIR = f"{settings.ROOT_DIR}/exports"
-
 FIELDS = [
     "id_pole_emploi",
     "nom",
@@ -24,7 +22,7 @@ FIELDS = [
     "code_postal",
     "code_postal_employeur",
     "numero_siret",
-    "raison_sociale"
+    "raison_sociale",
 ]
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -32,7 +30,7 @@ EXPORT_FORMATS = ["stream", "file"]
 
 def _approval_line(approval):
     assert approval
-    siae  = approval.jobapplication_set.latest("created_at").to_siae
+    siae = approval.jobapplication_set.latest("created_at").to_siae
     return [
         approval.user.pole_emploi_id,
         approval.user.first_name,
@@ -86,7 +84,7 @@ def export_approvals(export_format="file"):
     filename = f"export_pass_iae_{suffix}.xlsx"
 
     if export_format == "file":
-        path = f"{EXPORT_DIR}/{filename}"
+        path = f"{settings.EXPORT_DIR}/{filename}"
         wb.save(path)
         return path
     elif export_format == "stream":
