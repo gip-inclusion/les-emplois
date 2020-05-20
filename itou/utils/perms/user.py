@@ -1,7 +1,7 @@
 from collections import namedtuple
 
-from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.siae import get_current_siae_or_404
 
 
 KIND_JOB_SEEKER = "job_seeker"
@@ -25,7 +25,7 @@ def get_user_info(request):
 
     if request.user.is_siae_staff:
         kind = KIND_SIAE_STAFF
-        siae = Siae.get_current_siae_or_404(request)
+        siae = get_current_siae_or_404(request)
 
     if request.user.is_prescriber:
         kind = KIND_PRESCRIBER

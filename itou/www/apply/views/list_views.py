@@ -1,9 +1,9 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 
-from itou.siaes.models import Siae
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
@@ -70,7 +70,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
     """
-    siae = Siae.get_current_siae_or_404(request)
+    siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received
 
     filters_form = SiaeFilterJobApplicationsForm(job_applications, request.GET or None)

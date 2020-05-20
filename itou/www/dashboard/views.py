@@ -12,6 +12,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
 
@@ -23,7 +24,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     prescriber_is_orienter = False
 
     if request.user.is_siae_staff:
-        siae = Siae.get_current_siae_or_404(request)
+        siae = get_current_siae_or_404(request)
         job_applications_counter = siae.job_applications_received.filter(
             state=JobApplicationWorkflow.STATE_NEW
         ).count()

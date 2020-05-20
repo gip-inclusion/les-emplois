@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription
+from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import CreateSiaeForm, EditSiaeForm
 
@@ -43,7 +44,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     """
     Configure an SIAE's jobs.
     """
-    siae = Siae.get_current_siae_or_404(request, prefetch_job_description_through=True)
+    siae = get_current_siae_or_404(request)
 
     if request.method == "POST":
 
@@ -101,7 +102,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     """
     Create a new SIAE (Agence / Etablissement in French).
     """
-    current_siae = Siae.get_current_siae_or_404(request)
+    current_siae = get_current_siae_or_404(request)
     form = CreateSiaeForm(current_siae=current_siae, data=request.POST or None, initial={"siret": current_siae.siret})
 
     if request.method == "POST" and form.is_valid():
@@ -119,7 +120,7 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
     Edit an SIAE.
     """
-    siae = Siae.get_current_siae_or_404(request)
+    siae = get_current_siae_or_404(request)
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)
 
@@ -137,7 +138,7 @@ def members(request, template_name="siaes/members.html"):
     """
     List members of an SIAE.
     """
-    siae = Siae.get_current_siae_or_404(request)
+    siae = get_current_siae_or_404(request)
 
     members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
 
