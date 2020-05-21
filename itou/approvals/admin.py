@@ -5,8 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval
+from itou.approvals.export import export_approvals
 from itou.job_applications.models import JobApplication
-from itou.utils.exports.export_approvals import export_approvals
 
 
 class JobApplicationInline(admin.StackedInline):

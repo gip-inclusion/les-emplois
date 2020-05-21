@@ -2,7 +2,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from itou.utils.exports.export_approvals import export_approvals
+from itou.approvals.export import export_approvals
 
 
 class Command(BaseCommand):
