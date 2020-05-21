@@ -11,6 +11,8 @@ from django.views.decorators.http import require_POST
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditUserInfoForm
 
@@ -22,27 +24,22 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     prescriber_is_orienter = False
 
     if request.user.is_siae_staff:
-        pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
-        queryset = Siae.objects.member_required(request.user)
-        siae = get_object_or_404(queryset, pk=pk)
+        siae = get_current_siae_or_404(request)
         job_applications_counter = siae.job_applications_received.filter(
             state=JobApplicationWorkflow.STATE_NEW
         ).count()
 
     # See template for display message while authorized organization is being validated (prescriber path)
 
-    if request.user.is_prescriber:
-        pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
-        if pk:
-            queryset = PrescriberOrganization.objects.member_required(request.user)
-            prescriber = get_object_or_404(queryset, pk=pk)
-            prescriber_authorization_status_not_set = (
-                prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
-            )
-            # This is to hide the "secret code", except for orienter orgs
-            prescriber_is_orienter = (
-                prescriber.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
-            )
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
+        prescriber_authorization_status_not_set = (
+            prescriber_organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+        )
+        # This is to hide the "secret code", except for orienter orgs
+        prescriber_is_orienter = (
+            prescriber_organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
+        )
 
     context = {
         "job_applications_counter": job_applications_counter,

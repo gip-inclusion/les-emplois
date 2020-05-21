@@ -1,9 +1,11 @@
 from django.contrib import admin
+from django.http import HttpResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval
+from itou.approvals.export import export_approvals
 from itou.job_applications.models import JobApplication
 
 
@@ -58,6 +60,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "created_by")
     date_hierarchy = "start_at"
     inlines = (JobApplicationInline,)
+    actions = ["export_approvals"]
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -76,13 +79,27 @@ class ApprovalAdmin(admin.ModelAdmin):
         """
         return manually_add_approval(request, self, job_application_id)
 
+    def export_approvals(self, request):
+        """
+        Custom admin view to export all approvals as an XLSX file.
+        """
+        filename, file_content = export_approvals(export_format="stream")
+        response = HttpResponse(content=file_content, content_type="application/ms-excel")
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        return response
+
     def get_urls(self):
         additional_urls = [
             path(
                 "<uuid:job_application_id>/add_approval",
                 self.admin_site.admin_view(self.manually_add_approval),
                 name="approvals_approval_manually_add_approval",
-            )
+            ),
+            path(
+                "export_approvals",
+                self.admin_site.admin_view(self.export_approvals),
+                name="approvals_approval_export_approvals",
+            ),
         ]
         return additional_urls + super().get_urls()
 

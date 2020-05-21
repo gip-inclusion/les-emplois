@@ -1,3 +1,11 @@
+"""
+
+As of May 2020 this script should never be used again, however
+there is one reason why we are keeping it alive, it is because
+it is the only example we have yet of importing website data.
+
+"""
+
 import csv
 import logging
 import os

@@ -7,16 +7,14 @@ from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
 from itou.job_applications.models import JobApplication
-from itou.siaes.models import Siae
 from itou.utils.pdf import HtmlToPdf
+from itou.utils.perms.siae import get_current_siae_or_404
 
 
 @login_required
 def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
 
-    siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-    queryset = Siae.objects.member_required(request.user)
-    siae = get_object_or_404(queryset, pk=siae_pk)
+    siae = get_current_siae_or_404(request)
 
     queryset = JobApplication.objects.select_related("job_seeker", "approval", "to_siae")
     job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
