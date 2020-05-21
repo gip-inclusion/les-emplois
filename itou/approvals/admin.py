@@ -79,6 +79,15 @@ class ApprovalAdmin(admin.ModelAdmin):
         """
         return manually_add_approval(request, self, job_application_id)
 
+    def export_approvals(self, request):
+        """
+        Custom admin view to export all approvals as an XLSX file.
+        """
+        filename, file_content = export_approvals(export_format="stream")
+        response = HttpResponse(content=file_content, content_type="application/ms-excel")
+        response["Content-Disposition"] = f"attachment; filename={filename}"
+        return response
+
     def get_urls(self):
         additional_urls = [
             path(
@@ -86,15 +95,13 @@ class ApprovalAdmin(admin.ModelAdmin):
                 self.admin_site.admin_view(self.manually_add_approval),
                 name="approvals_approval_manually_add_approval",
             ),
-            path("export_approvals", self.export_approvals),
+            path(
+                "export_approvals",
+                self.admin_site.admin_view(self.export_approvals),
+                name="approvals_approval_export_approvals",
+            ),
         ]
         return additional_urls + super().get_urls()
-
-    def export_approvals(self, request):
-        filename, file_content = export_approvals(export_format="stream")
-        response = HttpResponse(content=file_content, content_type="application/ms-excel")
-        response["Content-Disposition"] = f"attachment; filename={filename}"
-        return response
 
 
 @admin.register(models.PoleEmploiApproval)
