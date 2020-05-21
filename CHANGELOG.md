@@ -7,13 +7,13 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 ## [1.0.3] - 2020-05-25
 
 ### Ajouté
-- Sondage sur l'affichage des résultats sur une carte
+- Sondage sur l'affichage des résultats re recherche sur une carte
 - Mécanisme d'export des PASS IAE au format Excel
 - Message d'information au candidat à propos de l'utilisation de ses données personnelles au moment de la création de son compte
 - Ajout du logo Pôle emploi dans la page de création de compte prescripteur
 - Derniers réglages du process de vérification de l'habilitation des organisations de prescripteurs
 - Possibilité de rechercher par code Safir dans l'admin des organisations de prescripteurs
-- Import de 13 nouvelles structures en provenance de l'ASP
+- Import de 11 nouvelles structures en provenance de l'ASP
 
 ### Modifié
 - Ré-ouverture des embauches pour toutes les structures
@@ -23,6 +23,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Mise à jour du Docker de développement vers PostgreSQL 12
 - Lorsqu'un utilisateur modifie sa date de naissance, il n'y a plus de date par défaut
 - Les champs "date" suivent désormais le format JJ/MM/AAAA et ont un "placeholder" JJ/MM/AAAA/
+- Résolution de bugs mineurs sur la page statistiques (sécurité du formulaire, encoding de caractères spéciaux, problème de cache)
 
 ## [1.0.2] - 2020-05-12
 
