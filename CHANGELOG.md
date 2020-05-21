@@ -4,6 +4,26 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2020-05-25
+
+### Ajouté
+- Sondage sur l'affichage des résultats sur une carte
+- Mécanisme d'export des PASS IAE au format Excel
+- Message d'information au candidat à propos de l'utilisation de ses données personnelles au moment de la création de son compte
+- Ajout du logo Pôle emploi dans la page de création de compte prescripteur
+- Derniers réglages du process de vérification de l'habilitation des organisations de prescripteurs
+- Possibilité de rechercher par code Safir dans l'admin des organisations de prescripteurs
+- Import de 13 nouvelles structures en provenance de l'ASP
+
+### Modifié
+- Ré-ouverture des embauches pour toutes les structures
+- Factorisation de la vérification de permissions des SIAE et des prescripteurs
+- Allongement du nombre de caractères permis dans le champ CV (500 max)
+- Allongement de la durée de rétractation d'un employeur sur une candidature jusqu'à 96h (cas des weekends)
+- Mise à jour du Docker de développement vers PostgreSQL 12
+- Lorsqu'un utilisateur modifie sa date de naissance, il n'y a plus de date par défaut
+- Les champs "date" suivent désormais le format JJ/MM/AAAA et ont un "placeholder" JJ/MM/AAAA/
+
 ## [1.0.2] - 2020-05-12
 
 ### Ajouté
