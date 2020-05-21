@@ -28,30 +28,6 @@ DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
 
 
-def _approval_line(approval):
-    assert approval
-
-    # Fix: some approval do not have job applications linked (staging)
-    if not approval.jobapplication_set.exists():
-        return None
-
-    siae = approval.jobapplication_set.latest("created_at").to_siae
-    
-    return [
-        approval.user.pole_emploi_id,
-        approval.user.first_name,
-        approval.user.last_name,
-        approval.user.birthdate.strftime(DATE_FMT),
-        approval.number,
-        approval.start_at.strftime(DATE_FMT),
-        approval.end_at.strftime(DATE_FMT),
-        approval.user.post_code,
-        siae.post_code,
-        siae.siret,
-        siae.name,
-    ]
-
-
 def export_approvals(export_format="file"):
     """
     Main entry point. Currently used by admin site and an admin command (`itou/approvals/management/commands/export_approvals.py`)
@@ -73,11 +49,25 @@ def export_approvals(export_format="file"):
     ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
 
     data = [FIELDS]
+    approvals = Approval.objects.all().select_related("user").prefetch_related("jobapplication_set__to_siae")
 
-    for approval in Approval.objects.valid():
-        new_line = _approval_line(approval)
-        if new_line:
-            data.append(_approval_line(approval))
+    for approval in approvals:
+        # The same approval can be used for multiple job applications.
+        for job_application in approval.jobapplication_set.all():
+            line = [
+                approval.user.pole_emploi_id,
+                approval.user.first_name,
+                approval.user.last_name,
+                approval.user.birthdate.strftime(DATE_FMT),
+                approval.number,
+                approval.start_at.strftime(DATE_FMT),
+                approval.end_at.strftime(DATE_FMT),
+                approval.user.post_code,
+                job_application.to_siae.post_code,
+                job_application.to_siae.siret,
+                job_application.to_siae.name,
+            ]
+            data.append(line)
 
     # Getting the column to auto-adjust to max field size
     max_width = [0] * (len(FIELDS) + 1)
