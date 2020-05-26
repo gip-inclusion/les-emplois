@@ -5,7 +5,7 @@
 
 {% blocktrans %}
 
-Un prescripteur s'est inscrit en se rattachant à une organisation existante n'ayant pas encore de membre.
+Un prescripteur s'est inscrit en se rattachant à une organisation existante n'ayant pas encore de membres.
 
 *Nouvel utilisateur* :
 
