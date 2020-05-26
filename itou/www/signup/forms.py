@@ -87,6 +87,9 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         if organization:
             if organization.has_members:
                 organization.new_signup_warning_email_to_existing_members(user).send()
+            else:
+                organization.organization_with_no_member_email().send()
+
             membership = PrescriberMembership()
             membership.user = user
             membership.organization = organization
