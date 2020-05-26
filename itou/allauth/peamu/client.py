@@ -30,7 +30,6 @@ class PEAMUOAuth2Client(OAuth2Client):
         if self.access_token_method == "GET":
             params = data
             data = None
-        # TODO: Proper exception handling
         resp = requests.request(
             self.access_token_method, url, params=params, data=data, headers=self.headers, auth=auth
         )
