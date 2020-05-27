@@ -1,14 +1,15 @@
 from django.db.models import Count, Q
 from django.shortcuts import render
 
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.pagination import pager
-from itou.www.search.forms import SiaeSearchForm
+from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
 
 def search_siaes(request, template_name="search/siaes_search_results.html"):
 
-    form = SiaeSearchForm(data=request.GET)
+    form = SiaeSearchForm(data=request.GET or None)
     siaes_page = None
 
     if form.is_valid():
@@ -29,4 +30,21 @@ def search_siaes(request, template_name="search/siaes_search_results.html"):
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
     context = {"form": form, "siaes_page": siaes_page}
+    return render(request, template_name, context)
+
+
+def search_prescribers(request, template_name="search/prescribers_search_results.html"):
+
+    form = PrescriberSearchForm(data=request.GET or None)
+    prescriber_orgs_page = None
+
+    if form.is_valid():
+
+        city = form.cleaned_data["city"]
+        distance_km = form.cleaned_data["distance"]
+
+        prescriber_orgs = PrescriberOrganization.objects.filter(is_authorized=True).within(city.coords, distance_km)
+        prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
+
+    context = {"form": form, "prescriber_orgs_page": prescriber_orgs_page}
     return render(request, template_name, context)

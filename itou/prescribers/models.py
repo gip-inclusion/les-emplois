@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.validators import RegexValidator
 from django.db import models
@@ -27,6 +29,13 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
 
     def by_safir_code(self, safir_code):
         return self.filter(code_safir_pole_emploi=safir_code).first()
+
+    def within(self, point, distance_km):
+        return (
+            self.filter(coords__distance_lte=(point, D(km=distance_km)))
+            .annotate(distance=Distance("coords", point))
+            .order_by("distance")
+        )
 
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
