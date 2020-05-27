@@ -118,3 +118,12 @@ class JobApplicationWithApprovalFactory(JobApplicationSentByPrescriberFactory):
             return
         self.approval.user = self.job_seeker
         self.approval.save()
+
+
+class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
+    """
+    Generates a Job Application without Approval.
+    """
+
+    state = models.JobApplicationWorkflow.STATE_ACCEPTED
+    approval_not_needed = True

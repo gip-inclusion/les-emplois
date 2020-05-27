@@ -193,7 +193,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     ),
                 )
 
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id,})
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
     context = {

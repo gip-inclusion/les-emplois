@@ -261,7 +261,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="approval_numbers_sent",
     )
 
-    approval_not_needed = models.BooleanField(default=False, verbose_name=_("L'entreprise a choisi de ne pas obtenir de PASS IAE"))
+    approval_not_needed = models.BooleanField(
+        default=False, verbose_name=_("L'entreprise a choisi de ne pas obtenir de PASS IAE")
+    )
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
