@@ -21,10 +21,13 @@
 
         <li>{% trans "Date de naissance :" %} <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b></li>
 
-        <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a></li>
+        <li>{% trans "E-mail :" %} <a
+                href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a></li>
 
         {% if job_application.job_seeker.phone %}
-            <li>{% trans "Téléphone :" %} <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a></li>
+            <li>{% trans "Téléphone :" %} <a
+                    href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a>
+            </li>
         {% endif %}
 
         {% if job_application.job_seeker.address_on_one_line %}
@@ -32,7 +35,9 @@
         {% endif %}
 
         {% if job_application.job_seeker.resume_link %}
-            <li>{% trans "Lien vers CV :" %} <a href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a> </li>
+            <li>{% trans "Lien vers CV :" %} <a
+                    href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
+            </li>
         {% endif %}
 
         {% if job_application.selected_jobs.exists %}
@@ -102,7 +107,7 @@
                     {% endif %}
                 {% endwith %}
 
-            {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
+                {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
 
                 {# The existence of a valid `PoleEmploiApproval` implies that #}
                 {# a diagnosis has been made outside of Itou. #}
@@ -132,7 +137,8 @@
 
         <li>{% trans "Type :" %} <b>{{ job_application.get_sender_kind_display }}</b></li>
 
-        <li>{% trans "E-mail :" %} <a href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
+        <li>{% trans "E-mail :" %} <a
+                href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
 
         {% if job_application.sender_prescriber_organization %}
             <li>
@@ -166,7 +172,8 @@
 
         <hr>
 
-        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}" class="js-prevent-multiple-submit">
+        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}"
+              class="js-prevent-multiple-submit">
             {% csrf_token %}
             {% buttons %}
                 <button type="submit" class="btn btn-warning">{% trans "J'étudie cette candidature" %}</button>
@@ -184,17 +191,17 @@
         <h3 class="font-weight-normal text-muted">{% trans "Réponse" %}</h3>
 
         {% if job_application.refusal_reason %}
-        <p>
-            <b>{% trans "Motif du refus :" %}</b><br>
-            {{ job_application.get_refusal_reason_display }}
-        </p>
+            <p>
+                <b>{% trans "Motif du refus :" %}</b><br>
+                {{ job_application.get_refusal_reason_display }}
+            </p>
         {% endif %}
 
         {% if job_application.answer %}
-        <div class="alert alert-secondary">
-            <p><b>{% trans "Message :" %}</b></p>
-            {{ job_application.answer|linebreaks }}
-        </div>
+            <div class="alert alert-secondary">
+                <p><b>{% trans "Message :" %}</b></p>
+                {{ job_application.answer|linebreaks }}
+            </div>
         {% endif %}
 
     {% endif %}
@@ -208,7 +215,8 @@
         {% if job_application.eligibility_diagnosis_by_siae_required %}
 
             <p>
-                <a href="{% url 'apply:eligibility' job_application_id=job_application %}" class="btn btn-secondary btn-block">
+                <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
+                   class="btn btn-secondary btn-block">
                     {% trans "Valider les critères d'éligibilité" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
@@ -217,25 +225,66 @@
         {% else %}
 
             <p>
-                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
+                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+                   class="btn btn-outline-danger btn-block">
                     {% trans "Je ne veux pas l'embaucher" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
 
             <p>
-                <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+                <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
                     {% trans "Je veux l'embaucher plus tard" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
 
             <p>
-                <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
-                    {% trans "Je l'embauche" %}
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    {% trans "Je l'embauche et j'obtiens un PASS IAE" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
+            
+            <p>
+                <a href="#" class="btn btn-outline-success btn-block"
+                   data-toggle="modal"
+                   data-target="#confirmModal">
+                    {% trans "Je l'embauche sans obtenir de PASS IAE" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+            <!-- Confirm applying without approval -->
+            <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModal"
+                 aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body p-4">
+                            <h4 class="modal-title text-center" id="mapModalLabel">Embauche sans PASS IAE</h4>
+                            <p class="pt-2 text-center">Veuillez confirmer votre intention d'embaucher cette personne
+                                <span class="font-weight-bold">sans obtenir de PASS IAE</span></p>
+                            <div id="mapPoll">
+                                <div class="row buttonsContainer">
+                                    <div class="col pr-2">
+                                        <a href="{% url 'apply:accept_without_approval' job_application_id=job_application.id %}"
+                                           class="btn btn-outline-success w-100">
+                                            Je l'embauche sans PASS IAE
+                                        </a>
+                                    </div>
+                                    <div class="col pl-2">
+                                        <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
+                                            Je me suis trompé !
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         {% endif %}
 
@@ -248,14 +297,16 @@
         <hr>
 
         <p>
-            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
                 {% trans "Je ne veux pas l'embaucher" %}
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>
 
         <p>
-            <a href="{% url 'apply:accept' job_application_id=job_application.id %}" class="btn btn-outline-success btn-block">
+            <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+               class="btn btn-outline-success btn-block">
                 {% trans "Je l'embauche" %}
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
@@ -268,12 +319,12 @@
     {% if job_application.state.is_accepted %}
         <hr>
 
-        <h3 class="font-weight-normal text-muted">{% trans "Détails du contrat de travail"%}</h3>
+        <h3 class="font-weight-normal text-muted">{% trans "Détails du contrat de travail" %}</h3>
         <p>
-            <ul>
-                <li>{% trans "Début" %} : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
-                <li>{% trans "Fin" %} : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
-            </ul>
+        <ul>
+            <li>{% trans "Début" %} : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
+            <li>{% trans "Fin" %} : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
+        </ul>
         </p>
 
         {# Job application cancellation -------------------------------------------------------------------------- #}
@@ -283,13 +334,15 @@
             <h3 class="font-weight-normal text-muted">{% trans "Rétractation" %}</h3>
             <p>
                 {% blocktrans with cancellation_date=job_application.cancellation_delay_end cancellation_days=cancellation_days %}
-                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit le {{ cancellation_date }} inclus.
+                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit le
+                    {{ cancellation_date }} inclus.
                 {% endblocktrans %}
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
                     {% blocktrans with user_name=job_application.job_seeker.get_full_name|title %}
-                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans
+                        le futur.
                     {% endblocktrans %}
                 </p>
             {% endif %}
@@ -314,7 +367,8 @@
         <ul>
             {% for log in transition_logs %}
                 <li>
-                    {% blocktrans with pretty_to_state=log.pretty_to_state %}Passé en "<b>{{ pretty_to_state }}</b>"{% endblocktrans %}
+                    {% blocktrans with pretty_to_state=log.pretty_to_state %}Passé en "<b>{{ pretty_to_state }}</b>
+                        "{% endblocktrans %}
                     <ul>
                         {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
                             <li>{% trans "Par" %} {{ log.user.get_full_name }}</li>

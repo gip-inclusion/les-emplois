@@ -340,6 +340,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def accept(self, *args, **kwargs):
 
         accepted_by = kwargs.get("user")
+        approval_needed = kwargs.get("approval_needed")
 
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
@@ -349,7 +350,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         emails = [self.email_accept]
 
         # Approval issuance logic.
-        if self.to_siae.is_subject_to_eligibility_rules:
+        if approval_needed and self.to_siae.is_subject_to_eligibility_rules:
 
             approvals_wrapper = self.job_seeker.approvals_wrapper
 

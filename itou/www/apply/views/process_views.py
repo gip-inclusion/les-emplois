@@ -142,6 +142,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     job_application = get_object_or_404(queryset, id=job_application_id)
     approvals_wrapper = job_application.job_seeker.approvals_wrapper
     check_waiting_period(approvals_wrapper, job_application)
+    approval_needed = request.path.endswith("_without_approval") # TND: moche
 
     forms = []
 
@@ -169,7 +170,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             form_user_address.save()
 
         job_application = form_accept.save()
-        job_application.accept(user=request.user)
+        job_application.accept(user=request.user, approval_needed=approval_needed)
 
         messages.success(request, mark_safe(_("Embauche acceptée !")))
 
