@@ -1,5 +1,7 @@
+from allauth.account.models import EmailAddress
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberMembership
@@ -69,6 +71,7 @@ class ItouUserAdmin(UserAdmin):
         "is_staff",
         "is_peamu",
         "is_created_by_a_proxy",
+        "has_verified_email",
         "last_login",
     )
     list_display_links = ("id", "email")
@@ -99,6 +102,16 @@ class ItouUserAdmin(UserAdmin):
         ),
     )
 
+    def has_verified_email(self, obj):
+        """
+        Quickly identify unverified email that could be the result of a typo.
+        """
+        return obj._has_verified_email
+
+    has_verified_email.boolean = True
+    has_verified_email.admin_order_field = "_has_verified_email"
+    has_verified_email.short_description = "Email validé"
+
     def is_created_by_a_proxy(self, obj):
         return obj.created_by is not None
 
@@ -122,6 +135,9 @@ class ItouUserAdmin(UserAdmin):
         qs = super().get_queryset(request)
         if not request.user.is_superuser:
             qs = qs.exclude(is_superuser=True)
+        if request.resolver_match.view_name.endswith("changelist"):
+            has_verified_email = EmailAddress.objects.filter(email=OuterRef("email"), verified=True)
+            qs = qs.annotate(_has_verified_email=Exists(has_verified_email))
         return qs
 
     def get_readonly_fields(self, request, obj=None):
