@@ -26,6 +26,8 @@ Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/is
 
     $ docker-compose -f docker-compose-dev.yml run --service-ports django
 
+Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à l'adresse http://localhost:8080/
+
 ### Peupler la base de données
 
     $ make populate_db
