@@ -61,7 +61,16 @@ class KindFilter(admin.SimpleListFilter):
 class ItouUserAdmin(UserAdmin):
 
     inlines = UserAdmin.inlines + [SiaeMembershipInline, PrescriberMembershipInline]
-    list_display = ("id", "email", "first_name", "last_name", "is_staff", "is_created_by_a_proxy", "last_login")
+    list_display = (
+        "id",
+        "email",
+        "first_name",
+        "last_name",
+        "is_staff",
+        "is_peamu",
+        "is_created_by_a_proxy",
+        "last_login",
+    )
     list_display_links = ("id", "email")
     list_filter = UserAdmin.list_filter + (KindFilter,)
     ordering = ("-id",)
@@ -94,6 +103,16 @@ class ItouUserAdmin(UserAdmin):
         return obj.created_by is not None
 
     is_created_by_a_proxy.boolean = True
+    is_created_by_a_proxy.short_description = "créé par proxy"
+
+    def is_peamu(self, obj):
+        """
+        This method is needed since is_peamu is a property, not a field.
+        """
+        return obj.is_peamu
+
+    is_peamu.boolean = True
+    is_peamu.short_description = "pe connect"
 
     def get_queryset(self, request):
         """

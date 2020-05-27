@@ -12,7 +12,7 @@
 
 Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le fichier `README.md`, puis y configurer les variables d'environnement suivantes :
 
-    DJANGO_PORT_ON_DOCKER_HOST=8000
+    DJANGO_PORT_ON_DOCKER_HOST=8080
     POSTGRES_PORT_ON_DOCKER_HOST=5433
 
 ### Lancer le serveur de développement
@@ -25,6 +25,8 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194) type `ipdb` :
 
     $ docker-compose -f docker-compose-dev.yml run --service-ports django
+
+Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à l'adresse http://localhost:8080/
 
 ### Peupler la base de données
 

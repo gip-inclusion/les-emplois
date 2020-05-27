@@ -1,10 +1,11 @@
-from allauth.account.views import PasswordChangeView
+from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
+from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
@@ -59,6 +60,28 @@ class ItouPasswordChangeView(PasswordChangeView):
 
 
 password_change = login_required(ItouPasswordChangeView.as_view())
+
+
+class ItouLogoutView(LogoutView):
+    def post(self, *args, **kwargs):
+        """
+        We overload this method so that we can process the PEAMU callback
+        when the user logs out.
+        Original code:
+        https://github.com/pennersr/django-allauth/blob/master/allauth/account/views.py#L775
+        """
+        peamu_id_token = self.request.user.peamu_id_token
+        ajax_response = super().post(*args, **kwargs)
+        if peamu_id_token:
+            hp_url = self.request.build_absolute_uri(reverse("home:hp"))
+            params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
+            peamu_logout_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
+            return HttpResponseRedirect(peamu_logout_url)
+        else:
+            return ajax_response
+
+
+logout = login_required(ItouLogoutView.as_view())
 
 
 @login_required

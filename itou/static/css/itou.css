@@ -316,3 +316,24 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 _:-ms-fullscreen, :root .alert-old-browser {
     display: block;
 }
+
+/* Horizontal line with words in the middle.
+https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-with-words-in-the-middle/44647131#44647131
+--------------------------------------------------------------------------- */
+
+.lines-on-sides {
+    display: flex;
+    flex-direction: row;
+}
+.lines-on-sides:before, .lines-on-sides:after{
+    content: "";
+    flex: 1 1;
+    border-bottom: 1px solid #000;
+    margin: auto;
+}
+.lines-on-sides:before {
+    margin-right: 10px
+}
+.lines-on-sides:after {
+    margin-left: 10px
+}

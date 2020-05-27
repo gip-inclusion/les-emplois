@@ -34,7 +34,7 @@ services:
       - .:/app
     restart: always
     ports:
-      - "${DJANGO_PORT_ON_DOCKER_HOST:-8000}:8000"
+      - "${DJANGO_PORT_ON_DOCKER_HOST:-8080}:8000"
 
 volumes:
   postgres_data:

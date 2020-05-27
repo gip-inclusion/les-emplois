@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
@@ -118,6 +119,16 @@ class User(AbstractUser, AddressMixin):
         return self.eligibility_diagnoses.select_related(
             "author", "author_siae", "author_prescriber_organization"
         ).latest("-created_at")
+
+    @cached_property
+    def is_peamu(self):
+        return self.socialaccount_set.filter(provider="peamu").exists()
+
+    @cached_property
+    def peamu_id_token(self):
+        if not self.is_peamu:
+            return None
+        return self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):

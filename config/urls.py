@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
 from itou.www.signup import views as signup_views
+from itou.www.login import views as login_views
 
 
 register_converter(SiretConverter, "siret")
@@ -26,6 +27,15 @@ urlpatterns = [
         r"^accounts/signup/$", signup_views.signup
     ),
     # --------------------------------------------------------------------------------------
+    # Override allauth `account_login` URL.
+    # /accounts/login/ <=> account_login
+    # We override this view because the login page should look slightly differently
+    # for job seekers, prescribers and employers.
+    # Also, PEAMU is only available for job seekers.
+    re_path(
+        r"^accounts/login/$", login_views.login
+    ),
+    # --------------------------------------------------------------------------------------
     # Override allauth `account_change_password` URL.
     # /accounts/password/change/ <=> account_change_password
     # https://github.com/pennersr/django-allauth/issues/468
@@ -35,8 +45,15 @@ urlpatterns = [
     # Avoid user enumeration via password reset page.
     re_path(r"^accounts/password/reset/$", signup_views.ItouPasswordResetView.as_view()),
     # --------------------------------------------------------------------------------------
-    # Other allauth URLs.
+    # Override allauth `account_logout` URL.
+    # /accounts/logout/ <=> account_logout
+    # We need custom code to process PEAMU logout.
+    re_path(r"^accounts/logout/$", dashboard_views.logout),
+    # --------------------------------------------------------------------------------------    # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
+    # --------------------------------------------------------------------------------------
+    # PEAMU URLs.
+    path("accounts/", include("itou.allauth.peamu.urls")),
     # --------------------------------------------------------------------------------------
 
     # www.
