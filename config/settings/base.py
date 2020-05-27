@@ -64,6 +64,7 @@ LOCAL_APPS = [
     "itou.job_applications",
     "itou.approvals",
     "itou.eligibility",
+    "itou.invitations",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
@@ -75,6 +76,7 @@ LOCAL_APPS = [
     "itou.www.search",
     "itou.www.siaes_views",
     "itou.www.signup",
+    "itou.www.invitations_views",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

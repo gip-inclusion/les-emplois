@@ -1,15 +1,17 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.views import PasswordResetView, SignupView
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
+from itou.invitations.models import Invitation
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -135,3 +137,33 @@ class PoleEmploiPrescriberView(PrescriberSignup):
 class AuthorizedPrescriberView(PrescriberSignup):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberForm
+
+
+class FromInvitationView(SignupView):
+
+    form_class = forms.UserSignupFromInvitationForm
+    template_name = "signup/signup_from_invitation.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(SignupView, self).get_context_data(**kwargs)
+        context["encoded_invitation_id"] = kwargs.get("encoded_invitation_id")
+        return context
+
+    def get(self, request, *args, **kwargs):
+        invitation = Invitation.objects.get_from_encoded_pk(kwargs.get("encoded_invitation_id"))
+        data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
+        form = forms.UserSignupFromInvitationForm(initial=data)
+        self.initial = data
+        return super().get(request, *args, **kwargs)
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        super().post(request, *args, **kwargs)
+        DefaultAccountAdapter().login(request, self.user)
+
+        invitation = Invitation.objects.get_from_encoded_pk(kwargs.get("encoded_invitation_id"))
+        invitation.accepted = True
+        invitation.save()
+
+        return redirect("dashboard:index")
