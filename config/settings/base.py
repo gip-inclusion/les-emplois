@@ -315,12 +315,10 @@ API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
 
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
-# Note that the `EMPLOI_STORE` naming below is incorrect,
-# as the Emploi Store is a totally different beast than the ESD.
-API_EMPLOI_STORE_KEY = os.environ["API_EMPLOI_STORE_KEY"]
-API_EMPLOI_STORE_SECRET = os.environ["API_EMPLOI_STORE_SECRET"]
-API_EMPLOI_STORE_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
-API_EMPLOI_STORE_BASE_URL = "https://api.emploi-store.fr/partenaire"
+API_ESD_KEY = os.environ["API_ESD_KEY"]
+API_ESD_SECRET = os.environ["API_ESD_SECRET"]
+API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
+API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
 # PEAM stands for Pôle Emploi Access Management.
@@ -334,8 +332,8 @@ SOCIALACCOUNT_PROVIDERS={
     "peamu": {
         "APP": {
             "key": "peamu",
-            "client_id": API_EMPLOI_STORE_KEY,
-            "secret": API_EMPLOI_STORE_SECRET
+            "client_id": API_ESD_KEY,
+            "secret": API_ESD_SECRET
         },
     },
 }

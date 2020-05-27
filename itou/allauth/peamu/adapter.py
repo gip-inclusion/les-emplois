@@ -18,7 +18,7 @@ class PEAMUOAuth2Adapter(OAuth2Adapter):
 
     authorize_url = f"{settings.PEAMU_AUTH_BASE_URL}/connexion/oauth2/authorize"
     access_token_url = f"{settings.PEAMU_AUTH_BASE_URL}/connexion/oauth2/access_token"
-    profile_url = f"{settings.API_EMPLOI_STORE_BASE_URL}/peconnect-individu/v1/userinfo"
+    profile_url = f"{settings.API_ESD_BASE_URL}/peconnect-individu/v1/userinfo"
     headers = {"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"}
 
     def complete_login(self, request, app, token, **kwargs):

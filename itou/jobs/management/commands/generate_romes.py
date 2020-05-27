@@ -4,7 +4,7 @@ import requests
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from itou.utils.apis.emploi_store_dev import get_access_token
+from itou.utils.apis.esd import get_access_token
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -24,7 +24,7 @@ class Command(BaseCommand):
     def handle(self, **options):
 
         token = get_access_token("api_romev1 nomenclatureRome")
-        url = f"{settings.API_EMPLOI_STORE_BASE_URL}/rome/v1/metier"
+        url = f"{settings.API_ESD_BASE_URL}/rome/v1/metier"
         r = requests.get(url, headers={"Authorization": token})
         r.raise_for_status()
 

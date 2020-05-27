@@ -30,7 +30,8 @@ EXPORT_FORMATS = ["stream", "file"]
 
 def export_approvals(export_format="file"):
     """
-    Main entry point. Currently used by admin site and an admin command (`itou/approvals/management/commands/export_approvals.py`)
+    Main entry point. Currently used by admin site and an admin command:
+        $ itou/approvals/management/commands/export_approvals.py
 
     `export_format` can be either:
         * `file` : for the admin command, export result as a file

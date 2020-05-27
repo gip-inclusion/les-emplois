@@ -1,3 +1,7 @@
+"""
+    Pôle emploi's Emploi Store Dev aka ESD.
+    https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
+"""
 import collections
 import datetime
 import logging
@@ -23,13 +27,13 @@ def get_access_token(scope):
             return token.value
 
     auth_request = requests.post(
-        f"{settings.API_EMPLOI_STORE_AUTH_BASE_URL}/connexion/oauth2/access_token",
+        f"{settings.API_ESD_AUTH_BASE_URL}/connexion/oauth2/access_token",
         data={
             "realm": "/partenaire",
             "grant_type": "client_credentials",
-            "client_id": settings.API_EMPLOI_STORE_KEY,
-            "client_secret": settings.API_EMPLOI_STORE_SECRET,
-            "scope": f"application_{settings.API_EMPLOI_STORE_KEY} {scope}",
+            "client_id": settings.API_ESD_KEY,
+            "client_secret": settings.API_ESD_SECRET,
+            "scope": f"application_{settings.API_ESD_KEY} {scope}",
         },
     )
     auth_request.raise_for_status()
