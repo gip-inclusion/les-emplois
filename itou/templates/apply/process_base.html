@@ -35,6 +35,8 @@
                     {% trans "Numéro d'agrément :" %} <b>{{ job_application.approval.number_with_spaces }}</b>
                     <br>
                     {% include "approvals/includes/status.html" with approval=job_application.approval %}
+                {% elif job_application.approval_not_needed %}
+                    {% trans "Vous n'avez pas demandé de PASS IAE." %}
                 {% else %}
                     {% trans "PASS IAE en cours de délivrance." %}
                 {% endif %}

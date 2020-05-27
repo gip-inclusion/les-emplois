@@ -20,9 +20,11 @@
         {% endif %}
 
         {% if form_pe_status %}
-            <div class="alert alert-warning" role="alert">
-                {% trans "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
-            </div>
+            {% if not job_application.approval_not_needed %}
+                <div class="alert alert-warning" role="alert">
+                    {% trans "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
+                </div>
+            {% endif %}
 
             {% bootstrap_form form_pe_status %}
         {% endif %}
@@ -41,7 +43,8 @@
 
 
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
+            <a class="btn btn-secondary"
+               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
             <button type="submit" class="btn btn-success">{% trans "Je l'embauche" %}</button>
         {% endbuttons %}
 

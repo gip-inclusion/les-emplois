@@ -261,6 +261,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="approval_numbers_sent",
     )
 
+    approval_not_needed = models.BooleanField(default=False, verbose_name=_("L'entreprise a choisi de ne pas obtenir de PASS IAE"))
+
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
 
@@ -340,7 +342,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def accept(self, *args, **kwargs):
 
         accepted_by = kwargs.get("user")
-        approval_needed = kwargs.get("approval_needed")
 
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
@@ -350,7 +351,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         emails = [self.email_accept]
 
         # Approval issuance logic.
-        if approval_needed and self.to_siae.is_subject_to_eligibility_rules:
+        if not self.approval_not_needed and self.to_siae.is_subject_to_eligibility_rules:
 
             approvals_wrapper = self.job_seeker.approvals_wrapper
 
