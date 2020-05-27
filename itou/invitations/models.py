@@ -1,12 +1,15 @@
 import logging
 
 from django.conf import settings
+from django.core import mail
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
+
+from itou.utils.emails import get_email_message
 
 
 logger = logging.getLogger(__name__)
@@ -53,3 +56,21 @@ class Invitation(models.Model):
     @property
     def acceptance_link(self):
         return reverse("invitations_views:accept", kwargs={"encoded_invitation_id": self.encoded_pk})
+
+    def accept(self):
+        self.accepted = True
+        self.save()
+        self.accepted_notif_sender()
+
+    def accepted_notif_sender(self):
+        connection = mail.get_connection()
+        emails = [self.email_accepted_notif_sender]
+        connection.send_messages(emails)
+
+    @property
+    def email_accepted_notif_sender(self):
+        to = [self.sender.email]
+        context = {"first_name": self.first_name, "last_name": self.last_name, "email": self.email}
+        subject = "invitations_views/email/accepted_notif_sender_subject.txt"
+        body = "invitations_views/email/accepted_notif_sender_body.txt"
+        return get_email_message(to, context, subject, body)

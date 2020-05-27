@@ -1,0 +1,15 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+
+{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst %}
+{{ first_name }} {{ last_name }} est désormais membre de notre site.
+{% endblocktrans %}
+
+{% trans "Détails" %}
+-------------------
+- {% trans "Prénom" %} : {{ first_name }}
+- {% trans "Nom" %} : {{ last_name }}
+- {% trans "E-mail" %} : {{ email }}
+
+{% endblock %}

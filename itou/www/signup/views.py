@@ -163,7 +163,6 @@ class FromInvitationView(SignupView):
         DefaultAccountAdapter().login(request, self.user)
 
         invitation = Invitation.objects.get_from_encoded_pk(kwargs.get("encoded_invitation_id"))
-        invitation.accepted = True
-        invitation.save()
+        invitation.accept()
 
         return redirect("dashboard:index")

@@ -22,3 +22,23 @@ class InvitationModelTest(TestCase):
 
     def test_acceptance_link(self):
         self.assertIn(self.invitation.encoded_pk, self.invitation.acceptance_link)
+
+
+class InvitationEmailsTest(TestCase):
+    def setUp(self):
+        self.invitation = SentInvitationFactory()
+
+    def test_accepted_notif_sender(self):
+        email = self.invitation.email_accepted_notif_sender
+
+        # Subject
+        self.assertIn(self.invitation.first_name, email.subject)
+        self.assertIn(self.invitation.last_name, email.subject)
+
+        # Body
+        self.assertIn(self.invitation.first_name, email.body)
+        self.assertIn(self.invitation.last_name, email.body)
+        self.assertIn(self.invitation.email, email.body)
+
+        # To
+        self.assertIn(self.invitation.sender.email, email.to)

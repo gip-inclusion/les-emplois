@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 
@@ -42,3 +43,7 @@ class AcceptInvitationTest(TestCase):
         invitation.refresh_from_db()
 
         self.assertTrue(invitation.accepted)
+
+        # Make sure an email is sent to the invitation sender
+        outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
+        self.assertIn(invitation.sender.email, outbox_emails)
