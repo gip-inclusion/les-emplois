@@ -1,0 +1,13 @@
+{% load i18n %}
+{% load static %}
+{% load bootstrap4 %}
+
+<a id="peamu_login" href="{% url 'peamu_login' %}">
+    <img src="{% static 'img/logo_peamu.svg' %}" class="btn m-3">
+</a>
+<p class="lines-on-sides">ou</p>
+<p>
+    <a href="https://candidat.pole-emploi.fr/compte/creation/etape1etatcivil" target="_blank">
+        {% trans "Je n'ai pas d'adresse e-mail" %}
+    </a>
+</p>

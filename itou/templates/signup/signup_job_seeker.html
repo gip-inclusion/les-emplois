@@ -1,15 +1,22 @@
 {% extends "layout/content_small.html" %}
-{% load bootstrap4 %}
 {% load i18n %}
+{% load static %}
+{% load bootstrap4 %}
 
 {% block title %}{% trans "Demandeur d'emploi - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Demandeur d'emploi" %}
-    <small class="text-muted">{% trans "Inscription" %}</small>
+    {% trans "Inscription" %}
+    <small class="text-muted">{% trans "Candidat" %}</small>
 </h1>
+
+<div class="text-center">
+    {% include "peamu/button.html" %}
+    <p class="lines-on-sides">ou</p>
+    <p>Créer son compte</p>
+</div>
 
 <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
 

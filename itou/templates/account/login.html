@@ -1,12 +1,26 @@
 {# django-allauth template override. #}
 {% extends "layout/content_small.html" %}
-{% load bootstrap4 %}
 {% load i18n %}
+{% load static %}
+{% load bootstrap4 %}
 
 {% block title %}{% trans "Connexion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Connexion" %}</h1>
+<h1>
+    {% trans "Connexion" %}
+    {% if account_type_display_name %}
+        <small class="text-muted">{{ account_type_display_name }}</small>
+    {% endif %}
+</h1>
+
+{% if show_peamu %}
+    <div class="text-center">
+        {% include "peamu/button.html" %}
+        <p class="lines-on-sides">ou</p>
+        <p>Se connecter avec son compte</p>
+    </div>
+{% endif %}
 
 <form method="post" action="{% url 'account_login' %}" class="js-prevent-multiple-submit">
 
@@ -20,6 +34,8 @@
 
     {% bootstrap_field form.login %}
     {% bootstrap_field form.password %}
+
+    <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
 
     {% buttons %}
         <button type="submit" class="btn btn-primary">{% trans "Connexion" %}</button>
@@ -38,8 +54,11 @@
 <p>{% trans "Vous n'avez pas de compte ?" %}</p>
 
 <p>
-    <a class="btn btn-outline-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-    {% trans "Inscription" %}
+    <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+    {% trans "Créer un compte" %}
+    {% if account_type_display_name %}
+        {{ account_type_display_name|lower }}
+    {% endif %}
     </a>
 </p>
 

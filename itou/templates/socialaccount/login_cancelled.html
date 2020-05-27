@@ -1,0 +1,28 @@
+{# django-allauth template override. #}
+{% extends "layout/content_small.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Connexion annulée" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Connexion annulée" %}</h1>
+
+<p>
+	{% trans "Vous avez annulé votre tentative de connexion." %}
+</p>
+<p>
+	<a href="{% url 'account_login' %}?account_type=job_seeker">
+		<button class="btn btn-secondary">
+			{% trans "Retour" %}
+		</button>
+	</a>
+	<a href="{% url 'peamu_login' %}">
+		<button class="btn btn-primary">
+            {% trans "Se connecter à nouveau avec son compte Pôle emploi" %}
+        </button>
+    </a>
+</p>
+
+{% endblock %}

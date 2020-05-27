@@ -313,12 +313,32 @@ API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 API_INSEE_KEY = os.environ["API_INSEE_KEY"]
 API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
 
-# Pôle emploi.
+# Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
-API_EMPLOI_STORE_KEY = os.environ["API_EMPLOI_STORE_KEY"]
-API_EMPLOI_STORE_SECRET = os.environ["API_EMPLOI_STORE_SECRET"]
-API_EMPLOI_STORE_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
-API_EMPLOI_STORE_BASE_URL = "https://api.emploi-store.fr/partenaire"
+API_ESD_KEY = os.environ["API_ESD_KEY"]
+API_ESD_SECRET = os.environ["API_ESD_SECRET"]
+API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
+API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
+
+# PE Connect aka PEAMU - technically one of ESD's APIs.
+# PEAM stands for Pôle Emploi Access Management.
+# Technically there are two PEAM distinct systems:
+# - PEAM "Entreprise", PEAM-E or PEAME for short.
+# - PEAM "Utilisateur", PEAM-U or PEAMU for short.
+# To avoid confusion between the two when contacting ESD support,
+# we get the habit to always explicitely state that we are using PEAM*U*.
+PEAMU_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
+SOCIALACCOUNT_PROVIDERS={
+    "peamu": {
+        "APP": {
+            "key": "peamu",
+            "client_id": API_ESD_KEY,
+            "secret": API_ESD_SECRET
+        },
+    },
+}
+SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_ADAPTER = "itou.allauth.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # PDFShift
 PDFSHIFT_API_KEY = os.environ["PDFSHIFT_API_KEY"]

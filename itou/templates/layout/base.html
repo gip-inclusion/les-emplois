@@ -62,16 +62,20 @@
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
                                             {% trans "Tableau de bord" %}
                                         </a>
+                                        
                                         <div class="dropdown-divider"></div>
 
-                                        <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                            {% trans "Modifier votre mot de passe" %}
-                                        </a>
+                                        {% if not user.is_peamu %}
+                                            <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
+                                                {% trans "Modifier votre mot de passe" %}
+                                            </a>
+                                        {% endif %}
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
                                             {% trans "Modifier votre profil" %}
                                         </a>
 
                                         <div class="dropdown-divider"></div>
+
                                         <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
                                             <i>{% trans "Déconnexion" %}</i>
                                         </a>
@@ -107,12 +111,25 @@
                                     </div>
                                 </div>
                             {% endif %}
-                        </div>
+                            </div>
 
                         {% else %}
-                            <a class="btn btn-primary w-100 w-sm-auto my-1" href="{% url 'account_login' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                {% trans "Se connecter" %}
-                            </a>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    {% trans "Se connecter" %}
+                                </button>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                        {% trans "Candidat" %}
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=prescriber{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                        {% trans "Prescripteur" %}
+                                    </a>
+                                    <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                        {% trans "Employeur solidaire" %}
+                                    </a>
+                                </div>
+                            </div>
                         {% endif %}
 
                     </nav>
@@ -211,34 +228,39 @@
     <script src="{% static "vendor/bootstrap-4.3.1/bootstrap.min.js" %}"></script>
 
     {% block script %}
-    <script src="{% static "js/logout.js" %}"></script>
-    <script src="{% static "js/city_autocomplete_field.js" %}"></script>
-    <script src="{% static "js/configure_jobs.js" %}"></script>
-    <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
+        <script src="{% static "js/logout.js" %}"></script>
+        <script src="{% static "js/city_autocomplete_field.js" %}"></script>
+        <script src="{% static "js/configure_jobs.js" %}"></script>
+        <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
     {% endblock %}
 
     {% if "inclusion.beta.gouv.fr" in ALLOWED_HOSTS %}
-    {# Matomo/Piwik open source web analytics #}
-    <script>
-        var _paq = window._paq || [];
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(['trackPageView']);
-        _paq.push(['enableLinkTracking']);
-        (function() {
-          var u = "//stats.data.gouv.fr/";
-          _paq.push(['setTrackerUrl', u + 'piwik.php']);
-          _paq.push(['setSiteId', '117']);
-          var d = document,
-            g = d.createElement('script'),
-            s = d.getElementsByTagName('script')[0];
-          g.type = 'text/javascript';
-          g.async = true;
-          g.defer = true;
-          g.src = u + 'piwik.js';
-          s.parentNode.insertBefore(g, s);
-        })();
-    </script>
-    <script src="{% static "js/matomo.js" %}"></script>
+        {# Matomo/Piwik open source web analytics #}
+        <script>
+            var _paq = window._paq || [];
+            /* Custom variables: https://matomo.org/docs/custom-variables/ */
+            /* Fields are, in order: index, name, value, scope. */
+            {% for key, value in  matomo_custom_variables.items %}
+              _paq.push(['setCustomVariable', {{ forloop.counter }}, '{{ key }}', '{{ value }}', 'page']);
+            {% endfor %}
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+              var u = "//stats.data.gouv.fr/";
+              _paq.push(['setTrackerUrl', u + 'piwik.php']);
+              _paq.push(['setSiteId', '117']);
+              var d = document,
+                g = d.createElement('script'),
+                s = d.getElementsByTagName('script')[0];
+              g.type = 'text/javascript';
+              g.async = true;
+              g.defer = true;
+              g.src = u + 'piwik.js';
+              s.parentNode.insertBefore(g, s);
+            })();
+        </script>
+        <script src="{% static "js/matomo.js" %}"></script>
     {% endif %}
 
     <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
