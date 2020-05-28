@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.utils.http import urlsafe_base64_decode
 
-from itou.invitations.factories import SentInvitationFactory
+from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
 from itou.invitations.models import Invitation
 
 
@@ -11,6 +11,13 @@ class InvitationModelTest(TestCase):
 
     def test_acceptance_link(self):
         self.assertIn(str(self.invitation.pk), self.invitation.acceptance_link)
+
+    def has_expired(self):
+        invitation = ExpiredInvitationFactory()
+        self.assertTrue(invitation.has_expired)
+
+        invitation = SentInvitationFactory()
+        self.assertFalse(invitation.has_expired)
 
 
 class InvitationEmailsTest(TestCase):

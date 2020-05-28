@@ -30,10 +30,7 @@ class Migration(migrations.Migration):
                         db_index=True, default=django.utils.timezone.now, verbose_name="Date de création"
                     ),
                 ),
-                (
-                    "updated_at",
-                    models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date de modification"),
-                ),
+                ("sent_at", models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="Date d'envoi")),
                 (
                     "sender",
                     models.ForeignKey(

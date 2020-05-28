@@ -1,9 +1,12 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
+from django.utils import timezone
 
-from itou.invitations.factories import SentInvitationFactory
+from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
+from itou.invitations.models import Invitation
 
 
 class AcceptInvitationTest(TestCase):
@@ -11,8 +14,7 @@ class AcceptInvitationTest(TestCase):
 
         invitation = SentInvitationFactory()
 
-        acceptance_link = invitation.acceptance_link
-        response = self.client.get(acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link, follow=True)
 
         signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
 
@@ -49,3 +51,16 @@ class AcceptInvitationTest(TestCase):
         # Make sure an email is sent to the invitation sender
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         self.assertIn(invitation.sender.email, outbox_emails)
+
+    def test_accept_expired_invitation(self):
+        invitation = ExpiredInvitationFactory()
+
+        # User wants to join our website but it's too late!
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "expirée")
+
+    def test_accept_non_existant_invitation(self):
+        invitation = Invitation(first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com")
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertEqual(response.status_code, 404)

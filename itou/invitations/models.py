@@ -1,10 +1,11 @@
 import logging
 import uuid
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.urls import reverse
+from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
@@ -24,6 +25,8 @@ class InvitationManager(models.Manager):
 
 class Invitation(models.Model):
 
+    EXPIRATION_DAYS = 14
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(verbose_name=_("E-mail"))
     first_name = models.CharField(verbose_name=_("Prénom"), max_length=255)
@@ -37,7 +40,7 @@ class Invitation(models.Model):
     )
     accepted = models.BooleanField(verbose_name=_("Acceptée"), default=False)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
+    sent_at = models.DateTimeField(verbose_name=_("Date d'envoi"), blank=True, null=True, db_index=True)
 
     objects = InvitationManager()
 
@@ -47,18 +50,24 @@ class Invitation(models.Model):
     def __str__(self):
         return f"{self.email}"
 
-    def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
-
     @property
     def acceptance_link(self):
         return reverse("invitations_views:accept", kwargs={"invitation_id": self.id})
+
+    @property
+    def has_expired(self):
+        expiration_date = self.sent_at + relativedelta(days=self.EXPIRATION_DAYS)
+        return expiration_date <= timezone.now()
 
     def accept(self):
         self.accepted = True
         self.save()
         self.accepted_notif_sender()
+
+    def send(self):
+        self.sent = True
+        self.sent_at = timezone.now()
+        self.save()
 
     def accepted_notif_sender(self):
         connection = mail.get_connection()

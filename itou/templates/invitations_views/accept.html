@@ -1,0 +1,18 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Tableau de bord" %}{{ block.super }}{% endblock %}
+
+{% block messages %}
+    {{ block.super }}
+    {% if invitation.has_expired %}
+        <div class="alert alert-warning" role="alert">
+            {% trans "Cette invitation est expirée. Merci de contacter la personne
+            qui vous a invité(e) afin d'en recevoir une nouvelle." %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
