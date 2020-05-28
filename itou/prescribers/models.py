@@ -4,6 +4,7 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.validators import RegexValidator
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -164,6 +165,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     @property
     def active_members(self):
         return self.members.filter(is_active=True)
+
+    def get_card_url(self):
+        return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
     @property
     def has_unset_authorization(self):

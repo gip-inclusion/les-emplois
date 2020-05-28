@@ -47,7 +47,9 @@
                 <div class="card d-block my-4">
                     <div class="card-body">
                         <h5 class="card-title">
-                            {{ prescriber_org.display_name }}
+                            <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                {{ prescriber_org.name }}
+                            </a>
                         </h5>
                         <h6 class="card-subtitle mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</h6>
                         <p class="card-text">
