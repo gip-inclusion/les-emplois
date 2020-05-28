@@ -5,62 +5,65 @@
 
 {% block content %}
 
-    <h2 class="text-center">{% trans "Rechercher des prescripteurs" %}</h2>
+    <h2 class="text-center">{% trans "Rechercher un prescripteur" %}</h2>
 
     <form method="get" action="" class="d-block mb-5">
         {% include "search/includes/prescribers_search_form.html" with form=form %}
     </form>
 
-    <h3>
-        {% trans "Prescripteurs" %}
-        {% if request.GET.city_name and request.GET.distance %}
-            {% with request.GET.city_name as city and request.GET.distance as distance %}
-                {% blocktrans %}à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
-            {% endwith %}
-        {% endif %}
-    </h3>
+    {% if request.GET %}
 
-    {% if not prescriber_orgs_page %}
+        <h3>
+            {% trans "Prescripteurs" %}
+            {% if request.GET.city_name and request.GET.distance %}
+                {% with request.GET.city_name as city and request.GET.distance as distance %}
+                    {% blocktrans %}à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
+                {% endwith %}
+            {% endif %}
+        </h3>
 
-        <h4 class="font-weight-normal text-muted">
-            {% trans "Aucun résultat." %}
-        </h4>
+        {% if not prescriber_orgs_page %}
 
-    {% else %}
+            <h4 class="font-weight-normal text-muted">
+                {% trans "Aucun résultat." %}
+            </h4>
 
-        <h4 class="font-weight-normal text-muted">
-            {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages %}
-                {% blocktrans count counter=prescriber_orgs_page.paginator.count %}
-                    <b>1</b> résultat
-                {% plural %}
-                    <b>{{ counter }}</b> résultats
-                {% endblocktrans %}
-                {% if prescriber_orgs_page.paginator.num_pages > 1 %}
-                    {% blocktrans %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktrans %}
-                {% endif %}
-            {% endwith %}
-        </h4>
+        {% else %}
 
-        {% for prescriber_org in prescriber_orgs_page %}
-            <div class="card d-block my-4">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        {{ prescriber_org.display_name }}
-                    </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</h6>
-                    <p class="card-text">
-                        {% blocktrans with distance=prescriber_org.distance.km|floatformat:1 %}
-                            <span class="badge badge-dark">{{ distance }} Km</span>
-                            de votre lieu de recherche
-                        {% endblocktrans %}
-                    </p>
+            <h4 class="font-weight-normal text-muted">
+                {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages %}
+                    {% blocktrans count counter=prescriber_orgs_page.paginator.count %}
+                        <b>1</b> résultat
+                    {% plural %}
+                        <b>{{ counter }}</b> résultats
+                    {% endblocktrans %}
+                    {% if prescriber_orgs_page.paginator.num_pages > 1 %}
+                        {% blocktrans %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktrans %}
+                    {% endif %}
+                {% endwith %}
+            </h4>
+
+            {% for prescriber_org in prescriber_orgs_page %}
+                <div class="card d-block my-4">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ prescriber_org.display_name }}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</h6>
+                        <p class="card-text">
+                            {% blocktrans with distance=prescriber_org.distance.km|floatformat:1 %}
+                                <span class="badge badge-dark">{{ distance }} Km</span>
+                                de votre lieu de recherche
+                            {% endblocktrans %}
+                        </p>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
 
-        {% include "includes/pagination.html" with page=prescriber_orgs_page %}
+            {% include "includes/pagination.html" with page=prescriber_orgs_page %}
+
+        {% endif %}
 
     {% endif %}
-
 
 {% endblock %}

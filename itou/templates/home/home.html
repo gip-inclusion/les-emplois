@@ -7,63 +7,67 @@
 
 {% block content %}
 
-    <section class="layout-section home-search pb-5 pb-sm-0">
-        <div class="layout layout-column-full">
+    <section class="layout-section home-search">
 
-            <h2 class="text-center mt-5 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
+        <div class="layout-content">
+
+            <h2 class="text-center my-5 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
 
             <form method="get" action="{% url 'search:siaes' %}">
                 {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
             </form>
 
-            <div class="bg-image position-relative mt-sm-5 layout-column-full" style="background-image: url('{% static 'img/home-bg.svg' %}');"></div>
-
         </div>
+
+        <div class="bg-image position-relative mt-sm-5 layout-column-full" style="background-image: url('{% static 'img/home-bg.svg' %}');"></div>
+
     </section>
 
     {% if not user.is_authenticated %}
         <section class="layout-section bg-light py-5 text-center">
-            <h3 class="h4 font-weight-bold">{% trans "Vous découvrez l’inclusion ?" %}</h3>
-            <h3 class="h4 pt-2 font-weight-light">{% trans "Nos outils sont à votre disposition" %}</h4>
+            <div class="layout-content">
+                <h3 class="h4 font-weight-bold">{% trans "Vous découvrez l'inclusion ?" %}</h3>
+                <h3 class="h4 pt-2 font-weight-light">{% trans "Nos outils sont à votre disposition" %}</h4>
 
-            <div class="card-deck my-5 justify-content-between text-center">
-                <div class="card p-4" style="flex: 0 0 23%;">
-                    <div class="card-body">
-                        <h5 class="card-title font-weight-light mb-4">
-                            <span class="d-block">{% trans "Pour commencer," %}</span>
-                            <span class="d-block">{% trans "inscrivez-vous sur la plateforme" %}</span>
-                        </h5>
-                        <a href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                            <button class="btn btn-primary">
-                                {% trans "Créer un compte" %}
-                            </button>
-                        </a>
+                <div class="card-deck my-5 justify-content-between text-center">
+                    <div class="card p-4" style="flex: 0 0 23%;">
+                        <div class="card-body">
+                            <h5 class="card-title font-weight-light mb-4">
+                                <span class="d-block">{% trans "Pour commencer," %}</span>
+                                <span class="d-block">{% trans "inscrivez-vous sur la plateforme" %}</span>
+                            </h5>
+                            <a href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                <button class="btn btn-primary">
+                                    {% trans "Créer un compte" %}
+                                </button>
+                            </a>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card p-4" style="flex: 0 0 23%;">
-                    <div class="card-body">
-                        <h5 class="card-title font-weight-light mb-4">
-                            {% trans "Discutez entre professionnels sur le forum de l'inclusion" %}
-                        </h5>
-                        <a class="card-link" href="https://forum.inclusion.beta.gouv.fr">
-                            <button class="btn btn-primary">
-                                {% trans "Accéder au forum" %}
-                            </button>
-                        </a>
+                    <div class="card p-4" style="flex: 0 0 23%;">
+                        <div class="card-body">
+                            <h5 class="card-title font-weight-light mb-4">
+                                {% trans "Discutez entre professionnels sur le forum de l'inclusion" %}
+                            </h5>
+                            <a class="card-link" href="https://forum.inclusion.beta.gouv.fr">
+                                <button class="btn btn-primary">
+                                    {% trans "Accéder au forum" %}
+                                </button>
+                            </a>
+                        </div>
                     </div>
-                </div>
 
-                <div class="card p-4" style="flex: 0 0 23%;">
-                    <div class="card-body">
-                        <h5 class="card-title font-weight-light mb-4">
-                            {% trans "Découvrez l’espace de documentation pour tout comprendre" %}
-                        </h5>
-                        <a class="card-link" href="https://doc.inclusion.beta.gouv.fr/" target=_blank>
-                            <button class="btn btn-primary">
-                                {% trans "En savoir plus" %}
-                            </button>
-                        </a>
+                    <div class="card p-4" style="flex: 0 0 23%;">
+                        <div class="card-body">
+                            <h5 class="card-title font-weight-light mb-4">
+                                {% trans "Découvrez l'espace de documentation pour tout comprendre" %}
+                            </h5>
+                            <a class="card-link" href="https://doc.inclusion.beta.gouv.fr/" target=_blank>
+                                <button class="btn btn-primary">
+                                    {% trans "En savoir plus" %}
+                                </button>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
