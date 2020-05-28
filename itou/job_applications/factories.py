@@ -126,4 +126,4 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
     """
 
     state = models.JobApplicationWorkflow.STATE_ACCEPTED
-    approval_not_needed = True
+    approval_needed = False
