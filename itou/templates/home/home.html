@@ -9,15 +9,15 @@
 
     <section class="layout-section home-search pb-5 pb-sm-0">
         <div class="layout layout-column-full">
-            <h2 class="text-center mt-5 mb-3 mx-4 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
 
-            <div class="layout-column-main">
-                <form method="get" action="{% url 'search:siaes' %}" class="my-3 mx-auto">
-                    {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
-                </form>
-            </div>
+            <h2 class="text-center mt-5 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
+
+            <form method="get" action="{% url 'search:siaes' %}">
+                {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
+            </form>
 
             <div class="bg-image position-relative mt-sm-5 layout-column-full" style="background-image: url('{% static 'img/home-bg.svg' %}');"></div>
+
         </div>
     </section>
 

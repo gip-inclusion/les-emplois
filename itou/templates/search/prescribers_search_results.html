@@ -5,59 +5,30 @@
 
 {% block content %}
 
-    <h1 class="text-center">{% trans "Rechercher des prescripteurs" %}</h1>
+    <h2 class="text-center">{% trans "Rechercher des prescripteurs" %}</h2>
 
-    <form method="get" action="" class="d-block my-4">
-
-        <div class="rounded p-3 bg-light">
-            <div class="row no-gutters">
-                {# Apply bottom margins only on `sm` sizes: https://stackoverflow.com/a/50879258 #}
-                <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
-                    {{ form.distance }}
-                </div>
-                <div class="col-sm mr-1 mb-1 mb-sm-0">
-                    {{ form.city }}
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            {# Loading #}
-                            <span class="input-group-text js-city-autocomplete-loading d-none">
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                <span class="sr-only">{% trans "Chargement..." %}</span>
-                            </span>
-                            {# No loading #}
-                            <span class="input-group-text js-city-autocomplete-no-loading">
-                                {% include "includes/icon.html" with icon="map-pin" %}
-                            </span>
-                        </div>
-                        {{ form.city_name }}
-                    </div>
-                </div>
-                <div class="col-sm-2">
-                    <button type="submit" class="btn btn-danger form-control js-search-button" title="{% trans 'Rechercher' %}">
-                        {% trans "Rechercher" %}
-                    </button>
-                </div>
-            </div>
-        </div>
-
+    <form method="get" action="" class="d-block mb-5">
+        {% include "search/includes/prescribers_search_form.html" with form=form %}
     </form>
 
-    <h2>
+    <h3>
         {% trans "Prescripteurs" %}
         {% if request.GET.city_name and request.GET.distance %}
             {% with request.GET.city_name as city and request.GET.distance as distance %}
                 {% blocktrans %}à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
             {% endwith %}
         {% endif %}
-    </h2>
+    </h3>
 
     {% if not prescriber_orgs_page %}
 
-        <h3 class="font-weight-normal text-muted">{% trans "Aucun résultat." %}</h3>
+        <h4 class="font-weight-normal text-muted">
+            {% trans "Aucun résultat." %}
+        </h4>
 
     {% else %}
 
-        <h3 class="font-weight-normal text-muted">
+        <h4 class="font-weight-normal text-muted">
             {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages %}
                 {% blocktrans count counter=prescriber_orgs_page.paginator.count %}
                     <b>1</b> résultat
@@ -68,7 +39,7 @@
                     {% blocktrans %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktrans %}
                 {% endif %}
             {% endwith %}
-        </h3>
+        </h4>
 
         {% for prescriber_org in prescriber_orgs_page %}
             <div class="card d-block my-4">

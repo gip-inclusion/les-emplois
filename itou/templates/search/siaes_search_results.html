@@ -5,7 +5,9 @@
 
 {% block content %}
 
-    <form method="get" action="" class="d-block mb-3" style="margin: -1rem;">
+    <h2 class="text-center">{% trans "Rechercher des employeurs solidaires" %}</h2>
+
+    <form method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
     </form>
 
@@ -17,16 +19,21 @@
         </h1>
     </div>
 
+    <h3>
+        {% with request.GET.city_name as city and request.GET.distance as distance %}
+            {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
+        {% endwith %}
+    </h3>
 
     {% if not siaes_page %}
 
-        <h2 class="font-weight-normal text-muted">
+        <h4 class="font-weight-normal text-muted">
             {% trans "Aucun résultat." %}
-        </h2>
+        </h4>
 
     {% else %}
 
-        <h2 class="font-weight-normal text-muted">
+        <h4 class="font-weight-normal text-muted">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages %}
                 {% blocktrans count counter=siaes_page.paginator.count %}
                     <b>1</b> résultat
@@ -37,7 +44,7 @@
                     {% blocktrans %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktrans %}
                 {% endif %}
             {% endwith %}
-        </h1>
+        </h4>
 
         {% for siae in siaes_page %}
             <div class="card d-block my-4">
