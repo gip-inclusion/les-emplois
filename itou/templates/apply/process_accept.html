@@ -41,12 +41,38 @@
             {% bootstrap_form form_accept %}
         </div>
 
-
         {% buttons %}
             <a class="btn btn-secondary"
                href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
-            <button type="submit" class="btn btn-success">{% trans "Je l'embauche" %}</button>
+            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% trans "Je l'embauche" %}</a>
+
         {% endbuttons %}
+            
+        <!-- Do we really need an approval ? -->
+        <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-body p-4">
+                        <h4 class="modal-title text-center" id="mapModalLabel">Obtention d'un PASS IAE</h4>
+                        <p class="pt-2 text-center">Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?</p>
+                        <div id="mapPoll">
+                            <div class="row buttonsContainer">
+                                <div class="col pr-2">
+                                    <button type="submit" class="btn btn-success w-100">
+                                        Je l'embauche et j'obtiens un PASS IAE
+                                    </button>
+                                </div>
+                                <div class="col pl-2">
+                                    <button type="submit" class="btn btn-success w-100" onClick="$(&quot;input[name='approval_needed']&quot;).val('False')">
+                                        Je n'ai pas besoin d'un PASS IAE
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </form>
 

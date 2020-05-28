@@ -243,48 +243,11 @@
             <p>
                 <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
-                    {% trans "Je l'embauche et j'obtiens un PASS IAE" %}
+                    {% trans "Je l'embauche" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
 
-            <p>
-                <a href="#" class="btn btn-outline-success btn-block"
-                   data-toggle="modal"
-                   data-target="#confirmModal">
-                    {% trans "Je l'embauche sans obtenir de PASS IAE" %}
-                    {% include "includes/icon.html" with icon="arrow-right" %}
-                </a>
-            </p>
-
-            <!-- Confirm applying without approval -->
-            <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModal"
-                 aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body p-4">
-                            <h4 class="modal-title text-center" id="mapModalLabel">Embauche sans PASS IAE</h4>
-                            <p class="pt-2 text-center">Veuillez confirmer votre intention d'embaucher cette personne
-                                <span class="font-weight-bold">sans obtenir de PASS IAE</span></p>
-                            <div id="mapPoll">
-                                <div class="row buttonsContainer">
-                                    <div class="col pr-2">
-                                        <a href="{% url 'apply:accept_without_approval' job_application_id=job_application.id %}"
-                                           class="btn btn-outline-success w-100">
-                                            Je l'embauche sans PASS IAE
-                                        </a>
-                                    </div>
-                                    <div class="col pl-2">
-                                        <button type="button" class="btn btn-outline-danger w-100" data-dismiss="modal">
-                                            Je me suis trompé !
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
         {% endif %}
 

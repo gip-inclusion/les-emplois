@@ -192,6 +192,7 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["approval_needed"].widget = forms.HiddenInput()
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].required = True
             self.fields[field].widget = DatePickerField()
@@ -199,7 +200,7 @@ class AcceptForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ["hiring_start_at", "hiring_end_at", "answer"]
+        fields = ["hiring_start_at", "hiring_end_at", "answer", "approval_needed"]
         help_texts = {
             "hiring_start_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
