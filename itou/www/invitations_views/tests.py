@@ -58,9 +58,23 @@ class AcceptInvitationTest(TestCase):
         # User wants to join our website but it's too late!
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
+        )
         self.assertContains(response, "expirée")
 
     def test_accept_non_existant_invitation(self):
         invitation = Invitation(first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com")
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 404)
+
+    def test_accept_accepted_invitation(self):
+        invitation = SentInvitationFactory(accepted=True)
+
+        # User wants to join our website but it's too late!
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
+        )
+        self.assertContains(response, "acceptée")

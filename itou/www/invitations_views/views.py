@@ -23,6 +23,9 @@ def accept(request, invitation_id):
             ),
         )
 
+    if invitation.accepted:
+        messages.error(request, _("Cette invitation a déjà été acceptée."))
+
     if messages.get_messages(request):
         context = {"invitation": invitation}
         return render(request, "invitations_views/accept.html", context=context)
