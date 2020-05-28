@@ -330,8 +330,9 @@
         <ul>
             {% for log in transition_logs %}
                 <li>
-                    {% blocktrans with pretty_to_state=log.pretty_to_state %}Passé en "<b>{{ pretty_to_state }}</b>
-                        "{% endblocktrans %}
+                    {% blocktrans with pretty_to_state=log.pretty_to_state %}
+                        Passé en "<b>{{ pretty_to_state }}</b>"
+                    {% endblocktrans %}
                     <ul>
                         {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
                             <li>{% trans "Par" %} {{ log.user.get_full_name }}</li>
