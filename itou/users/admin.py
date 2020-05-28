@@ -1,4 +1,5 @@
 from allauth.account.models import EmailAddress
+from allauth.socialaccount.models import SocialAccount
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
@@ -119,12 +120,10 @@ class ItouUserAdmin(UserAdmin):
     is_created_by_a_proxy.short_description = "créé par proxy"
 
     def is_peamu(self, obj):
-        """
-        This method is needed since is_peamu is a property, not a field.
-        """
-        return obj.is_peamu
+        return obj._is_peamu
 
     is_peamu.boolean = True
+    is_peamu.admin_order_field = "_is_peamu"
     is_peamu.short_description = "pe connect"
 
     def get_queryset(self, request):
@@ -137,7 +136,9 @@ class ItouUserAdmin(UserAdmin):
             qs = qs.exclude(is_superuser=True)
         if request.resolver_match.view_name.endswith("changelist"):
             has_verified_email = EmailAddress.objects.filter(email=OuterRef("email"), verified=True)
+            is_peamu = SocialAccount.objects.filter(user_id=OuterRef("id"), provider="peamu")
             qs = qs.annotate(_has_verified_email=Exists(has_verified_email))
+            qs = qs.annotate(_is_peamu=Exists(is_peamu))
         return qs
 
     def get_readonly_fields(self, request, obj=None):
