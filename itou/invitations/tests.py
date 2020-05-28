@@ -1,16 +1,15 @@
 from django.test import TestCase
+from django.utils import timezone
 from django.utils.http import urlsafe_base64_decode
 
-from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
+from itou.invitations.factories import ExpiredInvitationFactory, InvitationFactory, SentInvitationFactory
 from itou.invitations.models import Invitation
 
 
 class InvitationModelTest(TestCase):
-    def setUp(self):
-        self.invitation = SentInvitationFactory()
-
     def test_acceptance_link(self):
-        self.assertIn(str(self.invitation.pk), self.invitation.acceptance_link)
+        invitation = SentInvitationFactory()
+        self.assertIn(str(invitation.pk), invitation.acceptance_link)
 
     def has_expired(self):
         invitation = ExpiredInvitationFactory()
@@ -18,6 +17,19 @@ class InvitationModelTest(TestCase):
 
         invitation = SentInvitationFactory()
         self.assertFalse(invitation.has_expired)
+
+    def test_can_be_accepted(self):
+        invitation = ExpiredInvitationFactory()
+        self.assertFalse(invitation.can_be_accepted)
+
+        invitation = InvitationFactory(sent_at=timezone.now())
+        self.assertFalse(invitation.can_be_accepted)
+
+        invitation = SentInvitationFactory(accepted=True)
+        self.assertFalse(invitation.can_be_accepted)
+
+        invitation = SentInvitationFactory()
+        self.assertTrue(invitation.can_be_accepted)
 
 
 class InvitationEmailsTest(TestCase):

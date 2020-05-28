@@ -2,3 +2,19 @@
 {% load i18n %}
 
 {% block title %}{% trans "Invitation" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Invitation invalide"%}</h1>
+
+    {% if invitation.has_expired %}
+        {% blocktrans %}
+            <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
+        {% endblocktrans %}
+    {% elif invitation.accepted %}
+        {% blocktrans %}
+            <p>Cette invitation a déjà été acceptée.</p>
+        {% endblocktrans %}
+    {% endif %}
+
+{% endblock %}

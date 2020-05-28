@@ -59,6 +59,10 @@ class Invitation(models.Model):
         expiration_date = self.sent_at + relativedelta(days=self.EXPIRATION_DAYS)
         return expiration_date <= timezone.now()
 
+    @property
+    def can_be_accepted(self):
+        return not self.accepted and not self.has_expired and self.sent
+
     def accept(self):
         self.accepted = True
         self.save()

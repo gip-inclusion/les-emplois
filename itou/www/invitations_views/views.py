@@ -12,22 +12,10 @@ def accept(request, invitation_id):
     except Invitation.DoesNotExist:
         raise Http404(_("Aucune invitation n'a été trouvée."))
 
-    if invitation.has_expired:
-        messages.error(
-            request,
-            _(
-                """
-            Cette invitation est expirée. Merci de contacter la personne
-            qui vous a invité(e) afin d'en recevoir une nouvelle.
-        """
-            ),
-        )
-
-    if invitation.accepted:
-        messages.error(request, _("Cette invitation a déjà été acceptée."))
-
-    if messages.get_messages(request):
+    if invitation.can_be_accepted:
+        next_step = redirect("signup:from_invitation", invitation_id=invitation_id)
+    else:
         context = {"invitation": invitation}
-        return render(request, "invitations_views/accept.html", context=context)
+        next_step = render(request, "invitations_views/accept.html", context=context)
 
-    return redirect("signup:from_invitation", invitation_id=invitation_id)
+    return next_step
