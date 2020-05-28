@@ -126,12 +126,12 @@
         </header>
 
         <div class="layout-section layout-section-white border-bottom">
-            <nav class="nav">
+            <nav class="nav itou-main-nav">
                 {% if user.is_authenticated %}
-                    <a class="nav-link" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+                    <a class="nav-link{% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'index' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
                 {% endif %}
-                <a class="nav-link" href="{% url 'search:siaes' %}">{% trans "Rechercher un employeur solidaire" %}</a>
-                <a class="nav-link" href="{% url 'search:prescribers' %}">{% trans "Rechercher un prescripteur" %}</a>
+                <a class="nav-link{% if request.resolver_match.namespace == 'search' and request.resolver_match.url_name == 'siaes' %} active{% endif %}" href="{% url 'search:siaes' %}">{% trans "Rechercher un employeur solidaire" %}</a>
+                <a class="nav-link{% if request.resolver_match.namespace == 'search' and request.resolver_match.url_name == 'prescribers' %} active{% endif %}" href="{% url 'search:prescribers' %}">{% trans "Rechercher un prescripteur" %}</a>
                 <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Accéder au forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
                 <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% trans "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
             </nav>

@@ -337,3 +337,14 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
 .lines-on-sides:after {
     margin-left: 10px
 }
+
+/* Main nav (Boostrap override).
+--------------------------------------------------------------------------- */
+
+.itou-main-nav a:hover {
+    text-decoration: underline;
+}
+
+.itou-main-nav a.active {
+    background: #e2f2ff;
+}
