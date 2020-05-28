@@ -1,4 +1,5 @@
 import logging
+import uuid
 
 from django.conf import settings
 from django.core import mail
@@ -23,6 +24,7 @@ class InvitationManager(models.Manager):
 
 class Invitation(models.Model):
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(verbose_name=_("E-mail"))
     first_name = models.CharField(verbose_name=_("Prénom"), max_length=255)
     last_name = models.CharField(verbose_name=_("Nom"), max_length=255)
@@ -50,12 +52,8 @@ class Invitation(models.Model):
         return super().save(*args, **kwargs)
 
     @property
-    def encoded_pk(self):
-        return urlsafe_base64_encode(force_bytes(self.pk))
-
-    @property
     def acceptance_link(self):
-        return reverse("invitations_views:accept", kwargs={"encoded_invitation_id": self.encoded_pk})
+        return reverse("invitations_views:accept", kwargs={"invitation_id": self.id})
 
     def accept(self):
         self.accepted = True

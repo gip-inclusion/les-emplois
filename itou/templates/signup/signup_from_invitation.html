@@ -8,7 +8,7 @@
 {% block content %}
 <h1>{% trans "Inscription" %}</h1>
 
-<form method="post" action="{% url 'signup:from_invitation' encoded_invitation_id=encoded_invitation_id %}" role="form" class="js-prevent-multiple-submit">
+<form method="post" action="{% url 'signup:from_invitation' invitation_id=view.invitation_uuid %}" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 

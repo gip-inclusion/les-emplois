@@ -144,13 +144,13 @@ class FromInvitationView(SignupView):
     form_class = forms.UserSignupFromInvitationForm
     template_name = "signup/signup_from_invitation.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(SignupView, self).get_context_data(**kwargs)
-        context["encoded_invitation_id"] = kwargs.get("encoded_invitation_id")
-        return context
+    def invitation_uuid(self):
+        # UUIDs are not present in the kwargs of `get_context_data(self, **kwargs)`.
+        # Instead, they are attached to self.
+        return self.kwargs["invitation_id"]
 
     def get(self, request, *args, **kwargs):
-        invitation = Invitation.objects.get_from_encoded_pk(kwargs.get("encoded_invitation_id"))
+        invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
         data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
         form = forms.UserSignupFromInvitationForm(initial=data)
         self.initial = data
@@ -162,7 +162,7 @@ class FromInvitationView(SignupView):
         super().post(request, *args, **kwargs)
         DefaultAccountAdapter().login(request, self.user)
 
-        invitation = Invitation.objects.get_from_encoded_pk(kwargs.get("encoded_invitation_id"))
+        invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
         invitation.accept()
 
         return redirect("dashboard:index")

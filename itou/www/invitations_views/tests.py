@@ -14,9 +14,11 @@ class AcceptInvitationTest(TestCase):
         acceptance_link = invitation.acceptance_link
         response = self.client.get(acceptance_link, follow=True)
 
-        signup_form_url = reverse("signup:from_invitation", kwargs={"encoded_invitation_id": invitation.encoded_pk})
+        signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
 
         self.assertEqual(response.redirect_chain[0][0], signup_form_url)
+
+        self.client.get(signup_form_url)
 
         form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
 
