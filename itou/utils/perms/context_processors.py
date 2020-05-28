@@ -62,16 +62,20 @@ def get_matomo_context(user, prescriber_organization, user_is_siae_admin):
         account_sub_type = "anonymous"
     elif user.is_job_seeker:
         account_type = "job_seeker"
-        account_sub_type = "peconnect" if user.is_peamu else "not_peconnect"
+        account_sub_type = "job_seeker_with_peconnect" if user.is_peamu else "job_seeker_without_peconnect"
     elif user.is_prescriber:
         account_type = "prescriber"
         if prescriber_organization:
-            account_sub_type = "authorized_org" if prescriber_organization.is_authorized else "unauthorized_org"
+            account_sub_type = (
+                "prescriber_with_authorized_org"
+                if prescriber_organization.is_authorized
+                else "prescriber_with_unauthorized_org"
+            )
         else:
-            account_sub_type = "without_org"
+            account_sub_type = "prescriber_without_org"
     elif user.is_siae_staff:
         account_type = "employer"
-        account_sub_type = "admin" if user_is_siae_admin else "not_admin"
+        account_sub_type = "employer_admin" if user_is_siae_admin else "employer_not_admin"
     else:
         account_type = "unknown"
         account_sub_type = "unknown"
