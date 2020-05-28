@@ -7,10 +7,11 @@ from django.utils import timezone
 
 from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
 from itou.invitations.models import Invitation
+from itou.users.factories import UserFactory
 
 
 class AcceptInvitationTest(TestCase):
-    def test_accept_invitation(self):
+    def test_accept_invitation_signup(self):
 
         invitation = SentInvitationFactory()
 
@@ -78,3 +79,14 @@ class AcceptInvitationTest(TestCase):
             response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
         )
         self.assertContains(response, "acceptée")
+
+    def test_accept_invitation_signin(self):
+        user = UserFactory()
+        invitation = SentInvitationFactory(first_name=user.first_name, last_name=user.last_name, email=user.email)
+
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
+        )
+        self.assertContains(response, "membres")
