@@ -15,6 +15,7 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationFactory,
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiFactory,
 )
@@ -457,6 +458,45 @@ class PrescriberSignupTest(TestCase):
 
         # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
 
+    def test_authorized_prescriber_with_no_member_organization(self):
+        """
+        When a prescriber is linked to an existing prescriber organization without any member,
+        a specific email must be sent.
+        """
+        url = reverse("signup:prescriber_authorized")
+        response = self.client.get(url)
+
+        authorized_organization = PrescriberOrganizationFactory()
+        password = "!*p4ssw0rd123-"
+
+        self.assertEqual(response.status_code, 200)
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": password,
+            "password2": password,
+            "authorized_organization_id": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # See previous tests for user / org assertions
+        user = get_user_model().objects.get(email=post_data["email"])
+
+        # Check membership
+        self.assertIn(user, authorized_organization.members.all())
+        self.assertEqual(1, authorized_organization.members.count())
+
+        # Check email has been sent to support (validation/refusal of authorisation needed)
+        self.assertEqual(len(mail.outbox), 2)
+        subject = mail.outbox[0].subject
+        self.assertIn("Première inscription à une organisation", subject)
+        subject = mail.outbox[1].subject
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subject)
+
     def test_authorized_prescriber_without_registered_organization(self):
         url = reverse("signup:prescriber_authorized")
         response = self.client.get(url)
@@ -502,6 +542,8 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         subject = mail.outbox[0].subject
         self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
+        subject = mail.outbox[1].subject
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subject)
 
     def test_prescriber_signup_without_code_nor_organization(self):
         """

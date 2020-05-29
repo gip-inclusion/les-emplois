@@ -43,12 +43,12 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         DEPT = "DEPT", _("Service social du conseil départemental")
         SPIP = "SPIP", _("SPIP - Service pénitentiaire d'insertion et de probation")
         PJJ = "PJJ", _("PJJ - Protection judiciaire de la jeunesse")
-        CCAS = "CCAS", _("CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
+        CCAS = ("CCAS", _("CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale"))
         PLIE = "PLIE", _("PLIE - Plan local pour l'insertion et l'emploi")
         CHRS = "CHRS", _("CHRS - Centre d'hébergement et de réinsertion sociale")
-        CIDFF = "CIDFF", _("CIDFF - Centre d'information sur les droits des femmes et des familles")
+        CIDFF = ("CIDFF", _("CIDFF - Centre d'information sur les droits des femmes et des familles"))
         PREVENTION = "PREVENTION", _("Service ou club de prévention")
-        AFPA = "AFPA", _("AFPA - Agence nationale pour la formation professionnelle des adultes")
+        AFPA = ("AFPA", _("AFPA - Agence nationale pour la formation professionnelle des adultes"))
         PIJ_BIJ = "PIJ_BIJ", _("PIJ-BIJ - Point/Bureau information jeunesse")
         CAF = "CAF", _("CAF - Caisse d'allocation familiale")
         CADA = "CADA", _("CADA - Centre d'accueil de demandeurs d'asile")
@@ -196,13 +196,25 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def must_validate_prescriber_organization_email(self):
         """
         Send an email to the support:
-        signup of a new prescriber organization, with unregistered/unchecked org
+        signup of a **newly created** prescriber organization, with unregistered/unchecked org
         => prescriber organization authorization must be validated
         """
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {"organization": self}
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def organization_with_no_member_email(self, user):
+        """
+        Send an email to the support:
+        signup of an **exisiting** prescriber organization, without any member (hence not validated)
+        => prescriber organization authorization must be validated
+        """
+        to = [settings.ITOU_EMAIL_CONTACT]
+        context = {"organization": self, "new_user": user}
+        subject = "prescribers/email/organization_with_no_member_email_subject.txt"
+        body = "prescribers/email/organization_with_no_member_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 
