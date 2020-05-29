@@ -1,5 +1,5 @@
 from django import forms
-from django.core.exceptions import NON_FIELD_ERRORS
+from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -15,8 +15,9 @@ class CreateSiaeForm(forms.ModelForm):
     Create a new SIAE (Agence / Etablissement in French).
     """
 
-    def __init__(self, current_siae, *args, **kwargs):
+    def __init__(self, current_siae, current_user, *args, **kwargs):
         self.current_siae = current_siae
+        self.current_user = current_user
         super().__init__(*args, **kwargs)
 
         self.fields["department"].choices = DEPARTMENTS_CHOICES
@@ -52,18 +53,39 @@ class CreateSiaeForm(forms.ModelForm):
             ),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
         }
-        error_messages = {
-            NON_FIELD_ERRORS: {
-                "unique_together": "Il ne peut pas exister plus qu'une %(model_name)s "
-                "avec ce %(field_labels)s, or il en existe déjà une."
-            }
-        }
 
-    def clean_siret(self):
+    def clean(self):
         siret = self.cleaned_data["siret"]
+        kind = self.cleaned_data["kind"]
+        existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
+
+        if existing_siae_query.exists():
+            existing_siae = existing_siae_query.get()
+            user = self.current_user
+            error_message = _(
+                """
+                La structure à laquelle vous souhaitez vous rattacher est déjà
+                connue de nos services. Merci de nous contacter à l'adresse
+                """
+            )
+            mail_to = settings.ITOU_EMAIL_CONTACT
+            mail_subject = _("Se rattacher à une structure existante - Plateforme de l'inclusion")
+            mail_body = _("Veuillez rattacher mon compte")
+            mail_body += f" ({user.first_name} {user.last_name} ID={user.id})"
+            mail_body += _(" à la structure existante")
+            mail_body += f" ({existing_siae.kind} {existing_siae.siret} ID={existing_siae.id})"
+            mail_body += _(" sur la Plateforme de l'inclusion.")
+            mailto_html = (
+                f'<a href="mailto:{mail_to}?subject={mail_subject}&body={mail_body}"'
+                f' target="_blank" class="alert-link">{mail_to}</a>'
+            )
+            error_message = f"{error_message} {mailto_html}."
+            raise forms.ValidationError(error_message)
+
         if not siret.startswith(self.current_siae.siren):
             raise forms.ValidationError(_(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}"))
-        return siret
+
+        return self.cleaned_data
 
     def save(self, request, commit=True):
         siae = super().save(commit=commit)
