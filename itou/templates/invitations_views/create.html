@@ -1,0 +1,24 @@
+{% extends "layout/content.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% trans "Invitation" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Invitation"%}</h1>
+
+    <form method="post" action="{% url 'invitations_views:create' %}" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <a class="btn btn-secondary" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>
+            <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}

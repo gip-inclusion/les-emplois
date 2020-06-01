@@ -7,7 +7,47 @@ from django.utils import timezone
 
 from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
 from itou.invitations.models import Invitation
-from itou.users.factories import UserFactory
+from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.users.factories import DEFAULT_PASSWORD, UserFactory
+from itou.www.invitations_views.forms import NewInvitationForm
+
+
+class SendInvitationTest(TestCase):
+    def test_send_one_invitation(self):
+        user = UserFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+
+        new_invitation_url = reverse("invitations_views:create")
+        response = self.client.get(new_invitation_url)
+
+        # Assert form is present
+        form = NewInvitationForm(response.wsgi_request)
+        self.assertContains(response, form["first_name"].label)
+        self.assertContains(response, form["last_name"].label)
+        self.assertContains(response, form["email"].label)
+
+        data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@bathiat.com"}
+
+        response = self.client.post(new_invitation_url, data=data)
+
+        invitations = Invitation.objects.count()
+        self.assertEqual(invitations, 1)
+
+        invitation = Invitation.objects.first()
+        self.assertEqual(invitation.sender.pk, user.pk)
+
+        self.assertEqual(response.status_code, 200)
+
+        # Make sure a success message is present
+        messages = list(response.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level_tag, "success")
+
+        self.assertTrue(invitation.sent)
+
+        # Make sure an email has been sent to the invited person
+        outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
+        self.assertIn(data["email"], outbox_emails)
 
 
 class AcceptInvitationTest(TestCase):
@@ -80,7 +120,7 @@ class AcceptInvitationTest(TestCase):
         )
         self.assertContains(response, "acceptée")
 
-    def test_accept_invitation_signin(self):
+    def test_accept_invitation_user_already_exists(self):
         user = UserFactory()
         invitation = SentInvitationFactory(first_name=user.first_name, last_name=user.last_name, email=user.email)
 

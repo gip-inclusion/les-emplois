@@ -33,20 +33,34 @@ class InvitationModelTest(TestCase):
 
 
 class InvitationEmailsTest(TestCase):
-    def setUp(self):
-        self.invitation = SentInvitationFactory()
-
-    def test_accepted_notif_sender(self):
-        email = self.invitation.email_accepted_notif_sender
+    def test_send_invitation(self):
+        invitation = SentInvitationFactory()
+        email = invitation.email_invitation
 
         # Subject
-        self.assertIn(self.invitation.first_name, email.subject)
-        self.assertIn(self.invitation.last_name, email.subject)
+        self.assertIn(invitation.sender.first_name, email.subject)
+        self.assertIn(invitation.sender.last_name, email.subject)
 
         # Body
-        self.assertIn(self.invitation.first_name, email.body)
-        self.assertIn(self.invitation.last_name, email.body)
-        self.assertIn(self.invitation.email, email.body)
+        self.assertIn(invitation.first_name, email.body)
+        self.assertIn(invitation.last_name, email.body)
+        self.assertIn(invitation.acceptance_link, email.body)
 
         # To
-        self.assertIn(self.invitation.sender.email, email.to)
+        self.assertIn(invitation.email, email.to)
+
+    def test_accepted_notif_sender(self):
+        invitation = SentInvitationFactory()
+        email = invitation.email_accepted_notif_sender
+
+        # Subject
+        self.assertIn(invitation.first_name, email.subject)
+        self.assertIn(invitation.last_name, email.subject)
+
+        # Body
+        self.assertIn(invitation.first_name, email.body)
+        self.assertIn(invitation.last_name, email.body)
+        self.assertIn(invitation.email, email.body)
+
+        # To
+        self.assertIn(invitation.sender.email, email.to)

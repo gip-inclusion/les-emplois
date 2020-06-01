@@ -1,10 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
 from itou.invitations.models import Invitation
+from itou.www.invitations_views.forms import NewInvitationForm
 
 
 def accept(request, invitation_id):
@@ -26,3 +28,17 @@ def accept(request, invitation_id):
         next_step = render(request, "invitations_views/accept.html", context=context)
 
     return next_step
+
+
+@login_required
+def create(request, template_name="invitations_views/create.html"):
+    logged_in_user = request.user
+    form = NewInvitationForm(data=request.POST or None)
+
+    if request.POST and form.is_valid():
+        form.save(request)
+        messages.success(request, _("Invitation envoyée avec succès !"))
+
+    context = {"form": form}
+
+    return render(request, template_name, context)

@@ -71,6 +71,7 @@ class Invitation(models.Model):
     def send(self):
         self.sent = True
         self.sent_at = timezone.now()
+        self.send_invitation()
         self.save()
 
     def accepted_notif_sender(self):
@@ -78,10 +79,30 @@ class Invitation(models.Model):
         emails = [self.email_accepted_notif_sender]
         connection.send_messages(emails)
 
+    def send_invitation(self):
+        connection = mail.get_connection()
+        emails = [self.email_invitation]
+        connection.send_messages(emails)
+
+    # Emails
     @property
     def email_accepted_notif_sender(self):
         to = [self.sender.email]
         context = {"first_name": self.first_name, "last_name": self.last_name, "email": self.email}
         subject = "invitations_views/email/accepted_notif_sender_subject.txt"
         body = "invitations_views/email/accepted_notif_sender_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_invitation(self):
+        to = [self.email]
+        context = {
+            "sender": self.sender,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "email": self.email,
+            "acceptance_link": self.acceptance_link,
+        }
+        subject = "invitations_views/email/invitation_subject.txt"
+        body = "invitations_views/email/invitation_body.txt"
         return get_email_message(to, context, subject, body)
