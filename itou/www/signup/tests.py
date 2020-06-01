@@ -412,6 +412,10 @@ class PrescriberSignupTest(TestCase):
 
         # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
 
+        # Check prescriber signup (email already exists)
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(response, "form", "email", "Cette adresse email est déjà enregistrée")
+
     def test_authorized_prescriber_with_organization(self):
         url = reverse("signup:prescriber_authorized")
         response = self.client.get(url)
