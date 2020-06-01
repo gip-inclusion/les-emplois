@@ -49,6 +49,24 @@ class SendInvitationTest(TestCase):
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         self.assertIn(data["email"], outbox_emails)
 
+    def test_send_invitation_user_already_exists(self):
+        user = UserFactory()
+        invited_user = UserFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+
+        new_invitation_url = reverse("invitations_views:create")
+        data = {
+            "first_name": invited_user.first_name,
+            "last_name": invited_user.last_name,
+            "email": invited_user.email,
+        }
+
+        response = self.client.post(new_invitation_url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        invitations = Invitation.objects.count()
+        self.assertEqual(invitations, 0)
+
 
 class AcceptInvitationTest(TestCase):
     def test_accept_invitation_signup(self):
@@ -130,3 +148,21 @@ class AcceptInvitationTest(TestCase):
             response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
         )
         self.assertContains(response, "membres")
+
+
+class NewInvitationFormTest(TestCase):
+    def test_send_invitation_user_already_exists(self):
+        user = UserFactory()
+        invited_user = UserFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        new_invitation_url = reverse("invitations_views:create")
+
+        data = {
+            "first_name": invited_user.first_name,
+            "last_name": invited_user.last_name,
+            "email": invited_user.email,
+        }
+        response = self.client.post(new_invitation_url, data=data)
+
+        self.assertFormError(response, "form", "email", "Cet utilisateur existe déjà.")
+        # self.assertIn("email", response.context["form"].errors)
