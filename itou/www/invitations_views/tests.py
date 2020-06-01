@@ -179,3 +179,25 @@ class NewInvitationFormTest(TestCase):
         response = self.client.post(new_invitation_url, data=data)
 
         self.assertFormError(response, "form", "email", "Cette personne a déjà été invitée.")
+
+    def test_send_invitation_expired(self):
+        user = UserFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        new_invitation_url = reverse("invitations_views:create")
+        invitation = ExpiredInvitationFactory(
+            sender=user, first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
+        )
+
+        data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
+        response = self.client.post(new_invitation_url, data=data)
+
+        # Make sure a success message is present
+        messages = list(response.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0].level_tag, "success")
+
+        self.assertTrue(invitation.sent)
+
+        # Make sure an email has been sent to the invited person
+        outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
+        self.assertIn(data["email"], outbox_emails)

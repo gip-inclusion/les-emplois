@@ -31,6 +31,12 @@ class InvitationModelTest(TestCase):
         invitation = SentInvitationFactory()
         self.assertTrue(invitation.can_be_accepted)
 
+    def test_extend_expiration_date(self):
+        invitation = ExpiredInvitationFactory()
+        self.assertTrue(invitation.has_expired)
+        invitation.extend_expiration_date()
+        self.assertFalse(invitation.has_expired)
+
 
 class InvitationEmailsTest(TestCase):
     def test_send_invitation(self):

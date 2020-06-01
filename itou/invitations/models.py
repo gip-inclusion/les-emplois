@@ -63,6 +63,10 @@ class Invitation(models.Model):
     def can_be_accepted(self):
         return not self.accepted and not self.has_expired and self.sent
 
+    def extend_expiration_date(self):
+        self.sent_at = timezone.now()
+        self.save()
+
     def accept(self):
         self.accepted = True
         self.save()

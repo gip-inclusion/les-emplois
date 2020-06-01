@@ -22,8 +22,11 @@ class NewInvitationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
         invitation = Invitation.objects.filter(email__iexact=email).first()
         if invitation:
-            error = forms.ValidationError(_("Cette personne a déjà été invitée."))
-            self.add_error("email", error)
+            if invitation.has_expired:
+                invitation.extend_expiration_date()
+            else:
+                error = forms.ValidationError(_("Cette personne a déjà été invitée."))
+                self.add_error("email", error)
         return self.cleaned_data
 
     def save(self, request, *args, **kwargs):
