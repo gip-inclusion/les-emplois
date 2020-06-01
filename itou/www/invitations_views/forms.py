@@ -18,6 +18,14 @@ class NewInvitationForm(forms.ModelForm):
             self.add_error("email", error)
         return email
 
+    def clean(self):
+        email = self.cleaned_data["email"]
+        invitation = Invitation.objects.filter(email__iexact=email).first()
+        if invitation:
+            error = forms.ValidationError(_("Cette personne a déjà été invitée."))
+            self.add_error("email", error)
+        return self.cleaned_data
+
     def save(self, request, *args, **kwargs):
         invitation = super().save(commit=False)
         invitation.sender = request.user

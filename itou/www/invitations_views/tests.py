@@ -166,3 +166,16 @@ class NewInvitationFormTest(TestCase):
 
         self.assertFormError(response, "form", "email", "Cet utilisateur existe déjà.")
         # self.assertIn("email", response.context["form"].errors)
+
+    def test_send_invitation_existing_invitation(self):
+        user = UserFactory()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        new_invitation_url = reverse("invitations_views:create")
+        invitation = SentInvitationFactory(
+            sender=user, first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
+        )
+
+        data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
+        response = self.client.post(new_invitation_url, data=data)
+
+        self.assertFormError(response, "form", "email", "Cette personne a déjà été invitée.")
