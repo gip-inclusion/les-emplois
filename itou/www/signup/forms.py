@@ -57,8 +57,8 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
     def clean_email(self):
         # Must check if already exists
         email = self.cleaned_data["email"]
-        if User.email_already_exists(email):
-            raise ValidationError(gettext_lazy("Cette adresse email est déjà enregitrée"))
+        if get_user_model().email_already_exists(email):
+            raise ValidationError(gettext_lazy("Cette adresse email est déjà enregistrée"))
         return email
 
     def clean_secret_code(self):
