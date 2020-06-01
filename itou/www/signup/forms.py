@@ -10,8 +10,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
-from itou.users.models import User
 from itou.siaes.models import Siae, SiaeMembership
+from itou.users.models import User
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
@@ -118,12 +118,9 @@ class PoleEmploiPrescriberForm(PrescriberForm):
 
     def clean_email(self):
         email = super().clean_email()
+
         if not email.endswith("@pole-emploi.fr"):
             raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi"))
-
-        # Must check if already exists
-        if User.email_already_exists(email):
-            raise ValidationError(gettext_lazy("Cette adresse email est déjà enregitrée"))
 
         return email
 
