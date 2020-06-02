@@ -32,7 +32,6 @@ def accept(request, invitation_id):
 
 @login_required
 def create(request, template_name="invitations_views/create.html"):
-    logged_in_user = request.user
     form = NewInvitationForm(data=request.POST or None)
 
     if request.POST and form.is_valid():

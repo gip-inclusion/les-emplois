@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
 from django.utils.http import urlsafe_base64_decode
@@ -10,6 +11,9 @@ class InvitationModelTest(TestCase):
     def test_acceptance_link(self):
         invitation = SentInvitationFactory()
         self.assertIn(str(invitation.pk), invitation.acceptance_link)
+
+        # Must be an absolute URL
+        self.assertTrue(invitation.acceptance_link.startswith(settings.BASE_URL))
 
     def has_expired(self):
         invitation = ExpiredInvitationFactory()

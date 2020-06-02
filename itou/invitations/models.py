@@ -52,7 +52,8 @@ class Invitation(models.Model):
 
     @property
     def acceptance_link(self):
-        return reverse("invitations_views:accept", kwargs={"invitation_id": self.id})
+        acceptance_path = reverse("invitations_views:accept", kwargs={"invitation_id": self.id})
+        return f"{settings.BASE_URL}{acceptance_path}"
 
     @property
     def has_expired(self):
