@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.models import modelformset_factory
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -37,3 +38,5 @@ class NewInvitationForm(forms.ModelForm):
         invitation.save()
         invitation.send()
         return invitation
+
+InvitationFormSet = modelformset_factory(Invitation, form=NewInvitationForm, extra=1)

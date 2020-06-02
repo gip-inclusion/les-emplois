@@ -1,13 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.forms.models import modelformset_factory
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
 
 from itou.invitations.models import Invitation
-from itou.www.invitations_views.forms import NewInvitationForm
+from itou.www.invitations_views.forms import InvitationFormSet
 
 
 def accept(request, invitation_id):
@@ -40,7 +39,7 @@ def create(request, template_name="invitations_views/create.html"):
         if extra_form:
             total_forms = int(extra_form)
 
-    InvitationFormSet = modelformset_factory(Invitation, form=NewInvitationForm, extra=total_forms)
+    InvitationFormSet.extra = total_forms
     formset = InvitationFormSet(data=request.POST or None, form_kwargs={"sender": request.user})
 
     if request.POST and formset.is_valid():
@@ -48,9 +47,6 @@ def create(request, template_name="invitations_views/create.html"):
         messages.success(request, _("Invitation envoyée avec succès !"))
         formset = InvitationFormSet(form_kwargs={"sender": request.user})
 
-    context = {
-        "formset": formset,
-        "total_forms": total_forms
-    }
+    context = {"formset": formset, "total_forms": total_forms}
 
     return render(request, template_name, context)
