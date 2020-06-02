@@ -127,4 +127,3 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
 
     state = models.JobApplicationWorkflow.STATE_ACCEPTED
     hiring_without_approval = True
-

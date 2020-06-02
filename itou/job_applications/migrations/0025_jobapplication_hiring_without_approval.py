@@ -5,14 +5,14 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('job_applications', '0024_auto_20200423_1117'),
-    ]
+    dependencies = [("job_applications", "0024_auto_20200423_1117")]
 
     operations = [
         migrations.AddField(
-            model_name='jobapplication',
-            name='hiring_without_approval',
-            field=models.BooleanField(default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"),
-        ),
+            model_name="jobapplication",
+            name="hiring_without_approval",
+            field=models.BooleanField(
+                default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
+            ),
+        )
     ]
