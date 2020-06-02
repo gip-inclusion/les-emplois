@@ -26,3 +26,7 @@ DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_PROD"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")
+
+# Building absolute URIs in models require to have
+# access to the base url without using the request.
+BASE_URL = f"{ITOU_PROTOCOL}://{ITOU_FQDN}"
