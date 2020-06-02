@@ -13,7 +13,7 @@ La Plateforme de l’inclusion a-t-elle permis que votre candidat(e) soit embauc
 {% endblocktrans %}
 
 {% blocktrans %}
-Je donne mon avis en cliquant sur ce lien: 
+Je donne mon avis en cliquant sur ce lien: {{ survey_link }}
 {% endblocktrans %}
 
 {% else %}
