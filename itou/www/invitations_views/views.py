@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.forms.models import modelformset_factory
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
@@ -32,12 +33,14 @@ def accept(request, invitation_id):
 
 @login_required
 def create(request, template_name="invitations_views/create.html"):
-    form = NewInvitationForm(data=request.POST or None)
+    InvitationFormSet = modelformset_factory(Invitation, form=NewInvitationForm, extra=1)
+    formset = InvitationFormSet(data=request.POST or None, form_kwargs={"sender": request.user})
 
-    if request.POST and form.is_valid():
-        form.save(request)
+    if request.POST and formset.is_valid():
+        formset.save()
         messages.success(request, _("Invitation envoyée avec succès !"))
+        formset = InvitationFormSet(form_kwargs={"sender": request.user})
 
-    context = {"form": form}
+    context = {"formset": formset}
 
     return render(request, template_name, context)

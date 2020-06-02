@@ -7,7 +7,6 @@ from django.utils import timezone
 
 from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
 from itou.invitations.models import Invitation
-from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, UserFactory
 from itou.www.invitations_views.forms import NewInvitationForm
 
@@ -26,7 +25,15 @@ class SendInvitationTest(TestCase):
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
 
-        data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@bathiat.com"}
+        data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": "Léonie",
+            "form-0-last_name": "Bathiat",
+            "form-0-email": "leonie@bathiat.com",
+        }
 
         response = self.client.post(new_invitation_url, data=data)
 
@@ -47,7 +54,7 @@ class SendInvitationTest(TestCase):
 
         # Make sure an email has been sent to the invited person
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
-        self.assertIn(data["email"], outbox_emails)
+        self.assertIn(data["form-0-email"], outbox_emails)
 
     def test_send_invitation_user_already_exists(self):
         user = UserFactory()
@@ -56,9 +63,13 @@ class SendInvitationTest(TestCase):
 
         new_invitation_url = reverse("invitations_views:create")
         data = {
-            "first_name": invited_user.first_name,
-            "last_name": invited_user.last_name,
-            "email": invited_user.email,
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": invited_user.first_name,
+            "form-0-last_name": invited_user.last_name,
+            "form-0-email": invited_user.email,
         }
 
         response = self.client.post(new_invitation_url, data=data)
@@ -66,6 +77,32 @@ class SendInvitationTest(TestCase):
 
         invitations = Invitation.objects.count()
         self.assertEqual(invitations, 0)
+
+    def test_send_multiple_invitations(self):
+        user = UserFactory()
+        invited_user = UserFactory.build()
+        second_invited_user = UserFactory.build()
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        new_invitation_url = reverse("invitations_views:create")
+        response = self.client.get(new_invitation_url)
+
+        self.assertTrue(response.context["formset"])
+        data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": invited_user.first_name,
+            "form-0-last_name": invited_user.last_name,
+            "form-0-email": invited_user.email,
+            "form-1-first_name": second_invited_user.first_name,
+            "form-1-last_name": second_invited_user.last_name,
+            "form-1-email": second_invited_user.email,
+        }
+
+        self.client.post(new_invitation_url, data=data)
+        invitations = Invitation.objects.count()
+        self.assertEqual(invitations, 2)
 
 
 class AcceptInvitationTest(TestCase):
@@ -151,6 +188,17 @@ class AcceptInvitationTest(TestCase):
 
 
 class NewInvitationFormTest(TestCase):
+    def setUp(self):
+        self.data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": "Léonie",
+            "form-0-last_name": "Bathiat",
+            "form-0-email": "leonie@bathiat.com",
+        }
+
     def test_send_invitation_user_already_exists(self):
         user = UserFactory()
         invited_user = UserFactory()
@@ -158,27 +206,33 @@ class NewInvitationFormTest(TestCase):
         new_invitation_url = reverse("invitations_views:create")
 
         data = {
-            "first_name": invited_user.first_name,
-            "last_name": invited_user.last_name,
-            "email": invited_user.email,
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": invited_user.first_name,
+            "form-0-last_name": invited_user.last_name,
+            "form-0-email": invited_user.email,
         }
         response = self.client.post(new_invitation_url, data=data)
 
-        self.assertFormError(response, "form", "email", "Cet utilisateur existe déjà.")
-        # self.assertIn("email", response.context["form"].errors)
+        for error_dict in response.context["formset"].errors:
+            for key, errors in error_dict.items():
+                self.assertEqual(key, "email")
+                self.assertIn("Cet utilisateur existe déjà.", errors)
 
     def test_send_invitation_existing_invitation(self):
         user = UserFactory()
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         new_invitation_url = reverse("invitations_views:create")
-        invitation = SentInvitationFactory(
-            sender=user, first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
-        )
+        SentInvitationFactory(sender=user, first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com")
 
-        data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
-        response = self.client.post(new_invitation_url, data=data)
+        response = self.client.post(new_invitation_url, data=self.data)
 
-        self.assertFormError(response, "form", "email", "Cette personne a déjà été invitée.")
+        for error_dict in response.context["formset"].errors:
+            for key, errors in error_dict.items():
+                self.assertEqual(key, "email")
+                self.assertIn("Cette personne a déjà été invitée.", errors)
 
     def test_send_invitation_expired(self):
         user = UserFactory()
@@ -188,7 +242,7 @@ class NewInvitationFormTest(TestCase):
             sender=user, first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
         )
 
-        data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
+        data = self.data
         response = self.client.post(new_invitation_url, data=data)
 
         # Make sure a success message is present
@@ -200,4 +254,4 @@ class NewInvitationFormTest(TestCase):
 
         # Make sure an email has been sent to the invited person
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
-        self.assertIn(data["email"], outbox_emails)
+        self.assertIn(self.data["form-0-email"], outbox_emails)

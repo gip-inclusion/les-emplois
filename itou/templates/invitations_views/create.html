@@ -9,10 +9,14 @@
     <h1>{% trans "Invitation"%}</h1>
 
     <form method="post" action="{% url 'invitations_views:create' %}" class="js-prevent-multiple-submit">
-
         {% csrf_token %}
 
-        {% bootstrap_form form %}
+        {{ formset.management_form }}
+
+        {% for form in formset %}
+            {% bootstrap_form form %}
+
+        {% endfor %}
 
         {% buttons %}
             <a class="btn btn-secondary" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>

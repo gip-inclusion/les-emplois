@@ -10,16 +10,17 @@ class NewInvitationForm(forms.ModelForm):
         model = Invitation
         fields = ["first_name", "last_name", "email"]
 
+    def __init__(self, sender, *args, **kwargs):
+        self.sender = sender
+        super(NewInvitationForm, self).__init__(*args, **kwargs)
+
     def clean_email(self):
         email = self.cleaned_data["email"]
         self.user = get_user_model().objects.filter(email__iexact=email).first()
         if self.user:
             error = forms.ValidationError(_("Cet utilisateur existe déjà."))
             self.add_error("email", error)
-        return email
 
-    def clean(self):
-        email = self.cleaned_data["email"]
         invitation = Invitation.objects.filter(email__iexact=email).first()
         if invitation:
             if invitation.has_expired:
@@ -27,11 +28,12 @@ class NewInvitationForm(forms.ModelForm):
             else:
                 error = forms.ValidationError(_("Cette personne a déjà été invitée."))
                 self.add_error("email", error)
-        return self.cleaned_data
 
-    def save(self, request, *args, **kwargs):
-        invitation = super().save(commit=False)
-        invitation.sender = request.user
+        return email
+
+    def save(self, *args, **kwargs):
+        invitation = super(NewInvitationForm, self).save(commit=False)
+        invitation.sender = self.sender
         invitation.save()
         invitation.send()
         return invitation
