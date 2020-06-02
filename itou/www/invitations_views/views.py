@@ -33,7 +33,14 @@ def accept(request, invitation_id):
 
 @login_required
 def create(request, template_name="invitations_views/create.html"):
-    InvitationFormSet = modelformset_factory(Invitation, form=NewInvitationForm, extra=1)
+    total_forms = 1
+
+    if request.GET:
+        extra_form = request.GET.get("total_forms")
+        if extra_form:
+            total_forms = int(extra_form)
+
+    InvitationFormSet = modelformset_factory(Invitation, form=NewInvitationForm, extra=total_forms)
     formset = InvitationFormSet(data=request.POST or None, form_kwargs={"sender": request.user})
 
     if request.POST and formset.is_valid():
@@ -41,6 +48,9 @@ def create(request, template_name="invitations_views/create.html"):
         messages.success(request, _("Invitation envoyée avec succès !"))
         formset = InvitationFormSet(form_kwargs={"sender": request.user})
 
-    context = {"formset": formset}
+    context = {
+        "formset": formset,
+        "total_forms": total_forms
+    }
 
     return render(request, template_name, context)

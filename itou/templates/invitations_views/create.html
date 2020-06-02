@@ -22,7 +22,10 @@
             <a class="btn btn-secondary" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>
             <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
         {% endbuttons %}
-
     </form>
+
+    <a class="btn btn-secondary" href="{% url 'invitations_views:create' %}?total_forms={{ total_forms|add:'1' }}">
+        <button type="submit" class="btn btn-primary">{% trans "Ajouter" %}</button>
+    </a>
 
 {% endblock %}
