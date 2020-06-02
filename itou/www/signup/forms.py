@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
+from itou.users.models import User
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
@@ -52,6 +53,13 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         super().__init__(*args, **kwargs)
         self.organization = None
         self.new_organization = None
+
+    def clean_email(self):
+        # Must check if already exists
+        email = self.cleaned_data["email"]
+        if get_user_model().email_already_exists(email):
+            raise ValidationError(gettext_lazy("Cette adresse email est déjà enregistrée"))
+        return email
 
     def clean_secret_code(self):
         """
@@ -109,9 +117,11 @@ class PoleEmploiPrescriberForm(PrescriberForm):
     safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
 
     def clean_email(self):
-        email = self.cleaned_data["email"]
+        email = super().clean_email()
+
         if not email.endswith("@pole-emploi.fr"):
             raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi"))
+
         return email
 
     def clean_safir_code(self):
