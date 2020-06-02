@@ -451,7 +451,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         bcc = []
         if self.is_sent_by_proxy:
             bcc.append(self.sender.email)
-        context = {"job_application": self}
+        context = {"job_application": self,
+                   "survey_link": settings.ITOU_EMAIL_PRESCRIBER_NEW_HIRING_LINK, }
         subject = "apply/email/accept_subject.txt"
         body = "apply/email/accept_body.txt"
         return get_email_message(to, context, subject, body, bcc=bcc)
@@ -497,7 +498,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.approval:
             raise RuntimeError(_("No approval found for this job application."))
         to = [accepted_by.email]
-        context = {"job_application": self}
+        context = {"job_application": self, 
+                   "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_LINK, }
         subject = "apply/email/approval_number_subject.txt"
         body = "apply/email/approval_number_body.txt"
         return get_email_message(to, context, subject, body)
