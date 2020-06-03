@@ -14,11 +14,10 @@
         {{ formset.management_form }}
 
         {% for form in formset %}
-
+            {% bootstrap_form_errors form type="non_field_errors" %}
             <div class="form-row align-items-center">
                 {% bootstrap_form form show_label=False field_class="col-auto" %}
             </div>
-
         {% endfor %}
 
         <button type="submit" class="btn my-3 btn-light" formaction="{% url 'invitations_views:create' %}?add_form=1">{% trans "Ajouter une invitation" %}</button>

@@ -47,8 +47,7 @@ class NewInvitationForm(forms.ModelForm):
 class BaseInvitationFormSet(forms.BaseModelFormSet):
     def __init__(self, *args, **kwargs):
         """
-        By default, BaseModelFormSet show the objects
-        stored in the DB.
+        By default, BaseModelFormSet show the objects stored in the DB.
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
