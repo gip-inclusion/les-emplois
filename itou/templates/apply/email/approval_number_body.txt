@@ -32,7 +32,7 @@ Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktrans %}
 {% trans "La plateforme de l’inclusion vous a-t-elle permis d’embaucher plus rapidement ?" %}
 
 {% blocktrans %}
-Je donne mon avis en cliquant sur ce lien: {{ survey_link }}
+Donnez votre avis en cliquant sur ce lien: {{ survey_link }}
 {% endblocktrans %}
 
 {% endblock body %}

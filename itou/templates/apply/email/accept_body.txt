@@ -8,14 +8,6 @@
 La candidature de {{ job_seeker_full_name }} envoyée par {{ sender_full_name }} a été acceptée par {{ to_siae }}.
 {% endblocktrans %}
 
-{% blocktrans %}
-La Plateforme de l’inclusion a-t-elle permis que votre candidat(e) soit embauché(e) plus rapidement ?
-{% endblocktrans %}
-
-{% blocktrans %}
-Je donne mon avis en cliquant sur ce lien: {{ survey_link }}
-{% endblocktrans %}
-
 {% else %}
 
 {% blocktrans with to_siae=job_application.to_siae.display_name %}
@@ -29,5 +21,13 @@ Votre candidature a été acceptée par {{ to_siae }}.
 
 {{ job_application.answer }}
 {% endif %}
+
+{% blocktrans %}
+La Plateforme de l’inclusion a-t-elle permis que votre candidat(e) soit embauché(e) plus rapidement ?
+{% endblocktrans %}
+
+{% blocktrans %}
+Donnez votre avis en cliquant sur ce lien: {{ survey_link }}
+{% endblocktrans %}
 
 {% endblock body %}

@@ -1,5 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
 {% block subject %}
-{% blocktrans with job_seeker_full_name=job_application.job_seeker.get_full_name %}Délivrance d'un PASS IAE pour {{ job_seeker_full_name }}{% endblocktrans %}
+{% blocktrans with job_seeker_full_name=job_application.job_seeker.get_full_name %}Délivrance d'un PASS IAE pour {{ job_seeker_full_name }} et votre avis sur la Plateforme de l'inclusion{% endblocktrans %}
 {% endblock %}
