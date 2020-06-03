@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.forms.models import modelformset_factory
 from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
@@ -32,21 +33,21 @@ def accept(request, invitation_id):
 
 @login_required
 def create(request, template_name="invitations_views/create.html"):
-    total_forms = 1
-
-    if request.GET:
-        extra_form = request.GET.get("total_forms")
-        if extra_form:
-            total_forms = int(extra_form)
-
-    InvitationFormSet.extra = total_forms
     formset = InvitationFormSet(data=request.POST or None, form_kwargs={"sender": request.user})
+    add_form = request.GET.get("add_form")
 
-    if request.POST and formset.is_valid():
-        formset.save()
-        messages.success(request, _("Invitation envoyée avec succès !"))
-        formset = InvitationFormSet(form_kwargs={"sender": request.user})
+    if add_form:
+        formset.add_form(sender=request.user)
 
-    context = {"formset": formset, "total_forms": total_forms}
+    if request.POST:
+        if formset.is_valid():
+            # Validate the form even if the user only wants to add a row
+            # to inform him of any possible error.
+            if not add_form:
+                formset.save()
+                messages.success(request, _("Invitation envoyée avec succès !"))
+                formset = InvitationFormSet(form_kwargs={"sender": request.user})
+
+    context = {"formset": formset}
 
     return render(request, template_name, context)

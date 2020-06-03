@@ -14,18 +14,20 @@
         {{ formset.management_form }}
 
         {% for form in formset %}
-            {% bootstrap_form form %}
+
+            <div class="form-row align-items-center">
+                {% bootstrap_form form show_label=False field_class="col-auto" %}
+            </div>
 
         {% endfor %}
 
+        <button type="submit" class="btn my-3 btn-light" formaction="{% url 'invitations_views:create' %}?add_form=1">{% trans "Ajouter une invitation" %}</button>
+
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>
+            <a class="btn btn-secondary my-3" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>
             <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
         {% endbuttons %}
     </form>
 
-    <a class="btn btn-secondary" href="{% url 'invitations_views:create' %}?total_forms={{ total_forms|add:'1' }}">
-        <button type="submit" class="btn btn-primary">{% trans "Ajouter" %}</button>
-    </a>
 
 {% endblock %}
