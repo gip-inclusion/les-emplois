@@ -62,4 +62,4 @@ MIGRATION_MODULES = {
     'socialaccount': 'itou.allauth.migrations',
 }
 
-BASE_URL = "localhost"
+BASE_URL = "http://localhost:8080"

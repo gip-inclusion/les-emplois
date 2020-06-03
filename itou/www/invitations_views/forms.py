@@ -17,19 +17,8 @@ class NewInvitationForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.user = get_user_model().objects.filter(email__iexact=email).first()
-        if self.user:
-            error = forms.ValidationError(_("Cet utilisateur existe déjà."))
-            self.add_error("email", error)
-
-        invitation = Invitation.objects.filter(email__iexact=email).first()
-        if invitation:
-            if invitation.has_expired:
-                invitation.extend_expiration_date()
-            else:
-                error = forms.ValidationError(_("Cette personne a déjà été invitée."))
-                self.add_error("email", error)
-
+        self._invited_user_exists_error(email)
+        self._extend_expiration_date_or_error(email)
         return email
 
     def save(self, *args, **kwargs):
@@ -38,6 +27,21 @@ class NewInvitationForm(forms.ModelForm):
         invitation.save()
         invitation.send()
         return invitation
+
+    def _invited_user_exists_error(self, email):
+        self.user = get_user_model().objects.filter(email__iexact=email).first()
+        if self.user:
+            error = forms.ValidationError(_("Cet utilisateur existe déjà."))
+            self.add_error("email", error)
+
+    def _extend_expiration_date_or_error(self, email):
+        invitation = Invitation.objects.filter(email__iexact=email).first()
+        if invitation:
+            if invitation.has_expired:
+                invitation.extend_expiration_date()
+            else:
+                error = forms.ValidationError(_("Cette personne a déjà été invitée."))
+                self.add_error("email", error)
 
 
 class BaseInvitationFormSet(forms.BaseModelFormSet):
