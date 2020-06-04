@@ -158,11 +158,14 @@ class FromInvitationView(SignupView):
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        super().post(request, *args, **kwargs)
-        DefaultAccountAdapter().login(request, self.user)
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            super().post(request, *args, **kwargs)
+            DefaultAccountAdapter().login(request, self.user)
+            invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
+            invitation.accept()
+            next_step = redirect("dashboard:index")
+        else:
+            next_step = super().get(request, *args, **kwargs)
 
-        invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
-        invitation.accept()
-
-        return redirect("dashboard:index")
+        return next_step

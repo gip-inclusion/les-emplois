@@ -160,6 +160,21 @@ class AcceptInvitationTest(TestCase):
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         self.assertIn(invitation.sender.email, outbox_emails)
 
+    def test_accept_invitation_signup_weak_password(self):
+        invitation = SentInvitationFactory()
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
+        self.client.get(signup_form_url)
+        form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
+
+        # Fill in the password and send
+        response = self.client.post(
+            signup_form_url, data={**form_data, "password1": "password", "password2": "password"}, follow=True
+        )
+        self.assertFalse(response.context["form"].is_valid())
+        self.assertTrue(response.context["form"].errors.get("password1"))
+        self.assertTrue(response.wsgi_request.path, signup_form_url)
+
     def test_accept_expired_invitation(self):
         invitation = ExpiredInvitationFactory()
 
