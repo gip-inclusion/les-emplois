@@ -15,7 +15,7 @@
 
         {% for form in formset %}
             {% bootstrap_form_errors form type="non_field_errors" %}
-            <div class="form-row align-items-center">
+            <div class="form-row align-items-top">
                 {% bootstrap_form form show_label=False field_class="col-auto" %}
             </div>
         {% endfor %}
