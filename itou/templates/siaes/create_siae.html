@@ -16,7 +16,18 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form form %}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible alert-link" role="alert">
+            <button class="close" type="button" data-dismiss="alert" aria-label="{% trans 'close' %}">&#215;</button>
+            {% for error in form.non_field_errors %}
+                {{ error | safe }}{% if not forloop.last %}<br>{% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+        {% bootstrap_field field %}
+    {% endfor %}
 
     <div class="alert alert-warning" role="alert">
         <p>

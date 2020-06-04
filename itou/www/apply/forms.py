@@ -21,7 +21,7 @@ class UserExistsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.user = None
 
-    email = forms.EmailField(label=gettext_lazy("E-mail du candidat"))
+    email = forms.EmailField(label=gettext_lazy("E-mail personnel du candidat"))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -83,6 +83,8 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
                 "viewMode": "years",
                 "minDate": DatePickerField.min_birthdate().strftime("%Y"),
                 "maxDate": DatePickerField.max_birthdate().strftime("%Y"),
+                "useCurrent": False,
+                "allowInputToggle": False,
             }
         )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
@@ -192,6 +194,7 @@ class AcceptForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["hiring_without_approval"].widget = forms.HiddenInput()
         for field in ["hiring_start_at", "hiring_end_at"]:
             self.fields[field].required = True
             self.fields[field].widget = DatePickerField()
@@ -199,7 +202,7 @@ class AcceptForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ["hiring_start_at", "hiring_end_at", "answer"]
+        fields = ["hiring_start_at", "hiring_end_at", "answer", "hiring_without_approval"]
         help_texts = {
             "hiring_start_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},

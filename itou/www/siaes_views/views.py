@@ -103,7 +103,12 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     Create a new SIAE (Agence / Etablissement in French).
     """
     current_siae = get_current_siae_or_404(request)
-    form = CreateSiaeForm(current_siae=current_siae, data=request.POST or None, initial={"siret": current_siae.siret})
+    form = CreateSiaeForm(
+        current_siae=current_siae,
+        current_user=request.user,
+        data=request.POST or None,
+        initial={"siret": current_siae.siret},
+    )
 
     if request.method == "POST" and form.is_valid():
         siae = form.save(request)
