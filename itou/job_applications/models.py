@@ -441,10 +441,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/new_for_prescriber_body.txt"
         return get_email_message(to, context, subject, body)
 
-    @property
-    def email_new_for_job_seeker(self):
+    def email_new_for_job_seeker(self, base_url):
         to = [self.job_seeker.email]
-        context = {"job_application": self}
+        context = {"job_application": self, "base_url": base_url}
         subject = "apply/email/new_for_job_seeker_subject.txt"
         body = "apply/email/new_for_job_seeker_body.txt"
         return get_email_message(to, context, subject, body)

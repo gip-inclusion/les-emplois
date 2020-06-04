@@ -15,51 +15,6 @@
                 {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
             {% endwith %}
         </h1>
-
-        {% if siaes_page %}
-            <button
-                type="button"
-                class="btn btn-success my-3 m-sm-0 mb-sm-2 matomo-event"
-                data-toggle="modal"
-                data-target="#mapModal"
-                data-matomo-category="experimentation"
-                data-matomo-action="clic"
-                data-matomo-option="carte-recherche"
-                >
-                    {% include "includes/icon.html" with icon="map-pin" %} Voir la carte
-            </button>
-
-            <!-- Modal to test that a map is really needed by users -->
-            <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModal" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body p-4">
-                            <h5 class="modal-title text-center" id="mapModalLabel">En cours de conception 💡</h5>
-                            <p class="pt-2">Nous réfléchissons à afficher les résultats sur une carte.
-                            Votez pour nous donner votre avis !</p>
-                            <div id="mapPoll">
-                                <div class="row buttonsContainer">
-                                    <div class="col pr-2">
-                                        <button type="button" class="btn btn-outline-primary w-100">
-                                            <span class="h4">👍</span> <span class="d-block">Je veux voir</span> la carte !
-                                        </button>
-                                    </div>
-                                    <div class="col pl-2">
-                                        <button type="button" class="btn btn-outline-primary w-100">
-                                            <span class="h4">👎</span> <span class="d-block">La carte ne</span> m'intéresse pas.
-                                        </button>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <button type="button" class="btn btn-primary w-100 mt-3 mb-2" data-dismiss="modal" aria-label="Close">Fermer</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal end -->
-        {% endif %}
-
     </div>
 
 
