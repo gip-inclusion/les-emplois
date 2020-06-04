@@ -33,11 +33,13 @@ def accept(request, invitation_id):
 
 @login_required
 def create(request, template_name="invitations_views/create.html"):
-    formset = InvitationFormSet(data=request.POST or None, form_kwargs={"sender": request.user})
+    base_url = request.build_absolute_uri("/")[:-1]
+    form_kwargs = {"sender": request.user, "acceptance_link_base_url": base_url}
+    formset = InvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     add_form = request.GET.get("add_form")
 
     if add_form:
-        formset.add_form(sender=request.user)
+        formset.add_form(**form_kwargs)
 
     if request.POST:
         if formset.is_valid():
@@ -46,7 +48,7 @@ def create(request, template_name="invitations_views/create.html"):
             if not add_form:
                 formset.save()
                 messages.success(request, _("Invitation envoyée avec succès !"))
-                formset = InvitationFormSet(form_kwargs={"sender": request.user})
+                formset = InvitationFormSet(form_kwargs=form_kwargs)
 
     context = {"formset": formset}
 

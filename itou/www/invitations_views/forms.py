@@ -11,8 +11,9 @@ class NewInvitationForm(forms.ModelForm):
         model = Invitation
         fields = ["first_name", "last_name", "email"]
 
-    def __init__(self, sender, *args, **kwargs):
+    def __init__(self, sender, acceptance_link_base_url, *args, **kwargs):
         self.sender = sender
+        self.acceptance_link_base_url = acceptance_link_base_url
         super(NewInvitationForm, self).__init__(*args, **kwargs)
 
     def clean_email(self):
@@ -25,7 +26,7 @@ class NewInvitationForm(forms.ModelForm):
         invitation = super(NewInvitationForm, self).save(commit=False)
         invitation.sender = self.sender
         invitation.save()
-        invitation.send()
+        invitation.send(self.acceptance_link_base_url)
         return invitation
 
     def _invited_user_exists_error(self, email):
@@ -53,13 +54,17 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
         super().__init__(*args, **kwargs)
         self.queryset = Invitation.objects.none()
 
-    def add_form(self, sender, **kwargs):
+    def add_form(self, sender, acceptance_link_base_url, **kwargs):
         """
         Adding a form to a formset is a real hassle
         that does not seem to bother the Django team.
         https://code.djangoproject.com/ticket/21596
         """
-        self.forms.append(self._construct_form(self.total_form_count(), sender=sender, **kwargs))
+        self.forms.append(
+            self._construct_form(
+                self.total_form_count(), sender=sender, acceptance_link_base_url=acceptance_link_base_url, **kwargs
+            )
+        )
         self.forms[-1].is_bound = False
         self.data = self.data.copy()
         total_forms = self.management_form.cleaned_data["TOTAL_FORMS"] + 1

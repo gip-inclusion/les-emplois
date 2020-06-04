@@ -25,5 +25,3 @@ DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_STAGING"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")
-
-BASE_URL = f"{ITOU_PROTOCOL}://{ITOU_FQDN}"

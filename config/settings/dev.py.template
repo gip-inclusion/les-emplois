@@ -61,5 +61,3 @@ DEBUG_TOOLBAR_CONFIG = {
 MIGRATION_MODULES = {
     'socialaccount': 'itou.allauth.migrations',
 }
-
-BASE_URL = "http://localhost:8080"

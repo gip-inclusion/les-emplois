@@ -11,6 +11,9 @@ from itou.users.factories import DEFAULT_PASSWORD, UserFactory
 from itou.www.invitations_views.forms import NewInvitationForm
 
 
+BASE_URL = "http://testserver"
+
+
 class SendInvitationTest(TestCase):
     def test_send_one_invitation(self):
         user = UserFactory()
@@ -20,7 +23,7 @@ class SendInvitationTest(TestCase):
         response = self.client.get(new_invitation_url)
 
         # Assert form is present
-        form = NewInvitationForm(response.wsgi_request)
+        form = NewInvitationForm(response.wsgi_request, acceptance_link_base_url=BASE_URL)
         self.assertContains(response, form["first_name"].label)
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
@@ -122,7 +125,7 @@ class AcceptInvitationTest(TestCase):
 
         invitation = SentInvitationFactory()
 
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link(base_url=BASE_URL), follow=True)
 
         signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
 
@@ -162,7 +165,7 @@ class AcceptInvitationTest(TestCase):
 
     def test_accept_invitation_signup_weak_password(self):
         invitation = SentInvitationFactory()
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link(base_url=BASE_URL), follow=True)
         signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
         self.client.get(signup_form_url)
         form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
@@ -179,7 +182,7 @@ class AcceptInvitationTest(TestCase):
         invitation = ExpiredInvitationFactory()
 
         # User wants to join our website but it's too late!
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link(base_url=BASE_URL), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
@@ -188,14 +191,14 @@ class AcceptInvitationTest(TestCase):
 
     def test_accept_non_existant_invitation(self):
         invitation = Invitation(first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com")
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link(base_url=BASE_URL), follow=True)
         self.assertEqual(response.status_code, 404)
 
     def test_accept_accepted_invitation(self):
         invitation = SentInvitationFactory(accepted=True)
 
         # User wants to join our website but it's too late!
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link(base_url=BASE_URL), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})
@@ -206,7 +209,7 @@ class AcceptInvitationTest(TestCase):
         user = UserFactory()
         invitation = SentInvitationFactory(first_name=user.first_name, last_name=user.last_name, email=user.email)
 
-        response = self.client.get(invitation.acceptance_link, follow=True)
+        response = self.client.get(invitation.acceptance_link(base_url=BASE_URL), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.wsgi_request.path, reverse("invitations_views:accept", kwargs={"invitation_id": invitation.pk})

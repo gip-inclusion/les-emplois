@@ -50,10 +50,9 @@ class Invitation(models.Model):
     def __str__(self):
         return f"{self.email}"
 
-    @property
-    def acceptance_link(self):
+    def acceptance_link(self, base_url):
         acceptance_path = reverse("invitations_views:accept", kwargs={"invitation_id": self.id})
-        return f"{settings.BASE_URL}{acceptance_path}"
+        return f"{base_url}{acceptance_path}"
 
     @property
     def has_expired(self):
@@ -73,10 +72,10 @@ class Invitation(models.Model):
         self.save()
         self.accepted_notif_sender()
 
-    def send(self):
+    def send(self, acceptance_link_base_url):
         self.sent = True
         self.sent_at = timezone.now()
-        self.send_invitation()
+        self.send_invitation(acceptance_link_base_url)
         self.save()
 
     def accepted_notif_sender(self):
@@ -84,9 +83,9 @@ class Invitation(models.Model):
         emails = [self.email_accepted_notif_sender]
         connection.send_messages(emails)
 
-    def send_invitation(self):
+    def send_invitation(self, acceptance_link_base_url):
         connection = mail.get_connection()
-        emails = [self.email_invitation]
+        emails = [self.email_invitation(acceptance_link_base_url)]
         connection.send_messages(emails)
 
     # Emails
@@ -98,15 +97,15 @@ class Invitation(models.Model):
         body = "invitations_views/email/accepted_notif_sender_body.txt"
         return get_email_message(to, context, subject, body)
 
-    @property
-    def email_invitation(self):
+    def email_invitation(self, acceptance_link_base_url):
         to = [self.email]
+        acceptance_link = self.acceptance_link(base_url=acceptance_link_base_url)
         context = {
             "sender": self.sender,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "acceptance_link": self.acceptance_link,
+            "acceptance_link": acceptance_link,
         }
         subject = "invitations_views/email/invitation_subject.txt"
         body = "invitations_views/email/invitation_body.txt"
