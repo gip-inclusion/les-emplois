@@ -21,7 +21,7 @@ class UserExistsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.user = None
 
-    email = forms.EmailField(label=gettext_lazy("E-mail du candidat"))
+    email = forms.EmailField(label=gettext_lazy("E-mail personnel du candidat"))
 
     def clean_email(self):
         email = self.cleaned_data["email"]
