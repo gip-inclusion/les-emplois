@@ -22,4 +22,12 @@ Votre candidature a été acceptée par {{ to_siae }}.
 {{ job_application.answer }}
 {% endif %}
 
+{% blocktrans %}
+La Plateforme de l’inclusion a-t-elle permis que votre candidat(e) soit embauché(e) plus rapidement ?
+{% endblocktrans %}
+
+{% blocktrans %}
+Donnez votre avis en cliquant sur ce lien: {{ survey_link }}
+{% endblocktrans %}
+
 {% endblock body %}

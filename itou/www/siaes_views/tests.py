@@ -6,7 +6,7 @@ from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -149,7 +149,7 @@ class ConfigureJobsViewTest(TestCase):
 
 
 class CreateSiaeViewTest(TestCase):
-    def test_create_siae_outside_of_siren_fails(self):
+    def test_create_non_preexisting_siae_outside_of_siren_fails(self):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -163,6 +163,7 @@ class CreateSiaeViewTest(TestCase):
         new_siren = "9876543210"
         new_siret = f"{new_siren}1234"
         self.assertNotEqual(siae.siren, new_siren)
+        self.assertFalse(Siae.objects.filter(siret=new_siret).exists())
 
         post_data = {
             "siret": new_siret,
@@ -181,7 +182,52 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
 
+        expected_message = f"Le SIRET doit commencer par le SIREN {siae.siren}"
+        self.assertContains(response, escape(expected_message))
+        expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
+        self.assertNotContains(response, escape(expected_message))
+
         self.assertFalse(Siae.objects.filter(siret=post_data["siret"]).exists())
+
+    def test_create_preexisting_siae_outside_of_siren_fails(self):
+
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:create_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        preexisting_siae = SiaeFactory()
+        new_siret = preexisting_siae.siret
+        self.assertNotEqual(siae.siren, preexisting_siae.siren)
+        self.assertTrue(Siae.objects.filter(siret=new_siret).exists())
+
+        post_data = {
+            "siret": new_siret,
+            "kind": preexisting_siae.kind,
+            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "source": Siae.SOURCE_USER_CREATED,
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        expected_message = "Le SIRET doit commencer par le SIREN"
+        self.assertNotContains(response, escape(expected_message))
+        expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
+        self.assertContains(response, escape(expected_message))
+
+        self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
     def test_cannot_create_siae_with_same_siret_and_same_type(self):
 
@@ -210,6 +256,11 @@ class CreateSiaeViewTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
+
+        expected_message = "Le SIRET doit commencer par le SIREN"
+        self.assertNotContains(response, escape(expected_message))
+        expected_message = "La structure à laquelle vous souhaitez vous rattacher est déjà"
+        self.assertContains(response, escape(expected_message))
 
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
