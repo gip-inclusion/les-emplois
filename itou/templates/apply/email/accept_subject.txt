@@ -1,5 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
 {% block subject %}
-{% blocktrans %}Candidature acceptée{% endblocktrans %}
+{% blocktrans %}Candidature acceptée et votre avis sur la Plateforme de l'inclusion{% endblocktrans %}
 {% endblock %}
