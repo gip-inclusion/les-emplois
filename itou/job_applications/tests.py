@@ -242,7 +242,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
 
         # Assert the Job Seeker does not have access to confidential information.
-        email = job_application.email_new_for_job_seeker
+        email = job_application.email_new_for_job_seeker(base_url="http://testserver")
         self.assertIn(job_application.sender.get_full_name(), email.body)
         self.assertIn(job_application.sender_prescriber_organization.display_name, email.body)
         self.assertNotIn(job_application.sender.email, email.body)
@@ -250,7 +250,7 @@ class JobApplicationEmailTest(TestCase):
 
     def test_new_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory(selected_jobs=Appellation.objects.all())
-        email = job_application.email_new_for_job_seeker
+        email = job_application.email_new_for_job_seeker(base_url="http://testserver")
         # To.
         self.assertIn(job_application.sender.email, email.to)
         self.assertEqual(len(email.to), 1)
@@ -273,6 +273,8 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(reverse("account_login"), email.body)
+        self.assertIn(reverse("account_reset_password"), email.body)
 
     def test_accept(self):
 
