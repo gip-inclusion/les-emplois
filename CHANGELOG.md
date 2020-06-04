@@ -12,7 +12,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Inscription sans boite email (redirection vers PE connect) 
 - Connexion via PE Connect
 - Tracking Matomo pour PE Connect
-- Liens Typeform lors de l'envoi d'email (confirmation d'embauche pour les SIAE et prescripteurs) 
+- Liens Typeform lors de l'envoi d'emails (confirmation d'embauche pour les SIAE et prescripteurs) 
 - Possibilité de pouvoir embaucher sans obtenir de PASS IAE
 
 ### Modifié
