@@ -83,6 +83,8 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
                 "viewMode": "years",
                 "minDate": DatePickerField.min_birthdate().strftime("%Y"),
                 "maxDate": DatePickerField.max_birthdate().strftime("%Y"),
+                "useCurrent": False,
+                "allowInputToggle": False,
             }
         )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
