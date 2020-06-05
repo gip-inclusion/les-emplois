@@ -65,6 +65,7 @@ LOCAL_APPS = [
     "itou.approvals",
     "itou.eligibility",
     "itou.invitations",
+    "itou.metabase",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
@@ -145,11 +146,17 @@ DATABASES = {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
-        "NAME": os.environ.get("ITOU_POSTGRES_DATABASE_NAME", "jepostule"),
-        "USER": os.environ.get("ITOU_POSTGRES_USER", "jepostule"),
+        "NAME": os.environ.get("ITOU_POSTGRES_DATABASE_NAME", "itou"),
+        "USER": os.environ.get("ITOU_POSTGRES_USER", "itou"),
         "PASSWORD": os.environ.get("ITOU_POSTGRES_PASSWORD", "mdp"),
     }
 }
+
+METABASE_HOST = os.environ.get("METABASE_HOST")
+METABASE_PORT = os.environ.get("METABASE_PORT")
+METABASE_DATABASE = os.environ.get("METABASE_DATABASE")
+METABASE_USER = os.environ.get("METABASE_USER")
+METABASE_PASSWORD = os.environ.get("METABASE_PASSWORD")
 
 ATOMIC_REQUESTS = True
 
