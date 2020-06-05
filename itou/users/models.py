@@ -122,7 +122,9 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def is_peamu(self):
-        return self.socialaccount_set.filter(provider="peamu").exists()
+        social_accounts = self.socialaccount_set.all()
+        # We have to do all this in python to benefit from prefetch_related.
+        return len([sa for sa in social_accounts if sa.provider == "peamu"]) >= 1
 
     @cached_property
     def peamu_id_token(self):
