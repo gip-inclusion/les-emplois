@@ -26,7 +26,10 @@
             </div>
         {% endfor %}
 
-        <button type="submit" class="btn my-3 btn-light" formaction="{% url 'invitations_views:create' %}?add_form=1">{% trans "Ajouter une invitation" %}</button>
+        <button type="submit" class="btn mt-2 mb-3 pl-0 btn-link" formaction="{% url 'invitations_views:create' %}?add_form=1">
+            {% include "includes/icon.html" with icon="user-plus" class="mr-2" %}
+            {% trans "Ajouter un invité" %}
+        </button>
 
         {% buttons %}
             <a class="btn btn-secondary my-3" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>
