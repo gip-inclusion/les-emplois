@@ -75,4 +75,6 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
             self.management_form.data[f'{self.management_form.prefix}-{"TOTAL_FORMS"}'] = total_forms
 
 
-InvitationFormSet = modelformset_factory(Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=1)
+InvitationFormSet = modelformset_factory(
+    Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=1, max_num=30
+)
