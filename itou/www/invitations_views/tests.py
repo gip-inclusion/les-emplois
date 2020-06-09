@@ -105,6 +105,38 @@ class SendInvitationTest(TestCase):
         invitations = Invitation.objects.count()
         self.assertEqual(invitations, 2)
 
+    def test_send_multiple_invitations_duplicated_email(self):
+        user = UserFactory()
+        invited_user = UserFactory.build()
+        second_invited_user = UserFactory.build()
+        duplicated_user = UserFactory.build(email=second_invited_user.email)
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        new_invitation_url = reverse("invitations_views:create")
+        response = self.client.get(new_invitation_url)
+
+        self.assertTrue(response.context["formset"])
+        data = {
+            "form-TOTAL_FORMS": "2",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": invited_user.first_name,
+            "form-0-last_name": invited_user.last_name,
+            "form-0-email": invited_user.email,
+            "form-1-first_name": second_invited_user.first_name,
+            "form-1-last_name": second_invited_user.last_name,
+            "form-1-email": second_invited_user.email,
+            "form-2-first_name": duplicated_user.first_name,
+            "form-2-last_name": duplicated_user.last_name,
+            "form-2-email": duplicated_user.email,
+        }
+
+        response = self.client.post(new_invitation_url, data=data)
+        self.assertEqual(response.status_code, 200)
+
+        invitations = Invitation.objects.count()
+        self.assertEqual(invitations, 2)
+
     def test_add_invitation(self):
         user = UserFactory()
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
