@@ -178,7 +178,6 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 messages.success(
                     request, _("Le numéro d'agrément peut être utilisé pour la déclaration de la personne dans l'ASP.")
                 )
-            else:
                 messages.success(
                     request,
                     mark_safe(
