@@ -47,7 +47,6 @@ html {
     grid-column: full;
     display: inherit;
     grid-template-columns: inherit;
-    position: relative;
 }
 
 .layout-section > * {

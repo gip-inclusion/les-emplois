@@ -7,6 +7,6 @@ from itou.www.search import views
 app_name = "search"
 
 urlpatterns = [
-    path("search", views.search_siaes, name="siaes"),
+    path("employers", views.search_siaes, name="siaes"),
     path("prescribers", views.search_prescribers, name="prescribers"),
 ]

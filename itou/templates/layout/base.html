@@ -128,11 +128,11 @@
         <div class="layout-section layout-section-white border-bottom">
             <nav class="nav itou-main-nav">
                 {% if user.is_authenticated %}
-                    <a class="nav-link{% if request.resolver_match.namespace == 'dashboard' and request.resolver_match.url_name == 'index' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
                 {% endif %}
-                <a class="nav-link{% if request.resolver_match.namespace == 'search' and request.resolver_match.url_name == 'siaes' %} active{% endif %}" href="{% url 'search:siaes' %}">{% trans "Rechercher des employeurs solidaires" %}</a>
-                <a class="nav-link{% if request.resolver_match.namespace == 'search' and request.resolver_match.url_name == 'prescribers' %} active{% endif %}" href="{% url 'search:prescribers' %}">{% trans "Rechercher des prescripteurs" %}</a>
-                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Accéder au forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link{% if request.path == '/' or request.path == '/search/employers' %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
+                <a class="nav-link{% if request.path == '/search/prescribers' %} active{% endif %}" href="{% url 'search:prescribers' %}">{% trans "Rechercher des prescripteurs" %}</a>
+                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
                 <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% trans "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
             </nav>
         </div>
