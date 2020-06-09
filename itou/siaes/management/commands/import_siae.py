@@ -25,6 +25,7 @@ from django.core.management.base import BaseCommand
 from itou.siaes.management.commands.import_deleted_siae import (
     DEPARTMENTS_TO_OPEN_ON_14_04_2020,
     DEPARTMENTS_TO_OPEN_ON_20_04_2020,
+    DEPARTMENTS_TO_OPEN_ON_22_06_2020,
     DEPARTMENTS_TO_OPEN_ON_27_04_2020,
 )
 from itou.siaes.models import Siae
@@ -38,10 +39,15 @@ MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_05_11_fluxIAE_Structure_110520
 
 SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_05_07_siae_auth_email_and_external_id.csv"
 
+# ETTI are deployed all over France without restriction.
 SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
 
+# For other kinds of siaes, only some regions are deployed.
 SIAE_CREATION_ALLOWED_DEPARTMENTS = (
-    DEPARTMENTS_TO_OPEN_ON_14_04_2020 + DEPARTMENTS_TO_OPEN_ON_20_04_2020 + DEPARTMENTS_TO_OPEN_ON_27_04_2020
+    DEPARTMENTS_TO_OPEN_ON_14_04_2020
+    + DEPARTMENTS_TO_OPEN_ON_20_04_2020
+    + DEPARTMENTS_TO_OPEN_ON_27_04_2020
+    + DEPARTMENTS_TO_OPEN_ON_22_06_2020
 )
 
 EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
