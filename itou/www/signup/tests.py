@@ -527,6 +527,7 @@ class PrescriberSignupTest(TestCase):
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
+
         # Check `EmailAddress` state.
         self.assertEqual(user.emailaddress_set.count(), 1)
         user_email = user.emailaddress_set.first()
@@ -541,6 +542,10 @@ class PrescriberSignupTest(TestCase):
         self.assertIsNone(new_org.authorization_updated_at)
         self.assertIsNone(new_org.authorization_updated_by)
         self.assertEqual(new_org.created_by, user)
+
+        # Check membership
+        self.assertEqual(1, new_org.members.count())
+        self.assertIn(user, new_org.members.all())
 
         # Check email has been sent to support (validation/refusal of authorisation needed)
         self.assertEqual(len(mail.outbox), 2)
