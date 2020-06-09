@@ -76,5 +76,5 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
 
 
 InvitationFormSet = modelformset_factory(
-    Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=1, max_num=30
+    Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=2, max_num=30
 )
