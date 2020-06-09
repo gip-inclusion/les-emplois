@@ -4,7 +4,7 @@
 
 {% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst %}
 Bonjour {{ first_name }} {{ last_name }} !
-Vous avez été invité(e) à rejoindre notre site. Cliquez sur le lien ci-dessous pour vous inscrire.
+Vous avez été invité(e) à rejoindre la Plateforme de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire.
 {% endblocktrans %}
 
 {{ acceptance_link }}

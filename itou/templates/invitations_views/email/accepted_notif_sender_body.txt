@@ -3,7 +3,7 @@
 {% block body %}
 
 {% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst %}
-{{ first_name }} {{ last_name }} est désormais membre de notre site.
+{{ first_name }} {{ last_name }} est désormais membre de la Plateforme de l'inclusion.
 {% endblocktrans %}
 
 {% trans "Détails" %}

@@ -3,7 +3,7 @@
 {% block subject %}
 
 {% blocktrans with first_name=sender.first_name|capfirst last_name=sender.last_name|capfirst %}
-{{ first_name }} {{ last_name }} vous a invité(e) à rejoindre notre site.
+{{ first_name }} {{ last_name }} vous a invité(e) à rejoindre la Plateforme de l'inclusion.
 {% endblocktrans %}
 
 {% endblock %}
