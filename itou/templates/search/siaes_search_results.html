@@ -1,23 +1,32 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% with request.GET.city_name as city and request.GET.distance as distance %}{% blocktrans %}Employeurs solidaires à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
+{% block title %}
+    {% with request.GET.city_name as city and request.GET.distance as distance %}
+        {% blocktrans %}Employeurs solidaires à {{ distance }} Km autour de {{ city }}{% endblocktrans %}
+    {% endwith %}
+    {{ block.super }}
+{% endblock %}
+
+{% block pre_content %}
+
+    <section class="layout-section layout-section-banner-work-labour">
+
+        <div class="layout-content">
+
+            <h2 class="text-center my-5 text-light">{% trans "Rechercher un employeur solidaire" %}</h2>
+
+            <form method="get" action="" class="d-block mb-5">
+                {% include "search/includes/siaes_search_form.html" with form=form %}
+            </form>
+
+        </div>
+
+    </section>
+
+{% endblock %}
 
 {% block content %}
-
-    <h2 class="text-center">{% trans "Rechercher un employeur solidaire" %}</h2>
-
-    <form method="get" action="" class="d-block mb-5">
-        {% include "search/includes/siaes_search_form.html" with form=form %}
-    </form>
-
-    <div class="d-flex flex-column flex-sm-row justify-content-sm-between align-items-sm-center">
-        <h1 class="font-weight-normal">
-            {% with request.GET.city_name as city and request.GET.distance as distance %}
-                {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
-            {% endwith %}
-        </h1>
-    </div>
 
     {% if request.GET %}
 

@@ -1,15 +1,32 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% with request.GET.city_name as city and request.GET.distance as distance %}{% blocktrans %}Prescripteurs à {{ distance }} Km autour de {{ city }}{% endblocktrans %}{% endwith %}{{ block.super }}{% endblock %}
+{% block title %}
+    {% with request.GET.city_name as city and request.GET.distance as distance %}
+        {% blocktrans %}Prescripteurs à {{ distance }} Km autour de {{ city }}{% endblocktrans %}
+    {% endwith %}
+    {{ block.super }}
+{% endblock %}
+
+{% block pre_content %}
+
+    <section class="layout-section layout-section-banner-work-office">
+
+        <div class="layout-content">
+
+            <h2 class="text-center my-5 text-light">{% trans "Rechercher un prescripteur" %}</h2>
+
+            <form method="get" action="" class="d-block mb-5">
+                {% include "search/includes/prescribers_search_form.html" with form=form %}
+            </form>
+
+        </div>
+
+    </section>
+
+{% endblock %}
 
 {% block content %}
-
-    <h2 class="text-center">{% trans "Rechercher un prescripteur" %}</h2>
-
-    <form method="get" action="" class="d-block mb-5">
-        {% include "search/includes/prescribers_search_form.html" with form=form %}
-    </form>
 
     {% if request.GET %}
 
