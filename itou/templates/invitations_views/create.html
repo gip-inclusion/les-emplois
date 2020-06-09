@@ -7,16 +7,22 @@
 {% block content %}
 
     <h1>{% trans "Invitation"%}</h1>
+    {% blocktrans with date=expiration_date|date %}
+        <div class="alert alert-info w-sm-75" role="alert">
+            <span class="d-block">Vos invités recevront un e-mail qui leur permettra de rejoindre la Plateforme de l'inclusion.</span>
+            <span class="d-block">Cette invitation restera valide jusqu'au {{ date }}.</span>
+        </div>
+    {% endblocktrans %}
 
-    <form method="post" action="{% url 'invitations_views:create' %}" class="js-prevent-multiple-submit">
+    <form method="post" action="{% url 'invitations_views:create' %}" class="js-prevent-multiple-submit my-3">
         {% csrf_token %}
 
         {{ formset.management_form }}
 
         {% for form in formset %}
             {% bootstrap_form_errors form type="non_field_errors" %}
-            <div class="form-row align-items-top">
-                {% bootstrap_form form show_label=False field_class="col-auto" %}
+            <div class="inline-form-row row align-items-top mt-3">
+                {% bootstrap_form form show_label=False form_group_class="col-md-3 mt-2" %}
             </div>
         {% endfor %}
 

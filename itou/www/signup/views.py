@@ -152,7 +152,7 @@ class FromInvitationView(SignupView):
     def get(self, request, *args, **kwargs):
         invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
         data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
-        form = forms.UserSignupFromInvitationForm(initial=data)
+        forms.UserSignupFromInvitationForm(initial=data)
         self.initial = data
         return super().get(request, *args, **kwargs)
 

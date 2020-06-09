@@ -9,4 +9,10 @@ Vous avez été invité(e) à rejoindre la Plateforme de l'inclusion. Cliquez su
 
 {{ acceptance_link }}
 
+{# Don't specify datetime format as it depends on the language. #}
+{# Better relying on the global DATE_FORMAT configuration variable. #}
+{% blocktrans with date=expiration_date|date %}
+Cette invitation restera valide jusqu'au {{ date }}.
+{% endblocktrans %}
+
 {% endblock %}

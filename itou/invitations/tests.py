@@ -1,10 +1,7 @@
-from django.conf import settings
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.http import urlsafe_base64_decode
 
 from itou.invitations.factories import ExpiredInvitationFactory, InvitationFactory, SentInvitationFactory
-from itou.invitations.models import Invitation
 
 
 BASE_URL = "http://testserver"
@@ -59,6 +56,8 @@ class InvitationEmailsTest(TestCase):
         self.assertIn(invitation.first_name, email.body)
         self.assertIn(invitation.last_name, email.body)
         self.assertIn(invitation.acceptance_link(base_url=BASE_URL), email.body)
+
+        self.assertIn(str(invitation.expiration_date.day), email.body)
 
         # To
         self.assertIn(invitation.email, email.to)

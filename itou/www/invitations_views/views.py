@@ -1,9 +1,10 @@
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.forms.models import modelformset_factory
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext as _, ngettext as __
 
 from itou.invitations.models import Invitation
@@ -37,6 +38,7 @@ def create(request, template_name="invitations_views/create.html"):
     form_kwargs = {"sender": request.user, "acceptance_link_base_url": base_url}
     formset = InvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     add_form = request.GET.get("add_form")
+    expiration_date = timezone.now() + relativedelta(Invitation.EXPIRATION_DAYS)
 
     if add_form:
         formset.add_form(**form_kwargs)
@@ -56,6 +58,6 @@ def create(request, template_name="invitations_views/create.html"):
                 messages.success(request, message)
                 formset = InvitationFormSet(form_kwargs=form_kwargs)
 
-    context = {"formset": formset}
+    context = {"formset": formset, "expiration_date": expiration_date}
 
     return render(request, template_name, context)

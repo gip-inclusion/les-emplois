@@ -7,8 +7,7 @@ from django.core import mail
 from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.emails import get_email_message
@@ -55,9 +54,12 @@ class Invitation(models.Model):
         return f"{base_url}{acceptance_path}"
 
     @property
+    def expiration_date(self):
+        return self.sent_at + relativedelta(days=self.EXPIRATION_DAYS)
+
+    @property
     def has_expired(self):
-        expiration_date = self.sent_at + relativedelta(days=self.EXPIRATION_DAYS)
-        return expiration_date <= timezone.now()
+        return self.expiration_date <= timezone.now()
 
     @property
     def can_be_accepted(self):
@@ -106,6 +108,7 @@ class Invitation(models.Model):
             "last_name": self.last_name,
             "email": self.email,
             "acceptance_link": acceptance_link,
+            "expiration_date": self.expiration_date,
         }
         subject = "invitations_views/email/invitation_subject.txt"
         body = "invitations_views/email/invitation_body.txt"

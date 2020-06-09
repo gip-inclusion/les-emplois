@@ -1,9 +1,7 @@
-from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
-from django.utils import timezone
 
 from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory
 from itou.invitations.models import Invitation
