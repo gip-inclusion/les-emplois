@@ -418,6 +418,6 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 class UserSignupFromInvitationForm(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         super(UserSignupFromInvitationForm, self).__init__(*args, **kwargs)
-        readonly_fields = ["first_name", "last_name", "email"]
+        readonly_fields = ["email"]
         for field in readonly_fields:
             self.fields[field].widget.attrs["readonly"] = True
