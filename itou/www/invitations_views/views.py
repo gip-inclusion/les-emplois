@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.forms.models import modelformset_factory
 from django.http import Http404
 from django.shortcuts import redirect, render
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, ngettext as __
 
 from itou.invitations.models import Invitation
 from itou.www.invitations_views.forms import InvitationFormSet
@@ -47,7 +47,13 @@ def create(request, template_name="invitations_views/create.html"):
             # to inform him of any possible error.
             if not add_form:
                 formset.save()
-                messages.success(request, _("Invitation envoyée avec succès !"))
+                count = len(formset.forms)
+
+                message = __("Invitation envoyée avec succès.", "Invitations envoyées avec succès.", count) % {
+                    "count": count
+                }
+
+                messages.success(request, message)
                 formset = InvitationFormSet(form_kwargs=form_kwargs)
 
     context = {"formset": formset}
