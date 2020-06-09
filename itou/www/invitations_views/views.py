@@ -38,7 +38,7 @@ def create(request, template_name="invitations_views/create.html"):
     form_kwargs = {"sender": request.user, "acceptance_link_base_url": base_url}
     formset = InvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     add_form = request.GET.get("add_form")
-    expiration_date = timezone.now() + relativedelta(Invitation.EXPIRATION_DAYS)
+    expiration_date = timezone.now() + relativedelta(days=Invitation.EXPIRATION_DAYS)
 
     if add_form:
         formset.add_form(**form_kwargs)
