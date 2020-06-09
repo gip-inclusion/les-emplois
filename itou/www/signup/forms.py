@@ -91,19 +91,20 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         else:
             organization = self.organization
 
-            if organization:
-                if organization.has_members:
-                    organization.new_signup_warning_email_to_existing_members(user).send()
-                else:
-                    # for existing organization with no member
+        if organization:
+            if organization.has_members:
+                organization.new_signup_warning_email_to_existing_members(user).send()
+            else:
+                # for *existing* organization with no member
+                if not self.new_organization:
                     organization.organization_with_no_member_email(user).send()
 
-                membership = PrescriberMembership()
-                membership.user = user
-                membership.organization = organization
-                # The first member becomes an admin.
-                membership.is_admin = membership.organization.members.count() == 0
-                membership.save()
+            membership = PrescriberMembership()
+            membership.user = user
+            membership.organization = organization
+            # The first member becomes an admin.
+            membership.is_admin = membership.organization.members.count() == 0
+            membership.save()
 
         return user
 
