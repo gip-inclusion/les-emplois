@@ -225,13 +225,13 @@
         {% else %}
 
             <p>
-                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
-                   class="btn btn-outline-danger btn-block">
-                    {% trans "Je ne veux pas l'embaucher" %}
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    {% trans "Je l'embauche" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
-
+            
             <p>
                 <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
@@ -241,13 +241,12 @@
             </p>
 
             <p>
-                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
-                   class="btn btn-outline-success btn-block">
-                    {% trans "Je l'embauche" %}
+                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+                   class="btn btn-outline-danger btn-block">
+                    {% trans "Je ne veux pas l'embaucher" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
-
 
         {% endif %}
 

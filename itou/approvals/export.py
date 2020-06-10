@@ -20,9 +20,11 @@ FIELDS = [
     "date_debut_pass_iae",
     "date_fin_pass_iae",
     "code_postal",
+    "ville",
     "code_postal_employeur",
     "numero_siret",
     "raison_sociale",
+    "type_siae",
 ]
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -64,9 +66,11 @@ def export_approvals(export_format="file"):
                 approval.start_at.strftime(DATE_FMT),
                 approval.end_at.strftime(DATE_FMT),
                 approval.user.post_code,
+                approval.user.city,
                 job_application.to_siae.post_code,
                 job_application.to_siae.siret,
                 job_application.to_siae.name,
+                job_application.to_siae.kind,
             ]
             data.append(line)
 
