@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from django.shortcuts import render
 
@@ -33,6 +34,7 @@ def search_siaes(request, template_name="search/siaes_search_results.html"):
     return render(request, template_name, context)
 
 
+@login_required
 def search_prescribers(request, template_name="search/prescribers_search_results.html"):
 
     form = PrescriberSearchForm(data=request.GET or None)
