@@ -56,4 +56,8 @@ Candidature chez {{ siae_name }} envoyée avec succès !
 
 {% endif %}
 
+---
+{% trans "Pour vous connecter avec votre adresse e-mail, cliquez ici" %} : {{ base_url }}{% url 'account_login' %}?account_type=job_seeker
+{% trans "Mot de passe oublié ? Cliquez ici" %} : {{ base_url }}{% url 'account_reset_password' %}
+
 {% endblock body %}

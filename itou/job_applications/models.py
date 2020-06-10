@@ -261,6 +261,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="approval_numbers_sent",
     )
 
+    hiring_without_approval = models.BooleanField(
+        default=False, verbose_name=_("L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche")
+    )
+
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
 
@@ -349,7 +353,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         emails = [self.email_accept]
 
         # Approval issuance logic.
-        if self.to_siae.is_subject_to_eligibility_rules:
+        if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
 
             approvals_wrapper = self.job_seeker.approvals_wrapper
 
@@ -437,10 +441,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/new_for_prescriber_body.txt"
         return get_email_message(to, context, subject, body)
 
-    @property
-    def email_new_for_job_seeker(self):
+    def email_new_for_job_seeker(self, base_url):
         to = [self.job_seeker.email]
-        context = {"job_application": self}
+        context = {"job_application": self, "base_url": base_url}
         subject = "apply/email/new_for_job_seeker_subject.txt"
         body = "apply/email/new_for_job_seeker_body.txt"
         return get_email_message(to, context, subject, body)

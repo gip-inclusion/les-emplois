@@ -178,7 +178,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 messages.success(
                     request, _("Le numéro d'agrément peut être utilisé pour la déclaration de la personne dans l'ASP.")
                 )
-            else:
+            elif not job_application.hiring_without_approval:
                 messages.success(
                     request,
                     mark_safe(
@@ -254,3 +254,15 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         "form_confirm_eligibility": form_confirm_eligibility,
     }
     return render(request, template_name, context)
+
+
+@login_required()
+def accept_without_approval(request, job_application_id):
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    if not job_application.approval_not_needed:
+        job_application.approval_not_needed = True
+        job_application.save()
+
+    return accept(request, job_application_id)

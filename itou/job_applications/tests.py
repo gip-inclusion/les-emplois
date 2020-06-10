@@ -19,6 +19,7 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalFactory,
+    JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.factories import create_test_romes_and_appellations
@@ -242,7 +243,7 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
 
         # Assert the Job Seeker does not have access to confidential information.
-        email = job_application.email_new_for_job_seeker
+        email = job_application.email_new_for_job_seeker(base_url="http://testserver")
         self.assertIn(job_application.sender.get_full_name(), email.body)
         self.assertIn(job_application.sender_prescriber_organization.display_name, email.body)
         self.assertNotIn(job_application.sender.email, email.body)
@@ -250,7 +251,7 @@ class JobApplicationEmailTest(TestCase):
 
     def test_new_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory(selected_jobs=Appellation.objects.all())
-        email = job_application.email_new_for_job_seeker
+        email = job_application.email_new_for_job_seeker(base_url="http://testserver")
         # To.
         self.assertIn(job_application.sender.email, email.to)
         self.assertEqual(len(email.to), 1)
@@ -273,6 +274,8 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
         self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(reverse("account_login"), email.body)
+        self.assertIn(reverse("account_reset_password"), email.body)
 
     def test_accept(self):
 
@@ -575,6 +578,24 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
         self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+
+    def test_accept_job_application_sent_by_siae_with_no_approval(self):
+        """
+        A SIAE can hire somebody without getting approval if they don't want one
+        Basically the same as the 'accept' part, except we don't create an approval
+        and we don't notify
+        """
+        job_application = JobApplicationWithoutApprovalFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        # A valid Pôle emploi ID should trigger an automatic approval delivery.
+        self.assertNotEqual(job_application.job_seeker.pole_emploi_id, "")
+        job_application.accept(user=job_application.to_siae.members.first())
+        self.assertTrue(job_application.to_siae.is_subject_to_eligibility_rules)
+        self.assertIsNone(job_application.approval)
+        self.assertFalse(job_application.approval_number_sent_by_email)
+        self.assertEqual(job_application.approval_delivery_mode, "")
+        # Check sent email (no notification of approval).
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
 
     def test_accept_job_application_sent_by_siae_not_subject_to_eligibility_rules(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(

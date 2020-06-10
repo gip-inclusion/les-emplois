@@ -4,6 +4,26 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2020-06-04
+
+### Ajouté
+- Indicateur de validation de l'email dans l'admin (partie utilisateur)
+- Envoi d'un email au support lors du rattachement d'un prescripteur à une structure sans membres
+- Inscription sans boite email (redirection vers PE connect) 
+- Connexion via PE Connect
+- Tracking Matomo pour PE Connect
+- Liens Typeform lors de l'envoi d'emails (confirmation d'embauche pour les SIAE et prescripteurs) 
+- Possibilité de pouvoir embaucher sans obtenir de PASS IAE
+
+### Modifié
+- Correction d'un problème de vérification de doublon d'email lors de l'inscription d'un prescripteur
+- Reformulation des messages d'information et d'erreur lors de la création d'une structure
+- Uniformisation des logos ("Plateforme de l'inclusion")
+- Email envoyé au candidat lors d'une candidature effectuée pour lui
+
+### Supprimé
+- Bouton "Voir la carte"
+
 ## [1.0.3] - 2020-05-25
 
 ### Ajouté
