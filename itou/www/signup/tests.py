@@ -497,7 +497,7 @@ class PrescriberSignupTest(TestCase):
         # Check email has been sent to support (validation/refusal of authorisation needed)
         self.assertEqual(len(mail.outbox), 2)
         subject = mail.outbox[0].subject
-        self.assertIn("Première inscription à une organisation", subject)
+        self.assertIn("Première inscription à une organisation existante", subject)
         subject = mail.outbox[1].subject
         self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subject)
 
