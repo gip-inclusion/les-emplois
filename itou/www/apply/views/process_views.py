@@ -173,11 +173,12 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         messages.success(request, mark_safe(_("Embauche acceptée !")))
 
-        if job_application.hiring_without_approval and job_application.to_siae.is_subject_to_eligibility_rules:
+        if job_application.to_siae.is_subject_to_eligibility_rules:
             if job_application.approval:
                 messages.success(
                     request, _("Le numéro d'agrément peut être utilisé pour la déclaration de la personne dans l'ASP.")
                 )
+            elif not job_application.hiring_without_approval:
                 messages.success(
                     request,
                     mark_safe(
