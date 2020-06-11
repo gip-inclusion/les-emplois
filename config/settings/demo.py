@@ -8,7 +8,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "demo.inclusion.beta.gouv.fr"]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-ROOT_URLCONF = "config.urls_demo"
+ROOT_URLCONF = "config.urls"
 
 DATABASES = {
     "default": {
@@ -28,9 +28,9 @@ DATABASES = {
 
 
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
+#ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
 #ITOU_EMAIL_CONTACT = "contact+demo@inclusion.beta.gouv.fr"
 #DEFAULT_FROM_EMAIL = "noreply+demo@inclusion.beta.gouv.fr"
 
 # sentry_sdk.init(dsn=os.environ["SENTRY_DSN_demo"], integrations=[DjangoIntegration()])
-# ignore_logger("django.security.DisallowedHost")
+ignore_logger("django.security.DisallowedHost")
