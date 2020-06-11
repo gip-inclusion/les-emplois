@@ -23,8 +23,8 @@ DATABASES = {
 
 # Remove admin from demo env
 # ------------------------------------------------------------------------------
-DJANGO_APPS.remove("django.contrib.admin")
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+# DJANGO_APPS.remove("django.contrib.admin")
+# INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 ITOU_PROTOCOL = "https"
