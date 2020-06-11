@@ -160,10 +160,15 @@ class FromInvitationView(SignupView):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
-            super().post(request, *args, **kwargs)
-            DefaultAccountAdapter().login(request, self.user)
             invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
+            # Make sure the user did not change the email
+            request.POST = request.POST.copy()
+            request.POST["email"] = invitation.email
+
+            super().post(request, *args, **kwargs)
             invitation.accept()
+
+            DefaultAccountAdapter().login(request, self.user)
             next_step = redirect("dashboard:index")
         else:
             next_step = super().get(request, *args, **kwargs)

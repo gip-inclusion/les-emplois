@@ -192,6 +192,32 @@ class AcceptInvitationTest(TestCase):
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         self.assertIn(invitation.sender.email, outbox_emails)
 
+    def test_accept_invitation_signup_changed_email(self):
+
+        invitation = SentInvitationFactory()
+
+        response = self.client.get(invitation.acceptance_link, follow=True)
+
+        signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
+
+        self.client.get(signup_form_url)
+
+        # Email is based on the invitation object.
+        # The user changes it because c'est un petit malin.
+        form_data = {
+            "first_name": invitation.first_name,
+            "last_name": invitation.last_name,
+            "email": "hey@you.com",
+            "password1": "Erls92#32",
+            "password2": "Erls92#32",
+        }
+
+        # Fill in the password and send
+        response = self.client.post(signup_form_url, data={**form_data}, follow=True)
+
+        user = get_user_model().objects.get(email=invitation.email)
+        self.assertEqual(invitation.email, user.email)
+
     def test_accept_invitation_signup_weak_password(self):
         invitation = SentInvitationFactory()
         response = self.client.get(invitation.acceptance_link, follow=True)
