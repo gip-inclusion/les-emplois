@@ -6,7 +6,31 @@
 
 {% block content %}
 
-    <h1>{% trans "Invitation"%}</h1>
+    {% if pending_invitations %}
+        <h1>{% trans "Invitations en attente" %}</h1>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">{% trans "Prénom" %}</th>
+              <th scope="col">{% trans "Nom" %}</th>
+              <th scope="col">{% trans "E-mail" %}</th>
+              <th scope="col">{% trans "Envoyée le" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for invitation in pending_invitations %}
+                <tr>
+                  <td>{{ invitation.first_name }}</td>
+                  <td>{{ invitation.last_name }}</td>
+                  <td>{{ invitation.email }}</td>
+                  <td>{{ invitation.sent_at|date }}</td>
+                </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+    {% endif %}
+
+    <h1 class="mt-5">{% trans "Envoyer une invitation"%}</h1>
     {% blocktrans with date=expiration_date|date %}
         <div class="alert alert-info w-sm-75" role="alert">
             <p class="mb-0">Vos invités recevront un e-mail qui leur permettra de rejoindre la Plateforme de l'inclusion.</p>

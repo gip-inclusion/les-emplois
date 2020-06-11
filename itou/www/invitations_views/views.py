@@ -57,6 +57,7 @@ def create(request, template_name="invitations_views/create.html"):
                 messages.success(request, message)
                 formset = InvitationFormSet(form_kwargs=form_kwargs)
 
-    context = {"formset": formset, "expiration_date": expiration_date}
+    pending_invitations = request.user.invitations.filter(accepted=False)
+    context = {"formset": formset, "expiration_date": expiration_date, "pending_invitations": pending_invitations}
 
     return render(request, template_name, context)
