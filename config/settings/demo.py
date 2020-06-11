@@ -7,9 +7,6 @@ from sentry_sdk.integrations.logging import ignore_logger
 ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
 ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", ITOU_FQDN]
 
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-# ROOT_URLCONF = "config.urls"
 
 DATABASES = {
     "default": {
