@@ -24,10 +24,10 @@ def accept(request, invitation_id):
         else:
             messages.error(request, _("Vous comptez déjà parmi les membres de notre site."))
             context = {"invitation": invitation}
-            next_step = render(request, "invitations_views/accept.html", context=context)
+            next_step = render(request, "invitations_views/acceptance_errors.html", context=context)
     else:
         context = {"invitation": invitation}
-        next_step = render(request, "invitations_views/accept.html", context=context)
+        next_step = render(request, "invitations_views/acceptance_errors.html", context=context)
 
     return next_step
 
