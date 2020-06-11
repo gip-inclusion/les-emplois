@@ -38,6 +38,7 @@ class Invitation(models.Model):
         related_name="invitations",
     )
     accepted = models.BooleanField(verbose_name=_("Acceptée"), default=False)
+    accepted_at = models.DateTimeField(verbose_name=_("Date d'acceptation"), blank=True, null=True, db_index=True)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     sent_at = models.DateTimeField(verbose_name=_("Date d'envoi"), blank=True, null=True, db_index=True)
 
@@ -71,6 +72,7 @@ class Invitation(models.Model):
 
     def accept(self):
         self.accepted = True
+        self.accepted_at = timezone.now()
         self.save()
         self.accepted_notif_sender()
 

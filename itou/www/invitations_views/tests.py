@@ -170,7 +170,8 @@ class AcceptInvitationTest(TestCase):
 
         for key, data in form_data.items():
             self.assertEqual(form.initial[key], data)
-            self.assertTrue(form.fields[key].widget.attrs["readonly"])
+
+        self.assertTrue(form.fields["email"].widget.attrs["readonly"])
 
         total_users_before = get_user_model().objects.count()
 
@@ -188,6 +189,7 @@ class AcceptInvitationTest(TestCase):
         invitation.refresh_from_db()
 
         self.assertTrue(invitation.accepted)
+        self.assertTrue(invitation.accepted_at)
 
         # Make sure an email is sent to the invitation sender
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
