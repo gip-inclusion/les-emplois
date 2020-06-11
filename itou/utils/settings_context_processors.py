@@ -7,4 +7,7 @@ def expose_settings(request):
     https://docs.djangoproject.com/en/2.1/ref/templates/api/#using-requestcontext
     """
 
-    return {"ALLOWED_HOSTS": settings.ALLOWED_HOSTS, "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT}
+    return {"ALLOWED_HOSTS": settings.ALLOWED_HOSTS, 
+            "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
+            "ITOU_ENVIRONMENT":settings.ITOU_ENVIRONMENT,           
+           }

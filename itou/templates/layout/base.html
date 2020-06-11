@@ -17,6 +17,12 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    
+    {% if ITOU_ENVIRONMENT %}
+        <div class="sticky-top h2 w-100 bg-danger text-white text-center" style="z-index:1;">
+            {{ ITOU_ENVIRONMENT }}
+        </div>
+    {% endif%}
 
     <div class="layout">
 
