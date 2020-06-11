@@ -1,10 +1,10 @@
 from .base import *  # noqa
 
 import sentry_sdk
-# from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
 
-ALLOWED_HOSTS = ["127.0.0.1", "demo.inclusion.beta.gouv.fr"]
+ALLOWED_HOSTS = ["127.0.0.1", "cleverapps.io", "demo.inclusion.beta.gouv.fr"]
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
