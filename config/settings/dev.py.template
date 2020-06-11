@@ -61,3 +61,6 @@ DEBUG_TOOLBAR_CONFIG = {
 MIGRATION_MODULES = {
     'socialaccount': 'itou.allauth.migrations',
 }
+
+ITOU_PROTOCOL = "http"
+ITOU_FQDN = "localhost:8080"

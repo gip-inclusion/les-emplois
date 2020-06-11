@@ -34,8 +34,7 @@ def accept(request, invitation_id):
 
 @login_required
 def create(request, template_name="invitations_views/create.html"):
-    base_url = request.build_absolute_uri("/")[:-1]
-    form_kwargs = {"sender": request.user, "acceptance_link_base_url": base_url}
+    form_kwargs = {"sender": request.user}
     formset = InvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     add_form = request.GET.get("add_form")
     expiration_date = timezone.now() + relativedelta(days=Invitation.EXPIRATION_DAYS)

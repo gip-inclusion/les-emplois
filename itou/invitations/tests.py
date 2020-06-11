@@ -4,17 +4,13 @@ from django.utils import timezone
 from itou.invitations.factories import ExpiredInvitationFactory, InvitationFactory, SentInvitationFactory
 
 
-BASE_URL = "http://testserver"
-
-
 class InvitationModelTest(TestCase):
     def test_acceptance_link(self):
         invitation = SentInvitationFactory()
-        acceptance_link = invitation.acceptance_link(base_url=BASE_URL)
-        self.assertIn(str(invitation.pk), acceptance_link)
+        self.assertIn(str(invitation.pk), invitation.acceptance_link)
 
         # Must be an absolute URL
-        self.assertTrue(acceptance_link.startswith("http"))
+        self.assertTrue(invitation.acceptance_link.startswith("http"))
 
     def has_expired(self):
         invitation = ExpiredInvitationFactory()
@@ -46,7 +42,7 @@ class InvitationModelTest(TestCase):
 class InvitationEmailsTest(TestCase):
     def test_send_invitation(self):
         invitation = SentInvitationFactory()
-        email = invitation.email_invitation(acceptance_link_base_url=BASE_URL)
+        email = invitation.email_invitation
 
         # Subject
         self.assertIn(invitation.sender.first_name, email.subject)
@@ -55,7 +51,7 @@ class InvitationEmailsTest(TestCase):
         # Body
         self.assertIn(invitation.first_name, email.body)
         self.assertIn(invitation.last_name, email.body)
-        self.assertIn(invitation.acceptance_link(base_url=BASE_URL), email.body)
+        self.assertIn(invitation.acceptance_link, email.body)
 
         self.assertIn(str(invitation.expiration_date.day), email.body)
 

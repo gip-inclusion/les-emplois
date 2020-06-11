@@ -11,6 +11,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.emails import get_email_message
+from itou.utils.urls import get_absolute_url
 
 
 logger = logging.getLogger(__name__)
@@ -50,9 +51,10 @@ class Invitation(models.Model):
     def __str__(self):
         return f"{self.email}"
 
-    def acceptance_link(self, base_url):
+    @property
+    def acceptance_link(self):
         acceptance_path = reverse("invitations_views:accept", kwargs={"invitation_id": self.id})
-        return f"{base_url}{acceptance_path}"
+        return get_absolute_url(acceptance_path)
 
     @property
     def expiration_date(self):
@@ -76,17 +78,17 @@ class Invitation(models.Model):
         self.save()
         self.accepted_notif_sender()
 
-    def send(self, acceptance_link_base_url):
+    def send(self):
         self.sent = True
         self.sent_at = timezone.now()
-        self.send_invitation(acceptance_link_base_url)
+        self.send_invitation()
         self.save()
 
     def accepted_notif_sender(self):
         self.email_accepted_notif_sender.send()
 
-    def send_invitation(self, acceptance_link_base_url):
-        self.email_invitation(acceptance_link_base_url).send()
+    def send_invitation(self):
+        self.email_invitation.send()
 
     # Emails
     @property
@@ -97,15 +99,15 @@ class Invitation(models.Model):
         body = "invitations_views/email/accepted_notif_sender_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def email_invitation(self, acceptance_link_base_url):
+    @property
+    def email_invitation(self):
         to = [self.email]
-        acceptance_link = self.acceptance_link(base_url=acceptance_link_base_url)
         context = {
             "sender": self.sender,
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "acceptance_link": acceptance_link,
+            "acceptance_link": self.acceptance_link,
             "expiration_date": self.expiration_date,
         }
         subject = "invitations_views/email/invitation_subject.txt"
