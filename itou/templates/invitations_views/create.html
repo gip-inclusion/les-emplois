@@ -9,8 +9,8 @@
     <h1>{% trans "Invitation"%}</h1>
     {% blocktrans with date=expiration_date|date %}
         <div class="alert alert-info w-sm-75" role="alert">
-            <span class="d-block">Vos invités recevront un e-mail qui leur permettra de rejoindre la Plateforme de l'inclusion.</span>
-            <span class="d-block">Ces invitations resteront valides jusqu'au {{ date }}.</span>
+            <p class="mb-0">Vos invités recevront un e-mail qui leur permettra de rejoindre la Plateforme de l'inclusion.</p>
+            <p class="mb-0">Ces invitations resteront valides jusqu'au {{ date }}.</p>
         </div>
     {% endblocktrans %}
 

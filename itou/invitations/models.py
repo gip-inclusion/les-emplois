@@ -83,14 +83,10 @@ class Invitation(models.Model):
         self.save()
 
     def accepted_notif_sender(self):
-        connection = mail.get_connection()
-        emails = [self.email_accepted_notif_sender]
-        connection.send_messages(emails)
+        self.email_accepted_notif_sender.send()
 
     def send_invitation(self, acceptance_link_base_url):
-        connection = mail.get_connection()
-        emails = [self.email_invitation(acceptance_link_base_url)]
-        connection.send_messages(emails)
+        self.email_invitation(acceptance_link_base_url).send()
 
     # Emails
     @property
