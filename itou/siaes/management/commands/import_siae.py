@@ -12,7 +12,7 @@ and each time we received a new export from the ASP.
 Note that we use dataframes instead of csv reader mainly
 because the main CSV has a large number of columns (30+)
 and thus we need a proper tool to manage columns by their
-name instead of hardcoding row numbers as in `field = row[42]`.
+name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
 import logging
@@ -219,10 +219,28 @@ class Command(BaseCommand):
     def log(self, message):
         self.logger.debug(message)
 
+    def get_new_auth_email(self, external_id):
+        secondary_df_rows = get_secondary_df_rows_as_dict(external_id=external_id)
+        auth_emails = [row["auth_email"] for row in secondary_df_rows]
+        if len(set(auth_emails)) >= 2:
+            raise ValueError(f"siae.external_id={external_id} has contradictory auth_emails in ASP exports")
+        auth_email = auth_emails[0]
+        return auth_email
+
     def update_existing_siaes(self, dry_run):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
             if row:
+                new_auth_email = self.get_new_auth_email(external_id=siae.external_id)
+                if new_auth_email and siae.auth_email != new_auth_email:
+                    self.log(
+                        f"siae.id={siae.id} has changed auth_email from "
+                        f"{siae.auth_email} to {new_auth_email} (will be updated)"
+                    )
+                    if not dry_run:
+                        siae.auth_email = new_auth_email
+                        siae.save()
+
                 if row["siret"] == siae.siret:
                     continue
                 else:
