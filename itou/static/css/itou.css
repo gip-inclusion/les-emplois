@@ -141,6 +141,11 @@ header.layout-section {
     margin-right: 10px;
 }
 
+.layout-header-logo {
+    max-width: 400px;
+    min-width: 200px;
+}
+
 .layout-header-logo:focus,
 .layout-header-logo:active,
 .layout-header-logo:hover {
