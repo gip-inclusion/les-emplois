@@ -91,6 +91,9 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         else:
             organization = self.organization
 
+        # At this step, `organization` might still be None because
+        # a prescriber may not belong to any organization.
+
         if organization:
             if organization.has_members:
                 organization.new_signup_warning_email_to_existing_members(user).send()
