@@ -84,11 +84,13 @@ html {
         rgba(205,237,251,1) 70%,
         rgba(173,240,188,1) 100%
     );
+    z-index: 1;
 }
 
 .layout-banner-container > .layout-content {
     margin-bottom: 0;
     padding-bottom: 0;
+    z-index: 2;
 }
 
 /* Add shadow at the bottom of the banner. */
