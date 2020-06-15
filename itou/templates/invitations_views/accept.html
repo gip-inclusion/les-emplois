@@ -1,0 +1,45 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% trans "Invitation" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    {% if invitation.has_expired %}
+        <h1>{% trans "Invitation expirée"%}</h1>
+        {% blocktrans %}
+            <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
+        {% endblocktrans %}
+    {% elif invitation.accepted %}
+        <h1>{% trans "Invitation invalide"%}</h1>
+        {% blocktrans %}
+            <p>Cette invitation a déjà été acceptée.</p>
+        {% endblocktrans %}
+    {% endif %}
+
+    {% if form %}
+        <h1>{% trans "Bienvenue !" %}</h1>
+        <form method="post" action="{% url 'invitations_views:accept' invitation_id=invitation.pk %}" role="form" class="js-prevent-multiple-submit">
+
+            {% csrf_token %}
+
+            {% bootstrap_form_errors form %}
+
+            {% bootstrap_form form %}
+
+            <div class="small pb-4 text-secondary">
+                {% trans "Vous pourrez modifier ces informations après votre inscription à partir de votre tableau de bord." %}
+            </div>
+
+            {% include "signup/includes/submit_rgpd.html" %}
+
+        </form>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {{ form.media }}
+{% endblock %}

@@ -142,27 +142,21 @@ class AcceptInvitationTest(TestCase):
 
         response = self.client.get(invitation.acceptance_link, follow=True)
 
-        signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
-
-        self.assertEqual(response.redirect_chain[0][0], signup_form_url)
-
-        self.client.get(signup_form_url)
-
-        form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
+        form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name}
 
         # Assert data is already present and not editable
-        form = response.context_data.get("form")
+        form = response.context.get("form")
 
         for key, data in form_data.items():
-            self.assertEqual(form.initial[key], data)
-
-        self.assertTrue(form.fields["email"].widget.attrs["readonly"])
+            self.assertEqual(form.fields[key].initial, data)
 
         total_users_before = get_user_model().objects.count()
 
         # Fill in the password and send
         response = self.client.post(
-            signup_form_url, data={**form_data, "password1": "Erls92#32", "password2": "Erls92#32"}, follow=True
+            invitation.acceptance_link,
+            data={**form_data, "password1": "Erls92#32", "password2": "Erls92#32"},
+            follow=True,
         )
 
         total_users_after = get_user_model().objects.count()
@@ -185,10 +179,7 @@ class AcceptInvitationTest(TestCase):
         invitation = SentInvitationFactory()
 
         response = self.client.get(invitation.acceptance_link, follow=True)
-
-        signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
-
-        self.client.get(signup_form_url)
+        self.assertTrue(response.status_code, 200)
 
         # Email is based on the invitation object.
         # The user changes it because c'est un petit malin.
@@ -201,25 +192,24 @@ class AcceptInvitationTest(TestCase):
         }
 
         # Fill in the password and send
-        response = self.client.post(signup_form_url, data={**form_data}, follow=True)
+        response = self.client.post(invitation.acceptance_link, data={**form_data}, follow=True)
 
         user = get_user_model().objects.get(email=invitation.email)
         self.assertEqual(invitation.email, user.email)
 
     def test_accept_invitation_signup_weak_password(self):
         invitation = SentInvitationFactory()
-        response = self.client.get(invitation.acceptance_link, follow=True)
-        signup_form_url = reverse("signup:from_invitation", kwargs={"invitation_id": invitation.pk})
-        self.client.get(signup_form_url)
         form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
 
         # Fill in the password and send
         response = self.client.post(
-            signup_form_url, data={**form_data, "password1": "password", "password2": "password"}, follow=True
+            invitation.acceptance_link,
+            data={**form_data, "password1": "password", "password2": "password"},
+            follow=True,
         )
         self.assertFalse(response.context["form"].is_valid())
         self.assertTrue(response.context["form"].errors.get("password1"))
-        self.assertTrue(response.wsgi_request.path, signup_form_url)
+        self.assertTrue(response.wsgi_request.path, invitation.acceptance_link)
 
     def test_accept_expired_invitation(self):
         invitation = ExpiredInvitationFactory()

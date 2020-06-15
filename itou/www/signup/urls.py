@@ -15,5 +15,4 @@ urlpatterns = [
     path("siae/<str:encoded_siae_id>/<str:token>", views.SiaeSignupView.as_view(), name="siae"),
     path("siae", views.SiaeSignupView.as_view(), name="siae"),
     path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
-    path("from_invitation/<uuid:invitation_id>", views.FromInvitationView.as_view(), name="from_invitation"),
 ]

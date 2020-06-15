@@ -1,7 +1,6 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
-from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.views import PasswordResetView, SignupView
 from django.contrib import messages
 from django.db import transaction
@@ -137,40 +136,3 @@ class PoleEmploiPrescriberView(PrescriberSignup):
 class AuthorizedPrescriberView(PrescriberSignup):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberForm
-
-
-class FromInvitationView(SignupView):
-
-    form_class = forms.UserSignupFromInvitationForm
-    template_name = "signup/signup_from_invitation.html"
-
-    def invitation_uuid(self):
-        # UUIDs are not present in the kwargs of `get_context_data(self, **kwargs)`.
-        # Instead, they are attached to self.
-        return self.kwargs["invitation_id"]
-
-    def get(self, request, *args, **kwargs):
-        invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
-        data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
-        forms.UserSignupFromInvitationForm(initial=data)
-        self.initial = data
-        return super().get(request, *args, **kwargs)
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            invitation = Invitation.objects.get(pk=kwargs.get("invitation_id"))
-            # Make sure the user did not change the email
-            request.POST = request.POST.copy()
-            request.POST["email"] = invitation.email
-
-            super().post(request, *args, **kwargs)
-            invitation.accept()
-
-            DefaultAccountAdapter().login(request, self.user)
-            next_step = redirect("dashboard:index")
-        else:
-            next_step = super().get(request, *args, **kwargs)
-
-        return next_step

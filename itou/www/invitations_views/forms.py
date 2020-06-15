@@ -1,7 +1,8 @@
+from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms.models import modelformset_factory
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.invitations.models import Invitation
 
@@ -57,3 +58,34 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
 InvitationFormSet = modelformset_factory(
     Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=1, max_num=30
 )
+
+
+class NewUserForm(SignupForm):
+    first_name = forms.CharField(
+        label=gettext_lazy("Prénom"),
+        max_length=get_user_model()._meta.get_field("first_name").max_length,
+        required=True,
+        strip=True,
+    )
+
+    last_name = forms.CharField(
+        label=gettext_lazy("Nom"),
+        max_length=get_user_model()._meta.get_field("last_name").max_length,
+        required=True,
+        strip=True,
+    )
+
+    class Meta:
+        fields = ["first_name", "last_name", "password1", "password2"]
+
+    def __init__(self, invitation, *args, **kwargs):
+        self.email = invitation.email
+        super(NewUserForm, self).__init__(*args, **kwargs)
+        self.fields.pop("email")
+        self.fields["first_name"].initial = invitation.first_name
+        self.fields["last_name"].initial = invitation.last_name
+
+    def save(self, request):
+        self.cleaned_data["email"] = self.email
+        user = super(NewUserForm, self).save(request)
+        return user
