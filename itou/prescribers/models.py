@@ -1,7 +1,10 @@
 from django.conf import settings
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.validators import RegexValidator
 from django.db import models
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -27,6 +30,13 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
 
     def by_safir_code(self, safir_code):
         return self.filter(code_safir_pole_emploi=safir_code).first()
+
+    def within(self, point, distance_km):
+        return (
+            self.filter(coords__distance_lte=(point, D(km=distance_km)))
+            .annotate(distance=Distance("coords", point))
+            .order_by("distance")
+        )
 
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
@@ -155,6 +165,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     @property
     def active_members(self):
         return self.members.filter(is_active=True)
+
+    def get_card_url(self):
+        return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
     @property
     def has_unset_authorization(self):

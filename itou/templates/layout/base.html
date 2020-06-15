@@ -23,8 +23,8 @@
         <header class="layout-section layout-section-white">
             <div class="layout-header px-3 py-2">
                 <a href="/" class="text-decoration-none text-reset">
-                    <div class="row layout-header-logo pt-1 pl-3">
-                            <img src="{% static 'img/logo_header.svg' %}" alt="inclusion.beta.gouv.fr" width="400">
+                    <div class="row pt-1 pl-3">
+                        <img src="{% static 'img/logo_header.svg' %}" alt="inclusion.beta.gouv.fr" class="layout-header-logo">
                     </div>
                 </a>
                 <div class="layout-header-content">
@@ -35,10 +35,6 @@
                                 {% trans "Vous êtes une entreprise (hors IAE) avec un besoin de recrutement" %}
                             </a>
                         {% endif %}
-
-                        <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://forum.inclusion.beta.gouv.fr" target="_blank">
-                            {% trans "Accéder au forum" %}
-                        </a>
 
                         {% if user.is_authenticated %}
                             <div class="align-self-center">
@@ -129,14 +125,27 @@
             </div>
         </header>
 
-        {% if user.is_authenticated %}
         <div class="layout-section layout-section-white border-bottom">
-            <nav class="nav">
-                <a class="nav-link" href="/">{% trans "Rechercher un employeur solidaire" %}</a>
-                <a class="nav-link" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+            <nav class="nav itou-main-nav">
+
+                {% if user.is_authenticated %}
+                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+                {% endif %}
+
+                <a class="nav-link{% if request.path == '/' or request.path == '/search/employers' %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
+
+                {% if user.is_authenticated %}
+                    {# Do not confuse unlogged users with a prescriber search, especially jobseekers  #}
+                    {# who may be unfamiliar with the prescriber concept. #}
+                    <a class="nav-link{% if request.path == '/search/prescribers' %} active{% endif %}" href="{% url 'search:prescribers' %}">{% trans "Rechercher des prescripteurs" %}</a>
+                {% endif %}
+
+                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+
+                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% trans "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+
             </nav>
         </div>
-        {% endif %}
 
         <div class="layout-section layout-section-white">
             <div class="layout-messages">

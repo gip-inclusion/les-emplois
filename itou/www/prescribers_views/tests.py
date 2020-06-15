@@ -3,11 +3,20 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD, PrescriberFactory
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
+
+
+class CardViewTest(TestCase):
+    def test_card(self):
+        prescriber_org = PrescriberOrganizationFactory(is_authorized=True)
+        url = reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["prescriber_org"], prescriber_org)
 
 
 class CreateOrganizationTest(TestCase):
