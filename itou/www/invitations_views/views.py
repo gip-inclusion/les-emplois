@@ -36,26 +36,19 @@ def accept(request, invitation_id):
 def create(request, template_name="invitations_views/create.html"):
     form_kwargs = {"sender": request.user}
     formset = InvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
-    add_form = request.GET.get("add_form")
     expiration_date = timezone.now() + relativedelta(days=Invitation.EXPIRATION_DAYS)
-
-    if add_form:
-        formset.add_form(**form_kwargs)
 
     if request.POST:
         if formset.is_valid():
-            # Validate the form even if the user only wants to add a row
-            # to inform him of any possible error.
-            if not add_form:
-                formset.save()
-                count = len(formset.forms)
+            formset.save()
+            count = len(formset.forms)
 
-                message = __("Invitation envoyée avec succès.", "Invitations envoyées avec succès.", count) % {
-                    "count": count
-                }
+            message = __("Invitation envoyée avec succès.", "Invitations envoyées avec succès.", count) % {
+                "count": count
+            }
 
-                messages.success(request, message)
-                formset = InvitationFormSet(form_kwargs=form_kwargs)
+            messages.success(request, message)
+            formset = InvitationFormSet(form_kwargs=form_kwargs)
 
     pending_invitations = request.user.invitations.filter(accepted=False)
     context = {"formset": formset, "expiration_date": expiration_date, "pending_invitations": pending_invitations}

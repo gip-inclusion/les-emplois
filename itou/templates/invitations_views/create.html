@@ -1,4 +1,5 @@
 {% extends "layout/content.html" %}
+{% load static %}
 {% load bootstrap4 %}
 {% load i18n %}
 
@@ -7,32 +8,34 @@
 {% block content %}
 
     {% if pending_invitations %}
-        <h1>{% trans "Invitations en attente" %}</h1>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th scope="col">{% trans "Prénom" %}</th>
-              <th scope="col">{% trans "Nom" %}</th>
-              <th scope="col">{% trans "E-mail" %}</th>
-              <th scope="col">{% trans "Envoyée le" %}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for invitation in pending_invitations %}
+        <h1 class="mb-3">{% trans "Invitations en attente" %}</h1>
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
                 <tr>
-                  <td>{{ invitation.first_name }}</td>
-                  <td>{{ invitation.last_name }}</td>
-                  <td>{{ invitation.email }}</td>
-                  <td>{{ invitation.sent_at|date }}</td>
+                  <th scope="col">{% trans "Prénom" %}</th>
+                  <th scope="col">{% trans "Nom" %}</th>
+                  <th scope="col">{% trans "E-mail" %}</th>
+                  <th scope="col">{% trans "Envoyée le" %}</th>
                 </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {% for invitation in pending_invitations %}
+                    <tr>
+                      <td>{{ invitation.first_name }}</td>
+                      <td>{{ invitation.last_name }}</td>
+                      <td>{{ invitation.email }}</td>
+                      <td>{{ invitation.sent_at|date }}</td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        </div>
     {% endif %}
 
     <h1 class="mt-5">{% trans "Envoyer une invitation"%}</h1>
     {% blocktrans with date=expiration_date|date %}
-        <div class="alert alert-info w-sm-75" role="alert">
+        <div class="alert alert-info my-3" role="alert">
             <p class="mb-0">Vos invités recevront un e-mail qui leur permettra de rejoindre la Plateforme de l'inclusion.</p>
             <p class="mb-0">Ces invitations resteront valides jusqu'au {{ date }}.</p>
         </div>
@@ -45,12 +48,12 @@
 
         {% for form in formset %}
             {% bootstrap_form_errors form type="non_field_errors" %}
-            <div class="inline-form-row row align-items-top mt-3">
-                {% bootstrap_form form show_label=False form_group_class="col-md-3 mt-2" %}
+            <div class="inline-form-row row align-items-top mt-4">
+                {% bootstrap_form form show_label=False form_group_class="col-md mt-2 inline-col" %}
             </div>
         {% endfor %}
 
-        <button type="submit" class="btn mt-2 mb-3 pl-0 btn-link" formaction="{% url 'invitations_views:create' %}?add_form=1">
+        <button type="button" class="btn mt-2 mb-3 pl-0 btn-link add-form-row">
             {% include "includes/icon.html" with icon="user-plus" class="mr-2" %}
             {% trans "Ajouter un invité" %}
         </button>
@@ -61,5 +64,20 @@
         {% endbuttons %}
     </form>
 
-
 {% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/formset_add_remove_row.js' %}"></script>
+    <script type='text/javascript'>
+        $(document).on('click', '.add-form-row', function(e){
+            e.preventDefault();
+            cloneMore('.inline-form-row:last', 'form');
+            return false;
+        });
+        $(document).on('click', '.remove-form-row', function(e){
+            e.preventDefault();
+            deleteForm('.inline-form-row', 'form', $(this));
+            return false;
+        });
+    </script>
+{% endblock script %}

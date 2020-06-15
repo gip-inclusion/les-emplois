@@ -134,18 +134,6 @@ class SendInvitationTest(TestCase):
         invitations = Invitation.objects.count()
         self.assertEqual(invitations, 2)
 
-    def test_add_invitation(self):
-        user = UserFactory()
-        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
-        new_invitation_url = reverse("invitations_views:create")
-        response = self.client.get(new_invitation_url)
-
-        self.assertTrue(len(response.context["formset"].forms), 1)
-
-        new_invitation_url = f"{new_invitation_url}?total_forms=2"
-        response = self.client.get(new_invitation_url)
-        self.assertTrue(len(response.context["formset"].forms), 2)
-
 
 class AcceptInvitationTest(TestCase):
     def test_accept_invitation_signup(self):

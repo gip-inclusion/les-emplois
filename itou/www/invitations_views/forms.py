@@ -53,22 +53,6 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
         super().__init__(*args, **kwargs)
         self.queryset = Invitation.objects.none()
 
-    def add_form(self, sender, **kwargs):
-        """
-        Adding a form to a formset is a real hassle
-        that does not seem to bother the Django team.
-        https://code.djangoproject.com/ticket/21596
-        """
-        valid = self.is_valid()
-        if valid:
-            self.forms.append(self._construct_form(self.total_form_count(), sender=sender, **kwargs))
-            self.forms[-1].is_bound = False
-            self.data = self.data.copy()
-            total_forms = self.management_form.cleaned_data["TOTAL_FORMS"] + 1
-            self.data[f'{self.management_form.prefix}-{"TOTAL_FORMS"}'] = total_forms
-            self.management_form.data = self.management_form.data.copy()
-            self.management_form.data[f'{self.management_form.prefix}-{"TOTAL_FORMS"}'] = total_forms
-
 
 InvitationFormSet = modelformset_factory(
     Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=1, max_num=30
