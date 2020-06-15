@@ -36,10 +36,8 @@
                                 <span class="d-block">{% trans "Pour commencer," %}</span>
                                 <span class="d-block">{% trans "inscrivez-vous sur la plateforme" %}</span>
                             </h5>
-                            <a href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                <button class="btn btn-primary">
-                                    {% trans "Créer un compte" %}
-                                </button>
+                            <a class="btn btn-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                                {% trans "Créer un compte" %}
                             </a>
                         </div>
                     </div>
@@ -49,10 +47,8 @@
                             <h5 class="card-title font-weight-light mb-4">
                                 {% trans "Discutez entre professionnels sur le forum de l'inclusion" %}
                             </h5>
-                            <a class="card-link" href="https://forum.inclusion.beta.gouv.fr">
-                                <button class="btn btn-primary">
-                                    {% trans "Accéder au forum" %}
-                                </button>
+                            <a class="btn btn-primary" href="https://forum.inclusion.beta.gouv.fr">
+                                {% trans "Accéder au forum" %}
                             </a>
                         </div>
                     </div>
@@ -62,10 +58,8 @@
                             <h5 class="card-title font-weight-light mb-4">
                                 {% trans "Découvrez l'espace de documentation pour tout comprendre" %}
                             </h5>
-                            <a class="card-link" href="https://doc.inclusion.beta.gouv.fr/" target=_blank>
-                                <button class="btn btn-primary">
-                                    {% trans "En savoir plus" %}
-                                </button>
+                            <a class="btn btn-primary" href="https://doc.inclusion.beta.gouv.fr/" target=_blank>
+                                {% trans "En savoir plus" %}
                             </a>
                         </div>
                     </div>

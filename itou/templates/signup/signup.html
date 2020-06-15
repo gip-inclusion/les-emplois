@@ -13,10 +13,8 @@
                     <span class="d-block">{% trans "Vous êtes un employeur solidaire" %}</span>
                     <span class="d-block">{% trans "(SIAE, GEIQ, EA, ...)" %}</span>
                 </h5>
-                <a href="{% url 'signup:select_siae' %}">
-                    <button class="btn btn-primary">
-                        {% trans "Créer un compte" %}
-                    </button>
+                <a class="btn btn-primary" href="{% url 'signup:select_siae' %}">
+                    {% trans "Créer un compte" %}
                 </a>
             </div>
         </div>
@@ -26,10 +24,8 @@
                 <h5 class="card-title font-weight-light mb-4">
                     {% trans "Vous êtes prescripteur ou orienteur" %}
                 </h5>
-                <a class="card-link" href="{% url 'signup:select_prescriber_type' %}">
-                    <button class="btn btn-primary">
-                        {% trans "Créer un compte" %}
-                    </button>
+                <a class="btn btn-primary" href="{% url 'signup:select_prescriber_type' %}">
+                    {% trans "Créer un compte" %}
                 </a>
             </div>
         </div>
@@ -39,10 +35,8 @@
                 <h5 class="card-title font-weight-light mb-4">
                     {% trans "Vous êtes en recherche d'un emploi et souhaitez postuler" %}
                 </h5>
-                <a class="card-link" href="{% url 'signup:job_seeker' %}">
-                    <button class="btn btn-primary">
-                        {% trans "Créer un compte" %}
-                    </button>
+                <a class="btn btn-primary" href="{% url 'signup:job_seeker' %}">
+                    {% trans "Créer un compte" %}
                 </a>
             </div>
         </div>
