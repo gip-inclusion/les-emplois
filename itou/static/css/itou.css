@@ -75,7 +75,6 @@ html {
 --------------------------------------------------------------------------- */
 
 .layout-banner-container {
-    position: relative;
     background: rgb(205,237,251);
     background: linear-gradient(
         180deg,
@@ -84,13 +83,15 @@ html {
         rgba(205,237,251,1) 70%,
         rgba(173,240,188,1) 100%
     );
-    z-index: 1;
+    /* Relative positioning is used to put a shadow at the bottom. */
+    position: relative;
+    z-index: 0;
 }
 
 .layout-banner-container > .layout-content {
     margin-bottom: 0;
     padding-bottom: 0;
-    z-index: 2;
+    z-index: 1;
 }
 
 /* Add shadow at the bottom of the banner. */
