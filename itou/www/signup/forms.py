@@ -95,8 +95,9 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
             if organization.has_members:
                 organization.new_signup_warning_email_to_existing_members(user).send()
             else:
-                # for *existing* organization with no member
-                if not self.new_organization:
+                # For *existing* organization with no member.
+                # Pôle emploi agencies doesn't require a manual check, skip email notification.
+                if not self.new_organization and organization.kind != organization.Kind.PE:
                     organization.organization_with_no_member_email(user).send()
 
             membership = PrescriberMembership()

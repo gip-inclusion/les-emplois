@@ -470,7 +470,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_authorized")
         response = self.client.get(url)
 
-        authorized_organization = PrescriberOrganizationFactory()
+        authorized_organization = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         password = "!*p4ssw0rd123-"
 
         self.assertEqual(response.status_code, 200)
