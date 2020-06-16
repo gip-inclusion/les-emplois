@@ -55,10 +55,8 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         self.new_organization = None
         self.fields["email"].widget.attrs["placeholder"] = _("Adresse e-mail professionnelle")
         self.fields["email"].help_text = _(
-            """
-            Utilisez plutôt votre adresse e-mail professionnelle,
-            cela nous permettra de vous identifier plus facilement comme membre de votre structure.
-        """
+            "Utilisez plutôt votre adresse e-mail professionnelle, "
+            "cela nous permettra de vous identifier plus facilement comme membre de votre structure."
         )
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
 
@@ -315,10 +313,8 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         super(SiaeSignupForm, self).__init__(*args, **kwargs)
         self.fields["email"].widget.attrs["placeholder"] = _("Adresse e-mail professionnelle")
         self.fields["email"].help_text = _(
-            """
-            Utilisez plutôt votre adresse e-mail professionnelle,
-            cela nous permettra de vous identifier plus facilement comme membre de cette structure.
-        """
+            "Utilisez plutôt votre adresse e-mail professionnelle, "
+            "cela nous permettra de vous identifier plus facilement comme membre de cette structure."
         )
         self.fields["kind"].widget.attrs["readonly"] = True
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
