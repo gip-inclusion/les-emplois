@@ -4,16 +4,14 @@
 
     Usage:
     1- Create a formset. Each field should be in a column with the class "inline-col".
-
     2- Add a button inside the <form> to add a row. Its class should be `add-form-row`.
-
     3- Add this snippet to the script block:
     ```
     <script src="{% static "js/formset_add_remove_row.js" %}"></script>
     <script type='text/javascript'>
         $(document).on('click', '.add-form-row', function(e){
             e.preventDefault();
-            // First argument is the class wrapping each form of your formset.
+            // First argument is a selector targeting the row to clone..
             // Second argument is the name of your form.
             cloneMore('.inline-form-row:last', 'form');
             return false;

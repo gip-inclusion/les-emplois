@@ -19,6 +19,8 @@ def accept(request, invitation_id, template_name="invitations_views/accept.html"
         raise Http404(_("Aucune invitation n'a été trouvée."))
 
     context = {"invitation": invitation}
+    next_step = None
+
     if invitation.can_be_accepted:
         user = get_user_model().objects.filter(email=invitation.email)
         if not user:
@@ -29,15 +31,10 @@ def accept(request, invitation_id, template_name="invitations_views/accept.html"
                 invitation.accept()
                 DefaultAccountAdapter().login(request, user)
                 next_step = redirect("dashboard:index")
-            else:
-                next_step = render(request, template_name, context=context)
         else:
             messages.error(request, _("Vous comptez déjà parmi les membres de notre site."))
-            next_step = render(request, template_name, context=context)
-    else:
-        next_step = render(request, template_name, context=context)
 
-    return next_step
+    return next_step or render(request, template_name, context=context)
 
 
 @login_required

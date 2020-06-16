@@ -7,12 +7,12 @@
 {% block content %}
 
     {% if invitation.has_expired %}
-        <h1>{% trans "Invitation expirée"%}</h1>
+        <h1>{% trans "Invitation expirée" %}</h1>
         {% blocktrans %}
             <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
         {% endblocktrans %}
     {% elif invitation.accepted %}
-        <h1>{% trans "Invitation invalide"%}</h1>
+        <h1>{% trans "Invitation acceptée" %}</h1>
         {% blocktrans %}
             <p>Cette invitation a déjà été acceptée.</p>
         {% endblocktrans %}

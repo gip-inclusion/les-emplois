@@ -3,7 +3,6 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.core import mail
 from django.db import models
 from django.shortcuts import reverse
 from django.utils import timezone

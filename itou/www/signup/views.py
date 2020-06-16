@@ -5,12 +5,11 @@ from allauth.account.views import PasswordResetView, SignupView
 from django.contrib import messages
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
-from itou.invitations.models import Invitation
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
