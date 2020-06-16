@@ -170,6 +170,9 @@ class AcceptInvitationTest(TestCase):
         self.assertTrue(invitation.accepted)
         self.assertTrue(invitation.accepted_at)
 
+        user = get_user_model().objects.get(email=invitation.email)
+        self.assertTrue(user.emailaddress_set.first().verified)
+
         # Make sure an email is sent to the invitation sender
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         self.assertIn(invitation.sender.email, outbox_emails)

@@ -1,3 +1,4 @@
+from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib.auth import get_user_model
@@ -87,5 +88,6 @@ class NewUserForm(SignupForm):
 
     def save(self, request):
         self.cleaned_data["email"] = self.email
+        DefaultAccountAdapter().stash_verified_email(request, self.email)
         user = super(NewUserForm, self).save(request)
         return user
