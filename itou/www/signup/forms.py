@@ -11,6 +11,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
+from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_siret
 
@@ -52,6 +53,7 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         super().__init__(*args, **kwargs)
         self.organization = None
         self.new_organization = None
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
 
     def clean_email(self):
         # Must check if already exists
@@ -305,6 +307,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         super(SiaeSignupForm, self).__init__(*args, **kwargs)
         self.fields["kind"].widget.attrs["readonly"] = True
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
         self.fields["siret"].widget.attrs["readonly"] = True
         self.fields["siae_name"].widget.attrs["readonly"] = True
 
@@ -386,6 +389,10 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
+    def __init__(self, *args, **kwargs):
+        super(JobSeekerSignupForm, self).__init__(*args, **kwargs)
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+
     def save(self, request):
         user = super().save(request)
 
