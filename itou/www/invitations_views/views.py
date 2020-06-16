@@ -13,8 +13,9 @@ from itou.www.invitations_views.forms import InvitationFormSet, NewUserForm
 
 
 def accept(request, invitation_id, template_name="invitations_views/accept.html"):
-    # Make sure the user is logged out.
-    DefaultAccountAdapter().logout(request)
+    if request.user.is_authenticated:
+        messages.error(request, _("Merci de vous déconnecter avant d'accepter cette invitation."))
+        return redirect("account_logout")
 
     try:
         invitation = Invitation.objects.get(pk=invitation_id)

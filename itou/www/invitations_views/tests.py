@@ -177,21 +177,13 @@ class AcceptInvitationTest(TestCase):
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         self.assertIn(invitation.sender.email, outbox_emails)
 
-    def test_accept_invitation_logout_user(self):
+    def test_accept_invitation_logged_in_user(self):
+        # A logged in user should log out before accepting an invitation.
         logged_in_user = UserFactory()
         self.client.login(email=logged_in_user.email, password=DEFAULT_PASSWORD)
         invitation = SentInvitationFactory()
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertFalse(response.context["user"].is_authenticated)
-
-        form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name}
-
-        response = self.client.post(
-            invitation.acceptance_link,
-            data={**form_data, "password1": "Erls92#32", "password2": "Erls92#32"},
-            follow=True,
-        )
-        self.assertTrue(response.context["user"].is_authenticated)
+        self.assertEqual(response.wsgi_request.path, reverse("account_logout"))
 
     def test_accept_invitation_signup_changed_email(self):
 
