@@ -13,6 +13,9 @@ from itou.www.invitations_views.forms import InvitationFormSet, NewUserForm
 
 
 def accept(request, invitation_id, template_name="invitations_views/accept.html"):
+    # Make sure the user is logged out.
+    DefaultAccountAdapter().logout(request)
+
     try:
         invitation = Invitation.objects.get(pk=invitation_id)
     except Invitation.DoesNotExist:
