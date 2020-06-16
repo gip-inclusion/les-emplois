@@ -18,7 +18,7 @@
 </head>
 <body>
     
-    {% if ITOU_ENVIRONMENT %}
+    {% if ITOU_ENVIRONMENT == "DEMO" %}
         <div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
             <span class="h1 font-weight-bold">{{ ITOU_ENVIRONMENT }}</span>
         </div>
