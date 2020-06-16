@@ -26,46 +26,48 @@
     Working example: itou.templates.invitations_views.create.html
 *********************************************/
 function updateElementIndex(el, prefix, ndx) {
-    var id_regex = new RegExp('(' + prefix + '-\\d+)');
-    var replacement = prefix + '-' + ndx;
+    const id_regex = new RegExp(`(${prefix}-\\d+)`);
+    const replacement = `${prefix}-${ndx}`;
     if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
     if (el.id) el.id = el.id.replace(id_regex, replacement);
     if (el.name) el.name = el.name.replace(id_regex, replacement);
 }
 function cloneMore(selector, prefix) {
-    var newElement = $(selector).clone(true);
-    var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
+    const newElement = $(selector).clone(true);
+    let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
     newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
-        var name = $(this).attr('name').replace('-' + (total-1) + '-', '-' + total + '-');
-        var id = 'id_' + name;
+        const name = $(this).attr('name').replace(`-${(total-1)}-`, `-${total}-`);
+        const id = `id_${name}`;
         $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
     });
     newElement.find('label').each(function() {
-        var forValue = $(this).attr('for');
+        let forValue = $(this).attr('for');
         if (forValue) {
-          forValue = forValue.replace('-' + (total-1) + '-', '-' + total + '-');
+          forValue = forValue.replace(`-${(total-1)}-`, `-${total}-`);
           $(this).attr({'for': forValue});
         }
     });
     // Add a delete button if it does not exist.
     if (newElement.find('.remove-form-row').length == 0) {
-        var deletebutton = '<div class="inline-col col-md-1 remove-form-row"><button type="button" class="btn-outline-danger btn mt-2 w-100">X</button></div>';
+        const deletebutton = `<div class="inline-col col-md-1 remove-form-row">
+            <button type="button" class="btn-outline-danger btn mt-2 w-100">X</button>
+        </div>`;
         $(selector).find('.inline-col').last().after(deletebutton);
         newElement.find('.inline-col').last().after(deletebutton);
     }
     total++;
-    $('#id_' + prefix + '-TOTAL_FORMS').val(total);
+    $(`#id_${prefix}-TOTAL_FORMS`).val(total);
     $(selector).after(newElement);
     return false;
 }
 
 function deleteForm(selector, prefix, btn) {
-    var total = parseInt($('#id_' + prefix + '-TOTAL_FORMS').val());
+    const total = parseInt($(`#id_${prefix}-TOTAL_FORMS`).val());
     if (total > 1){
         btn.closest(selector).remove();
-        var forms = $(selector);
-        $('#id_' + prefix + '-TOTAL_FORMS').val(forms.length);
-        for (var i=0, formCount=forms.length; i<formCount; i++) {
+        const forms = $(selector);
+        $(`#id_${prefix}-TOTAL_FORMS`).val(forms.length);
+        for (let i=0, formCount=forms.length; i<formCount; i++) {
             $(forms.get(i)).find(':input').each(function() {
                 updateElementIndex(this, prefix, i);
             });
