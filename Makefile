@@ -5,7 +5,7 @@
 
 # Run a local server.
 run:
-	docker-compose -f docker-compose-dev.yml up
+	docker-compose up
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
@@ -97,23 +97,23 @@ psql_root:
 .PHONY: postgres_backup postgres_backups_cp_locally postgres_backups_list postgres_backup_restore postgres_backups_clean
 
 postgres_backup:
-	docker-compose -f docker-compose-dev.yml exec postgres backup
+	docker-compose exec postgres backup
 
 postgres_backups_cp_locally:
 	docker cp itou_postgres:/backups ~/Desktop/backups
 
 postgres_backups_list:
-	docker-compose -f docker-compose-dev.yml exec postgres backups
+	docker-compose exec postgres backups
 
 # Note: Django must be stopped to avoid a "database "itou" is being accessed by other users" error.
 # make postgres_backup_restore FILE=backup_2019_10_08T12_33_00.sql.gz
 postgres_backup_restore:
-	docker-compose -f docker-compose-dev.yml up -d --no-deps postgres && \
-	docker-compose -f docker-compose-dev.yml exec postgres restore $(FILE) && \
-	docker-compose -f docker-compose-dev.yml stop
+	docker-compose up -d --no-deps postgres && \
+	docker-compose exec postgres restore $(FILE) && \
+	docker-compose stop
 
 postgres_backups_clean:
-	docker-compose -f docker-compose-dev.yml exec postgres clean
+	docker-compose exec postgres clean
 
 postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump -d itou -t cities_city > /backups/cities.sql"
@@ -121,8 +121,8 @@ postgres_dump_cities:
 
 # Delete and recreate the DB manually.
 # =============================================================================
-# docker-compose -f docker-compose-dev.yml down
-# docker-compose -f docker-compose-dev.yml up --no-deps postgres
+# docker-compose down
+# docker-compose up --no-deps postgres
 # make shell_on_postgres_container
 # PGPASSWORD=password psql -h postgres -U postgres
 # DROP DATABASE itou;
