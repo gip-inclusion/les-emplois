@@ -17,6 +17,7 @@ DATABASES = {
     }
 }
 
+ITOU_ENVIRONMENT = "REVIEW_APP"
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = "staging.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"

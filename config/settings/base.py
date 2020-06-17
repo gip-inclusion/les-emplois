@@ -347,6 +347,8 @@ PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 # Itou.
 # ------------------------------------------------------------------------------
 
+# Environment, sets the type of env of the app (DEMO, REVIEW_APP, STAGING, DEV…)
+ITOU_ENVIRONMENT = "PROD"
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = "inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
@@ -360,13 +362,7 @@ ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 ITOU_EMAIL_APPROVAL_SURVEY_LINK = "https://startupsbeta.typeform.com/to/au9d8P"
 ITOU_EMAIL_PRESCRIBER_NEW_HIRING_LINK = "https://startupsbeta.typeform.com/to/X40eJC"
 
-
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.
 # Use the staging domain name when this case arises.
 ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
-
-# Environment
-# Defined in env vars, sets the type of env of the app,
-# f.i. DEMO, REVIEW_APP, STAGING, DEV, ...
-ITOU_ENVIRONMENT = os.environ.get("ITOU_ENVIRONMENT", "DEV")
