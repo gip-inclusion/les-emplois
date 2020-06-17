@@ -52,7 +52,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "sender_prescriber_organization__is_authorized",
         "to_siae__department",
     )
-    readonly_fields = ("created_at", "updated_at")
+    readonly_fields = ("created_at", "updated_at", "approval_number_delivered_by")
     inlines = (JobsInline, TransitionLogInline)
     search_fields = ("to_siae__siret", "job_seeker__email")
 
