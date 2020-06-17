@@ -361,7 +361,3 @@ ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 # Use the staging domain name when this case arises.
 ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 
-# Environment
-# Defined in env vars, sets the type of env of the app, 
-# f.i. DEMO, REVIEW_APP, STAGING, DEV, ...
-ITOU_ENVIRONMENT = os.environ.get("ITOU_ENVIRONMENT")
