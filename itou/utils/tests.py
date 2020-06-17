@@ -24,7 +24,7 @@ from itou.utils.perms.context_processors import get_current_organization_and_per
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.utils.validators import (
     alphanumeric,
     validate_birthdate,
@@ -352,6 +352,20 @@ class UtilsEmailsTestCase(TestCase):
         url = get_safe_url(request, "next", fallback_url="/fallback")
         expected = "/fallback"
         self.assertEqual(url, expected)
+
+    def test_get_absolute_url(self):
+        url = get_absolute_url()
+        self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/", url)
+
+        # With path
+        path = "awesome/team/"
+        url = get_absolute_url(path)
+        self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/{path}", url)
+
+        # Escape first slash
+        path = "/awesome/team/"
+        url = get_absolute_url(path)
+        self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/awesome/team/", url)
 
 
 class PermsUserTest(TestCase):

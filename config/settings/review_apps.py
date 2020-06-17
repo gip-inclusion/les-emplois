@@ -19,7 +19,7 @@ DATABASES = {
 
 ITOU_ENVIRONMENT = "REVIEW_APP"
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "staging.inclusion.beta.gouv.fr"
+ITOU_FQDN = os.environ.get("DEPLOY_URL", "staging.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
