@@ -17,7 +17,7 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    
+
     {% if ITOU_ENVIRONMENT == "DEMO" %}
         <div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
             <span class="h1 font-weight-bold">DEMO</span>
@@ -262,10 +262,13 @@
             "mandatory": false,  /* Show a message about mandatory cookies */
         });
 
+        {% if ITOU_ENVIRONMENT == "PROD" or ITOU_ENVIRONMENT == "DEMO" %}
         // Hotjar.
         (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
-        tarteaucitron.user.hotjarId = 1857070;
+        {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 1857070;{% endif %}
+        {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
         tarteaucitron.user.HotjarSv = 6;
+        {% endif %}
 
     </script>
 

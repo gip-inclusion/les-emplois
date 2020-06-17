@@ -367,6 +367,6 @@ ITOU_EMAIL_PRESCRIBER_NEW_HIRING_LINK = "https://startupsbeta.typeform.com/to/X4
 ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 
 # Environment
-# Defined in env vars, sets the type of env of the app, 
+# Defined in env vars, sets the type of env of the app,
 # f.i. DEMO, REVIEW_APP, STAGING, DEV, ...
-ITOU_ENVIRONMENT = os.environ.get("ITOU_ENVIRONMENT")
+ITOU_ENVIRONMENT = os.environ.get("ITOU_ENVIRONMENT", "DEV")
