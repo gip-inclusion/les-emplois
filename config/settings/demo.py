@@ -7,7 +7,6 @@ from sentry_sdk.integrations.logging import ignore_logger
 ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
 ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", ITOU_FQDN]
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
@@ -19,6 +18,7 @@ DATABASES = {
     }
 }
 
+ITOU_ENVIRONMENT = "DEMO"
 ITOU_PROTOCOL = "https"
 ITOU_EMAIL_CONTACT = "contact+demo@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+demo@inclusion.beta.gouv.fr"
