@@ -1,0 +1,4 @@
+-r ./base.txt
+
+uwsgi==2.0.18  # https://github.com/unbit/uwsgi
+sentry-sdk==0.12.3  # https://github.com/getsentry/sentry-python
