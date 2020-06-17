@@ -1,0 +1,28 @@
+{% load i18n %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% if ITOU_ENVIRONMENT == "DEMO" %}
+
+<div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
+    <span class="h1 font-weight-bold">DEMO</span>
+</div>
+
+<div class="modal fade" id="infoModal" tabindex=-1 role="dialog" data-toggle="modal" data-target="#infoModal" >
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{% trans "Connexion à l'environnement de démo" %}<h4>
+            </div>
+            <div class="modal-body">
+                sdhfsdhfshfshfgsdhjfgjsf
+                
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endif%}
+
