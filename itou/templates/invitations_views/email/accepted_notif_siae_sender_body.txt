@@ -2,8 +2,8 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst %}
-{{ first_name }} {{ last_name }} est désormais membre de la Plateforme de l'inclusion.
+{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst siae_name=siae_name %}
+{{ first_name }} {{ last_name }} est désormais membre de {{ siae_name }}.
 {% endblocktrans %}
 
 {% trans "Détails" %}

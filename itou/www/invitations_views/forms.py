@@ -5,17 +5,22 @@ from django.contrib.auth import get_user_model
 from django.forms.models import modelformset_factory
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.invitations.models import Invitation
+from itou.invitations.models import Invitation, SiaeStaffInvitation
 
 
-class NewInvitationForm(forms.ModelForm):
+class NewInvitationMixinForm(forms.ModelForm):
+    """
+    ModelForm based on an abstract class. It should not be used alone!
+    Inherit from it when you need a new kind of invitation.
+    """
+
     class Meta:
         model = Invitation
         fields = ["first_name", "last_name", "email"]
 
     def __init__(self, sender, *args, **kwargs):
         self.sender = sender
-        super(NewInvitationForm, self).__init__(*args, **kwargs)
+        super(NewInvitationMixinForm, self).__init__(*args, **kwargs)
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -23,21 +28,23 @@ class NewInvitationForm(forms.ModelForm):
         self._extend_expiration_date_or_error(email)
         return email
 
-    def save(self, *args, **kwargs):
-        invitation = super(NewInvitationForm, self).save(commit=False)
+    def save(self, commit=True, *args, **kwargs):
+        invitation = super(NewInvitationMixinForm, self).save(commit=False)
         invitation.sender = self.sender
-        invitation.save()
-        invitation.send()
+        if commit:
+            invitation.save()
+            invitation.send()
         return invitation
 
     def _invited_user_exists_error(self, email):
-        self.user = get_user_model().objects.filter(email__iexact=email).first()
-        if self.user:
+        user = get_user_model().objects.filter(email__iexact=email).first()
+        if user:
             error = forms.ValidationError(_("Cet utilisateur existe déjà."))
             self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
-        invitation = Invitation.objects.filter(email__iexact=email).first()
+        invitation_model = self.Meta.model
+        invitation = invitation_model.objects.filter(email__iexact=email).first()
         if invitation:
             if invitation.has_expired:
                 invitation.extend_expiration_date()
@@ -46,22 +53,55 @@ class NewInvitationForm(forms.ModelForm):
                 self.add_error("email", error)
 
 
-class BaseInvitationFormSet(forms.BaseModelFormSet):
+class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
+    class Meta:
+        fields = NewInvitationMixinForm.Meta.fields
+        model = SiaeStaffInvitation
+
+    def __init__(self, sender, siae, *args, **kwargs):
+        self.siae = siae
+        super(NewSiaeStaffInvitationForm, self).__init__(sender=sender, *args, **kwargs)
+
+    def _invited_user_exists_error(self, email):
+        """
+        An employer can only invite another employer to join his structure.
+        """
+        self.user = get_user_model().objects.filter(email__iexact=email).first()
+        if self.user and not self.user.is_siae_staff:
+            error = forms.ValidationError(_("Cet utilisateur n'est pas un employeur."))
+            self.add_error("email", error)
+
+    def save(self, *args, **kwargs):
+        invitation = super(NewSiaeStaffInvitationForm, self).save(commit=False)
+        invitation.siae = self.siae
+        invitation.save()
+        invitation.send()
+        return invitation
+
+
+class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
-        self.queryset = Invitation.objects.none()
+        self.queryset = SiaeStaffInvitation.objects.none()
 
 
-InvitationFormSet = modelformset_factory(
-    Invitation, form=NewInvitationForm, formset=BaseInvitationFormSet, extra=1, max_num=30
+"""
+Formset used when an employer invites other employers to join his structure.
+"""
+NewSiaeStaffInvitationFormSet = modelformset_factory(
+    SiaeStaffInvitation, form=NewSiaeStaffInvitationForm, formset=SiaeStaffInvitationFormSet, extra=1, max_num=30
 )
 
 
 class NewUserForm(SignupForm):
+    """
+    Signup form shown when a user accepts an invitation.
+    """
+
     first_name = forms.CharField(
         label=gettext_lazy("Prénom"),
         max_length=get_user_model()._meta.get_field("first_name").max_length,
@@ -80,6 +120,7 @@ class NewUserForm(SignupForm):
         fields = ["first_name", "last_name", "password1", "password2"]
 
     def __init__(self, invitation, *args, **kwargs):
+        # Do not let a guest change his email when signing up.
         self.email = invitation.email
         super(NewUserForm, self).__init__(*args, **kwargs)
         self.fields.pop("email")
