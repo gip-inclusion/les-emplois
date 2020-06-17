@@ -5,18 +5,64 @@
 {% if ITOU_ENVIRONMENT == "DEMO" %}
 
 <div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
-    <span class="h1 font-weight-bold">DEMO</span>
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <div class="h1 font-weight-bold">{{ ITOU_ENVIRONMENT }}</div>
+            </div>
+            <div class="col p-2">
+                <button class="btn btn-light border" data-toggle="modal" data-target="#infoModal">
+                    {% trans "Voir les codes d'accès" %}
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="modal fade" id="infoModal" tabindex=-1 role="dialog" data-toggle="modal" data-target="#infoModal" >
+<div class="modal fade" id="infoModal" tabindex=-1 role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">{% trans "Connexion à l'environnement de démo" %}<h4>
             </div>
             <div class="modal-body">
-                sdhfsdhfshfshfgsdhjfgjsf
-                
+                <p> 
+                Pour vous aider à mieux utiliser l'environnement de démonstration de la Plateforme de l'inclusion,
+                vous pouvez vous connecter avec les comptes d'exemple suivants:
+                </p>
+                <table class="table">
+                    <tr>
+                        <td>Demandeur d'emploi</td>
+                        <td class="font-weight-bold">test+de@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Prescripteur habilité</td>
+                        <td class="font-weight-bold">test+prescripteur@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Prescripteur non habilité (orienteur)</td>
+                        <td class="font-weight-bold">test+orienteur@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur ETTI et membre d'une EI</td>
+                        <td class="font-weight-bold">test+etti@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur EI et membre d'une ETTI</td>
+                        <td class="font-weight-bold">test+ei@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur GEIQ</td>
+                        <td class="font-weight-bold">test+geiq@inclusion.beta.gouv.fr</td>
+                    </tr>
+                </table>
+
+                <p>Le mot de passe est identique pour tous les comptes: <span class="font-weight-bold">password</span></p> 
+
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-dismiss="modal">C'est noté !</button>
+                </div>
 
             </div>
         </div>
