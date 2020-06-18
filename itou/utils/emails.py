@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
 
-
 def remove_extra_line_breaks(text):
     """
     Replaces multiple line breaks with just one.
@@ -21,16 +20,19 @@ def get_email_text_template(template, context):
             "itou_protocol": settings.ITOU_PROTOCOL,
             "itou_fqdn": settings.ITOU_FQDN,
             "itou_email_contact": settings.ITOU_EMAIL_CONTACT,
+            "itou_environment": settings.ITOU_ENVIRONMENT,
         }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())
 
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None):
+    subject_prefix = "[DEMO] " if settings.ITOU_ENVIRONMENT == "DEMO" else ""
+    print(f"Prefix: {subject_prefix}")
     return mail.EmailMessage(
         from_email=from_email,
         to=to,
         bcc=bcc,
-        subject=get_email_text_template(subject, context),
+        subject=subject_prefix + get_email_text_template(subject, context),
         body=get_email_text_template(body, context),
     )

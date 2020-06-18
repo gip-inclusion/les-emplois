@@ -109,7 +109,7 @@ class Approval(CommonApprovalMixin):
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
-    ASP_ITOU_PREFIX = "99999"
+    ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

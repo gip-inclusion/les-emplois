@@ -7,7 +7,6 @@ from sentry_sdk.integrations.logging import ignore_logger
 ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
 ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", ITOU_FQDN]
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
@@ -27,3 +26,7 @@ sentry_sdk.init(dsn=os.environ["SENTRY_DSN_DEMO"], integrations=[DjangoIntegrati
 ignore_logger("django.security.DisallowedHost")
 
 ITOU_ENVIRONMENT = "DEMO"
+ASP_ITOU_PREFIX = "XXXXX"
+
+# Override allauth DefaultAccountAdapter: provides custom context to email templates
+ACCOUNT_ADAPTER = "itou.utils.account_adapter.DemoAccountAdapter"
