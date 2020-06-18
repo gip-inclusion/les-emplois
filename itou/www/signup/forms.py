@@ -185,6 +185,7 @@ class AuthorizedPrescriberForm(PrescriberForm):
         * a registered one in the auto-complete list
         Not both or none
         """
+        super().clean()
         unregistered_organization = self.cleaned_data["unregistered_organization"]
         authorized_organization_id = self.cleaned_data["authorized_organization_id"]
 

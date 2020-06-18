@@ -167,6 +167,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         return self.members.filter(is_active=True)
 
     def get_card_url(self):
+        if not self.is_authorized:
+            return None
         return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
     @property

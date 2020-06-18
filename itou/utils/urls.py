@@ -38,6 +38,12 @@ def get_safe_url(request, param_name, fallback_url=None):
     return fallback_url
 
 
+def get_absolute_url(path=""):
+    if path.startswith("/"):
+        path = path[1:]
+    return f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/{path}"
+
+
 class SiretConverter:
     """
     Custom path converter for Siret.
