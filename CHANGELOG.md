@@ -4,6 +4,25 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2020-06-18
+
+### Ajouté
+- Possibilité de finaliser une embauche sans demander de PASS IAE
+- Documentation sur l'architecture des prescripteurs
+- Gestion du consentement des cookies via Tarteaucitron
+- Suivi Hotjar après consentement
+- Possibilité de rechercher des prescripteurs "habilités"
+- Fiches des prescripteurs "habilités"
+- Lien direct vers la fiche d'un prescripteur habilité depuis le tableau de bord
+
+### Modifié
+- Réduction du poids de la bannière SVG de la page d'accueil
+- Correction du mail envoyé à l'équipe lorsqu'un prescripteur rejoint une organisation sans membres
+- Pied de page : remplacement du lien "Nous contacter" par "Besoin d'aide ?"
+- Modification du mail envoyé au candidat, lorsqu'une candidature a été effectuée pour lui, afin de l'inciter à se connecter à son compte
+- L'émetteur du PASS IAE devient non modifiable dans l'admin des candidatures
+- Correction de l'email d'authentification de 50 structures
+
 ## [1.0.4] - 2020-06-04
 
 ### Ajouté
@@ -12,7 +31,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Inscription sans boite email (redirection vers PE connect) 
 - Connexion via PE Connect
 - Tracking Matomo pour PE Connect
-- Liens Typeform lors de l'envoi d'emails (confirmation d'embauche pour les SIAE et prescripteurs) 
+- Liens Typeform lors de l'envoi d'emails (confirmation d'embauche pour les SIAE et prescripteurs)
 - Possibilité de pouvoir embaucher sans obtenir de PASS IAE
 
 ### Modifié
