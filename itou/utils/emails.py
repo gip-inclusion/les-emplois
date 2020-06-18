@@ -29,7 +29,6 @@ def get_email_text_template(template, context):
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None):
     subject_prefix = "[DEMO] " if settings.ITOU_ENVIRONMENT == "DEMO" else ""
-    print(f"Prefix: {subject_prefix}")
     return mail.EmailMessage(
         from_email=from_email,
         to=to,
