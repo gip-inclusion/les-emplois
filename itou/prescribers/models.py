@@ -43,7 +43,33 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
     The organization of a prescriber, e.g.: Pôle emploi, missions locales, Cap emploi etc.
 
-    Note: it is not required for a prescriber to be a member of an organization.
+    A "prescriber" is always represented by a User object with the `is_prescriber` flag set to `True`.
+
+    The "prescriber" has the possibility of being a member of an organisation represented by a
+    `PrescriberOrganization` object through `PrescriberMembership`.
+
+    However it is not required for a "prescriber" to be a member of an organization. There are 3 possible cases:
+
+    Case 1
+    A "prescriber" is alone (e.g. "éducateur de rue"). In this case there is only a `User` object
+        - User.is_prescriber = True
+
+    Case 2
+    A "prescriber" is a member of an organization (e.g. an association of unemployed people etc.)
+    and uses the platform with 0 or n collaborators. In this case there are 3 objects:
+        - User.is_prescriber = True
+        - PrescriberOrganization
+        - PrescriberMembership
+
+    Case 3
+    This case is a variant of case 2 where the organization is "authorized" at national level or by
+    the Prefect (e.g. Pôle emploi, CCAS, Cap emploi…). This is similar to case 2  with an additional
+    flag for the organization:
+        - User.is_prescriber = True
+        - PrescriberOrganization.is_authorized = True
+        - PrescriberMembership
+
+    In the last 2 cases, there can be n members by organization.
     """
 
     class Kind(models.TextChoices):
