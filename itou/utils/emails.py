@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
 
+
 def remove_extra_line_breaks(text):
     """
     Replaces multiple line breaks with just one.

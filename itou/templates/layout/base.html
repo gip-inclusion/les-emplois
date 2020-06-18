@@ -16,10 +16,10 @@
     <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
     {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body>p
     
     {% include "includes/demo.html" %}
-
+                              
     <div class="layout">
 
         <header class="layout-section layout-section-white">
@@ -233,6 +233,13 @@
     {# tarteaucitron.js cookies consent / https://tarteaucitron.io/fr/install/ #}
     <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
     <script>
+
+        // Tarteaucitron's language is set according to the browser configuration
+        // but a lot of users don't know how to change it.
+        // This can be forced only by using a global `var` statement.
+        // https://github.com/AmauriC/tarteaucitron.js/blob/98b02b0bdda670bd953752d85443c3fd77dde724/tarteaucitron.js#L5
+        var tarteaucitronForceLanguage = "fr";
+
         tarteaucitron.init({
             "privacyUrl": "",  /* Privacy policy url */
             "hashtag": "#tarteaucitron",  /* Open the panel with this hashtag */
@@ -250,10 +257,15 @@
             "readmoreLink": "https://doc.inclusion.beta.gouv.fr/mentions/protection-des-donnees",  /* Change the default readmore link */
             "mandatory": false,  /* Show a message about mandatory cookies */
         });
+
+        {% if ITOU_ENVIRONMENT == "PROD" or ITOU_ENVIRONMENT == "DEMO" %}
         // Hotjar.
         (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
-        tarteaucitron.user.hotjarId = 1857070;
+        {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 1857070;{% endif %}
+        {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
         tarteaucitron.user.HotjarSv = 6;
+        {% endif %}
+
     </script>
 
     {% block script %}
