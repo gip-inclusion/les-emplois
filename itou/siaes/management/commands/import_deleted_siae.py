@@ -19,6 +19,18 @@ DEPARTMENTS_TO_OPEN_ON_20_04_2020 = ["08", "10", "51", "52", "54", "55", "57", "
 # Hauts-de-France - note that department 62 was already open.
 DEPARTMENTS_TO_OPEN_ON_27_04_2020 = ["02", "59", "60", "62", "80"]
 
+# BFC - Bourgogne-Franche-Comté
+DEPARTMENTS_TO_OPEN_ON_22_06_2020 = ["21", "25", "39", "58", "70", "71", "89", "90"]
+
+# ARA - Auvergne-Rhône-Alpes
+DEPARTMENTS_TO_OPEN_ON_29_06_2020 = ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"]
+
+# Corse + PACA - Provence-Alpes-Côte d'Azur
+DEPARTMENTS_TO_OPEN_ON_06_07_2020 = ["2A", "2B", "04", "05", "06", "13", "83", "84"]
+
+# Carefully pick your choice.
+DEPARTMENTS_TO_OPEN = DEPARTMENTS_TO_OPEN_ON_22_06_2020
+
 
 class Command(BaseCommand):
     """
@@ -62,9 +74,7 @@ class Command(BaseCommand):
 
     14/04/2020: open Île-de-France (75, 77, 78, 91, 92, 93, 94, 95)
 
-    20/04/2020: open Grand Est (08, 10, 51, 52, 54, 55, 57, 67, 68, 88)
-
-    27/04/2020: open Hauts-de-France (02, 59, 60, 62, 80)
+    20/04/2020 and later: see DEPARTMENTS_TO_OPEN_ON_* above.
     """
 
     help = "Restore deleted SIAEs data into the database."
@@ -91,15 +101,15 @@ class Command(BaseCommand):
 
                 siae = Siae(**item["fields"])
 
-                if siae.department not in DEPARTMENTS_TO_OPEN_ON_27_04_2020:
+                if siae.department not in DEPARTMENTS_TO_OPEN:
                     continue
+
+                assert not Siae.objects.filter(siret=siae.siret, kind=siae.kind).exists()
 
                 total_new_siaes += 1
 
                 if not dry_run:
                     siae.save()
-                else:
-                    self.stdout.write(f'{item["fields"]}')
 
         self.stdout.write("-" * 80)
 
