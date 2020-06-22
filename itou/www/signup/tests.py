@@ -23,6 +23,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.www.signup.forms import SelectSiaeForm
 
 
@@ -373,12 +374,25 @@ class PrescriberSignupTest(TestCase):
     def test_poleemploi_prescriber(self):
         url = reverse("signup:prescriber_poleemploi")
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
         organization = PrescriberPoleEmploiFactory()
-
         password = "!*p4ssw0rd123-"
 
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "safir_code": organization.code_safir_pole_emploi,
+        }
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
@@ -406,24 +420,52 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(organization.is_authorized)
         self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
 
-        # Check membership
+        # Check membership.
         self.assertIn(user, organization.members.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
 
         # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
 
-        # Check prescriber signup (email already exists)
+        # Check prescriber signup (email already exists).
         response = self.client.post(url, data=post_data)
         self.assertFormError(response, "form", "email", "Cette adresse email est déjà enregistrée")
 
     def test_authorized_prescriber_with_organization(self):
         url = reverse("signup:prescriber_authorized")
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
         authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
         password = "!*p4ssw0rd123-"
 
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "authorized_organization_id": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "authorized_organization_id": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
@@ -433,11 +475,10 @@ class PrescriberSignupTest(TestCase):
             "authorized_organization_id": authorized_organization.pk,
         }
         response = self.client.post(url, data=post_data)
-
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # User checks
+        # User checks.
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
@@ -453,7 +494,7 @@ class PrescriberSignupTest(TestCase):
             authorized_organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED
         )
 
-        # Check membership
+        # Check membership.
         self.assertIn(user, authorized_organization.members.all())
         self.assertEqual(2, authorized_organization.members.count())
         self.assertEqual(1, user.prescriberorganization_set.count())
@@ -469,11 +510,25 @@ class PrescriberSignupTest(TestCase):
         """
         url = reverse("signup:prescriber_authorized")
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
         authorized_organization = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         password = "!*p4ssw0rd123-"
 
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "authorized_organization_id": authorized_organization.pk,
+        }
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
@@ -487,10 +542,10 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # See previous tests for user / org assertions
+        # See previous tests for user / org assertions.
         user = get_user_model().objects.get(email=post_data["email"])
 
-        # Check membership
+        # Check membership.
         self.assertIn(user, authorized_organization.members.all())
         self.assertEqual(1, authorized_organization.members.count())
 
@@ -507,6 +562,20 @@ class PrescriberSignupTest(TestCase):
 
         organization_name = "UNREGISTERED_INC"
         password = "!*p4ssw0rd123-"
+
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "unregistered_organization": organization_name,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
 
         self.assertEqual(response.status_code, 200)
         post_data = {
@@ -535,7 +604,7 @@ class PrescriberSignupTest(TestCase):
 
         # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
 
-        # Check if a new organization is created
+        # Check if a new organization is created.
         new_org = PrescriberOrganization.objects.get(name=organization_name)
         self.assertFalse(new_org.is_authorized)
         self.assertEqual(new_org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
@@ -543,7 +612,7 @@ class PrescriberSignupTest(TestCase):
         self.assertIsNone(new_org.authorization_updated_by)
         self.assertEqual(new_org.created_by, user)
 
-        # Check membership
+        # Check membership.
         self.assertEqual(1, new_org.members.count())
         self.assertIn(user, new_org.members.all())
 
@@ -561,12 +630,24 @@ class PrescriberSignupTest(TestCase):
         The full "email confirmation process" is tested here.
         Further Prescriber's signup tests doesn't have to fully test it again.
         """
-
         url = reverse("signup:prescriber_orienter")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         password = "!*p4ssw0rd123-"
+
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
 
         post_data = {
             "first_name": "John",
@@ -619,13 +700,26 @@ class PrescriberSignupTest(TestCase):
         Prescriber signup (orienter) with a code to join an unauthorized organization.
         Organization has a pre-existing admin user who is notified of the signup.
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
-
         url = reverse("signup:prescriber_orienter")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+        organization = PrescriberOrganizationWithMembershipFactory()
         password = "!*p4ssw0rd123-"
+
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "secret_code": organization.secret_code,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
 
         post_data = {
             "first_name": "John",
@@ -678,6 +772,20 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         password = "!*p4ssw0rd123-"
+
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "secret_code": authorized_organization.secret_code,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
 
         post_data = {
             "first_name": "Jane",
