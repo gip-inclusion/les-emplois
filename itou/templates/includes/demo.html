@@ -11,13 +11,17 @@
             <div class="col">
                 <div class="h1 font-weight-bold">{{ ITOU_ENVIRONMENT }}</div>
             </div>
-            <div class="col"> </div>
+            <div class="col p-2">
+                <button class="btn btn-light border" data-toggle="modal" data-target="#infoModal">
+                    {% trans "Voir les informations" %}
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="modal fade" id="infoModal" tabindex=-1 role="dialog">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">{% trans "Connexion à l'environnement de démo" %}<h4>
@@ -36,6 +40,38 @@
                 <p>
                   Les informations saisies sur cet environnement sont également susceptibles d'être détruites à intervalle régulier.
                 </p>
+
+                <p>
+                  Vous pouvez vous connecter avec les comptes d'exemple suivants :
+                </p>
+
+
+                <table class="table">
+                    <tr>
+                        <td>Demandeur d'emploi</td>
+                        <td class="font-weight-bold">test+de@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Prescripteur habilité</td>
+                        <td class="font-weight-bold">test+prescripteur@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Prescripteur non habilité (orienteur)</td>
+                        <td class="font-weight-bold">test+orienteur@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur ETTI et membre d'une EI</td>
+                        <td class="font-weight-bold">test+etti@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur EI et membre d'une ETTI</td>
+                        <td class="font-weight-bold">test+ei@inclusion.beta.gouv.fr</td>
+                    </tr>
+                    <tr>
+                        <td>Administrateur GEIQ</td>
+                        <td class="font-weight-bold">test+geiq@inclusion.beta.gouv.fr</td>
+                    </tr>
+                </table>
 
                 <div class="modal-footer">
                     <button class="btn btn-success" data-dismiss="modal">C'est bien noté !</button>
