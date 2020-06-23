@@ -191,7 +191,7 @@ class AuthorizedPrescriberForm(PrescriberForm):
 
         if not (unregistered_organization or authorized_organization_id):
             raise ValidationError(gettext_lazy("Vous devez choisir une organisation"))
-        
+
         if (unregistered_organization and authorized_organization_id) or not (
             unregistered_organization or authorized_organization_id
         ):
