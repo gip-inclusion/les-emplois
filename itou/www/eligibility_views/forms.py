@@ -93,9 +93,6 @@ class AdministrativeCriteriaForm(forms.Form):
         level_1 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_1]
         level_2 = [obj for obj in selected_objects if obj.level == AdministrativeCriteria.Level.LEVEL_2]
 
-        # From 8 April, and until 30 April or beyond: 2 scenarios depending on the type of SIAE.
-        # https://docs.google.com/document/d/1PtQHmhe5DaHhG0ud5EHwSMUMBplTvm7WKRNm_AX056Y/edit
-
         # For EI, AI, ACI: 1 criterion level 1 OR 3 level 2 criteria.
         if self.siae.kind != self.siae.KIND_ETTI:
             len_valid = len(level_1) or len(level_2) >= 3
