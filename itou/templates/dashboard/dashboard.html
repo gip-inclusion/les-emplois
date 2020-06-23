@@ -123,13 +123,18 @@
                     {% else %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
-                            <a href="{% url 'prescribers_views:edit_organization' %}">
-                                {% trans "Modifier votre organisation" %}
-                            </a>
                             {% if current_prescriber_organization.get_card_url %}
-                                <small>
-                                    (<a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans "Voir la fiche" %}</a>)
-                                </small>
+                                <a href="{% url 'prescribers_views:edit_organization' %}">
+                                    {% trans "Modifier la fiche" %}
+                                </a>
+                                /
+                                <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                    {% trans "Voir la fiche" %}
+                                </a>
+                            {% else %}
+                                <a href="{% url 'prescribers_views:edit_organization' %}">
+                                    {% trans "Modifier votre organisation" %}
+                                </a>
                             {% endif %}
                         </p>
                         {% if user_is_prescriber_org_admin and prescriber_is_orienter %}
@@ -186,11 +191,12 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
                         <a href="{% url 'siaes_views:edit_siae' %}">
-                            {% trans "Modifier les coordonnées" %}
+                            {% trans "Modifier la fiche" %}
                         </a>
-                        <small>
-                            (<a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans "Voir la fiche" %}</a>)
-                        </small>
+                        /
+                        <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                            {% trans "Voir la fiche" %}
+                        </a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="users" %}
