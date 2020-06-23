@@ -13,9 +13,17 @@
 </h1>
 
 <div class="text-center">
-    {% include "peamu/button.html" %}
-    <p class="lines-on-sides">ou</p>
-    <p>Créer son compte</p>
+
+    <p>{% include "signup/includes/peamu_button.html" %}</p>
+
+    <p class="lines-on-sides">{% trans "ou" %}</p>
+
+    <p>{% include "signup/includes/no_email_link.html" %}</p>
+
+    <p class="lines-on-sides">{% trans "ou" %}</p>
+
+    <p>{% trans "Créer son compte" %}</p>
+
 </div>
 
 <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">

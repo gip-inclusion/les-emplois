@@ -16,9 +16,17 @@
 
 {% if show_peamu %}
     <div class="text-center">
-        {% include "peamu/button.html" %}
-        <p class="lines-on-sides">ou</p>
-        <p>Se connecter avec son compte</p>
+
+        <p>{% include "signup/includes/peamu_button.html" %}</p>
+
+        <p class="lines-on-sides">{% trans "ou" %}</p>
+
+        <p>{% include "signup/includes/no_email_link.html" %}</p>
+
+        <p class="lines-on-sides">{% trans "ou" %}</p>
+
+        <p>{% trans "Se connecter avec son compte" %}</p>
+
     </div>
 {% endif %}
 
