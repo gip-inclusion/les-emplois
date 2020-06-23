@@ -307,8 +307,8 @@
         <script src="{% static "js/matomo.js" %}"></script>
     {% endif %}
 
-    {# Display "Je done mon avis" only on HP. #}
-    {# The rationale behind it: "Je done mon avis" is imposed by DINUM but is redundant with Hotjar. #}
+    {# Display "Je donne mon avis" only on HP. #}
+    {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
     {# Hotjar is way more powerful. Compromise: display "Je donne mon avis" only on HP. #}
     {% if request.path == "/" %}
         <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">

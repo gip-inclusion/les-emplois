@@ -12,6 +12,9 @@
 
         {% bootstrap_form form %}
 
+        {% trans "Le candidat n'a pas d'email ?" as link_text %}
+        <p>{% include "signup/includes/no_email_link.html" with link_text=link_text %}</p>
+
         {% buttons %}
             <button type="submit" class="btn btn-primary">{% trans "Continuer" %}</button>
         {% endbuttons %}

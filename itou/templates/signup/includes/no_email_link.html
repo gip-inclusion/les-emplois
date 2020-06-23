@@ -1,10 +1,53 @@
 {% load i18n %}
+{% load static %}
 
-<a href="https://candidat.pole-emploi.fr/compte/creation/etape1etatcivil"
-    target="_blank"
-    class="matomo-event"
-    data-matomo-category="inscription-candidat"
-    data-matomo-action="clic"
-    data-matomo-option="je-n-ai-pas-d-adresse-email">
-    {% trans "Je n'ai pas d'adresse e-mail" %}
+<a href="#" data-toggle="modal" data-target="#no-email-modal">
+    {% if link_text %}
+        {{ link_text }}
+    {% else %}
+        {% trans "Je n'ai pas d'adresse e-mail" %}
+    {% endif %}
 </a>
+
+<div
+    class="modal fade text-left"
+    id="no-email-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="no-email-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col text-center">
+                            <img src="{% static 'img/no_email.svg' %}">
+                        </div>
+                        <div class="col">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="{% trans "Fermer" %}">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="modal-title" id="no-email-modal-label">
+                                {% trans "Créer une adresse e-mail" %}
+                            </h5>
+                            <br>
+                            <p>{% trans "Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net." %}</p>
+                            <p>{% trans "Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici." %}</p>
+                            <a
+                                href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
+                                class="btn btn-primary matomo-event"
+                                data-matomo-category="inscription-candidat"
+                                data-matomo-action="clic"
+                                data-matomo-option="je-n-ai-pas-d-adresse-email"
+                                rel="noopener"
+                                target="_blank">
+                                {% trans "Créer une adresse e-mail" %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,6 @@
 {# django-allauth template override. #}
 {% extends "layout/content_small.html" %}
 {% load i18n %}
-{% load static %}
 {% load bootstrap4 %}
 
 {% block title %}{% trans "Connexion" %}{{ block.super }}{% endblock %}
@@ -15,19 +14,17 @@
 </h1>
 
 {% if show_peamu %}
-    <div class="text-center">
 
-        <p>{% include "signup/includes/peamu_button.html" %}</p>
+    <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
 
-        <p class="lines-on-sides">{% trans "ou" %}</p>
+    <p class="lines-on-sides">{% trans "ou" %}</p>
 
-        <p>{% include "signup/includes/no_email_link.html" %}</p>
+    <p class="text-center">{% include "signup/includes/no_email_link.html" %}</p>
 
-        <p class="lines-on-sides">{% trans "ou" %}</p>
+    <p class="lines-on-sides">{% trans "ou" %}</p>
 
-        <p>{% trans "Se connecter avec son compte" %}</p>
+    <p>{% trans "Se connecter avec son compte" %}</p>
 
-    </div>
 {% endif %}
 
 <form method="post" action="{% url 'account_login' %}" class="js-prevent-multiple-submit">
