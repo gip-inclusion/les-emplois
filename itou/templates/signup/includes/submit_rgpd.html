@@ -2,44 +2,35 @@
 {% load i18n %}
 
 <div class="alert alert-warning" role="alert">
+
     <p>
-        {% blocktrans %}
-            En cliquant sur le bouton "Inscription", vous acceptez que le service "La plateforme de l'inclusion" traite les données recueillies pour partage avec les acteurs de l'Insertion par l'Activité Economique.
-        {% endblocktrans %}
+        <small>
+            {% trans "Le Ministère du Travail (DGEFP) et Pôle Emploi traitent vos données personnelles. La plateforme est ouverte aux acteurs de l'inclusion et permet de simplifier le recrutement des personnes éligibles aux structures de l'Insertion par l'Activité Economique (IAE). Elle est une composante du Pacte ambition IAE." %}
+        </small>
     </p>
+
     <p>
-        {% blocktrans %}
-            Pour en savoir plus sur la gestion de vos données personnelles, <a href="#" data-toggle="modal" data-target="#RGPDModal">cliquez ici</a>.
-        {% endblocktrans %}
+        <small>
+
+            {% trans "Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez" %}
+
+            <a href="https://doc.inclusion.beta.gouv.fr/mentions/protection-des-donnees" rel="noopener" target="_blank">
+                {% trans "la section Protection des données" %}
+                {% include "includes/icon.html" with icon="external-link" %}
+            </a>.
+
+            {% trans 'En cliquant sur le bouton "Inscription", vous acceptez' %}
+
+            <a href="https://doc.inclusion.beta.gouv.fr/mentions/cgu" rel="noopener" target="_blank">
+                {% trans "les conditions générales d'utilisation" %}
+                {% include "includes/icon.html" with icon="external-link" %}
+            </a>.
+
+        </small>
     </p>
+
     {% buttons %}
         <button type="submit" class="btn btn-primary">{% trans "Inscription" %}</button>
     {% endbuttons %}
-</div>
 
-
-<!-- Modal -->
-<div class="modal fade" id="RGPDModal" tabindex="-1" role="dialog" aria-labelledby="RGPDModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="RGPDModalLabel">Traitement de vos données</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-          <div class="modal-body">
-                {% blocktrans with email_contact=ITOU_EMAIL_CONTACT %}
-                    <p>La Délégation Générale à l'Emploi et à la Formation Professionnelle (DGEFP) et Pôle Emploi sont les responsables du traitement de vos données à caractère personnel.</p>
-                    <p>La plateforme de l’Inclusion est une composante du Pacte ambition IAE (insertion par l’activité économique). La plateforme est ouverte aux acteurs de l’inclusion au sens large et permet entre autres de fluidifier le recrutement des personnes éligibles en refondant l’agrément des bénéficiaires de l’insertion par l’activité économique.</p>
-                    <p>Vous pouvez accéder aux données à caractère personnel vous concernant. Vous disposez également d'un droit d’opposition, d’un droit de rectification et d’un droit à la limitation du traitement de vos données à caractère personnel.</p>
-                    <p>Pour exercer ces droits ou pour toute question relative au traitement de vos données à caractère personnel dans le cadre de ce dispositif, vous pouvez contacter la StartUp d’État Itou <a href="mailto:{{ email_contact }}">par voie électronique {{ email_contact }}</a>.</p>
-                    <p>Pour plus d’information, <a href="https://doc.inclusion.beta.gouv.fr/mentions/protection-des-donnees" target="_blank">consultez la section Protection des données en cliquant ici</a>.</p>
-                {% endblocktrans %}
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
-          </div>
-        </div>
-    </div>
 </div>
