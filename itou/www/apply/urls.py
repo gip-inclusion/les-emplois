@@ -42,4 +42,6 @@ urlpatterns = [
         process_views.accept_without_approval,
         name="accept_without_approval",
     ),
+    # Settings: block applications for SIAE
+    # path("<int:siae_pk>/block_job_applications", p)
 ]

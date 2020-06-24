@@ -149,3 +149,15 @@ def members(request, template_name="siaes/members.html"):
 
     context = {"siae": siae, "members": members}
     return render(request, template_name, context)
+
+
+@login_required
+def block_job_applications(request, template_name="siaes/block_job_applications.html"):
+    """
+    Settings: block job applications for given SIAE
+    """
+
+    siae = get_current_siae_or_404(request)
+    context = {"siae": siae, }
+
+    return render(request, template_name, context)
