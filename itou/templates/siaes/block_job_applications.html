@@ -1,0 +1,23 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load format_filters %}
+
+{% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Bloquer les nouvelles candidatures" %}</h1>
+<h3 class="text-secondary">{{ siae.display_name }}</h3>
+
+<div class="alert alert-info">
+   {% blocktrans %}
+   <p><b>Vous avez trop de candidatures à gérer ?</b> Bloquez la réception de nouvelles candidatures en provenance des prescripteurs et candidats en cochant la case ci-dessous.</p>
+   <p><b>Un message sera visible sur votre fiche.</b> Vous pourrez toujours obtenir un PASS IAE depuis votre tableau de bord.</p>
+   {% endblocktrans %}
+</div>
+
+<div>
+    Ne plus recevoir de candidature
+</div>
+
+
+{% endblock %}

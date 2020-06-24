@@ -158,6 +158,6 @@ def block_job_applications(request, template_name="siaes/block_job_applications.
     """
 
     siae = get_current_siae_or_404(request)
-    context = {"siae": siae, }
+    context = {"siae": siae}
 
     return render(request, template_name, context)
