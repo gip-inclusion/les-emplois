@@ -228,6 +228,10 @@ class SelectSiaeForm(forms.Form):
     This first form allows the user to select which siae will be joined.
     """
 
+    DOC_OPENING_SCHEDULE_URL = (
+        "https://doc.inclusion.beta.gouv.fr/presentation/quel-est-le-calendrier-de-deploiement-de-la-plateforme"
+    )
+
     kind = forms.ChoiceField(
         label=gettext_lazy("Type de structure"), choices=BLANK_CHOICE + Siae.KIND_CHOICES, required=True
     )
@@ -294,8 +298,9 @@ class SelectSiaeForm(forms.Form):
 
             if not email_exists:
                 error_message = _(
-                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus.<br>"
-                    f"Merci de vérifier votre saisie ou veuillez nous contacter "
+                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus.<br>Merci de "
+                    f'<a href="{self.DOC_OPENING_SCHEDULE_URL}">vérifier que la plateforme '
+                    f"est disponible sur votre territoire</a> ou veuillez nous contacter "
                     f"à l'adresse suivante : {settings.ITOU_EMAIL_CONTACT}"
                 )
                 raise forms.ValidationError(mark_safe(error_message))
