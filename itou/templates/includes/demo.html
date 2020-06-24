@@ -1,0 +1,86 @@
+{% load i18n %}
+{% load static %}
+{% load bootstrap4 %}
+
+{% if ITOU_ENVIRONMENT == "DEMO" %}
+
+<div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
+    <div class="container">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <h1 class="font-weight-bold">{{ ITOU_ENVIRONMENT }}</h1>
+            </div>
+            <div class="col p-2">
+                <button class="btn btn-light border" data-toggle="modal" data-target="#infoModal">
+                    {% trans "Voir les comptes de démonstration" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="infoModal" tabindex=-1 role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title font-weight-demo">{% trans "Connexion à l'environnement de démo" %}<h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                  {% blocktrans %}
+                    L'environnement de démonstration de la <b>Plateforme de l'inclusion</b> est limité à des fins de formation.
+                  {% endblocktrans %}
+                </p>
+
+                <p class="alert alert-danger"> 
+                  {% blocktrans %}
+                    Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>. 
+                    Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
+                  {% endblocktrans %}
+                </p>
+
+                <p>
+                  {% blocktrans %}
+                    Les <b>comptes de démonstration</b> dont le mot de passe est <code>password</code> sont les suivants :
+                  {% endblocktrans %}
+                </p>
+                
+                <table class="table table-sm">
+                    <tr>
+                        <td>{% trans "Demandeur d'emploi ; " %}<code>test+de@inclusion.beta.gouv.fr</code></td>
+                    </tr>
+                    <tr>
+                        <td>{% trans "Prescripteur habilité : " %}<code>test+prescripteur@inclusion.beta.gouv.fr</code></td>
+                    </tr>
+                    <tr>
+                        <td>{% trans "Prescripteur non habilité (orienteur) : " %}<code>test+orienteur@inclusion.beta.gouv.fr</code></td>
+                    </tr>
+                    <tr>
+                        <td>{% trans "Administrateur ETTI et membre d'une EI : " %}<code>test+etti@inclusion.beta.gouv.fr</code></td>
+                    </tr>
+                    <tr>
+                        <td>{% trans "Administrateur EI et membre d'une ETTI : " %}<code>test+ei@inclusion.beta.gouv.fr</code></td>
+                    </tr>
+                    <tr>
+                        <td>{% trans "Administrateur GEIQ : " %}<code>test+geiq@inclusion.beta.gouv.fr</code></td>
+                    </tr>
+                </table>
+
+                <p class="alert alert-secondary">
+                    {% blocktrans %}
+                        Employeurs présents : <b>Une nouvelle chance</b> une <b>ETTI</b> à Beaucaire (30) et le <b>Gararge Martinet</b> une <b>EI</b> à St-Etienne-du-Grès (13)
+                    {% endblocktrans %}
+                </p>
+                
+                <div class="modal-footer">
+                    <button class="btn btn-success" data-dismiss="modal">{% trans "C'est bien noté !" %}</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endif%}

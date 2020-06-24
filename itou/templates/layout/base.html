@@ -6,10 +6,10 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %} - La plateforme de l'inclusion{% endblock %}</title>
+    {% block meta_description %}<meta name="description" content="{% trans "La plateforme numérique de l'inclusion" %}">{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {# Use this to get the value of the CSRF token in JavaScript. #}
     <meta name="csrf-token" content="{{ csrf_token }}">
-    {% block meta_description %}{% endblock %}
     <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
     <link rel="stylesheet" href="{% static "vendor/jquery-ui-1.12.1/jquery-ui.min.css" %}" type="text/css">
     <link rel="stylesheet" href="{% static "vendor/bootstrap-4.3.1/bootstrap.min.css" %}" type="text/css">
@@ -17,13 +17,9 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-
-    {% if ITOU_ENVIRONMENT == "DEMO" %}
-        <div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
-            <span class="h1 font-weight-bold">DEMO</span>
-        </div>
-    {% endif%}
-
+    
+    {% include "includes/demo.html" %}
+                              
     <div class="layout">
 
         <header class="layout-section layout-section-white">
@@ -277,6 +273,9 @@
         <script src="{% static "js/city_autocomplete_field.js" %}"></script>
         <script src="{% static "js/configure_jobs.js" %}"></script>
         <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
+        {% if ITOU_ENVIRONMENT == "DEMO" %}
+          <script src="{% static "js/demo_localstorage.js"%}"></script>
+        {% endif%}
     {% endblock %}
 
     {% if "inclusion.beta.gouv.fr" in ALLOWED_HOSTS %}
@@ -308,11 +307,16 @@
         <script src="{% static "js/matomo.js" %}"></script>
     {% endif %}
 
-    <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
-        <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
-          <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis" title="Je donne mon avis sur cette démarche" style="width: 150px;">
-        </a>
-    </div>
+    {# Display "Je donne mon avis" only on HP. #}
+    {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
+    {# Hotjar is way more powerful. Compromise: display "Je donne mon avis" only on HP. #}
+    {% if request.path == "/" %}
+        <div class="fixed-sm-bottom text-center text-sm-right p-3 pr-sm-2 pb-sm-2">
+            <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
+              <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis" title="Je donne mon avis sur cette démarche" style="width: 150px;">
+            </a>
+        </div>
+    {% endif %}
 
 </body>
 </html>

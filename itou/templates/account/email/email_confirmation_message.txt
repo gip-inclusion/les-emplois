@@ -7,5 +7,7 @@ Afin de finaliser votre inscription, cliquez sur le lien suivant :{% endblocktr
 {{ activate_url }}
 
 {% blocktrans %}Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.{% endblocktrans %}
-
+{% if itou_environment == "DEMO" %}
+{% blocktrans %}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endblocktrans %}
+{% endif%}
 inclusion.beta.gouv.fr{% endautoescape %}
