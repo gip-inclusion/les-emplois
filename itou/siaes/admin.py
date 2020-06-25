@@ -33,12 +33,28 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
         return queryset
 
 
+class SiaeIsBlockingJobApplications(admin.SimpleListFilter):
+    title = _("Refuse les nouvelles candidatures")
+    parameter_name = "block_job_applications"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(block_job_applications=True)
+        if value == "no":
+            return queryset.exclude(block_job_applications=True)
+        return queryset
+
+
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
     list_display = ("id", "siret", "kind", "name", "department", "geocoding_score", "member_count")
-    list_filter = (SiaeHasMembersFilter, "kind", "source", "department")
+    list_filter = (SiaeHasMembersFilter, "kind", SiaeIsBlockingJobApplications, "source", "department")
     raw_id_fields = ("created_by",)
-    readonly_fields = ("created_by", "created_at", "updated_at")
+    readonly_fields = ("created_by", "created_at", "updated_at", "job_applications_blocked_at")
     fieldsets = (
         (
             _("SIAE"),
@@ -58,6 +74,8 @@ class SiaeAdmin(admin.ModelAdmin):
                     "created_by",
                     "created_at",
                     "updated_at",
+                    "block_job_applications",
+                    "job_applications_blocked_at",
                 )
             },
         ),
