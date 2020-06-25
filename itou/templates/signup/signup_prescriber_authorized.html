@@ -30,10 +30,10 @@
 
     <nav>
         <div class="nav nav-tabs" id="form-tab" role="tablist">
-            <a class="nav-item nav-link active" id="form-org-tab" data-toggle="tab" href="#form-org" role="tab" aria-controls="nav-home" aria-selected="true">
+            <a class="nav-item nav-link active" id="form-org-tab" data-toggle="tab" href="#form-org" role="tab" aria-controls="nav-home" aria-selected="true" onClick="$('#id_unregistered_organization').val('');">
                 {% trans "Votre organisation" %}
             </a>
-            <a class="nav-item nav-link" id="form-code-tab" data-toggle="tab" href="#form-code" role="tab" aria-controls="form-code" aria-selected="false">
+            <a class="nav-item nav-link" id="form-code-tab" data-toggle="tab" href="#form-code" role="tab" aria-controls="form-code" aria-selected="false" onClick="$('#id_authorized_organization_id').val('');$('#id_authorized_organization').val('');">
                 {% trans "Vous ne trouvez pas votre organisation ?" %}
             </a>
         </div>

@@ -189,6 +189,9 @@ class AuthorizedPrescriberForm(PrescriberForm):
         unregistered_organization = self.cleaned_data["unregistered_organization"]
         authorized_organization_id = self.cleaned_data["authorized_organization_id"]
 
+        if not (unregistered_organization or authorized_organization_id):
+            raise ValidationError(gettext_lazy("Vous devez choisir une organisation"))
+
         if (unregistered_organization and authorized_organization_id) or not (
             unregistered_organization or authorized_organization_id
         ):
