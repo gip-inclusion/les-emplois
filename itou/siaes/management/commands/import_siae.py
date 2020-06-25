@@ -35,9 +35,9 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_05_11_fluxIAE_Structure_11052020_073452.csv"
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_15_fluxIAE_Structure_15062020_074022.csv"
 
-SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_05_07_siae_auth_email_and_external_id.csv"
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_24_siae_auth_email_and_external_id.csv"
 
 # ETTI are deployed all over France without restriction.
 SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
@@ -230,6 +230,8 @@ class Command(BaseCommand):
         auth_emails = [row["auth_email"] for row in secondary_df_rows]
         if len(set(auth_emails)) >= 2:
             raise ValueError(f"siae.external_id={external_id} has contradictory auth_emails in ASP exports")
+        elif len(set(auth_emails)) == 0:
+            return None
         auth_email = auth_emails[0]
         return auth_email
 
@@ -252,13 +254,19 @@ class Command(BaseCommand):
                 else:
                     assert siae.siret[:9] == row["siret"][:9]
                     assert siae.kind in EXPECTED_KINDS
-                    self.log(
-                        f"siae.id={siae.id} has changed siret from "
-                        f"{siae.siret} to {row['siret']} (will be updated)"
-                    )
-                    if not dry_run:
-                        siae.siret = row["siret"]
-                        siae.save()
+                    if Siae.objects.filter(siret=row["siret"], kind=siae.kind).exists():
+                        self.log(
+                            f"siae.id={siae.id} has changed siret from "
+                            f"{siae.siret} to {row['siret']} but siret already exists (will *not* be updated)"
+                        )
+                    else:
+                        self.log(
+                            f"siae.id={siae.id} has changed siret from "
+                            f"{siae.siret} to {row['siret']} (will be updated)"
+                        )
+                        if not dry_run:
+                            siae.siret = row["siret"]
+                            siae.save()
                 # FIXME update other fields as well. Or not?
                 # Tricky decision since our users may have updated their data
                 # themselves and we have no record of that.
