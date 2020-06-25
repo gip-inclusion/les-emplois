@@ -318,6 +318,13 @@ API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 API_INSEE_KEY = os.environ["API_INSEE_KEY"]
 API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
 
+# API Entreprise
+# https://doc.entreprise.api.gouv.fr/
+API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
+API_ENTREPRISE_CONTEXT = "inclusion.beta.gouv.fr"
+API_ENTREPRISE_RECIPIENT = os.environ["API_ENTREPRISE_RECIPIENT"]
+API_ENTREPRISE_TOKEN = os.environ["API_ENTREPRISE_TOKEN"]
+
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
 API_ESD_KEY = os.environ["API_ESD_KEY"]
