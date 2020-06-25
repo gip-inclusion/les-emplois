@@ -1,0 +1,59 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+{% load l10n %}
+
+
+{% block title %}{% trans "Test SIRET" %}{% endblock %}
+
+{% block content %}
+
+    <h1>{% trans "Test SIRET API Entreprise" %}</h1>
+
+    <form method="get" action="">
+
+        <div class="form-group form-group-required">
+            <label for="id_login">SIRET</label>
+            <input class="form-control"  type="text" pattern="[0-9]{14}" value="{{ siret|default:'' }}" name="siret" required>
+        </div>
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% trans "Tester" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+    {% if etablissement %}
+
+        <br>
+
+        <div class="alert alert-secondary" role="alert">
+
+            <h2>{{ etablissement.name }}</h2>
+
+            {% with etablissement.address as address %}
+                <p>
+                    {{ address.address_line_1 }}<br>
+                    {% if address.address_line_2 %}{{ address.address_line_2 }}<br>{% endif %}
+                    {{ address.post_code }} {{ address.city }}<br>
+                </p>
+            {% endwith %}
+
+            {% if coords %}
+                <p>
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ coords.y|unlocalize }},{{ coords.x|unlocalize }}" rel="noopener" target="_blank">Voir la geoloc</a>
+
+                </p>
+            {% endif %}
+
+        </div>
+
+        <p><code>Résultat brut de l'API :</code></p>
+        <pre>
+            {{ etablissement.data|pprint }}
+        </pre>
+
+    {% endif %}
+
+
+{% endblock %}
