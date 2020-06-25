@@ -319,6 +319,9 @@ API_INSEE_KEY = os.environ["API_INSEE_KEY"]
 API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
 
 # API Entreprise
+# Dashboard (login is done with api.gouv.fr credentials):
+# https://dashboard.entreprise.api.gouv.fr/login
+# Doc:
 # https://doc.entreprise.api.gouv.fr/
 API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
 API_ENTREPRISE_CONTEXT = "inclusion.beta.gouv.fr"
