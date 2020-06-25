@@ -10,37 +10,46 @@ from itou.utils.address.departments import department_from_postcode
 logger = logging.getLogger(__name__)
 
 
-def etablissements(siret, object="Inscription à la Plateforme de l'inclusion"):
+class Etablissement:
     """
     https://doc.entreprise.api.gouv.fr/?json#etablissements-v2
     """
 
-    api_url = f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}"
+    def __init__(self, siret, object="Inscription à la Plateforme de l'inclusion"):
 
-    args = {
-        "recipient": settings.API_ENTREPRISE_RECIPIENT,
-        "context": settings.API_ENTREPRISE_CONTEXT,
-        "object": object,
-    }
-    query_string = urlencode(args)
+        api_url = f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}"
 
-    headers = {"Authorization": f"Bearer {settings.API_ENTREPRISE_TOKEN}"}
+        args = {
+            "recipient": settings.API_ENTREPRISE_RECIPIENT,
+            "context": settings.API_ENTREPRISE_CONTEXT,
+            "object": object,
+        }
+        query_string = urlencode(args)
 
-    url = f"{api_url}?{query_string}"
+        headers = {"Authorization": f"Bearer {settings.API_ENTREPRISE_TOKEN}"}
 
-    try:
-        r = requests.get(url, headers=headers)
-    except requests.exceptions.RequestException as e:
-        logger.error("Error while fetching `%s`: %s", url, e)
-        return None
+        url = f"{api_url}?{query_string}"
 
-    response = r.json()
+        try:
+            r = requests.get(url, headers=headers)
+        except requests.exceptions.RequestException as e:
+            logger.error("Error while fetching `%s`: %s", url, e)
+            return None
 
-    return {
-        "name": response["etablissement"]["adresse"]["l1"],
-        "address_line_1": response["etablissement"]["adresse"]["l4"],
-        "address_line_2": response["etablissement"]["adresse"]["l3"],
-        "post_code": response["etablissement"]["adresse"]["code_postal"],
-        "city": response["etablissement"]["adresse"]["localite"],
-        "department": department_from_postcode(post_code),
-    }
+        self.data = r.json()
+
+    @property
+    def name(self):
+        return self.data["etablissement"]["adresse"]["l1"]
+
+    @property
+    def address(self):
+        post_code = self.data["etablissement"]["adresse"]["code_postal"]
+        department = department_from_postcode(post_code)
+        return {
+            "address_line_1": self.data["etablissement"]["adresse"]["l4"],
+            "address_line_2": self.data["etablissement"]["adresse"]["l3"],
+            "post_code": post_code,
+            "city": self.data["etablissement"]["adresse"]["localite"],
+            "department": department,
+        }
