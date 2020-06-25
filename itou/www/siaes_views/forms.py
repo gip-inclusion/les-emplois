@@ -2,6 +2,7 @@ from django import forms
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
+from django.utils import timezone
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
@@ -172,3 +173,23 @@ class EditSiaeForm(forms.ModelForm):
             siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
             siae.save()
         return siae
+
+
+
+class BlockJobApplicationsForm(forms.ModelForm):
+    class Meta:
+        model = Siae
+        fields = ["block_job_applications"]
+        labels = {"block_job_applications": gettext_lazy("Ne plus recevoir de nouvelles candidatures")}
+
+    def save(self, commit=True):
+        siae = super().save(commit=commit)
+        block_job_applications = self.cleaned_data["block_job_applications"]
+
+        if commit:
+            if block_job_applications:
+                siae.job_applications_blocked_at = timezone.now()
+            siae.block_job_applications = block_job_applications
+            siae.save()
+        return siae
+
