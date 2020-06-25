@@ -10,7 +10,7 @@ from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import CreateSiaeForm, EditSiaeForm, BlockJobApplicationsForm
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
 
 
 def card(request, siae_id, template_name="siaes/card.html"):

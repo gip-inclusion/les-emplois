@@ -5,19 +5,19 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('siaes', '0022_auto_20200331_1729'),
-    ]
+    dependencies = [("siaes", "0022_auto_20200331_1729")]
 
     operations = [
         migrations.AddField(
-            model_name='siae',
-            name='block_job_applications',
-            field=models.BooleanField(default=False, verbose_name='Blocage des candidatures'),
+            model_name="siae",
+            name="block_job_applications",
+            field=models.BooleanField(default=False, verbose_name="Blocage des candidatures"),
         ),
         migrations.AddField(
-            model_name='siae',
-            name='job_applications_blocked_at',
-            field=models.DateTimeField(blank=True, null=True, verbose_name="Date d'effet du dernier blocage de candidatures"),
+            model_name="siae",
+            name="job_applications_blocked_at",
+            field=models.DateTimeField(
+                blank=True, null=True, verbose_name="Date d'effet du dernier blocage de candidatures"
+            ),
         ),
     ]

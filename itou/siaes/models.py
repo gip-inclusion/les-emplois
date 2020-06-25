@@ -155,7 +155,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     # Ability to block new job applications
     block_job_applications = models.BooleanField(verbose_name=_("Blocage des candidatures"), default=False)
-    job_applications_blocked_at = models.DateTimeField(verbose_name=_("Date d'effet du dernier blocage de candidatures"), blank=True, null=True)
+    job_applications_blocked_at = models.DateTimeField(
+        verbose_name=_("Date d'effet du dernier blocage de candidatures"), blank=True, null=True
+    )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
 

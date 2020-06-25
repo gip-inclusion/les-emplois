@@ -78,7 +78,7 @@
                                 de votre lieu de recherche
                             {% endblocktrans %}
                         </p>
-                        {% if siae.job_description_through.exists %}
+                        {% if siae.job_description_through.exists and not siae.block_job_applications %}
                             <h6 class="border-bottom border-gray pb-2">{% trans "Métiers proposés" %}</h6>
                             <ul class="mb-0">
                             {% for job in siae.job_description_through.all %}
@@ -94,15 +94,24 @@
 
                     <div class="card-footer">
                         {% if siae.num_active_members %}
+                          {% if siae.block_job_applications %}
+                            <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                            </a>
+                            <small>{% trans "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
+                          {% else %}
                             <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
                                 {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                             </a>
+                            {% endif %}
                         {% else %}
                             <a class="btn btn-sm btn-outline-secondary disabled" href="">
                                 {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                             </a>
                             <small>{% trans "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
                         {% endif %}
+
+
                     </div>
 
                 </div>

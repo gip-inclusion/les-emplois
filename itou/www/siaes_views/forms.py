@@ -1,8 +1,8 @@
 from django import forms
 from django.conf import settings
+from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
-from django.utils import timezone
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
@@ -175,8 +175,11 @@ class EditSiaeForm(forms.ModelForm):
         return siae
 
 
-
 class BlockJobApplicationsForm(forms.ModelForm):
+    """
+    Toggle blocking new job applications for this SIAE (used in dashboard settings)
+    """
+
     class Meta:
         model = Siae
         fields = ["block_job_applications"]
@@ -192,4 +195,3 @@ class BlockJobApplicationsForm(forms.ModelForm):
             siae.block_job_applications = block_job_applications
             siae.save()
         return siae
-
