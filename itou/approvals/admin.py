@@ -113,13 +113,14 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "first_name",
         "last_name",
         "birth_name",
+        "birthdate",
         "start_at",
         "end_at",
         "is_valid",
     )
     search_fields = ("pole_emploi_id", "number", "first_name", "last_name", "birth_name")
     list_filter = (IsValidFilter,)
-    date_hierarchy = "start_at"
+    date_hierarchy = "birthdate"
 
     def is_valid(self, obj):
         return obj.is_valid
