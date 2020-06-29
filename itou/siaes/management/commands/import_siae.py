@@ -27,6 +27,7 @@ from itou.siaes.management.commands.import_deleted_siae import (
     DEPARTMENTS_TO_OPEN_ON_20_04_2020,
     DEPARTMENTS_TO_OPEN_ON_22_06_2020,
     DEPARTMENTS_TO_OPEN_ON_27_04_2020,
+    DEPARTMENTS_TO_OPEN_ON_29_06_2020,
 )
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
@@ -48,6 +49,7 @@ SIAE_CREATION_ALLOWED_DEPARTMENTS = (
     + DEPARTMENTS_TO_OPEN_ON_20_04_2020
     + DEPARTMENTS_TO_OPEN_ON_27_04_2020
     + DEPARTMENTS_TO_OPEN_ON_22_06_2020
+    + DEPARTMENTS_TO_OPEN_ON_29_06_2020
 )
 
 EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
