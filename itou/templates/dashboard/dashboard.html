@@ -241,9 +241,13 @@
                     <p class="card-text">
                     {% include "includes/icon.html" with icon="settings" %}
                     <a href="{% url "siaes_views:block_job_applications" %}">
-                        {% trans "Bloquer les nouvelles candidatures "%}
+                        {% if current_siae.block_job_applications %}
+                            {% trans "Recevoir les nouvelles candidatures "%}
+                        {% else %}
+                            {% trans "Bloquer les nouvelles candidatures "%}
+                        {% endif%}
                     </a>
-                    <span class="badge badge-primary">{% trans "Nouveau" %}</span>
+                    <span class="badge badge-info">{% trans "Nouveau" %}</span>
                     </p>
 
                 </div>
