@@ -30,7 +30,7 @@
     {% endif %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{{ prev_url }}">{% trans "Annuler" %}</a>
+        <a class="btn btn-secondary" href="{% url "dashboard:index" %}">{% trans "Annuler" %}</a>
         <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
     {% endbuttons %}
 
