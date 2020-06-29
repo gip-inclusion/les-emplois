@@ -29,7 +29,7 @@ DEPARTMENTS_TO_OPEN_ON_29_06_2020 = ["01", "03", "07", "15", "26", "38", "42", "
 DEPARTMENTS_TO_OPEN_ON_06_07_2020 = ["2A", "2B", "04", "05", "06", "13", "83", "84"]
 
 # Carefully pick your choice.
-DEPARTMENTS_TO_OPEN = DEPARTMENTS_TO_OPEN_ON_22_06_2020
+DEPARTMENTS_TO_OPEN = DEPARTMENTS_TO_OPEN_ON_29_06_2020
 
 
 class Command(BaseCommand):
@@ -104,7 +104,9 @@ class Command(BaseCommand):
                 if siae.department not in DEPARTMENTS_TO_OPEN:
                     continue
 
-                assert not Siae.objects.filter(siret=siae.siret, kind=siae.kind).exists()
+                if Siae.objects.filter(siret=siae.siret, kind=siae.kind).exists():
+                    self.stdout.write(f"siae siret={siae.siret} kind={siae.kind} already exists (will be ignored)")
+                    continue
 
                 total_new_siaes += 1
 
