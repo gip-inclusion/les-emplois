@@ -160,7 +160,7 @@ def block_job_applications(request, template_name="siaes/block_job_applications.
 
     form = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
 
-    if request.method == "POST":
+    if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, _("Mise à jour du blocage des candidatures effectuée !"))
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
