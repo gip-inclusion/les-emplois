@@ -56,7 +56,7 @@ def start(request, siae_pk):
     if request.user.is_siae_staff and not siae.has_member(request.user):
         raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
 
-    if siae.block_job_applications:
+    if siae.block_job_applications and not siae.has_member(request.user):
         raise Http404(_("Cette organisation n'accepte plus de candidatures pour le moment."))
 
     # Start a fresh session.

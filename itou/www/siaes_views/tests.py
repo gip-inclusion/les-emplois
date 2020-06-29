@@ -437,7 +437,7 @@ class MembersTest(TestCase):
 
 
 class BlockJobApplicationsTest(TestCase):
-    def test_block_driect_job_application(self):
+    def test_block_direct_job_application(self):
         """
         Check if user is trying to get to job application directly via URL
         """
@@ -450,6 +450,13 @@ class BlockJobApplicationsTest(TestCase):
         url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
+
+        # Check for member of the SIAE: should pass
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
 
     def test_toggle_blocking(self):
         """Testing enabling / disabling job applications blocking and checking results"""
