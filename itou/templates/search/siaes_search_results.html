@@ -93,24 +93,21 @@
                     </div>
 
                     <div class="card-footer">
-                        {% if siae.num_active_members %}
-                          {% if siae.block_job_applications %}
-                            <a class="btn btn-sm btn-outline-secondary disabled" href="">
-                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                            </a>
-                            <small>{% trans "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
-                          {% else %}
-                            <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-                            </a>
-                            {% endif %}
-                        {% else %}
+                        {% if not siae.num_active_members %}
                             <a class="btn btn-sm btn-outline-secondary disabled" href="">
                                 {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                             </a>
                             <small>{% trans "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
+                        {% elif siae.block_job_applications %}
+                            <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                            </a>
+                            <small>{% trans "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
+                        {% else %}
+                            <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                            </a>
                         {% endif %}
-
 
                     </div>
 

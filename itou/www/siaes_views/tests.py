@@ -441,9 +441,7 @@ class BlockJobApplicationsTest(TestCase):
         """
         Check if user is trying to get to job application directly via URL
         """
-        siae = SiaeWithMembershipAndJobsFactory()
-        siae.block_job_applications = True
-        siae.save()
+        siae = SiaeWithMembershipAndJobsFactory(block_job_applications=True)
 
         user = JobSeekerFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -460,12 +458,9 @@ class BlockJobApplicationsTest(TestCase):
 
     def test_toggle_blocking(self):
         """Testing enabling / disabling job applications blocking and checking results"""
-        siae = SiaeWithMembershipFactory()
 
         # Avoid errors in validation of the SIAE
-        siae.department = "67"
-        siae.post_code = "67020"
-        siae.save()
+        siae = SiaeWithMembershipFactory(department="67", post_code="67020")
 
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
