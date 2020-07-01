@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -55,6 +55,10 @@ def start(request, siae_pk):
 
     if request.user.is_siae_staff and not siae.has_member(request.user):
         raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
+
+    # Refuse all applications except those issued by the SIAE
+    if siae.block_job_applications and not siae.has_member(request.user):
+        raise Http404(_("Cette organisation n'accepte plus de candidatures pour le moment."))
 
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
