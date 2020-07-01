@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 from django.utils.translation import gettext as _, ngettext as __
 
-from itou.invitations.models import Invitation, SiaeStaffInvitation
+from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.invitations_views.forms import NewSiaeStaffInvitationFormSet, NewUserForm
@@ -17,7 +17,7 @@ from itou.www.invitations_views.forms import NewSiaeStaffInvitationFormSet, NewU
 
 def new_user(request, invitation_type, invitation_id, template_name="invitations_views/new_user.html"):
 
-    invitation_type = Invitation.get_model_from_string(invitation_type)
+    invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_type, pk=invitation_id)
     context = {"invitation": invitation}
     next_step = None

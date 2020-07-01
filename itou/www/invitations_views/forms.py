@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.forms.models import modelformset_factory
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.invitations.models import Invitation, SiaeStaffInvitation
+from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
 
 
 class NewInvitationMixinForm(forms.ModelForm):
@@ -15,7 +15,7 @@ class NewInvitationMixinForm(forms.ModelForm):
     """
 
     class Meta:
-        model = Invitation
+        model = InvitationAbstract
         fields = ["first_name", "last_name", "email"]
 
     def __init__(self, sender, *args, **kwargs):

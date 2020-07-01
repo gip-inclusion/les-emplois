@@ -27,7 +27,9 @@ class SentInvitationFactory(InvitationFactory):
 
 class ExpiredInvitationFactory(SentInvitationFactory):
     sent_at = factory.LazyAttribute(
-        lambda self: timezone.now() - relativedelta(days=models.Invitation.EXPIRATION_DAYS) - relativedelta(days=1)
+        lambda self: timezone.now()
+        - relativedelta(days=models.InvitationAbstract.EXPIRATION_DAYS)
+        - relativedelta(days=1)
     )
 
 

@@ -7,7 +7,7 @@ from itou.invitations.factories import (
     SentInvitationFactory,
     SiaeSentInvitationFactory,
 )
-from itou.invitations.models import Invitation, SiaeStaffInvitation
+from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
 from itou.users.factories import UserFactory
 
 
@@ -46,14 +46,14 @@ class InvitationModelTest(TestCase):
         self.assertFalse(invitation.has_expired)
 
     def test_get_model_from_string(self):
-        invitation_type = Invitation.get_model_from_string("siae_staff")
+        invitation_type = InvitationAbstract.get_model_from_string("siae_staff")
         self.assertEqual(invitation_type, SiaeStaffInvitation)
 
         with self.assertRaises(TypeError):
-            Invitation.get_model_from_string("wrong_type")
+            InvitationAbstract.get_model_from_string("wrong_type")
 
         with self.assertRaises(TypeError):
-            Invitation.get_model_from_string(12)
+            InvitationAbstract.get_model_from_string(12)
 
 
 class InvitationEmailsTest(TestCase):

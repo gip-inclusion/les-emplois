@@ -18,7 +18,7 @@ from itou.utils.urls import get_absolute_url
 logger = logging.getLogger(__name__)
 
 
-class Invitation(models.Model):
+class InvitationAbstract(models.Model):
     # String representing the account type to use when logging in.
     # f"reverse("account_login")?account_type={account_type}"
     SIGNIN_ACCOUNT_TYPE = None
@@ -129,7 +129,7 @@ class Invitation(models.Model):
         raise NotImplementedError
 
 
-class SiaeStaffInvitation(Invitation):
+class SiaeStaffInvitation(InvitationAbstract):
     SIGNIN_ACCOUNT_TYPE = "siae"
     siae = models.ForeignKey("siaes.Siae", on_delete=models.CASCADE, related_name="invitations")
 
