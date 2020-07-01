@@ -146,8 +146,9 @@ def members(request, template_name="siaes/members.html"):
     siae = get_current_siae_or_404(request)
 
     members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
+    pending_invitations = siae.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    context = {"siae": siae, "members": members}
+    context = {"siae": siae, "members": members, "pending_invitations": pending_invitations}
     return render(request, template_name, context)
 
 

@@ -6,21 +6,11 @@
 
 {% block content %}
 
-    {% if invitation.has_expired %}
-        <h1>{% trans "Invitation expirée" %}</h1>
-        {% blocktrans %}
-            <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
-        {% endblocktrans %}
-    {% elif invitation.accepted %}
-        <h1>{% trans "Invitation acceptée" %}</h1>
-        {% blocktrans %}
-            <p>Cette invitation a déjà été acceptée.</p>
-        {% endblocktrans %}
-    {% endif %}
+    {% include "invitations_views/includes/invitation_errors.html" with invitation=invitation %}
 
     {% if form %}
         <h1>{% trans "Bienvenue !" %}</h1>
-        <form method="post" action="{% url 'invitations_views:accept' invitation_id=invitation.pk %}" role="form" class="js-prevent-multiple-submit">
+        <form method="post" action="{{ invitation.acceptance_link }}" role="form" class="js-prevent-multiple-submit">
 
             {% csrf_token %}
 
