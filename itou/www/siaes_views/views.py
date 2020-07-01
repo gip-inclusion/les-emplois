@@ -10,7 +10,7 @@ from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import CreateSiaeForm, EditSiaeForm
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
@@ -148,4 +148,23 @@ def members(request, template_name="siaes/members.html"):
     members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
 
     context = {"siae": siae, "members": members}
+    return render(request, template_name, context)
+
+
+@login_required
+def block_job_applications(request, template_name="siaes/block_job_applications.html"):
+    """
+    Settings: block job applications for given SIAE
+    """
+    siae = get_current_siae_or_404(request)
+
+    form = BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("Mise à jour du blocage des candidatures effectuée !"))
+        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+
+    context = {"siae": siae, "form": form}
+
     return render(request, template_name, context)

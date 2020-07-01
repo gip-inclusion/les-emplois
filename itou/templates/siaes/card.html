@@ -61,29 +61,36 @@
 
     {% endif %}
 
-    {% if siae.job_description_through.exists %}
-        <hr>
-        <p class="mb-2">
-            {% include "includes/icon.html" with icon="briefcase" %}
-            {% trans "Métiers proposés" %}
-        </p>
-        <ul>
-        {% for job in siae.job_description_through.all %}
-            <li>
-                <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans job.display_name %}</a>
-            </li>
-        {% endfor %}
-        </ul>
+    {% if siae.block_job_applications %}
+    <div class="alert alert-warning">
+        {% trans "Cet employeur ne traite plus de nouvelles candidatures pour le moment" %}
+    </div>
+    {% else %}
+        {% if iae.job_description_through.exists %}
+            <hr>
+            <p class="mb-2">
+                {% include "includes/icon.html" with icon="briefcase" %}
+                {% trans "Métiers proposés" %}
+            </p>
+            <ul>
+            {% for job in siae.job_description_through.all %}
+                <li>
+                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans job.display_name %}</a>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if siae.has_members %}
+            <hr>
+            <p>
+                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                    {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                </a>
+            </p>
+        {% endif %}
     {% endif %}
 
-    {% if siae.has_members %}
-        <hr>
-        <p>
-            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
-            </a>
-        </p>
-    {% endif %}
 
     {% if back_url %}
         <hr>

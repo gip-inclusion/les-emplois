@@ -238,6 +238,18 @@
                             {% endif %}
                         </a>
                     </p>
+                    <p class="card-text">
+                    {% include "includes/icon.html" with icon="settings" %}
+                    <a href="{% url "siaes_views:block_job_applications" %}">
+                        {% if current_siae.block_job_applications %}
+                            {% trans "Recevoir de nouvelles candidatures "%}
+                        {% else %}
+                            {% trans "Bloquer les nouvelles candidatures "%}
+                        {% endif%}
+                    </a>
+                    <span class="badge badge-info">{% trans "Nouveau" %}</span>
+                    </p>
+
                 </div>
             </div>
         {% endif %}
