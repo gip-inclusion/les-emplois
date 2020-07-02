@@ -1,29 +1,38 @@
 from allauth.account.adapter import DefaultAccountAdapter
-from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.shortcuts import redirect, render
-from django.utils import timezone
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, redirect, render, reverse
+from django.utils import formats, safestring
 from django.utils.translation import gettext as _, ngettext as __
 
-from itou.invitations.models import Invitation
-from itou.www.invitations_views.forms import InvitationFormSet, NewUserForm
+from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
+from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.urls import get_safe_url
+from itou.www.invitations_views.forms import NewSiaeStaffInvitationFormSet, NewUserForm
 
 
-def accept(request, invitation_id, template_name="invitations_views/accept.html"):
-    if request.user.is_authenticated:
-        messages.error(request, _("Merci de vous déconnecter avant d'accepter cette invitation."))
-        return redirect("account_logout")
+def new_user(request, invitation_type, invitation_id, template_name="invitations_views/new_user.html"):
 
-    try:
-        invitation = Invitation.objects.get(pk=invitation_id)
-    except Invitation.DoesNotExist:
-        raise Http404(_("Aucune invitation n'a été trouvée."))
-
+    invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
+    invitation = get_object_or_404(invitation_type, pk=invitation_id)
     context = {"invitation": invitation}
     next_step = None
+
+    if request.user.is_authenticated:
+        if not request.user.email == invitation.email:
+            message = (
+                "Un utilisateur précédent est déjà connecté.<br>"
+                "Veuillez déconnecter ce compte en cliquant sur le bouton ci-dessous "
+                "(ne tenez pas compte de la page d'accueil qui se chargera automatiquement) "
+                "puis cliquez de nouveau sur le lien envoyé par e-mail pour accepter votre invitation."
+            )
+            message = safestring.mark_safe(message)
+            messages.error(request, _(message))
+            return redirect("account_logout")
 
     if invitation.can_be_accepted:
         user = get_user_model().objects.filter(email=invitation.email)
@@ -32,34 +41,67 @@ def accept(request, invitation_id, template_name="invitations_views/accept.html"
             context["form"] = form
             if form.is_valid():
                 user = form.save(request)
-                invitation.accept()
                 DefaultAccountAdapter().login(request, user)
-                next_step = redirect("dashboard:index")
+                next_step = redirect(get_safe_url(request, "redirect_to"))
         else:
-            messages.error(request, _("Vous comptez déjà parmi les membres de notre site."))
+            next_step = "{}?account_type={}&next={}".format(
+                reverse("account_login"), invitation.SIGNIN_ACCOUNT_TYPE, get_safe_url(request, "redirect_to")
+            )
+            next_step = redirect(next_step)
 
     return next_step or render(request, template_name, context=context)
 
 
 @login_required
-def create(request, template_name="invitations_views/create.html"):
-    form_kwargs = {"sender": request.user}
-    formset = InvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
-    expiration_date = timezone.now() + relativedelta(days=Invitation.EXPIRATION_DAYS)
+def join_siae(request, invitation_id, template_name="invitations_views/join_siae.html"):
+    invitation = get_object_or_404(SiaeStaffInvitation, pk=invitation_id)
+    if not invitation.guest_can_join_siae(request):
+        raise PermissionDenied()
 
+    if invitation.can_be_accepted:
+        invitation.add_invited_user_to_siae()
+        invitation.accept()
+        messages.success(request, _(f"Vous êtes désormais membre de l'organisation {invitation.siae.display_name}."))
+    else:
+        messages.error(request, _("Cette invitation n'est plus valide."))
+
+    request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = invitation.siae.pk
+    return redirect("dashboard:index")
+
+
+@login_required
+def invite_siae_staff(request, template_name="invitations_views/create.html"):
+    siae = get_current_siae_or_404(request)
+    form_kwargs = {"sender": request.user, "siae": siae}
+    formset = NewSiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
-            formset.save()
+            invitations = formset.save()
             count = len(formset.forms)
 
-            message = __("Invitation envoyée avec succès.", "Invitations envoyées avec succès.", count) % {
-                "count": count
-            }
+            message_singular = (
+                "Votre invitation a été envoyée par e-mail.<br>"
+                "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
+                "sur le lien de validation reçu dans le courriel.<br>"
+            )
+
+            message_plural = (
+                "Vos invitations ont été envoyées par e-mail.<br>"
+                "Pour rejoindre votre organisation, vos invités peuvent désormais "
+                "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
+            )
+
+            message = __(message_singular, message_plural, count) % {"count": count}
+            expiration_date = formats.date_format(invitations[0].expiration_date)
+            message += _(f"Le lien de validation est valable jusqu'au {expiration_date}.")
+            message = safestring.mark_safe(message)
 
             messages.success(request, message)
-            formset = InvitationFormSet(form_kwargs=form_kwargs)
+            formset = NewSiaeStaffInvitationFormSet(form_kwargs=form_kwargs)
+            return redirect(request.path)
 
-    pending_invitations = request.user.invitations.filter(accepted=False)
-    context = {"formset": formset, "expiration_date": expiration_date, "pending_invitations": pending_invitations}
+    form_post_url = reverse("invitations_views:invite_siae_staff")
+    back_url = reverse("siaes_views:members")
+    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset}
 
     return render(request, template_name, context)

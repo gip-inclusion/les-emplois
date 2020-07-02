@@ -6,9 +6,39 @@
 {% block title %}{% trans "Invitation" %}{{ block.super }}{% endblock %}
 
 {% block content %}
+    <h1>{% trans "Envoyer une invitation"%}</h1>
+    {% blocktrans %}
+        <div class="alert alert-info my-3" role="alert">
+            <p class="mb-0">Une fois vos invitations envoyées, vos invités recevront un e-mail contenant un lien de validation.</p>
+        </div>
+    {% endblocktrans %}
+
+    <form method="post" action="{{ form_post_url }}" class="js-prevent-multiple-submit my-3">
+        {% csrf_token %}
+
+        {{ formset.management_form }}
+
+        {% for form in formset %}
+            {% bootstrap_form_errors form type="non_field_errors" %}
+            <div class="inline-form-row row align-items-top mt-4">
+                {% bootstrap_form form show_label=False form_group_class="col-md mt-2 inline-col" %}
+            </div>
+        {% endfor %}
+
+        <button type="button" class="btn mt-2 mb-3 pl-0 btn-link add-form-row">
+            {% include "includes/icon.html" with icon="user-plus" class="mr-2" %}
+            {% trans "Ajouter un autre collaborateur" %}
+        </button>
+
+        {% buttons %}
+            <a class="btn btn-secondary my-3" href="{{ back_url }}">{% trans "Retour" %}</a>
+            <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
+        {% endbuttons %}
+    </form>
+
 
     {% if pending_invitations %}
-        <h1 class="mb-3">{% trans "Invitations en attente" %}</h1>
+        <h1 class="mt-5">{% trans "Invitations en attente" %}</h1>
         <div class="table-responsive">
             <table class="table table-striped">
               <thead>
@@ -33,42 +63,14 @@
         </div>
     {% endif %}
 
-    <h1 class="mt-5">{% trans "Envoyer une invitation"%}</h1>
-    {% blocktrans with date=expiration_date|date %}
-        <div class="alert alert-info my-3" role="alert">
-            <p class="mb-0">Vos invités recevront un e-mail qui leur permettra de rejoindre la Plateforme de l'inclusion.</p>
-            <p class="mb-0">Ces invitations resteront valides jusqu'au {{ date }}.</p>
-        </div>
-    {% endblocktrans %}
-
-    <form method="post" action="{% url 'invitations_views:create' %}" class="js-prevent-multiple-submit my-3">
-        {% csrf_token %}
-
-        {{ formset.management_form }}
-
-        {% for form in formset %}
-            {% bootstrap_form_errors form type="non_field_errors" %}
-            <div class="inline-form-row row align-items-top mt-4">
-                {% bootstrap_form form show_label=False form_group_class="col-md mt-2 inline-col" %}
-            </div>
-        {% endfor %}
-
-        <button type="button" class="btn mt-2 mb-3 pl-0 btn-link add-form-row">
-            {% include "includes/icon.html" with icon="user-plus" class="mr-2" %}
-            {% trans "Ajouter un invité" %}
-        </button>
-
-        {% buttons %}
-            <a class="btn btn-secondary my-3" href="{% url 'siaes_views:members' %}">{% trans "Retour" %}</a>
-            <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
-        {% endbuttons %}
-    </form>
-
 {% endblock %}
 
 {% block script %}
     <script src="{% static 'js/formset_add_remove_row.js' %}"></script>
     <script type='text/javascript'>
+        $(document).ready(function(){
+            addRemoveButton(".inline-form-row", ".inline-col", "form");
+        });
         $(document).on('click', '.add-form-row', function(e){
             e.preventDefault();
             cloneMore('.inline-form-row:last', 'form');

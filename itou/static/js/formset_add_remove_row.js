@@ -32,13 +32,26 @@ function updateElementIndex(el, prefix, ndx) {
     if (el.id) el.id = el.id.replace(id_regex, replacement);
     if (el.name) el.name = el.name.replace(id_regex, replacement);
 }
+
+function addRemoveButton(selector, col_selector, prefix) {
+    let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
+    if (total > 1) {
+        const deletebutton = `<div class="inline-col col-md-1 remove-form-row">
+            <button type="button" class="btn-outline-danger btn mt-2 w-100">X</button>
+        </div>`;
+        $(selector).find(`${col_selector}:last`).after(deletebutton);
+    }
+}
+
 function cloneMore(selector, prefix) {
     const newElement = $(selector).clone(true);
     let total = $(`#id_${prefix}-TOTAL_FORMS`).val();
+    newElement.removeClass('is-invalid');
     newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
         const name = $(this).attr('name').replace(`-${(total-1)}-`, `-${total}-`);
         const id = `id_${name}`;
         $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+        $(this).removeClass('is-invalid');
     });
     newElement.find('label').each(function() {
         let forValue = $(this).attr('for');

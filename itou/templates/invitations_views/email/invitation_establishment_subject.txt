@@ -1,0 +1,9 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% load i18n %}
+{% block subject %}
+
+{% blocktrans with first_name=sender.first_name|capfirst last_name=sender.last_name|capfirst org_name=org.display_name %}
+{{ first_name }} {{ last_name }} vous a invité(e) à rejoindre l'organisation {{ org_name }} sur la Plateforme de l'inclusion.
+{% endblocktrans %}
+
+{% endblock %}
