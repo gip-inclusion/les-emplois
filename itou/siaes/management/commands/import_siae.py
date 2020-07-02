@@ -125,6 +125,16 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
 MAIN_DF = get_main_df()
 
 
+def get_siret_to_external_id():
+    siret_to_external_id = {}
+    for index, row in MAIN_DF.iterrows():
+        siret_to_external_id[row.siret] = row.external_id
+    return siret_to_external_id
+
+
+SIRET_TO_EXTERNAL_ID = get_siret_to_external_id()
+
+
 def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     """
     The secondary dataset is called "Liste correspondants techniques" by the ASP
@@ -239,7 +249,17 @@ class Command(BaseCommand):
         auth_email = auth_emails[0]
         return auth_email
 
+    def fix_missing_external_ids(self, dry_run):
+        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
+            if siae.siret in SIRET_TO_EXTERNAL_ID:
+                external_id = SIRET_TO_EXTERNAL_ID[siae.siret]
+                self.log(f"siae.id={siae.id} will be assigned external_id={external_id}")
+                if not dry_run:
+                    siae.external_id = external_id
+                    siae.save()
+
     def update_existing_siaes(self, dry_run):
+        self.fix_missing_external_ids(dry_run)
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
             if row:
