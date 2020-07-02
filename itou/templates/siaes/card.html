@@ -62,11 +62,14 @@
     {% endif %}
 
     {% if siae.block_job_applications %}
-    <div class="alert alert-warning">
-        {% trans "Cet employeur ne traite plus de nouvelles candidatures pour le moment" %}
-    </div>
+
+        <div class="alert alert-warning">
+            {% trans "Cet employeur ne traite plus de nouvelles candidatures pour le moment" %}
+        </div>
+
     {% else %}
-        {% if iae.job_description_through.exists %}
+
+        {% if siae.job_description_through.exists %}
             <hr>
             <p class="mb-2">
                 {% include "includes/icon.html" with icon="briefcase" %}
@@ -89,8 +92,8 @@
                 </a>
             </p>
         {% endif %}
-    {% endif %}
 
+    {% endif %}
 
     {% if back_url %}
         <hr>
