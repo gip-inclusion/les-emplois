@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 from django.utils.translation import gettext as _, ngettext as __
