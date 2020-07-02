@@ -9,11 +9,6 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.address.departments import DEPARTMENTS, department_from_postcode
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-CSV_FILE = f"{CURRENT_DIR}/data/pole_emploi_agencies.csv"
-
-
 class Command(BaseCommand):
     """
     Import Pole emploi agencies (prescriber organizations) data into
@@ -21,16 +16,17 @@ class Command(BaseCommand):
     This command is meant to be used before any fixture is available.
 
     To debug:
-        django-admin import_pole_emploi_agencies --dry-run
-        django-admin import_pole_emploi_agencies --dry-run --verbosity=2
+        django-admin import_pole_emploi_agencies --dry-run path_to_file.csv
+        django-admin import_pole_emploi_agencies --dry-run --verbosity=2 path_to_file.csv
 
     To populate the database:
-        django-admin import_pole_emploi_agencies
+        django-admin import_pole_emploi_agencies path_to_file.csv
     """
 
     help = "Import the content of the prescriber organizations csv file into the database."
 
     def add_arguments(self, parser):
+        parser.add_argument("path_to_file", type=str)
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
@@ -47,12 +43,11 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, dry_run=False, path_to_file=None, **options):
 
         self.set_logger(options.get("verbosity"))
 
-        with open(CSV_FILE) as csvfile:
-
+        with open(path_to_file) as csvfile:
             # Count lines in CSV.
             reader = csv.reader(csvfile, delimiter=",")
             row_count = sum(1 for row in reader)
@@ -71,23 +66,33 @@ class Command(BaseCommand):
                     self.stdout.write(f"Creating prescriber organizations… {progress}%")
                     last_progress = progress
 
-                self.logger.debug("-" * 80)
-
-                name = f"POLE EMPLOI - {row[1].strip().upper()}"
-                self.logger.debug(name)
-
-                code_safir = row[2].strip()
+                # SAFIR code is mandatory for security reasons
+                code_safir = row[0].strip()
+                if not code_safir:
+                    self.stdout.write(f"No SAFIR code provided for line {i}")
+                    continue
                 assert code_safir.isdigit()
                 assert len(code_safir) == 5
+
+                agency_kind = row[1].strip()
+                name = row[2].strip()
+                address_line_1 = row[4].strip()
+                address_line_2 = row[3].strip()
+                post_code = row[5].strip()
+                city = row[6].strip()
+
+                self.logger.debug("-" * 80)
+
+                if agency_kind == "APE" or name.upper().startswith("DT"):
+                    name = f"Pôle emploi - {name.upper()}"
+                else:
+                    name = f"Pôle emploi - {agency_kind} {name.upper()}"
+
+                self.logger.debug(name)
                 self.logger.debug(code_safir)
-
-                address_line_1 = row[8].strip()
                 self.logger.debug(address_line_1)
-
-                city = row[10].strip()
+                self.logger.debug(address_line_2)
                 self.logger.debug(city)
-
-                post_code = row[9].strip()
                 self.logger.debug(post_code)
 
                 # See address.utils.departement
@@ -96,26 +101,33 @@ class Command(BaseCommand):
                 self.logger.debug(department)
                 assert department in DEPARTMENTS
 
-                latitude = row[11].strip().replace(",", ".")
-                self.logger.debug(latitude)
+                existing_org = PrescriberOrganization.objects.filter(code_safir_pole_emploi=code_safir)
 
-                longitude = row[12].strip().replace(",", ".")
-                self.logger.debug(longitude)
+                if existing_org.exists():
+                    self.stdout.write(f"Skipping line {i} ({name}) because an organization with")
+                    self.stdout.write(f"the following SAFIR already exists: {code_safir}.")
+                    continue
 
                 if not dry_run:
+                    pe_kind = PrescriberOrganization.Kind.PE
 
-                    PrescriberOrganization.objects.get_or_create(
+                    org, created = PrescriberOrganization.objects.get_or_create(
                         code_safir_pole_emploi=code_safir,
+                        kind=pe_kind,
                         defaults={
                             "is_authorized": True,
                             "name": name,
                             "address_line_1": address_line_1,
+                            "address_line_2": address_line_2,
                             "post_code": post_code,
                             "city": city,
                             "department": department,
-                            "coords": GEOSGeometry(f"POINT({longitude} {latitude})"),
                         },
                     )
+
+                    org.set_coords(address=org.address_line_1, post_code=org.post_code)
+                    org.save()
+                    self.logger.debug("%s created.", org.display_name)
 
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")

@@ -149,9 +149,11 @@ def department_from_postcode(post_code):
     """
     if post_code:
         if post_code.startswith("20"):
-            if post_code.startswith("200") or post_code.startswith("201"):
+            a_post_codes = ("200", "201", "207")
+            b_post_codes = ("202", "204", "206")
+            if post_code.startswith(a_post_codes):
                 department = "2A"
-            elif post_code.startswith("202") or post_code.startswith("206"):
+            elif post_code.startswith(b_post_codes):
                 department = "2B"
         elif post_code.startswith("97") or post_code.startswith("98"):
             department = post_code[:3]
