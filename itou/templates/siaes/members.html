@@ -7,11 +7,7 @@
 
 <div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
     <h1>{% trans "Collaborateurs" %}</h1>
-
     <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
-    <a href="{% url 'invitations_views:invite_siae_staff' %}" class="ml-sm-4 align-self-center">
-        <button class="btn btn-outline-primary mb-1 w-100 w-sm-auto">{% trans "Inviter des collaborateurs" %}</button>
-    </a>
 </div>
 
 <div class="table-responsive">
@@ -36,6 +32,9 @@
         </tbody>
     </table>
 </div>
+<a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
+    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% trans "Inviter des collaborateurs" %}</button>
+</a>
 
 {% if pending_invitations %}
     <h1 class="mt-5 mb-3">{% trans "Invitations en attente" %}</h1>
