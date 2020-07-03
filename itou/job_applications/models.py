@@ -138,6 +138,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_PREVENT_OBJECTIVES = "prevent_objectives"
     REFUSAL_REASON_NO_POSITION = "no_position"
     REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
+    REFUSAL_REASON_DEACTIVATION = "deactivation"
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, _("Candidat non venu ou non joignable")),
@@ -157,6 +158,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ),
         (REFUSAL_REASON_NO_POSITION, _("Pas de poste ouvert en ce moment")),
         (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, _("La date de fin du PASS IAE / agrément est trop proche")),
+        (REFUSAL_REASON_DEACTIVATION, _("La structure n'est plus conventionnée")),
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
@@ -333,6 +335,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def cancellation_delay_end(self):
         return self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+
+    @property
+    def is_refused_due_to_deactivation(self):
+        return (
+            self.state == JobApplicationWorkflow.STATE_REFUSED
+            and self.refusal_reason == self.REFUSAL_REASON_DEACTIVATION
+        )
 
     # Workflow transitions.
 
