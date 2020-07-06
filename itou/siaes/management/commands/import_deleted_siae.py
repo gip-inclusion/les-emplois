@@ -29,7 +29,7 @@ DEPARTMENTS_TO_OPEN_ON_29_06_2020 = ["01", "03", "07", "15", "26", "38", "42", "
 DEPARTMENTS_TO_OPEN_ON_06_07_2020 = ["2A", "2B", "04", "05", "06", "13", "83", "84"]
 
 # Carefully pick your choice.
-DEPARTMENTS_TO_OPEN = DEPARTMENTS_TO_OPEN_ON_29_06_2020
+DEPARTMENTS_TO_OPEN = DEPARTMENTS_TO_OPEN_ON_06_07_2020
 
 
 class Command(BaseCommand):
