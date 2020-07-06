@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase

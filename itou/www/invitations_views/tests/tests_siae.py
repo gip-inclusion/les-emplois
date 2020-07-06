@@ -14,9 +14,11 @@ from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.invitations_views.forms import NewSiaeStaffInvitationForm
 
 
+"""
 #####################################################################
 ############################## Views ################################
 #####################################################################
+"""
 
 
 class TestSendSiaeInvitation(TestCase):
@@ -72,7 +74,7 @@ class TestSendSiaeInvitation(TestCase):
             "form-0-last_name": self.guest.last_name,
             "form-0-email": self.guest.email,
         }
-        response = self.client.post(self.send_invitation_url, data=post_data)
+        self.client.post(self.send_invitation_url, data=post_data)
         invitation_query = self.invitations_model.objects.filter(siae=siae_2)
         self.assertTrue(invitation_query.exists())
         invitation = invitation_query.first()
@@ -267,9 +269,11 @@ class TestAcceptSiaeInvitationExceptions(TestCase):
         self.assertEqual(len(messages), 1)
 
 
+"""
 #####################################################################
 ############################## Forms ################################
 #####################################################################
+"""
 
 
 class TestNewSiaeStaffForm(TestCase):

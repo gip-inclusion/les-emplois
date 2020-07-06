@@ -4,6 +4,26 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2020-07-02
+
+### Ajouté
+- Déploiement - Bourgogne-Franche-Comté (22 Juin)
+- Déploiement - Auvergne-Rhône-Alpes (29 Juin)
+- Import de nouvelles structures en provenance de l'ASP (25 Juin)
+- Messages explicatifs sur l'écran d'inscription des employeurs pour faire comprendre aux employeurs qui sont hors des départements ouverts qu'ils ne peuvent pas encore s'inscrire
+- Modale pour donner davantage d'explications quand on a pas d'email
+- Nouvel environnement de démo
+- Re-calcul des coordonnées géographiques en cas de changement d'adresse dans l'admin SIAE et dans l'admin Organisations de prescripteur
+- Un employeur solidaire peut inviter un collaborateur à rejoindre sa structure
+- Ajout d'un filtre "date de naissance" dans la recherche d'agréments Pôle emploi
+- Blocage des candidatures
+
+### Modifié
+- Les critères d'éligibilité simplifiés ETTI deviennent permanents
+- "Modifier les coordonnées" devient "Modifier la fiche" sur le tableau de bord des SIAE et des prescripteurs habilités
+- Modification de la mention mention RGPD demandée par la DGEFP/PE sur les écrans d'inscription
+- "Je donne mon avis" est affiché seulement sur la HP
+
 ## [1.0.5] - 2020-06-18
 
 ### Ajouté
