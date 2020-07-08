@@ -254,7 +254,8 @@ class SelectSiaeForm(forms.Form):
     email = forms.EmailField(
         label=gettext_lazy("E-mail"),
         help_text=gettext_lazy(
-            "Pour les SIAE, adresse e-mail connue possiblement de l'Agence de services et de paiement (ASP)"
+            "Vous êtes une SIAE ? Attention, indiquez l'e-mail utilisé "
+            "par le référent technique ASP et non votre e-mail de connexion."
         ),
         required=False,
     )
@@ -266,7 +267,10 @@ class SelectSiaeForm(forms.Form):
         email = cleaned_data.get("email")
 
         if not (siret or email):
-            error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
+            error_message = _(
+                "Merci de renseigner l'e-mail utilisé par le référent technique ASP "
+                "ou un numéro de SIRET connu de nos services."
+            )
             raise forms.ValidationError(error_message)
 
         siaes = Siae.objects.filter(kind=kind)
