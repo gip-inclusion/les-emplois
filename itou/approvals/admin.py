@@ -52,10 +52,10 @@ class IsValidFilter(admin.SimpleListFilter):
 
 @admin.register(models.Approval)
 class ApprovalAdmin(admin.ModelAdmin):
-    list_display = ("id", "number", "user", "start_at", "end_at", "is_valid", "created_at")
-    search_fields = ("number", "user__first_name", "user__last_name", "user__email")
+    list_display = ("pk", "number", "user", "start_at", "end_at", "is_valid", "created_at")
+    search_fields = ("pk", "number", "user__first_name", "user__last_name", "user__email")
     list_filter = (IsValidFilter,)
-    list_display_links = ("id", "number")
+    list_display_links = ("pk", "number")
     raw_id_fields = ("user", "created_by")
     readonly_fields = ("created_at", "created_by")
     date_hierarchy = "start_at"
@@ -107,7 +107,7 @@ class ApprovalAdmin(admin.ModelAdmin):
 @admin.register(models.PoleEmploiApproval)
 class PoleEmploiApprovalAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
+        "pk",
         "pole_emploi_id",
         "number",
         "first_name",
@@ -118,7 +118,7 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "end_at",
         "is_valid",
     )
-    search_fields = ("pole_emploi_id", "number", "first_name", "last_name", "birth_name")
+    search_fields = ("pk", "pole_emploi_id", "number", "first_name", "last_name", "birth_name")
     list_filter = (IsValidFilter,)
     date_hierarchy = "birthdate"
 

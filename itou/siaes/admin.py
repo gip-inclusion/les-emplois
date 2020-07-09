@@ -35,7 +35,7 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
-    list_display = ("id", "siret", "kind", "name", "department", "geocoding_score", "member_count")
+    list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = ("created_by", "created_at", "updated_at", "job_applications_blocked_at")
@@ -78,7 +78,7 @@ class SiaeAdmin(admin.ModelAdmin):
             },
         ),
     )
-    search_fields = ("id", "siret", "name")
+    search_fields = ("pk", "siret", "name")
     inlines = (MembersInline, JobsInline)
 
     def member_count(self, obj):
