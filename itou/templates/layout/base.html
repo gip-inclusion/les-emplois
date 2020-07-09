@@ -148,12 +148,12 @@
                     <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
                 {% endif %}
 
-                <a class="nav-link{% if request.path == '/' or request.path == '/search/employers' %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
+                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
 
                 {% if user.is_authenticated %}
                     {# Do not confuse unlogged users with a prescriber search, especially jobseekers  #}
                     {# who may be unfamiliar with the prescriber concept. #}
-                    <a class="nav-link{% if request.path == '/search/prescribers' %} active{% endif %}" href="{% url 'search:prescribers' %}">{% trans "Rechercher des prescripteurs" %}</a>
+                    <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% trans "Rechercher des prescripteurs" %}</a>
                 {% endif %}
 
                 <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
