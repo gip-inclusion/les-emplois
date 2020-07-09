@@ -6,8 +6,22 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %} - La plateforme de l'inclusion{% endblock %}</title>
-    {% block meta_description %}<meta name="description" content="{% trans "La plateforme numérique de l'inclusion" %}">{% endblock %}
+    {% block meta_description %}<meta name="description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {# https://metatags.io #}
+    <meta name="title" content="{% trans "La plateforme de l'inclusion" %}">
+    {# https://metatags.io Open Graph / Facebook #}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
+    <meta property="og:title" content="{% trans "La plateforme de l'inclusion" %}">
+    <meta property="og:description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
+    <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
+    {# https://metatags.io Twitter #}
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }/">
+    <meta property="twitter:title" content="{% trans "La plateforme de l'inclusion" %}">
+    <meta property="twitter:description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
+    <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
     {# Use this to get the value of the CSRF token in JavaScript. #}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
@@ -134,12 +148,12 @@
                     <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
                 {% endif %}
 
-                <a class="nav-link{% if request.path == '/' or request.path == '/search/employers' %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
+                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
 
                 {% if user.is_authenticated %}
                     {# Do not confuse unlogged users with a prescriber search, especially jobseekers  #}
                     {# who may be unfamiliar with the prescriber concept. #}
-                    <a class="nav-link{% if request.path == '/search/prescribers' %} active{% endif %}" href="{% url 'search:prescribers' %}">{% trans "Rechercher des prescripteurs" %}</a>
+                    <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% trans "Rechercher des prescripteurs" %}</a>
                 {% endif %}
 
                 <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>

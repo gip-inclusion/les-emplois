@@ -12,8 +12,8 @@ class AdministrativeCriteriaInline(admin.TabularInline):
 
 @admin.register(models.EligibilityDiagnosis)
 class EligibilityDiagnosisAdmin(admin.ModelAdmin):
-    list_display = ("id", "job_seeker", "author", "author_kind", "created_at")
-    list_display_links = ("id", "job_seeker")
+    list_display = ("pk", "job_seeker", "author", "author_kind", "created_at")
+    list_display_links = ("pk", "job_seeker")
     list_filter = ("author_kind",)
     raw_id_fields = ("job_seeker", "author", "author_siae", "author_prescriber_organization")
     readonly_fields = ("created_at", "updated_at")
@@ -23,8 +23,8 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
 
 @admin.register(models.AdministrativeCriteria)
 class AdministrativeCriteriaAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "level", "ui_rank", "created_at")
-    list_display_links = ("id", "name")
+    list_display = ("pk", "name", "level", "ui_rank", "created_at")
+    list_display_links = ("pk", "name")
     list_filter = ("level",)
     raw_id_fields = ("created_by",)
     readonly_fields = ("created_at",)

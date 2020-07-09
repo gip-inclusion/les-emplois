@@ -8,7 +8,16 @@ from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
 
-def search_siaes(request, template_name="search/siaes_search_results.html"):
+def search_siaes_home(request, template_name="search/siaes_search_home.html"):
+    """
+    The search home page has a different design from the results page.
+    """
+    form = SiaeSearchForm()
+    context = {"form": form}
+    return render(request, template_name, context)
+
+
+def search_siaes_results(request, template_name="search/siaes_search_results.html"):
 
     form = SiaeSearchForm(data=request.GET or None)
     siaes_page = None
@@ -35,7 +44,17 @@ def search_siaes(request, template_name="search/siaes_search_results.html"):
 
 
 @login_required
-def search_prescribers(request, template_name="search/prescribers_search_results.html"):
+def search_prescribers_home(request, template_name="search/prescribers_search_home.html"):
+    """
+    The search home page has a different design from the results page.
+    """
+    form = PrescriberSearchForm()
+    context = {"form": form}
+    return render(request, template_name, context)
+
+
+@login_required
+def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
 
     form = PrescriberSearchForm(data=request.GET or None)
     prescriber_orgs_page = None

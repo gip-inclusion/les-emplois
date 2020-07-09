@@ -95,8 +95,8 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         ),
     )
     inlines = (MembersInline,)
-    list_display = ("id", "name", "post_code", "city", "department", "member_count")
-    list_display_links = ("id", "name")
+    list_display = ("pk", "name", "post_code", "city", "department", "member_count")
+    list_display_links = ("pk", "name")
     list_filter = (AuthorizationValidationRequired, HasMembersFilter, "is_authorized", "kind", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = (
@@ -110,7 +110,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "authorization_updated_at",
         "authorization_updated_by",
     )
-    search_fields = ("siret", "name", "code_safir_pole_emploi")
+    search_fields = ("pk", "siret", "name", "code_safir_pole_emploi")
 
     def member_count(self, obj):
         return obj._member_count
