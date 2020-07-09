@@ -31,9 +31,9 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    
+
     {% include "includes/demo.html" %}
-                              
+
     <div class="layout">
 
         <header class="layout-section layout-section-white">
@@ -45,13 +45,6 @@
                 </a>
                 <div class="layout-header-content">
                     <nav class="d-flex align-content-stretch flex-wrap">
-
-                        {% if not user.is_authenticated %}
-                            <a class="btn btn-outline-primary w-100 w-sm-auto my-1 mr-sm-2" href="https://entreprise.inclusion.beta.gouv.fr" target="_blank">
-                                {% trans "Vous êtes une entreprise (hors IAE) avec un besoin de recrutement" %}
-                            </a>
-                        {% endif %}
-
                         {% if user.is_authenticated %}
                             <div class="align-self-center">
                                 <div class="dropdown">
