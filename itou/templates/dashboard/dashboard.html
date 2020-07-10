@@ -123,17 +123,13 @@
                     {% else %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
+                            <a href="{% url 'prescribers_views:edit_organization' %}">
+                                {% trans "Modifier les informations" %}
+                            </a>
                             {% if current_prescriber_organization.get_card_url %}
-                                <a href="{% url 'prescribers_views:edit_organization' %}">
-                                    {% trans "Modifier la fiche" %}
-                                </a>
                                 /
                                 <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     {% trans "Voir la fiche" %}
-                                </a>
-                            {% else %}
-                                <a href="{% url 'prescribers_views:edit_organization' %}">
-                                    {% trans "Modifier votre organisation" %}
                                 </a>
                             {% endif %}
                         </p>
@@ -191,11 +187,11 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
                         <a href="{% url 'siaes_views:edit_siae' %}">
-                            {% trans "Modifier la fiche" %}
+                            {% trans "Modifier les informations de l'établissement" %}
                         </a>
                         /
                         <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            {% trans "Voir la fiche" %}
+                            {% trans "Voir la fiche publique" %}
                         </a>
                     </p>
                     <p class="card-text">
@@ -208,7 +204,7 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'siaes_views:configure_jobs' %}">
-                            {% trans "Configurer les fiches de postes" %}
+                            {% trans "Configurer les descriptions de postes" %}
                         </a>
                     </p>
                     {% if user_is_siae_admin %}

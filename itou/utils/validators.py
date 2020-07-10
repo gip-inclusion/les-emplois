@@ -1,5 +1,6 @@
 import datetime
 
+from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 from django.utils import timezone
@@ -40,11 +41,11 @@ def get_min_birthdate():
 
 
 def get_max_birthdate():
-    return timezone.now().date()
+    return timezone.now().date() - relativedelta(years=16)
 
 
 def validate_birthdate(birthdate):
     if birthdate < get_min_birthdate():
         raise ValidationError(_("La date de naissance doit être postérieure à 1900."))
     if birthdate >= get_max_birthdate():
-        raise ValidationError(_("Cette date de naissance n'est pas valide (date future)."))
+        raise ValidationError(_("La personne doit avoir plus de 16 ans."))
