@@ -8,6 +8,7 @@
     <title>{% block title %} - La plateforme de l'inclusion{% endblock %}</title>
     {% block meta_description %}<meta name="description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     {# https://metatags.io #}
     <meta name="title" content="{% trans "La plateforme de l'inclusion" %}">
     {# https://metatags.io Open Graph / Facebook #}
@@ -22,6 +23,7 @@
     <meta property="twitter:title" content="{% trans "La plateforme de l'inclusion" %}">
     <meta property="twitter:description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
     <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
+
     {# Use this to get the value of the CSRF token in JavaScript. #}
     <meta name="csrf-token" content="{{ csrf_token }}">
     <link rel="shortcut icon" href="{% static "favicon.ico" %}" type="image/ico">
@@ -37,7 +39,7 @@
     <div class="layout">
 
         <header class="layout-section layout-section-white">
-            <div class="layout-header px-3 py-2">
+            <div class="layout-header py-2 px-0 px-sm-3">
                 <a href="/" class="text-decoration-none text-reset">
                     <div class="row pt-1 pl-3">
                         <img src="{% static 'img/logo_header.svg' %}" alt="inclusion.beta.gouv.fr" class="layout-header-logo img-fluid">
@@ -46,16 +48,17 @@
                 <div class="layout-header-content">
                     <nav class="d-flex align-content-stretch flex-wrap">
                         {% if user.is_authenticated %}
-                            <div class="align-self-center">
-                                <div class="dropdown">
-                                    {% include "includes/icon.html" with icon="user" %}
-                                    <a
-                                        href="#"
-                                        class="dropdown-toggle"
+                            <div class="d-flex flex-row">
+                                <div class="dropdown mr-2">
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle"
                                         data-toggle="dropdown"
-                                        data-display="static"
-                                        aria-expanded="false">{{ user.email|truncatechars:25 }}</a>
-                                    <div class="dropdown-menu dropdown-menu-lg-right">
+                                        aria-haspopup="true"
+                                        aria-expanded="false" data-display="static" >
+                                        {% include "includes/icon.html" with icon="user" %} {% trans "Mon espace" %}
+                                    </button>
+                                    <div class="dropdown-menu">
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
                                             {% trans "Tableau de bord" %}
                                         </a>
@@ -64,11 +67,11 @@
 
                                         {% if not user.is_peamu %}
                                             <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                                {% trans "Modifier votre mot de passe" %}
+                                                {% trans "Modifier mon mot de passe" %}
                                             </a>
                                         {% endif %}
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                                            {% trans "Modifier votre profil" %}
+                                            {% trans "Modifier mon profil" %}
                                         </a>
 
                                         <div class="dropdown-divider"></div>
@@ -80,29 +83,20 @@
                                 </div>
 
                             {% if user.is_siae_staff and user_siae_set|length > 1 %}
-                                <div class="dropdown">
-                                    {% include "includes/icon.html" with icon="home" %}
-                                    <a
-                                        href="#"
-                                        class="dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        data-display="static"
-                                        aria-expanded="false">{{ current_siae.display_name|truncatechars:25 }}</a>
-                                    <div class="dropdown-menu dropdown-menu-lg-right">
-                                        <span class="dropdown-item-text">
-                                            <small>{% trans "Vos structures :" %}</small>
-                                        </span>
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                        {% trans "Changer de structure" %}
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
                                         <form action="{% url 'dashboard:switch_siae' %}" method="post">
                                             {% csrf_token %}
                                             {% for s in user.siae_set.all %}
-                                                {% if current_siae.id != s.pk %}
-                                                    <button
-                                                        class="dropdown-item"
-                                                        type="submit"
-                                                        name="siae_id"
-                                                        value="{{ s.pk }}">{{ s.display_name }}
-                                                    </button>
-                                                {% endif %}
+                                                <button
+                                                    class="dropdown-item text-primary"
+                                                    type="submit"
+                                                    name="siae_id"
+                                                    value="{{ s.pk }}">{{ s.display_name }}
+                                                </button>
                                             {% endfor %}
                                         </form>
                                     </div>
