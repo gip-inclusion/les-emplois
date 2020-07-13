@@ -161,6 +161,16 @@ class SelectedAdministrativeCriteria(models.Model):
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
 
+    # Values of administrative criteria can be imported via APIs (and overridden by user if needed)
+    # Default 'data source' is 'app'(lication)
+    DATA_SOURCE_APP = "app"
+    DATA_SOURCE_API_PE = "peconnect"
+
+    DATA_SOURCE_CHOICES = ((DATA_SOURCE_APP, _("Application")), (DATA_SOURCE_API_PE, "APIs PE Connect"), )
+
+    data_source = models.CharField(verbose_name=_("Source de données"), max_length=20, choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_APP)
+    data_source_updated_at = models.DateTimeField(verbose_name=_("Date de MAJ de la source de données"), default=timezone.now)
+
     class Meta:
         verbose_name = _("Critère administratif sélectionné")
         verbose_name_plural = _("Critères administratifs sélectionnés")
