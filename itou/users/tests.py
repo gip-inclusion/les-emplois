@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.approvals.factories import PoleEmploiApprovalFactory
-from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory, ExpiredEligibilityDiagnosisFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 
 
@@ -67,6 +67,11 @@ class ModelTest(TestCase):
         PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate, start_at=start_at, end_at=end_at
         )
+        self.assertFalse(job_seeker.has_eligibility_diagnosis)
+
+        # Has an expired diagnosis
+        job_seeker = JobSeekerFactory()
+        ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
         self.assertFalse(job_seeker.has_eligibility_diagnosis)
 
     def test_clean_pole_emploi_fields(self):

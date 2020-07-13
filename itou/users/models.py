@@ -102,12 +102,13 @@ class User(AbstractUser, AddressMixin):
     @property
     def has_eligibility_diagnosis(self):
         """
-        Returns True if a diagnosis exists, False otherwise.
+        Returns True if an ongoing diagnosis exists, False otherwise.
         """
         if not self.is_job_seeker:
             return False
         if self.eligibility_diagnoses.exists():
-            return True
+            if not self.eligibility_diagnoses.latest("-created_at").has_expired:
+                return True
         # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
         # has been made outside of Itou.
         latest_approval = self.approvals_wrapper.latest_approval

@@ -69,9 +69,14 @@
             {% if eligibility_diagnosis %}
 
                 <hr>
-                <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
+                <h3 class="font-weight-normal text-muted d-flex">
+                    {% trans "Critères d'éligibilité" %}
+                    {% if eligibility_diagnosis.has_expired %}
+                        <span class="badge badge-danger ml-3">{% trans "Expirés" %}</span>
+                    {% endif %}
+                </h3>
                 <p>
-                    {% trans "Validés par :" %}
+                    {% trans "Validés par" %}
                     <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
                     {% if eligibility_diagnosis.author_siae %}
                         ({{ eligibility_diagnosis.author_siae.display_name }})
@@ -80,7 +85,7 @@
                         ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
                     {% endif %}
                     {% trans "le" %}
-                    <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
+                    <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>.
                 </p>
 
                 {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
@@ -107,14 +112,24 @@
                     {% endif %}
                 {% endwith %}
 
-                {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
+                {% if eligibility_diagnosis.has_expired %}
+                    <p class="text-danger">
+                        {% trans "Ce diagnostic est expiré depuis le " %} {{ eligibility_diagnosis.expires_at|date }}.
+                    </p>
+                {% else %}
+                    <p>
+                        {% trans "Ce diagnostic expire le " %} {{ eligibility_diagnosis.expires_at|date }}.
+                    </p>
+                {% endif %}
+
+            {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
 
                 {# The existence of a valid `PoleEmploiApproval` implies that #}
                 {# a diagnosis has been made outside of Itou. #}
                 <hr>
                 <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
                 <p>
-                    {% trans "Validés par :" %} <b>{% trans "Pôle emploi" %}</b>
+                    {% trans "Validés par" %} <b>{% trans "Pôle emploi" %}</b>.
                 </p>
 
             {% endif %}
@@ -231,7 +246,7 @@
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
-            
+
             <p>
                 <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
