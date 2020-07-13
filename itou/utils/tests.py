@@ -2,6 +2,7 @@ import datetime
 from collections import OrderedDict
 from unittest import mock
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -281,11 +282,11 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_birthdate, datetime.date(1899, 12, 31))
         validate_birthdate(datetime.date(1900, 1, 1))
         # Max.
-        current_date = datetime.datetime.now().date()
-        self.assertRaises(ValidationError, validate_birthdate, current_date + datetime.timedelta(days=1))
-        self.assertRaises(ValidationError, validate_birthdate, current_date + datetime.timedelta(days=365))
-        self.assertRaises(ValidationError, validate_birthdate, current_date)
-        validate_birthdate(current_date - datetime.timedelta(days=3600))
+        max_date = datetime.datetime.now().date() - relativedelta(years=16)
+        self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=1))
+        self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=365))
+        self.assertRaises(ValidationError, validate_birthdate, max_date)
+        validate_birthdate(max_date - datetime.timedelta(days=3600))
 
 
 class UtilsTemplateTagsTestCase(TestCase):

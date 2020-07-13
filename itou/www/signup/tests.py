@@ -49,7 +49,9 @@ class SiaeSignupFormTest(TestCase):
         post_data = {"kind": Siae.KIND_ACI}
         form = SelectSiaeForm(data=post_data)
         form.is_valid()
-        expected_error = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
+        expected_error = _(
+            "Merci de renseigner l'e-mail utilisé par le référent technique ASP ou un numéro de SIRET connu de nos services."
+        )
         self.assertIn(expected_error, form.errors["__all__"])
 
         # (email, kind) or (siret, kind) does not match any siae.
