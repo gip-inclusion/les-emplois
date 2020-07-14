@@ -1,8 +1,6 @@
 import csv
 import logging
-import os
 
-from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 
 from itou.prescribers.models import PrescriberOrganization
