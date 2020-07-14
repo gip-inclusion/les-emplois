@@ -16,6 +16,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
+from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -241,6 +242,29 @@ class UtilsSiretTest(TestCase):
             "post_code": "75015",
         }
         self.assertEqual(result, expected)
+
+
+class UtilsDepartmentsTest(TestCase):
+    def test_department_from_postcode(self):
+        # Corsica south == 2A
+        post_codes = ["20000", "20137", "20700"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), "2A")
+
+        # Corsica north == 2B
+        post_codes = ["20240", "20220", "20407", "20660"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), "2B")
+
+        # DOM
+        post_codes = ["97500", "97000", "98800", "98000"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), post_code[:3])
+
+        # Any other city
+        post_codes = ["13150", "30210", "17000"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), post_code[:2])
 
 
 class UtilsValidatorsTest(TestCase):
