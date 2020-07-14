@@ -65,6 +65,7 @@ LOCAL_APPS = [
     "itou.approvals",
     "itou.eligibility",
     "itou.invitations",
+    "itou.pe_data.apps.PeDataConfig",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
