@@ -50,7 +50,8 @@ class SiaeSignupFormTest(TestCase):
         form = SelectSiaeForm(data=post_data)
         form.is_valid()
         expected_error = _(
-            "Merci de renseigner l'e-mail utilisé par le référent technique ASP ou un numéro de SIRET connu de nos services."
+            "Merci de renseigner l'e-mail utilisé par le référent technique ASP"
+            " ou un numéro de SIRET connu de nos services."
         )
         self.assertIn(expected_error, form.errors["__all__"])
 
