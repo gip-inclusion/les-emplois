@@ -2,6 +2,7 @@ import datetime
 from collections import OrderedDict
 from unittest import mock
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
@@ -15,6 +16,7 @@ from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
+from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -242,6 +244,29 @@ class UtilsSiretTest(TestCase):
         self.assertEqual(result, expected)
 
 
+class UtilsDepartmentsTest(TestCase):
+    def test_department_from_postcode(self):
+        # Corsica south == 2A
+        post_codes = ["20000", "20137", "20700"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), "2A")
+
+        # Corsica north == 2B
+        post_codes = ["20240", "20220", "20407", "20660"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), "2B")
+
+        # DOM
+        post_codes = ["97500", "97000", "98800", "98000"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), post_code[:3])
+
+        # Any other city
+        post_codes = ["13150", "30210", "17000"]
+        for post_code in post_codes:
+            self.assertEqual(department_from_postcode(post_code), post_code[:2])
+
+
 class UtilsValidatorsTest(TestCase):
     def test_validate_alphanumeric(self):
         self.assertRaises(ValidationError, alphanumeric, "1245a_89871")
@@ -281,11 +306,11 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_birthdate, datetime.date(1899, 12, 31))
         validate_birthdate(datetime.date(1900, 1, 1))
         # Max.
-        current_date = datetime.datetime.now().date()
-        self.assertRaises(ValidationError, validate_birthdate, current_date + datetime.timedelta(days=1))
-        self.assertRaises(ValidationError, validate_birthdate, current_date + datetime.timedelta(days=365))
-        self.assertRaises(ValidationError, validate_birthdate, current_date)
-        validate_birthdate(current_date - datetime.timedelta(days=3600))
+        max_date = datetime.datetime.now().date() - relativedelta(years=16)
+        self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=1))
+        self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=365))
+        self.assertRaises(ValidationError, validate_birthdate, max_date)
+        validate_birthdate(max_date - datetime.timedelta(days=3600))
 
 
 class UtilsTemplateTagsTestCase(TestCase):
