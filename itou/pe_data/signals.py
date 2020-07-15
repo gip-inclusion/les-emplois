@@ -1,5 +1,6 @@
 from allauth.account.signals import user_logged_in
 from django.dispatch import receiver
+
 from itou.allauth.peamu.provider import PEAMUProvider
 
 
@@ -11,6 +12,4 @@ def user_has_logged(sender, **kwargs):
     login = kwargs.get("sociallogin")
     if login and login.account.provider == PEAMUProvider.id:
         # TBD:  API calls
-        print(login)
-        print(login.token)
-
+        print(f"token: {login.token}")

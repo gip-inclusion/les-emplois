@@ -2,6 +2,7 @@ import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
 
+
 # PE Connect API data retrieval tools
 
 API_ESD_BASE_URL = settings.API_ESD_BASE_URL
@@ -74,7 +75,7 @@ def _get_status(token):
     key = "codeStatutIndividu"
     result = _fields_or_nas(_call_api(ESD_STATUS_API, token), [key])
     code = result.get(key)
-    return {key: code or N_A}
+    return {key: int(code) if code else N_A}
 
 
 def _get_address(token):
@@ -96,6 +97,7 @@ def _get_address(token):
     """
     keys = ["adresse1", "adresse2", "adresse3", "adresse4", "codePostal", "codeINSEE", "libelleCommune"]
     return _fields_or_nas(_call_api(ESD_COORDS_API, token), keys)
+
 
 #  Public ----
 
