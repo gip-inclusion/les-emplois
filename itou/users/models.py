@@ -107,7 +107,7 @@ class User(AbstractUser, AddressMixin):
         if not self.is_job_seeker:
             return False
         if self.eligibility_diagnoses.exists():
-            if not self.eligibility_diagnoses.latest("-created_at").has_expired:
+            if not self.eligibility_diagnoses.latest("created_at").has_expired:
                 return True
         # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
         # has been made outside of Itou.
@@ -119,7 +119,7 @@ class User(AbstractUser, AddressMixin):
             return None
         return self.eligibility_diagnoses.select_related(
             "author", "author_siae", "author_prescriber_organization"
-        ).latest("-created_at")
+        ).latest("created_at")
 
     @cached_property
     def is_peamu(self):

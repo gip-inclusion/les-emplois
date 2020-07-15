@@ -64,8 +64,6 @@
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-        {% with job_application.job_seeker.get_eligibility_diagnosis as eligibility_diagnosis %}
-
             {% if eligibility_diagnosis %}
 
                 <hr>
@@ -114,7 +112,12 @@
 
                 {% if eligibility_diagnosis.has_expired %}
                     <p class="text-danger">
-                        {% trans "Ce diagnostic est expiré depuis le " %} {{ eligibility_diagnosis.expires_at|date }}.
+                        {% blocktrans with date=eligibility_diagnosis.expires_at|date %}
+                            Ce diagnostic est expiré depuis le {{ date }}.
+                        {% endblocktrans %}
+                        {% if job_application.state.is_processing %}
+                            {% trans "Pour embaucher ce candidat, réalisez un nouveau diagnostic d'éligibilité afin d'évaluer sa situation actuelle." %}
+                        {% endif %}
                     </p>
                 {% else %}
                     <p>
@@ -133,8 +136,6 @@
                 </p>
 
             {% endif %}
-
-        {% endwith %}
 
     {% endif %}
 
@@ -228,14 +229,34 @@
         <hr>
 
         {% if job_application.eligibility_diagnosis_by_siae_required %}
+                {% if eligibility_diagnosis and eligibility_diagnosis.has_expired %}
+                    <p>
+                        <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
+                           class="btn btn-secondary btn-block">
+                                {% trans "Réaliser un nouveau diagnostic" %}
+                            {% include "includes/icon.html" with icon="arrow-right" %}
+                        </a>
+                    </p>
 
-            <p>
-                <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
-                   class="btn btn-secondary btn-block">
-                    {% trans "Valider les critères d'éligibilité" %}
-                    {% include "includes/icon.html" with icon="arrow-right" %}
-                </a>
-            </p>
+                    <p>
+                        <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+                           class="btn btn-outline-danger btn-block">
+                            {% trans "Je ne veux pas l'embaucher" %}
+                            {% include "includes/icon.html" with icon="arrow-right" %}
+                        </a>
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
+                           class="btn btn-secondary btn-block">
+                                {% trans "Valider les critères d'éligibilité" %}
+                            {% include "includes/icon.html" with icon="arrow-right" %}
+                        </a>
+                    </p>
+
+                {% endif %}
 
         {% else %}
 
