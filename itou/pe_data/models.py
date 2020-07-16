@@ -4,7 +4,15 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
+class ExtraDataQuerySet(models.QuerySet):
+
+    def for_user(self, user):
+        return self.filter(user__pk=user.pk)
+
+
 class ExtraUserData(models.Model):
+
+    objects = models.Manager.from_queryset(ExtraDataQuerySet)()
 
     created_at = models.DateTimeField(verbose_name=_("Date de création de l'import"), default=now)
     user = models.ForeignKey(
@@ -30,3 +38,7 @@ class ExtraUserData(models.Model):
 
     def __str__(self):
         return f"[{self.pk}] ExtraUserData: user={self.user.pk}, created_at={self.created_at}"
+
+    @staticmethod
+    def exists_for_user(user):
+        return ExtraUserData.objects.filter(user__pk=user.pk).exists()
