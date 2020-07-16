@@ -1,3 +1,5 @@
+import logging
+
 import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
@@ -17,16 +19,22 @@ ESD_COMPENSATION_API = "peconnect-indemnisations/v1/indemnisation"
 ESD_PT_TRAININGS_API = "peconnect-formations/v1/formations"
 ESD_PT_LICENSES_API = "peconnect-formations/v1/permits"
 
-N_A = "N/A"
+N_A = None
 
 # Internal ----
+
+logger = logging.getLogger(__name__)
 
 
 def _call_api(api_path, token):
     url = f"{API_ESD_BASE_URL}/{api_path}"
     resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
-
-    return resp.json() if resp.status_code == 200 else None
+    if resp.status_code == 200:
+        return resp.json()
+    else:
+        # Track it for QoS
+        logger.warning(f"API call to: {url} returned status code {resp.status_code}")
+        return None
 
 
 def _fields_or_nas(result, keys):
@@ -58,8 +66,9 @@ def _get_birthdate(token):
 
     """
     key = "dateDeNaissance"
+    # code, resp = _call_api(ESD_BIRTHDATE_API, token)
     result = _fields_or_nas(_call_api(ESD_BIRTHDATE_API, token), [key])
-    return {key: parse_datetime(result.get(key)) or N_A}
+    return {key: result.get(key) or N_A}
 
 
 def _get_status(token):
