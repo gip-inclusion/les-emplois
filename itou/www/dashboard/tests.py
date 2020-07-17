@@ -16,6 +16,10 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_user_with_single_expired_siae_cannot_login(self):
+        # FIXME
+        pass
+
 
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):
@@ -84,3 +88,7 @@ class SwitchSiaeTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)
+
+    def test_cannot_switch_to_expired_siae(self):
+        # FIXME
+        pass

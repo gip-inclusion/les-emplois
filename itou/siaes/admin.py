@@ -35,6 +35,7 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
+    # FIXME has_expired
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by",)

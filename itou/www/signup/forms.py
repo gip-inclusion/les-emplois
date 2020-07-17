@@ -273,6 +273,7 @@ class SelectSiaeForm(forms.Form):
             )
             raise forms.ValidationError(error_message)
 
+        # FIXME has_expired
         siaes = Siae.objects.filter(kind=kind)
         if siret and email:
             # We match siaes having any of the two correct fields.
@@ -363,6 +364,8 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
             siae = self.get_siae()
         else:
             raise RuntimeError("This should never happen. Attack attempted.")
+
+        # FIXME raise if has_expired
 
         if siae.has_members:
             siae.new_signup_warning_email_to_existing_members(user).send()

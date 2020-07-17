@@ -25,9 +25,11 @@ def get_current_organization_and_perms(request):
             user_siae_set = [membership.siae for membership in memberships]
             for membership in memberships:
                 if membership.siae_id == siae_pk:
+                    # FIXME has_expired
                     siae = membership.siae
                     user_is_siae_admin = membership.is_siae_admin
                     break
+            # FIXME all siaes have expired
             if siae is None:
                 raise PermissionDenied
 

@@ -126,6 +126,16 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
 
+    # Expiration is managed by import_siae.py script only.
+    has_expired = models.BooleanField(
+        verbose_name=_("Déconventionnée"),
+        default=False,
+        help_text=_("Précise si la structure manque de conventionnement valide à ce jour."),
+    )
+    # This expiration date is not enforced and only stored for information
+    # for the admin and/or metabase. Only siae.has_expired is enforced.
+    expires_at = models.DateTimeField(verbose_name=_("Date de fin de conventionnement"), blank=True, null=True)
+
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
@@ -133,6 +143,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # the siae objects in ASP's own database. These are supposed to never change,
     # so as long as the ASP keeps including this field in all their exports,
     # it will be easy for us to accurately match data between exports.
+    # Note that this external_id unicity is based on SIRET only.
+    # In other words, if an EI and a ACI share the same SIRET, they also
+    # share the same external_id in ASP's own database.
     external_id = models.IntegerField(verbose_name=_("ID externe"), null=True, blank=True)
 
     jobs = models.ManyToManyField(

@@ -282,6 +282,10 @@ class SiaeSignupTest(TestCase):
             self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", subjects)
             self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
+    def test_cannot_join_a_non_valid_siae(self):
+        # FIXME
+        pass
+
     def test_legacy_route(self):
         """
         Opening the old route without any magic link credentials
