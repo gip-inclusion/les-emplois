@@ -273,7 +273,7 @@ class SelectSiaeForm(forms.Form):
             )
             raise forms.ValidationError(error_message)
 
-        siaes = Siae.objects.filter(kind=kind)
+        siaes = Siae.objects.filter(kind=kind, is_authorized=True)
         if siret and email:
             # We match siaes having any of the two correct fields.
             siaes = siaes.filter(Q(siret=siret) | Q(auth_email=email))
@@ -393,7 +393,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         if not self.get_encoded_siae_id():
             return None
         siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
-        siae = Siae.objects.get(pk=siae_id)
+        siae = Siae.objects.get(pk=siae_id, is_authorized=True)
         return siae
 
     def check_siae_signup_credentials(self):

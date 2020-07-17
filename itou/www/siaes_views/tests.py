@@ -314,6 +314,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.description, post_data["description"])
         self.assertEqual(new_siae.created_by, user)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
+        self.assertTrue(new_siae.is_authorized)
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
         self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
@@ -369,6 +370,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.description, post_data["description"])
         self.assertEqual(new_siae.created_by, user)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
+        self.assertTrue(new_siae.is_authorized)
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
         self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")

@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.urls import reverse
 
 
 def get_current_organization_and_perms(request):
@@ -21,7 +22,7 @@ def get_current_organization_and_perms(request):
         siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
             # Get all info in 1 SQL query.
-            memberships = request.user.siaemembership_set.select_related("siae").all()
+            memberships = request.user.siaemembership_set.select_related("siae").filter(siae__is_authorized=True).all()
             user_siae_set = [membership.siae for membership in memberships]
             for membership in memberships:
                 if membership.siae_id == siae_pk:
@@ -29,7 +30,8 @@ def get_current_organization_and_perms(request):
                     user_is_siae_admin = membership.is_siae_admin
                     break
             if siae is None:
-                raise PermissionDenied
+                if request.path != reverse("account_logout"):
+                    raise PermissionDenied
 
         prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
         if prescriber_org_pk:

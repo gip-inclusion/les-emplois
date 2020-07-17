@@ -282,6 +282,32 @@ class SiaeSignupTest(TestCase):
             self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", subjects)
             self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
+    def test_cannot_join_an_unauthorized_siae(self):
+        """
+        A user cannot join an unauthorized SIAE.
+        """
+
+        user_first_name = "Judas"  # noqa F841
+        user_email = "judas.iscariot@siae.com"
+
+        siae = SiaeFactory(kind=Siae.KIND_ETTI, is_authorized=False)
+        self.assertEqual(0, siae.members.count())
+
+        token = siae.get_token()
+        with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
+
+            url = reverse("signup:select_siae")
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+            # Find an SIAE: (siret, kind) matches one SIAE.
+            post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 200)
+
+            expected_message = _("Votre numéro de SIRET ou votre e-mail nous sont inconnus.")
+            self.assertContains(response, expected_message)
+
     def test_legacy_route(self):
         """
         Opening the old route without any magic link credentials
