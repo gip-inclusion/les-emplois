@@ -15,6 +15,7 @@ class ExternalUserData(models.Model):
     When possible, relevant data is updated directly in the User model (address and birth date for instance)
     If external data is not usable "as-is", it is stored here for further processing.
     """
+
     objects = models.Manager.from_queryset(ExternaUserDataQuery)()
 
     created_at = models.DateTimeField(verbose_name=_("Date de création de l'import"), default=now)
@@ -45,7 +46,9 @@ class ExternalUserData(models.Model):
     # These are 1st level eligibility criterias, except for AER
     #
     # original field: PE / beneficiairePrestationSolidarite
-    has_social_allowance = models.BooleanField(verbose_name=_("L'utilisateur est béneficiaire d'un ou plusieurs minima sociaux"))
+    has_social_allowance = models.BooleanField(
+        verbose_name=_("L'utilisateur est béneficiaire d'un ou plusieurs minima sociaux")
+    )
 
     # Is the user a job seeker ? (from PE perspective)
     #

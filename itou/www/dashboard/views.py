@@ -9,8 +9,8 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.external_data.models import ExternalUserData
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_current_org_or_404
