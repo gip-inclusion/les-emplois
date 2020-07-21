@@ -1,4 +1,3 @@
-from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 
 from itou.eligibility.factories import EligibilityDiagnosisFactory, ExpiredEligibilityDiagnosisFactory
