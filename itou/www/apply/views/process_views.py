@@ -44,7 +44,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
     eligibility_diagnosis = None
-    if job_application.job_seeker.eligibility_diagnoses.exists():
+    if job_application.job_seeker.has_eligibility_diagnoses:
         eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
 
     context = {

@@ -44,21 +44,21 @@ class ModelTest(TestCase):
         with self.assertRaises(ValidationError):
             User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
-    def test_has_eligibility_diagnosis(self):
+    def test_has_valid_eligibility_diagnosis(self):
 
         # No diagnosis.
         job_seeker = JobSeekerFactory()
-        self.assertFalse(job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
 
         # Has Itou diagnosis.
         job_seeker = JobSeekerFactory()
         EligibilityDiagnosisFactory(job_seeker=job_seeker)
-        self.assertTrue(job_seeker.has_eligibility_diagnosis)
+        self.assertTrue(job_seeker.has_valid_eligibility_diagnosis)
 
         # Has valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
         PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
-        self.assertTrue(job_seeker.has_eligibility_diagnosis)
+        self.assertTrue(job_seeker.has_valid_eligibility_diagnosis)
 
         # Has expired Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
@@ -67,12 +67,12 @@ class ModelTest(TestCase):
         PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate, start_at=start_at, end_at=end_at
         )
-        self.assertFalse(job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
 
         # Has an expired diagnosis
         job_seeker = JobSeekerFactory()
         ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
-        self.assertFalse(job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
 
     def test_clean_pole_emploi_fields(self):
 

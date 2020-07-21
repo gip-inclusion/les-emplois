@@ -212,7 +212,7 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -242,7 +242,13 @@ class ProcessViewsTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
-        self.assertTrue(job_application.job_seeker.has_eligibility_diagnosis)
+        # In order to avoid calling the database too often, `has_eligibility_diagnoses`
+        # is a cached property.
+        # Delete the attribute to refresh it.
+        # See https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.functional.cached_property
+        delattr(job_application.job_seeker, "has_eligibility_diagnoses")
+        self.assertTrue(job_application.job_seeker.has_valid_eligibility_diagnosis)
+
         # Check diagnosis.
         eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
         self.assertEqual(eligibility_diagnosis.author, siae_user)
