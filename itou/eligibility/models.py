@@ -1,5 +1,6 @@
 import logging
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -25,6 +26,8 @@ class EligibilityDiagnosis(models.Model):
         (AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
         (AUTHOR_KIND_SIAE_STAFF, _("Employeur (SIAE)")),
     )
+
+    EXPIRATION_DELAY_MONTHS = 6
 
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -71,6 +74,14 @@ class EligibilityDiagnosis(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    @property
+    def expires_at(self):
+        return self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
+
+    @property
+    def has_expired(self):
+        return timezone.now() > self.expires_at
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()

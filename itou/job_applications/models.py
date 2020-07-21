@@ -303,7 +303,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return (
             self.state.is_processing
             and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.has_eligibility_diagnosis
+            and not self.job_seeker.has_valid_eligibility_diagnosis
         )
 
     @property
