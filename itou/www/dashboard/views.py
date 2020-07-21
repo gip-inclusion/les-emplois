@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.external_data.models import ExternalUserData
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -93,6 +94,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
     form = EditUserInfoForm(instance=request.user, data=request.POST or None)
+    extra_data = ExternalUserData.objects.for_user(request.user).first()
 
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -100,7 +102,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
-    context = {"form": form, "prev_url": prev_url}
+    context = {"form": form, "prev_url": prev_url, "extra_data": extra_data}
     return render(request, template_name, context)
 
 

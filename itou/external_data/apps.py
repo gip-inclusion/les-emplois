@@ -5,12 +5,12 @@ from django.apps import AppConfig
 # https://docs.djangoproject.com/en/3.0/ref/applications/#for-application-authors
 
 
-class PeDataConfig(AppConfig):
-    name = "itou.pe_data"
+class ExternalDataConfig(AppConfig):
+    name = "itou.external_data"
 
     def ready(self):
         """
-        When the app is loaded: 
+        When the app is loaded:
         import / activate registration to allauth login signals
         """
         from . import signals
