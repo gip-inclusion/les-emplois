@@ -1,7 +1,7 @@
 from django.contrib import admin
-
-from django.utils.translation import gettext as _
 from django.utils.formats import date_format
+from django.utils.translation import gettext as _
+
 from itou.eligibility import models
 
 
