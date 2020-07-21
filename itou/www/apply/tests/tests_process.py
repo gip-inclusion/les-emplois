@@ -7,6 +7,7 @@ from django.urls import reverse
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -275,9 +276,9 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_eligibility_wrong_state_for_job_application(self):
-        """The eligibility diagnosis page must only be accessible in `STATE_PROCESSING`."""
+        """The eligibility diagnosis page must only be accessible
+        in `STATE_PROCESSING` and state `STATE_POSTPONED`."""
         for state in [
-            JobApplicationWorkflow.STATE_POSTPONED,
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_REFUSED,
             JobApplicationWorkflow.STATE_CANCELLED,
@@ -359,13 +360,27 @@ class ProcessTemplatesTest(TestCase):
         # Test template content.
         self.assertNotContains(response, self.url_process)
         self.assertContains(response, self.url_eligibility)
-        self.assertNotContains(response, self.url_refuse)
+        self.assertContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_postponed(self):
         """Test actions available when the state is postponed."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
+    def test_details_template_for_state_postponed_valid_diagnosis(self):
+        """Test actions available when the state is postponed."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
         self.job_application.save()
         response = self.client.get(self.url_details)
