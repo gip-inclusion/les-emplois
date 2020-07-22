@@ -115,6 +115,7 @@ def get_aggregated_user_data(token):
     """
     Aggregates all needed user data before formatting and storage,
     and return as a dict.
+    KISS: simple and flat 
     """
     # TBD: include API results "à volonté"
     return {**_get_userinfo(token), **_get_birthdate(token), **_get_status(token), **_get_address(token)}

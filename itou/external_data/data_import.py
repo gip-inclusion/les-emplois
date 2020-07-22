@@ -1,6 +1,6 @@
 from django.utils.dateparse import parse_datetime
 
-from . import models
+from .models import ExternalUserData
 
 
 # External user data from PE Connect API:
@@ -9,7 +9,7 @@ from . import models
 
 
 def import_pe_external_user_data(user, data):
-    # User part
+    # User part can be directly "inserted" in to the model
     user.birthdate = user.birthdate or parse_datetime(data.get("dateDeNaissance"))
     user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
     # FIXME: WTF user.address_line_2 = '' or user.address_line_2 or data.get("adresse2")
@@ -20,9 +20,20 @@ def import_pe_external_user_data(user, data):
 
     # Save import metadata
 
-    # FIXME: set correct import status
-    pe_extra_data = models.ExternalUserData(user=user, status=models.ExternalUserData.STATUS_OK)
-    pe_extra_data.has_social_allowance = data.get("beneficiairePrestationSolidarite", False)
-    pe_extra_data.is_pe_jobseeker = data.get("is_pe_jobseeker ", False)
+    external_user_data = [
+        ExternalUserData(key=ExternalUserData.KEY_IS_PE_JOBSEEKER, value=data.get("is_pe_jobseeker ", False)),
+        ExternalUserData(
+            key=ExternalUserData.KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE,
+            value=data.get("beneficiairePrestationSolidarite", False),
+        ),
+        ExternalUserData(key="adresse4", value=data.get("adresse4"))
 
-    pe_extra_data.save()
+    ]
+
+    for data in external_user_data:
+        data.user = user
+        data.source = ExternalUserData.DATA_SOURCE_PE_CONNECT
+        data.status = ExternalUserData.STATUS_OK
+
+    # FIXME: set correct import status
+    ExternalUserData.objects.bulk_create(external_user_data)
