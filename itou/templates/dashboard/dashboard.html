@@ -166,6 +166,7 @@
                             <a href="{% url 'prescribers_views:members' %}">
                                 {% trans "Collaborateurs" %}
                             </a>
+                            <span class="badge badge-info">{% trans "Nouveau" %}</span>
                         </p>
                         {% if current_prescriber_organization.is_authorized %}
                             <hr>

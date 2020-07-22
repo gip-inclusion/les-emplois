@@ -4,6 +4,7 @@ from django.utils import timezone
 from itou.invitations.factories import (
     ExpiredInvitationFactory,
     InvitationFactory,
+    PrescriberWithOrgSentInvitationFactory,
     SentInvitationFactory,
     SiaeSentInvitationFactory,
 )
@@ -66,7 +67,7 @@ class InvitationEmailsTest(TestCase):
         self.assertIn(invitation.sender.last_name, email.subject)
 
         # Body
-        self.assertIn(invitation.first_name, email.body)
+        self.assertIn(invitation.first_name.title(), email.body)
         self.assertIn(invitation.last_name, email.body)
         self.assertIn(invitation.acceptance_link, email.body)
 
@@ -76,16 +77,92 @@ class InvitationEmailsTest(TestCase):
         self.assertIn(invitation.email, email.to)
 
 
+"""
+################################################################
+###################### PrescribersWithOrg ######################
+################################################################
+"""
+
+
+class TestPrescriberWithOrgInvitation(TestCase):
+    def test_add_member_to_organization(self):
+        invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
+        UserFactory(email=invitation.email)
+        org_members = invitation.organization.members.count()
+        invitation.add_invited_user_to_organization()
+        org_members_after = invitation.organization.members.count()
+        self.assertEqual(org_members + 1, org_members_after)
+
+
+class TestPrescriberWithOrgInvitationEmails(TestCase):
+    def test_accepted_notif_organization_members(self):
+        user = UserFactory()
+        invitation = PrescriberWithOrgSentInvitationFactory(email=user.email)
+        invitation.organization.members.add(user)
+        email = invitation.email_accepted_notif_organization_members
+
+        # Subject
+        self.assertIn(invitation.first_name, email.subject)
+        self.assertIn(invitation.last_name, email.subject)
+
+        # Body
+        self.assertIn(invitation.first_name, email.body)
+        self.assertIn(invitation.last_name, email.body)
+        self.assertIn(invitation.email, email.body)
+        self.assertIn(invitation.sender.first_name, email.body)
+        self.assertIn(invitation.sender.last_name, email.body)
+        self.assertIn(invitation.organization.display_name, email.body)
+
+        # To
+        members = invitation.organization.members.exclude(email__in=[invitation.sender.email, invitation.email])
+        for member in members:
+            self.assertIn(member.email, email.to)
+
+        self.assertNotIn(invitation.sender.email, email.to)
+        self.assertNotIn(invitation.email, email.to)
+
+    def test_accepted_notif_sender(self):
+        invitation = PrescriberWithOrgSentInvitationFactory()
+        email = invitation.email_accepted_notif_sender
+
+        # Subject
+        self.assertIn(invitation.first_name, email.subject)
+        self.assertIn(invitation.last_name, email.subject)
+
+        # Body
+        self.assertIn(invitation.first_name, email.body)
+        self.assertIn(invitation.last_name, email.body)
+        self.assertIn(invitation.email, email.body)
+        self.assertIn(invitation.organization.display_name, email.body)
+
+        # To
+        self.assertIn(invitation.sender.email, email.to)
+
+    def test_email_invitation(self):
+        invitation = PrescriberWithOrgSentInvitationFactory()
+        email = invitation.email_invitation
+
+        # Subject
+        self.assertIn(invitation.organization.display_name, email.subject)
+
+        # Body
+        self.assertIn(invitation.first_name, email.body)
+        self.assertIn(invitation.last_name, email.body)
+        self.assertIn(invitation.acceptance_link, email.body)
+        self.assertIn(invitation.organization.display_name, email.body)
+
+        # To
+        self.assertIn(invitation.email, email.to)
+
+
 class TestSiaeInvitation(TestCase):
     def test_add_member_to_siae(self):
         invitation = SiaeSentInvitationFactory(email="hey@you.com")
-        user = UserFactory(email=invitation.email)
+        UserFactory(email=invitation.email)
         siae_members = invitation.siae.members.count()
         invitation.add_invited_user_to_siae()
         siae_members_after = invitation.siae.members.count()
         self.assertEqual(siae_members + 1, siae_members_after)
-
-        user.refresh_from_db()
 
 
 class TestSiaeInvitationEmails(TestCase):
