@@ -1,4 +1,5 @@
 import ast
+
 from django.conf import settings
 from django.db import models
 from django.utils.timezone import now
@@ -11,13 +12,18 @@ class ExternaUserDataQuery(models.QuerySet):
 
 
 class ASTLiteralField(models.CharField):
+    """
+    Custom field type
+    Useful for auto-typing key/value for ExternalUserData
+    """
 
     def from_db_value(self, value, expression, connection):
+        # Process applied when getting value from DB
         return ast.literal_eval(value)
 
     def get_prep_value(self, value):
-        print(f"to DB: {value}")
-        return repr(value) if type(value) == str else str(value)
+        # Process applied when storing value to DB
+        return repr(value)
 
 
 class ExternalUserData(models.Model):
@@ -61,7 +67,10 @@ class ExternalUserData(models.Model):
     )
 
     source = models.CharField(
-        max_length=20, verbose_name=_("Origine des données externes sur l'utilisateur"), choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
+        max_length=20,
+        verbose_name=_("Origine des données externes sur l'utilisateur"),
+        choices=DATA_SOURCE_CHOICES,
+        default=DATA_SOURCE_UNKNOWN,
     )
 
     # Simple key value storage for external data
@@ -88,8 +97,10 @@ class ExternalUserData(models.Model):
     # original field: PE / beneficiairePrestationSolidarite
     KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE = "has_minimal_social_allowance"
 
-    KEY_CHOICES = ((KEY_IS_PE_JOBSEEKER, _("L'utilisateur est inscrit comme demandeur d'emploi PE")),
-                   (KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE, _("L'utilisateur dispose d'une prestation de minima sociaux")))
+    KEY_CHOICES = (
+        (KEY_IS_PE_JOBSEEKER, _("L'utilisateur est inscrit comme demandeur d'emploi PE")),
+        (KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE, _("L'utilisateur dispose d'une prestation de minima sociaux")),
+    )
 
     key = models.CharField(max_length=32, verbose_name=_("Clé"), choices=KEY_CHOICES, default=KEY_UNKNOWN)
 

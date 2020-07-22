@@ -26,8 +26,7 @@ def import_pe_external_user_data(user, data):
             key=ExternalUserData.KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE,
             value=data.get("beneficiairePrestationSolidarite", False),
         ),
-        ExternalUserData(key="adresse4", value=data.get("adresse4"))
-
+        ExternalUserData(key="adresse4", value=data.get("adresse4")),
     ]
 
     for data in external_user_data:
