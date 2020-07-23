@@ -6,8 +6,8 @@ from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
     JobApplicationSentByJobSeekerFactory,
