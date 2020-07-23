@@ -115,7 +115,7 @@
                         {% blocktrans with date=eligibility_diagnosis.expires_at|date %}
                             Ce diagnostic est expiré depuis le {{ date }}.
                         {% endblocktrans %}
-                        {% if job_application.state.is_processing %}
+                        {% if job_application.state.is_processing or job_application.state.is_postponed %}
                             {% trans "Pour embaucher ce candidat, réalisez un nouveau diagnostic d'éligibilité afin d'évaluer sa situation actuelle." %}
                         {% endif %}
                     </p>
@@ -229,37 +229,10 @@
         <hr>
 
         {% if job_application.eligibility_diagnosis_by_siae_required %}
-                {% if eligibility_diagnosis and eligibility_diagnosis.has_expired %}
-                    <p>
-                        <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
-                           class="btn btn-secondary btn-block">
-                                {% trans "Réaliser un nouveau diagnostic" %}
-                            {% include "includes/icon.html" with icon="arrow-right" %}
-                        </a>
-                    </p>
-
-                    <p>
-                        <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
-                           class="btn btn-outline-danger btn-block">
-                            {% trans "Je ne veux pas l'embaucher" %}
-                            {% include "includes/icon.html" with icon="arrow-right" %}
-                        </a>
-                    </p>
-
-                {% else %}
-
-                    <p>
-                        <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
-                           class="btn btn-secondary btn-block">
-                                {% trans "Valider les critères d'éligibilité" %}
-                            {% include "includes/icon.html" with icon="arrow-right" %}
-                        </a>
-                    </p>
-
-                {% endif %}
-
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
         {% else %}
-
             <p>
                 <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
@@ -276,23 +249,7 @@
                 </a>
             </p>
 
-            <p>
-                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
-                   class="btn btn-outline-danger btn-block">
-                    {% trans "Je ne veux pas l'embaucher" %}
-                    {% include "includes/icon.html" with icon="arrow-right" %}
-                </a>
-            </p>
-
         {% endif %}
-
-    {% endif %}
-
-    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
-
-    {% if job_application.state.is_postponed %}
-
-        <hr>
 
         <p>
             <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
@@ -302,10 +259,32 @@
             </a>
         </p>
 
+    {% endif %}
+
+    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
+
+    {% if job_application.state.is_postponed %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    {% trans "Je l'embauche" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+        {% endif %}
+
         <p>
-            <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
-               class="btn btn-outline-success btn-block">
-                {% trans "Je l'embauche" %}
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
+                {% trans "Je ne veux pas l'embaucher" %}
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>
