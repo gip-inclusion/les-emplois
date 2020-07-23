@@ -16,6 +16,8 @@ from itou.utils.perms.user import get_user_info
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
+from itou.external_data.models import ExternalUserData
+
 
 def valid_session_required(function=None):
     def decorated(request, *args, **kwargs):
@@ -255,6 +257,8 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     data = request.POST if request.method == "POST" else None
     form_administrative_criteria = AdministrativeCriteriaForm(request.user, siae=None, data=data)
 
+    external_user_data = ExternalUserData.last_data_to_dict(job_seeker)
+
     if request.method == "POST" and form_administrative_criteria.is_valid():
         EligibilityDiagnosis.create_diagnosis(
             job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
@@ -266,6 +270,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         "siae": siae,
         "job_seeker": job_seeker,
         "approvals_wrapper": approvals_wrapper,
+        "external_user_data": external_user_data,
         "form_administrative_criteria": form_administrative_criteria,
     }
     return render(request, template_name, context)

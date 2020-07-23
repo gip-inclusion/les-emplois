@@ -17,12 +17,15 @@ def user_has_logged(sender, **kwargs):
     user = kwargs.get("user")
 
     if user and login and login.account.provider == PEAMUProvider.id:
-
         # Format and store data if needed
-        extra_data = models.ExternalUserData.objects.for_user(user).first()
+        pe_data_import = models.DataImport.objects.for_user(user).filter(
+            source=models.DataImport.DATA_SOURCE_PE_CONNECT
+        )
 
-        if not extra_data or extra_data.status == models.ExternalUserData.STATUS_FAILED:
+        if not pe_data_import.exists() or pe_data_import.last().status == models.DataImport.STATUS_FAILED:
+            # fetch data
             extra_data = apis.get_aggregated_user_data(login.token)
+            # Store and dispatch as kvs
             data_import.import_pe_external_user_data(user, extra_data)
             print("Extra data:", extra_data)
 

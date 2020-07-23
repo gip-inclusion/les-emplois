@@ -6,15 +6,23 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
-class ExternaUserDataQuery(models.QuerySet):
+class DataImportQuerySet(models.QuerySet):
     def for_user(self, user):
         return self.filter(user__pk=user.pk)
+
+    def last_pe_import_for_user(self, user):
+        return self.for_user(user).filter(source=DataImport.DATA_SOURCE_PE_CONNECT).first()
+
+
+class ExternalUserDataQuerySet(models.QuerySet):
+    def for_user(self, user):
+        return self.filter(data_import__user=user)
 
 
 class ASTLiteralField(models.CharField):
     """
-    Custom field type
-    Useful for auto-typing key/value for ExternalUserData
+    Custom value field type based on CharField
+    Useful for auto-typing key/value for ExternalUserData objects
     """
 
     def from_db_value(self, value, expression, connection):
@@ -26,24 +34,12 @@ class ASTLiteralField(models.CharField):
         return repr(value)
 
 
-class ExternalUserData(models.Model):
+class DataImport(models.Model):
     """
-    User data acquired by **external** sources (mainly APIs like PE)
-    When possible, relevant data is updated directly in the User model (address and birth date for instance)
-    If external data is not usable "as-is", it is stored as timestamped key/value pair for further processing.
+    Track of API calls made for a given user
     """
 
-    objects = models.Manager.from_queryset(ExternaUserDataQuery)()
-
-    created_at = models.DateTimeField(verbose_name=_("Date de création de l'import"), default=now)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Candidat / Utilisateur API PE"),
-        on_delete=models.CASCADE,
-        related_name="external_user_data",
-    )
-
-    # Data import status (for possible retry)
+    objects = models.Manager.from_queryset(DataImportQuerySet)()
 
     STATUS_OK = "OK"
     STATUS_PARTIAL = "PARTIAL"
@@ -55,6 +51,7 @@ class ExternalUserData(models.Model):
     )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+    created_at = models.DateTimeField(verbose_name=_("Date de création de l'import"), default=now)
 
     # Data sources : external data providers (APIs)
     # Mainly PE at the moment
@@ -72,6 +69,28 @@ class ExternalUserData(models.Model):
         choices=DATA_SOURCE_CHOICES,
         default=DATA_SOURCE_UNKNOWN,
     )
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("Candidat / Utilisateur API PE"), on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = _("Jeu de données externe importé")
+        unique_together = ["user", "source"]
+
+
+class ExternalUserData(models.Model):
+    """
+    User data acquired by **external** sources (mainly APIs like PE)
+    When possible, relevant data is updated directly in the User model (address and birth date for instance)
+    If external data is not usable "as-is", it is stored as timestamped key/value pair for further processing.
+    """
+
+    objects = models.Manager.from_queryset(ExternalUserDataQuerySet)()
+
+    created_at = models.DateTimeField(verbose_name=_("Date d'enregistrement des données"), default=now)
+
+    data_import = models.ForeignKey(DataImport, on_delete=models.CASCADE)
 
     # Simple key value storage for external data
     #
@@ -108,11 +127,16 @@ class ExternalUserData(models.Model):
 
     class Meta:
         verbose_name = _("Informations externes complémentaires sur l'utilisateur (API externes)")
-        unique_together = ["key", "user"]
 
     def __str__(self):
-        return f"[{self.pk}] ExternalUserData: user={self.user.pk}, created_at={self.created_at}"
+        return f"[{self.pk}] ExternalUserData: created_at={self.created_at}"
+
+    class _AttrDict(dict):
+        __getattr__ = dict.get
 
     @staticmethod
-    def exists_for_user(user):
-        return ExternalUserData.objects.for_user(user).exists()
+    def last_data_to_dict(user):
+        """
+        Fetch last set of data imported for user and wrap them in a dict
+        """
+        return ExternalUserData._AttrDict({user.key: user.value for user in ExternalUserData.objects.for_user(user)})
