@@ -29,8 +29,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         kind = form.cleaned_data["kind"]
 
         siaes = (
-            Siae.objects.within(city.coords, distance_km)
-            .filter(is_authorized=True)
+            Siae.active.within(city.coords, distance_km)
             .shuffle()
             .annotate(num_active_members=Count("members", filter=Q(members__is_active=True)))
             .prefetch_job_description_through(is_active=True)

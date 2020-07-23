@@ -43,8 +43,8 @@ class SiaeAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "job_applications_blocked_at",
-        "is_authorized",
-        "authorized_until",
+        "is_active",
+        "active_until",
     )
     fieldsets = (
         (

@@ -72,6 +72,11 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(shuffled_rank=shuffle_expression).order_by("shuffled_rank")
 
 
+class ActiveSiaeManager(models.Manager.from_queryset(SiaeQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
@@ -126,15 +131,22 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
 
-    # Authorization is managed by import_siae.py script only.
-    is_authorized = models.BooleanField(
-        verbose_name=_("Conventionnée"),
+    # An active structure means:
+    # - (for SIAE) it is authorized by ASP ("conventionnée" in French).
+    # - (for non SIAE) it is allowed to use the service.
+    is_active = models.BooleanField(
+        verbose_name=_("Active"),
         default=True,
-        help_text=_("Précise si la structure a un conventionnement valide à ce jour."),
+        help_text=_(
+            "Précise pour les SIAE si la structure a un "
+            "conventionnement valide à ce jour et pour les autres "
+            "types de structures si elle est autorisée à utiliser "
+            "la plateforme."
+        ),
     )
-    # This authorization end date is not enforced and only stored for
+    # This deactivation date is not enforced and only stored for
     # information, for admin and/or metabase uses.
-    authorized_until = models.DateTimeField(verbose_name=_("Date de fin de conventionnement"), blank=True, null=True)
+    active_until = models.DateTimeField(verbose_name=_("Date de désactivation"), blank=True, null=True)
 
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
@@ -173,6 +185,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
+    active = ActiveSiaeManager()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")

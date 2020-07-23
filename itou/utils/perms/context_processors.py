@@ -22,7 +22,7 @@ def get_current_organization_and_perms(request):
         siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
             # Get all info in 1 SQL query.
-            memberships = request.user.siaemembership_set.select_related("siae").filter(siae__is_authorized=True).all()
+            memberships = request.user.siaemembership_set.select_related("siae").filter(siae__is_active=True).all()
             user_siae_set = [membership.siae for membership in memberships]
             for membership in memberships:
                 if membership.siae_id == siae_pk:

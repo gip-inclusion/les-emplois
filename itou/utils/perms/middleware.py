@@ -27,19 +27,22 @@ class ItouCurrentOrganizationMiddleware:
             # during the siae invitation process, thus we have filter out this edge case here.
             if user.is_siae_staff and user.siae_set.exists():
                 current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-                if not user.siae_set.filter(pk=current_siae_pk, is_authorized=True).exists():
-                    first_authorized_siae = user.siae_set.filter(is_authorized=True).first()
-                    if first_authorized_siae:
-                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_authorized_siae.pk
+                if not user.siae_set(manager="active").filter(pk=current_siae_pk).exists():
+                    first_active_siae = user.siae_set(manager="active").first()
+                    if first_active_siae:
+                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
                     elif request.path != reverse("account_logout"):
-                        # SIAE user has no authorized SIAE and thus must not be able to login.
+                        # SIAE user has no active SIAE and thus must not be able to login.
                         message = (
-                            "Votre compte employeur n'est plus valable car "
-                            "la ou les structures associées ne sont plus "
-                            "conventionnées à ce jour."
+                            "Nous sommes désolés, votre compte n'est "
+                            "malheureusement plus actif car la ou les "
+                            "structures associées ne sont plus "
+                            "conventionnées. Nous espérons cependant "
+                            "avoir l'occasion de vous accueillir de "
+                            "nouveau sur la Plateforme."
                         )
                         message = safestring.mark_safe(message)
-                        messages.error(request, _(message))
+                        messages.warning(request, _(message))
                         return redirect("account_logout")
 
             elif user.is_prescriber:

@@ -282,15 +282,15 @@ class SiaeSignupTest(TestCase):
             self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", subjects)
             self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
-    def test_cannot_join_an_unauthorized_siae(self):
+    def test_cannot_join_an_inactive_siae(self):
         """
-        A user cannot join an unauthorized SIAE.
+        A user cannot join an inactive SIAE.
         """
 
         user_first_name = "Judas"  # noqa F841
         user_email = "judas.iscariot@siae.com"
 
-        siae = SiaeFactory(kind=Siae.KIND_ETTI, is_authorized=False)
+        siae = SiaeFactory(kind=Siae.KIND_ETTI, is_active=False)
         self.assertEqual(0, siae.members.count())
 
         token = siae.get_token()
@@ -305,7 +305,7 @@ class SiaeSignupTest(TestCase):
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 200)
 
-            expected_message = _("Votre numéro de SIRET ou votre e-mail nous sont inconnus.")
+            expected_message = _("La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
             self.assertContains(response, expected_message)
 
     def test_legacy_route(self):

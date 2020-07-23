@@ -17,8 +17,8 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_user_with_single_unauthorized_siae_cannot_login(self):
-        siae = SiaeWithMembershipFactory(is_authorized=False)
+    def test_user_with_single_inactive_siae_cannot_login(self):
+        siae = SiaeWithMembershipFactory(is_active=False)
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -28,7 +28,7 @@ class DashboardViewTest(TestCase):
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("account_logout"))
 
-        expected_message = _("Votre compte employeur n'est plus valable")
+        expected_message = _("votre compte n'est malheureusement plus actif")
         self.assertContains(response, expected_message)
 
 
@@ -100,12 +100,12 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)
 
-    def test_cannot_switch_to_unauthorized_siae(self):
+    def test_cannot_switch_to_inactive_siae(self):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        related_siae = SiaeFactory(is_authorized=False)
+        related_siae = SiaeFactory(is_active=False)
         related_siae.members.add(user)
 
         url = reverse("dashboard:index")
@@ -117,7 +117,7 @@ class SwitchSiaeTest(TestCase):
         response = self.client.post(url, data={"siae_id": related_siae.pk})
         self.assertEqual(response.status_code, 302)
 
-        # User is still working on the main authorized siae.
+        # User is still working on the main active siae.
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

@@ -273,7 +273,7 @@ class SelectSiaeForm(forms.Form):
             )
             raise forms.ValidationError(error_message)
 
-        siaes = Siae.objects.filter(kind=kind, is_authorized=True)
+        siaes = Siae.objects.filter(kind=kind)
         if siret and email:
             # We match siaes having any of the two correct fields.
             siaes = siaes.filter(Q(siret=siret) | Q(auth_email=email))
@@ -287,12 +287,21 @@ class SelectSiaeForm(forms.Form):
         # There can be at most one siret match due to (kind, siret) unicity.
         siret_exists = len(siaes_matching_siret) == 1
 
+        def raise_form_error_for_inactive_siae():
+            error_message = _(f"La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
+            raise forms.ValidationError(mark_safe(error_message))
+
         if siret_exists:
-            self.selected_siae = siaes_matching_siret[0]
+            if siaes_matching_siret[0].is_active:
+                self.selected_siae = siaes_matching_siret[0]
+            else:
+                raise_form_error_for_inactive_siae()
         else:
             siaes_matching_email = [s for s in siaes if s.auth_email == email]
             email_exists = len(siaes_matching_email) > 0
-            several_siaes_share_same_email = len(siaes_matching_email) > 1
+            active_siaes_matching_email = [s for s in siaes_matching_email if s.is_active]
+            several_siaes_share_same_email = len(active_siaes_matching_email) > 1
+            email_exists_in_active_siae = len(active_siaes_matching_email) > 0
 
             if several_siaes_share_same_email:
                 error_message = _(
@@ -312,7 +321,10 @@ class SelectSiaeForm(forms.Form):
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
-            self.selected_siae = siaes_matching_email[0]
+            if not email_exists_in_active_siae:
+                raise_form_error_for_inactive_siae()
+
+            self.selected_siae = active_siaes_matching_email[0]
 
 
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
@@ -362,7 +374,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         if self.check_siae_signup_credentials():
             siae = self.get_siae()
         else:
-            raise RuntimeError("This should never happen. Attack attempted.")
+            raise RuntimeError("This should never happen.")
 
         if siae.has_members:
             siae.new_signup_warning_email_to_existing_members(user).send()
@@ -393,7 +405,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         if not self.get_encoded_siae_id():
             return None
         siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
-        siae = Siae.objects.get(pk=siae_id, is_authorized=True)
+        siae = Siae.active.get(pk=siae_id)
         return siae
 
     def check_siae_signup_credentials(self):
