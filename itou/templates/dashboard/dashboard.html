@@ -264,6 +264,17 @@
                         </a>
                         <span class="badge badge-info">{% trans "Nouveau" %}</span>
                     </p>
+                    {% if current_siae.is_subject_to_eligibility_rules %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="book-open" %}
+                            <a
+                                href="https://doc.inclusion.beta.gouv.fr/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
+                                target="_blank">
+                                    {% trans "Liste des critères d'éligibilité" %}
+                            </a>
+                            <span class="badge badge-info">{% trans "Nouveau" %}</span>
+                        </p>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
