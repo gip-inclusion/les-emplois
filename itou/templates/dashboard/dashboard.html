@@ -217,7 +217,6 @@
                         <a href="{% url 'siaes_views:members' %}">
                             {% trans "Collaborateurs" %}
                         </a>
-                        <span class="badge badge-info">{% trans "Nouveau" %}</span>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
@@ -262,7 +261,6 @@
                                 {% trans "Bloquer les nouvelles candidatures "%}
                             {% endif%}
                         </a>
-                        <span class="badge badge-info">{% trans "Nouveau" %}</span>
                     </p>
                     {% if current_siae.is_subject_to_eligibility_rules %}
                         <p class="card-text">
