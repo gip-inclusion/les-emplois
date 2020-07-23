@@ -301,9 +301,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         when processing an application, False otherwise.
         """
         return (
-            self.state.is_processing
+            (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.has_eligibility_diagnosis
+            and not self.job_seeker.has_valid_eligibility_diagnosis
         )
 
     @property

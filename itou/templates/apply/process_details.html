@@ -64,14 +64,17 @@
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-        {% with job_application.job_seeker.get_eligibility_diagnosis as eligibility_diagnosis %}
-
             {% if eligibility_diagnosis %}
 
                 <hr>
-                <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
+                <h3 class="font-weight-normal text-muted d-flex">
+                    {% trans "Critères d'éligibilité" %}
+                    {% if eligibility_diagnosis.has_expired %}
+                        <span class="badge badge-danger ml-3">{% trans "Expirés" %}</span>
+                    {% endif %}
+                </h3>
                 <p>
-                    {% trans "Validés par :" %}
+                    {% trans "Validés par" %}
                     <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
                     {% if eligibility_diagnosis.author_siae %}
                         ({{ eligibility_diagnosis.author_siae.display_name }})
@@ -80,7 +83,7 @@
                         ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
                     {% endif %}
                     {% trans "le" %}
-                    <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>
+                    <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>.
                 </p>
 
                 {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
@@ -107,19 +110,32 @@
                     {% endif %}
                 {% endwith %}
 
-                {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
+                {% if eligibility_diagnosis.has_expired %}
+                    <p class="text-danger">
+                        {% blocktrans with date=eligibility_diagnosis.expires_at|date %}
+                            Ce diagnostic est expiré depuis le {{ date }}.
+                        {% endblocktrans %}
+                        {% if job_application.state.is_processing or job_application.state.is_postponed %}
+                            {% trans "Pour embaucher ce candidat, réalisez un nouveau diagnostic d'éligibilité afin d'évaluer sa situation actuelle." %}
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <p>
+                        {% trans "Ce diagnostic expire le " %} {{ eligibility_diagnosis.expires_at|date }}.
+                    </p>
+                {% endif %}
+
+            {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
 
                 {# The existence of a valid `PoleEmploiApproval` implies that #}
                 {# a diagnosis has been made outside of Itou. #}
                 <hr>
                 <h3 class="font-weight-normal text-muted">{% trans "Critères d'éligibilité" %}</h3>
                 <p>
-                    {% trans "Validés par :" %} <b>{% trans "Pôle emploi" %}</b>
+                    {% trans "Validés par" %} <b>{% trans "Pôle emploi" %}</b>.
                 </p>
 
             {% endif %}
-
-        {% endwith %}
 
     {% endif %}
 
@@ -213,17 +229,10 @@
         <hr>
 
         {% if job_application.eligibility_diagnosis_by_siae_required %}
-
             <p>
-                <a href="{% url 'apply:eligibility' job_application_id=job_application %}"
-                   class="btn btn-secondary btn-block">
-                    {% trans "Valider les critères d'éligibilité" %}
-                    {% include "includes/icon.html" with icon="arrow-right" %}
-                </a>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
             </p>
-
         {% else %}
-
             <p>
                 <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
@@ -231,7 +240,7 @@
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
-            
+
             <p>
                 <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
@@ -240,23 +249,7 @@
                 </a>
             </p>
 
-            <p>
-                <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
-                   class="btn btn-outline-danger btn-block">
-                    {% trans "Je ne veux pas l'embaucher" %}
-                    {% include "includes/icon.html" with icon="arrow-right" %}
-                </a>
-            </p>
-
         {% endif %}
-
-    {% endif %}
-
-    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
-
-    {% if job_application.state.is_postponed %}
-
-        <hr>
 
         <p>
             <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
@@ -266,10 +259,32 @@
             </a>
         </p>
 
+    {% endif %}
+
+    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
+
+    {% if job_application.state.is_postponed %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    {% trans "Je l'embauche" %}
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+        {% endif %}
+
         <p>
-            <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
-               class="btn btn-outline-success btn-block">
-                {% trans "Je l'embauche" %}
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
+                {% trans "Je ne veux pas l'embaucher" %}
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>
