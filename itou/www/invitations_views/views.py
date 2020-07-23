@@ -29,10 +29,11 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
     if request.user.is_authenticated:
         if not request.user.email == invitation.email:
             message = (
-                "Un utilisateur précédent est déjà connecté.<br>"
-                "Veuillez déconnecter ce compte en cliquant sur le bouton ci-dessous "
-                "(ne tenez pas compte de la page d'accueil qui se chargera automatiquement) "
-                "puis cliquez de nouveau sur le lien envoyé par e-mail pour accepter votre invitation."
+                "Un utilisateur est déjà connecté.<br>"
+                "Merci de déconnecter ce compte en cliquant sur le bouton ci-dessous. "
+                "La page d'accueil se chargera automatiquement, n'en tenez pas compte.<br>"
+                "Retournez dans votre boite mail et cliquez de nouveau sur le lien "
+                "reçu pour accepter l'invitation."
             )
             message = safestring.mark_safe(message)
             messages.error(request, _(message))
@@ -67,15 +68,15 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
             count = len(formset.forms)
 
             message_singular = (
-                "Votre invitation a été envoyée par e-mail.<br>"
-                "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
-                "sur le lien de validation reçu dans le courriel.<br>"
+                "Votre invitation a été envoyée par courriel.<br>"
+                "Pour rejoindre votre organisation, il suffira simplement à votre invité(e) "
+                "de cliquer sur le lien de validation contenu dans le courriel.<br>"
             )
 
             message_plural = (
-                "Vos invitations ont été envoyées par e-mail.<br>"
-                "Pour rejoindre votre organisation, vos invités peuvent désormais "
-                "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
+                "Vos invitations ont été envoyées par courriel.<br>"
+                "Pour rejoindre votre organisation, il suffira simplement à vos invités "
+                "de cliquer sur le lien de validation contenu dans le courriel.<br>"
             )
 
             message = __(message_singular, message_plural, count) % {"count": count}
