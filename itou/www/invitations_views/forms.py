@@ -231,7 +231,7 @@ class NewUserForm(SignupForm):
         self.fields["last_name"].initial = invitation.last_name
 
     def clean(self):
-        if not self.invitation.siae.is_active:
+        if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
             raise forms.ValidationError(_("Cette structure n'est plus active."))
         super().clean()
 

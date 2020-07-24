@@ -23,16 +23,22 @@ class ItouCurrentOrganizationMiddleware:
 
         if user.is_authenticated:
 
-            # Note that the case of a siae user without any siae attached actually happens
-            # during the siae invitation process, thus we have filter out this edge case here.
-            if user.is_siae_staff and user.siae_set.exists():
+            if user.is_siae_staff:
                 current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
                 if not user.siae_set(manager="active").filter(pk=current_siae_pk).exists():
                     first_active_siae = user.siae_set(manager="active").first()
                     if first_active_siae:
                         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
-                    elif request.path != reverse("account_logout"):
-                        # SIAE user has no active SIAE and thus must not be able to login.
+                    elif request.path not in [
+                        reverse("account_logout"),
+                        reverse("account_login"),
+                    ] and not request.path.startswith("/invitations/"):
+                        # SIAE user has no active SIAE and thus must not be able to access any page,
+                        # thus we force a logout with a few exceptions:
+                        # - logout (to avoid infinite redirect loop)
+                        # - pages of the invitation process (including login)
+                        #   as being invited to a new active siae is the only
+                        #   way for an inactive siae user to be ressucitated.
                         message = (
                             "Nous sommes désolés, votre compte n'est "
                             "malheureusement plus actif car la ou les "

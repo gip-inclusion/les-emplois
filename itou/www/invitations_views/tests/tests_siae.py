@@ -55,11 +55,26 @@ class TestSendSiaeInvitation(TestCase):
         self.post_data["form-0-email"] = self.guest.email
         self.client.post(self.send_invitation_url, data=self.post_data)
 
-    def test_send_two_invitations_to_the_same_guest(self):
-        # SIAE 1 invites guest once.
+    def test_invite_existing_user_with_existing_inactive_siae(self):
+        """
+        An inactive siae user (i.e. attached to a single inactive siae)
+        can only be ressucitated by being invited to a new siae.
+        We test here that this is indeed possible.
+        """
+        self.guest = SiaeWith2MembershipsFactory(is_active=False).members.first()
+        self.post_data["form-0-first_name"] = self.guest.first_name
+        self.post_data["form-0-last_name"] = self.guest.last_name
+        self.post_data["form-0-email"] = self.guest.email
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("invitations_views:invite_siae_staff"))
+
+    def test_two_employers_invite_the_same_guest(self):
+        # SIAE 1 invites guest.
         self.client.post(self.send_invitation_url, data=self.post_data)
 
-        # SIAE 2 invites guest too
+        # SIAE 2 invites guest as well.
         siae_2 = SiaeWith2MembershipsFactory()
         siae_2_sender = siae_2.members.first()
         self.client.login(email=siae_2_sender.email, password=DEFAULT_PASSWORD)
@@ -197,6 +212,26 @@ class TestAcceptSiaeInvitation(TestCase):
 
     def test_accept_existing_user_is_employer(self):
         self.user = SiaeWith2MembershipsFactory().members.first()
+        self.invitation = SiaeSentInvitationFactory(
+            sender=self.sender,
+            siae=self.siae,
+            first_name=self.user.first_name,
+            last_name=self.user.last_name,
+            email=self.user.email,
+        )
+        self.client.login(email=self.user.email, password=DEFAULT_PASSWORD)
+        self.response = self.client.get(self.invitation.acceptance_link, follow=True)
+
+        current_siae = get_current_siae_or_404(self.response.wsgi_request)
+        self.assertEqual(self.invitation.siae.pk, current_siae.pk)
+
+    def test_accept_existing_user_with_existing_inactive_siae(self):
+        """
+        An inactive siae user (i.e. attached to a single inactive siae)
+        can only be ressucitated by being invited to a new siae.
+        We test here that this is indeed possible.
+        """
+        self.user = SiaeWith2MembershipsFactory(is_active=False).members.first()
         self.invitation = SiaeSentInvitationFactory(
             sender=self.sender,
             siae=self.siae,
