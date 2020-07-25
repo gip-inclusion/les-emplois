@@ -6,12 +6,12 @@ from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
 
 
-class DataImportQuerySet(models.QuerySet):
+class ExternalDataImportQuerySet(models.QuerySet):
     def for_user(self, user):
         return self.filter(user__pk=user.pk)
 
     def last_pe_import_for_user(self, user):
-        return self.for_user(user).filter(source=DataImport.DATA_SOURCE_PE_CONNECT).first()
+        return self.for_user(user).filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT).first()
 
 
 class ExternalUserDataQuerySet(models.QuerySet):
@@ -34,19 +34,21 @@ class ASTLiteralField(models.CharField):
         return repr(value)
 
 
-class DataImport(models.Model):
+class ExternalDataImport(models.Model):
     """
-    Track of API calls made for a given user
+    Track of API calls made for importing given user external data
     """
 
-    objects = models.Manager.from_queryset(DataImportQuerySet)()
+    objects = models.Manager.from_queryset(ExternalDataImportQuerySet)()
 
     STATUS_OK = "OK"
     STATUS_PARTIAL = "PARTIAL"
+    STATUS_PROCESSING = "PROCESSING"
     STATUS_FAILED = "FAILED"
     STATUS_CHOICES = (
         (STATUS_OK, _("Import de données réalisé sans erreur")),
         (STATUS_PARTIAL, _("Import de données réalisé partiellement")),
+        (STATUS_PROCESSING, _("Import de données réalisé en cours")),
         (STATUS_FAILED, _("Import de données en erreur")),
     )
 
@@ -90,7 +92,7 @@ class ExternalUserData(models.Model):
 
     created_at = models.DateTimeField(verbose_name=_("Date d'enregistrement des données"), default=now)
 
-    data_import = models.ForeignKey(DataImport, on_delete=models.CASCADE)
+    data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
     # Simple key value storage for external data
     #
@@ -128,8 +130,11 @@ class ExternalUserData(models.Model):
     class Meta:
         verbose_name = _("Informations externes complémentaires sur l'utilisateur (API externes)")
 
-    def __str__(self):
+    def __repr__(self):
         return f"[{self.pk}] ExternalUserData: created_at={self.created_at}"
+
+    def __str__(self):
+        return self.get_key_display()
 
     class _AttrDict(dict):
         __getattr__ = dict.get
