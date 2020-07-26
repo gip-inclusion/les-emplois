@@ -36,7 +36,13 @@ class ASTLiteralField(models.CharField):
 
 class ExternalDataImport(models.Model):
     """
-    Track of API calls made for importing given user external data
+    Store API calls made when importing external data of a given user.
+
+    Each call to an external source has a timestamp, an execution status, and an origin.
+
+    The goal of each API call is to gather data that may or may not fit directly in the model of the app.
+
+    Each api call is processed and rendered as a list of key/value pairs (see ExternalUserData class).
     """
 
     objects = models.Manager.from_queryset(ExternalDataImportQuerySet)()
@@ -67,7 +73,7 @@ class ExternalDataImport(models.Model):
 
     source = models.CharField(
         max_length=20,
-        verbose_name=_("Origine des données externes sur l'utilisateur"),
+        verbose_name=_("Origine des données externes de l'utilisateur"),
         choices=DATA_SOURCE_CHOICES,
         default=DATA_SOURCE_UNKNOWN,
     )
@@ -83,16 +89,28 @@ class ExternalDataImport(models.Model):
 
 class ExternalUserData(models.Model):
     """
-    User data acquired by **external** sources (mainly APIs like PE)
-    When possible, relevant data is updated directly in the User model (address and birth date for instance)
-    If external data is not usable "as-is", it is stored as timestamped key/value pair for further processing.
+    User data acquired by **external** sources (mainly APIs like PE).
+
+    External user data are stored as simple key / value pairs, attached to a parent ExternalDataImport object.
+
+    Documentation about valid keys is included in the code (as Django 'choices'), 
+    and usable via the 'description' property.
+
+    When possible, relevant data is updated directly in the User model (user address and birthdate for instance).
+    If external data is not usable "as-is" or not directly manageable in the app, it is stored as timestamped 
+    key/value pair for further processing or usage.
+
+    Storing external data as k/v pairs is a way to keep in mind that we do not have "authority" on:
+        - value (may change on API provider side),
+        - correctness (external data validation is not our responsibility),
+        - lifecycle (data may be outdated or updated on the "other side").
+
+    User data could have been stored "flat" with a Django JSONField or Postgres HStore, but:
+        - we could lose some useful metadata (like description),
+        - documentation on keys / JSON schema is not available directly (keys are documented in the model code).
+
+    Moreover, JSONField and HStore are Postgres specific.
     """
-
-    objects = models.Manager.from_queryset(ExternalUserDataQuerySet)()
-
-    created_at = models.DateTimeField(verbose_name=_("Date d'enregistrement des données"), default=now)
-
-    data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
     # Simple key value storage for external data
     #
@@ -108,7 +126,7 @@ class ExternalUserData(models.Model):
     KEY_IS_PE_JOBSEEKER = "is_pe_jobseeker"
 
     # The user has open rights to **at least one** the following social helps;
-    # * ASS (! Allocation Solidarité Spécifique)
+    # * ASS (Allocation Solidarité Spécifique)
     # * AAH (Allocation Adulte Handicapé)
     # * RSA (Revenue Solidarité Active)
     # * AER (Allocation Equivalent Retraite)
@@ -119,32 +137,49 @@ class ExternalUserData(models.Model):
     KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE = "has_minimal_social_allowance"
 
     KEY_CHOICES = (
+        (KEY_UNKNOWN, _("Clé inconnue")),
         (KEY_IS_PE_JOBSEEKER, _("L'utilisateur est inscrit comme demandeur d'emploi PE")),
         (KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE, _("L'utilisateur dispose d'une prestation de minima sociaux")),
     )
 
+    objects = models.Manager.from_queryset(ExternalUserDataQuerySet)()
+
     key = models.CharField(max_length=32, verbose_name=_("Clé"), choices=KEY_CHOICES, default=KEY_UNKNOWN)
+
+    created_at = models.DateTimeField(verbose_name=_("Date d'enregistrement des données"), default=now)
+
+    data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
     value = ASTLiteralField(max_length=512, verbose_name=_("Valeur"), null=True)
 
     class Meta:
-        verbose_name = _("Informations externes complémentaires sur l'utilisateur (API externes)")
+        verbose_name = _("Informations complémentaires sur l'utilisateur (API externes)")
 
     def __repr__(self):
-        return f"[{self.pk}] ExternalUserData: created_at={self.created_at}"
+        return f"[{self.pk}] ExternalUserData: key={self.key}, value={self.value}, created_at={self.created_at}"
 
     def __str__(self):
         return f"{self.key}: {self.value}"
 
+    @property
     def description(self):
+        """
+        Get a human readable description of the key / value pair (stored in KEY_CHOICES)
+        """
         return self.get_key_display()
 
-    class _AttrDict(dict):
+    class _DictWithAttrs(dict):
+        """
+        Helper class: add property-like access to a dict 
+        i.e. accessing user data with `my_ext_data.has_minimal_allowance`
+
+        There may be a better way to do that...
+        """
         __getattr__ = dict.get
 
     @staticmethod
-    def last_data_to_dict(user):
+    def user_data_to_dict(user):
         """
         Fetch last set of data imported for user and wrap them in a dict
         """
-        return ExternalUserData._AttrDict({user.key: user.value for user in ExternalUserData.objects.for_user(user)})
+        return ExternalUserData._DictWithAttrs({user.key: user.value for user in ExternalUserData.objects.for_user(user)})
