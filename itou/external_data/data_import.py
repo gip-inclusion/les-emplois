@@ -1,6 +1,6 @@
 from django.utils.dateparse import parse_datetime
 
-from .models import DataImport, ExternalUserData
+from .models import ExternalDataImport, ExternalUserData
 
 
 # External user data from PE Connect API:
@@ -19,7 +19,9 @@ def import_pe_external_user_data(user, data):
     user.save()
 
     # Save import metadata
-    data_import = DataImport(user=user, status=DataImport.STATUS_OK, source=DataImport.DATA_SOURCE_PE_CONNECT)
+    data_import = ExternalDataImport(
+        user=user, status=ExternalDataImport.STATUS_OK, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT
+    )
     data_import.save()
 
     external_user_data = [

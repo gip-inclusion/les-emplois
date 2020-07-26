@@ -134,6 +134,9 @@ class ExternalUserData(models.Model):
         return f"[{self.pk}] ExternalUserData: created_at={self.created_at}"
 
     def __str__(self):
+        return f"{self.key}: {self.value}"
+
+    def description(self):
         return self.get_key_display()
 
     class _AttrDict(dict):
