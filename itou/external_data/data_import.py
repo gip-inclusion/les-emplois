@@ -5,7 +5,8 @@ from .models import ExternalDataImport, ExternalUserData
 
 # External user data from PE Connect API:
 # * transform raw data from API
-# * dispatch data into models
+# * dispatch data into models if possible
+# * or store as key / value if needed
 
 
 def import_pe_external_user_data(user, data):

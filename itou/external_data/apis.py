@@ -2,7 +2,6 @@ import logging
 
 import requests
 from django.conf import settings
-from django.utils.dateparse import parse_datetime
 
 
 # PE Connect API data retrieval tools

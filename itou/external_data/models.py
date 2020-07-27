@@ -93,11 +93,11 @@ class ExternalUserData(models.Model):
 
     External user data are stored as simple key / value pairs, attached to a parent ExternalDataImport object.
 
-    Documentation about valid keys is included in the code (as Django 'choices'), 
+    Documentation about valid keys is included in the code (as Django 'choices'),
     and usable via the 'description' property.
 
     When possible, relevant data is updated directly in the User model (user address and birthdate for instance).
-    If external data is not usable "as-is" or not directly manageable in the app, it is stored as timestamped 
+    If external data is not usable "as-is" or not directly manageable in the app, it is stored as timestamped
     key/value pair for further processing or usage.
 
     Storing external data as k/v pairs is a way to keep in mind that we do not have "authority" on:
@@ -170,16 +170,19 @@ class ExternalUserData(models.Model):
 
     class _DictWithAttrs(dict):
         """
-        Helper class: add property-like access to a dict 
+        Helper class: add property-like access to a dict
         i.e. accessing user data with `my_ext_data.has_minimal_allowance`
 
         There may be a better way to do that...
         """
+
         __getattr__ = dict.get
 
     @staticmethod
     def user_data_to_dict(user):
         """
-        Fetch last set of data imported for user and wrap them in a dict
+        Fetch last set of data imported for user and wrap them in a "custom" dict (with properties access)
         """
-        return ExternalUserData._DictWithAttrs({user.key: user.value for user in ExternalUserData.objects.for_user(user)})
+        return ExternalUserData._DictWithAttrs(
+            {user.key: user.value for user in ExternalUserData.objects.for_user(user)}
+        )
