@@ -17,7 +17,7 @@ and fields. Not linked here but easy to find internally.
 """
 import logging
 import random
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import partial
 
 import psycopg2
@@ -39,7 +39,7 @@ from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 # This "WIP" mode is useful for quickly testing changes and iterating.
 # It builds tables with a *_wip suffix added to their name, to avoid
 # touching any real table, and injects only a sample of data.
-ENABLE_WIP_MODE = True
+ENABLE_WIP_MODE = False
 WIP_MODE_ROWS_PER_TABLE = 1000
 
 # Useful to troobleshoot whether this scripts runs a deluge of SQL requests.
@@ -694,6 +694,8 @@ class Command(BaseCommand):
                     ]
                 ),
             },
+            {"name": "longitude", "type": "float", "comment": "Longitude", "lambda": lambda o: o.longitude},
+            {"name": "latitude", "type": "float", "comment": "Latitude", "lambda": lambda o: o.latitude},
         ]
 
         self.populate_table(table_name=table_name, table_columns=table_columns, objects=objects)
@@ -994,6 +996,14 @@ class Command(BaseCommand):
                 "type": "date",
                 "comment": "Date de dernière connexion au service du candidat",
                 "lambda": lambda o: o.last_login,
+            },
+            {
+                "name": "actif",
+                "type": "boolean",
+                "comment": "Dernière connexion dans les 7 jours",
+                "lambda": lambda o: o.last_login > datetime.now(timezone.utc) + timedelta(days=-7)
+                if o.last_login
+                else None,
             },
         ]
         table_columns += get_department_and_region_columns(comment_suffix=" du candidat")
