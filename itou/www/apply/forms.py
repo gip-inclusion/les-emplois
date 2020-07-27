@@ -62,8 +62,6 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        print("Cleaned:")
-        print(self.cleaned_data)
         self._meta.model.clean_pole_emploi_fields(
             self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
         )
