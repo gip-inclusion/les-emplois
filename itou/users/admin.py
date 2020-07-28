@@ -129,7 +129,7 @@ class ItouUserAdmin(UserAdmin):
 
     def get_queryset(self, request):
         """
-        Remove superuser. The purpose is to prevent staff users
+        Exclude superusers. The purpose is to prevent staff users
         to change the password of a superuser.
         """
         qs = super().get_queryset(request)
