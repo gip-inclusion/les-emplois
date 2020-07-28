@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from itou.external_data.models import DataImport
+from itou.external_data.models import ExternalDataImport
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -94,7 +94,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
     form = EditUserInfoForm(instance=request.user, data=request.POST or None)
-    extra_data = DataImport.objects.last_pe_import_for_user(request.user)
+    extra_data = ExternalDataImport.objects.last_pe_import_for_user(request.user)
 
     if request.method == "POST" and form.is_valid():
         form.save()
