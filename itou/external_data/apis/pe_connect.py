@@ -179,19 +179,6 @@ def _store_user_data(user, status, data):
     # Set a trace of data import, whatever the resulting status
     data_import = ExternalDataImport.objects.last_pe_import_for_user(user)
 
-    # If user data already exists, erase and replace
-    if data_import:
-        data_import.delete()
-
-    data_import = ExternalDataImport(user=user, status=status, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
-    data_import.save()
-
-    if status == ExternalDataImport.STATUS_FAILED:
-        return data_import
-
-    # FIXME: remove
-    print(f"Data: {data}")
-
     # User part:
     # Can be directly "inserted" in to the model
 
@@ -247,9 +234,12 @@ def import_user_data(user, token):
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
     # Create a new import with a pending status (wil be async)
-    data_import = ExternalDataImport(
-        user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT
-    )
+    data_import = ExternalDataImport.objects.last_pe_import_for_user(user)
+
+    if data_import:
+        data_import.delete()
+
+    data_import = ExternalDataImport(user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
     data_import.save()
 
     status, result = _get_aggregated_user_data(token)
