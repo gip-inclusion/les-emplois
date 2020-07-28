@@ -230,6 +230,11 @@ class NewUserForm(SignupForm):
         self.fields["first_name"].initial = invitation.first_name
         self.fields["last_name"].initial = invitation.last_name
 
+    def clean(self):
+        if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
+            raise forms.ValidationError(_("Cette structure n'est plus active."))
+        super().clean()
+
     def save(self, request):
         self.cleaned_data["email"] = self.email
         DefaultAccountAdapter().stash_verified_email(request, self.email)

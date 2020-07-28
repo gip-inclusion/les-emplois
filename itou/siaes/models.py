@@ -72,6 +72,11 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(shuffled_rank=shuffle_expression).order_by("shuffled_rank")
 
 
+class ActiveSiaeManager(models.Manager.from_queryset(SiaeQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().filter(is_active=True)
+
+
 class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
@@ -126,6 +131,23 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
 
+    # An active structure means:
+    # - (for SIAE) it is authorized by ASP ("conventionnée" in French).
+    # - (for non SIAE) it is allowed to use the service.
+    is_active = models.BooleanField(
+        verbose_name=_("Active"),
+        default=True,
+        help_text=_(
+            "Précise pour les SIAE si la structure a un "
+            "conventionnement valide à ce jour et pour les autres "
+            "types de structures si elle est autorisée à utiliser "
+            "la plateforme."
+        ),
+    )
+    # This deactivation date is not enforced and only stored for
+    # information, for admin and/or metabase uses.
+    active_until = models.DateTimeField(verbose_name=_("Date de désactivation"), blank=True, null=True)
+
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
@@ -133,6 +155,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # the siae objects in ASP's own database. These are supposed to never change,
     # so as long as the ASP keeps including this field in all their exports,
     # it will be easy for us to accurately match data between exports.
+    # Note that this external_id unicity is based on SIRET only.
+    # In other words, if an EI and a ACI share the same SIRET, they also
+    # share the same external_id in ASP's own database.
     external_id = models.IntegerField(verbose_name=_("ID externe"), null=True, blank=True)
 
     jobs = models.ManyToManyField(
@@ -160,6 +185,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
+    active = ActiveSiaeManager()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")
