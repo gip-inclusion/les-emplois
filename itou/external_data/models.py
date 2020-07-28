@@ -49,12 +49,12 @@ class ExternalDataImport(models.Model):
 
     STATUS_OK = "OK"
     STATUS_PARTIAL = "PARTIAL"
-    STATUS_PROCESSING = "PROCESSING"
+    STATUS_PENDING = "PENDING"
     STATUS_FAILED = "FAILED"
     STATUS_CHOICES = (
         (STATUS_OK, _("Import de données réalisé sans erreur")),
         (STATUS_PARTIAL, _("Import de données réalisé partiellement")),
-        (STATUS_PROCESSING, _("Import de données réalisé en cours")),
+        (STATUS_PENDING, _("Import de données en cours")),
         (STATUS_FAILED, _("Import de données en erreur")),
     )
 

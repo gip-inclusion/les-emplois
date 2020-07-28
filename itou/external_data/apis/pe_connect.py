@@ -77,7 +77,10 @@ def _get_birthdate(token):
     key = "dateDeNaissance"
     # code, resp = _call_api(ESD_BIRTHDATE_API, token)
     result = _fields_or_failed(_call_api(ESD_BIRTHDATE_API, token), [key])
-    return {key: result.get(key) or None}
+    if result:
+        return {key: result.get(key)}
+    else:
+        return None
 
 
 def _get_status(token):
@@ -92,8 +95,11 @@ def _get_status(token):
     """
     key = "codeStatutIndividu"
     result = _fields_or_failed(_call_api(ESD_STATUS_API, token), [key])
-    code = result.get(key)
-    return {key: int(code) if code else None}
+    if result:
+        code = result.get(key)
+        return {key: int(code)}
+    else:
+        return None
 
 
 def _get_address(token):
@@ -230,6 +236,12 @@ def import_user_data(user, token):
     Import external user data via PE Connect
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
+    # Create a new import
+    data_import = ExternalDataImport(
+        user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT
+    )
+    data_import.save()
+
     status, result = _get_aggregated_user_data(token)
     data_import = _store_user_data(user, status, result)
 
