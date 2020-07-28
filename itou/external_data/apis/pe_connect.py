@@ -239,7 +239,9 @@ def import_user_data(user, token):
     if data_import:
         data_import.delete()
 
-    data_import = ExternalDataImport(user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
+    data_import = ExternalDataImport(
+        user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT
+    )
     data_import.save()
 
     status, result = _get_aggregated_user_data(token)

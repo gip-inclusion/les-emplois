@@ -6,7 +6,8 @@ from django.conf import settings
 
 # We do not use the extra 8 APIs yet, even though they are prepared below,
 # because the ESD staff has not validated our 8 contracts yet.
-USE_ALL_APIS = False
+USE_ALL_APIS = True
+
 
 BASIC_SCOPES = [
     # API Se connecter avec Pôle emploi (individu) v1
@@ -36,12 +37,12 @@ EXTRA_SCOPES = [
     "indemnisation",
     # API Expériences professionnelles v1
     # https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-experiences-professionnelles.html
-    "api_peconnect-experiencesv1",
-    "pfcexperiences",
+    # "api_peconnect-experiencesv1",
+    # "pfcexperiences",
     # API Expériences déclarées par l’Employeur v1
     # https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-exp-declarees-v1.html
-    "api_peconnect-experiencesprofessionellesdeclareesparlemployeurv1",
-    "passeprofessionnel",
+    # "api_peconnect-experiencesprofessionellesdeclareesparlemployeurv1",
+    # "passeprofessionnel",
     # API Formations professionnelles v1
     # https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-formations-professionnelles.html
     "api_peconnect-formationsv1",
@@ -49,10 +50,10 @@ EXTRA_SCOPES = [
     "pfcpermis",
     # API Compétences professionnelles v2
     # https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-competence-v2-1.html
-    "api_peconnect-competencesv2",
-    "pfccompetences",
-    "pfclangues",
-    "pfccentresinteret",
+    # "api_peconnect-competencesv2",
+    # "pfccompetences",
+    # "pfclangues",
+    # "pfccentresinteret",
 ]
 
 
