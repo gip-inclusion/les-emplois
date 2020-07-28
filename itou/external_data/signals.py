@@ -26,6 +26,6 @@ def user_logged_in(sender, **kwargs):
         )
 
         # If no data for user or import failed last time
-        if not pe_data_import.exists() or pe_data_import.last().status == ExternalDataImport.STATUS_FAILED:
+        if not pe_data_import.exists() or pe_data_import.last().status != ExternalDataImport.STATUS_OK:
             # Store and dispatch as key / value pairs
             import_user_data(user, login.token)

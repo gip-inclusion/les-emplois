@@ -189,13 +189,15 @@ def _store_user_data(user, status, data):
     if status == ExternalDataImport.STATUS_FAILED:
         return data_import
 
+    # FIXME: remove
+    print(f"Data: {data}")
+
     # User part:
     # Can be directly "inserted" in to the model
-    user.birthdate = user.birthdate or parse_datetime(data.get("dateDeNaissance"))
+    if data.get("dateDeNaissance"):
+        user.birthdate = user.birthdate or parse_datetime(data.get("dateDeNaissance"))
+
     user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
-
-    # FIXME: WTF user.address_line_2 = '' or user.address_line_2 or data.get("adresse2")
-
     user.post_code = user.post_code or data.get("codePostal")
     user.city = user.city or data.get("libelleCommune")
 
@@ -236,7 +238,7 @@ def import_user_data(user, token):
     Import external user data via PE Connect
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
-    # Create a new import
+    # Create a new import with a pending status (wil be async)
     data_import = ExternalDataImport(
         user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT
     )
