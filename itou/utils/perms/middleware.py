@@ -23,10 +23,13 @@ class ItouCurrentOrganizationMiddleware:
                 if not user.siae_set.filter(pk=current_siae_pk).exists():
                     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = user.siae_set.first().pk
 
-            elif user.is_prescriber and user.prescriberorganization_set.exists():
-                request.session[
-                    settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-                ] = user.prescriberorganization_set.first().pk
+            elif user.is_prescriber:
+                if user.prescriberorganization_set.exists():
+                    request.session[
+                        settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+                    ] = user.prescriberorganization_set.first().pk
+                elif request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY):
+                    del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
         response = self.get_response(request)
 

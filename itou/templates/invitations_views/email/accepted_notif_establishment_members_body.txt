@@ -6,8 +6,8 @@
 L'invitation envoyée par {{ sender_first_name }} {{ sender_last_name }} a été acceptée.
 {% endblocktrans %}
 
-{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst siae_name=siae_name %}
-{{ first_name }} {{ last_name }} est désormais membre de votre structure ({{ siae_name }}).
+{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst establishment_name=establishment_name %}
+{{ first_name }} {{ last_name }} est désormais membre de votre structure ({{ establishment_name }}).
 {% endblocktrans %}
 
 {% trans "Détails" %}
