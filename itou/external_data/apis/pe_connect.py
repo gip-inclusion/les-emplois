@@ -194,12 +194,20 @@ def _store_user_data(user, status, data):
 
     # User part:
     # Can be directly "inserted" in to the model
+
+    # Birth date
     if data.get("dateDeNaissance"):
         user.birthdate = user.birthdate or parse_datetime(data.get("dateDeNaissance"))
 
-    user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
-    user.post_code = user.post_code or data.get("codePostal")
-    user.city = user.city or data.get("libelleCommune")
+    # User address
+    if data.get("address_line_1"):
+        user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
+
+    if data.get("codePostal"):
+        user.post_code = user.post_code or data.get("codePostal")
+
+    if data.get("libelleCommune"):
+        user.city = user.city or data.get("libelleCommune")
 
     user.save()
 
