@@ -77,11 +77,9 @@ class InvitationEmailsTest(TestCase):
         self.assertIn(invitation.email, email.to)
 
 
-"""
 ################################################################
 ###################### PrescribersWithOrg ######################
 ################################################################
-"""
 
 
 class TestPrescriberWithOrgInvitation(TestCase):

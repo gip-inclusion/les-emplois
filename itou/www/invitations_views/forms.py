@@ -53,11 +53,9 @@ class NewInvitationMixinForm(forms.ModelForm):
                 self.add_error("email", error)
 
 
-"""
 ########################################################################
 ##################### PrescriberWithOrg invitation #####################
 ########################################################################
-"""
 
 
 class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
@@ -131,11 +129,9 @@ NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
 )
 
 
-"""
 #############################################################
 ###################### SiaeStaffInvitation ##################
 #############################################################
-"""
 
 
 class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
@@ -198,11 +194,9 @@ NewSiaeStaffInvitationFormSet = modelformset_factory(
 )
 
 
-"""
 ###############################################################
 ######################### Signup forms ########################
 ###############################################################
-"""
 
 
 class NewUserForm(SignupForm):
