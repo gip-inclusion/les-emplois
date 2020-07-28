@@ -38,7 +38,9 @@ def _call_api(api_path, token):
     url = f"{API_ESD_BASE_URL}/{api_path}"
     resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
     if resp.status_code == 200:
-        return resp.json()
+        result = resp.json()
+        logger.info(f"CALL {url}: {result}")
+        return result
     else:
         # Track it for QoS
         logger.warning(f"API call to: {url} returned status code {resp.status_code}")
@@ -245,6 +247,9 @@ def import_user_data(user, token):
     data_import.save()
 
     status, result = _get_aggregated_user_data(token)
+
+    logger.info(f"API DATA: {result}")
+
     data_import = _store_user_data(user, status, result)
 
     # At the moment, results are stored only if OK
