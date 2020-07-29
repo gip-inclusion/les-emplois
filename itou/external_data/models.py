@@ -59,7 +59,7 @@ class ExternalDataImport(models.Model):
     )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    created_at = models.DateTimeField(verbose_name=_("Date de création de l'import"), default=now)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=now)
 
     # Data sources : external data providers (APIs)
     # Mainly PE at the moment
@@ -72,22 +72,21 @@ class ExternalDataImport(models.Model):
     )
 
     source = models.CharField(
-        max_length=20,
-        verbose_name=_("Origine des données externes de l'utilisateur"),
-        choices=DATA_SOURCE_CHOICES,
-        default=DATA_SOURCE_UNKNOWN,
+        max_length=20, verbose_name=_("Origine des données"), choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
     )
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_("Candidat / Utilisateur API PE"), on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Utilisateur"), on_delete=models.CASCADE)
 
     class Meta:
-        verbose_name = _("Jeu de données externe importé")
+        verbose_name = _("Import de données externes")
+        verbose_name_plural = _("Imports de données externes")
         unique_together = ["user", "source"]
 
-    def __str__(self):
+    def __repr__(self):
         return f"ExternalDataImport: pk={self.pk}, user-pk={self.user.pk}, status={self.status}, source={self.source}"
+
+    def __str__(self):
+        return f"Import {self.source} pour {self.user.email}"
 
 
 class ExternalUserData(models.Model):
@@ -156,7 +155,8 @@ class ExternalUserData(models.Model):
     value = ASTLiteralField(max_length=512, verbose_name=_("Valeur"), null=True)
 
     class Meta:
-        verbose_name = _("Informations complémentaires sur l'utilisateur (API externes)")
+        verbose_name = _("Donnée externe de l'utilisateur")
+        verbose_name_plural = _("Données externes de l'utilisateur")
 
     def __repr__(self):
         return f"ExternalUserData: pk={self.pk}, key={self.key}, value={self.value}, created_at={self.created_at}"
