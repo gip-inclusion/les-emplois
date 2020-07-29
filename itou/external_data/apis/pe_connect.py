@@ -40,7 +40,7 @@ def _call_api(api_path, token):
     resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
     if resp.status_code == 200:
         result = resp.json()
-        logger.info(f"CALL {url}: {result}")
+        # logger.debug(f"CALL {url}: {result}")
         return result
     else:
         # Track it for QoS
@@ -257,8 +257,6 @@ def import_user_data(user, token):
     data_import.save()
 
     status, result = _get_aggregated_user_data(token)
-
-    logger.info(f"API DATA: {result}")
 
     data_import = _store_user_data(user, status, result)
 
