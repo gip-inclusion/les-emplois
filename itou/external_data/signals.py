@@ -1,9 +1,11 @@
+import asyncio
+
 from allauth.account.signals import user_logged_in
 from django.dispatch import receiver
 
 from itou.allauth.peamu.provider import PEAMUProvider
 
-from .apis.pe_connect import import_user_data
+from .apis.pe_connect import async_import_user_data, import_user_data
 from .models import ExternalDataImport
 
 
@@ -28,4 +30,9 @@ def user_logged_in(sender, **kwargs):
         # If no data for user or import failed last time
         if not pe_data_import.exists() or pe_data_import.last().status != ExternalDataImport.STATUS_OK:
             # Store and dispatch as key / value pairs
-            import_user_data(user, login.token)
+
+            # SYNC:
+            # import_user_data(user, login.token)
+            
+            # ASYNC:
+            asyncio.run(async_import_user_data(user, login.token))

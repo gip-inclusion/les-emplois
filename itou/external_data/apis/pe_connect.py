@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 import requests
@@ -232,6 +233,11 @@ def _store_user_data(user, status, data):
 
 
 #  Public ----
+
+
+async def async_import_user_data(user, token):
+    loop = asyncio.get_running_loop()
+    loop.run_in_executor(None, import_user_data, user, token)
 
 
 def import_user_data(user, token):
