@@ -116,9 +116,6 @@ class ExternalDataImportTest(TestCase):
         self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
 
 
-# API DATA: {'given_name': 'Tom', 'family_name': 'Riddle', 'gender': 'male', 'email': 'fred@ikarius.com', 'dateDeNaissance': '1972-03-26T00:00:00+01:00', 'codeStatutIndividu': 1, 'adresse1': None, 'adresse2': None, 'adresse3': None, 'adresse4': '19 RUE CECILE BERGEROT', 'codePostal': '37700', 'codeINSEE': '37273', 'libelleCommune': 'LA VILLE AUX DAMES', 'beneficiairePrestationSolidarite': False, 'beneficiaireAssuranceChomage': False}
-
-
 class ExternalUserDataTest(TestCase):
     @requests_mock.Mocker()
     def test_import_ok(self, m):
