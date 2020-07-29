@@ -33,6 +33,6 @@ def user_logged_in(sender, **kwargs):
 
             # SYNC:
             # import_user_data(user, login.token)
-            
+
             # ASYNC:
             asyncio.run(async_import_user_data(user, login.token))
