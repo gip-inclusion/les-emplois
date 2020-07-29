@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
 
 
 # For custom app config, see:
@@ -7,6 +8,7 @@ from django.apps import AppConfig
 
 class ExternalDataConfig(AppConfig):
     name = "itou.external_data"
+    verbose_name = _("Gestion des données utilisateur (APIs externes)")
 
     def ready(self):
         """

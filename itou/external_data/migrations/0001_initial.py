@@ -10,8 +10,6 @@ import itou.external_data.models
 
 class Migration(migrations.Migration):
 
-    replaces = [("external_data", "0001_initial"), ("external_data", "0002_auto_20200729_1352")]
-
     initial = True
 
     dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
