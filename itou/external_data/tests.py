@@ -8,7 +8,7 @@ import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
 
 from .apis.pe_connect import import_user_data
-from .models import ExternalDataImport
+from .models import ExternalDataImport, ExternalUserData
 
 
 # Test data import status (All ok, failed, partial)
@@ -46,7 +46,7 @@ _RESP_USER_COORDS = {
     "adresse1": None,
     "adresse2": "The cupboard under the stairs",
     "adresse3": None,
-    "adresse4": "4, private drive",
+    "adresse4": "4, Privet Drive",
     "codePostal": "37700",
     "codeINSEE": "37273",
     "libelleCommune": "LA VILLE AUX DAMES",
@@ -62,8 +62,6 @@ def _url_for_key(k):
     return f"{pec.API_ESD_BASE_URL}/{k}"
 
 
-# API DATA: {'given_name': 'Tom', 'family_name': 'Riddle', 'gender': 'male', 'email': 'fred@ikarius.com', 'dateDeNaissance': '1972-03-26T00:00:00+01:00', 'codeStatutIndividu': 1, 'adresse1': None, 'adresse2': None, 'adresse3': None, 'adresse4': '19 RUE CECILE BERGEROT', 'codePostal': '37700', 'codeINSEE': '37273', 'libelleCommune': 'LA VILLE AUX DAMES', 'beneficiairePrestationSolidarite': False, 'beneficiaireAssuranceChomage': False}
-
 _API_KEYS = [
     pec.ESD_COMPENSATION_API,
     pec.ESD_COORDS_API,
@@ -73,30 +71,32 @@ _API_KEYS = [
 ]
 
 
+def _status_ok(m):
+    m.get(_url_for_key(pec.ESD_USERINFO_API), text=json.dumps(_RESP_USER_INFO))
+    m.get(_url_for_key(pec.ESD_BIRTHDATE_API), text=json.dumps(_RESP_USER_BIRTHDATE))
+    m.get(_url_for_key(pec.ESD_STATUS_API), text=json.dumps(_RESP_USER_STATUS))
+    m.get(_url_for_key(pec.ESD_COORDS_API), text=json.dumps(_RESP_USER_COORDS))
+    m.get(_url_for_key(pec.ESD_COMPENSATION_API), text=json.dumps(_RESP_COMPENSATION))
+
+
+def _status_partial(m):
+    _status_ok(m)
+    m.get(_url_for_key(pec.ESD_COMPENSATION_API), text="", status_code=503)
+    m.get(_url_for_key(pec.ESD_BIRTHDATE_API), text="", status_code=503)
+
+
+def _status_failed(m):
+    for api_k in _API_KEYS:
+        m.get(_url_for_key(api_k), text="", status_code=500)
+
+
 class ExternalDataImportTest(TestCase):
-    def _status_ok(self, m):
-        # m.get("https://api.emploi-store.fr/partenaire/peconnect-individu/v1/userinfo", text=str(_RESP_USER_INFO))
-        m.get(_url_for_key(pec.ESD_USERINFO_API), text=json.dumps(_RESP_USER_INFO))
-        m.get(_url_for_key(pec.ESD_BIRTHDATE_API), text=json.dumps(_RESP_USER_BIRTHDATE))
-        m.get(_url_for_key(pec.ESD_STATUS_API), text=json.dumps(_RESP_USER_STATUS))
-        m.get(_url_for_key(pec.ESD_COORDS_API), text=json.dumps(_RESP_USER_COORDS))
-        m.get(_url_for_key(pec.ESD_COMPENSATION_API), text=json.dumps(_RESP_COMPENSATION))
-
-    def _status_partial(self, m):
-        self._status_ok(m)
-        # Randomly override one or more response with a generic error response
-        m.get(_url_for_key(pec.ESD_COMPENSATION_API), text="", status_code=503)
-
-    def _status_failed(self, m):
-        for api_k in _API_KEYS:
-            m.get(_url_for_key(api_k), text="", status_code=500)
-
     @requests_mock.Mocker()
     def test_status_ok(self, m):
         user = JobSeekerFactory()
 
         # Mock all PE APIs
-        self._status_ok(m)
+        _status_ok(m)
 
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
@@ -104,24 +104,66 @@ class ExternalDataImportTest(TestCase):
     @requests_mock.Mocker()
     def test_status_partial(self, m):
         user = JobSeekerFactory()
-        self._status_partial(m)
+        _status_partial(m)
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
 
     @requests_mock.Mocker()
     def test_status_failed(self, m):
         user = JobSeekerFactory()
-        self._status_failed(m)
+        _status_failed(m)
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
 
 
+# API DATA: {'given_name': 'Tom', 'family_name': 'Riddle', 'gender': 'male', 'email': 'fred@ikarius.com', 'dateDeNaissance': '1972-03-26T00:00:00+01:00', 'codeStatutIndividu': 1, 'adresse1': None, 'adresse2': None, 'adresse3': None, 'adresse4': '19 RUE CECILE BERGEROT', 'codePostal': '37700', 'codeINSEE': '37273', 'libelleCommune': 'LA VILLE AUX DAMES', 'beneficiairePrestationSolidarite': False, 'beneficiaireAssuranceChomage': False}
+
+
 class ExternalUserDataTest(TestCase):
-    def test_import_ok(self):
-        pass
+    @requests_mock.Mocker()
+    def test_import_ok(self, m):
+        _status_ok(m)
 
-    def test_import_partial(self):
-        pass
+        user = JobSeekerFactory()
 
-    def test_import_failed(self):
-        pass
+        # Check override of birthdate
+        user.birthdate = None
+
+        result = import_user_data(user, FOO_TOKEN)
+        self.assertTrue(result.externaluserdata_set.exists())
+
+        data = ExternalUserData.user_data_to_dict(user)
+
+        # Key/values
+        self.assertFalse(data.has_minimal_social_allowance)
+        self.assertTrue(data.is_pe_jobseeker)
+
+        # Inserted into model
+        self.assertEquals(user.address_line_1, "4, Privet Drive")
+        self.assertEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
+
+    @requests_mock.Mocker()
+    def test_import_partial(self, m):
+        _status_partial(m)
+
+        user = JobSeekerFactory()
+        result = import_user_data(user, FOO_TOKEN)
+        self.assertTrue(result.externaluserdata_set.exists())
+
+        data = ExternalUserData.user_data_to_dict(user)
+
+        # Key/values
+        self.assertIsNone(data.has_minimal_social_allowance)
+        self.assertTrue(data.is_pe_jobseeker)
+
+        # Inserted into model
+        self.assertEquals(user.address_line_1, "4, Privet Drive")
+        self.assertNotEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
+
+    @requests_mock.Mocker()
+    def test_import_failed(self, m):
+        _status_failed(m)
+
+        user = JobSeekerFactory()
+        result = import_user_data(user, FOO_TOKEN)
+        self.assertFalse(result.externaluserdata_set.exists())

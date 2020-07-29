@@ -189,7 +189,7 @@ def _store_user_data(user, status, data):
         user.birthdate = user.birthdate or parse_datetime(data.get("dateDeNaissance"))
 
     # User address
-    if data.get("address_line_1"):
+    if data.get("adresse4"):
         user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
 
     if data.get("codePostal"):
@@ -205,8 +205,9 @@ def _store_user_data(user, status, data):
     result_keys = list(data.keys())
 
     if "codeStatutIndividu" in result_keys:
+        value = data.get("codeStatutIndividu")
         external_user_data.append(
-            ExternalUserData(key=ExternalUserData.KEY_IS_PE_JOBSEEKER, value=data.get("codeStatutIndividu"))
+            ExternalUserData(key=ExternalUserData.KEY_IS_PE_JOBSEEKER, value=(True if value == 1 else False))
         )
 
     if "beneficiairePrestationSolidarite" in result_keys:
