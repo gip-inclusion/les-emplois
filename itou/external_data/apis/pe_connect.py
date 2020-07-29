@@ -224,6 +224,9 @@ def _store_user_data(user, status, data):
 
     ExternalUserData.objects.bulk_create(external_user_data)
 
+    data_import.status = status
+    data_import.save()
+
     return data_import
 
 

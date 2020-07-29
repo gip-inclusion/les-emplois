@@ -86,6 +86,9 @@ class ExternalDataImport(models.Model):
         verbose_name = _("Jeu de données externe importé")
         unique_together = ["user", "source"]
 
+    def __str__(self):
+        return f"ExternalDataImport: pk={self.pk}, user-pk={self.user.pk}, status={self.status}, source={self.source}"
+
 
 class ExternalUserData(models.Model):
     """
@@ -156,7 +159,7 @@ class ExternalUserData(models.Model):
         verbose_name = _("Informations complémentaires sur l'utilisateur (API externes)")
 
     def __repr__(self):
-        return f"[{self.pk}] ExternalUserData: key={self.key}, value={self.value}, created_at={self.created_at}"
+        return f"ExternalUserData: pk={self.pk}, key={self.key}, value={self.value}, created_at={self.created_at}"
 
     def __str__(self):
         return f"{self.key}: {self.value}"
