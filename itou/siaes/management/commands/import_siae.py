@@ -491,6 +491,9 @@ class Command(BaseCommand):
 
         siae = Siae()
         siae.external_id = external_id
+
+        siae.active_until = EXTERNAL_ID_TO_DEACTIVATION_DATE.get(external_id)
+
         siae.siret = siret
         siae.kind = kind
         siae.naf = main_df_row["naf"]
