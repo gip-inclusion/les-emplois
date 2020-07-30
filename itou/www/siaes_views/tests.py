@@ -149,7 +149,7 @@ class ConfigureJobsViewTest(TestCase):
 
 
 class CreateSiaeViewTest(TestCase):
-    def test_create_non_preexisting_siae_outside_of_siren_fails(self):
+    def test_cannot_create_non_preexisting_siae_outside_of_siren(self):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -189,7 +189,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.assertFalse(Siae.objects.filter(siret=post_data["siret"]).exists())
 
-    def test_create_preexisting_siae_outside_of_siren_fails(self):
+    def test_cannot_create_preexisting_siae_outside_of_siren(self):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -265,7 +265,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_can_create_siae_with_same_siret_and_different_type(self, mock_call_ban_geocoding_api):
+    def test_create_siae_with_same_siret_and_different_type(self, mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         siae.kind = Siae.KIND_ETTI
         siae.save()
@@ -313,6 +313,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.website, post_data["website"])
         self.assertEqual(new_siae.description, post_data["description"])
         self.assertEqual(new_siae.created_by, user)
+        self.assertEqual(new_siae.parent, siae)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
         self.assertTrue(new_siae.is_active)
 
@@ -369,6 +370,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.website, post_data["website"])
         self.assertEqual(new_siae.description, post_data["description"])
         self.assertEqual(new_siae.created_by, user)
+        self.assertEqual(new_siae.parent, siae)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
         self.assertTrue(new_siae.is_active)
 

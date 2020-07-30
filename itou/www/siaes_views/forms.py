@@ -102,6 +102,7 @@ class CreateSiaeForm(forms.ModelForm):
         if commit:
             siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
             siae.created_by = request.user
+            siae.parent = self.current_siae.root_parent
             siae.source = Siae.SOURCE_USER_CREATED
             siae.save()
             membership = SiaeMembership()

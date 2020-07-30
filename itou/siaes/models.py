@@ -189,6 +189,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    parent = models.ForeignKey(
+        "self",
+        verbose_name=_("Structure mère"),
+        related_name="children",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
 
     # Ability to block new job applications
     block_job_applications = models.BooleanField(verbose_name=_("Blocage des candidatures"), default=False)
@@ -252,6 +260,12 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
+
+    @property
+    def root_parent(self):
+        if self.parent:
+            return self.parent.root_parent
+        return self
 
     @property
     def active_members(self):

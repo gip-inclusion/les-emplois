@@ -47,6 +47,7 @@ class SiaeAdmin(admin.ModelAdmin):
         "created_by",
         "created_at",
         "updated_at",
+        "parent",
         "job_applications_blocked_at",
     )
     fieldsets = (
