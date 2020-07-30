@@ -40,7 +40,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
             return redirect("account_logout")
 
     if invitation.can_be_accepted:
-        user = get_user_model().objects.filter(email=invitation.email)
+        user = get_user_model().objects.filter(email__iexact=invitation.email)
         if not user:
             form = NewUserForm(data=request.POST or None, invitation=invitation)
             context["form"] = form
