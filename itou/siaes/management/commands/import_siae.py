@@ -42,9 +42,9 @@ REFUSE_PENDING_JOB_APPLICATIONS_OF_DEACTIVATED_SIAE = False
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_15_fluxIAE_Structure_15062020_074022.csv"
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_27072020_122717.csv"
 
-SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_24_siae_auth_email_and_external_id.csv"
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_07_24_siae_auth_email_and_external_id.csv"
 
 VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_30_fluxIAE_AnnexeFinanciere_29062020_063002.csv"
 
