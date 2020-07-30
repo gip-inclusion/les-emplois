@@ -1,8 +1,9 @@
 {% load i18n %}
 {% load static %}
 {% load bootstrap4 %}
+{% load demo_accounts %}
 
-{% if ITOU_ENVIRONMENT == "DEMO" %}
+{# if ITOU_ENVIRONMENT == "DEMO" #}
 
 <div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
     <div class="container">
@@ -24,57 +25,98 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title font-weight-demo">{% trans "Connexion à l'environnement de démo" %}<h4>
+                <h3 class="modal-title font-weight-demo m-auto">{% trans "Comptes de démonstration" %}</h3>
             </div>
             <div class="modal-body">
-                <p>
-                  {% blocktrans %}
-                    L'environnement de démonstration de la <b>Plateforme de l'inclusion</b> est limité à des fins de formation.
-                  {% endblocktrans %}
-                </p>
 
-                <p class="alert alert-danger"> 
+                <p class="alert alert-danger">
                   {% blocktrans %}
-                    Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>. 
+                    L'environnement de démonstration de la <b>Plateforme de l'inclusion</b> est limité à des fins de formation.<br>
+                    Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>.
                     Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
                   {% endblocktrans %}
                 </p>
 
-                <p>
-                  {% blocktrans %}
-                    Les <b>comptes de démonstration</b> dont le mot de passe est <code>password</code> sont les suivants :
-                  {% endblocktrans %}
-                </p>
-                
-                <table class="table table-sm">
-                    <tr>
-                        <td>{% trans "Demandeur d'emploi ; " %}<code>test+de@inclusion.beta.gouv.fr</code></td>
-                    </tr>
-                    <tr>
-                        <td>{% trans "Prescripteur habilité : " %}<code>test+prescripteur@inclusion.beta.gouv.fr</code></td>
-                    </tr>
-                    <tr>
-                        <td>{% trans "Prescripteur non habilité (orienteur) : " %}<code>test+orienteur@inclusion.beta.gouv.fr</code></td>
-                    </tr>
-                    <tr>
-                        <td>{% trans "Administrateur ETTI et membre d'une EI : " %}<code>test+etti@inclusion.beta.gouv.fr</code></td>
-                    </tr>
-                    <tr>
-                        <td>{% trans "Administrateur EI et membre d'une ETTI : " %}<code>test+ei@inclusion.beta.gouv.fr</code></td>
-                    </tr>
-                    <tr>
-                        <td>{% trans "Administrateur GEIQ : " %}<code>test+geiq@inclusion.beta.gouv.fr</code></td>
-                    </tr>
-                </table>
+                <div class="pt-2 pb-5">
+                    <h4 class="text-center pb-3">Employeurs</h4>
+                    <div class="card-deck">
+                        {% employers_accounts_tag as employers_accounts %}
+                        {% for account in employers_accounts %}
+                            <div class="card">
+                                <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title h6">{{ account.title }}</h5>
+                                    <p class="card-text">{{ account.description }}</p>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="siae_staff">
+                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="pb-5">
+                    <h4 class="text-center pb-3">Prescripteurs</h4>
+                    <div class="card-deck">
+                        {% prescribers_accounts_tag as prescribers_accounts %}
+                        {% for account in prescribers_accounts %}
+                            <div class="card">
+                                <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title h6">{{ account.title }}</h5>
+                                    <p class="card-text">{{ account.description }}</p>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="prescriber">
+                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="pb-5">
+                    <h4 class="text-center pb-3">Candidat</h4>
+                    <div class="card-deck w-sm-33 m-auto">
+                        {% job_seekers_accounts_tag as job_seekers_accounts %}
+                        {% for account in job_seekers_accounts %}
+                            <div class="card">
+                                <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
+                                <div class="card-body">
+                                    <h5 class="card-title h6">{{ account.title }}</h5>
+                                    <p class="card-text">{{ account.description }}</p>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="job_seeker">
+                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
 
                 <p class="alert alert-secondary">
                     {% blocktrans %}
                         Employeurs présents : <b>Une nouvelle chance</b> une <b>ETTI</b> à Beaucaire (30) et le <b>Gararge Martinet</b> une <b>EI</b> à St-Etienne-du-Grès (13)
                     {% endblocktrans %}
                 </p>
-                
+
                 <div class="modal-footer">
-                    <button class="btn btn-success" data-dismiss="modal">{% trans "C'est bien noté !" %}</button>
+                    <button class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>
+                </div>
+
+                <div class="d-none">
+                    <form id="demoForm" method="post" action="{% url 'account_login' %}">
+                        {% csrf_token %}
+                        <input type="email" name="login">
+                        <input type="password" name="password">
+                        <input type="hidden" name="account_type">
+                    </form>
                 </div>
 
             </div>
@@ -83,4 +125,4 @@
 </div>
 
 
-{% endif%}
+{# endif #}
