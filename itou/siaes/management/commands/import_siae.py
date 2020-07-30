@@ -169,7 +169,7 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     - auth_email
     When joined with the first dataset, it somehow constitutes a complete dataset.
     """
-    df = pd.read_csv(filename, converters={"siret": str, "auth_email": str}, sep=";")
+    df = pd.read_csv(filename, converters={"siret": str, "auth_email": str}, sep=",")
 
     # Filter out rows with irrelevant data.
     df = df[df.kind != "FDI"]
@@ -183,6 +183,10 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
 
     # Delete unused field to avoid confusion.
     del df["name"]
+
+    # Remove useless suffixes used by ASP.
+    df["kind"] = df["kind"].str.replace("_DC", "")
+    df["kind"] = df["kind"].str.replace("_MP", "")
 
     for kind in df.kind:
         assert kind in EXPECTED_KINDS
