@@ -180,7 +180,7 @@ def _get_aggregated_user_data(token):
 
 def _store_user_data(user, status, data):
     # Set a trace of data import, whatever the resulting status
-    data_import = ExternalDataImport.objects.last_pe_import_for_user(user)
+    data_import = ExternalDataImport.objects.pe_import_for_user(user).first()
 
     # User part:
     # Can be directly "inserted" in to the model
@@ -234,7 +234,9 @@ def _store_user_data(user, status, data):
 
 #  Public ----
 
-
+# Experimental:
+# * logs will be truncated (per thread writing, will not work simply with async)
+#
 async def async_import_user_data(user, token):
     loop = asyncio.get_running_loop()
     loop.run_in_executor(None, import_user_data, user, token)
@@ -246,7 +248,7 @@ def import_user_data(user, token):
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
     # Create a new import with a pending status (wil be async)
-    data_import = ExternalDataImport.objects.last_pe_import_for_user(user)
+    data_import = ExternalDataImport.objects.pe_import_for_user(user)
 
     if data_import:
         data_import.delete()
@@ -256,16 +258,20 @@ def import_user_data(user, token):
     )
     data_import.save()
 
-    status, result = _get_aggregated_user_data(token)
+    try:
+        status, result = _get_aggregated_user_data(token)
+        data_import = _store_user_data(user, status, result)
 
-    data_import = _store_user_data(user, status, result)
-
-    # At the moment, results are stored only if OK
-    if status == ExternalDataImport.STATUS_OK:
-        logger.info(f"Stored external data for user {user}")
-    elif status == ExternalDataImport.STATUS_PARTIAL:
-        logger.warning(f"Could only fetch partial results for {user}")
-    else:
-        logger.error(f"Could not fetch any data for {user}: not data stored")
+        # At the moment, results are stored only if OK
+        if status == ExternalDataImport.STATUS_OK:
+            logger.info(f"Stored external data for user {user}")
+        elif status == ExternalDataImport.STATUS_PARTIAL:
+            logger.warning(f"Could only fetch partial results for {user}")
+        else:
+            logger.error(f"Could not fetch any data for {user}: not data stored")
+    except Exception as ex:
+        logger.error(f"Data import for {user} failed: {ex}")
+        data_import.status = ExternalDataImport.STATUS_FAILED
+        data_import.save()
 
     return data_import

@@ -12,8 +12,7 @@ from .models import ExternalDataImport, ExternalUserData
 
 
 # Test data import status (All ok, failed, partial)
-
-# Mock PE connect endpoints
+# Tests are SYNCHRONOUS (because calls to `import_user_data` are)
 
 FOO_TOKEN = "kreatur_token"
 

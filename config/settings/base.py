@@ -374,3 +374,9 @@ ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 # ------------------------------------------------------------------------------
 # Approval numbering prefix can be different for non-production envs
 ASP_ITOU_PREFIX = "99999"
+
+
+# External data import (APIs)
+# ------------------------------------------------------------------------------
+# Data retrieval mode (sync or async)
+EXTERNAL_DATA_SYNC_API_CALL = False

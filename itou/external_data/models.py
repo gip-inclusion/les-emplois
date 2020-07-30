@@ -10,8 +10,8 @@ class ExternalDataImportQuerySet(models.QuerySet):
     def for_user(self, user):
         return self.filter(user__pk=user.pk)
 
-    def last_pe_import_for_user(self, user):
-        return self.for_user(user).filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT).first()
+    def pe_import_for_user(self, user):
+        return self.for_user(user).filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
 
 
 class ExternalUserDataQuerySet(models.QuerySet):

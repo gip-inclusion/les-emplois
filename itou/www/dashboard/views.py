@@ -90,11 +90,10 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     Edit a user.
     """
-
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
     form = EditUserInfoForm(instance=request.user, data=request.POST or None)
-    extra_data = ExternalDataImport.objects.last_pe_import_for_user(request.user)
+    extra_data = ExternalDataImport.objects.pe_import_for_user(request.user).first()
 
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -103,6 +102,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         return HttpResponseRedirect(success_url)
 
     context = {"form": form, "prev_url": prev_url, "extra_data": extra_data}
+
     return render(request, template_name, context)
 
 
@@ -112,7 +112,6 @@ def switch_siae(request):
     """
     Switch to the dashboard of another SIAE of the same SIREN.
     """
-
     dashboard_url = reverse_lazy("dashboard:index")
 
     pk = request.POST["siae_id"]
@@ -120,4 +119,5 @@ def switch_siae(request):
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
     messages.success(request, _(f"Vous travaillez sur {siae.display_name}"))
+
     return HttpResponseRedirect(dashboard_url)
