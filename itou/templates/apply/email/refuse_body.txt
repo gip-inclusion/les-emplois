@@ -16,6 +16,18 @@ Votre candidature chez {{ to_siae }} n'a malheureusement pas pu aboutir.
 
 {% endif %}
 
+{% if job_application.is_refused_due_to_deactivation %}
+
+Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures. 
+
+{% if not job_application.is_sent_by_proxy %}
+
+Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
+
+{% endif %}
+
+{% endif %}
+
 {% if job_application.answer %}
 {% trans "*Message de l'entreprise* :" %}
 
