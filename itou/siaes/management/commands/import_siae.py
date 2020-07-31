@@ -1,9 +1,10 @@
 """
 
 This script updates existing SIAEs and injects new ones
-by joining the following two ASP datasets:
+by joining the following three ASP datasets:
 - Vue Structure (main dataset)
 - Liste Correspondants Techniques (secondary dataset)
+- Vue AF ("Annexes Financières", used to deactivate siaes)
 to build a complete SIAE dataset.
 
 It should be played again after each upcoming Opening (HDF, the whole country...)
@@ -21,7 +22,9 @@ import os
 import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.management.commands.import_deleted_siae import (
     DEPARTMENTS_TO_OPEN_ON_06_07_2020,
     DEPARTMENTS_TO_OPEN_ON_14_04_2020,
@@ -35,11 +38,15 @@ from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
+REFUSE_PENDING_JOB_APPLICATIONS_OF_DEACTIVATED_SIAE = False
+
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_15_fluxIAE_Structure_15062020_074022.csv"
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_27072020_122717.csv"
 
-SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_24_siae_auth_email_and_external_id.csv"
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_07_24_siae_auth_email_and_external_id.csv"
+
+VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_30_fluxIAE_AnnexeFinanciere_29062020_063002.csv"
 
 # ETTI are deployed all over France without restriction.
 SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
@@ -83,8 +90,8 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
         sep="|",
         converters={
             "structure_siret_actualise": str,
-            "structure_adresse_admin_cp": str,
-            "structure_adresse_admin_telephone": str,
+            "structure_adresse_gestion_cp": str,
+            "structure_adresse_gestion_telephone": str,
         },
     )
 
@@ -94,18 +101,19 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
             "structure_id_siae": "external_id",
             "structure_code_naf": "naf",
             "structure_denomination": "name",
-            "structure_adresse_admin_numero": "street_num",
-            "structure_adresse_admin_cplt_num_voie": "street_num_extra",
-            "structure_adresse_admin_type_voie": "street_type",
-            "structure_adresse_admin_nom_voie": "street_name",
+            # ASP recommends using *_gestion_* rather than *_admin_*.
+            "structure_adresse_gestion_numero": "street_num",
+            "structure_adresse_gestion_cplt_num_voie": "street_num_extra",
+            "structure_adresse_gestion_type_voie": "street_type",
+            "structure_adresse_gestion_nom_voie": "street_name",
             # The extra* fields have very low quality data,
             # their content does not reflect the field name at all.
-            "structure_adresse_admin_numero_apt": "extra1",
-            "structure_adresse_admin_entree": "extra2",
-            "structure_adresse_admin_cplt_adresse": "extra3",
-            "structure_adresse_admin_cp": "zipcode",
-            "structure_adresse_admin_commune": "city",
-            "structure_adresse_admin_telephone": "phone",
+            "structure_adresse_gestion_numero_apt": "extra1",
+            "structure_adresse_gestion_entree": "extra2",
+            "structure_adresse_gestion_cplt_adresse": "extra3",
+            "structure_adresse_gestion_cp": "zipcode",
+            "structure_adresse_gestion_commune": "city",
+            "structure_adresse_gestion_telephone": "phone",
         },
         inplace=True,
     )
@@ -125,6 +133,31 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
 MAIN_DF = get_main_df()
 
 
+def get_df_rows_as_dict(df, external_id):
+    rows = df[df.external_id == external_id].to_dict("records")
+    return rows
+
+
+def get_df_row_as_dict(df, external_id):
+    rows = get_df_rows_as_dict(df, external_id)
+    assert len(rows) <= 1
+    return rows[0] if len(rows) == 1 else None
+
+
+def get_main_df_row_as_dict(external_id):
+    return get_df_row_as_dict(MAIN_DF, external_id)
+
+
+def get_siret_to_external_id():
+    siret_to_external_id = {}
+    for index, row in MAIN_DF.iterrows():
+        siret_to_external_id[row.siret] = row.external_id
+    return siret_to_external_id
+
+
+SIRET_TO_EXTERNAL_ID = get_siret_to_external_id()
+
+
 def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     """
     The secondary dataset is called "Liste correspondants techniques" by the ASP
@@ -136,7 +169,7 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     - auth_email
     When joined with the first dataset, it somehow constitutes a complete dataset.
     """
-    df = pd.read_csv(filename, converters={"siret": str, "auth_email": str}, sep=";")
+    df = pd.read_csv(filename, converters={"siret": str, "auth_email": str}, sep=",")
 
     # Filter out rows with irrelevant data.
     df = df[df.kind != "FDI"]
@@ -150,6 +183,10 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
 
     # Delete unused field to avoid confusion.
     del df["name"]
+
+    # Remove useless suffixes used by ASP.
+    df["kind"] = df["kind"].str.replace("_DC", "")
+    df["kind"] = df["kind"].str.replace("_MP", "")
 
     for kind in df.kind:
         assert kind in EXPECTED_KINDS
@@ -167,21 +204,6 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
 SECONDARY_DF = get_secondary_df()
 
 
-def get_df_rows_as_dict(df, external_id):
-    rows = df[df.external_id == external_id].to_dict("records")
-    return rows
-
-
-def get_df_row_as_dict(df, external_id):
-    rows = get_df_rows_as_dict(df, external_id)
-    assert len(rows) <= 1
-    return rows[0] if len(rows) == 1 else None
-
-
-def get_main_df_row_as_dict(external_id):
-    return get_df_row_as_dict(MAIN_DF, external_id)
-
-
 def get_secondary_df_row_as_dict(external_id):
     return get_df_row_as_dict(SECONDARY_DF, external_id)
 
@@ -190,7 +212,85 @@ def get_secondary_df_rows_as_dict(external_id):
     return get_df_rows_as_dict(SECONDARY_DF, external_id)
 
 
+def get_vue_af_df(filename=VUE_AF_DATASET_FILENAME):
+    """
+    The "Vue AF - Annexes Financières" is the third ASP export we are using.
+    It enables us to know which siae is or is not "conventionnée" as of today.
+    Meaningful columns:
+    - af_id_structure == siae.external_id
+    - af_mesure_dispositif_code == siae.kind (modulo some suffixes)
+    - af_date_fin_effet: consider only AF which are still valid to this day
+    - af_etat_annexe_financiere_code: only consider VALIDE and PROVISOIRE
+    """
+    df = pd.read_csv(
+        filename,
+        sep="|",
+        parse_dates=["af_date_fin_effet"],
+        # Fix `DtypeWarning: Columns (84,86) have mixed types.` warning.
+        low_memory=False,
+    )
+
+    df.rename(
+        columns={
+            "af_id_structure": "external_id",
+            "af_mesure_dispositif_code": "kind",
+            "af_date_fin_effet": "deactivation_date",
+            "af_etat_annexe_financiere_code": "state",
+        },
+        inplace=True,
+    )
+
+    # Remove useless suffixes used by ASP.
+    df["kind"] = df["kind"].str.replace("_DC", "")
+    df["kind"] = df["kind"].str.replace("_MP", "")
+
+    # Filter out rows with irrelevant data.
+    df = df[df.kind != "FDI"]
+
+    # Ignore structure kinds we have not implemented yet.
+    df = df[df.kind != "EITI"]
+
+    for kind in df.kind:
+        assert kind in EXPECTED_KINDS
+
+    # Filter out invalid AF states.
+    df = df[df.state.isin(["VALIDE", "PROVISOIRE"])]
+
+    # Replace NaN elements with None.
+    df = df.replace({np.nan: None})
+
+    return df
+
+
+def get_external_id_to_deactivation_date():
+    """
+    Deactivation date (future or past) is eventually stored as siae.active_until.
+    """
+    external_id_to_deactivation_date = {}
+    af_df = get_vue_af_df()
+    for index, row in af_df.iterrows():
+        deactivation_date = timezone.make_aware(row.deactivation_date)
+        if row.external_id in external_id_to_deactivation_date:
+            if deactivation_date > external_id_to_deactivation_date[row.external_id]:
+                external_id_to_deactivation_date[row.external_id] = deactivation_date
+        else:
+            external_id_to_deactivation_date[row.external_id] = deactivation_date
+    return external_id_to_deactivation_date
+
+
+EXTERNAL_ID_TO_DEACTIVATION_DATE = get_external_id_to_deactivation_date()
+
+
+VALID_EXTERNAL_IDS = [
+    external_id
+    for external_id, deactivation_date in EXTERNAL_ID_TO_DEACTIVATION_DATE.items()
+    if timezone.now() < deactivation_date
+]
+
+
 def should_siae_be_created(siae):
+    if siae.external_id not in VALID_EXTERNAL_IDS:
+        return False
     if siae.kind in SIAE_CREATION_ALLOWED_KINDS:
         return True
     return siae.department in SIAE_CREATION_ALLOWED_DEPARTMENTS
@@ -239,10 +339,24 @@ class Command(BaseCommand):
         auth_email = auth_emails[0]
         return auth_email
 
+    def fix_missing_external_ids(self, dry_run):
+        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
+            if siae.siret in SIRET_TO_EXTERNAL_ID:
+                external_id = SIRET_TO_EXTERNAL_ID[siae.siret]
+                self.log(f"siae.id={siae.id} will be assigned external_id={external_id}")
+                if not dry_run:
+                    siae.external_id = external_id
+                    siae.save()
+
     def update_existing_siaes(self, dry_run):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
+
             if row:
+                assert siae.siret[:9] == row["siret"][:9]
+                assert siae.kind in EXPECTED_KINDS
+
+                # Update siae.auth_email when needed.
                 new_auth_email = self.get_new_auth_email(external_id=siae.external_id)
                 if new_auth_email and siae.auth_email != new_auth_email:
                     self.log(
@@ -255,42 +369,95 @@ class Command(BaseCommand):
 
                 if row["siret"] == siae.siret:
                     continue
+
+                # Update siae.siret when needed.
+                if Siae.objects.filter(siret=row["siret"], kind=siae.kind).exists():
+                    self.log(
+                        f"siae.id={siae.id} has changed siret from "
+                        f"{siae.siret} to {row['siret']} but siret already exists (will *not* be updated)"
+                    )
                 else:
-                    assert siae.siret[:9] == row["siret"][:9]
-                    assert siae.kind in EXPECTED_KINDS
-                    if Siae.objects.filter(siret=row["siret"], kind=siae.kind).exists():
-                        self.log(
-                            f"siae.id={siae.id} has changed siret from "
-                            f"{siae.siret} to {row['siret']} but siret already exists (will *not* be updated)"
-                        )
-                    else:
-                        self.log(
-                            f"siae.id={siae.id} has changed siret from "
-                            f"{siae.siret} to {row['siret']} (will be updated)"
-                        )
-                        if not dry_run:
-                            siae.siret = row["siret"]
-                            siae.save()
+                    self.log(
+                        f"siae.id={siae.id} has changed siret from "
+                        f"{siae.siret} to {row['siret']} (will be updated)"
+                    )
+                    if not dry_run:
+                        siae.siret = row["siret"]
+                        siae.save()
                 # FIXME update other fields as well. Or not?
                 # Tricky decision since our users may have updated their data
                 # themselves and we have no record of that.
+
+    def update_siae_active_until(self, siae, dry_run):
+        new_active_until = EXTERNAL_ID_TO_DEACTIVATION_DATE.get(siae.external_id)
+        if siae.active_until != new_active_until:
+            if not dry_run:
+                siae.active_until = new_active_until
+                siae.save()
+            return 1
+        return 0
+
+    def activate_siae(self, siae, dry_run):
+        if not dry_run:
+            siae.is_active = True
+            siae.save()
+
+    def deactivate_siae(self, siae, dry_run):
+        if not dry_run:
+            siae.is_active = False
+            siae.save()
+
+    def reject_pending_job_applications(self, siae, dry_run):
+        """
+        Refusing pending job applications will be done at a later step
+        since it is not easy to rollback. We only deactivate siaes
+        for this step, which is very easy to rollback,
+        let's first see whether support is overwhelmed.
+        """
+        pending_job_applications = siae.job_applications_received.filter(
+            state__in=[
+                JobApplicationWorkflow.STATE_NEW,
+                JobApplicationWorkflow.STATE_PROCESSING,
+                JobApplicationWorkflow.STATE_POSTPONED,
+            ]
+        )
+        for ja in pending_job_applications:
+            if REFUSE_PENDING_JOB_APPLICATIONS_OF_DEACTIVATED_SIAE:
+                if not dry_run:
+                    if ja.state == JobApplicationWorkflow.STATE_NEW:
+                        ja.process()
+                    ja.refusal_reason = JobApplication.REFUSAL_REASON_DEACTIVATION
+                    # An email will be sent to the job seeker and its prescriber.
+                    ja.refuse()
+                    # FIXME Maybe we should throttle sending so many emails
+                    # at the same time? Like sleep 1 second between each.
+        return len(pending_job_applications)
+
+    def manage_siae_activation(self, dry_run):
+        activations = 0
+        deactivations = 0
+        refused_job_applications = 0
+        active_until_updates = 0
+        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP):
+            siae_is_valid = siae.external_id in VALID_EXTERNAL_IDS
+            if siae_is_valid:
+                if not siae.is_active:
+                    # Ressucitate formerly deactivated siae.
+                    self.activate_siae(siae, dry_run)
+                    activations += 1
             else:
-                if siae.members.count():
-                    self.log(
-                        f"siae.id={siae.id} has members but no longer exists "
-                        f"in latest export (should eventually be deleted "
-                        f"but not this time)"
-                    )
-                    # if not dry_run:
-                    #     siae.delete()
-                else:
-                    self.log(
-                        f"siae.id={siae.id} no longer exists "
-                        f"in latest export (should eventually be deleted "
-                        f"but not this time)"
-                    )
-                    # if not dry_run:
-                    #     siae.delete()
+                if siae.is_active:
+                    self.deactivate_siae(siae, dry_run)
+                    deactivations += 1
+                refused_job_applications += self.reject_pending_job_applications(siae, dry_run)
+            active_until_updates += self.update_siae_active_until(siae, dry_run)
+
+        self.log(f"{deactivations} siaes will be deactivated.")
+        self.log(f"{activations} siaes will be activated.")
+        self.log(f"{refused_job_applications} job applications will be refused.")
+        self.log(f"{active_until_updates} siae.active_until fields will be updated.")
+
+        # FIXME deactivate children as well - will be done at a later step.
 
     def geocode_siae(self, siae):
         assert siae.address_on_one_line
@@ -324,6 +491,9 @@ class Command(BaseCommand):
 
         siae = Siae()
         siae.external_id = external_id
+
+        siae.active_until = EXTERNAL_ID_TO_DEACTIVATION_DATE.get(external_id)
+
         siae.siret = siret
         siae.kind = kind
         siae.naf = main_df_row["naf"]
@@ -373,7 +543,7 @@ class Command(BaseCommand):
 
         # VERY IMPORTANT : external_id is *not* unique!! o_O
         # Several structures can share the same external_id and in this
-        # case they will have the same siret. Note that several structures
+        # case they will have the same siret. Note that several ASP structures
         # can share the same external_id, siret *and* kind o_O
         for external_id in external_ids_with_complete_data:
 
@@ -432,7 +602,11 @@ class Command(BaseCommand):
 
         self.set_logger(options.get("verbosity"))
 
+        self.fix_missing_external_ids(dry_run)
+
         self.update_existing_siaes(dry_run)
+
+        self.manage_siae_activation(dry_run)
 
         self.create_new_siaes(dry_run)
 
