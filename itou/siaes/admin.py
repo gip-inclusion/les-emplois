@@ -39,7 +39,7 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 class SiaeAdmin(admin.ModelAdmin):
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
-    raw_id_fields = ("created_by",)
+    raw_id_fields = ("created_by", "parent")
     readonly_fields = (
         "active_until",
         "reactivated_by",
@@ -73,6 +73,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "created_by",
                     "created_at",
                     "updated_at",
+                    "parent",
                     "block_job_applications",
                     "job_applications_blocked_at",
                 )
