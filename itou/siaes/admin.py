@@ -39,12 +39,12 @@ class SiaeAdmin(admin.ModelAdmin):
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = (
+        "is_active",
+        "active_until",
         "created_by",
         "created_at",
         "updated_at",
         "job_applications_blocked_at",
-        "is_active",
-        "active_until",
     )
     fieldsets = (
         (
@@ -62,6 +62,8 @@ class SiaeAdmin(admin.ModelAdmin):
                     "website",
                     "description",
                     "source",
+                    "is_active",
+                    "active_until",
                     "created_by",
                     "created_at",
                     "updated_at",
