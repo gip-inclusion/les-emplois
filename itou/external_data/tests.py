@@ -14,7 +14,7 @@ from .models import ExternalDataImport, ExternalUserData
 # Test data import status (All ok, failed, partial)
 # Tests are SYNCHRONOUS (because calls to `import_user_data` are)
 
-FOO_TOKEN = "kreatur_token"
+FOO_TOKEN = "kreacher_token"
 
 # CALL https://api.emploi-store.fr/partenaire/peconnect-individu/v1/userinfo:
 _RESP_USER_INFO = {
@@ -136,6 +136,7 @@ class ExternalUserDataTest(TestCase):
 
         # Inserted into model
         self.assertEquals(user.address_line_1, "4, Privet Drive")
+        self.assertEquals(user.address_line_2, "The cupboard under the stairs")
         self.assertEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
 
     @requests_mock.Mocker()
@@ -154,6 +155,7 @@ class ExternalUserDataTest(TestCase):
 
         # Inserted into model
         self.assertEquals(user.address_line_1, "4, Privet Drive")
+        self.assertEquals(user.address_line_2, "The cupboard under the stairs")
         self.assertNotEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
 
     @requests_mock.Mocker()
