@@ -163,10 +163,10 @@ class SelectedAdministrativeCriteria(models.Model):
 
     # Values of administrative criteria can be imported via APIs (and overridden by user if needed)
     # Default 'data source' is 'app'(lication)
-    DATA_SOURCE_APP = "app"
-    DATA_SOURCE_API_PE = "peconnect"
+    DATA_SOURCE_APP = "itou"
+    DATA_SOURCE_API_PE = "peamu"
 
-    DATA_SOURCE_CHOICES = ((DATA_SOURCE_APP, _("Application")), (DATA_SOURCE_API_PE, "APIs PE Connect"))
+    DATA_SOURCE_CHOICES = ((DATA_SOURCE_APP, _("Application ITOU")), (DATA_SOURCE_API_PE, "APIs PE Connect"))
 
     data_source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_APP
