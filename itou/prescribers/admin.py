@@ -53,18 +53,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             _("Structure"),
-            {
-                "fields": (
-                    "siret",
-                    "kind",
-                    "name",
-                    "phone",
-                    "email",
-                    "secret_code",
-                    "code_safir_pole_emploi",
-                    "is_authorized",
-                )
-            },
+            {"fields": ("siret", "kind", "name", "phone", "email", "code_safir_pole_emploi", "is_authorized")},
         ),
         (
             _("Adresse"),
@@ -100,7 +89,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     list_filter = (AuthorizationValidationRequired, HasMembersFilter, "is_authorized", "kind", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = (
-        "secret_code",
         "code_safir_pole_emploi",
         "created_by",
         "created_at",

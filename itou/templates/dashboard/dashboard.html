@@ -152,20 +152,6 @@
                             {% endif %}
                         </p>
 
-                        {% comment %}
-                            {# Hide secret code until we erase the system beneath #}
-                            {% if user_is_prescriber_org_admin and prescriber_is_orienter %}
-                                <!-- <p class="card-text">
-                                    {% include "includes/icon.html" with icon="user-plus" %}
-                                    <i>{% trans "Inviter des utilisateurs" %}</i>
-                                    <br>
-                                    {% trans "Transmettez ce code aux personnes de votre choix, elles pourront alors l'utiliser au moment de leur inscription afin de rejoindre votre organisation :" %}
-                                    <br>
-                                    <b><code>{{ current_prescriber_organization.secret_code }}</code></b>
-                                </p> -->
-                            {% endif %}
-                        {% endcomment %}
-
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
                             <a href="{% url 'prescribers_views:members' %}">
