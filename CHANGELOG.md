@@ -4,6 +4,23 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2020-08-03
+
+### Ajouté
+- Un prescripteur peut inviter ses collaborateurs à joindre son organisation
+- [Simulateur de la demande d'aide
+du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
+- Une embauche reportée permet maintenant un nouveau diagnostic
+- Un diagnostic a maintenant une durée de vie limitée
+- Nouveau lien "Liste des critères d'éligibilité" sur le tableau de bord Employeur
+- Nouveau texte sur le tableau de bord Employeur pour informer du fait que les agréments ont été allongés
+- Hotjar sur le Forum
+
+### Modifié
+- Déblocage Mailjet permettant à certains utilisateurs de pouvoir recevoir nos emails correctement
+- Désactivation de 200 structures n'ayant pas de conventionnement valide à ce jour
+- Un prescripteur ayant été détaché de son organisation peut maintenant continuer à utiliser la Plateforme sans erreur
+
 ## [1.0.7] - 2020-07-17
 
 ### Ajouté
