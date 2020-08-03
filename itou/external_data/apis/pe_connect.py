@@ -193,6 +193,9 @@ def _store_user_data(user, status, data):
     if data.get("adresse4"):
         user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
 
+    if data.get("adresse2"):
+        user.address_line_2 = "" or user.address_line_2 or data.get("adresse2")
+
     if data.get("codePostal"):
         user.post_code = user.post_code or data.get("codePostal")
 

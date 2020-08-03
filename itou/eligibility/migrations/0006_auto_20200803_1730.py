@@ -5,14 +5,17 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('eligibility', '0005_auto_20200713_1611_squashed_0006_auto_20200713_1808'),
-    ]
+    dependencies = [("eligibility", "0005_auto_20200713_1611_squashed_0006_auto_20200713_1808")]
 
     operations = [
         migrations.AlterField(
-            model_name='selectedadministrativecriteria',
-            name='data_source',
-            field=models.CharField(choices=[('itou', 'Application ITOU'), ('peamu', 'APIs PE Connect')], default='itou', max_length=20, verbose_name='Source de données'),
-        ),
+            model_name="selectedadministrativecriteria",
+            name="data_source",
+            field=models.CharField(
+                choices=[("itou", "Application ITOU"), ("peamu", "APIs PE Connect")],
+                default="itou",
+                max_length=20,
+                verbose_name="Source de données",
+            ),
+        )
     ]
