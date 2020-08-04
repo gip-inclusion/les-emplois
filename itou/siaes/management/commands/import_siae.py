@@ -24,7 +24,7 @@ import pandas as pd
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.management.commands.import_deleted_siae import (
     DEPARTMENTS_TO_OPEN_ON_06_07_2020,
     DEPARTMENTS_TO_OPEN_ON_14_04_2020,
@@ -37,9 +37,6 @@ from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
 
-
-DEACTIVATE_SIAE_FOR_REAL = False
-REFUSE_PENDING_JOB_APPLICATIONS_OF_DEACTIVATED_SIAE = False
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
@@ -465,10 +462,13 @@ class Command(BaseCommand):
             siae.save()
 
     def deactivate_siae(self, siae, dry_run):
-        if DEACTIVATE_SIAE_FOR_REAL:
-            if not dry_run:
-                siae.is_active = False
-                siae.save()
+        pass
+        # We no longer deactivate any siae for now, only reactivate them,
+        # to avoid overriding reactivations made by support.
+        #
+        # if not dry_run:
+        #     siae.is_active = False
+        #     siae.save()
 
     def reject_pending_job_applications(self, siae, dry_run):
         """
@@ -485,15 +485,18 @@ class Command(BaseCommand):
             ]
         )
         for ja in pending_job_applications:
-            if REFUSE_PENDING_JOB_APPLICATIONS_OF_DEACTIVATED_SIAE:
-                if not dry_run:
-                    if ja.state == JobApplicationWorkflow.STATE_NEW:
-                        ja.process()
-                    ja.refusal_reason = JobApplication.REFUSAL_REASON_DEACTIVATION
-                    # An email will be sent to the job seeker and its prescriber.
-                    ja.refuse()
-                    # FIXME Maybe we should throttle sending so many emails
-                    # at the same time? Like sleep 1 second between each.
+            pass
+            # We are not confident enough yet about deactivations
+            # to refuse all pending job applications for real.
+            #
+            # if not dry_run:
+            #     if ja.state == JobApplicationWorkflow.STATE_NEW:
+            #         ja.process()
+            #     ja.refusal_reason = JobApplication.REFUSAL_REASON_DEACTIVATION
+            #     # An email will be sent to the job seeker and its prescriber.
+            #     ja.refuse()
+            #     # FIXME Maybe we should throttle sending so many emails
+            #     # at the same time? Like sleep 1 second between each.
         return len(pending_job_applications)
 
     def manage_siae_activation(self, dry_run):
