@@ -38,14 +38,7 @@ class SiaeAdmin(admin.ModelAdmin):
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by",)
-    readonly_fields = (
-        "is_active",
-        "active_until",
-        "created_by",
-        "created_at",
-        "updated_at",
-        "job_applications_blocked_at",
-    )
+    readonly_fields = ("active_until", "created_by", "created_at", "updated_at", "job_applications_blocked_at")
     fieldsets = (
         (
             _("SIAE"),
