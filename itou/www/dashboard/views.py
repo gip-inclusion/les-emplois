@@ -37,15 +37,10 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         prescriber_authorization_status_not_set = (
             prescriber_organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
         )
-        # This is to hide the "secret code", except for orienter orgs
-        prescriber_is_orienter = (
-            prescriber_organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
-        )
 
     context = {
         "job_applications_counter": job_applications_counter,
         "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
-        "prescriber_is_orienter": prescriber_is_orienter,
     }
 
     return render(request, template_name, context)
