@@ -1,5 +1,6 @@
 import logging
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -25,6 +26,8 @@ class EligibilityDiagnosis(models.Model):
         (AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
         (AUTHOR_KIND_SIAE_STAFF, _("Employeur (SIAE)")),
     )
+
+    EXPIRATION_DELAY_MONTHS = 6
 
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -71,6 +74,14 @@ class EligibilityDiagnosis(models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    @property
+    def expires_at(self):
+        return self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
+
+    @property
+    def has_expired(self):
+        return timezone.now() > self.expires_at
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
@@ -160,18 +171,6 @@ class SelectedAdministrativeCriteria(models.Model):
         AdministrativeCriteria, on_delete=models.CASCADE, related_name="administrative_criteria_through"
     )
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-
-    # Values of administrative criteria can be imported via APIs (and overridden by user if needed)
-    # Default 'data source' is 'app'(lication)
-    DATA_SOURCE_APP = "itou"
-    DATA_SOURCE_API_PE = "peamu"
-
-    DATA_SOURCE_CHOICES = ((DATA_SOURCE_APP, _("Application ITOU")), (DATA_SOURCE_API_PE, "APIs PE Connect"))
-
-    data_source = models.CharField(
-        verbose_name=_("Source de données"), max_length=20, choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_APP
-    )
-    data_source_updated_at = models.DateTimeField(verbose_name=_("Date de MAJ de la source de données"), null=True)
 
     class Meta:
         verbose_name = _("Critère administratif sélectionné")
