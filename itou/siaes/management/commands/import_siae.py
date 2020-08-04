@@ -366,14 +366,23 @@ class Command(BaseCommand):
     def fix_siae_parenthood(self, dry_run):
         # WIPP
         for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind__in=SIAE_ASP_KINDS):
-            assert siae.created_by
+            if not siae.created_by:
+                self.log(f"siae.id={siae.id} created by null :-/")
+                continue
             if siae.created_by.is_staff:
                 self.log(f"siae.id={siae.id} created by staff :-/")
                 continue
-            # assert not siae.created_by.is_staff
             assert not siae.created_by.is_job_seeker
             assert not siae.created_by.is_prescriber
             assert siae.created_by.is_siae_staff
+            other_siaes = siae.created_by.siae_set.exclude(pk=siae.pk).filter(source=Siae.SOURCE_ASP)
+            WIPP = siae.created_by.siaemembership_set.filter(is_siae_admin=True, siae__source=Siae.SOURCE_ASP).exclude(siae=siae)
+            # tricky user.id=4456
+            # TODO filter on SIREN!!
+            assert other_siaes.count() == 1
+            parent_siae = other_siaes.get()
+            assert parent_siae.source == Siae.SOURCE_ASP
+            assert parent_siae.siren == siae.siren
 
     def fix_missing_external_ids(self, dry_run):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
