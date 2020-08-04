@@ -35,19 +35,11 @@
         {% trans "Critères administratifs de niveau 1" %}
     </h3>
 
-
-    {% if external_user_data.has_minimal_social_allowance %}
-        <div class="alert alert-info">
-            {% trans "D'aprés les informations de votre compte Pôle emploi, vous êtes bénéficiaire d'un des minimas sociaux suivants. Merci de bien vouloir préciser lequel." %}</p>
-        </div>
-    {% endif %}
-    
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
-             {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
-         {% endif %}
-     {% endfor %}
-
+            {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
+        {% endif %}
+    {% endfor %}
 
     <h3>
         {% trans "Critères administratifs de niveau 2" %}
