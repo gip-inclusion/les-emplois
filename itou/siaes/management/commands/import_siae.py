@@ -59,7 +59,7 @@ SIAE_CREATION_ALLOWED_DEPARTMENTS = (
     + DEPARTMENTS_TO_OPEN_ON_06_07_2020
 )
 
-EXPECTED_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
+SIAE_ASP_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
 
 # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
 # This score is arbitrarily set based on general observation.
@@ -213,7 +213,7 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     df["kind"] = df["kind"].str.replace("_MP", "")
 
     for kind in df.kind:
-        assert kind in EXPECTED_KINDS
+        assert kind in SIAE_ASP_KINDS
 
     for email in df.auth_email:
         assert " " not in email
@@ -275,7 +275,7 @@ def get_vue_af_df(filename=VUE_AF_DATASET_FILENAME):
     df = df[df.kind != "EITI"]
 
     for kind in df.kind:
-        assert kind in EXPECTED_KINDS
+        assert kind in SIAE_ASP_KINDS
 
     # Filter out invalid AF states.
     df = df[df.state.isin(["VALIDE", "PROVISOIRE"])]
@@ -363,6 +363,18 @@ class Command(BaseCommand):
         auth_email = auth_emails[0]
         return auth_email
 
+    def fix_siae_parenthood(self, dry_run):
+        # WIPP
+        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind__in=SIAE_ASP_KINDS):
+            assert siae.created_by
+            if siae.created_by.is_staff:
+                self.log(f"siae.id={siae.id} created by staff :-/")
+                continue
+            # assert not siae.created_by.is_staff
+            assert not siae.created_by.is_job_seeker
+            assert not siae.created_by.is_prescriber
+            assert siae.created_by.is_siae_staff
+
     def fix_missing_external_ids(self, dry_run):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
             if siae.siret in SIRET_TO_EXTERNAL_ID:
@@ -399,7 +411,7 @@ class Command(BaseCommand):
 
             if row:
                 assert siae.siret[:9] == row["siret"][:9]
-                assert siae.kind in EXPECTED_KINDS
+                assert siae.kind in SIAE_ASP_KINDS
 
                 # Update siae.auth_email when needed.
                 new_auth_email = self.get_new_auth_email(external_id=siae.external_id)
@@ -625,10 +637,10 @@ class Command(BaseCommand):
                 for siae in Siae.objects.filter(siret=siret, source=Siae.SOURCE_ASP):
                     if siae.external_id:
                         assert siae.external_id == external_id
-                        assert siae.kind in EXPECTED_KINDS
+                        assert siae.kind in SIAE_ASP_KINDS
                     elif siae.kind == kind:
                         self.log(f"existing siae.id={siae.id} will be assigned external_id={external_id}")
-                        assert siae.kind in EXPECTED_KINDS
+                        assert siae.kind in SIAE_ASP_KINDS
                         if not dry_run:
                             siae.external_id = external_id
                             siae.save()
@@ -667,6 +679,10 @@ class Command(BaseCommand):
     def handle(self, dry_run=False, **options):
 
         self.set_logger(options.get("verbosity"))
+
+        self.fix_siae_parenthood(dry_run)
+
+        return  # WIPP
 
         self.fix_missing_external_ids(dry_run)
 
