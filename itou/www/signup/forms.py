@@ -36,19 +36,6 @@ class FullnameFormMixin(forms.Form):
 
 
 class PrescriberForm(FullnameFormMixin, SignupForm):
-
-    secret_code = forms.CharField(
-        label=gettext_lazy("Code de l'organisation"),
-        max_length=6,
-        required=False,
-        strip=True,
-        widget=forms.TextInput(attrs={"placeholder": "Code composé de 6 caractères"}),
-        help_text=gettext_lazy(
-            "Si vous avez été invité par un collègue travaillant dans la même structure que vous,"
-            " saisissez le code de l'organisation qu'il vous a transmis. "
-        ),
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = None
@@ -66,20 +53,6 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         if get_user_model().email_already_exists(email):
             raise ValidationError(gettext_lazy("Cette adresse email est déjà enregistrée"))
         return email
-
-    def clean_secret_code(self):
-        """
-        Retrieve a PrescriberOrganization instance from the `secret_code` field.
-        """
-        secret_code = self.cleaned_data["secret_code"]
-        if secret_code:
-            secret_code = secret_code.upper()
-            try:
-                self.organization = PrescriberOrganization.objects.get(secret_code=secret_code)
-            except PrescriberOrganization.DoesNotExist:
-                error = _("Ce code n'est pas valide.")
-                raise forms.ValidationError(error)
-        return secret_code
 
     def save(self, request):
         user = super().save(request)
