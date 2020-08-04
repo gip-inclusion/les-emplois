@@ -38,6 +38,7 @@ from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
+DEACTIVATE_SIAE_FOR_REAL = False
 REFUSE_PENDING_JOB_APPLICATIONS_OF_DEACTIVATED_SIAE = False
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -73,7 +74,8 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
     The main dataset is called "Vue Structure" by the ASP
     and has those fields:
     - external_id
-    - siret
+    - siret (current)
+    - siret (initial)
     - name
     - address
     - phone
@@ -90,6 +92,7 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
         sep="|",
         converters={
             "structure_siret_actualise": str,
+            "structure_siret_signature": str,
             "structure_adresse_gestion_cp": str,
             "structure_adresse_gestion_telephone": str,
         },
@@ -98,6 +101,7 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
     df.rename(
         columns={
             "structure_siret_actualise": "siret",
+            "structure_siret_signature": "siret_initial",
             "structure_id_siae": "external_id",
             "structure_code_naf": "naf",
             "structure_denomination": "name",
@@ -119,6 +123,9 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
     )
 
     for siret in df.siret:
+        assert len(siret) == 14
+
+    for siret in df.siret_initial:
         assert len(siret) == 14
 
     for naf in df.naf:
@@ -149,9 +156,29 @@ def get_main_df_row_as_dict(external_id):
 
 
 def get_siret_to_external_id():
+    """
+    External_id is a permanent immutable ID in ASP exports used to
+    identify a structure (an ACI and an EI sharing the same SIRET being
+    considered as a single structure). This external_id can be thought as
+    a "permanent SIRET".
+
+    The SIRET=>external_id match is very important to make sure all itou siaes
+    are matched to their ASP counterpart.
+
+    As there are two siret fields in ASP main export (Vue Structures) we
+    use both to have a maximum chance to get a match and avoid leaving
+    ghost siaes behind.
+    """
     siret_to_external_id = {}
     for index, row in MAIN_DF.iterrows():
         siret_to_external_id[row.siret] = row.external_id
+        # Current siret has precedence over initial siret.
+        # FTR necessary subtelty due to a weird edge case in ASP data:
+        # siret=44431048600030 has two different external_ids (2338, 4440)
+        # one as an initial siret, the other as a current siret.
+        # (╯°□°)╯︵ ┻━┻
+        if row.siret_initial not in siret_to_external_id:
+            siret_to_external_id[row.siret_initial] = row.external_id
     return siret_to_external_id
 
 
@@ -348,6 +375,27 @@ class Command(BaseCommand):
                     siae.external_id = external_id
                     siae.save()
 
+    def siae_can_be_deleted(self, siae):
+        return siae.members.count() == 0 and siae.job_applications_received.count() == 0
+
+    def delete_siae(self, siae, dry_run):
+        assert self.siae_can_be_deleted(siae)
+        if not dry_run:
+            siae.delete()
+
+    def delete_siaes_without_external_id(self, dry_run):
+        """
+        Any siae which cannot be found in the latest ASP exports
+        is a "ghost" siae which should be deleted.
+        Of course we check it does not have data.
+        """
+        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
+            if self.siae_can_be_deleted(siae):
+                self.log(f"siae.id={siae.id} without external_id has no data and will be deleted")
+                self.delete_siae(siae, dry_run)
+            else:
+                self.log(f"siae.id={siae.id} without external_id has data and thus cannot be deleted")
+
     def update_existing_siaes(self, dry_run):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
@@ -371,11 +419,25 @@ class Command(BaseCommand):
                     continue
 
                 # Update siae.siret when needed.
-                if Siae.objects.filter(siret=row["siret"], kind=siae.kind).exists():
-                    self.log(
-                        f"siae.id={siae.id} has changed siret from "
-                        f"{siae.siret} to {row['siret']} but siret already exists (will *not* be updated)"
-                    )
+                existing_siae = Siae.objects.filter(siret=row["siret"], kind=siae.kind).first()
+                if existing_siae:
+                    if self.siae_can_be_deleted(siae):
+                        self.log(f"siae.id={siae.id} ghost will be deleted")
+                        self.delete_siae(siae, dry_run)
+                    elif self.siae_can_be_deleted(existing_siae):
+                        self.log(f"siae.id={existing_siae.id} ghost will be deleted")
+                        self.delete_siae(existing_siae, dry_run)
+                        if not dry_run:
+                            siae.siret = row["siret"]
+                            siae.save()
+                    else:
+                        self.log(
+                            f"siae.id={siae.id} has changed siret from "
+                            f"{siae.siret} to {existing_siae.siret} but siret "
+                            f"already exists (siae.id={existing_siae.id}) "
+                            f"and both siaes have data (will *not* be fixed)"
+                        )
+
                 else:
                     self.log(
                         f"siae.id={siae.id} has changed siret from "
@@ -403,9 +465,10 @@ class Command(BaseCommand):
             siae.save()
 
     def deactivate_siae(self, siae, dry_run):
-        if not dry_run:
-            siae.is_active = False
-            siae.save()
+        if DEACTIVATE_SIAE_FOR_REAL:
+            if not dry_run:
+                siae.is_active = False
+                siae.save()
 
     def reject_pending_job_applications(self, siae, dry_run):
         """
@@ -603,6 +666,8 @@ class Command(BaseCommand):
         self.set_logger(options.get("verbosity"))
 
         self.fix_missing_external_ids(dry_run)
+
+        self.delete_siaes_without_external_id(dry_run)
 
         self.update_existing_siaes(dry_run)
 
