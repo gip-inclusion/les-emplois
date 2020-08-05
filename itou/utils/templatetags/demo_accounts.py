@@ -8,15 +8,25 @@ register = template.Library()
 def employers_accounts_tag():
     return [
         {
-            "title": "Entreprise de Travail Temporaire d'Insertion (E.T.T.I)",
             "email": "test+etti@inclusion.beta.gouv.fr",
+            "description": "1 poste ouvert aux recrutements",
             "image": "etti.svg",
+            "location": "Beaucaire (30)",
+            "title": "Entreprise de Travail Temporaire d'Insertion (E.T.T.I)",
         },
-        {"title": "Entreprise d'Insertion (E.I.)", "email": "test+ei@inclusion.beta.gouv.fr", "image": "ei.svg"},
         {
-            "title": "Groupement d'Employeurs pour l'Insertion et la Qualification (G.E.I.Q.)",
+            "email": "test+ei@inclusion.beta.gouv.fr",
+            "description": "2 postes ouverts aux recrutements",
+            "image": "ei.svg",
+            "location": "St-Etienne du Grès (13)",
+            "title": "Entreprise d'Insertion (E.I.)",
+        },
+        {
             "email": "test+geiq@inclusion.beta.gouv.fr",
+            "description": "1 poste ouvert aux recrutements",
             "image": "geiq.svg",
+            "location": "Tarascon (13)",
+            "title": "Groupement d'Employeurs pour l'Insertion et la Qualification (G.E.I.Q.)",
         },
     ]
 
@@ -44,4 +54,4 @@ def prescribers_accounts_tag():
 
 @register.simple_tag
 def job_seekers_accounts_tag():
-    return [{"title": "Candidat", "email": "test+de@inclusion.beta.gouv.fr", "image": "de.svg"}]
+    return [{"email": "test+de@inclusion.beta.gouv.fr", "image": "de.svg"}]

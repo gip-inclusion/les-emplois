@@ -43,15 +43,21 @@
                         {% employers_accounts_tag as employers_accounts %}
                         {% for account in employers_accounts %}
                             <div class="card">
-                                <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title h6">{{ account.title }}</h5>
-                                    <p class="card-text">{{ account.description }}</p>
+                                <div class="card-body py-0">
+                                    <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
+                                    <h5 class="card-title h6 font-weight-bold text-center">{{ account.title }}</h5>
                                 </div>
-                                <div class="card-footer text-center">
-                                    <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="siae_staff">
-                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
-                                    </a>
+                                <div>
+                                    <div class="p-3">
+                                        <p class="card-text">{{ account.description }}</p>
+                                        <p class="m-auto card-text">{% include "includes/icon.html" with icon="map" title=title class="mr-1"%}{{ account.location }}</p>
+                                    </div>
+                                    <div class="card-footer text-center">
+                                        <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="siae_staff">
+                                            <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                        </a>
+
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -64,9 +70,9 @@
                         {% prescribers_accounts_tag as prescribers_accounts %}
                         {% for account in prescribers_accounts %}
                             <div class="card">
-                                <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
+                                <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
                                 <div class="card-body">
-                                    <h5 class="card-title h6">{{ account.title }}</h5>
+                                    <h5 class="card-title h6 font-weight-bold text-center">{{ account.title }}</h5>
                                     <p class="card-text">{{ account.description }}</p>
                                 </div>
                                 <div class="card-footer text-center">
@@ -87,7 +93,7 @@
                             <div class="card">
                                 <img src="{% static '/img/demo_profiles/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
                                 <div class="card-body">
-                                    <h5 class="card-title h6">{{ account.title }}</h5>
+                                    <h5 class="card-title h6 font-weight-bold text-center">{{ account.title }}</h5>
                                     <p class="card-text">{{ account.description }}</p>
                                 </div>
                                 <div class="card-footer text-center">
@@ -99,12 +105,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
-                <p class="alert alert-secondary">
-                    {% blocktrans %}
-                        Employeurs présents : <b>Une nouvelle chance</b> une <b>ETTI</b> à Beaucaire (30) et le <b>Gararge Martinet</b> une <b>EI</b> à St-Etienne-du-Grès (13)
-                    {% endblocktrans %}
-                </p>
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>
