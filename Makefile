@@ -105,9 +105,14 @@ postgres_backups_cp_locally:
 postgres_backups_list:
 	docker-compose exec postgres backups
 
-# Note: Django must be stopped to avoid a "database "itou" is being accessed by other users" error.
+# - Note: Django must be stopped to avoid a "database "itou" is being accessed by other users" error.
 # make postgres_backup_restore FILE=backup_2019_10_08T12_33_00.sql.gz
+# - Second note: you might get this message: `pg_restore: warning: errors ignored on restore: 331`.
+# This is due to permissions on extensions and can be ignored.
+# Just check you have all the data you need.
 postgres_backup_restore:
+	# Copy the backup file in the container first.
+	# Example: docker cp FILE itou_postgres:/backups/
 	docker-compose up -d --no-deps postgres && \
 	docker-compose exec postgres restore $(FILE) && \
 	docker-compose stop
