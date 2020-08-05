@@ -5,18 +5,17 @@
 
 {% if SHOW_DEMO_BANNER %}
 
-<div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
-    <div class="container">
-        <div class="row">
-            <div class="col"></div>
-            <div class="col">
-                <h1 class="font-weight-bold">{{ ITOU_ENVIRONMENT }}</h1>
-            </div>
-            <div class="col p-2">
-                <button class="btn btn-light border" data-toggle="modal" data-target="#infoModal">
-                    {% trans "Voir les comptes de démonstration" %}
-                </button>
-            </div>
+<div class="sticky-top shadow bg-danger text-white text-center layout" style="z-index:1;">
+    <div class="layout-content py-0">
+        <div class="d-flex align-items-center text-center p-1">
+            <h1 class="font-weight-bold flex-grow-1 mb-0">{{ ITOU_ENVIRONMENT }}</h1>
+            {% if not user.is_authenticated %}
+                <div>
+                    <button class="btn btn-light border" data-toggle="modal" data-target="#infoModal">
+                        {% trans "Voir les comptes de démonstration" %}
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
