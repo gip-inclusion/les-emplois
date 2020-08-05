@@ -65,7 +65,7 @@ LOCAL_APPS = [
     "itou.approvals",
     "itou.eligibility",
     "itou.invitations",
-    "itou.external_data.apps.ExternalDataConfig",
+    "itou.external_data",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
