@@ -23,5 +23,7 @@ ITOU_FQDN = os.environ.get("DEPLOY_URL", "staging.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
+SHOW_DEMO_BANNER = True
+
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_STAGING"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")

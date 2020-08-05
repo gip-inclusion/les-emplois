@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 {% load demo_accounts %}
 
-{# if ITOU_ENVIRONMENT == "DEMO" #}
+{% if SHOW_DEMO_BANNER %}
 
 <div class="sticky-top shadow bg-danger text-white text-center" style="z-index:1;">
     <div class="container">
@@ -125,4 +125,4 @@
 </div>
 
 
-{# endif #}
+{% endif %}

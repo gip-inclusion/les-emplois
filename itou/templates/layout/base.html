@@ -290,23 +290,23 @@
         <script src="{% static "js/city_autocomplete_field.js" %}"></script>
         <script src="{% static "js/configure_jobs.js" %}"></script>
         <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
-        {# if ITOU_ENVIRONMENT == "DEMO" #}
-          <script src="{% static "js/demo_localstorage.js"%}"></script>
+        {% if SHOW_DEMO_BANNER %}
+            <script src="{% static "js/demo_localstorage.js"%}"></script>
 
-          <script type="text/javascript">
-              $(document).ready(function(){
-                  $('.postLogin').on('click', function(){
-                      const account_type = $(this).data('type');
-                      const email = $(this).data('email');
-                      const form = $("#demoForm");
-                      form.find('input[type=email]').val(email);
-                      form.find('input[type=password]').val("password");
-                      form.find('input[name=account_type]').val(account_type);
-                      form.submit();
-                  });
-              });
-          </script>
-        {# endif #}
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $('.postLogin').on('click', function(){
+                        const account_type = $(this).data('type');
+                        const email = $(this).data('email');
+                        const form = $("#demoForm");
+                        form.find('input[type=email]').val(email);
+                        form.find('input[type=password]').val("password");
+                        form.find('input[name=account_type]').val(account_type);
+                        form.submit();
+                    });
+                });
+            </script>
+        {% endif %}
     {% endblock %}
 
     {% if "inclusion.beta.gouv.fr" in ALLOWED_HOSTS %}

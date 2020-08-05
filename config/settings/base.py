@@ -369,6 +369,8 @@ ITOU_EMAIL_PRESCRIBER_NEW_HIRING_LINK = "https://startupsbeta.typeform.com/to/X4
 # Use the staging domain name when this case arises.
 ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 
+SHOW_DEMO_BANNER = False
+
 # Approvals
 # ------------------------------------------------------------------------------
 # Approval numbering prefix can be different for non-production envs

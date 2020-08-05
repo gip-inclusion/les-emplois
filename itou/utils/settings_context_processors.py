@@ -13,4 +13,5 @@ def expose_settings(request):
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,
         "ITOU_FQDN": settings.ITOU_FQDN,
         "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
+        "SHOW_DEMO_BANNER": settings.SHOW_DEMO_BANNER,
     }
