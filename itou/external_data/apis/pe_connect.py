@@ -157,7 +157,6 @@ def _get_aggregated_user_data(token):
     ok = all(results)
     partial = not ok and any(results)
     cleaned_results = [part for part in results if part]
-    resp = dict()
 
     if ok:
         status = ExternalDataImport.STATUS_OK
@@ -166,8 +165,9 @@ def _get_aggregated_user_data(token):
     else:
         status = ExternalDataImport.STATUS_FAILED
 
+    resp = {}
     for result in cleaned_results:
-        resp = {**resp, **result}
+        resp.update(result)
 
     return status, resp
 
@@ -206,7 +206,7 @@ def _store_user_data(user, status, data):
 
     # The following will be stored as k/v
     external_user_data = []
-    result_keys = list(data.keys())
+    result_keys = data.keys()
 
     if "codeStatutIndividu" in result_keys:
         value = data.get("codeStatutIndividu")

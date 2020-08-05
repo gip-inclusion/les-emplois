@@ -116,7 +116,7 @@ class ExternalUserData(models.Model):
 
     # Simple key value storage for external data
     #
-    # Though "flat is better than nested", each data chunkk needs a source and an import date
+    # Though "flat is better than nested", each data chunkkkkk needs a source and an import date
     # Model may change to M-N relationship if the number of keys grows to much
     # Add new keys as needed...
 
