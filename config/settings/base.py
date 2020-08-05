@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = [
     "mathfilters",
 ]
 
+
 LOCAL_APPS = [
     # Core apps, order is important.
     "itou.utils",

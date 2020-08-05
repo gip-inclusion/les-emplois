@@ -10,7 +10,6 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.external_data.models import ExternalUserData
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
@@ -256,7 +255,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     data = request.POST if request.method == "POST" else None
     form_administrative_criteria = AdministrativeCriteriaForm(request.user, siae=None, data=data)
 
-    external_user_data = ExternalUserData.last_data_to_dict(job_seeker)
+    external_user_data = job_seeker.job_seeker_data if job_seeker.has_external_data else None
 
     if request.method == "POST" and form_administrative_criteria.is_valid():
         EligibilityDiagnosis.create_diagnosis(

@@ -1,6 +1,7 @@
 import ast
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -12,26 +13,6 @@ class ExternalDataImportQuerySet(models.QuerySet):
 
     def pe_import_for_user(self, user):
         return self.for_user(user).filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
-
-
-class ExternalUserDataQuerySet(models.QuerySet):
-    def for_user(self, user):
-        return self.filter(data_import__user=user)
-
-
-class ASTLiteralField(models.CharField):
-    """
-    Custom value field type based on CharField
-    Useful for auto-typing key/value for ExternalUserData objects
-    """
-
-    def from_db_value(self, value, expression, connection):
-        # Process applied when getting value from DB
-        return ast.literal_eval(value)
-
-    def get_prep_value(self, value):
-        # Process applied when storing value to DB
-        return repr(value)
 
 
 class ExternalDataImport(models.Model):
@@ -89,43 +70,26 @@ class ExternalDataImport(models.Model):
         return f"Import {self.source} pour {self.user.email}"
 
 
-class ExternalUserData(models.Model):
-    """
-    User data acquired by **external** sources (mainly APIs like PE).
+# External user data: the return
 
-    External user data are stored as simple key / value pairs, attached to a parent ExternalDataImport object.
 
-    Documentation about valid keys is included in the code (as Django 'choices'),
-    and usable via the 'description' property.
+class JobSeekerExternalData(models.Model):
+    class Meta:
+        verbose_name = _("Données externes pour un chercheur d'emploi")
+        verbose_name_plural = _("Données externes pour un chercheur d'emploi")
 
-    When possible, relevant data is updated directly in the User model (user address and birthdate for instance).
-    If external data is not usable "as-is" or not directly manageable in the app, it is stored as timestamped
-    key/value pair for further processing or usage.
+    created_at = models.DateTimeField(default=now, verbose_name=_("Date de création"))
 
-    Storing external data as k/v pairs is a way to keep in mind that we do not have "authority" on:
-        - value (may change on API provider side),
-        - correctness (external data validation is not our responsibility),
-        - lifecycle (data may be outdated or updated on the "other side").
+    data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
-    User data could have been stored "flat" with a Django JSONField or Postgres HStore, but:
-        - we could lose some useful metadata (like description),
-        - documentation on keys / JSON schema is not available directly (keys are documented in the model code).
-
-    Moreover, JSONField and HStore are Postgres specific.
-    """
-
-    # Simple key value storage for external data
-    #
-    # Though "flat is better than nested", each data chunkkkkk needs a source and an import date
-    # Model may change to M-N relationship if the number of keys grows to much
-    # Add new keys as needed...
-
-    KEY_UNKNOWN = "unknown"
+    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, primary_key=True)
 
     # Is the user a job seeker ? (from PE perspective)
     # --
     # original field: PE / codeStatutIndividu
-    KEY_IS_PE_JOBSEEKER = "is_pe_jobseeker"
+    is_pe_jobseeker = models.BooleanField(
+        null=True, verbose_name=_("L'utilisateur est inscrit comme demandeur d'emploi PE")
+    )
 
     # The user has open rights to **at least one** the following social helps;
     # * ASS (Allocation Solidarité Spécifique)
@@ -136,56 +100,9 @@ class ExternalUserData(models.Model):
     # These are 1st level eligibility criterias, except for AER
     # --
     # original field: PE / beneficiairePrestationSolidarite
-    KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE = "has_minimal_social_allowance"
-
-    KEY_CHOICES = (
-        (KEY_UNKNOWN, _("Clé inconnue")),
-        (KEY_IS_PE_JOBSEEKER, _("L'utilisateur est inscrit comme demandeur d'emploi PE")),
-        (KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE, _("L'utilisateur dispose d'une prestation de minima sociaux")),
+    has_minimal_social_allowance = models.BooleanField(
+        null=True, verbose_name=_("L'utilisateur dispose d'une prestation de minima sociaux")
     )
 
-    objects = models.Manager.from_queryset(ExternalUserDataQuerySet)()
-
-    key = models.CharField(max_length=32, verbose_name=_("Clé"), choices=KEY_CHOICES, default=KEY_UNKNOWN)
-
-    created_at = models.DateTimeField(verbose_name=_("Date d'enregistrement des données"), default=now)
-
-    data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
-
-    value = ASTLiteralField(max_length=512, verbose_name=_("Valeur"), null=True)
-
-    class Meta:
-        verbose_name = _("Donnée externe de l'utilisateur")
-        verbose_name_plural = _("Données externes de l'utilisateur")
-
     def __repr__(self):
-        return f"ExternalUserData: pk={self.pk}, key={self.key}, value={self.value}, created_at={self.created_at}"
-
-    def __str__(self):
-        return f"{self.key}: {self.value}"
-
-    @property
-    def description(self):
-        """
-        Get a human readable description of the key / value pair (stored in KEY_CHOICES)
-        """
-        return self.get_key_display()
-
-    class _DictWithAttrs(dict):
-        """
-        Helper class: add property-like access to a dict
-        i.e. accessing user data with `my_ext_data.has_minimal_allowance`
-
-        There may be a better way to do that...
-        """
-
-        __getattr__ = dict.get
-
-    @staticmethod
-    def user_data_to_dict(user):
-        """
-        Fetch last set of data imported for user and wrap them in a "custom" dict (with properties access)
-        """
-        return ExternalUserData._DictWithAttrs(
-            {user.key: user.value for user in ExternalUserData.objects.for_user(user)}
-        )
+        return f"[self.pk] JobSeekerExternalData: user={self.user.pk}, created_at={self.created_at}, data_import={self.data_import.pk}"

@@ -5,7 +5,7 @@ import requests
 from django.conf import settings
 from django.utils.dateparse import parse_datetime
 
-from itou.external_data.models import ExternalDataImport, ExternalUserData
+from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
 
 
 # PE Connect API data retrieval tools
@@ -204,30 +204,19 @@ def _store_user_data(user, status, data):
 
     user.save()
 
-    # The following will be stored as k/v
-    external_user_data = []
+    # The following will be stored as JobSeekerExternalData
+    job_seeker_data = JobSeekerExternalData(user=user, data_import=data_import)
     result_keys = data.keys()
 
     if "codeStatutIndividu" in result_keys:
         value = data.get("codeStatutIndividu")
-        external_user_data.append(
-            ExternalUserData(key=ExternalUserData.KEY_IS_PE_JOBSEEKER, value=(True if value == 1 else False))
-        )
+        job_seeker_data.is_pe_jobseeker = True if value == 1 else False
 
     if "beneficiairePrestationSolidarite" in result_keys:
-        external_user_data.append(
-            ExternalUserData(
-                key=ExternalUserData.KEY_HAS_MINIMAL_SOCIAL_ALLOWANCE,
-                value=data.get("beneficiairePrestationSolidarite"),
-            )
-        )
+        job_seeker_data.has_minimal_social_allowance = data.get("beneficiairePrestationSolidarite")
 
     # ...
-
-    for elt in external_user_data:
-        elt.data_import = data_import
-
-    ExternalUserData.objects.bulk_create(external_user_data)
+    job_seeker_data.save()
 
     data_import.status = status
     data_import.save()
@@ -250,15 +239,11 @@ def import_user_data(user, token):
     Import external user data via PE Connect
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
-    # Create a new import with a pending status (wil be async)
-    data_import = ExternalDataImport.objects.pe_import_for_user(user)
-
-    if data_import:
-        data_import.delete()
-
-    data_import = ExternalDataImport(
-        user=user, status=ExternalDataImport.STATUS_PENDING, source=ExternalDataImport.DATA_SOURCE_PE_CONNECT
+    # Create a new import with a pending status (will be async)
+    data_import = ExternalDataImport.objects.pe_import_for_user(user).first() or ExternalDataImport(
+        source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user
     )
+    data_import.status = ExternalDataImport.STATUS_PENDING
     data_import.save()
 
     try:

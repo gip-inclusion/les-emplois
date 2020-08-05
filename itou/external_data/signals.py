@@ -28,8 +28,6 @@ def user_logged_in(sender, **kwargs):
 
         # If no data for user or import failed last time
         if not pe_data_import.exists() or pe_data_import.first().status != ExternalDataImport.STATUS_OK:
-            # Store and dispatch as key / value pairs
-
             if settings.EXTERNAL_DATA_SYNC_API_CALL:
                 # SYNC (fallback):
                 import_user_data(user, login.token)
