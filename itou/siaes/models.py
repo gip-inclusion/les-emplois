@@ -147,6 +147,18 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # This deactivation date is not enforced and only stored for
     # information, for admin and/or metabase uses.
     active_until = models.DateTimeField(verbose_name=_("Date de désactivation"), blank=True, null=True)
+    # When itou staff manually reactivates an inactive siae, store who did it and when.
+    reactivated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Réactivée manuellement en dernier par"),
+        related_name="reactivated_siae_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    reactivated_at = models.DateTimeField(
+        verbose_name=_("Date de dernière réactivation manuelle"), blank=True, null=True
+    )
 
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
