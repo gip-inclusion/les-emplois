@@ -9,21 +9,21 @@ def employers_accounts_tag():
     return [
         {
             "email": "test+etti@inclusion.beta.gouv.fr",
-            "description": "1 poste ouvert aux recrutements",
+            "description": "1 poste ouvert au recrutement",
             "image": "etti.svg",
             "location": "Beaucaire (30)",
             "title": "Entreprise de Travail Temporaire d'Insertion (E.T.T.I)",
         },
         {
             "email": "test+ei@inclusion.beta.gouv.fr",
-            "description": "2 postes ouverts aux recrutements",
+            "description": "2 postes ouverts au recrutement",
             "image": "ei.svg",
             "location": "St-Etienne du Grès (13)",
             "title": "Entreprise d'Insertion (E.I.)",
         },
         {
             "email": "test+geiq@inclusion.beta.gouv.fr",
-            "description": "1 poste ouvert aux recrutements",
+            "description": "1 poste ouvert au recrutement",
             "image": "geiq.svg",
             "location": "Tarascon (13)",
             "title": "Groupement d'Employeurs pour l'Insertion et la Qualification (G.E.I.Q.)",
@@ -40,12 +40,12 @@ def prescribers_accounts_tag():
             "image": "prescripteur_habilite.svg",
         },
         {
-            "title": "Prescripteur non habilité",
+            "title": "Orienteur <br>(prescripteur non habilité)",
             "email": "test+orienteur@inclusion.beta.gouv.fr",
             "image": "prescripteur_non_habilite.svg",
         },
         {
-            "title": "Prescripteur seul, sans organisation",
+            "title": "Orienteur seul,<br> sans organisation",
             "email": "test+orienteur-solo@inclusion.beta.gouv.fr",
             "image": "prescripteur_solo.svg",
         },
