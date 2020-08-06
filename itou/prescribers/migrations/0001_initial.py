@@ -181,7 +181,6 @@ class Migration(migrations.Migration):
                 (
                     "secret_code",
                     models.CharField(
-                        default=itou.utils.tokens.generate_random_token,
                         help_text="Code permettant à un utilisateur de rejoindre l'organisation.",
                         max_length=6,
                         unique=True,
