@@ -1,6 +1,6 @@
 -r ./base.txt
 
-Werkzeug==0.14.1  # pyup: < 0.15 # https://github.com/pallets/werkzeug
+Werkzeug==1.0.1  # pyup: < 2 # https://github.com/pallets/werkzeug
 ipdb==0.13.3  # https://github.com/gotcha/ipdb
 tblib  # https://github.com/ionelmc/python-tblib
 
