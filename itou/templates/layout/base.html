@@ -191,7 +191,7 @@
                             </a>
                         </li>
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
-                            <a href=" https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" class="text-reset" target="_blank">
+                            <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" class="text-reset" target="_blank">
                                 {% trans "Questions à la communauté" %}
                             </a>
                         </li>
@@ -210,7 +210,6 @@
                         <div class="col-4 col-sm-2">
                             <img src="{% static 'img/logo_ministere_du_travail.svg' %}" class="w-sm-75 w-100 bg-white">
                         </div>
-
                         <div class="col-8 col-sm-5">
                             <p class="h5">
                                 <span class="font-weight-bold">inclusion</span><span>.beta.gouv.fr</span>
@@ -219,6 +218,23 @@
                                     {% trans "Plateforme de l'inclusion en expérimentation" %}
                                 </span>
                             </p>
+                            <p class="mb-0">
+                                {% trans "Nous suivre" %}
+                            </p>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="https://www.linkedin.com/company/la-plateforme-de-l-inclusion/" rel="noopener" target="_blank" class="text-white">
+                                        {% include "includes/icon.html" with icon="linkedin" %}
+                                        <small>LinkedIn</small>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank" class="text-white">
+                                        {% include "includes/icon.html" with icon="youtube" %}
+                                        <small>YouTube</small>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
