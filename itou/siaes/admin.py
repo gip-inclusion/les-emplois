@@ -112,9 +112,10 @@ class SiaeAdmin(admin.ModelAdmin):
                 # Refresh geocoding.
                 obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
 
-        if not obj.auth_email:
+        if obj.source == models.Siae.SOURCE_ASP and not obj.auth_email:
             messages.warning(
-                request, "Cette structure n'ayant pas d'email d'authentification il est impossible de s'y inscrire."
+                request,
+                "Cette structure mère ASP n'ayant pas d'email d'authentification il est impossible de s'y inscrire.",
             )
 
         super().save_model(request, obj, form, change)
