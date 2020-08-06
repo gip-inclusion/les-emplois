@@ -34,7 +34,7 @@
 </head>
 <body>
 
-    {% include "includes/demo.html" %}
+    {% include "includes/test_accounts.html" %}
 
     <div class="layout">
 
@@ -290,8 +290,8 @@
         <script src="{% static "js/city_autocomplete_field.js" %}"></script>
         <script src="{% static "js/configure_jobs.js" %}"></script>
         <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
-        {% if SHOW_DEMO_BANNER %}
-            <script src="{% static 'js/demo_accounts.js'%}"></script>
+        {% if SHOW_TEST_ACCOUNTS_BANNER %}
+            <script src="{% static 'js/test_accounts.js'%}"></script>
         {% endif %}
     {% endblock %}
 

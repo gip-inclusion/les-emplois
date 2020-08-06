@@ -1,9 +1,9 @@
 {% load i18n %}
 {% load static %}
 {% load bootstrap4 %}
-{% load demo_accounts %}
+{% load test_accounts %}
 
-{% if SHOW_DEMO_BANNER %}
+{% if SHOW_TEST_ACCOUNTS_BANNER %}
 
 <div class="sticky-top shadow bg-danger text-white text-center layout" style="z-index:1;">
     <div class="layout-content py-0">
@@ -11,7 +11,7 @@
             <h1 class="font-weight-bold flex-grow-1 mb-0">{{ ITOU_ENVIRONMENT }}</h1>
             {% if not user.is_authenticated %}
                 <div>
-                    <button class="btn btn-light border" data-toggle="modal" data-target="#demoAccountsModal">
+                    <button class="btn btn-light border" data-toggle="modal" data-target="#testAccountsModal">
                         {% trans "Voir les comptes de démonstration" %}
                     </button>
                 </div>
@@ -20,7 +20,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="demoAccountsModal" tabindex=-1 role="dialog">
+<div class="modal fade" id="testAccountsModal" tabindex=-1 role="dialog">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -43,7 +43,7 @@
                         {% for account in employers_accounts %}
                             <div class="card">
                                 <div class="card-body mb-auto py-0">
-                                    <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
+                                    <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
                                     <h5 class="card-title h6 font-weight-bold text-center">{{ account.title }}</h5>
                                 </div>
                                 <div class="p-3 text-center">
@@ -66,7 +66,7 @@
                         {% prescribers_accounts_tag as prescribers_accounts %}
                         {% for account in prescribers_accounts %}
                             <div class="card">
-                                <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
+                                <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:11rem;">
                                 <div class="card-body">
                                     <h5 class="card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
                                     <p class="card-text">{{ account.description }}</p>
@@ -87,7 +87,7 @@
                         {% job_seekers_accounts_tag as job_seekers_accounts %}
                         {% for account in job_seekers_accounts %}
                             <div class="card">
-                                <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
+                                <img src="{% static '/img/test_accounts/' %}{{ account.image }}" class="card-img-top p-2" style="min-height:10rem;">
                                 <div class="card-body">
                                     <h5 class="card-title h6 font-weight-bold text-center mb-0">{{ account.title }}</h5>
                                     <p class="card-text">{{ account.description }}</p>
@@ -107,7 +107,7 @@
                 </div>
 
                 <div class="d-none">
-                    <form id="demoForm" method="post" action="{% url 'account_login' %}">
+                    <form id="testAccountsForm" method="post" action="{% url 'account_login' %}">
                         {% csrf_token %}
                         <input type="email" name="login">
                         <input type="password" name="password">
