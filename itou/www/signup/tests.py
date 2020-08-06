@@ -16,7 +16,6 @@ from itou.cities.models import City
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiFactory,
 )
 from itou.prescribers.models import PrescriberOrganization

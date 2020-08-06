@@ -22,7 +22,6 @@ from itou.www.dashboard.forms import EditUserInfoForm
 def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_counter = 0
     prescriber_authorization_status_not_set = None
-    prescriber_is_orienter = False
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
