@@ -114,7 +114,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (SOURCE_USER_CREATED, _("Utilisateur")),
     )
 
-    ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI]
+    ASP_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI]
+    ELIGIBILITY_REQUIRED_KINDS = ASP_KINDS
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True)
@@ -264,7 +265,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def root_parent(self):
         if self.parent:
-            return self.parent.root_parent
+            if self.parent.kind in self.ASP_KINDS and self.parent.source != self.SOURCE_ASP:
+                # Only one level of hierarchy, no grandparent allowed!
+                raise RuntimeError(f"siae.pk={self.pk} parent is not root.")
+            return self.parent
         return self
 
     @property

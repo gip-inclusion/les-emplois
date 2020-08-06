@@ -59,8 +59,6 @@ SIAE_CREATION_ALLOWED_DEPARTMENTS = (
     + DEPARTMENTS_TO_OPEN_ON_06_07_2020
 )
 
-SIAE_ASP_KINDS = [Siae.KIND_ETTI, Siae.KIND_ACI, Siae.KIND_EI, Siae.KIND_AI]
-
 # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
 # This score is arbitrarily set based on general observation.
 API_BAN_RELIABLE_MIN_SCORE = 0.6
@@ -213,7 +211,7 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     df["kind"] = df["kind"].str.replace("_MP", "")
 
     for kind in df.kind:
-        assert kind in SIAE_ASP_KINDS
+        assert kind in Siae.ASP_KINDS
 
     for email in df.auth_email:
         assert " " not in email
@@ -275,7 +273,7 @@ def get_vue_af_df(filename=VUE_AF_DATASET_FILENAME):
     df = df[df.kind != "EITI"]
 
     for kind in df.kind:
-        assert kind in SIAE_ASP_KINDS
+        assert kind in Siae.ASP_KINDS
 
     # Filter out invalid AF states.
     df = df[df.state.isin(["VALIDE", "PROVISOIRE"])]
@@ -365,7 +363,7 @@ class Command(BaseCommand):
 
     def fix_siae_parenthood(self, dry_run):
         # WIPP
-        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind__in=SIAE_ASP_KINDS):
+        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED, kind__in=Siae.ASP_KINDS):
             if not siae.created_by:
                 self.log(f"siae.id={siae.id} created by null :-/")
                 continue
@@ -422,7 +420,7 @@ class Command(BaseCommand):
 
             if row:
                 assert siae.siret[:9] == row["siret"][:9]
-                assert siae.kind in SIAE_ASP_KINDS
+                assert siae.kind in Siae.ASP_KINDS
 
                 # Update siae.auth_email when needed.
                 new_auth_email = self.get_new_auth_email(external_id=siae.external_id)
@@ -648,10 +646,10 @@ class Command(BaseCommand):
                 for siae in Siae.objects.filter(siret=siret, source=Siae.SOURCE_ASP):
                     if siae.external_id:
                         assert siae.external_id == external_id
-                        assert siae.kind in SIAE_ASP_KINDS
+                        assert siae.kind in Siae.ASP_KINDS
                     elif siae.kind == kind:
                         self.log(f"existing siae.id={siae.id} will be assigned external_id={external_id}")
-                        assert siae.kind in SIAE_ASP_KINDS
+                        assert siae.kind in Siae.ASP_KINDS
                         if not dry_run:
                             siae.external_id = external_id
                             siae.save()
