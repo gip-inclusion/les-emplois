@@ -373,16 +373,24 @@ class Command(BaseCommand):
             assert not siae.created_by.is_job_seeker
             assert not siae.created_by.is_prescriber
             assert siae.created_by.is_siae_staff
-            other_siaes = siae.created_by.siae_set.exclude(pk=siae.pk).filter(source=Siae.SOURCE_ASP)
-            other_memberships = siae.created_by.siaemembership_set.filter(
-                is_siae_admin=True, siae__source=Siae.SOURCE_ASP
-            ).exclude(siae=siae)
-            # tricky user.id=4456
-            # TODO filter on SIREN!! + created before that one.
-            assert other_siaes.count() == 1
-            parent_siae = other_siaes.get()
-            assert parent_siae.source == Siae.SOURCE_ASP
-            assert parent_siae.siren == siae.siren
+            other_memberships = siae.created_by.siaemembership_set.exclude(siae=siae)
+            assert other_memberships.count() >= 1
+            if other_memberships.count() > 1:
+                other_memberships = other_memberships.filter(
+                    is_siae_admin=True,
+                    siae__source=Siae.SOURCE_ASP,
+                    siae__siret__startswith=siae.siren,
+                    siae__created_at__lte=siae.created_at,
+                    joined_at__lte=siae.created_at,
+                )
+            # siae.pk=4504 has 7 potential parents!
+            # siae.pk=3865 has 0 parent
+            if other_memberships.count() != 1:
+                self.log(f"siae.pk={siae.pk} has {other_memberships.count()} potential parents!")
+            # assert other_memberships.count() == 1
+            # parent_siae = other_memberships.get().siae
+            # assert parent_siae.source == Siae.SOURCE_ASP
+            # assert parent_siae.siren == siae.siren
 
     def fix_missing_external_ids(self, dry_run):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
