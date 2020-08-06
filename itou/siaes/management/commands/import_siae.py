@@ -376,9 +376,9 @@ class Command(BaseCommand):
             assert not siae.created_by.is_prescriber
             assert siae.created_by.is_siae_staff
             other_siaes = siae.created_by.siae_set.exclude(pk=siae.pk).filter(source=Siae.SOURCE_ASP)
-            other_memberships = siae.created_by.siaemembership_set.filter(is_siae_admin=True, siae__source=Siae.SOURCE_ASP).exclude(
-                siae=siae
-            )
+            other_memberships = siae.created_by.siaemembership_set.filter(
+                is_siae_admin=True, siae__source=Siae.SOURCE_ASP
+            ).exclude(siae=siae)
             # tricky user.id=4456
             # TODO filter on SIREN!! + created before that one.
             assert other_siaes.count() == 1
