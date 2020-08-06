@@ -229,7 +229,7 @@ class AcceptForm(forms.ModelForm):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
 
-        if hiring_end_at <= hiring_start_at:
+        if hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
         if self.instance.to_siae.is_subject_to_eligibility_rules:

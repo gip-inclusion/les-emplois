@@ -15,19 +15,19 @@ cdsitepackages:
 
 quality:
 	docker exec -ti itou_django black --check --line-length 119 itou
-	docker exec -ti itou_django isort --check-only --recursive itou
+	docker exec -ti itou_django isort --check-only itou
 	docker exec -ti itou_django flake8 itou
 
 style:
 	docker exec -ti itou_django black --line-length 119 itou
-	docker exec -ti itou_django isort --recursive itou
+	docker exec -ti itou_django isort itou
 
 setup_git_pre_commit_hook:
 	touch .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
 	echo -e "\
 	docker exec -t itou_django black --line-length 119 itou\n\
-	docker exec -t itou_django isort --recursive itou\n\
+	docker exec -t itou_django isort itou\n\
 	" > .git/hooks/pre-commit
 
 # Django.

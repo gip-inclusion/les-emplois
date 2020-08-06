@@ -21,22 +21,6 @@ class JobsInline(admin.TabularInline):
     raw_id_fields = ("siaejobdescription",)
 
 
-class ApprovalNumberSentByEmailFilter(admin.SimpleListFilter):
-    title = _("PASS IAE envoyé par email")
-    parameter_name = "approval_number_sent_by_email"
-
-    def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value == "yes":
-            return queryset.exclude(approval=None).filter(approval_number_sent_by_email=True)
-        if value == "no":
-            return queryset.exclude(approval=None).filter(approval_number_sent_by_email=False)
-        return queryset
-
-
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
     actions = ("bulk_send_approval_by_email",)
@@ -45,7 +29,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     raw_id_fields = ("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
     exclude = ("selected_jobs",)
     list_filter = (
-        ApprovalNumberSentByEmailFilter,
+        "approval_number_sent_by_email",
         "sender_kind",
         "state",
         "approval_delivery_mode",

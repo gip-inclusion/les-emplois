@@ -31,3 +31,5 @@ ASP_ITOU_PREFIX = "XXXXX"
 
 # Override allauth DefaultAccountAdapter: provides custom context to email templates
 ACCOUNT_ADAPTER = "itou.utils.account_adapter.DemoAccountAdapter"
+
+SHOW_TEST_ACCOUNTS_BANNER = True

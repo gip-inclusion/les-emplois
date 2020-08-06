@@ -390,6 +390,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_approval_number(accepted_by))
             elif self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN:
                 # Trigger a manual approval creation.
+                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
                 emails.append(self.email_accept_trigger_manual_approval(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
@@ -522,7 +523,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
-        self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
         self.approval_number_delivered_by = deliverer
         self.save()
 
