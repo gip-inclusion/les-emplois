@@ -1,33 +1,29 @@
-Pillow==7.0.0  # https://github.com/python-pillow/Pillow
-psycopg2-binary==2.8.4  # https://github.com/psycopg/psycopg2
-pytz==2019.3  # https://github.com/stub42/pytz
-requests==2.23.0  # https://github.com/psf/requests
+Pillow==7.2.0  # https://github.com/python-pillow/Pillow
+psycopg2-binary==2.8.5  # https://github.com/psycopg/psycopg2
+pytz==2020.1  # https://github.com/stub42/pytz
+requests==2.24.0  # https://github.com/psf/requests
 python-dateutil==2.8.1  # https://pypi.org/project/python-dateutil/
 openpyxl==3.0.3  # https://openpyxl.readthedocs.io/en/stable/
 Unidecode==1.1.1  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.0.8  # pyup: < 4.0  # https://www.djangoproject.com/
-
-# Django REST Framework
-djangorestframework==3.9.4  # https://github.com/encode/django-rest-framework
+django==3.1  # pyup: < 4.0  # https://www.djangoproject.com/
 
 # django-allauth
-django-allauth==0.41.0  # https://github.com/pennersr/django-allauth
+django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
-django-anymail==7.0  # https://github.com/anymail/django-anymail
+django-anymail==7.2.1  # https://github.com/anymail/django-anymail
 
 # API Insee
-api-insee==1.0.1  # https://github.com/sne3ks/api_insee
+api-insee==1.5  # https://github.com/sne3ks/api_insee
 
 # Django-XWorkflows
 django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 
 # Allow basic math (e.g. A/B) in templates
 django-mathfilters==1.0.0  # https://github.com/dbrgn/django-mathfilters
-
 
 # Front-end
 # ------------------------------------------------------------------------------
@@ -36,11 +32,10 @@ django-mathfilters==1.0.0  # https://github.com/dbrgn/django-mathfilters
 django-bootstrap4==1.1.0  # https://github.com/zostera/django-bootstrap4
 
 # Datepicker widget for Django using Bootstrap
-django-bootstrap-datepicker-plus==3.0.5 # https://github.com/monim67/django-bootstrap-datepicker-plus
+django-bootstrap-datepicker-plus==3.0.5  # https://github.com/monim67/django-bootstrap-datepicker-plus
 
 # Enhance select fields in forms with jQuery Select plugin
-django_select2==7.2.0
-
+django_select2==7.4.2  # https://github.com/codingjoe/django-select2
 
 # Data management
 # ------------------------------------------------------------------------------
@@ -48,9 +43,8 @@ django_select2==7.2.0
 # Manipulate ASP CSV exports having 30+ (!) columns easily
 pandas==1.0.3
 
-
 # Third-party applications
 # ------------------------------------------------------------------------------
 
 # Turn HTML files into PDF
-pdfshift==1.0.4   # https://github.com/pdfshift/pdfshift-python
+pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
