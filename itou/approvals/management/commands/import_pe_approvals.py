@@ -28,7 +28,7 @@ class Command(BaseCommand):
             dest="file_path",
             required=True,
             action="store",
-            help=f"Absolute path of the XLSX file to import",
+            help="Absolute path of the XLSX file to import",
         )
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
@@ -64,8 +64,8 @@ class Command(BaseCommand):
         wb = openpyxl.load_workbook(file_path, read_only=True)
         ws = wb.active
 
-        self.stdout.write(f"Ready.")
-        self.stdout.write(f"Creating approvals… 0%")
+        self.stdout.write("Ready.")
+        self.stdout.write("Creating approvals… 0%")
 
         last_progress = 0
         for i, row in enumerate(ws.rows):

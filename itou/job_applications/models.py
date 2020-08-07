@@ -162,8 +162,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
-    ERROR_START_IN_PAST = _(f"La date de début du contrat ne doit pas être dans le passé.")
-    ERROR_END_IS_BEFORE_START = _(f"La date de fin du contrat doit être postérieure à la date de début.")
+    ERROR_START_IN_PAST = _("La date de début du contrat ne doit pas être dans le passé.")
+    ERROR_END_IS_BEFORE_START = _("La date de fin du contrat doit être postérieure à la date de début.")
     ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
 
     APPROVAL_DELIVERY_MODE_AUTOMATIC = "automatic"

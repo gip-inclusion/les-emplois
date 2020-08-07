@@ -37,7 +37,7 @@ class User(AbstractUser, AddressMixin):
         (REASON_NOT_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
     )
 
-    ERROR_EMAIL_ALREADY_EXISTS = _(f"Cet e-mail existe déjà.")
+    ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]

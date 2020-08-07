@@ -261,7 +261,7 @@ class SelectSiaeForm(forms.Form):
         siret_exists = len(siaes_matching_siret) == 1
 
         def raise_form_error_for_inactive_siae():
-            error_message = _(f"La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
+            error_message = _("La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
             raise forms.ValidationError(mark_safe(error_message))
 
         if siret_exists:

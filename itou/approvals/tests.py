@@ -225,14 +225,14 @@ class ApprovalModelTest(TestCase):
         Approval.objects.all().delete()
 
         # With pre-existing Pôle emploi approval.
-        ApprovalFactory(number=f"625741810182", start_at=now)
+        ApprovalFactory(number="625741810182", start_at=now)
         expected_number = f"{PREFIX}{current_year}00001"
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
 
         # With various pre-existing objects.
         ApprovalFactory(number=f"{PREFIX}{current_year}00222", start_at=now)
-        ApprovalFactory(number=f"625741810182", start_at=now)
+        ApprovalFactory(number="625741810182", start_at=now)
         expected_number = f"{PREFIX}{current_year}00223"
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()

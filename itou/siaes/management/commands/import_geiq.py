@@ -110,7 +110,7 @@ class Command(BaseCommand):
                 assert len(siret) == 14
 
                 if siret in SEEN_SIRET:
-                    self.stderr.write(f"Siret already seen. Skipping.")
+                    self.stderr.write("Siret already seen. Skipping.")
                     continue
                 SEEN_SIRET.add(siret)
 
