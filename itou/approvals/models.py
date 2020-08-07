@@ -296,10 +296,16 @@ class PoleEmploiApproval(CommonApprovalMixin):
     # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
     # increases the length to 15 chars.
     # Suffixes meaning in French:
-    # - `P`: Prolongation = la personne a besoin d'encore quelques mois
-    # - `E`: Extension = la personne est passée d'une structure à une autre
-    # - `A`: Interruption = la personne ne s'est pas présentée
-    # - `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
+    SUFFIX_TO_MEANING = {
+        # - `P`: Prolongation = la personne a besoin d'encore quelques mois
+        "P": "Prolongation",
+        # - `E`: Extension = la personne est passée d'une structure à une autre
+        "E": "Extension",
+        # - `A`: Interruption = la personne ne s'est pas présentée
+        "A": "Interruption",
+        # - `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
+        "S": "Suspension",
+    }
     # The last two digits refer to the act number (e.g. E02 = second extension).
     # Suffixes are not taken into account in Itou yet but that might change.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)

@@ -17,13 +17,14 @@ and fields. Not linked here but easy to find internally.
 """
 import logging
 import random
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 from functools import partial
 
 import psycopg2
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.translation import gettext, gettext_lazy as _
 from tqdm import tqdm
@@ -39,7 +40,7 @@ from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 # This "WIP" mode is useful for quickly testing changes and iterating.
 # It builds tables with a *_wip suffix added to their name, to avoid
 # touching any real table, and injects only a sample of data.
-ENABLE_WIP_MODE = False
+ENABLE_WIP_MODE = True
 WIP_MODE_ROWS_PER_TABLE = 1000
 
 # Useful to troobleshoot whether this scripts runs a deluge of SQL requests.
@@ -110,12 +111,12 @@ def anonymize(value, salt):
     return salted_hmac(salt, value, secret=settings.SECRET_KEY).hexdigest()
 
 
-def chunks(l, n):
+def chunks(items, n):
     """
-    Yield successive n-sized chunks from l.
+    Yield successive n-sized chunks from items.
     """
-    for i in range(0, len(l), n):
-        yield l[i : i + n]
+    for i in range(0, len(items), n):
+        yield items[i : i + n]
 
 
 def get_choice(choices, key):
@@ -195,13 +196,13 @@ def get_job_application_sub_type(ja):
         if ja.sender_prescriber_organization:
             sub_type += f" {ja.sender_prescriber_organization.kind}"
         else:
-            sub_type += f" sans organisation"
+            sub_type += " sans organisation"
     return sub_type
 
 
 def _get_ja_time_spent_in_transition(ja, logs):
-    if len(logs) >= 1:
-        assert len(logs) == 1
+    assert len(logs) in [0, 1]
+    if len(logs) == 1:
         new_timestamp = ja.created_at
         transition_timestamp = logs[0].timestamp
         assert transition_timestamp > new_timestamp
@@ -213,7 +214,7 @@ def _get_ja_time_spent_in_transition(ja, logs):
 def get_ja_time_spent_from_new_to_processing(ja):
     # Find the new=>processing transition log.
     # We have to do all this in python to benefit from prefetch_related.
-    logs = [l for l in ja.logs.all() if l.transition == JobApplicationWorkflow.TRANSITION_PROCESS]
+    logs = [log for log in ja.logs.all() if log.transition == JobApplicationWorkflow.TRANSITION_PROCESS]
     return _get_ja_time_spent_in_transition(ja, logs)
 
 
@@ -221,9 +222,9 @@ def get_ja_time_spent_from_new_to_accepted_or_refused(ja):
     # Find the *=>accepted or *=>refused transition log.
     # We have to do all this in python to benefit from prefetch_related.
     logs = [
-        l
-        for l in ja.logs.all()
-        if l.to_state in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_REFUSED]
+        log
+        for log in ja.logs.all()
+        if log.to_state in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_REFUSED]
     ]
     return _get_ja_time_spent_in_transition(ja, logs)
 
@@ -235,7 +236,7 @@ def get_timedelta_since_org_last_job_application(org):
         if len(job_applications) >= 1:
             job_applications.sort(key=lambda o: o.created_at, reverse=True)
             last_job_application = job_applications[0]
-            now = datetime.now(timezone.utc)
+            now = timezone.now()
             return now - last_job_application.created_at
     # This field makes no sense for prescribers without org.
     return None
@@ -339,29 +340,21 @@ def compose(f, g):
     return lambda *a, **kw: f(g(*a, **kw))
 
 
-POLE_EMPLOI_APPROVAL_SUFFIX_TO_MEANING = {
-    "P": "Prolongation",
-    "E": "Extension",
-    "A": "Interruption",
-    "S": "Suspension",
-}
-
-
 def get_approval_type(approval):
     """
     Build a human readable category for approvals and PE approvals.
     """
     if isinstance(approval, Approval):
-        if approval.number.startswith("99999"):
-            return "Pass IAE (99999)"
+        if approval.number.startswith(settings.ASP_ITOU_PREFIX):
+            return f"Pass IAE ({settings.ASP_ITOU_PREFIX})"
         else:
-            return "Agrément PE via ITOU (non 99999)"
+            return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
     elif isinstance(approval, PoleEmploiApproval):
         if len(approval.number) == 12:
             return "Agrément PE"
         elif len(approval.number) == 15:
             suffix = approval.number[12]
-            return f"{POLE_EMPLOI_APPROVAL_SUFFIX_TO_MEANING[suffix]} PE"
+            return f"{PoleEmploiApproval.SUFFIX_TO_MEANING[suffix]} PE"
         else:
             raise ValueError("Unexpected PoleEmploiApproval.number length")
     else:
@@ -429,6 +422,29 @@ class MetabaseDatabaseCursor:
         self.conn.close()
 
 
+def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_lambda=lambda o: o):
+    return [
+        {
+            "name": f"département{name_suffix}",
+            "type": "varchar",
+            "comment": f"Département{comment_suffix}",
+            "lambda": lambda o: custom_lambda(o).department if custom_lambda(o) else None,
+        },
+        {
+            "name": f"nom_département{name_suffix}",
+            "type": "varchar",
+            "comment": f"Nom complet du département{comment_suffix}",
+            "lambda": lambda o: DEPARTMENTS.get(custom_lambda(o).department) if custom_lambda(o) else None,
+        },
+        {
+            "name": f"région{name_suffix}",
+            "type": "varchar",
+            "comment": f"Région{comment_suffix}",
+            "lambda": lambda o: DEPARTMENT_TO_REGION.get(custom_lambda(o).department) if custom_lambda(o) else None,
+        },
+    ]
+
+
 def get_address_columns(name_suffix="", comment_suffix=""):
     return [
         {
@@ -456,29 +472,6 @@ def get_address_columns(name_suffix="", comment_suffix=""):
             "lambda": lambda o: o.city,
         },
     ] + get_department_and_region_columns(name_suffix, comment_suffix)
-
-
-def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_lambda=lambda o: o):
-    return [
-        {
-            "name": f"département{name_suffix}",
-            "type": "varchar",
-            "comment": f"Département{comment_suffix}",
-            "lambda": lambda o: custom_lambda(o).department if custom_lambda(o) else None,
-        },
-        {
-            "name": f"nom_département{name_suffix}",
-            "type": "varchar",
-            "comment": f"Nom complet du département{comment_suffix}",
-            "lambda": lambda o: DEPARTMENTS.get(custom_lambda(o).department) if custom_lambda(o) else None,
-        },
-        {
-            "name": f"région{name_suffix}",
-            "type": "varchar",
-            "comment": f"Région{comment_suffix}",
-            "lambda": lambda o: DEPARTMENT_TO_REGION.get(custom_lambda(o).department) if custom_lambda(o) else None,
-        },
-    ]
 
 
 class Command(BaseCommand):
@@ -1001,9 +994,7 @@ class Command(BaseCommand):
                 "name": "actif",
                 "type": "boolean",
                 "comment": "Dernière connexion dans les 7 jours",
-                "lambda": lambda o: o.last_login > datetime.now(timezone.utc) + timedelta(days=-7)
-                if o.last_login
-                else None,
+                "lambda": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else None,
             },
         ]
         table_columns += get_department_and_region_columns(comment_suffix=" du candidat")
