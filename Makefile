@@ -25,7 +25,7 @@ style:
 setup_git_pre_commit_hook:
 	touch .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
-	echo -e "\
+	echo "\
 	docker exec -t itou_django black --line-length 119 itou\n\
 	docker exec -t itou_django isort itou\n\
 	" > .git/hooks/pre-commit
