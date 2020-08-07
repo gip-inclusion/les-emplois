@@ -38,10 +38,10 @@ class SiaeQuerySet(models.QuerySet):
             return self
         return self.filter(members=user, members__is_active=True)
 
-    def shuffle(self):
+    def add_shuffled_rank(self):
         """
-        Quick and dirty solution to shuffle results with a
-        determistic seed which changes every day.
+        Add a shuffled rank using a determistic seed which changes every day,
+        which can then later be used to shuffle results.
 
         We may later implement a more rigorous shuffling but this will
         require setting up a daily cronjob to rebuild the shuffling index
@@ -69,7 +69,7 @@ class SiaeQuerySet(models.QuerySet):
         # than this so as to avoid collisions as much as possible.
         c = random.randint(1000, 10000)
         shuffle_expression = (a + F("id")) * (b + F("id")) % c
-        return self.annotate(shuffled_rank=shuffle_expression).order_by("shuffled_rank")
+        return self.annotate(shuffled_rank=shuffle_expression)
 
 
 class ActiveSiaeManager(models.Manager.from_queryset(SiaeQuerySet)):
