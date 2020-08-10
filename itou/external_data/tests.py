@@ -7,7 +7,7 @@ import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
 
 from .apis.pe_connect import import_user_data
-from .models import ExternalDataImport, JobSeekerExternalData  
+from .models import ExternalDataImport, JobSeekerExternalData
 
 
 # Test data import status (All ok, failed, partial)
@@ -116,7 +116,9 @@ class ExternalDataImportTest(TestCase):
         report = result.report
         self.assertTrue(user.has_external_data)
         self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertIn(f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker", report.get("fields_updated"))
+        self.assertIn(
+            f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker", report.get("fields_updated")
+        )
         self.assertEquals(5, len(report.get("fields_updated")))
         self.assertEquals(9, len(report.get("fields_fetched")))
 
