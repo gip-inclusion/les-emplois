@@ -32,7 +32,12 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             Siae.active.within(city.coords, distance_km)
             .add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
-            # More readable than a convoluted Exists/OuterRef.
+            # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
+            # If we sort naively by `-_total_active_members` we would show
+            # siaes with 10 members (where 10 is the max), then siaes
+            # with 9 members, then siaes with 8 members etc...
+            # This is clearly not what we want. We want to show siaes with members
+            # (whatever the number of members is) then siaes without members.
             .annotate(
                 has_active_members=Case(
                     When(_total_active_members__gte=1, then=Value(1)), default=Value(0), output_field=IntegerField()
