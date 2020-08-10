@@ -3,6 +3,7 @@ import logging
 
 import requests
 from django.conf import settings
+from django.forms.models import model_to_dict
 from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
@@ -172,6 +173,15 @@ def _get_aggregated_user_data(token):
     return status, resp
 
 
+def _model_fields_changed(initial, final_instance):
+    """
+    Return an array with fields of the model_instance object that will be changed on `save()`
+    """
+    final = model_to_dict(final_instance)
+    class_name = type(final_instance).__name__
+    return [f"{class_name}/{final_instance.pk}/{k}" for k, v in initial.items() if v != final.get(k)]
+
+
 # External user data from PE Connect API:
 # * transform raw data from API
 # * dispatch data into models if possible
@@ -179,46 +189,58 @@ def _get_aggregated_user_data(token):
 
 
 def _store_user_data(user, status, data):
+    """
+    Store user data and produce a "report" containing an array of JSON objects, with these fields:
+        - name: of the key/field
+        - is_fetched (boolean): data properly fetched or not (API error...)
+        - is_stored (boolean): the data was stored in the model or not (ignored)
+
+    Return a ExternalDataImport object containing outcome of the data import
+    """
     # Set a trace of data import, whatever the resulting status
     data_import = ExternalDataImport.objects.pe_import_for_user(user).first()
 
-    # User part:
-    # Can be directly "inserted" in to the model
+    fields_fetched = [k for k, v in data.items() if v is not None]
+    fields_failed = [k for k, v in data.items() if v is None]
 
-    # Birth date
-    if data.get("dateDeNaissance"):
-        user.birthdate = user.birthdate or parse_datetime(data.get("dateDeNaissance"))
+    job_seeker_data = JobSeekerExternalData(user=user, data_import=data_import)
 
-    # User address
-    if data.get("adresse4"):
-        user.address_line_1 = "" or user.address_line_1 or data.get("adresse4")
+    # Record changes on model objects:
+    initial_job_seekeer_data = model_to_dict(job_seeker_data)
+    initial_user = model_to_dict(user)
 
-    if data.get("adresse2"):
-        user.address_line_2 = "" or user.address_line_2 or data.get("adresse2")
+    for k in fields_fetched:
+        v = data.get(k)
 
-    if data.get("codePostal"):
-        user.post_code = user.post_code or data.get("codePostal")
+        # User part:
+        if k == "dateDeNaissance":
+            user.birthdate = user.birthdate or parse_datetime(v)
+        elif k == "adresse4":
+            user.address_line_1 = "" or user.address_line_1 or v
+        elif k == "adresse2":
+            user.address_line_2 = "" or user.address_line_2 or v
+        elif k == "codePostal":
+            user.post_code = user.post_code or v
+        elif k == "libelleCommune":
+            user.city = user.city or v
 
-    if data.get("libelleCommune"):
-        user.city = user.city or data.get("libelleCommune")
+        # JobSeekerExternalData part:
+        if k == "codeStatutIndividu":
+            job_seeker_data.is_pe_jobseeker = True if v == 1 else False
+        elif k == "beneficiairePrestationSolidarite":
+            job_seeker_data.has_minimal_social_allowance = v
+
+    # Check updated fields
+    # To be done before saving objects:
+    fields_updated = _model_fields_changed(initial_user, user) + _model_fields_changed(initial_job_seekeer_data, job_seeker_data)
 
     user.save()
-
-    # The following will be stored as JobSeekerExternalData
-    job_seeker_data = JobSeekerExternalData(user=user, data_import=data_import)
-    result_keys = data.keys()
-
-    if "codeStatutIndividu" in result_keys:
-        value = data.get("codeStatutIndividu")
-        job_seeker_data.is_pe_jobseeker = True if value == 1 else False
-
-    if "beneficiairePrestationSolidarite" in result_keys:
-        job_seeker_data.has_minimal_social_allowance = data.get("beneficiairePrestationSolidarite")
-
-    # ...
     job_seeker_data.save()
 
+    report = {"fields_fetched": fields_fetched, "fields_failed": fields_failed, "fields_updated": fields_updated}
+
     data_import.status = status
+    data_import.report = report
     data_import.save()
 
     return data_import

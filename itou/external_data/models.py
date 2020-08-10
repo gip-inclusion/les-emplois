@@ -58,6 +58,8 @@ class ExternalDataImport(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Utilisateur"), on_delete=models.CASCADE)
 
+    report = models.JSONField(verbose_name=_("Rapport technique"), default=dict)
+
     class Meta:
         verbose_name = _("Import de données externes")
         verbose_name_plural = _("Imports de données externes")
