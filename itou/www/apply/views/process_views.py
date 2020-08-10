@@ -43,9 +43,14 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
     cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
+    eligibility_diagnosis = None
+    if job_application.job_seeker.has_eligibility_diagnoses:
+        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
+
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "cancellation_days": cancellation_days,
+        "eligibility_diagnosis": eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
     }
@@ -228,7 +233,11 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     """
 
     queryset = JobApplication.objects.siae_member_required(request.user)
-    job_application = get_object_or_404(queryset, id=job_application_id, state=JobApplicationWorkflow.STATE_PROCESSING)
+    job_application = get_object_or_404(
+        queryset,
+        id=job_application_id,
+        state__in=[JobApplicationWorkflow.STATE_PROCESSING, JobApplicationWorkflow.STATE_POSTPONED],
+    )
 
     if not job_application.to_siae.is_subject_to_eligibility_rules:
         raise Http404()

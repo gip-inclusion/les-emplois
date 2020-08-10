@@ -3,9 +3,9 @@
 {% load i18n %}
 {% block body %}
 
-{% trans "Vous avez reçu une nouvelle candidature !" %}
+{% translate "Vous avez reçu une nouvelle candidature !" %}
 
-{% trans "*Candidat* :" %}
+{% translate "*Candidat* :" %}
 
 - Nom : {{ job_application.job_seeker.last_name }}
 - Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
@@ -18,7 +18,7 @@
 
 {% if job_application.message %}
 
-{% trans "*Message du candidat* :" %}
+{% translate "*Message du candidat* :" %}
 
 {{ job_application.message }}
 
@@ -26,17 +26,17 @@
 
 {% if job_application.selected_jobs.exists %}
 
-{% trans "*Métier(s) recherché(s)* :" %}
+{% translate "*Métier(s) recherché(s)* :" %}
 
 {% for job in job_application.selected_jobs.all %}
 - {{ job.display_name }}{% endfor %}
 
 {% endif %}
 
-{% trans "*Candidature envoyée par :*" %}
+{% translate "*Candidature envoyée par :*" %}
 
 {% if job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
-{% trans "Le candidat lui même." %}
+{% translate "Le candidat lui même." %}
 {% endif %}
 
 {% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}

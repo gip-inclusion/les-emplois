@@ -53,18 +53,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             _("Structure"),
-            {
-                "fields": (
-                    "siret",
-                    "kind",
-                    "name",
-                    "phone",
-                    "email",
-                    "secret_code",
-                    "code_safir_pole_emploi",
-                    "is_authorized",
-                )
-            },
+            {"fields": ("siret", "kind", "name", "phone", "email", "code_safir_pole_emploi", "is_authorized")},
         ),
         (
             _("Adresse"),
@@ -95,12 +84,11 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         ),
     )
     inlines = (MembersInline,)
-    list_display = ("id", "name", "post_code", "city", "department", "member_count")
-    list_display_links = ("id", "name")
+    list_display = ("pk", "name", "post_code", "city", "department", "member_count")
+    list_display_links = ("pk", "name")
     list_filter = (AuthorizationValidationRequired, HasMembersFilter, "is_authorized", "kind", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = (
-        "secret_code",
         "code_safir_pole_emploi",
         "created_by",
         "created_at",
@@ -110,7 +98,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "authorization_updated_at",
         "authorization_updated_by",
     )
-    search_fields = ("siret", "name", "code_safir_pole_emploi")
+    search_fields = ("pk", "siret", "name", "code_safir_pole_emploi")
 
     def member_count(self, obj):
         return obj._member_count
@@ -123,10 +111,18 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         return queryset
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
+
+        if not change:
             obj.created_by = request.user
-        if not obj.geocoding_score and obj.address_on_one_line:
-            obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+            if not obj.geocoding_score and obj.address_on_one_line:
+                # Set geocoding.
+                obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+
+        if change and obj.address_on_one_line:
+            old_obj = self.model.objects.get(id=obj.id)
+            if obj.address_on_one_line != old_obj.address_on_one_line:
+                # Refresh geocoding.
+                obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
 
         super().save_model(request, obj, form, change)
 

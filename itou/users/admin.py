@@ -65,7 +65,7 @@ class ItouUserAdmin(UserAdmin):
 
     inlines = UserAdmin.inlines + [SiaeMembershipInline, PrescriberMembershipInline]
     list_display = (
-        "id",
+        "pk",
         "email",
         "first_name",
         "last_name",
@@ -75,10 +75,11 @@ class ItouUserAdmin(UserAdmin):
         "has_verified_email",
         "last_login",
     )
-    list_display_links = ("id", "email")
+    list_display_links = ("pk", "email")
     list_filter = UserAdmin.list_filter + (KindFilter,)
     ordering = ("-id",)
     raw_id_fields = ("created_by",)
+    search_fields = UserAdmin.search_fields + ("pk",)
 
     fieldsets = UserAdmin.fieldsets + (
         (
@@ -128,7 +129,7 @@ class ItouUserAdmin(UserAdmin):
 
     def get_queryset(self, request):
         """
-        Remove superuser. The purpose is to prevent staff users
+        Exclude superusers. The purpose is to prevent staff users
         to change the password of a superuser.
         """
         qs = super().get_queryset(request)
@@ -136,7 +137,7 @@ class ItouUserAdmin(UserAdmin):
             qs = qs.exclude(is_superuser=True)
         if request.resolver_match.view_name.endswith("changelist"):
             has_verified_email = EmailAddress.objects.filter(email=OuterRef("email"), verified=True)
-            is_peamu = SocialAccount.objects.filter(user_id=OuterRef("id"), provider="peamu")
+            is_peamu = SocialAccount.objects.filter(user_id=OuterRef("pk"), provider="peamu")
             qs = qs.annotate(_has_verified_email=Exists(has_verified_email))
             qs = qs.annotate(_is_peamu=Exists(is_peamu))
         return qs

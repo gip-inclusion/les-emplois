@@ -17,7 +17,7 @@ def get_safe_url(request, param_name, fallback_url=None):
             # since it's not a member of `allowed_hosts`:
             # https://github.com/django/django/blob/525274f/django/utils/http.py#L413
             # As a quick fix, we build a new URL without the port.
-            from urllib.parse import urlparse, ParseResult
+            from urllib.parse import ParseResult, urlparse
 
             url_info = urlparse(url)
             url_without_port = ParseResult(

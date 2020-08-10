@@ -35,13 +35,13 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
-        self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
         self.assertFalse(job_application.eligibility_diagnosis_by_siae_required)
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_EI
         )
-        self.assertFalse(job_application.job_seeker.has_eligibility_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
     def test_accepted_by(self):
@@ -396,14 +396,16 @@ class JobApplicationEmailTest(TestCase):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING, approval=approval
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            approval=approval,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
         job_application.accept(user=job_application.to_siae.members.first())
         mail.outbox = []  # Delete previous emails.
         job_application.send_approval_number_by_email_manually(deliverer=staff_member)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertIsNotNone(job_application.approval_number_sent_at)
-        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
         self.assertEqual(job_application.approval_number_delivered_by, staff_member)
         self.assertEqual(len(mail.outbox), 1)
 
@@ -488,8 +490,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         job_application.accept(user=job_application.to_siae.members.first())
         self.assertIsNone(job_application.approval)
-        # This will be set only after the effective approval delivery.
-        self.assertEqual(job_application.approval_delivery_mode, "")
+        self.assertEqual(job_application.approval_delivery_mode, JobApplication.APPROVAL_DELIVERY_MODE_MANUAL)
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)

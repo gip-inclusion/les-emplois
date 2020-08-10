@@ -5,7 +5,7 @@
         <div class="card-header" id="heading-1-1">
             <h5 class="mb-0">
                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-1-1" aria-expanded="true" aria-controls="collapse-1-1">
-                    {% trans "Indicateurs" %}
+                    {% translate "Indicateurs" %}
                 </button>
             </h5>
         </div>
@@ -14,51 +14,51 @@
             <div class="card-body">
                 <ul>
                     <li>
-                        {% trans "Candidatures à ce jour" %} : <b>{{ data.total_job_applications }}</b>
+                        {% translate "Candidatures à ce jour" %} : <b>{{ data.total_job_applications }}</b>
                     </li>
                     <li>
-                        {% trans "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
+                        {% translate "Embauches à ce jour" %} : <b>{{ data.total_hirings }}</b>
                     </li>
                     <li>
-                        {% trans "Durée moyenne entre la candidature et son acceptation" %} :
+                        {% translate "Durée moyenne entre la candidature et son acceptation" %} :
                         <b>
                             {{ data.average_delay_from_application_to_hiring.days }}
-                            {% trans "jour(s) et " %}
+                            {% translate "jour(s) et " %}
                             {{ data.average_delay_from_application_to_hiring.seconds|intdiv:3600 }}
-                            {% trans "heure(s)" %}
+                            {% translate "heure(s)" %}
                         </b>
                     </li>
                     <li>
-                        {% trans "Durée moyenne entre l'acceptation de la candidature et la délivrance du PASS IAE" %} :
+                        {% translate "Durée moyenne entre l'acceptation de la candidature et la délivrance du PASS IAE" %} :
                         <b>
                             {{ data.average_delay_from_hiring_to_pass_delivery.days }}
-                            {% trans "jour(s) et " %}
+                            {% translate "jour(s) et " %}
                             {{ data.average_delay_from_hiring_to_pass_delivery.seconds|intdiv:3600 }}
-                            {% trans "heure(s)" %}
+                            {% translate "heure(s)" %}
                         </b>
                     </li>
                     <li>
-                        {% trans "Durée moyenne entre la délivrance du PASS IAE et le début du contrat" %} :
+                        {% translate "Durée moyenne entre la délivrance du PASS IAE et le début du contrat" %} :
                         <b>
                             {{ data.average_delay_from_pass_delivery_to_contract_start.days }}
-                            {% trans "jour(s) et " %}
+                            {% translate "jour(s) et " %}
                             {{ data.average_delay_from_pass_delivery_to_contract_start.seconds|intdiv:3600 }}
-                            {% trans "heure(s)" %}
+                            {% translate "heure(s)" %}
                         </b>
                     </li>
                     <li>
-                        {% trans "PASS IAE délivrés de façon automatique à ce jour" %} : <b>{{ data.total_auto_approval_deliveries }}</b>
+                        {% translate "PASS IAE délivrés de façon automatique à ce jour" %} : <b>{{ data.total_auto_approval_deliveries }}</b>
                     </li>
                     <li>
-                        {% trans "PASS IAE délivrés de façon manuelle à ce jour" %} : <b>{{ data.total_manual_approval_deliveries }}</b>
+                        {% translate "PASS IAE délivrés de façon manuelle à ce jour" %} : <b>{{ data.total_manual_approval_deliveries }}</b>
                     </li>
                     <li>
-                        {% trans "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }}</b>
+                        {% translate "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }}</b>
                     </li>
                     <li>
-                        {% blocktrans with days=data.days_for_total_job_seeker_users_without_opportunity value=data.total_job_seeker_users_without_opportunity %}
+                        {% blocktranslate with days=data.days_for_total_job_seeker_users_without_opportunity value=data.total_job_seeker_users_without_opportunity %}
                             Comptes candidat sans opportunité (inscrits depuis plus de {{ days }} jours avec au moins une candidature mais sans embauche) à ce jour : <b>{{ value }}</b>
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                     </li>
                 </ul>
             </div>
@@ -68,16 +68,16 @@
         <div class="card-header" id="heading-1-2">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-1-2" aria-expanded="false" aria-controls="collapse-1-2">
-                    {% trans "Evolution des candidatures et embauches dans le temps" %}
+                    {% translate "Evolution des candidatures et embauches dans le temps" %}
                 </button>
             </h5>
         </div>
         <div id="collapse-1-2" class="collapse" aria-labelledby="heading-1-2" data-parent="#accordion-1">
             <div class="card-body">
-                {% trans "Candidatures" as chart_title %}
+                {% translate "Candidatures" as chart_title %}
                 {% include "stats/includes/basic_column_chart.html" with chart_id="job_applications" data=data.job_applications_per_creation_week title=chart_title %}
 
-                {% trans "Embauches (groupées selon la date de la candidature correspondante)" as chart_title %}
+                {% translate "Embauches (groupées selon la date de la candidature correspondante)" as chart_title %}
                 {% include "stats/includes/basic_column_chart.html" with chart_id="hirings" data=data.hirings_per_creation_week title=chart_title %}
             </div>
         </div>
@@ -86,16 +86,16 @@
         <div class="card-header" id="heading-1-3">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-1-3" aria-expanded="false" aria-controls="collapse-1-3">
-                    {% trans "Source des candidatures et embauches" %}
+                    {% translate "Source des candidatures et embauches" %}
                 </button>
             </h5>
         </div>
         <div id="collapse-1-3" class="collapse" aria-labelledby="heading-1-3" data-parent="#accordion-1">
             <div class="card-body">
-                {% trans "Source<br>des candidatures" as chart_title %}
+                {% translate "Source<br>des candidatures" as chart_title %}
                 {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_sources" data=data.job_applications_per_sender_kind title=chart_title %}
 
-                {% trans "Source<br>des embauches" as chart_title %}
+                {% translate "Source<br>des embauches" as chart_title %}
                 {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_sources" data=data.hirings_per_sender_kind title=chart_title %}
             </div>
         </div>
@@ -104,13 +104,13 @@
         <div class="card-header" id="heading-1-4">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-1-4" aria-expanded="false" aria-controls="collapse-1-4">
-                    {% trans "Auteurs de la validation d'éligibilité" %}
+                    {% translate "Auteurs de la validation d'éligibilité" %}
                 </button>
             </h5>
         </div>
         <div id="collapse-1-4" class="collapse" aria-labelledby="heading-1-4" data-parent="#accordion-1">
             <div class="card-body">
-                {% trans "Auteurs<br>de l\\\'éligibilité" as chart_title %}
+                {% translate "Auteurs<br>de l\\\'éligibilité" as chart_title %}
                 {% include "stats/includes/semi_circle_donut.html" with chart_id="eligibility_sources" data=data.hirings_per_eligibility_author_kind title=chart_title %}
             </div>
         </div>
@@ -119,16 +119,16 @@
         <div class="card-header" id="heading-1-5">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-1-5" aria-expanded="false" aria-controls="collapse-1-5">
-                    {% trans "Structures destinataires des candidatures et embauches" %}
+                    {% translate "Structures destinataires des candidatures et embauches" %}
                 </button>
             </h5>
         </div>
         <div id="collapse-1-5" class="collapse" aria-labelledby="heading-1-5" data-parent="#accordion-1">
             <div class="card-body">
-                {% trans "Destination<br>des candidatures" as chart_title %}
+                {% translate "Destination<br>des candidatures" as chart_title %}
                 {% include "stats/includes/semi_circle_donut.html" with chart_id="job_application_destinations" data=data.job_applications_per_destination_kind title=chart_title %}
 
-                {% trans "Destination<br>des embauches" as chart_title %}
+                {% translate "Destination<br>des embauches" as chart_title %}
                 {% include "stats/includes/semi_circle_donut.html" with chart_id="hiring_destinations" data=data.hirings_per_destination_kind title=chart_title %}
             </div>
         </div>

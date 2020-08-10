@@ -12,14 +12,14 @@
 {% load bootstrap4 %}
 
 <div class="alert alert-warning" role="alert">
-    <i>{% trans "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
+    <i>{% translate "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
 </div>
 
 <form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
-    <h2>{% trans "Critères d'éligibilité" %}</h2>
+    <h2>{% translate "Critères d'éligibilité" %}</h2>
 
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
         {% bootstrap_form_errors form_confirm_eligibility %}
@@ -28,11 +28,11 @@
     {% bootstrap_form_errors form_administrative_criteria %}
 
     <h2 id="criteres_administratifs">
-        <span class="badge badge-secondary">{% trans "Critères administratifs" %}</span>
+        <span class="badge badge-secondary">{% translate "Critères administratifs" %}</span>
     </h2>
 
     <h3>
-        {% trans "Critères administratifs de niveau 1" %}
+        {% translate "Critères administratifs de niveau 1" %}
     </h3>
 
     {% for field in form_administrative_criteria %}
@@ -42,7 +42,7 @@
     {% endfor %}
 
     <h3>
-        {% trans "Critères administratifs de niveau 2" %}
+        {% translate "Critères administratifs de niveau 2" %}
     </h3>
 
     {% for field in form_administrative_criteria %}
@@ -59,13 +59,13 @@
 
     <div class="alert alert-warning" role="alert">
         <p>
-            {% blocktrans %}En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.{% endblocktrans %}
+            {% blocktranslate %}En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.{% endblocktranslate %}
         </p>
         {% buttons %}
             {% if cancel_url %}
-                <a class="btn btn-secondary" href="{{ cancel_url }}">{% trans "Annuler" %}</a>
+                <a class="btn btn-secondary" href="{{ cancel_url }}">{% translate "Annuler" %}</a>
             {% endif %}
-            <button type="submit" class="btn btn-primary">{% trans "Valider" %}</button>
+            <button type="submit" class="btn btn-primary">{% translate "Valider" %}</button>
         {% endbuttons %}
     </div>
 

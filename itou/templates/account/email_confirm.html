@@ -5,22 +5,22 @@
 {% load account %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Confirmer l'adresse e-mail" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Confirmer l'adresse e-mail" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Confirmer l'adresse e-mail" %}</h1>
+<h1>{% translate "Confirmer l'adresse e-mail" %}</h1>
 
 {% if confirmation %}
 
-    <p>{% blocktrans with email=confirmation.email_address.email %}Confirmez que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous :{% endblocktrans %}</p>
+    <p>{% blocktranslate with email=confirmation.email_address.email %}Confirmez que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous :{% endblocktranslate %}</p>
 
     <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 
         {% csrf_token %}
 
         {% buttons %}
-                <button type="submit" class="btn btn-primary">{% trans "Confirmer" %}</button>
+                <button type="submit" class="btn btn-primary">{% translate "Confirmer" %}</button>
         {% endbuttons %}
 
     </form>
@@ -30,11 +30,11 @@
     {% url 'account_email' as email_url %}
 
     <div class="alert alert-danger" role="alert">
-        {% blocktrans %}
+        {% blocktranslate %}
             Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.
             <br>
             Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
-        {% endblocktrans %}
+        {% endblocktranslate %}
     </div>
 
 {% endif %}

@@ -1,17 +1,13 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Collaborateurs" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Collaborateurs" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
-    <h1>{% trans "Collaborateurs" %}</h1>
-
+    <h1>{% translate "Collaborateurs" %}</h1>
     <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
-    <a href="{% url 'invitations_views:invite_siae_staff' %}" class="ml-sm-4 align-self-center">
-        <button class="btn btn-outline-primary mb-1 w-100 w-sm-auto">{% trans "Inviter des collaborateurs" %}</button>
-    </a>
 </div>
 
 <div class="table-responsive">
@@ -19,9 +15,9 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">{% trans "Nom" %}</th>
-                <th scope="col">{% trans "Email" %}</th>
-                <th scope="col">{% trans "Date d'inscription" %}</th>
+                <th scope="col">{% translate "Nom" %}</th>
+                <th scope="col">{% translate "Email" %}</th>
+                <th scope="col">{% translate "Date d'inscription" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -36,31 +32,12 @@
         </tbody>
     </table>
 </div>
+<a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
+    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
+</a>
 
 {% if pending_invitations %}
-    <h1 class="mt-5 mb-3">{% trans "Invitations en attente" %}</h1>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">{% trans "Nom" %}</th>
-                    <th scope="col">{% trans "Email" %}</th>
-                    <th scope="col">{% trans "Envoyée le" %}</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for invitation in pending_invitations %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ invitation.first_name }} {{ invitation.last_name }}</td>
-                    <td><a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a></td>
-                    <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    </div>
+    {% include "invitations_views/includes/pending_invitations.html" %}
 {% endif %}
 
 {% endblock %}

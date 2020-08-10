@@ -247,7 +247,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         # Only "authorized prescribers" can perform an eligibility diagnosis.
         not user_info.is_authorized_prescriber
         # Eligibility diagnosis already performed.
-        or job_seeker.has_eligibility_diagnosis
+        or job_seeker.has_valid_eligibility_diagnosis
     )
     if skip:
         return HttpResponseRedirect(next_url)

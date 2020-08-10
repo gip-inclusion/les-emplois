@@ -4,6 +4,65 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2020-08-03
+
+### Ajouté
+- Un prescripteur peut inviter ses collaborateurs à joindre son organisation
+- [Simulateur de la demande d'aide
+du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
+- Une embauche reportée permet maintenant un nouveau diagnostic
+- Un diagnostic a maintenant une durée de vie limitée
+- Nouveau lien "Liste des critères d'éligibilité" sur le tableau de bord Employeur
+- Nouveau texte sur le tableau de bord Employeur pour informer du fait que les agréments ont été allongés
+- Hotjar sur le Forum
+
+### Modifié
+- Déblocage Mailjet permettant à certains utilisateurs de pouvoir recevoir nos emails correctement
+- Désactivation de 200 structures n'ayant pas de conventionnement valide à ce jour
+- Un prescripteur ayant été détaché de son organisation peut maintenant continuer à utiliser la Plateforme sans erreur
+
+## [1.0.7] - 2020-07-17
+
+### Ajouté
+- Déploiement - PACA + Corse (6 juillet)
+- Import des agréments Pôle emploi de Juin 2020 (9 juillet)
+- Import de nouvelles agences Pôle emploi (14 juillet)
+- Allongement des agréments de 3 mois pour les PASS IAE créés avant le 17 juin 2020
+- Ajout de `meta property` SEO pour que l'image et la description du service remonte lors d'un partage sur Facebook ou autre
+- Ajout de la possibilité de rechercher par ID dans l'admin (agréments, utilisateurs, organisations et structures)
+- Ajout de la possibilité de corriger les adresses email utilisateurs dans l'admin
+- Ajout d'un contrôle sur la date de naissance du candidat qui doit être âgé au minimum de 16 ans
+
+### Modifié
+- Amélioration de la visibilité de la liste de résultats des employeurs solidaires après une recherche
+- Clarification des termes ambigus fiche/fiche de poste
+- Mise en avant du bouton de filtre des candidatures : "Rechercher dans vos candidatures"
+- Clarification du fait que l'email ASP attendu pour les SIAE est l'email du référent technique extranet ASP
+- Retrait de l'exemple "Linkedin" pour les propositions de solutions de partage de CV
+- Suppression du bouton "Vous êtes une entreprise avec un besoin de recrutement"
+- Modification du bandeau inscription SIAE "'Les inscriptions s'ouvrent aux régions progressivement. Vérifiez que la Plateforme est bien disponible sur votre territoire. Seules les ETTI sont ouvertes en France entière."
+- Amélioration de la visibilité du bouton multi-structures
+
+## [1.0.6] - 2020-07-02
+
+### Ajouté
+- Déploiement - Bourgogne-Franche-Comté (22 Juin)
+- Déploiement - Auvergne-Rhône-Alpes (29 Juin)
+- Import de nouvelles structures en provenance de l'ASP (25 Juin)
+- Messages explicatifs sur l'écran d'inscription des employeurs pour faire comprendre aux employeurs qui sont hors des départements ouverts qu'ils ne peuvent pas encore s'inscrire
+- Modale pour donner davantage d'explications quand on a pas d'email
+- Nouvel environnement de démo
+- Re-calcul des coordonnées géographiques en cas de changement d'adresse dans l'admin SIAE et dans l'admin Organisations de prescripteur
+- Un employeur solidaire peut inviter un collaborateur à rejoindre sa structure
+- Ajout d'un filtre "date de naissance" dans la recherche d'agréments Pôle emploi
+- Blocage des candidatures
+
+### Modifié
+- Les critères d'éligibilité simplifiés ETTI deviennent permanents
+- "Modifier les coordonnées" devient "Modifier la fiche" sur le tableau de bord des SIAE et des prescripteurs habilités
+- Modification de la mention mention RGPD demandée par la DGEFP/PE sur les écrans d'inscription
+- "Je donne mon avis" est affiché seulement sur la HP
+
 ## [1.0.5] - 2020-06-18
 
 ### Ajouté

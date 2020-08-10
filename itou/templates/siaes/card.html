@@ -37,7 +37,7 @@
 
         {% if siae.email %}
             <p>
-                {% trans "E-mail" as email_label %}
+                {% translate "E-mail" as email_label %}
                 {% include "includes/icon.html" with icon="mail" title=email_label %}
                 <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
             </p>
@@ -45,7 +45,7 @@
 
         {% if siae.phone %}
             <p>
-                {% trans "Téléphone" as phone_label %}
+                {% translate "Téléphone" as phone_label %}
                 {% include "includes/icon.html" with icon="phone" title=phone_label %}
                 <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
             </p>
@@ -53,7 +53,7 @@
 
         {% if siae.website %}
             <p>
-                {% trans "Site Internet" as website_label %}
+                {% translate "Site Internet" as website_label %}
                 {% include "includes/icon.html" with icon="external-link" title=website_label %}
                 <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
             </p>
@@ -62,20 +62,23 @@
     {% endif %}
 
     {% if siae.block_job_applications %}
-    <div class="alert alert-warning">
-        {% trans "Cet employeur ne traite plus de nouvelles candidatures pour le moment" %}
-    </div>
+
+        <div class="alert alert-warning">
+            {% translate "Cet employeur ne traite plus de nouvelles candidatures pour le moment" %}
+        </div>
+
     {% else %}
-        {% if iae.job_description_through.exists %}
+
+        {% if siae.job_description_through.exists %}
             <hr>
             <p class="mb-2">
                 {% include "includes/icon.html" with icon="briefcase" %}
-                {% trans "Métiers proposés" %}
+                {% translate "Métiers proposés" %}
             </p>
             <ul>
             {% for job in siae.job_description_through.all %}
                 <li>
-                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% trans job.display_name %}</a>
+                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% translate job.display_name %}</a>
                 </li>
             {% endfor %}
             </ul>
@@ -85,17 +88,17 @@
             <hr>
             <p>
                 <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                    {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                    {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                 </a>
             </p>
         {% endif %}
-    {% endif %}
 
+    {% endif %}
 
     {% if back_url %}
         <hr>
         <p>
-            <a href="{{ back_url }}">{% trans "Retour" %}</a>
+            <a href="{{ back_url }}">{% translate "Retour" %}</a>
         </p>
     {% endif %}
 

@@ -2,5 +2,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
 {% block subject %}
-{% blocktrans %}Première inscription à une organisation existante{% endblocktrans %}
+{% blocktranslate %}Première inscription à une organisation existante{% endblocktranslate %}
 {% endblock %}

@@ -37,7 +37,7 @@ class User(AbstractUser, AddressMixin):
         (REASON_NOT_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
     )
 
-    ERROR_EMAIL_ALREADY_EXISTS = _(f"Cet e-mail existe déjà.")
+    ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
@@ -100,25 +100,30 @@ class User(AbstractUser, AddressMixin):
         return ApprovalsWrapper(self)
 
     @property
-    def has_eligibility_diagnosis(self):
+    def has_valid_eligibility_diagnosis(self):
         """
-        Returns True if a diagnosis exists, False otherwise.
+        Returns True if an ongoing diagnosis exists, False otherwise.
         """
         if not self.is_job_seeker:
             return False
-        if self.eligibility_diagnoses.exists():
-            return True
+        if self.has_eligibility_diagnoses:
+            if not self.eligibility_diagnoses.latest("created_at").has_expired:
+                return True
         # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
         # has been made outside of Itou.
         latest_approval = self.approvals_wrapper.latest_approval
         return latest_approval and latest_approval.is_valid and not latest_approval.originates_from_itou
+
+    @cached_property
+    def has_eligibility_diagnoses(self):
+        return self.eligibility_diagnoses.exists()
 
     def get_eligibility_diagnosis(self):
         if not self.is_job_seeker:
             return None
         return self.eligibility_diagnoses.select_related(
             "author", "author_siae", "author_prescriber_organization"
-        ).latest("-created_at")
+        ).latest("created_at")
 
     @cached_property
     def is_peamu(self):

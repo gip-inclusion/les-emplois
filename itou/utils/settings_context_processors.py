@@ -11,4 +11,7 @@ def expose_settings(request):
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,
+        "ITOU_FQDN": settings.ITOU_FQDN,
+        "ITOU_PROTOCOL": settings.ITOU_PROTOCOL,
+        "SHOW_TEST_ACCOUNTS_BANNER": settings.SHOW_TEST_ACCOUNTS_BANNER,
     }

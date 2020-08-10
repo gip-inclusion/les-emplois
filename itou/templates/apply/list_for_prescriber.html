@@ -1,19 +1,19 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Suivi des candidatures" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Suivi des candidatures" %}{{ block.super }}{% endblock %}
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Suivi des candidatures" %}</h1>
+    <h1>{% translate "Suivi des candidatures" %}</h1>
 
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
-            {% trans "Aucune candidature pour le moment." %}
+            {% translate "Aucune candidature pour le moment." %}
         </h2>
     {% endif %}
 
@@ -27,7 +27,7 @@
 
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
-            {% include "apply/includes/list_card_footer_refusal.html" with job_application=job_application %}
+            {% include "apply/includes/list_card_footer.html" with job_application=job_application %}
 
         </div>
 

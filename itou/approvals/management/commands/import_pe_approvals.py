@@ -8,33 +8,27 @@ from django.core.management.base import BaseCommand
 from itou.approvals.models import PoleEmploiApproval
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-# The content of `{CURRENT_DIR}/data/` must be git ignored.
-XLSX_FILE_PATH = f"{CURRENT_DIR}/data"
-
-
 class Command(BaseCommand):
     """
     Import Pole emploi's approvals (or `agrément` in French) into the database.
 
     To debug:
-        django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx --dry-run
-        django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx --dry-run --verbosity=2
+        django-admin import_pe_approvals --file-path=/tmp/2020_02_12_base_agrements_aura.xlsx --dry-run
+        django-admin import_pe_approvals --file-path=/tmp/2020_02_12_base_agrements_aura.xlsx --dry-run --verbosity=2
 
     To populate the database:
-        django-admin import_pe_approvals --file-name=2020_02_12_base_agrements_aura.xlsx
+        django-admin import_pe_approvals --file-path=/tmp/2020_02_12_base_agrements_aura.xlsx
     """
 
     help = "Import the content of the Pole emploi's approvals xlsx file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--file-name",
-            dest="file_name",
+            "--file-path",
+            dest="file_path",
             required=True,
             action="store",
-            help=f"Name of the XLSX file to import (must be located in {XLSX_FILE_PATH})",
+            help="Absolute path of the XLSX file to import",
         )
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
@@ -52,7 +46,7 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-    def handle(self, file_name, dry_run=False, **options):
+    def handle(self, file_path, dry_run=False, **options):
 
         self.set_logger(options.get("verbosity"))
 
@@ -60,19 +54,18 @@ class Command(BaseCommand):
         count_canceled_approvals = 0
         unique_approval_suffixes = {}
 
-        XLSX_FILE = f"{XLSX_FILE_PATH}/{file_name}"
-        file_size_in_bytes = os.path.getsize(XLSX_FILE)
+        file_size_in_bytes = os.path.getsize(file_path)
         self.stdout.write(f"Opening a {file_size_in_bytes >> 20} MB file… (this will take some time)")
 
         bulk_create_queue = []
         chunk_size = 5000
 
         # https://openpyxl.readthedocs.io/en/latest/optimized.html#read-only-mode
-        wb = openpyxl.load_workbook(XLSX_FILE, read_only=True)
+        wb = openpyxl.load_workbook(file_path, read_only=True)
         ws = wb.active
 
-        self.stdout.write(f"Ready.")
-        self.stdout.write(f"Creating approvals… 0%")
+        self.stdout.write("Ready.")
+        self.stdout.write("Creating approvals… 0%")
 
         last_progress = 0
         for i, row in enumerate(ws.rows):

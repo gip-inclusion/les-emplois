@@ -2,8 +2,8 @@
 {% load i18n %}
 {% block subject %}
 
-{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst %}
+{% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst %}
 {{ first_name }} {{ last_name }} a rejoint votre structure.
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {% endblock %}

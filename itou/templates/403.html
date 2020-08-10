@@ -1,11 +1,11 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Erreur 403" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Erreur 403" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Accès refusé" %}</h1>
+    <h1>{% translate "Accès refusé" %}</h1>
 
     {% if exception %}
         <div class="lead alert alert-warning" role="alert">

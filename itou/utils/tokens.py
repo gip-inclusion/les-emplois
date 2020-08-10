@@ -1,4 +1,3 @@
-import secrets
 from datetime import datetime
 
 from django.conf import settings
@@ -7,25 +6,6 @@ from django.utils.http import base36_to_int, int_to_base36
 
 
 SIAE_SIGNUP_MAGIC_LINK_TIMEOUT = 2 * 7 * 24 * 3600
-
-
-def generate_random_token(n=6):
-    """
-    Returns a random token of n chars.
-    https://docs.python.org/3/library/secrets.html#secrets.token_hex
-    E.g.:
-        F0915B
-        034846
-        09F94D
-        C50364
-        etc.
-    """
-    # Little arithmetic trick to get the correct length in both cases:
-    # - if n even (n=2k), len(token_hex(1 + n // 2)) == 2+2k == n+2
-    # - if n odd (n=2k+1), len(token_hex(1 + n // 2)) == 2+2k == n+1
-    # the final `[:n]` ensures we get the correct length (n)
-    # while calculating as little extra characters as possible.
-    return secrets.token_hex(1 + n // 2)[:n].upper()
 
 
 class SiaeSignupTokenGenerator:

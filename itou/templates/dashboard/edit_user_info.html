@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Modifier votre profil" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Modifier votre profil" %}{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% trans "Modifier votre profil" %}</h1>
+<h1>{% translate "Modifier votre profil" %}</h1>
 
 {% if extra_data %}
 
@@ -29,8 +29,8 @@
     {% bootstrap_form form %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{{ prev_url }}">{% trans "Annuler" %}</a>
-        <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+        <a class="btn btn-secondary" href="{{ prev_url }}">{% translate "Annuler" %}</a>
+        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
     {% endbuttons %}
 
 </form>

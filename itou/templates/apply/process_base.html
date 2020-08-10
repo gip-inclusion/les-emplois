@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-    {% trans "Candidature" %}
+    {% translate "Candidature" %}
     -
     {{ job_application.job_seeker.get_full_name }}
     {{ block.super }}
@@ -11,7 +11,7 @@
 {% block content %}
 
     <h1>
-        {% trans "Candidature de" %}
+        {% translate "Candidature de" %}
         <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
         <div class="row">
             <div class="col-sm">
@@ -20,7 +20,7 @@
             {% if job_application.can_download_approval_as_pdf %}
                 <div class="col-sm text-sm-right">
                     <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="details-candidature">
-                        <button type="button" class="btn btn-outline-primary">{% trans "Télécharger l'attestation" %}</button>
+                        <button type="button" class="btn btn-outline-primary">{% translate "Télécharger l'attestation" %}</button>
                     </a>
                 </div>
             {% endif %}
@@ -32,13 +32,13 @@
         {% if job_application.state.is_accepted %}
             <div class="alert border">
                 {% if job_application.approval %}
-                    {% trans "Numéro d'agrément :" %} <b>{{ job_application.approval.number_with_spaces }}</b>
+                    {% translate "Numéro d'agrément :" %} <b>{{ job_application.approval.number_with_spaces }}</b>
                     <br>
                     {% include "approvals/includes/status.html" with approval=job_application.approval %}
                 {% elif job_application.hiring_without_approval %}
-                    {% trans "Vous n'avez pas demandé de PASS IAE." %}
+                    {% translate "Vous n'avez pas demandé de PASS IAE." %}
                 {% else %}
-                    {% trans "PASS IAE en cours de délivrance." %}
+                    {% translate "PASS IAE en cours de délivrance." %}
                 {% endif %}
             </div>
         {% elif not job_application.state.is_cancelled and approvals_wrapper.latest_approval %}
@@ -46,7 +46,7 @@
                 {# Employers need to know the expiration date of an approval #}
                 {# to decide whether they may accept a job application or not. #}
 
-                {% trans "Agrément existant" %}
+                {% translate "Agrément existant" %}
                 <br>
                 {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
             </div>

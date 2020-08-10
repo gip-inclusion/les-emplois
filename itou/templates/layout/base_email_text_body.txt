@@ -4,8 +4,8 @@
 {% block body %}{% endblock %}
 
 ---
-{% if itou_environment == "DEMO"%}{% blocktrans %}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endblocktrans %}{% endif %}
-{% blocktrans %}Plateforme de l'Inclusion{% endblocktrans %}
+{% if itou_environment == "DEMO"%}{% blocktranslate %}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endblocktranslate %}{% endif %}
+{% blocktranslate %}Plateforme de l'Inclusion{% endblocktranslate %}
 {{ itou_protocol }}://{{ itou_fqdn }}
 
 {% endautoescape %}

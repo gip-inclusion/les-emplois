@@ -36,19 +36,6 @@ class FullnameFormMixin(forms.Form):
 
 
 class PrescriberForm(FullnameFormMixin, SignupForm):
-
-    secret_code = forms.CharField(
-        label=gettext_lazy("Code de l'organisation"),
-        max_length=6,
-        required=False,
-        strip=True,
-        widget=forms.TextInput(attrs={"placeholder": "Code composé de 6 caractères"}),
-        help_text=gettext_lazy(
-            "Si vous avez été invité par un collègue travaillant dans la même structure que vous,"
-            " saisissez le code de l'organisation qu'il vous a transmis. "
-        ),
-    )
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.organization = None
@@ -66,20 +53,6 @@ class PrescriberForm(FullnameFormMixin, SignupForm):
         if get_user_model().email_already_exists(email):
             raise ValidationError(gettext_lazy("Cette adresse email est déjà enregistrée"))
         return email
-
-    def clean_secret_code(self):
-        """
-        Retrieve a PrescriberOrganization instance from the `secret_code` field.
-        """
-        secret_code = self.cleaned_data["secret_code"]
-        if secret_code:
-            secret_code = secret_code.upper()
-            try:
-                self.organization = PrescriberOrganization.objects.get(secret_code=secret_code)
-            except PrescriberOrganization.DoesNotExist:
-                error = _("Ce code n'est pas valide.")
-                raise forms.ValidationError(error)
-        return secret_code
 
     def save(self, request):
         user = super().save(request)
@@ -254,7 +227,8 @@ class SelectSiaeForm(forms.Form):
     email = forms.EmailField(
         label=gettext_lazy("E-mail"),
         help_text=gettext_lazy(
-            "Pour les SIAE, adresse e-mail connue possiblement de l'Agence de services et de paiement (ASP)"
+            "Vous êtes une SIAE ? Attention, indiquez l'e-mail utilisé "
+            "par le référent technique ASP et non votre e-mail de connexion."
         ),
         required=False,
     )
@@ -266,7 +240,10 @@ class SelectSiaeForm(forms.Form):
         email = cleaned_data.get("email")
 
         if not (siret or email):
-            error_message = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
+            error_message = _(
+                "Merci de renseigner l'e-mail utilisé par le référent technique ASP "
+                "ou un numéro de SIRET connu de nos services."
+            )
             raise forms.ValidationError(error_message)
 
         siaes = Siae.objects.filter(kind=kind)
@@ -283,12 +260,21 @@ class SelectSiaeForm(forms.Form):
         # There can be at most one siret match due to (kind, siret) unicity.
         siret_exists = len(siaes_matching_siret) == 1
 
+        def raise_form_error_for_inactive_siae():
+            error_message = _("La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
+            raise forms.ValidationError(mark_safe(error_message))
+
         if siret_exists:
-            self.selected_siae = siaes_matching_siret[0]
+            if siaes_matching_siret[0].is_active:
+                self.selected_siae = siaes_matching_siret[0]
+            else:
+                raise_form_error_for_inactive_siae()
         else:
             siaes_matching_email = [s for s in siaes if s.auth_email == email]
             email_exists = len(siaes_matching_email) > 0
-            several_siaes_share_same_email = len(siaes_matching_email) > 1
+            active_siaes_matching_email = [s for s in siaes_matching_email if s.is_active]
+            several_siaes_share_same_email = len(active_siaes_matching_email) > 1
+            email_exists_in_active_siae = len(active_siaes_matching_email) > 0
 
             if several_siaes_share_same_email:
                 error_message = _(
@@ -308,7 +294,10 @@ class SelectSiaeForm(forms.Form):
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
-            self.selected_siae = siaes_matching_email[0]
+            if not email_exists_in_active_siae:
+                raise_form_error_for_inactive_siae()
+
+            self.selected_siae = active_siaes_matching_email[0]
 
 
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
@@ -358,7 +347,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         if self.check_siae_signup_credentials():
             siae = self.get_siae()
         else:
-            raise RuntimeError("This should never happen. Attack attempted.")
+            raise RuntimeError("This should never happen.")
 
         if siae.has_members:
             siae.new_signup_warning_email_to_existing_members(user).send()
@@ -389,7 +378,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         if not self.get_encoded_siae_id():
             return None
         siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
-        siae = Siae.objects.get(pk=siae_id)
+        siae = Siae.active.filter(pk=siae_id).first()
         return siae
 
     def check_siae_signup_credentials(self):

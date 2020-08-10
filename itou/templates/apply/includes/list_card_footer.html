@@ -1,0 +1,26 @@
+{% load i18n %}
+<div class="card-footer">
+    <a
+        href="#"
+        data-toggle="collapse"
+        data-target="#answer{{ forloop.counter0 }}"
+        aria-expanded="false"
+        aria-controls="answer{{ forloop.counter0 }}"
+    >{% translate "Plus d'informations" %}</a>
+    <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
+        <p>
+            <b>{% translate "Message de candidature :" %}</b>
+        </p>
+        <div>
+            {{ job_application.message|linebreaks }}
+        </div>
+        {% if job_application.state.is_refused and job_application.answer %}
+            <p>
+                <b>{% translate "Réponse :" %}</b>
+            </p>
+            <div>
+                {{ job_application.answer|linebreaks }}
+            </div>
+        {% endif %}
+    </div>
+</div>

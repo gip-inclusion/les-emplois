@@ -11,7 +11,7 @@
                 aria-expanded="false">{{ selected_department_name }}</a>
             <div class="dropdown-menu dropdown-menu-lg-right">
                 <span class="dropdown-item-text">
-                    <small>{% trans "Départements :" %}</small>
+                    <small>{% translate "Départements :" %}</small>
                 </span>
                 <form action="{% url 'stats:index' %}" method="get">
                     {% for d in department_choices %}

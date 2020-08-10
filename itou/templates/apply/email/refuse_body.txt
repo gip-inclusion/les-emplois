@@ -4,20 +4,32 @@
 
 {% if job_application.is_sent_by_proxy %}
 
-{% blocktrans with sender_full_name=job_application.sender.get_full_name job_seeker_full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
+{% blocktranslate with sender_full_name=job_application.sender.get_full_name job_seeker_full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
 La candidature de {{ job_seeker_full_name }} envoyée par {{ sender_full_name }} chez {{ to_siae }} n'a malheureusement pas pu aboutir.
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {% else %}
 
-{% blocktrans with to_siae=job_application.to_siae.display_name %}
+{% blocktranslate with to_siae=job_application.to_siae.display_name %}
 Votre candidature chez {{ to_siae }} n'a malheureusement pas pu aboutir.
-{% endblocktrans %}
+{% endblocktranslate %}
+
+{% endif %}
+
+{% if job_application.is_refused_due_to_deactivation %}
+
+Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures. 
+
+{% if not job_application.is_sent_by_proxy %}
+
+Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
+
+{% endif %}
 
 {% endif %}
 
 {% if job_application.answer %}
-{% trans "*Message de l'entreprise* :" %}
+{% translate "*Message de l'entreprise* :" %}
 
 {{ job_application.answer }}
 {% endif %}

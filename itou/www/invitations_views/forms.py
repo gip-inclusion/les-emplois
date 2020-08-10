@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.forms.models import modelformset_factory
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.invitations.models import Invitation, SiaeStaffInvitation
+from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
 
 
 class NewInvitationMixinForm(forms.ModelForm):
@@ -15,7 +15,7 @@ class NewInvitationMixinForm(forms.ModelForm):
     """
 
     class Meta:
-        model = Invitation
+        model = InvitationAbstract
         fields = ["first_name", "last_name", "email"]
 
     def __init__(self, sender, *args, **kwargs):
@@ -53,6 +53,87 @@ class NewInvitationMixinForm(forms.ModelForm):
                 self.add_error("email", error)
 
 
+########################################################################
+##################### PrescriberWithOrg invitation #####################
+########################################################################
+
+
+class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
+    class Meta:
+        fields = NewInvitationMixinForm.Meta.fields
+        model = PrescriberWithOrgInvitation
+
+    def __init__(self, sender, organization, *args, **kwargs):
+        self.organization = organization
+        super().__init__(sender=sender, *args, **kwargs)
+
+    def _invited_user_exists_error(self, email):
+        """
+        If the guest is already a user, he should be a prescriber
+        but without belonging to another organization.
+        Reminder: we do not handle multi-structure prescribers for the moment.
+        """
+        self.user = get_user_model().objects.filter(email__iexact=email).first()
+        if self.user:
+            if not self.user.is_prescriber:
+                error = forms.ValidationError(_("Cet utilisateur n'est pas un prescripteur."))
+                self.add_error("email", error)
+            else:
+                user_belongs_to_another_org = self.user.prescriberorganization_set.exists()
+                if user_belongs_to_another_org:
+                    error = forms.ValidationError(_("Cette personne est membre d'une autre organisation."))
+                    self.add_error("email", error)
+                else:
+                    user_is_member = self.organization.members.filter(email=self.user.email).exists()
+                    if user_is_member:
+                        error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
+                        self.add_error("email", error)
+
+    def _extend_expiration_date_or_error(self, email):
+        invitation_model = self.Meta.model
+        invitation = invitation_model.objects.filter(email__iexact=email, organization=self.organization).first()
+        if invitation:
+            if invitation.accepted:
+                error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
+                self.add_error("email", error)
+            else:
+                invitation.extend_expiration_date()
+
+    def save(self, *args, **kwargs):
+        invitation = super().save(commit=False)
+        invitation.organization = self.organization
+        invitation.save()
+        invitation.send()
+        return invitation
+
+
+class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
+    def __init__(self, *args, **kwargs):
+        """
+        By default, BaseModelFormSet show the objects stored in the DB.
+        See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
+        """
+        super().__init__(*args, **kwargs)
+        self.queryset = PrescriberWithOrgInvitation.objects.none()
+
+
+"""
+Formset used when a prescriber invites a person to join his structure.
+"""
+NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
+    PrescriberWithOrgInvitation,
+    form=NewPrescriberWithOrgInvitationForm,
+    formset=PrescriberWithOrgInvitationFormSet,
+    extra=1,
+    max_num=30,
+)
+
+
+#############################################################
+###################### SiaeStaffInvitation ##################
+#############################################################
+
+
 class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
     class Meta:
         fields = NewInvitationMixinForm.Meta.fields
@@ -71,10 +152,11 @@ class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
             if not self.user.is_siae_staff:
                 error = forms.ValidationError(_("Cet utilisateur n'est pas un employeur."))
                 self.add_error("email", error)
-            user_is_member = self.siae.members.filter(email=self.user.email).exists()
-            if user_is_member:
-                error = forms.ValidationError(_("Cette personne fait déjà partie de votre structure."))
-                self.add_error("email", error)
+            else:
+                user_is_member = self.siae.members.filter(email=self.user.email).exists()
+                if user_is_member:
+                    error = forms.ValidationError(_("Cette personne fait déjà partie de votre structure."))
+                    self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
@@ -112,6 +194,11 @@ NewSiaeStaffInvitationFormSet = modelformset_factory(
 )
 
 
+###############################################################
+######################### Signup forms ########################
+###############################################################
+
+
 class NewUserForm(SignupForm):
     """
     Signup form shown when a user accepts an invitation.
@@ -142,6 +229,11 @@ class NewUserForm(SignupForm):
         self.fields.pop("email")
         self.fields["first_name"].initial = invitation.first_name
         self.fields["last_name"].initial = invitation.last_name
+
+    def clean(self):
+        if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
+            raise forms.ValidationError(_("Cette structure n'est plus active."))
+        super().clean()
 
     def save(self, request):
         self.cleaned_data["email"] = self.email

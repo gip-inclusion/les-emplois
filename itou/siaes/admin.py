@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import admin, messages
 from django.db.models import Count
 from django.utils.translation import gettext as _
@@ -35,10 +37,18 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
-    list_display = ("id", "siret", "kind", "name", "department", "geocoding_score", "member_count")
+    list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by",)
-    readonly_fields = ("created_by", "created_at", "updated_at", "job_applications_blocked_at")
+    readonly_fields = (
+        "active_until",
+        "reactivated_by",
+        "reactivated_at",
+        "created_by",
+        "created_at",
+        "updated_at",
+        "job_applications_blocked_at",
+    )
     fieldsets = (
         (
             _("SIAE"),
@@ -55,6 +65,10 @@ class SiaeAdmin(admin.ModelAdmin):
                     "website",
                     "description",
                     "source",
+                    "is_active",
+                    "active_until",
+                    "reactivated_by",
+                    "reactivated_at",
                     "created_by",
                     "created_at",
                     "updated_at",
@@ -78,7 +92,7 @@ class SiaeAdmin(admin.ModelAdmin):
             },
         ),
     )
-    search_fields = ("id", "siret", "name")
+    search_fields = ("pk", "siret", "name")
     inlines = (MembersInline, JobsInline)
 
     def member_count(self, obj):
@@ -97,14 +111,32 @@ class SiaeAdmin(admin.ModelAdmin):
         return form
 
     def save_model(self, request, obj, form, change):
-        if not obj.pk:
+
+        if not change:
             obj.created_by = request.user
-        if not obj.geocoding_score and obj.address_on_one_line:
-            obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
-        if not obj.auth_email:
+            if not obj.geocoding_score and obj.address_on_one_line:
+                # Set geocoding.
+                obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+
+        if change and obj.is_active:
+            old_obj = self.model.objects.get(id=obj.id)
+            if not old_obj.is_active:
+                # Itou staff manually reactivated siae.
+                obj.reactivated_by = request.user
+                obj.reactivated_at = datetime.datetime.now()
+
+        if change and obj.address_on_one_line:
+            old_obj = self.model.objects.get(id=obj.id)
+            if obj.address_on_one_line != old_obj.address_on_one_line:
+                # Refresh geocoding.
+                obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+
+        if obj.source == models.Siae.SOURCE_ASP and not obj.auth_email:
             messages.warning(
-                request, "Cette structure n'ayant pas d'email d'authentification il est impossible de s'y inscrire."
+                request,
+                "Cette structure mère ASP n'ayant pas d'email d'authentification il est impossible de s'y inscrire.",
             )
+
         super().save_model(request, obj, form, change)
 
 

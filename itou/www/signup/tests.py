@@ -16,7 +16,6 @@ from itou.cities.models import City
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationFactory,
-    PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiFactory,
 )
 from itou.prescribers.models import PrescriberOrganization
@@ -49,7 +48,10 @@ class SiaeSignupFormTest(TestCase):
         post_data = {"kind": Siae.KIND_ACI}
         form = SelectSiaeForm(data=post_data)
         form.is_valid()
-        expected_error = _("Merci de renseigner un e-mail ou un numéro de SIRET connu de nos services.")
+        expected_error = _(
+            "Merci de renseigner l'e-mail utilisé par le référent technique ASP"
+            " ou un numéro de SIRET connu de nos services."
+        )
         self.assertIn(expected_error, form.errors["__all__"])
 
         # (email, kind) or (siret, kind) does not match any siae.
@@ -278,6 +280,32 @@ class SiaeSignupTest(TestCase):
             subjects = [email.subject for email in mail.outbox]
             self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", subjects)
             self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
+
+    def test_cannot_join_an_inactive_siae(self):
+        """
+        A user cannot join an inactive SIAE.
+        """
+
+        user_first_name = "Judas"  # noqa F841
+        user_email = "judas.iscariot@siae.com"
+
+        siae = SiaeFactory(kind=Siae.KIND_ETTI, is_active=False)
+        self.assertEqual(0, siae.members.count())
+
+        token = siae.get_token()
+        with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
+
+            url = reverse("signup:select_siae")
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
+            # Find an SIAE: (siret, kind) matches one SIAE.
+            post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 200)
+
+            expected_message = _("La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
+            self.assertContains(response, expected_message)
 
     def test_legacy_route(self):
         """
@@ -694,129 +722,6 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.url, reverse("dashboard:index"))
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
-
-    def test_prescriber_signup_with_code_to_unauthorized_organization(self):
-        """
-        Prescriber signup (orienter) with a code to join an unauthorized organization.
-        Organization has a pre-existing admin user who is notified of the signup.
-        """
-        url = reverse("signup:prescriber_orienter")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        organization = PrescriberOrganizationWithMembershipFactory()
-        password = "!*p4ssw0rd123-"
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "secret_code": organization.secret_code,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@prescriber.com",
-            "password1": password,
-            "password2": password,
-            "secret_code": organization.secret_code,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
-        self.assertIn(user, organization.members.all())
-        self.assertEqual(2, organization.members.count())
-        membership = user.prescribermembership_set.get(organization=organization)
-        self.assertFalse(membership.is_admin)
-        # Check `EmailAddress` state.
-        self.assertEqual(user.emailaddress_set.count(), 1)
-        user_email = user.emailaddress_set.first()
-        self.assertFalse(user_email.verified)
-
-        # Check sent emails.
-        self.assertEqual(len(mail.outbox), 2)
-        subjects = [email.subject for email in mail.outbox]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", subjects)
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
-
-    def test_second_member_signup_without_code_to_authorized_organization(self):
-        """
-        A second user signup to join an authorized organization.
-        First one is notified when second one signs up.
-        """
-
-        # Create an authorized organization with one admin.
-        authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
-        self.assertEqual(1, authorized_organization.members.count())
-        first_user = authorized_organization.members.first()
-        membership = first_user.prescribermembership_set.get(organization=authorized_organization)
-        self.assertTrue(membership.is_admin)
-
-        # A second user wants to join the authorized organization.
-        url = reverse("signup:prescriber_orienter")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        password = "!*p4ssw0rd123-"
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "secret_code": authorized_organization.secret_code,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        post_data = {
-            "first_name": "Jane",
-            "last_name": "Doe",
-            "email": "jane.doe@prescriber.com",
-            "password1": password,
-            "password2": password,
-            "secret_code": authorized_organization.secret_code,
-        }
-
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # Check `User` state.
-        second_user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(second_user.is_job_seeker)
-        self.assertFalse(second_user.is_siae_staff)
-        self.assertTrue(second_user.is_prescriber)
-        # Check `Membership` state.
-        self.assertIn(second_user, authorized_organization.members.all())
-        self.assertEqual(2, authorized_organization.members.count())
-        self.assertEqual(1, second_user.prescriberorganization_set.count())
-        membership = second_user.prescribermembership_set.get(organization=authorized_organization)
-        self.assertFalse(membership.is_admin)
-
-        # Check sent emails.
-        self.assertEqual(len(mail.outbox), 2)
-        subjects = [email.subject for email in mail.outbox]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", subjects)
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subjects)
 
 
 class PasswordResetTest(TestCase):

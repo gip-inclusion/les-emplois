@@ -2,13 +2,13 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Prescripteur Pôle emploi - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Prescripteur Pôle emploi - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Inscription" %}
-    <small class="text-muted">{% trans "Prescripteur Pôle emploi" %}</small>
+    {% translate "Inscription" %}
+    <small class="text-muted">{% translate "Prescripteur Pôle emploi" %}</small>
 </h1>
 
 <form method="post" action="{% url 'signup:prescriber_poleemploi' %}" role="form" class="js-prevent-multiple-submit">
@@ -35,6 +35,6 @@
 <hr>
 
 <p>
-    <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
+    <a href="{% url 'account_login' %}">{% translate "Vous avez déjà un compte ?" %}</a>
 </p>
 {% endblock %}

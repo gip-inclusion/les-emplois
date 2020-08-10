@@ -3,11 +3,11 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Connexion" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Connexion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 <h1>
-    {% trans "Connexion" %}
+    {% translate "Connexion" %}
     {% if account_type_display_name %}
         <small class="text-muted">{{ account_type_display_name }}</small>
     {% endif %}
@@ -17,13 +17,13 @@
 
     <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
 
-    <p class="lines-on-sides">{% trans "ou" %}</p>
+    <p class="lines-on-sides">{% translate "ou" %}</p>
 
     <p class="text-center">{% include "signup/includes/no_email_link.html" %}</p>
 
-    <p class="lines-on-sides">{% trans "ou" %}</p>
+    <p class="lines-on-sides">{% translate "ou" %}</p>
 
-    <p>{% trans "Se connecter avec son compte" %}</p>
+    <p>{% translate "Se connecter avec son compte" %}</p>
 
 {% endif %}
 
@@ -43,7 +43,7 @@
     <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
 
     {% buttons %}
-        <button type="submit" class="btn btn-primary">{% trans "Connexion" %}</button>
+        <button type="submit" class="btn btn-primary">{% translate "Connexion" %}</button>
     {% endbuttons %}
 
 </form>
@@ -51,16 +51,16 @@
 <hr>
 
 <p>
-    <a href="{% url 'account_reset_password' %}">{% trans "Mot de passe oublié ?" %}</a>
+    <a href="{% url 'account_reset_password' %}">{% translate "Mot de passe oublié ?" %}</a>
 </p>
 
 <hr>
 
-<p>{% trans "Vous n'avez pas de compte ?" %}</p>
+<p>{% translate "Vous n'avez pas de compte ?" %}</p>
 
 <p>
     <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-    {% trans "Créer un compte" %}
+    {% translate "Créer un compte" %}
     {% if account_type_display_name %}
         {{ account_type_display_name|lower }}
     {% endif %}

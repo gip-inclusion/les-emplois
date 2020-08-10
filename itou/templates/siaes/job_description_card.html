@@ -16,7 +16,7 @@
         {% else %}
             <p>
                 <i>
-                    {% blocktrans with siae.display_name as display_name %}<b>{{ display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.{% endblocktrans %}
+                    {% blocktranslate with siae.display_name as display_name %}<b>{{ display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.{% endblocktranslate %}
                 </i>
             </p>
         {% endif %}
@@ -25,7 +25,7 @@
     {% if siae.has_members %}
         <p>
             <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}">
-                {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
             </a>
         </p>
     {% endif %}
@@ -33,7 +33,7 @@
     <hr>
 
     <p class="text-muted mb-0">
-        {% trans "Métier proposé par :" %}
+        {% translate "Métier proposé par :" %}
     </p>
 
     <h2 class="mb-0">
@@ -52,12 +52,12 @@
 
     <p>
       <a data-toggle="collapse" href="#share-job-description-job" role="button" aria-expanded="false">
-          {% trans "Partager cette offre" %}
+          {% translate "Partager cette offre" %}
       </a>
     </p>
     <div class="collapse form-group" id="share-job-description-job">
         <p>
-            {% trans "Copiez-collez ce lien pour partager cette fiche de poste :" %}
+            {% translate "Copiez-collez ce lien pour partager cette fiche de poste :" %}
         </p>
         {# Poor man's copy and paste with onClick #}
         <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
@@ -66,7 +66,7 @@
     {% if back_url %}
         <hr>
         <p>
-            <a href="{{ back_url }}">{% trans "Retour" %}</a>
+            <a href="{{ back_url }}">{% translate "Retour" %}</a>
         </p>
     {% endif %}
 

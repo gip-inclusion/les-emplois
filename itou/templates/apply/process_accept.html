@@ -8,7 +8,7 @@
 
 
     <div class="alert alert-info" role="alert">
-        {% trans "Confirmez votre choix en renseignant quelques informations supplémentaires." %}
+        {% translate "Confirmez votre choix en renseignant quelques informations supplémentaires." %}
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit mt-5">
@@ -16,13 +16,13 @@
         {% csrf_token %}
 
         {% if form_address or form_pe_status %}
-            <h3>{% trans "Candidat" %}</h3>
+            <h3>{% translate "Candidat" %}</h3>
         {% endif %}
 
         {% if form_pe_status %}
             {% if not job_application.approval_not_needed %}
                 <div class="alert alert-warning" role="alert">
-                    {% trans "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
+                    {% translate "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
                 </div>
             {% endif %}
 
@@ -36,15 +36,15 @@
         {% endif %}
 
         <div class="mt-5">
-            <h3>{% trans "Embauche" %}</h3>
+            <h3>{% translate "Embauche" %}</h3>
 
             {% bootstrap_form form_accept %}
         </div>
 
         {% buttons %}
             <a class="btn btn-secondary"
-               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
-            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% trans "Je l'embauche" %}</a>
+               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% translate "Annuler" %}</a>
+            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% translate "Je l'embauche" %}</a>
 
         {% endbuttons %}
             

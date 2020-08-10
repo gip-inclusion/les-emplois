@@ -68,6 +68,7 @@ def members(request, template_name="prescribers/members.html"):
     organization = get_current_org_or_404(request)
 
     members = organization.prescribermembership_set.select_related("user").all().order_by("joined_at")
+    pending_invitations = organization.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    context = {"organization": organization, "members": members}
+    context = {"organization": organization, "members": members, "pending_invitations": pending_invitations}
     return render(request, template_name, context)

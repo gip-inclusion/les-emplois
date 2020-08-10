@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "La plateforme de l'inclusion" %}{% endblock %}
+{% block title %}{% translate "La plateforme de l'inclusion" %}{% endblock %}
 
 {% block content %}
 
@@ -10,9 +10,9 @@
 
         <div class="layout-content">
 
-            <h2 class="text-center my-5 text-light">{% trans "Prenez contact avec un employeur solidaire" %}</h3>
+            <h2 class="text-center my-5 text-light">{% translate "Prenez contact avec un employeur solidaire" %}</h3>
 
-            <form method="get" action="{% url 'search:siaes' %}">
+            <form method="get" action="{% url 'search:siaes_results' %}">
                 {% include "search/includes/siaes_search_form.html" with form=siae_search_form %}
             </form>
 
@@ -25,18 +25,18 @@
     {% if not user.is_authenticated %}
         <section class="layout-section bg-light py-5 text-center">
             <div class="layout-content">
-                <h3 class="h4 font-weight-bold">{% trans "Vous découvrez l'inclusion ?" %}</h3>
-                <h3 class="h4 pt-2 font-weight-light">{% trans "Nos outils sont à votre disposition" %}</h4>
+                <h3 class="h4 font-weight-bold">{% translate "Vous découvrez l'inclusion ?" %}</h3>
+                <h3 class="h4 pt-2 font-weight-light">{% translate "Nos outils sont à votre disposition" %}</h4>
 
                 <div class="card-deck my-5 justify-content-between text-center">
                     <div class="card p-4" style="flex: 0 0 23%;">
                         <div class="card-body">
                             <h5 class="card-title font-weight-light mb-4">
-                                <span class="d-block">{% trans "Pour commencer," %}</span>
-                                <span class="d-block">{% trans "inscrivez-vous sur la plateforme" %}</span>
+                                <span class="d-block">{% translate "Pour commencer," %}</span>
+                                <span class="d-block">{% translate "inscrivez-vous sur la plateforme" %}</span>
                             </h5>
                             <a class="btn btn-primary" href="{% url 'account_signup' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                {% trans "Créer un compte" %}
+                                {% translate "Créer un compte" %}
                             </a>
                         </div>
                     </div>
@@ -44,10 +44,10 @@
                     <div class="card p-4" style="flex: 0 0 23%;">
                         <div class="card-body">
                             <h5 class="card-title font-weight-light mb-4">
-                                {% trans "Discutez entre professionnels sur le forum de l'inclusion" %}
+                                {% translate "Discutez entre professionnels sur le forum de l'inclusion" %}
                             </h5>
                             <a class="btn btn-primary" href="https://forum.inclusion.beta.gouv.fr">
-                                {% trans "Accéder au forum" %}
+                                {% translate "Accéder au forum" %}
                             </a>
                         </div>
                     </div>
@@ -55,10 +55,10 @@
                     <div class="card p-4" style="flex: 0 0 23%;">
                         <div class="card-body">
                             <h5 class="card-title font-weight-light mb-4">
-                                {% trans "Découvrez l'espace de documentation pour tout comprendre" %}
+                                {% translate "Découvrez l'espace de documentation pour tout comprendre" %}
                             </h5>
                             <a class="btn btn-primary" href="https://doc.inclusion.beta.gouv.fr/" target=_blank>
-                                {% trans "En savoir plus" %}
+                                {% translate "En savoir plus" %}
                             </a>
                         </div>
                     </div>

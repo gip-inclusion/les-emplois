@@ -97,7 +97,7 @@ def get_stats(selected_department):
 
 
 def get_department_choices():
-    all_departments_text = _(f"Tous les départements")
+    all_departments_text = _("Tous les départements")
     department_choices = [(None, all_departments_text)]
     department_choices += list(DEPARTMENTS.items())
     return department_choices

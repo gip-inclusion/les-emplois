@@ -138,6 +138,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_PREVENT_OBJECTIVES = "prevent_objectives"
     REFUSAL_REASON_NO_POSITION = "no_position"
     REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE = "approval_expiration_too_close"
+    REFUSAL_REASON_DEACTIVATION = "deactivation"
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
         (REFUSAL_REASON_DID_NOT_COME, _("Candidat non venu ou non joignable")),
@@ -157,11 +158,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ),
         (REFUSAL_REASON_NO_POSITION, _("Pas de poste ouvert en ce moment")),
         (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, _("La date de fin du PASS IAE / agrément est trop proche")),
+        (REFUSAL_REASON_DEACTIVATION, _("La structure n'est plus conventionnée")),
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
-    ERROR_START_IN_PAST = _(f"La date de début du contrat ne doit pas être dans le passé.")
-    ERROR_END_IS_BEFORE_START = _(f"La date de fin du contrat doit être postérieure à la date de début.")
+    ERROR_START_IN_PAST = _("La date de début du contrat ne doit pas être dans le passé.")
+    ERROR_END_IS_BEFORE_START = _("La date de fin du contrat doit être postérieure à la date de début.")
     ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
 
     APPROVAL_DELIVERY_MODE_AUTOMATIC = "automatic"
@@ -301,9 +303,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         when processing an application, False otherwise.
         """
         return (
-            self.state.is_processing
+            (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.has_eligibility_diagnosis
+            and not self.job_seeker.has_valid_eligibility_diagnosis
         )
 
     @property
@@ -333,6 +335,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def cancellation_delay_end(self):
         return self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+
+    @property
+    def is_refused_due_to_deactivation(self):
+        return (
+            self.state == JobApplicationWorkflow.STATE_REFUSED
+            and self.refusal_reason == self.REFUSAL_REASON_DEACTIVATION
+        )
 
     # Workflow transitions.
 
@@ -381,6 +390,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_approval_number(accepted_by))
             elif self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN:
                 # Trigger a manual approval creation.
+                self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
                 emails.append(self.email_accept_trigger_manual_approval(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
@@ -513,7 +523,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
-        self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
         self.approval_number_delivered_by = deliverer
         self.save()
 
