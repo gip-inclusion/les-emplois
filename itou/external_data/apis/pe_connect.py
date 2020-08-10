@@ -190,10 +190,10 @@ def _model_fields_changed(initial, final_instance):
 
 def _store_user_data(user, status, data):
     """
-    Store user data and produce a "report" containing an array of JSON objects, with these fields:
-        - name: of the key/field
-        - is_fetched (boolean): data properly fetched or not (API error...)
-        - is_stored (boolean): the data was stored in the model or not (ignored)
+    Store user data and produce a "report" containing a JSON object, with these fields:
+        - fields_fetched (array): successfully imported field names
+        - fields_failed (array): fields that could not be fetched (API error...)
+        - fields_updated (array): updated fields in the db each of form: `class_name/pk/field_name` (f.i. `User/10/birthdate`)
 
     Return a ExternalDataImport object containing outcome of the data import
     """
