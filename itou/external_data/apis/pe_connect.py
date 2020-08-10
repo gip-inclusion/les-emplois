@@ -232,7 +232,9 @@ def _store_user_data(user, status, data):
 
     # Check updated fields
     # To be done before saving objects:
-    fields_updated = _model_fields_changed(initial_user, user) + _model_fields_changed(initial_job_seekeer_data, job_seeker_data)
+    fields_updated = _model_fields_changed(initial_user, user) + _model_fields_changed(
+        initial_job_seekeer_data, job_seeker_data
+    )
 
     user.save()
     job_seeker_data.save()
