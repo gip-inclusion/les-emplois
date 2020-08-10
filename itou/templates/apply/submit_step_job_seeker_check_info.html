@@ -7,7 +7,7 @@
     {{ block.super }}
 
     <div class="alert alert-warning" role="alert">
-        {% trans "La date de naissance et les informations Pôle emploi sont obligatoires pour continuer." %}
+        {% translate "La date de naissance et les informations Pôle emploi sont obligatoires pour continuer." %}
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -17,7 +17,7 @@
         {% bootstrap_form form %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
         {% endbuttons %}
 
     </form>

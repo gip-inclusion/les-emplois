@@ -7,7 +7,7 @@
     {{ block.super }}
 
     <div class="alert alert-warning" role="alert">
-        {% trans "Confirmez votre choix." %}
+        {% translate "Confirmez votre choix." %}
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -32,8 +32,8 @@
         {% bootstrap_field form.answer %}
 
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% trans "Annuler" %}</a>
-            <button type="submit" class="btn btn-danger">{% trans "Je ne veux pas l'embaucher" %}</button>
+            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% translate "Annuler" %}</a>
+            <button type="submit" class="btn btn-danger">{% translate "Je ne veux pas l'embaucher" %}</button>
         {% endbuttons %}
 
     </form>

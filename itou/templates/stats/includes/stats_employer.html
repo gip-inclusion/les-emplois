@@ -4,7 +4,7 @@
         <div class="card-header" id="heading-2-1">
             <h5 class="mb-0">
                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-2-1" aria-expanded="true" aria-controls="collapse-2-1">
-                    {% trans "Lexique employeurs" %}
+                    {% translate "Lexique employeurs" %}
                 </button>
             </h5>
         </div>
@@ -13,31 +13,31 @@
             <div class="card-body">
                 <ul>
                     <li>
-                        {% trans "<b>Employeur</b> : SIAE, GEIQ ou EA." %}
+                        {% translate "<b>Employeur</b> : SIAE, GEIQ ou EA." %}
                     </li>
                     <li>
-                        {% trans "<b>SIAE</b> : Structure d'insertion par l'activité économique: ACI, AI, EI, ETTI ou EITI." %}
+                        {% translate "<b>SIAE</b> : Structure d'insertion par l'activité économique: ACI, AI, EI, ETTI ou EITI." %}
                     </li>
                     {% for entry in data.siaes_by_kind.categories %}
                         <li>
-                            {% blocktrans with abbreviation=entry.0 description=entry.1 %}
+                            {% blocktranslate with abbreviation=entry.0 description=entry.1 %}
                                 <b>{{ abbreviation }}</b> : {{ description }}.
-                            {% endblocktrans %}
+                            {% endblocktranslate %}
                         </li>
                     {% endfor %}
                     <li>
-                        {% trans "<b>EITI</b> : Entreprise d’insertion par le travail indépendant." %}
+                        {% translate "<b>EITI</b> : Entreprise d’insertion par le travail indépendant." %}
                     </li>
                     <li>
-                        {% trans "<b>Structure connue</b> : Structure présente dans la base de données de la plateforme alimentée par les données de l'ASP pour les SIAE et les données GEIQ, ou bien ayant été manuellement créée par un utilisateur de la plateforme." %}
+                        {% translate "<b>Structure connue</b> : Structure présente dans la base de données de la plateforme alimentée par les données de l'ASP pour les SIAE et les données GEIQ, ou bien ayant été manuellement créée par un utilisateur de la plateforme." %}
                     </li>
                     <li>
-                        {% trans "<b>Structure inscrite</b> : Structure ayant au moins un compte utilisateur créé sur la plateforme." %}
+                        {% translate "<b>Structure inscrite</b> : Structure ayant au moins un compte utilisateur créé sur la plateforme." %}
                     </li>
                     <li>
-                        {% blocktrans with days=data.days_for_siae_to_be_considered_active %}
+                        {% blocktranslate with days=data.days_for_siae_to_be_considered_active %}
                             <b>Structure active</b> : Structure créée il y a moins de {{ days }} jours, ou ayant un nouvel utilisateur créé il y a moins de {{ days }} jours, ou ayant créé ou modifié une fiche de poste il y a moins de {{ days }} jours, ou ayant reçu ou modifié une candidature il y a moins de {{ days }} jours.
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                     </li>
                 </ul>
 
@@ -48,7 +48,7 @@
         <div class="card-header" id="heading-2-2">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2-2" aria-expanded="false" aria-controls="collapse-2-2">
-                    {% trans "Indicateurs employeurs" %}
+                    {% translate "Indicateurs employeurs" %}
                 </button>
             </h5>
         </div>
@@ -68,7 +68,7 @@
         <div class="card-header" id="heading-2-3">
             <h5 class="mb-0">
                 <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2-3" aria-expanded="false" aria-controls="collapse-2-3">
-                    {% trans "Répartition des indicateurs employeurs par type de structure" %}
+                    {% translate "Répartition des indicateurs employeurs par type de structure" %}
                 </button>
             </h5>
         </div>
@@ -83,7 +83,7 @@
             <div class="card-header" id="heading-2-4">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2-4" aria-expanded="false" aria-controls="collapse-2-4">
-                        {% trans "Répartition des indicateurs employeurs par région" %}
+                        {% translate "Répartition des indicateurs employeurs par région" %}
                     </button>
                 </h5>
             </div>
@@ -99,7 +99,7 @@
             <div class="card-header" id="heading-2-5">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2-5" aria-expanded="false" aria-controls="collapse-2-5">
-                        {% trans "Répartition des indicateurs employeurs par département" %}
+                        {% translate "Répartition des indicateurs employeurs par département" %}
                     </button>
                 </h5>
             </div>

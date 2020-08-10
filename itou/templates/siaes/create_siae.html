@@ -2,23 +2,23 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Créer une nouvelle structure" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Créer une nouvelle structure" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Créer une nouvelle structure" %}</h1>
+<h1>{% translate "Créer une nouvelle structure" %}</h1>
 
 <form method="post" action="" class="js-prevent-multiple-submit">
 
     <div class="alert alert-secondary" role="alert">
-        <i>{% trans "Laisser les champs vides pour ne rien afficher." %}</i>
+        <i>{% translate "Laisser les champs vides pour ne rien afficher." %}</i>
     </div>
 
     {% csrf_token %}
 
     {% if form.non_field_errors %}
         <div class="alert alert-danger alert-dismissible alert-link" role="alert">
-            <button class="close" type="button" data-dismiss="alert" aria-label="{% trans 'close' %}">&#215;</button>
+            <button class="close" type="button" data-dismiss="alert" aria-label="{% translate 'close' %}">&#215;</button>
             {% for error in form.non_field_errors %}
                 {{ error | safe }}{% if not forloop.last %}<br>{% endif %}
             {% endfor %}
@@ -31,11 +31,11 @@
 
     <div class="alert alert-warning" role="alert">
         <p>
-            {% blocktrans %}En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.{% endblocktrans %}
+            {% blocktranslate %}En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.{% endblocktranslate %}
         </p>
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
-            <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% translate "Annuler" %}</a>
+            <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
         {% endbuttons %}
     </div>
 

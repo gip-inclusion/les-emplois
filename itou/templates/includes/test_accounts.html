@@ -12,7 +12,7 @@
             {% if not user.is_authenticated %}
                 <div>
                     <button class="btn btn-light border" data-toggle="modal" data-target="#testAccountsModal">
-                        {% trans "Voir les comptes de démonstration" %}
+                        {% translate "Voir les comptes de démonstration" %}
                     </button>
                 </div>
             {% endif %}
@@ -24,16 +24,16 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title font-weight-demo m-auto">{% trans "Comptes de démonstration" %}</h3>
+                <h3 class="modal-title font-weight-demo m-auto">{% translate "Comptes de démonstration" %}</h3>
             </div>
             <div class="modal-body">
 
                 <p class="alert alert-danger">
-                  {% blocktrans %}
+                  {% blocktranslate %}
                     L'environnement de démonstration de la <b>Plateforme de l'inclusion</b> est limité à des fins de formation.<br>
                     Les données, documents et e-mails envoyés depuis cet environnement n'ont <b>aucune valeur</b>.
                     Ils sont susceptibles d'être <b>détruits à intervalle régulier</b>.
-                  {% endblocktrans %}
+                  {% endblocktranslate %}
                 </p>
 
                 <div class="pt-2 pb-5">
@@ -52,7 +52,7 @@
                                 </div>
                                 <div class="card-footer text-center">
                                     <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="siae_staff">
-                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                        <button role="button" class="btn btn-link">{% translate "Utiliser ce compte" %}</button>
                                     </a>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="card-footer text-center">
                                     <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="prescriber">
-                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                        <button role="button" class="btn btn-link">{% translate "Utiliser ce compte" %}</button>
                                     </a>
                                 </div>
                             </div>
@@ -94,7 +94,7 @@
                                 </div>
                                 <div class="card-footer text-center">
                                     <a href="#" class="postLogin" data-email="{{ account.email }}" data-type="job_seeker">
-                                        <button role="button" class="btn btn-link">{% trans "Utiliser ce compte" %}</button>
+                                        <button role="button" class="btn btn-link">{% translate "Utiliser ce compte" %}</button>
                                     </a>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-dismiss="modal">{% trans "Fermer" %}</button>
+                    <button class="btn btn-secondary" data-dismiss="modal">{% translate "Fermer" %}</button>
                 </div>
 
                 <div class="d-none">

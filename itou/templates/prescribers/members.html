@@ -1,11 +1,11 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Collaborateurs" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Collaborateurs" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Collaborateurs" %}</h1>
+<h1>{% translate "Collaborateurs" %}</h1>
 
 <h2 class="text-muted">
     {{ organization.display_name }}
@@ -16,9 +16,9 @@
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">{% trans "Nom" %}</th>
-                <th scope="col">{% trans "Email" %}</th>
-                <th scope="col">{% trans "Date d'inscription" %}</th>
+                <th scope="col">{% translate "Nom" %}</th>
+                <th scope="col">{% translate "Email" %}</th>
+                <th scope="col">{% translate "Date d'inscription" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -35,7 +35,7 @@
 </div>
 
 <a href="{% url 'invitations_views:invite_prescriber_with_org' %}" class="align-self-center">
-    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% trans "Inviter des collaborateurs" %}</button>
+    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
 </a>
 
 {% if pending_invitations %}

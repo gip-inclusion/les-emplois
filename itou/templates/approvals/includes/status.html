@@ -10,17 +10,17 @@
 
     <span class="text-success">
 
-        {% blocktrans with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
+        {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
             <b>Valide</b> du {{ start }} au {{ end }}
-        {% endblocktrans %}
+        {% endblocktranslate %}
 
         {% with approval.time_until_waiting_period as still %}
             {% if still == "0" %}
-                {% trans "(expire aujourd'hui)" %}
+                {% translate "(expire aujourd'hui)" %}
             {% elif still == "in_future" %}
-                {% trans "(dans le futur)" %}
+                {% translate "(dans le futur)" %}
             {% else %}
-                {% blocktrans %}(encore {{ still }}){% endblocktrans %}
+                {% blocktranslate %}(encore {{ still }}){% endblocktranslate %}
             {% endif %}
         {% endwith %}
 
@@ -30,9 +30,9 @@
 
     <span class="text-danger">
 
-        {% blocktrans with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
+        {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
             <b>Expiré</b> le {{ end }} (depuis {{ since }})
-        {% endblocktrans %}
+        {% endblocktranslate %}
 
     </span>
 

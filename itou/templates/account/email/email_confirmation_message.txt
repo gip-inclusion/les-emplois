@@ -1,13 +1,13 @@
-{% load account %}{% load i18n %}{% autoescape off %}{% blocktrans %}Bonjour,
+{% load account %}{% load i18n %}{% autoescape off %}{% blocktranslate %}Bonjour,
 
 Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
 
-Afin de finaliser votre inscription, cliquez sur le lien suivant :{% endblocktrans %}
+Afin de finaliser votre inscription, cliquez sur le lien suivant :{% endblocktranslate %}
 
 {{ activate_url }}
 
-{% blocktrans %}Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.{% endblocktrans %}
+{% blocktranslate %}Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.{% endblocktranslate %}
 {% if itou_environment == "DEMO" %}
-{% blocktrans %}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endblocktrans %}
+{% blocktranslate %}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endblocktranslate %}
 {% endif%}
 inclusion.beta.gouv.fr{% endautoescape %}

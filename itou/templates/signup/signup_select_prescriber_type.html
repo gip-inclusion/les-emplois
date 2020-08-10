@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "Inscription | Connexion" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Inscription | Connexion" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
@@ -18,14 +18,14 @@
             <div class="card-body">
                 <div class="d-flex align-items-center flex-column h-100">
                     <h5 class="card-title font-weight-light">
-                        {% trans "Je travaille pour Pôle emploi" %}
+                        {% translate "Je travaille pour Pôle emploi" %}
                     </h5>
                     <div class="mt-auto">
                         <img src="{% static 'img/logo-pole-emploi.svg' %}" class="w-75">
                     </div>
                     <div class="mt-auto pt-4">
                         <a href="{% url 'signup:prescriber_poleemploi' %}" class="card-link btn btn-primary">
-                            {% trans "Créer mon compte Pôle emploi" %}
+                            {% translate "Créer mon compte Pôle emploi" %}
                         </a>
                     </div>
                 </div>
@@ -36,14 +36,14 @@
             <div class="card-body">
                 <div class="d-flex align-items-center flex-column h-100">
                     <h5 class="card-title font-weight-light mb-4">
-                        {% trans "Je travaille pour un prescripteur habilité" %}
+                        {% translate "Je travaille pour un prescripteur habilité" %}
                     </h5>
                     <div class="h6 pb-5">
                         Cap emploi, mission locale, CCAS, SPIP, PLIE... (<a href="https://doc.inclusion.beta.gouv.fr/presentation/prescripteurs-habilites" target="_blank">voir liste</a>)
                     </div>
                     <div class="mt-auto">
                         <a href="{% url 'signup:prescriber_authorized' %}" class="card-link btn btn-primary">
-                            {% trans "Créer mon compte prescripteur habilité" %}
+                            {% translate "Créer mon compte prescripteur habilité" %}
                         </a>
                     </div>
                 </div>
@@ -54,14 +54,14 @@
             <div class="card-body">
                 <div class="d-flex align-items-center flex-column h-100">
                     <h5 class="card-title font-weight-light mb-4">
-                        {% trans "J’aide à orienter des candidats en recherche d’un emploi" %}
+                        {% translate "J’aide à orienter des candidats en recherche d’un emploi" %}
                     </h5>
                     <div class="h6 pb-5">
                         Club sportif, éducateur de rue, association de chômeurs, bénévole associatif...
                     </div>
                     <div class="mt-auto">
                         <a href="{% url 'signup:prescriber_orienter' %}" class="card-link btn btn-primary">
-                            {% trans "Créer mon compte orienteur" %}
+                            {% translate "Créer mon compte orienteur" %}
                         </a>
                     </div>
                 </div>

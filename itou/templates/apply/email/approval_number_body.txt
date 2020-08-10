@@ -2,37 +2,37 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans %}Vous avez déclaré l'embauche d'un candidat sur la Plateforme de l'inclusion. Nous vous confirmons la délivrance d'un PASS IAE (valant agrément pour le compte de Pôle emploi conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail).
+{% blocktranslate %}Vous avez déclaré l'embauche d'un candidat sur la Plateforme de l'inclusion. Nous vous confirmons la délivrance d'un PASS IAE (valant agrément pour le compte de Pôle emploi conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail).
 
-Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktrans %}
+Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktranslate %}
 
-{% trans "PASS IAE N° :" %} {{ job_application.approval.number_with_spaces }}
+{% translate "PASS IAE N° :" %} {{ job_application.approval.number_with_spaces }}
 
-{% trans "Délivré pour l'embauche de :" %}
-{% trans "Nom :" %} {{ job_application.approval.user.last_name }}
-{% trans "Prénom :" %} {{ job_application.approval.user.first_name }}
-{% trans "Date de naissance :" %} {{ job_application.approval.user.birthdate|date:"d/m/Y" }}
+{% translate "Délivré pour l'embauche de :" %}
+{% translate "Nom :" %} {{ job_application.approval.user.last_name }}
+{% translate "Prénom :" %} {{ job_application.approval.user.first_name }}
+{% translate "Date de naissance :" %} {{ job_application.approval.user.birthdate|date:"d/m/Y" }}
 
-{% trans "Pour un contrat d'insertion :" %}
-{% trans "Débutant le :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if job_application.hiring_end_at %}
-{% trans "Se terminant le :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}{% endif %}
+{% translate "Pour un contrat d'insertion :" %}
+{% translate "Débutant le :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if job_application.hiring_end_at %}
+{% translate "Se terminant le :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}{% endif %}
 
-{% trans "Au sein de la structure :" %}
+{% translate "Au sein de la structure :" %}
 {{ job_application.to_siae.display_name }}
 {{ job_application.to_siae.get_kind_display }}
 {{ job_application.to_siae.address_line_1 }}{% if job_application.to_siae.address_line_2 %}
 {{ job_application.to_siae.address_line_2 }}{% endif %}
 {{ job_application.to_siae.post_code }} {{ job_application.to_siae.city }}
 
-{% trans "Pour le compte de Pôle emploi," %}
+{% translate "Pour le compte de Pôle emploi," %}
 
-{% trans "Votre contact :" %}
+{% translate "Votre contact :" %}
 {{ itou_email_contact }}
 
-{% trans "La plateforme de l’inclusion vous a-t-elle permis d’embaucher plus rapidement ?" %}
+{% translate "La plateforme de l’inclusion vous a-t-elle permis d’embaucher plus rapidement ?" %}
 
-{% blocktrans %}
+{% blocktranslate %}
 Donnez votre avis en cliquant sur ce lien: {{ survey_link }}
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {% endblock body %}

@@ -3,15 +3,15 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Déconnexion" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Déconnexion" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
 <div class="alert alert-info" role="alert">
 
-    <h1>{% trans "Déconnexion" %}</h1>
+    <h1>{% translate "Déconnexion" %}</h1>
 
-    <p>{% trans "Voulez-vous vraiment vous déconnecter ?" %}</p>
+    <p>{% translate "Voulez-vous vraiment vous déconnecter ?" %}</p>
 
     <form method="post" action="{% url 'account_logout' %}" class="js-prevent-multiple-submit">
 
@@ -22,7 +22,7 @@
         {% endif %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Se déconnecter" %}</button>
+            <button type="submit" class="btn btn-primary">{% translate "Se déconnecter" %}</button>
         {% endbuttons %}
 
     </form>

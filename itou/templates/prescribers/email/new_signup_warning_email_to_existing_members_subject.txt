@@ -1,5 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
 {% block subject %}
-{% blocktrans %}Un nouvel utilisateur vient de rejoindre votre organisation{% endblocktrans %}
+{% blocktranslate %}Un nouvel utilisateur vient de rejoindre votre organisation{% endblocktranslate %}
 {% endblock %}

@@ -3,14 +3,14 @@
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
-        {% blocktrans %}Employeurs solidaires à {{ distance }} Km autour de {{ city }}{% endblocktrans %}
+        {% blocktranslate %}Employeurs solidaires à {{ distance }} Km autour de {{ city }}{% endblocktranslate %}
     {% endwith %}
     {{ block.super }}
 {% endblock %}
 
 {% block content %}
 
-    <h2>{% trans "Rechercher des employeurs solidaires" %}</h2>
+    <h2>{% translate "Rechercher des employeurs solidaires" %}</h2>
 
     <form method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
@@ -18,27 +18,27 @@
 
     <h3>
         {% with request.GET.city_name as city and request.GET.distance as distance %}
-            {% blocktrans %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
+            {% blocktranslate %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktranslate %}
         {% endwith %}
     </h3>
 
     {% if not siaes_page %}
 
         <h4 class="font-weight-normal text-muted">
-            {% trans "Aucun résultat." %}
+            {% translate "Aucun résultat." %}
         </h4>
 
     {% else %}
 
         <h4 class="font-weight-normal text-muted">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages %}
-                {% blocktrans count counter=siaes_page.paginator.count %}
+                {% blocktranslate count counter=siaes_page.paginator.count %}
                     <b>1</b> résultat
                 {% plural %}
                     <b>{{ counter }}</b> résultats
-                {% endblocktrans %}
+                {% endblocktranslate %}
                 {% if siaes_page.paginator.num_pages > 1 %}
-                    {% blocktrans %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktrans %}
+                    {% blocktranslate %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktranslate %}
                 {% endif %}
             {% endwith %}
         </h4>
@@ -57,13 +57,13 @@
                     </h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
                     <p class="card-text">
-                        {% blocktrans with distance=siae.distance.km|floatformat:1 %}
+                        {% blocktranslate with distance=siae.distance.km|floatformat:1 %}
                             <span class="badge badge-dark">{{ distance }} Km</span>
                             de votre lieu de recherche
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                     </p>
                     {% if siae.job_description_through.exists and not siae.block_job_applications %}
-                        <h6 class="border-bottom border-gray pb-2">{% trans "Métiers proposés" %}</h6>
+                        <h6 class="border-bottom border-gray pb-2">{% translate "Métiers proposés" %}</h6>
                         <ul class="mb-0">
                         {% for job in siae.job_description_through.all %}
                             <li>
@@ -79,17 +79,17 @@
                 <div class="card-footer">
                     {% if not siae.has_active_members %}
                         <a class="btn btn-sm btn-outline-secondary disabled" href="">
-                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
-                        <small>{% trans "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
+                        <small>{% translate "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
                     {% elif siae.block_job_applications %}
                         <a class="btn btn-sm btn-outline-secondary disabled" href="">
-                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
-                        <small>{% trans "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
+                        <small>{% translate "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
                     {% else %}
                         <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                            {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
+                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
                     {% endif %}
 
