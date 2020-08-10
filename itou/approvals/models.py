@@ -292,20 +292,21 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
     # Matches prescriber_organisation.code_safir_pole_emploi
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
+
     # The normal length of a number is 12 chars.
     # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
     # increases the length to 15 chars.
     # Suffixes meaning in French:
-    SUFFIX_TO_MEANING = {
-        # - `P`: Prolongation = la personne a besoin d'encore quelques mois
-        "P": "Prolongation",
-        # - `E`: Extension = la personne est passée d'une structure à une autre
-        "E": "Extension",
-        # - `A`: Interruption = la personne ne s'est pas présentée
-        "A": "Interruption",
-        # - `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
-        "S": "Suspension",
-    }
+    class Suffix(models.TextChoices):
+        # `P`: Prolongation = la personne a besoin d'encore quelques mois
+        P = "prolongation", _("Prolongation")
+        # `E`: Extension = la personne est passée d'une structure à une autre
+        E = "extension", _("Extension")
+        # `A`: Interruption = la personne ne s'est pas présentée
+        A = "interruption", _("Interruption")
+        # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
+        S = "suspension", _("Suspension")
+
     # The last two digits refer to the act number (e.g. E02 = second extension).
     # Suffixes are not taken into account in Itou yet but that might change.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)

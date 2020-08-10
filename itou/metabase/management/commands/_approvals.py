@@ -47,7 +47,7 @@ def get_approval_type(approval):
             return "Agrément PE"
         elif len(approval.number) == 15:
             suffix = approval.number[12]
-            return f"{PoleEmploiApproval.SUFFIX_TO_MEANING[suffix]} PE"
+            return f"{PoleEmploiApproval.Suffix[suffix].label} PE"
         else:
             raise ValueError("Unexpected PoleEmploiApproval.number length")
     else:
