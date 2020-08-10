@@ -77,7 +77,7 @@
                 </div>
 
                 <div class="card-footer">
-                    {% if not siae.num_active_members %}
+                    {% if not siae.has_active_members %}
                         <a class="btn btn-sm btn-outline-secondary disabled" href="">
                             {% include "includes/icon.html" with icon="message-square" %} {% trans "Postuler" %}
                         </a>

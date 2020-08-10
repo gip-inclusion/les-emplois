@@ -258,10 +258,11 @@
         var tarteaucitronForceLanguage = "fr";
 
         tarteaucitron.init({
+            "bodyPosition": "top",  /* Put the banner at the beginning of the DOM for screen readers */
             "privacyUrl": "",  /* Privacy policy url */
             "hashtag": "#tarteaucitron",  /* Open the panel with this hashtag */
             "cookieName": "tarteaucitron", /* Cookie name */
-            "orientation": "middle",  /* Banner position (top - bottom) */
+            "orientation": "top",  /* Put the banner at the top to help visually impaired people */
             "showAlertSmall": false,  /* Show the small banner on bottom right */
             "cookieslist": false,  /* Show the cookie list */
             "adblocker": false,  /* Show a Warning if an adblocker is detected */
@@ -275,13 +276,11 @@
             "mandatory": false,  /* Show a message about mandatory cookies */
         });
 
-        {% if ITOU_ENVIRONMENT == "PROD" or ITOU_ENVIRONMENT == "DEMO" %}
         // Hotjar.
         (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
         {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 1857070;{% endif %}
         {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
         tarteaucitron.user.HotjarSv = 6;
-        {% endif %}
 
     </script>
 
@@ -291,7 +290,7 @@
         <script src="{% static "js/configure_jobs.js" %}"></script>
         <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
         {% if SHOW_TEST_ACCOUNTS_BANNER %}
-            <script src="{% static 'js/test_accounts.js'%}"></script>
+        <script src="{% static 'js/test_accounts.js'%}"></script>
         {% endif %}
     {% endblock %}
 
