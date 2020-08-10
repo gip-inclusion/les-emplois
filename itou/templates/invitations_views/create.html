@@ -7,11 +7,11 @@
 
 {% block content %}
     <h1>{% translate "Envoyer une invitation"%}</h1>
-    {% blocktrans %}
+    {% blocktranslate %}
         <div class="alert alert-info my-3" role="alert">
             <p class="mb-0">Une fois vos invitations envoyées, vos invités recevront un e-mail contenant un lien de validation.</p>
         </div>
-    {% endblocktrans %}
+    {% endblocktranslate %}
 
     <form method="post" action="{{ form_post_url }}" class="js-prevent-multiple-submit my-3">
         {% csrf_token %}

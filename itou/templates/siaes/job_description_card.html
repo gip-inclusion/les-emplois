@@ -16,7 +16,7 @@
         {% else %}
             <p>
                 <i>
-                    {% blocktrans with siae.display_name as display_name %}<b>{{ display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.{% endblocktrans %}
+                    {% blocktranslate with siae.display_name as display_name %}<b>{{ display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.{% endblocktranslate %}
                 </i>
             </p>
         {% endif %}

@@ -5,14 +5,14 @@
 
 {% if job_application.is_sent_by_proxy %}
 
-{% blocktrans with siae_name=job_application.to_siae.display_name sender=job_application.sender.get_full_name %}
+{% blocktranslate with siae_name=job_application.to_siae.display_name sender=job_application.sender.get_full_name %}
 {{ sender }} a candidaté pour vous chez {{ siae_name }}.
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {% else %}
-{% blocktrans with siae_name=job_application.to_siae.display_name %}
+{% blocktranslate with siae_name=job_application.to_siae.display_name %}
 Candidature chez {{ siae_name }} envoyée avec succès !
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {% endif %}
 

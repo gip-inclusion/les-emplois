@@ -20,9 +20,9 @@
                     </li>
                     {% for entry in data.siaes_by_kind.categories %}
                         <li>
-                            {% blocktrans with abbreviation=entry.0 description=entry.1 %}
+                            {% blocktranslate with abbreviation=entry.0 description=entry.1 %}
                                 <b>{{ abbreviation }}</b> : {{ description }}.
-                            {% endblocktrans %}
+                            {% endblocktranslate %}
                         </li>
                     {% endfor %}
                     <li>
@@ -35,9 +35,9 @@
                         {% translate "<b>Structure inscrite</b> : Structure ayant au moins un compte utilisateur créé sur la plateforme." %}
                     </li>
                     <li>
-                        {% blocktrans with days=data.days_for_siae_to_be_considered_active %}
+                        {% blocktranslate with days=data.days_for_siae_to_be_considered_active %}
                             <b>Structure active</b> : Structure créée il y a moins de {{ days }} jours, ou ayant un nouvel utilisateur créé il y a moins de {{ days }} jours, ou ayant créé ou modifié une fiche de poste il y a moins de {{ days }} jours, ou ayant reçu ou modifié une candidature il y a moins de {{ days }} jours.
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                     </li>
                 </ul>
 

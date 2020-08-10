@@ -112,9 +112,9 @@
 
                 {% if eligibility_diagnosis.has_expired %}
                     <p class="text-danger">
-                        {% blocktrans with date=eligibility_diagnosis.expires_at|date %}
+                        {% blocktranslate with date=eligibility_diagnosis.expires_at|date %}
                             Ce diagnostic est expiré depuis le {{ date }}.
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                         {% if job_application.state.is_processing or job_application.state.is_postponed %}
                             {% translate "Pour embaucher ce candidat, réalisez un nouveau diagnostic d'éligibilité afin d'évaluer sa situation actuelle." %}
                         {% endif %}
@@ -310,17 +310,17 @@
 
             <h3 class="font-weight-normal text-muted">{% translate "Rétractation" %}</h3>
             <p>
-                {% blocktrans with cancellation_date=job_application.cancellation_delay_end cancellation_days=cancellation_days %}
+                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end cancellation_days=cancellation_days %}
                     Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit le
                     {{ cancellation_date }} inclus.
-                {% endblocktrans %}
+                {% endblocktranslate %}
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
-                    {% blocktrans with user_name=job_application.job_seeker.get_full_name|title %}
+                    {% blocktranslate with user_name=job_application.job_seeker.get_full_name|title %}
                         {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans
                         le futur.
-                    {% endblocktrans %}
+                    {% endblocktranslate %}
                 </p>
             {% endif %}
             <p>
@@ -344,9 +344,9 @@
         <ul>
             {% for log in transition_logs %}
                 <li>
-                    {% blocktrans with pretty_to_state=log.pretty_to_state %}
+                    {% blocktranslate with pretty_to_state=log.pretty_to_state %}
                         Passé en "<b>{{ pretty_to_state }}</b>"
-                    {% endblocktrans %}
+                    {% endblocktranslate %}
                     <ul>
                         {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
                             <li>{% translate "Par" %} {{ log.user.get_full_name }}</li>

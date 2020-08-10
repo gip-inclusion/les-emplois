@@ -16,9 +16,9 @@
                         {% translate "<b>Prescripteur</b> : compte utilisateur de type prescripteur." %}
                     </li>
                     <li>
-                        {% blocktrans with days=data.days_for_orgs_to_be_considered_active %}
+                        {% blocktranslate with days=data.days_for_orgs_to_be_considered_active %}
                             <b>Prescripteur actif</b> : prescripteur ayant créé au moins une candidature sur la période considérée, ou bien sur les {{ days }} derniers jours.
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                     </li>
                     <li>
                         {% translate "<b>Prescripteur habilité</b> : prescripteur appartenant à une organisation." %}

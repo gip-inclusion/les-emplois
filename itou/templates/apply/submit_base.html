@@ -7,21 +7,21 @@
 
     <h1>
         {% if request.user.is_siae_staff %}
-            {% blocktrans with siae_name=siae.display_name %}
+            {% blocktranslate with siae_name=siae.display_name %}
                 <span class="text-muted">{{ siae_name }}</span>
-            {% endblocktrans %}
+            {% endblocktranslate %}
         {% else %}
-            {% blocktrans with siae_name=siae.display_name %}
+            {% blocktranslate with siae_name=siae.display_name %}
                 Postuler chez <span class="text-muted">{{ siae_name }}</span>
-            {% endblocktrans %}
+            {% endblocktranslate %}
         {% endif %}
     </h1>
 
     {% if job_seeker and request.user != job_seeker %}
         <div class="alert alert-warning" role="alert">
-            {% blocktrans with full_name=job_seeker.get_full_name email=job_seeker.email %}
+            {% blocktranslate with full_name=job_seeker.get_full_name email=job_seeker.email %}
                 Vous postulez pour <b>{{ full_name }}</b> ({{ email }})
-            {% endblocktrans %}
+            {% endblocktranslate %}
         </div>
     {% endif %}
 

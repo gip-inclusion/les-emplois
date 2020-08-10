@@ -13,12 +13,12 @@
     {% if current_siae and not current_siae.has_reliable_coords %}
         <div class="alert alert-warning" role="alert">
             {% url 'siaes_views:edit_siae' as edit_siae_url %}
-            {% blocktrans with address=current_siae.address_on_one_line %}
+            {% blocktranslate with address=current_siae.address_on_one_line %}
                 Nous n'avons pu géolocaliser votre établissement avec l'adresse <b>{{ address }}</b> :
                 cela pourrait affecter votre position dans les résultats de recherche.
                 Vous pouvez nous <a href="{{ edit_siae_url }}">indiquer une autre adresse</a> ou
                 <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">nous contacter</a> en cas de problème.
-            {% endblocktrans %}
+            {% endblocktranslate %}
         </div>
     {% endif %}
     {% if current_prescriber_organization and prescriber_authorization_status_not_set %}
@@ -27,10 +27,10 @@
                 <span aria-hidden="true">&times;</span>
             </button>
             <div>
-                {% blocktrans %}
+                {% blocktranslate %}
                     Vous êtes membre d'une organisation dont l'habilitation est en cours de vérification.
                     Vous serez notifié par e-mail lorsque cette vérification sera terminée.
-                {% endblocktrans %}
+                {% endblocktranslate %}
             </div>
         </div>
     {% endif %}
@@ -41,14 +41,14 @@
                 <span aria-hidden="true">&times;</span>
             </button>
             <div>
-                {% blocktrans %}
+                {% blocktranslate %}
                     <p>
                         Suite au confinement, tout Pass IAE en cours de validité entre le <strong>17 mars</strong> et le <strong>16 juin 2020 inclus</strong> voit sa date d'échéance reportée de 3 mois. Aucune démarche à faire, le report se fait automatiquement !
                     </p>
                     <p class="mb-1">
                         Exemple : date d'échéance d'un Pass IAE délivré en avril 2018 portée à juillet 2020 au lieu d'avril 2020.
                     </p>
-                {% endblocktrans %}
+                {% endblocktranslate %}
             </div>
         </div>
     {% endif %}
@@ -164,9 +164,9 @@
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
                                 <span>
-                                    {% blocktrans with name=current_prescriber_organization.display_name %}
+                                    {% blocktranslate with name=current_prescriber_organization.display_name %}
                                         {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
-                                    {% endblocktrans %}
+                                    {% endblocktranslate %}
                                 </span>
                             </p>
                         {% endif %}

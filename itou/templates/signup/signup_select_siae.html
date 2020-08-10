@@ -16,9 +16,9 @@
 </div>
 
 <div class="alert alert-warning" role="info">
-    {% blocktrans with doc_opening_schedule_url=form.DOC_OPENING_SCHEDULE_URL%}
+    {% blocktranslate with doc_opening_schedule_url=form.DOC_OPENING_SCHEDULE_URL%}
         Les inscriptions s'ouvrent aux régions progressivement. <a href="{{ doc_opening_schedule_url }}" rel="noopener" target="_blank">Vérifiez que la Plateforme est bien disponible sur votre territoire.</a> Seules les ETTI sont ouvertes en France entière.
-    {% endblocktrans %}
+    {% endblocktranslate %}
 </div>
 
 <form method="post" action="{% url 'signup:select_siae' %}" role="form">
@@ -40,7 +40,7 @@
 </form>
 
 <p>
-    {% blocktrans %}En cas de problème ou pour plus d'informations, veuillez nous contacter à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>{% endblocktrans %}.
+    {% blocktranslate %}En cas de problème ou pour plus d'informations, veuillez nous contacter à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>{% endblocktranslate %}.
 </p>
 
 <hr>

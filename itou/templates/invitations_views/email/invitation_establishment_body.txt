@@ -2,22 +2,22 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktrans with first_name=first_name|capfirst last_name=last_name|capfirst org_name=org.display_name %}
+{% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst org_name=org.display_name %}
 Bonjour {{ first_name }} {{ last_name }} !
 
 Vous avez été invité(e) à rejoindre la structure {{ org_name }}. Cliquez sur le lien ci-dessous pour vous inscrire.
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {{ acceptance_link }}
 
 {# Don't specify datetime format as it depends on the language. #}
 {# Better relying on the global DATE_FORMAT configuration variable. #}
-{% blocktrans with date=expiration_date|date %}
+{% blocktranslate with date=expiration_date|date %}
 Cette invitation restera valide jusqu'au {{ date }}.
-{% endblocktrans %}
+{% endblocktranslate %}
 
-{% blocktrans %}
+{% blocktranslate %}
 Si vous ne souhaitez pas rejoindre cette organisation, vous pouvez ignorer cet e-mail en toute sécurité.
-{% endblocktrans %}
+{% endblocktranslate %}
 
 {% endblock %}

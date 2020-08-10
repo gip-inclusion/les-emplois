@@ -56,9 +56,9 @@
                         {% translate "Comptes candidat à ce jour" %} : <b>{{ data.total_job_seeker_users }}</b>
                     </li>
                     <li>
-                        {% blocktrans with days=data.days_for_total_job_seeker_users_without_opportunity value=data.total_job_seeker_users_without_opportunity %}
+                        {% blocktranslate with days=data.days_for_total_job_seeker_users_without_opportunity value=data.total_job_seeker_users_without_opportunity %}
                             Comptes candidat sans opportunité (inscrits depuis plus de {{ days }} jours avec au moins une candidature mais sans embauche) à ce jour : <b>{{ value }}</b>
-                        {% endblocktrans %}
+                        {% endblocktranslate %}
                     </li>
                 </ul>
             </div>
