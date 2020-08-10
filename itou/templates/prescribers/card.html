@@ -7,7 +7,7 @@
 {% block content %}
 
     <p>
-        <b>{% trans "Prescripteur habilité" %}</b>
+        <b>{% translate "Prescripteur habilité" %}</b>
         -
         <i>{{ prescriber_org.get_kind_display }}</i>
     </p>
@@ -35,7 +35,7 @@
 
         {% if prescriber_org.email %}
             <p>
-                {% trans "E-mail" as email_label %}
+                {% translate "E-mail" as email_label %}
                 {% include "includes/icon.html" with icon="mail" title=email_label %}
                 <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
             </p>
@@ -43,7 +43,7 @@
 
         {% if prescriber_org.phone %}
             <p>
-                {% trans "Téléphone" as phone_label %}
+                {% translate "Téléphone" as phone_label %}
                 {% include "includes/icon.html" with icon="phone" title=phone_label %}
                 <a href="tel:{{ prescriber_org.phone }}">{{ prescriber_org.phone|format_phone }}</a>
             </p>
@@ -51,7 +51,7 @@
 
         {% if prescriber_org.website %}
             <p>
-                {% trans "Site Internet" as website_label %}
+                {% translate "Site Internet" as website_label %}
                 {% include "includes/icon.html" with icon="external-link" title=website_label %}
                 <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank">{{ prescriber_org.website }}</a>
             </p>
@@ -62,7 +62,7 @@
     {% if back_url %}
         <hr>
         <p>
-            <a href="{{ back_url }}">{% trans "Retour" %}</a>
+            <a href="{{ back_url }}">{% translate "Retour" %}</a>
         </p>
     {% endif %}
 

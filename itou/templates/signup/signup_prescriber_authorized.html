@@ -3,13 +3,13 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "Prescripteur habilité - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Prescripteur habilité - Inscription" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% trans "Inscription" %}
-    <small class="text-muted">{% trans "Prescripteur habilité" %}</small>
+    {% translate "Inscription" %}
+    <small class="text-muted">{% translate "Prescripteur habilité" %}</small>
 </h1>
 
 <form method="post" action="{% url 'signup:prescriber_authorized' %}" role="form" class="js-prevent-multiple-submit">
@@ -31,10 +31,10 @@
     <nav>
         <div class="nav nav-tabs" id="form-tab" role="tablist">
             <a class="nav-item nav-link active" id="form-org-tab" data-toggle="tab" href="#form-org" role="tab" aria-controls="nav-home" aria-selected="true" onClick="$('#id_unregistered_organization').val('');">
-                {% trans "Votre organisation" %}
+                {% translate "Votre organisation" %}
             </a>
             <a class="nav-item nav-link" id="form-code-tab" data-toggle="tab" href="#form-code" role="tab" aria-controls="form-code" aria-selected="false" onClick="$('#id_authorized_organization_id').val('');$('#id_authorized_organization').val('');">
-                {% trans "Vous ne trouvez pas votre organisation ?" %}
+                {% translate "Vous ne trouvez pas votre organisation ?" %}
             </a>
         </div>
     </nav>
@@ -69,7 +69,7 @@
 <hr>
 
 <p>
-    <a href="{% url 'account_login' %}">{% trans "Vous avez déjà un compte ?" %}</a>
+    <a href="{% url 'account_login' %}">{% translate "Vous avez déjà un compte ?" %}</a>
 </p>
 {% endblock %}
 

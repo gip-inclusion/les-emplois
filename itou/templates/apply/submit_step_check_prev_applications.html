@@ -28,8 +28,8 @@
             {% csrf_token %}
             <input type="hidden" name="force_new_application" value="force">
             {% buttons %}
-                <a class="btn btn-secondary" href="/">{% trans "Annuler" %}</a>
-                <button type="submit" class="btn btn-primary">{% trans "Postuler à nouveau" %}</button>
+                <a class="btn btn-secondary" href="/">{% translate "Annuler" %}</a>
+                <button type="submit" class="btn btn-primary">{% translate "Postuler à nouveau" %}</button>
             {% endbuttons %}
         </form>
 

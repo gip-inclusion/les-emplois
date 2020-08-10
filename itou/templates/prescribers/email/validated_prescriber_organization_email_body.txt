@@ -3,14 +3,14 @@
 {% load i18n %}
 {% block body %}
 
-{% trans "La vérification de l'habilitation de l'organisation que vous avez saisie lors de votre inscription est terminée." %}
+{% translate "La vérification de l'habilitation de l'organisation que vous avez saisie lors de votre inscription est terminée." %}
 
-{% trans "*Structure* :" %}
+{% translate "*Structure* :" %}
 
-- {% trans "Nom" %} : {{ organization.display_name }}
-- {% trans "SIRET" %} : {{ organization.siret }}
-- {% trans "Type" %} : {{ organization.kind }}
+- {% translate "Nom" %} : {{ organization.display_name }}
+- {% translate "SIRET" %} : {{ organization.siret }}
+- {% translate "Type" %} : {{ organization.kind }}
 
-{% trans "Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus." %}
+{% translate "Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus." %}
 
 {% endblock body %}

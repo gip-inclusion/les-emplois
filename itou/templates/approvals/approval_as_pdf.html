@@ -21,7 +21,7 @@
         </div>
 
         <section class="mt-5">
-            <span class="d-block font-weight-bold">{% trans "Votre contact en direct :" %}</span>
+            <span class="d-block font-weight-bold">{% translate "Votre contact en direct :" %}</span>
             <span class="d-block text-decoration">{{ contact_email }}</span>
         </section>
 
@@ -39,8 +39,8 @@
         </section>
 
         <section class="mt-5">
-            <span class="d-block font-weight-bold">{% trans "Références à rappeler :" %}</span>
-            <span class="d-block">{% trans "PASS IAE n°" %} {{ approval.number_with_spaces }}</span>
+            <span class="d-block font-weight-bold">{% translate "Références à rappeler :" %}</span>
+            <span class="d-block">{% translate "PASS IAE n°" %} {{ approval.number_with_spaces }}</span>
 
             <span class="d-block">
                 {% blocktrans with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
@@ -48,13 +48,13 @@
                 {% endblocktrans %}
             </span>
 
-            <span class="d-block">{% trans "délivré par la Plateforme de l'inclusion" %}</span>
+            <span class="d-block">{% translate "délivré par la Plateforme de l'inclusion" %}</span>
         </section>
 
         <section class="mt-5">
-            <p>{% trans "Objet" %} :
+            <p>{% translate "Objet" %} :
                 <span class="font-weight-bold">
-                    {% trans "Décision d'agrément pour un parcours d'insertion par l'activité économique" %}
+                    {% translate "Décision d'agrément pour un parcours d'insertion par l'activité économique" %}
                 </span>
             </p>
             <p class="text-justify">
@@ -64,14 +64,14 @@
                     {% endblocktrans %}
 
                     {% if diagnosis_author_org_name %}
-                        ({% trans diagnosis_author_org_name|title %})
+                        ({% translate diagnosis_author_org_name|title %})
                     {% endif %}
 
-                    {% trans 'portant sur ' %}
+                    {% translate 'portant sur ' %}
 
                 {% else %}
 
-                    {% trans 'Au vu de' %}
+                    {% translate 'Au vu de' %}
 
                 {% endif %}
 

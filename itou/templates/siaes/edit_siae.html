@@ -2,11 +2,11 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Modifier les coordonnées de votre structure" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Modifier les coordonnées de votre structure" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Modifier les coordonnées de votre structure" %}</h1>
+<h1>{% translate "Modifier les coordonnées de votre structure" %}</h1>
 
 <h2 class="text-muted">
     {{ siae.display_name }}
@@ -21,7 +21,7 @@
 <form method="post" action="" class="js-prevent-multiple-submit">
 
     <div class="alert alert-secondary" role="alert">
-        <i>{% trans "Laisser les champs vides pour ne rien afficher." %}</i>
+        <i>{% translate "Laisser les champs vides pour ne rien afficher." %}</i>
     </div>
 
     {% csrf_token %}
@@ -33,8 +33,8 @@
             {% blocktrans %}En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.{% endblocktrans %}
         </p>
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
-            <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% translate "Annuler" %}</a>
+            <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
         {% endbuttons %}
     </div>
 

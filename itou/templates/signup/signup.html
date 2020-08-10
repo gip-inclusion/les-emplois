@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% trans "Inscription | Connexion" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Inscription | Connexion" %}{{ block.super }}{% endblock %}
 
 
 {% block content %}
@@ -10,11 +10,11 @@
         <div class="card p-4" style="flex: 0 0 23%;">
             <div class="card-body">
                 <h5 class="card-title font-weight-light mb-4">
-                    <span class="d-block">{% trans "Vous êtes un employeur solidaire" %}</span>
-                    <span class="d-block">{% trans "(SIAE, GEIQ, EA, ...)" %}</span>
+                    <span class="d-block">{% translate "Vous êtes un employeur solidaire" %}</span>
+                    <span class="d-block">{% translate "(SIAE, GEIQ, EA, ...)" %}</span>
                 </h5>
                 <a class="btn btn-primary" href="{% url 'signup:select_siae' %}">
-                    {% trans "Créer un compte" %}
+                    {% translate "Créer un compte" %}
                 </a>
             </div>
         </div>
@@ -22,10 +22,10 @@
         <div class="card p-4" style="flex: 0 0 23%;">
             <div class="card-body">
                 <h5 class="card-title font-weight-light mb-4">
-                    {% trans "Vous êtes prescripteur ou orienteur" %}
+                    {% translate "Vous êtes prescripteur ou orienteur" %}
                 </h5>
                 <a class="btn btn-primary" href="{% url 'signup:select_prescriber_type' %}">
-                    {% trans "Créer un compte" %}
+                    {% translate "Créer un compte" %}
                 </a>
             </div>
         </div>
@@ -33,10 +33,10 @@
         <div class="card p-4" style="flex: 0 0 23%;">
             <div class="card-body">
                 <h5 class="card-title font-weight-light mb-4">
-                    {% trans "Vous êtes en recherche d'un emploi et souhaitez postuler" %}
+                    {% translate "Vous êtes en recherche d'un emploi et souhaitez postuler" %}
                 </h5>
                 <a class="btn btn-primary" href="{% url 'signup:job_seeker' %}">
-                    {% trans "Créer un compte" %}
+                    {% translate "Créer un compte" %}
                 </a>
             </div>
         </div>

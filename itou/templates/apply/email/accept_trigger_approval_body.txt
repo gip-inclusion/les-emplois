@@ -5,14 +5,14 @@ Nouvelle embauche sur Itou.
 
 Informations pour l'obtention d'un PASS IAE.
 
-{% trans "*Candidat* :" %}
+{% translate "*Candidat* :" %}
 
 - Nom : {{ job_application.job_seeker.last_name }}
 - Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
 - Email : {{ job_application.job_seeker.email }}{% endif %}
 - Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}
 
-{% trans "*Employeur solidaire* :" %}
+{% translate "*Employeur solidaire* :" %}
 
 - Siret : {{ job_application.to_siae.siret }}
 - Nom : {{ job_application.to_siae.display_name }}

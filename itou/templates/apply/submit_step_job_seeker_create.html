@@ -7,7 +7,7 @@
     {{ block.super }}
 
     <div class="alert alert-warning" role="alert">
-        {% trans "Cet email n'existe pas dans notre base de données. Vous devez créer un compte pour votre candidat en utilisant le formulaire ci-dessous afin de pouvoir continuer." %}
+        {% translate "Cet email n'existe pas dans notre base de données. Vous devez créer un compte pour votre candidat en utilisant le formulaire ci-dessous afin de pouvoir continuer." %}
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -35,7 +35,7 @@
         {% bootstrap_field form.resume_link %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% trans "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
         {% endbuttons %}
 
     </form>

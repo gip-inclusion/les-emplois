@@ -7,7 +7,7 @@
 
 {% block content %}
 
-<h1>{% trans "Bloquer les nouvelles candidatures" %}</h1>
+<h1>{% translate "Bloquer les nouvelles candidatures" %}</h1>
 <h3 class="text-secondary">{{ siae.display_name }}</h3>
 
 <div class="alert alert-info">
@@ -26,13 +26,13 @@
 
     {% if siae.block_job_applications %}
     <div class="alert alert-warning">
-        {% trans "Vous avez activé cette option la dernière fois le "%}{{ siae.job_applications_blocked_at|date }}
+        {% translate "Vous avez activé cette option la dernière fois le "%}{{ siae.job_applications_blocked_at|date }}
     </div>
     {% endif %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{% url "dashboard:index" %}">{% trans "Annuler" %}</a>
-        <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+        <a class="btn btn-secondary" href="{% url "dashboard:index" %}">{% translate "Annuler" %}</a>
+        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
     {% endbuttons %}
 
 </form>

@@ -2,14 +2,14 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Invitation" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Invitation" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
     {% include "invitations_views/includes/invitation_errors.html" with invitation=invitation %}
 
     {% if form %}
-        <h1>{% trans "Bienvenue !" %}</h1>
+        <h1>{% translate "Bienvenue !" %}</h1>
         <form method="post" action="{{ invitation.acceptance_link }}" role="form" class="js-prevent-multiple-submit">
 
             {% csrf_token %}
@@ -19,7 +19,7 @@
             {% bootstrap_form form %}
 
             <div class="small pb-4 text-secondary">
-                {% trans "Vous pourrez modifier ces informations après votre inscription à partir de votre tableau de bord." %}
+                {% translate "Vous pourrez modifier ces informations après votre inscription à partir de votre tableau de bord." %}
             </div>
 
             {% include "signup/includes/submit_rgpd.html" %}

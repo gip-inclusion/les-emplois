@@ -3,10 +3,10 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% trans "Invitation" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Invitation" %}{{ block.super }}{% endblock %}
 
 {% block content %}
-    <h1>{% trans "Envoyer une invitation"%}</h1>
+    <h1>{% translate "Envoyer une invitation"%}</h1>
     {% blocktrans %}
         <div class="alert alert-info my-3" role="alert">
             <p class="mb-0">Une fois vos invitations envoyées, vos invités recevront un e-mail contenant un lien de validation.</p>
@@ -27,26 +27,26 @@
 
         <button type="button" class="btn mt-2 mb-3 pl-0 btn-link add-form-row">
             {% include "includes/icon.html" with icon="user-plus" class="mr-2" %}
-            {% trans "Ajouter un autre collaborateur" %}
+            {% translate "Ajouter un autre collaborateur" %}
         </button>
 
         {% buttons %}
-            <a class="btn btn-secondary my-3" href="{{ back_url }}">{% trans "Retour" %}</a>
-            <button type="submit" class="btn btn-primary">{% trans "Envoyer" %}</button>
+            <a class="btn btn-secondary my-3" href="{{ back_url }}">{% translate "Retour" %}</a>
+            <button type="submit" class="btn btn-primary">{% translate "Envoyer" %}</button>
         {% endbuttons %}
     </form>
 
 
     {% if pending_invitations %}
-        <h1 class="mt-5">{% trans "Invitations en attente" %}</h1>
+        <h1 class="mt-5">{% translate "Invitations en attente" %}</h1>
         <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th scope="col">{% trans "Prénom" %}</th>
-                  <th scope="col">{% trans "Nom" %}</th>
-                  <th scope="col">{% trans "E-mail" %}</th>
-                  <th scope="col">{% trans "Envoyée le" %}</th>
+                  <th scope="col">{% translate "Prénom" %}</th>
+                  <th scope="col">{% translate "Nom" %}</th>
+                  <th scope="col">{% translate "E-mail" %}</th>
+                  <th scope="col">{% translate "Envoyée le" %}</th>
                 </tr>
               </thead>
               <tbody>

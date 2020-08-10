@@ -1,13 +1,13 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Tableau de bord" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Tableau de bord" %}{{ block.super }}{% endblock %}
 
 {% block messages %}
     {{ block.super }}
     {% if current_siae %}
         <div class="alert alert-warning" role="alert">
-            {% trans "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
+            {% translate "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
         </div>
     {% endif %}
     {% if current_siae and not current_siae.has_reliable_coords %}
@@ -57,7 +57,7 @@
 {% block content %}
 
     <h1>
-        {% trans "Tableau de bord" %}
+        {% translate "Tableau de bord" %}
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %} -
             <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
@@ -69,7 +69,7 @@
 
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
         <p class="text-muted">
-            <span class="badge badge-warning">{% trans "Prescripteur habilité" %}</span>
+            <span class="badge badge-warning">{% translate "Prescripteur habilité" %}</span>
         </p>
     {% endif %}
 
@@ -77,12 +77,12 @@
 
         {% if user.is_staff %}
             <div class="card">
-                <h5 class="card-header">{% trans "Admin" %}</h5>
+                <h5 class="card-header">{% translate "Admin" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="key" %}
                         <a href="{% url 'admin:index' %}">
-                            {% trans "Admin" %}
+                            {% translate "Admin" %}
                         </a>
                     </p>
                 </div>
@@ -92,15 +92,15 @@
         {% if user.is_job_seeker %}
 
             <div class="card">
-                <h5 class="card-header">{% trans "Candidatures" %}</h5>
+                <h5 class="card-header">{% translate "Candidatures" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_job_seeker' %}">{% trans "Vos candidatures" %}</a>
+                        <a href="{% url 'apply:list_for_job_seeker' %}">{% translate "Vos candidatures" %}</a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="/">{% trans "Rechercher une entreprise" %}</a>
+                        <a href="/">{% translate "Rechercher une entreprise" %}</a>
                     </p>
                 </div>
             </div>
@@ -108,7 +108,7 @@
             {% with user.approvals_wrapper as approvals_wrapper %}
                 {% if approvals_wrapper.has_valid or approvals_wrapper.has_in_waiting_period %}
                     <div class="card">
-                        <h5 class="card-header">{% trans "Numéro d'agrément" %}</h5>
+                        <h5 class="card-header">{% translate "Numéro d'agrément" %}</h5>
                         <div class="card-body">
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
@@ -131,23 +131,23 @@
 
         {% if user.is_prescriber %}
             <div class="card">
-                <h5 class="card-header">{% trans "Organisation" %}</h5>
+                <h5 class="card-header">{% translate "Organisation" %}</h5>
                 <div class="card-body">
                     {% if not current_prescriber_organization %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
-                            <a href="{% url 'prescribers_views:create_organization' %}">{% trans "Créer une organisation" %}</a>
+                            <a href="{% url 'prescribers_views:create_organization' %}">{% translate "Créer une organisation" %}</a>
                         </p>
                     {% else %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
                             <a href="{% url 'prescribers_views:edit_organization' %}">
-                                {% trans "Modifier les informations" %}
+                                {% translate "Modifier les informations" %}
                             </a>
                             {% if current_prescriber_organization.get_card_url %}
                                 /
                                 <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                                    {% trans "Voir la fiche" %}
+                                    {% translate "Voir la fiche" %}
                                 </a>
                             {% endif %}
                         </p>
@@ -155,9 +155,9 @@
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
                             <a href="{% url 'prescribers_views:members' %}">
-                                {% trans "Collaborateurs" %}
+                                {% translate "Collaborateurs" %}
                             </a>
-                            <span class="badge badge-info">{% trans "Nouveau" %}</span>
+                            <span class="badge badge-info">{% translate "Nouveau" %}</span>
                         </p>
                         {% if current_prescriber_organization.is_authorized %}
                             <hr>
@@ -174,16 +174,16 @@
                 </div>
             </div>
             <div class="card">
-                <h5 class="card-header">{% trans "Candidatures" %}</h5>
+                <h5 class="card-header">{% translate "Candidatures" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_prescriber' %}">{% trans "Suivi des candidatures" %}</a>
+                        <a href="{% url 'apply:list_for_prescriber' %}">{% translate "Suivi des candidatures" %}</a>
                     </p>
 
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="user-check" %}
-                        <a href="/">{% trans "Postuler pour un candidat" %}</a>
+                        <a href="/">{% translate "Postuler pour un candidat" %}</a>
                     </p>
 
                 </div>
@@ -192,44 +192,44 @@
 
         {% if user.is_siae_staff %}
             <div class="card">
-                <h5 class="card-header">{% trans "Employeur solidaire" %}</h5>
+                <h5 class="card-header">{% translate "Employeur solidaire" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
                         <a href="{% url 'siaes_views:edit_siae' %}">
-                            {% trans "Modifier les informations de l'établissement" %}
+                            {% translate "Modifier les informations de l'établissement" %}
                         </a>
                         /
                         <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            {% trans "Voir la fiche publique" %}
+                            {% translate "Voir la fiche publique" %}
                         </a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="users" %}
                         <a href="{% url 'siaes_views:members' %}">
-                            {% trans "Collaborateurs" %}
+                            {% translate "Collaborateurs" %}
                         </a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'siaes_views:configure_jobs' %}">
-                            {% trans "Configurer les descriptions de postes" %}
+                            {% translate "Configurer les descriptions de postes" %}
                         </a>
                     </p>
                     {% if user_is_siae_admin %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
-                            <a href="{% url 'siaes_views:create_siae' %}">{% trans "Créer une nouvelle structure" %}</a>
+                            <a href="{% url 'siaes_views:create_siae' %}">{% translate "Créer une nouvelle structure" %}</a>
                         </p>
                     {% endif %}
                 </div>
             </div>
             <div class="card">
-                <h5 class="card-header">{% trans "Candidatures" %}</h5>
+                <h5 class="card-header">{% translate "Candidatures" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_siae' %}">{% trans "Répondre aux candidatures reçues" %}</a>
+                        <a href="{% url 'apply:list_for_siae' %}">{% translate "Répondre aux candidatures reçues" %}</a>
                         {% if job_applications_counter > 0 %}
                             <span class="badge badge-danger">{{ job_applications_counter }}</span>
                         {% endif %}
@@ -238,9 +238,9 @@
                         {% include "includes/icon.html" with icon="user-check" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
                             {% if current_siae.is_subject_to_eligibility_rules %}
-                                {% trans "Obtenir un PASS IAE (candidature spontanée)" %}
+                                {% translate "Obtenir un PASS IAE (candidature spontanée)" %}
                             {% else %}
-                                {% trans "Candidature spontanée" %}
+                                {% translate "Candidature spontanée" %}
                             {% endif %}
                         </a>
                     </p>
@@ -248,9 +248,9 @@
                         {% include "includes/icon.html" with icon="settings" %}
                         <a href="{% url 'siaes_views:block_job_applications' %}">
                             {% if current_siae.block_job_applications %}
-                                {% trans "Recevoir de nouvelles candidatures "%}
+                                {% translate "Recevoir de nouvelles candidatures "%}
                             {% else %}
-                                {% trans "Bloquer les nouvelles candidatures "%}
+                                {% translate "Bloquer les nouvelles candidatures "%}
                             {% endif%}
                         </a>
                     </p>
@@ -260,9 +260,9 @@
                             <a
                                 href="https://doc.inclusion.beta.gouv.fr/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
                                 target="_blank">
-                                    {% trans "Liste des critères d'éligibilité" %}
+                                    {% translate "Liste des critères d'éligibilité" %}
                             </a>
-                            <span class="badge badge-info">{% trans "Nouveau" %}</span>
+                            <span class="badge badge-info">{% translate "Nouveau" %}</span>
                         </p>
                     {% endif %}
                 </div>

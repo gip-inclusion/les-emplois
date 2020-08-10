@@ -6,22 +6,22 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %} - La plateforme de l'inclusion{% endblock %}</title>
-    {% block meta_description %}<meta name="description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">{% endblock %}
+    {% block meta_description %}<meta name="description" content="{% translate "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {# https://metatags.io #}
-    <meta name="title" content="{% trans "La plateforme de l'inclusion" %}">
+    <meta name="title" content="{% translate "La plateforme de l'inclusion" %}">
     {# https://metatags.io Open Graph / Facebook #}
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
-    <meta property="og:title" content="{% trans "La plateforme de l'inclusion" %}">
-    <meta property="og:description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
+    <meta property="og:title" content="{% translate "La plateforme de l'inclusion" %}">
+    <meta property="og:description" content="{% translate "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
     <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
     {# https://metatags.io Twitter #}
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }/">
-    <meta property="twitter:title" content="{% trans "La plateforme de l'inclusion" %}">
-    <meta property="twitter:description" content="{% trans "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
+    <meta property="twitter:title" content="{% translate "La plateforme de l'inclusion" %}">
+    <meta property="twitter:description" content="{% translate "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
     <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
     {# Use this to get the value of the CSRF token in JavaScript. #}
@@ -56,28 +56,28 @@
                                         data-toggle="dropdown"
                                         aria-haspopup="true"
                                         aria-expanded="false" data-display="static" >
-                                        {% include "includes/icon.html" with icon="user" %} {% trans "Mon espace" %}
+                                        {% include "includes/icon.html" with icon="user" %} {% translate "Mon espace" %}
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
-                                            {% trans "Tableau de bord" %}
+                                            {% translate "Tableau de bord" %}
                                         </a>
 
                                         <div class="dropdown-divider"></div>
 
                                         {% if not user.is_peamu %}
                                             <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                                {% trans "Modifier mon mot de passe" %}
+                                                {% translate "Modifier mon mot de passe" %}
                                             </a>
                                         {% endif %}
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                                            {% trans "Modifier mon profil" %}
+                                            {% translate "Modifier mon profil" %}
                                         </a>
 
                                         <div class="dropdown-divider"></div>
 
                                         <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
-                                            <i>{% trans "Déconnexion" %}</i>
+                                            <i>{% translate "Déconnexion" %}</i>
                                         </a>
                                     </div>
                                 </div>
@@ -85,7 +85,7 @@
                             {% if user.is_siae_staff and user_siae_set|length > 1 %}
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                        {% trans "Changer de structure" %}
+                                        {% translate "Changer de structure" %}
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
                                         <form action="{% url 'dashboard:switch_siae' %}" method="post">
@@ -107,17 +107,17 @@
                         {% else %}
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {% trans "Se connecter" %}
+                                    {% translate "Se connecter" %}
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        {% trans "Candidat" %}
+                                        {% translate "Candidat" %}
                                     </a>
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=prescriber{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        {% trans "Prescripteur" %}
+                                        {% translate "Prescripteur" %}
                                     </a>
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        {% trans "Employeur solidaire" %}
+                                        {% translate "Employeur solidaire" %}
                                     </a>
                                 </div>
                             </div>
@@ -132,20 +132,20 @@
             <nav class="nav itou-main-nav">
 
                 {% if user.is_authenticated %}
-                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% trans "Tableau de bord" %}</a>
+                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% translate "Tableau de bord" %}</a>
                 {% endif %}
 
-                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">{% trans "Rechercher des employeurs" %}</a>
+                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">{% translate "Rechercher des employeurs" %}</a>
 
                 {% if user.is_authenticated %}
                     {# Do not confuse unlogged users with a prescriber search, especially jobseekers  #}
                     {# who may be unfamiliar with the prescriber concept. #}
-                    <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% trans "Rechercher des prescripteurs" %}</a>
+                    <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% translate "Rechercher des prescripteurs" %}</a>
                 {% endif %}
 
-                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% trans "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
 
-                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% trans "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
 
             </nav>
         </div>
@@ -158,7 +158,7 @@
 
                     {# Display an alert for old browsers #}
                     <div class="alert alert-secondary alert-old-browser" role="alert">
-                        {% trans "La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site." %}
+                        {% translate "La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site." %}
                     </div>
 
                 {% endblock %}
@@ -173,31 +173,31 @@
                     <ul class="list-unstyled list-inline h6 mb-0 row">
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 text-sm-left">
                             <a href="https://doc.inclusion.beta.gouv.fr/aide-et-support" target="_blank" class="text-reset">
-                                {% trans "Besoin d'aide ?" %}
+                                {% translate "Besoin d'aide ?" %}
                             </a>
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
                             <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" class="text-reset" target="_blank">
-                                {% trans "Inscription Newsletter" %}
+                                {% translate "Inscription Newsletter" %}
                             </a>
                         </li>
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
                             <a href="{% url 'stats:index' %}" class="text-reset">
-                                {% trans "Statistiques, lexiques et indicateurs" %}
+                                {% translate "Statistiques, lexiques et indicateurs" %}
                             </a>
                         </li>
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
                             <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" class="text-reset" target="_blank">
-                                {% trans "Qui peut bénéficier des contrats d'IAE ?" %}
+                                {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
                             </a>
                         </li>
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
                             <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" class="text-reset" target="_blank">
-                                {% trans "Questions à la communauté" %}
+                                {% translate "Questions à la communauté" %}
                             </a>
                         </li>
                         <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2 text-sm-right">
                             <a href="https://doc.inclusion.beta.gouv.fr/mentions/" class="text-reset" target="_blank">
-                                {% trans "Mentions légales" %}
+                                {% translate "Mentions légales" %}
                             </a>
                         </li>
                     </ul>
@@ -215,11 +215,11 @@
                                 <span class="font-weight-bold">inclusion</span><span>.beta.gouv.fr</span>
                             <p>
                                 <span class="d-block">
-                                    {% trans "Plateforme de l'inclusion en expérimentation" %}
+                                    {% translate "Plateforme de l'inclusion en expérimentation" %}
                                 </span>
                             </p>
                             <p class="mb-0">
-                                {% trans "Nous suivre" %}
+                                {% translate "Nous suivre" %}
                             </p>
                             <ul class="list-unstyled">
                                 <li>

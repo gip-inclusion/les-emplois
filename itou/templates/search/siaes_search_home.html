@@ -1,7 +1,7 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Rechercher des employeurs solidaires" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Rechercher des employeurs solidaires" %}{{ block.super }}{% endblock %}
 
 {% block pre_content %}
 
@@ -9,7 +9,7 @@
 
         <div class="layout-content">
 
-            <h2 class="text-center my-5 text-light">{% trans "Rechercher des employeurs solidaires" %}</h2>
+            <h2 class="text-center my-5 text-light">{% translate "Rechercher des employeurs solidaires" %}</h2>
 
             <form method="get" action="{% url 'search:siaes_results' %}" class="d-block mb-5">
                 {% include "search/includes/siaes_search_form.html" with form=form %}

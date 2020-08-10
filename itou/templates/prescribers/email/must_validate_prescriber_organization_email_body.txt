@@ -3,12 +3,12 @@
 {% load i18n %}
 {% block body %}
 
-{% trans "Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier." %}
+{% translate "Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier." %}
 
-{% trans "*Structure* :" %}
+{% translate "*Structure* :" %}
 
-- {% trans "Nom" %} : {{ organization.display_name }}
-- {% trans "ID" %} : {{ organization.id }}
+- {% translate "Nom" %} : {{ organization.display_name }}
+- {% translate "ID" %} : {{ organization.id }}
 
 
 {% endblock body %}

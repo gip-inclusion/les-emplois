@@ -2,11 +2,11 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Modifier votre organisation" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Modifier votre organisation" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% trans "Modifier votre organisation" %}</h1>
+<h1>{% translate "Modifier votre organisation" %}</h1>
 
 <h2 class="text-muted">
     {{ organization.display_name }}
@@ -19,8 +19,8 @@
     {% bootstrap_form form %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% trans "Annuler" %}</a>
-        <button type="submit" class="btn btn-primary">{% trans "Enregistrer" %}</button>
+        <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% translate "Annuler" %}</a>
+        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
     {% endbuttons %}
 
 </form>

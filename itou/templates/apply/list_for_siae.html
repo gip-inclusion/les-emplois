@@ -2,20 +2,20 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% trans "Candidatures reçues" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Candidatures reçues" %}{{ block.super }}{% endblock %}
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% trans "Candidatures reçues" %}</h1>
+    <h1>{% translate "Candidatures reçues" %}</h1>
     <h2 class="text-muted">{{ siae.display_name }}</h2>
 
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted mt-4">
-            {% trans "Aucune candidature pour le moment." %}
+            {% translate "Aucune candidature pour le moment." %}
         </h2>
     {% endif %}
 
@@ -31,14 +31,14 @@
                 <div class="row">
                     <div class="col-sm-2">
                         <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">
-                            {% trans "Gérer la candidature" %}
+                            {% translate "Gérer la candidature" %}
                         </a>
 
                     </div>
                     {% if job_application.can_download_approval_as_pdf %}
                         <div class="col-sm-3">
                             <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="liste-candidatures">
-                                {% trans "Télécharger l'attestation" %}
+                                {% translate "Télécharger l'attestation" %}
                             </a>
                         </div>
                     {% endif %}

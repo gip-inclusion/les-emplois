@@ -3,7 +3,7 @@
 {% load mathfilters %}
 {% load static %}
 
-{% block title %}{% trans "Statistiques" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Statistiques" %}{{ block.super }}{% endblock %}
 
 {% block extra_head %}
     {{ block.super }}
@@ -19,7 +19,7 @@
             <div class="card-header" id="heading-1">
                 <h5 class="mb-0">
                     <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
-                        {% trans "Statistiques des candidatures et embauches" %}
+                        {% translate "Statistiques des candidatures et embauches" %}
                     </button>
                 </h5>
             </div>
@@ -34,7 +34,7 @@
             <div class="card-header" id="heading-2">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
-                        {% trans "Statistiques employeurs" %}
+                        {% translate "Statistiques employeurs" %}
                     </button>
                 </h5>
             </div>
@@ -48,7 +48,7 @@
             <div class="card-header" id="heading-3">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
-                        {% trans "Statistiques prescripteurs" %}
+                        {% translate "Statistiques prescripteurs" %}
                     </button>
                 </h5>
             </div>

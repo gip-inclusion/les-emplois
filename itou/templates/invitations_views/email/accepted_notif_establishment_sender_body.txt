@@ -6,10 +6,10 @@
 {{ first_name }} {{ last_name }} est désormais membre de la structure {{ establishment_name }}.
 {% endblocktrans %}
 
-{% trans "Détails" %}
+{% translate "Détails" %}
 -------------------
-- {% trans "Prénom" %} : {{ first_name }}
-- {% trans "Nom" %} : {{ last_name }}
-- {% trans "E-mail" %} : {{ email }}
+- {% translate "Prénom" %} : {{ first_name }}
+- {% translate "Nom" %} : {{ last_name }}
+- {% translate "E-mail" %} : {{ email }}
 
 {% endblock %}

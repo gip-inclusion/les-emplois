@@ -17,7 +17,7 @@ Votre candidature a été acceptée par {{ to_siae }}.
 {% endif %}
 
 {% if job_application.answer %}
-{% trans "*Message de l'entreprise* :" %}
+{% translate "*Message de l'entreprise* :" %}
 
 {{ job_application.answer }}
 {% endif %}

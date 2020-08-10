@@ -1,7 +1,7 @@
 {% extends "layout/content_small.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Postuler" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Postuler" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -27,7 +27,7 @@
 
     {% if approvals_wrapper.latest_approval %}
         <div class="alert border">
-            {% trans "Agrément existant" %}
+            {% translate "Agrément existant" %}
             <br>
             {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
         </div>

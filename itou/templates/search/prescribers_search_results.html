@@ -10,14 +10,14 @@
 
 {% block content %}
 
-    <h2>{% trans "Rechercher des prescripteurs" %}</h2>
+    <h2>{% translate "Rechercher des prescripteurs" %}</h2>
 
     <form method="get" action="" class="d-block mb-5">
         {% include "search/includes/prescribers_search_form.html" with form=form %}
     </form>
 
     <h3>
-        {% trans "Prescripteurs" %}
+        {% translate "Prescripteurs" %}
         {% if request.GET.city_name and request.GET.distance %}
             {% with request.GET.city_name as city and request.GET.distance as distance %}
                 {% blocktrans %}à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktrans %}
@@ -28,7 +28,7 @@
     {% if not prescriber_orgs_page %}
 
         <h4 class="font-weight-normal text-muted">
-            {% trans "Aucun résultat." %}
+            {% translate "Aucun résultat." %}
         </h4>
 
     {% else %}
