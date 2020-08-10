@@ -198,7 +198,7 @@ def _store_user_data(user, status, data):
     Return a ExternalDataImport object containing outcome of the data import
     """
     # Set a trace of data import, whatever the resulting status
-    data_import = ExternalDataImport.objects.pe_import_for_user(user).first()
+    data_import = user.externaldataimport_set.pe_imports().first()
 
     fields_fetched = [k for k, v in data.items() if v is not None]
     fields_failed = [k for k, v in data.items() if v is None]
@@ -264,7 +264,7 @@ def import_user_data(user, token):
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
     # Create a new import with a pending status (will be async)
-    data_import = ExternalDataImport.objects.pe_import_for_user(user).first() or ExternalDataImport(
+    data_import = user.externaldataimport_set.pe_imports().first() or ExternalDataImport(
         source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user
     )
     data_import.status = ExternalDataImport.STATUS_PENDING

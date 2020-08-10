@@ -1,5 +1,3 @@
-import ast
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -8,11 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ExternalDataImportQuerySet(models.QuerySet):
-    def for_user(self, user):
-        return self.filter(user__pk=user.pk)
-
-    def pe_import_for_user(self, user):
-        return self.for_user(user).filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
+    def pe_imports(self):
+        return self.filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
 
 
 class ExternalDataImport(models.Model):
@@ -26,7 +21,15 @@ class ExternalDataImport(models.Model):
     Each api call is processed and rendered as a list of key/value pairs (see ExternalUserData class).
     """
 
-    objects = models.Manager.from_queryset(ExternalDataImportQuerySet)()
+    # Data sources : external data providers (APIs)
+    # Mainly PE at the moment
+
+    DATA_SOURCE_PE_CONNECT = "PE_CONNECT"
+    DATA_SOURCE_UNKNOWN = "UNKNOWN"
+    DATA_SOURCE_CHOICES = (
+        (DATA_SOURCE_PE_CONNECT, _("API PE Connect")),
+        (DATA_SOURCE_UNKNOWN, _("Autre")),
+    )
 
     STATUS_OK = "OK"
     STATUS_PARTIAL = "PARTIAL"
@@ -41,24 +44,13 @@ class ExternalDataImport(models.Model):
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=now)
-
-    # Data sources : external data providers (APIs)
-    # Mainly PE at the moment
-
-    DATA_SOURCE_PE_CONNECT = "PE_CONNECT"
-    DATA_SOURCE_UNKNOWN = "UNKNOWN"
-    DATA_SOURCE_CHOICES = (
-        (DATA_SOURCE_PE_CONNECT, _("API PE Connect")),
-        (DATA_SOURCE_UNKNOWN, _("Source non repertoriée")),
-    )
-
     source = models.CharField(
         max_length=20, verbose_name=_("Origine des données"), choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
     )
-
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Utilisateur"), on_delete=models.CASCADE)
-
     report = models.JSONField(verbose_name=_("Rapport technique"), default=dict)
+
+    objects = models.Manager.from_queryset(ExternalDataImportQuerySet)()
 
     class Meta:
         verbose_name = _("Import de données externes")

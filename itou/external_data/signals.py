@@ -11,7 +11,7 @@ from .models import ExternalDataImport
 
 
 @receiver(user_logged_in)
-def user_logged_in(sender, **kwargs):
+def user_logged_in_receiver(sender, **kwargs):
     """
     Get token from succesful login for (a)sync PE API calls
     This is a receiver for a allauth signal (`user_logged_in`)
@@ -24,7 +24,7 @@ def user_logged_in(sender, **kwargs):
     # This part only for users login-in with PE
     if user and login and login.account.provider == PEAMUProvider.id:
         # Format and store data if needed
-        pe_data_import = ExternalDataImport.objects.pe_import_for_user(user)
+        pe_data_import = user.externaldataimport_set.pe_imports()
 
         # If no data for user or import failed last time
         if not pe_data_import.exists() or pe_data_import.first().status != ExternalDataImport.STATUS_OK:
