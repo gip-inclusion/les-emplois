@@ -2,7 +2,13 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.metabase.management.commands._utils import get_address_columns, get_first_membership_join_date
+from itou.metabase.management.commands._utils import (
+    get_address_columns,
+    get_choice,
+    get_establishment_is_active_column,
+    get_establishment_last_login_date_column,
+    get_first_membership_join_date,
+)
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -63,11 +69,30 @@ def get_timedelta_since_org_last_job_application(org):
     return None
 
 
+ORGANIZATION_KIND_TO_READABLE_KIND = {
+    PrescriberOrganization.Kind.PE: "Pôle emploi",
+    PrescriberOrganization.Kind.CAP_EMPLOI: "CAP emploi",
+    PrescriberOrganization.Kind.ML: "Mission locale",
+    PrescriberOrganization.Kind.DEPT: "Département",
+    PrescriberOrganization.Kind.OTHER: "Autre",
+}
+
 TABLE_COLUMNS = (
     [
         {"name": "id", "type": "integer", "comment": "ID organisation", "lambda": lambda o: o.id},
         {"name": "nom", "type": "varchar", "comment": "Nom organisation", "lambda": lambda o: o.display_name},
-        {"name": "type", "type": "varchar", "comment": "Type organisation (PE, ML...)", "lambda": lambda o: o.kind},
+        {
+            "name": "type",
+            "type": "varchar",
+            "comment": "Type organisation (abrégé)",
+            "lambda": lambda o: ORGANIZATION_KIND_TO_READABLE_KIND.get(o.kind, o.kind),
+        },
+        {
+            "name": "type_complet",
+            "type": "varchar",
+            "comment": "Type organisation (détaillé)",
+            "lambda": lambda o: get_choice(choices=PrescriberOrganization.Kind.choices, key=o.kind),
+        },
         {
             "name": "habilitée",
             "type": "boolean",
@@ -108,4 +133,6 @@ TABLE_COLUMNS = (
             "lambda": get_timedelta_since_org_last_job_application,
         },
     ]
+    + get_establishment_last_login_date_column()
+    + get_establishment_is_active_column()
 )

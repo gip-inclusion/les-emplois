@@ -16,7 +16,6 @@ from itou.metabase.management.commands._utils import (
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
 AUTHOR_KIND_CHOICES = (
-    (EligibilityDiagnosis.AUTHOR_KIND_JOB_SEEKER, _("Demandeur d'emploi")),
     (EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
     (EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF, _("Employeur")),
 )
@@ -64,12 +63,17 @@ def get_latest_diagnosis_author_sub_kind(job_seeker):
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
         author_kind = get_choice(choices=AUTHOR_KIND_CHOICES, key=latest_diagnosis.author_kind)
-        if latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF:
+        author_sub_kind = None
+        if (
+            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+            and latest_diagnosis.author_siae
+        ):
             author_sub_kind = latest_diagnosis.author_siae.kind
-        elif latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER:
+        elif (
+            latest_diagnosis.author_kind == EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
+            and latest_diagnosis.author_prescriber_organization
+        ):
             author_sub_kind = latest_diagnosis.author_prescriber_organization.kind
-        else:
-            raise ValueError("Unexpected latest_diagnosis.author_kind")
         return f"{author_kind} {author_sub_kind}"
     return None
 
@@ -128,7 +132,7 @@ TABLE_COLUMNS = (
             "lambda": lambda o: o.is_peamu,
         },
         {
-            "name": "dernière_connexion",
+            "name": "date_dernière_connexion",
             "type": "date",
             "comment": "Date de dernière connexion au service du candidat",
             "lambda": lambda o: o.last_login,
@@ -211,6 +215,7 @@ for criteria in AdministrativeCriteria.objects.order_by("id").all():
     # Make criteria name prettier to read.
     column_comment = (
         criteria.name.replace("'", " ")
+        .replace(",", "")
         .replace("12-24", "12 à 24")
         .replace("+", "plus de ")
         .replace("-", "moins de ")

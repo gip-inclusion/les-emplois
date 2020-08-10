@@ -22,6 +22,7 @@ import psycopg2
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -82,7 +83,6 @@ class Command(BaseCommand):
     def cleanup_tables(self, table_name):
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_old;")
         self.conn.commit()
@@ -95,9 +95,19 @@ class Command(BaseCommand):
         """
         self.cleanup_tables(table_name)
 
+        # Ugly workaround until we setup a nightly cronjob.
+        table_columns += [
+            {
+                "name": "date_mise_à_jour_metabase",
+                "type": "date",
+                "comment": "Date de dernière mise à jour de Metabase",
+                "lambda": lambda o: timezone.now(),
+            },
+        ]
+
         if self.dry_run:
             table_name = f"{table_name}_dry_run"
-            objects = random.sample(list(objects), self.max_rows_per_table)
+            objects = random.sample(list(objects), min(self.max_rows_per_table, len(objects)))
 
         # Transform boolean fields into 0-1 integer fields as
         # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
@@ -143,9 +153,17 @@ class Command(BaseCommand):
         """
         Populate siaes table with various statistics.
         """
-        objects = Siae.objects.prefetch_related("members", "siaemembership_set", "job_applications_received").all()[
-            : self.max_rows_per_table
-        ]
+        objects = (
+            Siae.objects.active()
+            .prefetch_related(
+                "members",
+                "siaemembership_set",
+                "job_applications_received",
+                "job_applications_received__logs",
+                "job_description_through",
+            )
+            .all()[: self.max_rows_per_table]
+        )
 
         self.populate_table(table_name="structures", table_columns=_siaes.TABLE_COLUMNS, objects=objects)
 
