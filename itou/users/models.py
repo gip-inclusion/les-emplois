@@ -183,7 +183,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_external_data(self):
-        return hasattr(self, "job_seeker_data")
+        return hasattr(self, "jobseekerexternaldata")
 
 
 def get_allauth_account_user_display(user):

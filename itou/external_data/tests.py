@@ -1,5 +1,4 @@
 import json
-import random
 
 import requests_mock
 from django.test import TestCase
@@ -8,7 +7,7 @@ import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
 
 from .apis.pe_connect import import_user_data
-from .models import ExternalDataImport, ExternalUserData
+from .models import ExternalDataImport, JobSeekerExternalData  
 
 
 # Test data import status (All ok, failed, partial)
@@ -93,6 +92,7 @@ class ExternalDataImportTest(TestCase):
     @requests_mock.Mocker()
     def test_status_ok(self, m):
         user = JobSeekerFactory()
+        user.birthdate = None
 
         # Mock all PE APIs
         _status_ok(m)
@@ -100,12 +100,25 @@ class ExternalDataImportTest(TestCase):
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
 
+        report = result.report
+        self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
+        self.assertEquals(7, len(report.get("fields_updated")))
+        self.assertEquals(12, len(report.get("fields_fetched")))
+
     @requests_mock.Mocker()
     def test_status_partial(self, m):
         user = JobSeekerFactory()
+        user.birthdate = None
         _status_partial(m)
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
+
+        report = result.report
+        self.assertTrue(user.has_external_data)
+        self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
+        self.assertIn(f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker", report.get("fields_updated"))
+        self.assertEquals(5, len(report.get("fields_updated")))
+        self.assertEquals(9, len(report.get("fields_fetched")))
 
     @requests_mock.Mocker()
     def test_status_failed(self, m):
@@ -114,8 +127,12 @@ class ExternalDataImportTest(TestCase):
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
 
+        report = result.report
+        self.assertEquals(0, len(report.get("fields_updated")))
+        self.assertEquals(0, len(report.get("fields_fetched")))
 
-class ExternalUserDataTest(TestCase):
+
+class JobSeekerExternalDataTest(TestCase):
     @requests_mock.Mocker()
     def test_import_ok(self, m):
         _status_ok(m)
@@ -125,10 +142,10 @@ class ExternalUserDataTest(TestCase):
         # Check override of birthdate
         user.birthdate = None
 
-        result = import_user_data(user, FOO_TOKEN)
-        self.assertTrue(result.externaluserdata_set.exists())
+        import_user_data(user, FOO_TOKEN)
+        self.assertTrue(user.has_external_data)
 
-        data = ExternalUserData.user_data_to_dict(user)
+        data = user.jobseekerexternaldata
 
         # Key/values
         self.assertFalse(data.has_minimal_social_allowance)
@@ -144,10 +161,10 @@ class ExternalUserDataTest(TestCase):
         _status_partial(m)
 
         user = JobSeekerFactory()
-        result = import_user_data(user, FOO_TOKEN)
-        self.assertTrue(result.externaluserdata_set.exists())
+        import_user_data(user, FOO_TOKEN)
+        self.assertTrue(user.has_external_data)
 
-        data = ExternalUserData.user_data_to_dict(user)
+        data = user.jobseekerexternaldata
 
         # Key/values
         self.assertIsNone(data.has_minimal_social_allowance)
@@ -163,5 +180,9 @@ class ExternalUserDataTest(TestCase):
         _status_failed(m)
 
         user = JobSeekerFactory()
-        result = import_user_data(user, FOO_TOKEN)
-        self.assertFalse(result.externaluserdata_set.exists())
+        import_user_data(user, FOO_TOKEN)
+        self.assertTrue(user.has_external_data)
+
+        data = user.jobseekerexternaldata
+        self.assertIsNone(data.is_pe_jobseeker)
+        self.assertIsNone(data.has_minimal_social_allowance)
