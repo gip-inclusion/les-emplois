@@ -82,6 +82,7 @@ LOCAL_APPS = [
     "itou.www.signup",
     "itou.www.invitations_views",
     "itou.www.stats",
+    "itou.www.welcoming_tour",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -265,7 +266,10 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-LOGIN_REDIRECT_URL = "dashboard:index"
+# User authentication callbacks such as redirections after login.
+# Replaces LOGIN_REDIRECT_URL, which is static, by ACCOUNT_ADAPTER which is dynamic.
+# https://django-allauth.readthedocs.io/en/latest/advanced.html#custom-redirects
+ACCOUNT_ADAPTER = 'itou.users.adapter.UserAdapter'
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True

@@ -1,0 +1,85 @@
+{% extends "layout/content.html" %}
+{% load static %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% translate "Bienvenue !" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div id="welcoming_tour" class="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#welcoming_tour" data-slide-to="0" class="active"></li>
+        <li data-target="#welcoming_tour" data-slide-to="1"></li>
+        <li data-target="#welcoming_tour" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="d-block w-100">
+                <h1 class="text-center">{% translate "Bienvenue sur la Plateforme de l'inclusion" %}</h1>
+
+                <img src="{% static 'img/welcoming_tour/1.svg' %}" class="d-block mx-auto my-4">
+
+                <p class="w-sm-50 m-auto lead text-center pb-5">
+                    {% blocktranslate %}
+                        La Plateforme de l'inclusion facilite la mise en relation des <b>personnes éloignées de l'emploi</b> auprès des <b>employeurs solidaires</b> et des accompagnants <b>prescripteurs</b>.
+                    {% endblocktranslate %}
+                </p>
+                <p class="pt-3 text-center">
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next" >
+                      <button type="button" class="btn btn-primary">{% translate "Suivant" %}</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="d-block w-100">
+                <h1 class="text-center">{% translate "Faites-vous connaître sur la Plateforme" %}</h1>
+
+                <img src="{% static 'img/welcoming_tour/2.svg' %}" class="d-block mx-auto my-4">
+
+                <p class="w-sm-50 m-auto lead text-center pb-5">
+                    {% blocktranslate %}
+                        En tant qu'<b>employeur solidaire</b>, vous pouvez modifier votre fiche pour y <b>renseigner une description</b> sur votre activité. Vous pouvez également <b>configurer vos fiches de poste</b>.
+                    {% endblocktranslate %}
+                </p>
+                <p class="pt-3 text-center">
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev" >
+                      <button type="button" class="btn btn-secondary">{% translate "Précédent" %}</button>
+                    </a>
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next" >
+                      <button type="button" class="btn btn-primary">{% translate "Suivant" %}</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="d-block w-100">
+                <h1 class="text-center">{% translate "Gérer des candidatures reçues en ligne" %}</h1>
+
+                <img src="{% static 'img/welcoming_tour/3.svg' %}" class="d-block mx-auto my-4">
+
+                <p class="w-sm-50 m-auto lead text-center pb-5">
+                    {% blocktranslate %}
+                        Vous pouvez traiter une <b>candidature spontanée</b>, créer un compte pour un(e) candidat(e) et recevoir des candidatures. Enfin, pour certaines candidatures, vous pouvez <b>obtenir un agrément</b> IAE (nommé <b>PASS IAE</b>) et embaucher en autonomie.
+                    {% endblocktranslate %}
+                </p>
+                <p class="pt-3 text-center">
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev" >
+                      <button type="button" class="btn btn-secondary">{% translate "Précédent" %}</button>
+                    </a>
+                    <a class="text-decoration-none" href="{% url 'dashboard:index' %}" role="button" data-slide="next" >
+                      <button type="button" class="btn btn-primary">{% translate "Terminer" %}</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<p class="text-center pt-5 mb-0">
+    <a href="{% url 'dashboard:index' %}">
+        <button type="button" class="btn btn-link">{% translate 'Ignorer la présentation' %}</button>
+    </a>
+</p>
+
+{% endblock content %}

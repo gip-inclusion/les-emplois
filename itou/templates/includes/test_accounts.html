@@ -5,7 +5,8 @@
 
 {% if SHOW_TEST_ACCOUNTS_BANNER %}
 
-<div class="sticky-top shadow bg-danger text-white text-center layout" style="z-index:1;">
+<!-- Before you change the z-index, check if the BETA banner and a carousel are not overlaying. -->
+<div class="sticky-top shadow bg-danger text-white text-center layout" style="z-index:2;">
     <div class="layout-content py-0">
         <div class="d-flex align-items-center text-center p-1">
             <h1 class="font-weight-bold flex-grow-1 mb-0">{{ ITOU_ENVIRONMENT }}</h1>

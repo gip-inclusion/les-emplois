@@ -52,6 +52,9 @@
         </div>
     {% endif %}
 
+    {% if user.joined_recently %}
+        {% include "welcoming_tour/includes/message.html" %}
+    {% endif %}
 {% endblock %}
 
 {% block content %}
