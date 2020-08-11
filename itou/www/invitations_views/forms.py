@@ -114,6 +114,7 @@ class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
+        self.forms[0].empty_permitted = False
         self.queryset = PrescriberWithOrgInvitation.objects.none()
 
 
@@ -183,6 +184,7 @@ class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
+        self.forms[0].empty_permitted = False
         self.queryset = SiaeStaffInvitation.objects.none()
 
 
