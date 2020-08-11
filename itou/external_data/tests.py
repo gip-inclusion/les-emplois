@@ -123,6 +123,7 @@ class ExternalDataImportTest(TestCase):
         )
         self.assertEquals(5, len(report.get("fields_updated")))
         self.assertEquals(9, len(report.get("fields_fetched")))
+        self.assertEquals(2, len(report.get("fields_failed")))
 
     @requests_mock.Mocker()
     def test_status_failed(self, m):
@@ -135,6 +136,7 @@ class ExternalDataImportTest(TestCase):
         report = result.report
         self.assertEquals(0, len(report.get("fields_updated")))
         self.assertEquals(0, len(report.get("fields_fetched")))
+        self.assertEquals(0, len(report.get("fields_failed")))
 
 
 class JobSeekerExternalDataTest(TestCase):
