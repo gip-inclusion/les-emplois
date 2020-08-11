@@ -167,7 +167,7 @@ TABLE_COLUMNS = (
             "name": "date_diagnostic",
             "type": "date",
             "comment": "Date du dernier diagnostic",
-            "lambda": lambda o: get_latest_diagnosis(o).created_at if get_latest_diagnosis(o) else None,
+            "lambda": lambda o: getattr(get_latest_diagnosis(o), "created_at", None),
         },
         {
             "name": "type_auteur_diagnostic",

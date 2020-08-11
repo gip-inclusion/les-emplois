@@ -363,24 +363,24 @@ class Command(BaseCommand):
         auth_email = auth_emails[0]
         return auth_email
 
-    def fix_missing_external_ids(self, dry_run):
+    def fix_missing_external_ids(self):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
             if siae.siret in SIRET_TO_EXTERNAL_ID:
                 external_id = SIRET_TO_EXTERNAL_ID[siae.siret]
                 self.log(f"siae.id={siae.id} will be assigned external_id={external_id}")
-                if not dry_run:
+                if not self.dry_run:
                     siae.external_id = external_id
                     siae.save()
 
     def siae_can_be_deleted(self, siae):
         return siae.members.count() == 0 and siae.job_applications_received.count() == 0
 
-    def delete_siae(self, siae, dry_run):
+    def delete_siae(self, siae):
         assert self.siae_can_be_deleted(siae)
-        if not dry_run:
+        if not self.dry_run:
             siae.delete()
 
-    def delete_siaes_without_external_id(self, dry_run):
+    def delete_siaes_without_external_id(self):
         """
         Any siae which cannot be found in the latest ASP exports
         is a "ghost" siae which should be deleted.
@@ -389,11 +389,11 @@ class Command(BaseCommand):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
             if self.siae_can_be_deleted(siae):
                 self.log(f"siae.id={siae.id} without external_id has no data and will be deleted")
-                self.delete_siae(siae, dry_run)
+                self.delete_siae(siae)
             else:
                 self.log(f"siae.id={siae.id} without external_id has data and thus cannot be deleted")
 
-    def update_existing_siaes(self, dry_run):
+    def update_existing_siaes(self):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
 
@@ -408,7 +408,7 @@ class Command(BaseCommand):
                         f"siae.id={siae.id} has changed auth_email from "
                         f"{siae.auth_email} to {new_auth_email} (will be updated)"
                     )
-                    if not dry_run:
+                    if not self.dry_run:
                         siae.auth_email = new_auth_email
                         siae.save()
 
@@ -420,11 +420,11 @@ class Command(BaseCommand):
                 if existing_siae:
                     if self.siae_can_be_deleted(siae):
                         self.log(f"siae.id={siae.id} ghost will be deleted")
-                        self.delete_siae(siae, dry_run)
+                        self.delete_siae(siae)
                     elif self.siae_can_be_deleted(existing_siae):
                         self.log(f"siae.id={existing_siae.id} ghost will be deleted")
-                        self.delete_siae(existing_siae, dry_run)
-                        if not dry_run:
+                        self.delete_siae(existing_siae)
+                        if not self.dry_run:
                             siae.siret = row["siret"]
                             siae.save()
                     else:
@@ -440,37 +440,37 @@ class Command(BaseCommand):
                         f"siae.id={siae.id} has changed siret from "
                         f"{siae.siret} to {row['siret']} (will be updated)"
                     )
-                    if not dry_run:
+                    if not self.dry_run:
                         siae.siret = row["siret"]
                         siae.save()
                 # FIXME update other fields as well. Or not?
                 # Tricky decision since our users may have updated their data
                 # themselves and we have no record of that.
 
-    def update_siae_active_until(self, siae, dry_run):
+    def update_siae_active_until(self, siae):
         new_active_until = EXTERNAL_ID_TO_DEACTIVATION_DATE.get(siae.external_id)
         if siae.active_until != new_active_until:
-            if not dry_run:
+            if not self.dry_run:
                 siae.active_until = new_active_until
                 siae.save()
             return 1
         return 0
 
-    def activate_siae(self, siae, dry_run):
-        if not dry_run:
+    def activate_siae(self, siae):
+        if not self.dry_run:
             siae.is_active = True
             siae.save()
 
-    def deactivate_siae(self, siae, dry_run):
+    def deactivate_siae(self, siae):
         pass
         # We no longer deactivate any siae for now, only reactivate them,
         # to avoid overriding reactivations made by support.
         #
-        # if not dry_run:
+        # if not self.dry_run:
         #     siae.is_active = False
         #     siae.save()
 
-    def reject_pending_job_applications(self, siae, dry_run):
+    def reject_pending_job_applications(self, siae):
         """
         Refusing pending job applications will be done at a later step
         since it is not easy to rollback. We only deactivate siaes
@@ -489,7 +489,7 @@ class Command(BaseCommand):
             # We are not confident enough yet about deactivations
             # to refuse all pending job applications for real.
             #
-            # if not dry_run:
+            # if not self.dry_run:
             #     if ja.state == JobApplicationWorkflow.STATE_NEW:
             #         ja.process()
             #     ja.refusal_reason = JobApplication.REFUSAL_REASON_DEACTIVATION
@@ -499,7 +499,7 @@ class Command(BaseCommand):
             #     # at the same time? Like sleep 1 second between each.
         return len(pending_job_applications)
 
-    def manage_siae_activation(self, dry_run):
+    def manage_siae_activation(self):
         activations = 0
         deactivations = 0
         refused_job_applications = 0
@@ -509,14 +509,14 @@ class Command(BaseCommand):
             if siae_is_valid:
                 if not siae.is_active:
                     # Ressucitate formerly deactivated siae.
-                    self.activate_siae(siae, dry_run)
+                    self.activate_siae(siae)
                     activations += 1
             else:
                 if siae.is_active:
-                    self.deactivate_siae(siae, dry_run)
+                    self.deactivate_siae(siae)
                     deactivations += 1
-                refused_job_applications += self.reject_pending_job_applications(siae, dry_run)
-            active_until_updates += self.update_siae_active_until(siae, dry_run)
+                refused_job_applications += self.reject_pending_job_applications(siae)
+            active_until_updates += self.update_siae_active_until(siae)
 
         self.log(f"{deactivations} siaes will be deactivated.")
         self.log(f"{activations} siaes will be activated.")
@@ -600,7 +600,7 @@ class Command(BaseCommand):
 
         return siae
 
-    def create_new_siaes(self, dry_run):
+    def create_new_siaes(self):
         external_ids_from_main_df = set(MAIN_DF.external_id.to_list())
         external_ids_from_secondary_df = set(SECONDARY_DF.external_id.to_list())
         external_ids_with_complete_data = external_ids_from_main_df.intersection(external_ids_from_secondary_df)
@@ -629,13 +629,13 @@ class Command(BaseCommand):
                     elif siae.kind == kind:
                         self.log(f"existing siae.id={siae.id} will be assigned external_id={external_id}")
                         assert siae.kind in EXPECTED_KINDS
-                        if not dry_run:
+                        if not self.dry_run:
                             siae.external_id = external_id
                             siae.save()
 
                 if Siae.objects.filter(siret=siret, kind=kind).exists():
                     continue
-                if not dry_run:
+                if not self.dry_run:
                     if Siae.objects.filter(external_id=external_id, kind=kind).exists():
                         # Siret should have been updated during update_existing_siaes().
                         raise RuntimeError("This should never happen.")
@@ -661,22 +661,23 @@ class Command(BaseCommand):
         self.log(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
 
         for siae in creatable_siaes:
-            if not dry_run:
+            if not self.dry_run:
                 siae.save()
 
     def handle(self, dry_run=False, **options):
+        self.dry_run = dry_run
 
         self.set_logger(options.get("verbosity"))
 
-        self.fix_missing_external_ids(dry_run)
+        self.fix_missing_external_ids()
 
-        self.delete_siaes_without_external_id(dry_run)
+        self.delete_siaes_without_external_id()
 
-        self.update_existing_siaes(dry_run)
+        self.update_existing_siaes()
 
-        self.manage_siae_activation(dry_run)
+        self.manage_siae_activation()
 
-        self.create_new_siaes(dry_run)
+        self.create_new_siaes()
 
         self.log("-" * 80)
 

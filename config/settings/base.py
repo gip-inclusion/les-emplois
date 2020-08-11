@@ -382,3 +382,21 @@ SHOW_TEST_ACCOUNTS_BANNER = False
 # ------------------------------------------------------------------------------
 # Approval numbering prefix can be different for non-production envs
 ASP_ITOU_PREFIX = "99999"
+
+# Metabase
+# ------------------------------------------------------------------------------
+METABASE_DRY_RUN_ROWS_PER_TABLE = 100
+
+# Useful to troobleshoot whether the script runs a deluge of SQL requests.
+METABASE_SHOW_SQL_REQUESTS = False
+
+# Set how many rows are inserted at a time in metabase database.
+# -- Bench results for self.populate_approvals()
+# by batch of 100 => 2m38s
+# by batch of 1000 => 2m23s
+# -- Bench results for self.populate_diagnostics()
+# by batch of 1 => 2m51s
+# by batch of 10 => 19s
+# by batch of 100 => 5s
+# by batch of 1000 => 5s
+METABASE_INSERT_BATCH_SIZE = 1000

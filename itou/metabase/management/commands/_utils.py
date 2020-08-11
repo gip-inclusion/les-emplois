@@ -89,19 +89,19 @@ def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_
             "name": f"département{name_suffix}",
             "type": "varchar",
             "comment": f"Département{comment_suffix}",
-            "lambda": lambda o: custom_lambda(o).department if custom_lambda(o) else None,
+            "lambda": lambda o: getattr(custom_lambda(o), "department", None),
         },
         {
             "name": f"nom_département{name_suffix}",
             "type": "varchar",
             "comment": f"Nom complet du département{comment_suffix}",
-            "lambda": lambda o: DEPARTMENTS.get(custom_lambda(o).department) if custom_lambda(o) else None,
+            "lambda": lambda o: DEPARTMENTS.get(getattr(custom_lambda(o), "department", None)),
         },
         {
             "name": f"région{name_suffix}",
             "type": "varchar",
             "comment": f"Région{comment_suffix}",
-            "lambda": lambda o: DEPARTMENT_TO_REGION.get(custom_lambda(o).department) if custom_lambda(o) else None,
+            "lambda": lambda o: DEPARTMENT_TO_REGION.get(getattr(custom_lambda(o), "department", None)),
         },
     ]
 
