@@ -205,3 +205,15 @@ class JobSeekerExternalDataTest(TestCase):
         data = user.jobseekerexternaldata
         self.assertIsNone(data.is_pe_jobseeker)
         self.assertIsNone(data.has_minimal_social_allowance)
+
+    @requests_mock.Mocker()
+    def test_has_external_data(self, m):
+        _status_ok(m)
+
+        user1 = JobSeekerFactory()
+        user2 = JobSeekerFactory()
+
+        import_user_data(user1, FOO_TOKEN)
+
+        self.assertTrue(user1.has_external_data)
+        self.assertFalse(user2.has_external_data)
