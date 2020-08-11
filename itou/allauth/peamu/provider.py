@@ -4,10 +4,7 @@ from allauth.socialaccount.providers.oauth2.provider import OAuth2Provider
 from django.conf import settings
 
 
-# We do not use the extra 8 APIs yet, even though they are prepared below,
-# because the ESD staff has not validated our 8 contracts yet.
-USE_ALL_APIS = True
-
+# OIDC scopes
 
 BASIC_SCOPES = [
     # API Se connecter avec Pôle emploi (individu) v1
@@ -64,9 +61,7 @@ class PEAMUProvider(OAuth2Provider):
 
     def get_default_scope(self):
         client_id = settings.SOCIALACCOUNT_PROVIDERS["peamu"]["APP"]["client_id"]
-        scope = [f"application_{client_id}"] + BASIC_SCOPES
-        if USE_ALL_APIS:
-            scope += EXTRA_SCOPES
+        scope = [f"application_{client_id}"] + BASIC_SCOPES + EXTRA_SCOPES
         return scope
 
     def get_auth_params(self, request, action):
