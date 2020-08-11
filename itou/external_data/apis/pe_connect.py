@@ -270,7 +270,9 @@ def import_user_data(user, token):
     data_import.status = ExternalDataImport.STATUS_PENDING
     data_import.save()
 
-    data_import, _ = ExternalDataImport.objects.get_or_create(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user)
+    data_import, _ = ExternalDataImport.objects.get_or_create(
+        source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user
+    )
 
     # Save pending status
     data_import.status = ExternalDataImport.STATUS_PENDING
