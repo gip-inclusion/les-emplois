@@ -1,9 +1,5 @@
-from .base import *  # noqa
-
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import ignore_logger
-
+from .base import *
+from ._sentry import sentry_init
 
 ALLOWED_HOSTS = ["itou-prod.cleverapps.io", "inclusion.beta.gouv.fr"]
 
@@ -24,5 +20,4 @@ ITOU_FQDN = "inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
-sentry_sdk.init(dsn=os.environ["SENTRY_DSN_PROD"], integrations=[DjangoIntegration()])
-ignore_logger("django.security.DisallowedHost")
+sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])

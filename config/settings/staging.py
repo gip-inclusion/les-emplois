@@ -1,8 +1,5 @@
-from .base import *  # noqa
-
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import ignore_logger
+from .base import *
+from ._sentry import sentry_init
 
 ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr"]
 
@@ -23,7 +20,6 @@ ITOU_FQDN = "staging.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
-sentry_sdk.init(dsn=os.environ["SENTRY_DSN_STAGING"], integrations=[DjangoIntegration()])
-ignore_logger("django.security.DisallowedHost")
+sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 ASP_ITOU_PREFIX = "YYYYY"
