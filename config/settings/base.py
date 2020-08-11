@@ -152,12 +152,6 @@ DATABASES = {
     }
 }
 
-METABASE_HOST = os.environ.get("METABASE_HOST")
-METABASE_PORT = os.environ.get("METABASE_PORT")
-METABASE_DATABASE = os.environ.get("METABASE_DATABASE")
-METABASE_USER = os.environ.get("METABASE_USER")
-METABASE_PASSWORD = os.environ.get("METABASE_PASSWORD")
-
 ATOMIC_REQUESTS = True
 
 # Password validation.
@@ -385,6 +379,12 @@ ASP_ITOU_PREFIX = "99999"
 
 # Metabase
 # ------------------------------------------------------------------------------
+METABASE_HOST = os.environ.get("METABASE_HOST")
+METABASE_PORT = os.environ.get("METABASE_PORT")
+METABASE_DATABASE = os.environ.get("METABASE_DATABASE")
+METABASE_USER = os.environ.get("METABASE_USER")
+METABASE_PASSWORD = os.environ.get("METABASE_PASSWORD")
+
 METABASE_DRY_RUN_ROWS_PER_TABLE = 100
 
 # Useful to troobleshoot whether the script runs a deluge of SQL requests.
