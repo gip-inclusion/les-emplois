@@ -147,6 +147,7 @@ def department_from_postcode(post_code):
     """
     Extract the department from the postal code (if possible)
     """
+    department = ""
     if post_code:
         if post_code.startswith("20"):
             a_post_codes = ("200", "201", "207")
@@ -159,6 +160,5 @@ def department_from_postcode(post_code):
             department = post_code[:3]
         else:
             department = post_code[:2]
-        return department
 
-    return ""
+    return department
