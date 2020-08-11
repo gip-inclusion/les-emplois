@@ -1,5 +1,6 @@
 -r ./base.txt
 
+# Werkzeug is required to use django-extensions's runserver_plus.
 Werkzeug==1.0.1  # pyup: < 2 # https://github.com/pallets/werkzeug
 ipdb==0.13.3  # https://github.com/gotcha/ipdb
 tblib  # https://github.com/ionelmc/python-tblib
@@ -16,4 +17,4 @@ isort==5.3.0  # https://github.com/timothycrosley/isort
 factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
 
 django-debug-toolbar==2.2  # https://github.com/jazzband/django-debug-toolbar
-django-extensions==3.0.4  # https://github.com/django-extensions/django-extensions
+django-extensions==3.0.5  # https://github.com/django-extensions/django-extensions

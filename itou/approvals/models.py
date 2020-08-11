@@ -290,15 +290,23 @@ class PoleEmploiApproval(CommonApprovalMixin):
     model when it is attached to a JobApplication.
     """
 
+    # Matches prescriber_organisation.code_safir_pole_emploi
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
+
     # The normal length of a number is 12 chars.
     # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
     # increases the length to 15 chars.
     # Suffixes meaning in French:
-    # - `P`: Prolongation = la personne a besoin d'encore quelques mois
-    # - `E`: Extension = la personne est passée d'une structure à une autre
-    # - `A`: Interruption = la personne ne s'est pas présentée
-    # - `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
+    class Suffix(models.TextChoices):
+        # `P`: Prolongation = la personne a besoin d'encore quelques mois
+        P = "prolongation", _("Prolongation")
+        # `E`: Extension = la personne est passée d'une structure à une autre
+        E = "extension", _("Extension")
+        # `A`: Interruption = la personne ne s'est pas présentée
+        A = "interruption", _("Interruption")
+        # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
+        S = "suspension", _("Suspension")
+
     # The last two digits refer to the act number (e.g. E02 = second extension).
     # Suffixes are not taken into account in Itou yet but that might change.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
@@ -354,13 +362,13 @@ class ApprovalsWrapper:
 
     # Error messages.
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
-        "Vous avez terminé un parcours il y à moins de deux ans. "
+        "Vous avez terminé un parcours il y a moins de deux ans. "
         "Pour prétendre à nouveau à un parcours en structure d'insertion "
         "par l'activité économique vous devez rencontrer un prescripteur "
         "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
     )
     ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = _(
-        "Le candidat a terminé un parcours il y à moins de deux ans. "
+        "Le candidat a terminé un parcours il y a moins de deux ans. "
         "Pour prétendre à nouveau à un parcours en structure d'insertion "
         "par l'activité économique il doit rencontrer un prescripteur "
         "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
