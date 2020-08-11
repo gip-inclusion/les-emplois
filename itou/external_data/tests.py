@@ -92,7 +92,6 @@ class ExternalDataImportTest(TestCase):
     @requests_mock.Mocker()
     def test_status_ok(self, m):
         user = JobSeekerFactory()
-        user.birthdate = None
 
         # Mock all PE APIs
         _status_ok(m)
@@ -101,15 +100,18 @@ class ExternalDataImportTest(TestCase):
         self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
 
         report = result.report
-        self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertEquals(7, len(report.get("fields_updated")))
+
+        # Birthdate is already filled by factory:
+        self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
+
+        self.assertEquals(6, len(report.get("fields_updated")))
         self.assertEquals(12, len(report.get("fields_fetched")))
 
     @requests_mock.Mocker()
     def test_status_partial(self, m):
         user = JobSeekerFactory()
-        user.birthdate = None
         _status_partial(m)
+
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
 
@@ -126,6 +128,7 @@ class ExternalDataImportTest(TestCase):
     def test_status_failed(self, m):
         user = JobSeekerFactory()
         _status_failed(m)
+
         result = import_user_data(user, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
 
@@ -141,22 +144,36 @@ class JobSeekerExternalDataTest(TestCase):
 
         user = JobSeekerFactory()
 
-        # Check override of birthdate
+        # Check override of birthdate / of a field
         user.birthdate = None
 
-        import_user_data(user, FOO_TOKEN)
+        result = import_user_data(user, FOO_TOKEN)
         self.assertTrue(user.has_external_data)
 
         data = user.jobseekerexternaldata
 
-        # Key/values
         self.assertFalse(data.has_minimal_social_allowance)
         self.assertTrue(data.is_pe_jobseeker)
 
-        # Inserted into model
         self.assertEquals(user.address_line_1, "4, Privet Drive")
         self.assertEquals(user.address_line_2, "The cupboard under the stairs")
         self.assertEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
+
+        report = result.report
+        self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
+        self.assertEquals(7, len(report.get("fields_updated")))
+        self.assertEquals(12, len(report.get("fields_fetched")))
+
+        # Just checking birthdate is not overriden
+        user = JobSeekerFactory()
+        birthdate = user.birthdate
+
+        report = import_user_data(user, FOO_TOKEN).report
+
+        user.refresh_from_db()
+
+        self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
+        self.assertEquals(birthdate, user.birthdate)
 
     @requests_mock.Mocker()
     def test_import_partial(self, m):
@@ -168,11 +185,9 @@ class JobSeekerExternalDataTest(TestCase):
 
         data = user.jobseekerexternaldata
 
-        # Key/values
         self.assertIsNone(data.has_minimal_social_allowance)
         self.assertTrue(data.is_pe_jobseeker)
 
-        # Inserted into model
         self.assertEquals(user.address_line_1, "4, Privet Drive")
         self.assertEquals(user.address_line_2, "The cupboard under the stairs")
         self.assertNotEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
