@@ -28,6 +28,15 @@ class User(AbstractUser, AddressMixin):
     To retrieve prescribers this user belongs to:
         self.prescriberorganization_set.all()
         self.prescribermembership_set.all()
+
+
+    The User model has a "companion" model in the `external_data` app,
+    for third-party APIs data import concerns (class `JobSeekerExternalData`).
+
+    At the moment, only users (job seekers) connected via PE Connect
+    have external data stored.
+
+    More details in `itou.external_data.models` module
     """
 
     REASON_FORGOTTEN = "FORGOTTEN"
@@ -183,7 +192,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_external_data(self):
-        return hasattr(self, "jobseekerexternaldata")
+        return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
 
 
 def get_allauth_account_user_display(user):

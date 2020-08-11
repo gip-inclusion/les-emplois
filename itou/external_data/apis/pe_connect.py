@@ -203,7 +203,7 @@ def _store_user_data(user, status, data):
     fields_fetched = [k for k, v in data.items() if v is not None]
     fields_failed = [k for k, v in data.items() if v is None]
 
-    job_seeker_data = JobSeekerExternalData(user=user, data_import=data_import)
+    job_seeker_data, _ = JobSeekerExternalData.objects.get_or_create(user=user, data_import=data_import)
 
     # Record changes on model objects:
     initial_job_seekeer_data = model_to_dict(job_seeker_data)
@@ -267,6 +267,12 @@ def import_user_data(user, token):
     data_import = user.externaldataimport_set.pe_imports().first() or ExternalDataImport(
         source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user
     )
+    data_import.status = ExternalDataImport.STATUS_PENDING
+    data_import.save()
+
+    data_import, _ = ExternalDataImport.objects.get_or_create(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user)
+
+    # Save pending status
     data_import.status = ExternalDataImport.STATUS_PENDING
     data_import.save()
 
