@@ -53,6 +53,7 @@ THIRD_PARTY_APPS = [
     "mathfilters",
 ]
 
+
 LOCAL_APPS = [
     # Core apps, order is important.
     "itou.utils",
@@ -65,6 +66,7 @@ LOCAL_APPS = [
     "itou.approvals",
     "itou.eligibility",
     "itou.invitations",
+    "itou.external_data.apps.ExternalDataConfig",
     "itou.metabase",
     # www.
     "itou.www.apply",
