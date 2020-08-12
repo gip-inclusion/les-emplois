@@ -509,8 +509,8 @@ class SiaeSignupTokenGeneratorTest(TestCase):
         The token generated for a siae created in the same request
         will work correctly.
         """
-        siae = Siae.objects.create(email="test@example.com")
-        siae_reload = Siae.objects.get(email="test@example.com")
+        siae = Siae.objects.create(email="itou@example.com")
+        siae_reload = Siae.objects.get(email="itou@example.com")
         p0 = MockedSiaeSignupTokenGenerator(datetime.datetime.now())
         tk1 = p0.make_token(siae)
         tk2 = p0.make_token(siae_reload)
