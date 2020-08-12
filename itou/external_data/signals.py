@@ -1,11 +1,9 @@
-import asyncio
-
 from allauth.account.signals import user_logged_in
 from django.dispatch import receiver
 
 from itou.allauth.peamu.provider import PEAMUProvider
 
-from .apis.pe_connect import import_user_data
+from .apis.pe_connect import async_import_user_data
 from .models import ExternalDataImport
 
 
@@ -30,6 +28,4 @@ def user_logged_in_receiver(sender, **kwargs):
             # SYNC can be done like:
             # import_user_data(user, login.token)
             # ASYNC (default):
-            # asyncio.run(async_import_user_data(user, login.token))
-            loop = asyncio.new_event_loop()
-            loop.run_in_executor(None, import_user_data, user, login.token)
+            async_import_user_data(user, login.token)
