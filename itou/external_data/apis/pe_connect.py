@@ -254,8 +254,8 @@ def _store_user_data(user, status, data):
 # * logs will be truncated (per thread writing, will not work simply with async)
 #
 async def async_import_user_data(user, token):
-    # loop = asyncio.get_running_loop()
-    loop = asyncio.get_event_loop()
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    loop = asyncio.get_running_loop()
     loop.run_in_executor(None, import_user_data, user, token)
 
 
