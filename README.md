@@ -20,11 +20,11 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
     $ make run
 
     # Équivalent de :
-    $ docker-compose -f docker-compose-dev.yml up
+    $ docker-compose up
 
 Ou pour utiliser [un débogueur interactif](https://github.com/docker/compose/issues/4677#issuecomment-320804194) type `ipdb` :
 
-    $ docker-compose -f docker-compose-dev.yml run --service-ports django
+    $ docker-compose run --service-ports django
 
 Une fois votre serveur de développement lancé, vous pouvez accéder au frontend à l'adresse http://localhost:8080/
 
