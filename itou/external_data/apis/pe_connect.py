@@ -8,6 +8,7 @@ from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
 
+from concurrent.futures import ProcessPoolExecutor
 
 # PE Connect API data retrieval tools
 
@@ -253,15 +254,19 @@ def _store_user_data(user, status, data):
 # Experimental:
 # * logs will be truncated (per thread writing, will not work simply with async)
 #
-async def async_import_user_data(user, token):
-    asyncio.set_event_loop(asyncio.new_event_loop())
-    loop = asyncio.get_running_loop()
+
+# executor = ProcessPoolExecutor(max_workers=2)
+
+
+def async_import_user_data(user, token):
+    loop = asyncio.new_event_loop()
     loop.run_in_executor(None, import_user_data, user, token)
 
 
 def import_user_data(user, token):
     """
     Import external user data via PE Connect
+    This function is *synchronous*
     Returns a valid ExternalDataImport object when result is partial or ok.
     """
     # Create a new import with a pending status (will be async)

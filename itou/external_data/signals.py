@@ -5,9 +5,11 @@ from django.dispatch import receiver
 
 from itou.allauth.peamu.provider import PEAMUProvider
 
-from .apis.pe_connect import async_import_user_data
+from .apis.pe_connect import async_import_user_data,import_user_data
 from .models import ExternalDataImport
 
+import asyncio  
+from concurrent.futures import ProcessPoolExecutor
 
 @receiver(user_logged_in)
 def user_logged_in_receiver(sender, **kwargs):
@@ -27,7 +29,9 @@ def user_logged_in_receiver(sender, **kwargs):
 
         # If no data for user or import failed last time
         if not pe_data_import.exists() or pe_data_import.first().status != ExternalDataImport.STATUS_OK:
-            # SYNC can be dpne like:
+            # SYNC can be done like:
             # import_user_data(user, login.token)
             # ASYNC (default):
-            asyncio.run(async_import_user_data(user, login.token))
+            # asyncio.run(async_import_user_data(user, login.token))
+            loop = asyncio.new_event_loop()
+            loop.run_in_executor(None, import_user_data, user, login.token)
