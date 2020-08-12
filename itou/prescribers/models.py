@@ -69,8 +69,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         - PrescriberMembership
 
     In the last 2 cases, there can be n members by organization.
-
-    A member of an organization where `is_authorized = False` is called an "orienteur" in French.
     """
 
     class Kind(models.TextChoices):
