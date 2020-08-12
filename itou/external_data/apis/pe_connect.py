@@ -8,7 +8,6 @@ from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
 
-from concurrent.futures import ProcessPoolExecutor
 
 # PE Connect API data retrieval tools
 
@@ -255,10 +254,13 @@ def _store_user_data(user, status, data):
 # * logs will be truncated (per thread writing, will not work simply with async)
 #
 
-# executor = ProcessPoolExecutor(max_workers=2)
-
 
 def async_import_user_data(user, token):
+    """
+    Using a new event loop because we're on main thread
+    Loops have a default executor but we can eventually provide on (ProcessPoolExecutor)
+    This would allow tuning the number of workers for this task for all the app.
+    """
     loop = asyncio.new_event_loop()
     loop.run_in_executor(None, import_user_data, user, token)
 

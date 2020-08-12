@@ -5,11 +5,9 @@ from django.dispatch import receiver
 
 from itou.allauth.peamu.provider import PEAMUProvider
 
-from .apis.pe_connect import async_import_user_data,import_user_data
+from .apis.pe_connect import import_user_data
 from .models import ExternalDataImport
 
-import asyncio  
-from concurrent.futures import ProcessPoolExecutor
 
 @receiver(user_logged_in)
 def user_logged_in_receiver(sender, **kwargs):
