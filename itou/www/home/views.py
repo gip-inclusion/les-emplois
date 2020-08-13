@@ -30,15 +30,15 @@ def tmp_test_siret(request, template_name="home/tmp_test_siret.html"):
         etablissement = Etablissement(siret)
 
         address_fields = [
-            etablissement.address["address_line_1"],
-            etablissement.address["address_line_2"],
-            etablissement.address["post_code"],
-            etablissement.address["city"],
-            etablissement.address["department"],
+            etablissement.address_line_1,
+            etablissement.address_line_2,
+            etablissement.post_code,
+            etablissement.city,
+            etablissement.department,
         ]
         address_on_one_line = ", ".join([field for field in address_fields if field])
 
-        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.address["post_code"])
+        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code)
         coords = geocoding_data["coords"]
 
     context = {"etablissement": etablissement, "coords": coords, "siret": siret}

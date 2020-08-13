@@ -43,13 +43,21 @@ class Etablissement:
         return self.data["etablissement"]["adresse"]["l1"]
 
     @property
-    def address(self):
-        post_code = self.data["etablissement"]["adresse"]["code_postal"]
-        department = department_from_postcode(post_code)
-        return {
-            "address_line_1": self.data["etablissement"]["adresse"]["l4"],
-            "address_line_2": self.data["etablissement"]["adresse"]["l3"],
-            "post_code": post_code,
-            "city": self.data["etablissement"]["adresse"]["localite"],
-            "department": department,
-        }
+    def address_line_1(self):
+        return self.data["etablissement"]["adresse"]["l4"]
+
+    @property
+    def address_line_2(self):
+        return self.data["etablissement"]["adresse"]["l3"]
+
+    @property
+    def post_code(self):
+        return self.data["etablissement"]["adresse"]["code_postal"]
+
+    @property
+    def city(self):
+        return self.data["etablissement"]["adresse"]["localite"]
+
+    @property
+    def department(self):
+        return department_from_postcode(self.post_code)
