@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 def _call_api(api_path, token):
-    """ 
+    """
     Make a sync call to an API
     For further processing, returning smth else than `None` if considered a success
     """
@@ -320,7 +320,7 @@ def async_import_user_data(user, token):
 def import_user_data(user, token):
     """
     Import external user data via PE Connect
-    Returns a valid ExternalDataImport object when result is partial PARTIAL or OK.
+    Returns a valid ExternalDataImport object when result is PARTIAL or OK.
     This function is *synchronous*
     """
     data_import, _ = ExternalDataImport.objects.get_or_create(

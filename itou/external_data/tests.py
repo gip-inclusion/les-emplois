@@ -7,7 +7,7 @@ import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
 
 from .apis.pe_connect import import_user_data
-from .models import ExternalDataImport, JobSeekerExternalData
+from .models import ExternalDataImport
 
 
 # Test data import status (All ok, failed, partial)
