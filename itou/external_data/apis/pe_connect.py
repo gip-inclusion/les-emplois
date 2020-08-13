@@ -255,11 +255,11 @@ def async_import_user_data(user, token):
     """
     Asynchronous update of user data:
 
-    This part of the app have to be processed asynchronously:
+    This part of the app has to be processed asynchronously:
         - many (blocking) HTTP requests are made sequentially in order to fetch data from PE,
           rising up the total execution time to more than 5s in some cases,
         - it is triggered from a synchronous signal receiver (see `signals.py`),
-        - it's mostly "fire & forget" and able to log any issue in it's own context.
+        - it's mostly "fire & forget" and able to log any issue in its own context.
 
     "What happens in a loop stays in the loop":
 
