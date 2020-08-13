@@ -4,6 +4,25 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2020-08-13
+
+### Ajouté
+- Import des agréments Pôle emploi de Juillet 2020
+- Ajout de liens vers YouTube et LinkedIn dans le footer
+- Affichage aux DE et prescripteurs de la lettre de motivation envoyée dans leurs candidatures
+- Ajout d'une possibilité de connexion automatique aux différents comptes de tests dans l'environnement de Démo
+- Import des données DE en provenance de PE connect
+
+### Modifié
+- Évolution du tri pour que les SIAEs actuellement en mesure de recruter soient affichées en premier
+- Possibilité d'embaucher pour une durée d'une seule journée
+- La modale de consentement des cookies devient un bandeau pour une meilleure accessibilité du service
+- Suppression du code secret lors de l'inscription des orienteurs
+- Affichage des candidatures qu'un orienteur a envoyé avant de créer son organisation
+- Possibilité de retrouver facilement dans l'admin des candidatures avec des PASS IAE en attente de délivrance manuelle
+- "Recevoir des candidatures" devient "Publier la fiche de poste" dans l'UI d'ajout de fiche de poste
+- Mise à jour de Django en version 3.1 et des dépendances Python du projet
+
 ## [1.0.8] - 2020-08-03
 
 ### Ajouté
