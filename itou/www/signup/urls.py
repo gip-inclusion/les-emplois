@@ -7,6 +7,7 @@ from itou.www.signup import views
 app_name = "signup"
 
 urlpatterns = [
+    path("prescriber", views.prescriber_funnel, name="prescriber_funnel"),
     path("select_prescriber_type", views.select_prescriber_type, name="select_prescriber_type"),
     path("prescriber/orienter", views.OrienterPrescriberView.as_view(), name="prescriber_orienter"),
     path("prescriber/poleemploi", views.PoleEmploiPrescriberView.as_view(), name="prescriber_poleemploi"),

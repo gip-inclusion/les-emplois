@@ -109,6 +109,9 @@ class JobSeekerSignupView(SignupView):
         return super().post(request, *args, **kwargs)
 
 
+# OLD
+
+
 def select_prescriber_type(request):
     """
     New signup process for prescribers, can be one of:
@@ -139,3 +142,15 @@ class PoleEmploiPrescriberView(PrescriberSignup):
 class AuthorizedPrescriberView(PrescriberSignup):
     template_name = "signup/signup_prescriber_authorized.html"
     form_class = forms.AuthorizedPrescriberForm
+
+
+# NEW
+
+
+def prescriber_funnel(request, template_name="signup/signup_prescriber_funnel.html"):
+    """
+    Signup process for prescribers as a funnel.
+    """
+    form = forms.PrescriberOrgForm(data=request.POST or None)
+    context = {"form": form}
+    return render(request, template_name, context)

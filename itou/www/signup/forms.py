@@ -409,3 +409,8 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         user.save()
 
         return user
+
+
+class PrescriberOrgForm(forms.Form):
+
+    safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
