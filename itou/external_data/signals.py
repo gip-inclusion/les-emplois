@@ -1,5 +1,3 @@
-import asyncio
-
 from allauth.account.signals import user_logged_in
 from django.dispatch import receiver
 
@@ -27,7 +25,7 @@ def user_logged_in_receiver(sender, **kwargs):
 
         # If no data for user or import failed last time
         if not pe_data_import.exists() or pe_data_import.first().status != ExternalDataImport.STATUS_OK:
-            # SYNC can be dpne like:
+            # SYNC can be done like:
             # import_user_data(user, login.token)
             # ASYNC (default):
-            asyncio.run(async_import_user_data(user, login.token))
+            async_import_user_data(user, login.token)
