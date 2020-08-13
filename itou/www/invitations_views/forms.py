@@ -114,8 +114,11 @@ class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
-        self.forms[0].empty_permitted = False
         self.queryset = PrescriberWithOrgInvitation.objects.none()
+        # Any access to `self.forms` must be performed after any access to `self.queryset`,
+        # otherwise `self.queryset` will have no effect.
+        # https://code.djangoproject.com/ticket/31879
+        self.forms[0].empty_permitted = False
 
 
 """
@@ -184,8 +187,11 @@ class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
         See https://docs.djangoproject.com/en/3.0/topics/forms/modelforms/#changing-the-queryset
         """
         super().__init__(*args, **kwargs)
-        self.forms[0].empty_permitted = False
         self.queryset = SiaeStaffInvitation.objects.none()
+        # Any access to `self.forms` must be performed after any access to `self.queryset`,
+        # otherwise `self.queryset` will have no effect.
+        # https://code.djangoproject.com/ticket/31879
+        self.forms[0].empty_permitted = False
 
 
 """
