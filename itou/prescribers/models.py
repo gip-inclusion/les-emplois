@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.validators import validate_siret
+from itou.utils.validators import validate_code_safir, validate_siret
 
 
 class PrescriberOrganizationQuerySet(models.QuerySet):
@@ -124,7 +124,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     code_safir_pole_emploi = models.CharField(
         verbose_name=_("Code Safir"),
         help_text=_("Code unique d'une agence Pole emploi."),
-        validators=[RegexValidator("^[0-9]{5}$", message=_("Le code SAFIR est erroné"))],
+        validators=[validate_code_safir],
         max_length=5,
         null=True,
         unique=True,

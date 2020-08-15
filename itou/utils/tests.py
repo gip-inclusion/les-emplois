@@ -30,6 +30,7 @@ from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.utils.validators import (
     alphanumeric,
     validate_birthdate,
+    validate_code_safir,
     validate_naf,
     validate_pole_emploi_id,
     validate_post_code,
@@ -271,6 +272,11 @@ class UtilsValidatorsTest(TestCase):
     def test_validate_alphanumeric(self):
         self.assertRaises(ValidationError, alphanumeric, "1245a_89871")
         alphanumeric("6201Z")
+
+    def test_validate_code_safir(self):
+        self.assertRaises(ValidationError, validate_code_safir, "1a3v5")
+        self.assertRaises(ValidationError, validate_code_safir, "123456")
+        alphanumeric("12345")
 
     def test_validate_naf(self):
         self.assertRaises(ValidationError, validate_naf, "1")
