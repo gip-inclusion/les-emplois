@@ -8,16 +8,20 @@
 
 {% block content %}
 
-        <h1>
-            {% translate "Inscription" %}
-            <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
-        </h1>
+    <h1>
+        {% translate "Inscription" %}
+        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
+    </h1>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
 
         {% bootstrap_form form %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+        {% endbuttons %}
 
     </form>
 

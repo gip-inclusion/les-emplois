@@ -371,3 +371,74 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
 .itou-main-nav a.active {
     background: #e2f2ff;
 }
+
+
+/* Responsive Multi-Step Progress Bar.
+https://codepen.io/athimannil/pen/wWPYkQ
+--------------------------------------------------------------------------- */
+
+.multi-steps > li.is-active:before, .multi-steps > li.is-active ~ li:before {
+    content: counter(stepNum);
+}
+
+.multi-steps > li.is-active:after, .multi-steps > li.is-active ~ li:after {
+    background-color: #ededed;
+}
+
+.multi-steps {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.multi-steps > li {
+    counter-increment: stepNum;
+    text-align: center;
+    display: table-cell;
+    position: relative;
+    color: #28a745;
+    z-index: 1;
+}
+
+.multi-steps > li:before {
+    content: '\2713'; /* Check mark symbol. */
+    display: block;
+    margin: 0 auto 4px;
+    background: #fff;
+    width: 36px;
+    height: 36px;
+    line-height: 32px;
+    text-align: center;
+    font-weight: bold;
+    border: 2px solid #28a745;
+    border-radius: 50%;
+}
+
+.multi-steps > li:after {
+    content: '';
+    height: 2px;
+    width: 100%;
+    background-color: #28a745;
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    z-index: -1;
+}
+
+.multi-steps > li:last-child:after {
+    display: none;
+}
+
+.multi-steps > li.is-active:before {
+    background-color: #fff;
+    border-color: #28a745;
+}
+
+.multi-steps > li.is-active ~ li {
+    color: #808080;
+}
+
+.multi-steps > li.is-active ~ li:before {
+    background-color: #ededed;
+    border-color: #ededed;
+}

@@ -373,6 +373,7 @@ DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
+ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 
 # Typeform survey links to include in some emails
 ITOU_EMAIL_APPROVAL_SURVEY_LINK = "https://startupsbeta.typeform.com/to/au9d8P"

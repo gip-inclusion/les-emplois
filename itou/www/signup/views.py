@@ -2,14 +2,16 @@
 Handle multiple user types sign up with django-allauth.
 """
 from allauth.account.views import PasswordResetView, SignupView
+from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -144,13 +146,90 @@ class AuthorizedPrescriberView(PrescriberSignup):
     form_class = forms.AuthorizedPrescriberForm
 
 
-# NEW
+# TODO: NEW
+# ------------------------------------------------------------------------------------------
 
 
-def prescriber_funnel(request, template_name="signup/signup_prescriber_funnel.html"):
+def prescriber_entry_point(request, template_name="signup/prescriber_entry_point.html"):
     """
-    Signup process for prescribers as a funnel.
+    Entry point of the signup process for prescribers/orienters.
+
+    Since 80% of prescribers who sign up on Itou are Pôle emploi members,
+    we get them into the right funnel as soon as possible.
     """
-    form = forms.PrescriberOrgForm(data=request.POST or None)
+
+    # Start a fresh session. It will be used through the multiple steps of the signup process.
+    request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {
+        "kind": None,
+        "prescriber_organization_pk": None,
+    }
+
+    form = forms.PrescriberEntryPointForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        is_pole_emploi = form.cleaned_data["is_pole_emploi"]
+        if is_pole_emploi:
+            return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
+        else:
+            pass
+            # TODO: redirect to other signups
+
     context = {"form": form}
     return render(request, template_name, context)
+
+
+def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
+
+    form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data["kind"] = PrescriberOrganization.Kind.PE.value
+        session_data["prescriber_organization_pk"] = form.prescriber_organization.pk
+        return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_user"))
+
+    context = {"form": form}
+    return render(request, template_name, context)
+
+
+class PrescriberPoleEmploiUserSignupView(SignupView):
+
+    form_class = forms.PrescriberPoleEmploiUserSignupForm
+    template_name = "signup/prescriber_pole_emploi_user.html"
+
+    def __init__(self, **kwargs):
+        self.prescriber_organization = None
+        return super().__init__(**kwargs)
+
+    @transaction.atomic
+    def dispatch(self, request, *args, **kwargs):
+
+        session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        if not session_data:
+            raise Http404()
+
+        kind = session_data.get("kind")
+        prescriber_organization_pk = session_data.get("prescriber_organization_pk")
+        if (kind != PrescriberOrganization.Kind.PE.value) or not prescriber_organization_pk:
+            raise Http404()
+
+        self.prescriber_organization = get_object_or_404(
+            PrescriberOrganization, pk=prescriber_organization_pk, kind=PrescriberOrganization.Kind.PE.value
+        )
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self, **kwargs):
+        kwargs = super().get_form_kwargs(**kwargs)
+        # Pass the PrescriberOrganization instance to the form.
+        kwargs["prescriber_organization"] = self.prescriber_organization
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["prescriber_organization"] = self.prescriber_organization
+        return context
+
+    def form_valid(self, form):
+        del self.request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        return super().form_valid(form)

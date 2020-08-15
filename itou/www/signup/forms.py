@@ -13,7 +13,7 @@ from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_siret
+from itou.utils.validators import validate_code_safir, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -411,6 +411,86 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         return user
 
 
-class PrescriberOrgForm(forms.Form):
+# TODO: NEW
+# ------------------------------------------------------------------------------------------
 
-    safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
+
+class PrescriberEntryPointForm(forms.Form):
+    """
+    Ask a user if he's a PE member.
+    """
+
+    IS_POLE_EMPLOI_CHOICES = (
+        (1, gettext_lazy("Oui")),
+        (0, gettext_lazy("Non")),
+    )
+
+    is_pole_emploi = forms.TypedChoiceField(
+        label=gettext_lazy("Travaillez-vous pour Pôle emploi ?"),
+        choices=IS_POLE_EMPLOI_CHOICES,
+        widget=forms.RadioSelect,
+        coerce=int,
+    )
+
+
+class PrescriberPoleEmploiSafirCodeForm(forms.Form):
+    """
+    Retrieve a PrescriberOrganization from the SAFIR code.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.prescriber_organization = None
+
+    safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"), validators=[validate_code_safir])
+
+    def clean_safir_code(self):
+        safir_code = self.cleaned_data["safir_code"]
+        self.prescriber_organization = PrescriberOrganization.objects.by_safir_code(safir_code)
+        if not self.prescriber_organization:
+            error = _("Ce code SAFIR est inconnu.")
+            raise forms.ValidationError(error)
+        return safir_code
+
+
+class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
+    """
+    Create a new user of type prescriber and add it to the members of the given prescriber organization.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.prescriber_organization = kwargs.pop("prescriber_organization")
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        self.fields["email"].help_text = _(
+            "Utilisez votre dresse e-mail professionnelle se terminant par @pole-emploi.fr"
+        )
+
+    def clean_email(self):
+        email = super().clean_email()
+        if not email.endswith("@pole-emploi.fr"):
+            raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi."))
+        return email
+
+    def save(self, request):
+
+        # Create the user.
+        user = super().save(request)
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+        user.is_prescriber = True
+        user.save()
+
+        # The member becomes a member of the PE agency.
+        membership = PrescriberMembership()
+        membership.user = user
+        membership.organization = self.prescriber_organization
+        # The first member becomes an admin.
+        membership.is_admin = membership.organization.members.count() == 0
+        membership.save()
+
+        # Send a notification to existing members.
+        if self.prescriber_organization.has_members:
+            self.prescriber_organization.new_signup_warning_email_to_existing_members(user).send()
+
+        return user

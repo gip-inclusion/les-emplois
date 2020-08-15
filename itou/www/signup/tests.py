@@ -679,6 +679,96 @@ class PrescriberSignupTest(TestCase):
         self.assertTrue(user_email.verified)
 
 
+# TODO: NEW
+# ------------------------------------------------------------------------------------------
+
+
+class NewPrescriberSignupTest(TestCase):
+    def test_pole_emploi_signup(self):
+        """
+        Test the creation a new user of type prescriber and his joining to a Pole emploi agency.
+        """
+
+        organization = PrescriberPoleEmploiFactory()
+
+        # Step 1: do the user work for PE?
+
+        start_url = reverse("signup:prescriber_entry_point")
+        response = self.client.get(start_url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 1,
+        }
+        response = self.client.post(start_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        safir_url = reverse("signup:prescriber_pole_emploi_safir_code")
+        self.assertRedirects(response, safir_url)
+
+        # Step 2: ask the user his SAFIR code.
+
+        post_data = {
+            "safir_code": organization.code_safir_pole_emploi,
+        }
+        response = self.client.post(safir_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        user_info_url = reverse("signup:prescriber_pole_emploi_user")
+        self.assertRedirects(response, user_info_url)
+
+        # Step 3: user info.
+
+        # Ensures that the parent form's clean() method is called by testing
+        # with a password that does not comply with CNIL recommendations.
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe+unregistered@prescriber.com",
+            "password1": "foofoofoo",
+            "password2": "foofoofoo",
+            "safir_code": organization.code_safir_pole_emploi,
+        }
+        response = self.client.post(user_info_url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+
+        password = "!*p4ssw0rd123-"
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@pole-emploi.fr",
+            "password1": password,
+            "password2": password,
+            "safir_code": organization.code_safir_pole_emploi,
+        }
+        response = self.client.post(user_info_url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check org.
+        self.assertTrue(organization.is_authorized)
+        self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
+
+        # Check membership.
+        self.assertIn(user, organization.members.all())
+        self.assertEqual(1, user.prescriberorganization_set.count())
+
+        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`.
+
+        # Ensure that the user cannot access `user_info_url` without a clean session state.
+        response = self.client.post(user_info_url, data=post_data)
+        self.assertEqual(response.status_code, 404)
+
+
 class PasswordResetTest(TestCase):
     def test_password_reset_flow(self):
 
