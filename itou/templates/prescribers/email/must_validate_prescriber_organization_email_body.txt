@@ -7,8 +7,9 @@
 
 {% translate "*Structure* :" %}
 
-- {% translate "Nom" %} : {{ organization.display_name }}
-- {% translate "ID" %} : {{ organization.id }}
+- {% translate "Nom" %} : {{ organization.display_name }}
+- {% translate "ID" %} : {{ organization.id }}
 
+{{ itou_protocol }}://{{ itou_fqdn }}{% url 'admin:prescribers_prescriberorganization_change' organization.id %}
 
 {% endblock body %}

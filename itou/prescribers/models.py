@@ -98,7 +98,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
                 "d'accueil communautaire et d'activité solidaire"
             ),
         )
-        OTHER = "OTHER", _("Autre structure")
+        OTHER = "OTHER", _("Autre")
 
     class AuthorizationStatus(models.TextChoices):
         NOT_SET = "NOT_SET", _("Habilitation en attente de validation")

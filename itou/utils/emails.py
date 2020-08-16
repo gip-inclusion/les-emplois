@@ -20,6 +20,7 @@ def get_email_text_template(template, context):
         {
             "itou_protocol": settings.ITOU_PROTOCOL,
             "itou_fqdn": settings.ITOU_FQDN,
+            "itou_email_assistance": settings.ITOU_EMAIL_ASSISTANCE,
             "itou_email_contact": settings.ITOU_EMAIL_CONTACT,
             "itou_environment": settings.ITOU_ENVIRONMENT,
         }

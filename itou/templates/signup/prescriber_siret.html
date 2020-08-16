@@ -3,18 +3,18 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Inscription | Connexion" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Prescripteur/Orienteur - Inscription" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
         {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur Pôle emploi" %}</small>
+        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
     </h1>
 
     <ul class="list-unstyled multi-steps my-5">
         <li>{% translate "Qui êtes-vous ?" %}</li>
-        <li class="is-active">{% translate "Code SAFIR" %}</li>
+        <li class="is-active">{% translate "SIRET" %}</li>
         <li>{% translate "Vos informations" %}</li>
     </ul>
 

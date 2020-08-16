@@ -8,17 +8,30 @@ app_name = "signup"
 
 urlpatterns = [
     # Prescriber/orienter NEW.
-    path("prescriber", views.prescriber_entry_point, name="prescriber_entry_point"),
     path(
-        "prescriber/poleemploi/safir",
+        "prescriber/who_are_you/step1",
+        views.prescriber_intro_step_pole_emploi,
+        name="prescriber_intro_step_pole_emploi",
+    ),
+    path("prescriber/who_are_you/step2", views.prescriber_intro_step_org, name="prescriber_intro_step_org",),
+    path("prescriber/who_are_you/step3", views.prescriber_intro_step_kind, name="prescriber_intro_step_kind",),
+    path(
+        "prescriber/who_are_you/step4",
+        views.prescriber_intro_step_authorization,
+        name="prescriber_intro_step_authorization",
+    ),
+    path("prescriber/siret", views.prescriber_siret, name="prescriber_siret",),
+    path(
+        "prescriber/pole_emploi/safir",
         views.prescriber_pole_emploi_safir_code,
         name="prescriber_pole_emploi_safir_code",
     ),
     path(
-        "prescriber/poleemploi/user",
+        "prescriber/pole_emploi/user",
         views.PrescriberPoleEmploiUserSignupView.as_view(),
         name="prescriber_pole_emploi_user",
     ),
+    path("prescriber/authorized/user", views.PrescriberUserSignupView.as_view(), name="prescriber_user",),
     # Prescriber/orienter OLD.
     path("select_prescriber_type", views.select_prescriber_type, name="select_prescriber_type"),
     path("prescriber/orienter", views.OrienterPrescriberView.as_view(), name="prescriber_orienter"),

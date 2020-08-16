@@ -3,6 +3,7 @@ import logging
 import requests
 from django.conf import settings
 from django.utils.http import urlencode
+from django.utils.translation import gettext as _
 
 from itou.utils.address.departments import department_from_postcode
 
@@ -10,12 +11,14 @@ from itou.utils.address.departments import department_from_postcode
 logger = logging.getLogger(__name__)
 
 
-class Etablissement:
+class EtablissementAPI:
     """
     https://doc.entreprise.api.gouv.fr/?json#etablissements-v2
     """
 
     def __init__(self, siret, object="Inscription à la Plateforme de l'inclusion"):
+
+        self.error = None
 
         api_url = f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}"
 
@@ -32,11 +35,17 @@ class Etablissement:
 
         try:
             r = requests.get(url, headers=headers)
-        except requests.exceptions.RequestException as e:
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
             logger.error("Error while fetching `%s`: %s", url, e)
-            return None
+            self.error = _("Erreur de connexion à API Entreprise.")
+            return
 
+        r = requests.get(url, headers=headers)
         self.data = r.json()
+
+        if self.data.get("errors"):
+            self.error = self.data["errors"][0]
 
     @property
     def name(self):

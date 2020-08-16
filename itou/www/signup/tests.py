@@ -693,7 +693,7 @@ class NewPrescriberSignupTest(TestCase):
 
         # Step 1: do the user work for PE?
 
-        start_url = reverse("signup:prescriber_entry_point")
+        start_url = reverse("signup:prescriber_intro_step_pole_emploi")
         response = self.client.get(start_url)
         self.assertEqual(response.status_code, 200)
 

@@ -368,6 +368,7 @@ ITOU_PROTOCOL = "https"
 ITOU_FQDN = "inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 ITOU_EMAIL_ASSISTANCE = "assistance@inclusion.beta.gouv.fr"
+
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
