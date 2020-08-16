@@ -31,7 +31,7 @@ urlpatterns = [
         views.PrescriberPoleEmploiUserSignupView.as_view(),
         name="prescriber_pole_emploi_user",
     ),
-    path("prescriber/authorized/user", views.PrescriberUserSignupView.as_view(), name="prescriber_user",),
+    path("prescriber/user", views.PrescriberUserSignupView.as_view(), name="prescriber_user",),
     # Prescriber/orienter OLD.
     path("select_prescriber_type", views.select_prescriber_type, name="select_prescriber_type"),
     path("prescriber/orienter", views.OrienterPrescriberView.as_view(), name="prescriber_orienter"),

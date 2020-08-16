@@ -25,6 +25,9 @@
         {% bootstrap_form form %}
 
         {% buttons %}
+            <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_intro_step_pole_emploi' %}">
+                {% translate "Annuler" %}
+            </a>
             <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
         {% endbuttons %}
 
