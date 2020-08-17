@@ -4,10 +4,12 @@ Handle multiple user types sign up with django-allauth.
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
@@ -150,12 +152,21 @@ class AuthorizedPrescriberView(PrescriberSignup):
 # ------------------------------------------------------------------------------------------
 
 
+def valid_prescriber_signup_session_required(function=None):
+    def decorated(request, *args, **kwargs):
+        session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        if not session_data:
+            raise PermissionDenied
+        return function(request, *args, **kwargs)
+
+    return decorated
+
+
 def prescriber_intro_step_pole_emploi(request, template_name="signup/prescriber_intro_step_pole_emploi.html"):
     """
     Entry point of the signup process for prescribers/orienteurs.
 
-    Ask questions to identify the kind of prescriber of the user: ask the user if he works for
-    Pôle emploi because 80% of prescribers who sign up on Itou are Pôle emploi members.
+    80% of prescribers on Itou are Pôle emploi members: ask the user if this is the case.
     """
 
     # Start a fresh session.
@@ -182,17 +193,18 @@ def prescriber_intro_step_pole_emploi(request, template_name="signup/prescriber_
     return render(request, template_name, context)
 
 
+@valid_prescriber_signup_session_required
 def prescriber_intro_step_org(request, template_name="signup/prescriber_intro_step_org.html"):
     """
-    Ask questions to identify the kind of prescriber of the user:
-    ask the user the kind of the organization he's working for.
+    Ask the user the kind of the organization he's working for.
     """
+
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     form = forms.PrescriberIdentifyOrganizationKindForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         prescriber_kind = form.cleaned_data["kind"]
 
         if prescriber_kind == PrescriberOrganization.Kind.PE.value:
@@ -210,17 +222,18 @@ def prescriber_intro_step_org(request, template_name="signup/prescriber_intro_st
     return render(request, template_name, context)
 
 
+@valid_prescriber_signup_session_required
 def prescriber_intro_step_kind(request, template_name="signup/prescriber_intro_step_kind.html"):
     """
-    Ask questions to identify the kind of prescriber of the user: if we could not identify
-    the kind of the prescriber's organization, ask him other questions to identify his kind.
+    If the user hasn't found his organization, ask him other questions to identify his kind.
     """
+
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
     form = forms.PrescriberIdentifyKindForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         prescriber_kind = form.cleaned_data["kind"]
 
         if prescriber_kind == form.KIND_AUTHORIZED_ORG:
@@ -242,18 +255,21 @@ def prescriber_intro_step_kind(request, template_name="signup/prescriber_intro_s
     return render(request, template_name, context)
 
 
+@valid_prescriber_signup_session_required
 def prescriber_intro_step_authorization(request, template_name="signup/prescriber_intro_step_authorization.html"):
     """
-    Ask questions to identify the kind of prescriber of the user: ask the user to confirm
-    that his organization is authorized. That should help support with illegitimate requests.
+    Ask the user to confirm that his organization is authorized.
+
+    That should help support with illegitimate or erroneous requests.
     """
+
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+
     form = forms.PrescriberConfirmAuthorizationForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         confirm_authorization = form.cleaned_data["confirm_authorization"]
-
         if confirm_authorization:
             session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
             return HttpResponseRedirect(reverse("signup:prescriber_siret"))
@@ -265,17 +281,15 @@ def prescriber_intro_step_authorization(request, template_name="signup/prescribe
     return render(request, template_name, context)
 
 
+@valid_prescriber_signup_session_required
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
     """
-    At this step, we know that the user works for Pôle emploi.
-    Retrieve the Pôle emploi's organization based on the given SAFIR code.
+    Find a pre-existing Pôle emploi organization from a given SAFIR code.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    initial = {"safir_code": session_data.get("safir_code")}
-
-    form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None, initial=initial)
+    form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -287,31 +301,21 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
     return render(request, template_name, context)
 
 
+@valid_prescriber_signup_session_required
 def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     """
-    Get info (name, address and geocoding) about a prescriber's organization
-    from the given SIRET.
+    Get info about the prescriber's organization from a given SIRET.
 
     The SIRET is also the best way we have yet found to avoid duplicate organizations in the DB.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    prescriber_org_data = session_data["prescriber_org_data"] or {}
-    initial_siret = prescriber_org_data.get("siret")
 
-    initial = {"siret": initial_siret}
+    form = forms.PrescriberSiretForm(data=request.POST or None)
 
-    form = forms.PrescriberSiretForm(data=request.POST or None, initial=initial)
-
-    if request.method == "POST":
-
-        if request.POST["siret"] == initial_siret:
-            # Skip API calls if the SIRET does not change.
-            return HttpResponseRedirect(reverse("signup:prescriber_user"))
-
-        if form.is_valid():
-            session_data["prescriber_org_data"] = form.org_data
-            return HttpResponseRedirect(reverse("signup:prescriber_user"))
+    if request.method == "POST" and form.is_valid():
+        session_data["prescriber_org_data"] = form.org_data
+        return HttpResponseRedirect(reverse("signup:prescriber_user"))
 
     context = {"form": form}
     return render(request, template_name, context)
@@ -319,29 +323,23 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
 class PrescriberPoleEmploiUserSignupView(SignupView):
     """
-    Signup a user of type prescriber and make him join a pre-existing Pôle emploi organization.
+    Create a user of type prescriber and make him join a pre-existing Pôle emploi organization.
     """
 
     form_class = forms.PrescriberPoleEmploiUserSignupForm
     template_name = "signup/prescriber_pole_emploi_user.html"
 
-    def __init__(self, **kwargs):
-        self.prescriber_organization = None
-        self.session_data = None
-        return super().__init__(**kwargs)
-
     @transaction.atomic
+    @method_decorator(valid_prescriber_signup_session_required)
     def dispatch(self, request, *args, **kwargs):
 
-        self.session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        kind = session_data.get("kind")
+        prescriber_org_pk = session_data.get("prescriber_org_pk")
 
-        if not self.session_data:
-            raise Http404()
-
-        kind = self.session_data.get("kind")
-        prescriber_org_pk = self.session_data.get("prescriber_org_pk")
-        if (kind != PrescriberOrganization.Kind.PE.value) or not prescriber_org_pk:
-            raise Http404()
+        # Check session data.
+        if not prescriber_org_pk or kind != PrescriberOrganization.Kind.PE.value:
+            raise PermissionDenied
 
         self.prescriber_organization = get_object_or_404(
             PrescriberOrganization, pk=prescriber_org_pk, kind=PrescriberOrganization.Kind.PE.value
@@ -367,37 +365,27 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
 
 class PrescriberUserSignupView(SignupView):
     """
-    Signup a user of type prescriber (and create an organization if necessary):
+    Create:
 
-    - as a member of an authorized organization
-    - as an "orienteur" a member of an unauthorized organization
-    - as an "orienteur" without an organization
+    - a user of type prescriber with an authorized organization
+    - or: a user of type prescriber with an unauthorized organization ("orienteur")
+    - or: a user of type prescriber without organization ("orienteur")
 
-    The "authorized" character of an organization, if required,
-    is still to be validated by the support.
+    If required, the "authorized" character of an organization is still to be validated
+    by the support.
     """
 
     form_class = forms.PrescriberUserSignupForm
     template_name = "signup/prescriber_user.html"
 
-    def __init__(self, **kwargs):
-        self.session_data = None
-        self.data = None
-        return super().__init__(**kwargs)
-
     @transaction.atomic
+    @method_decorator(valid_prescriber_signup_session_required)
     def dispatch(self, request, *args, **kwargs):
 
-        self.session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
-
-        if not self.session_data:
-            raise Http404()
-
-        authorization_status = self.session_data["authorization_status"]
-        prescriber_org_data = self.session_data["prescriber_org_data"]
-        kind = self.session_data.get("kind")
-        if kind == PrescriberOrganization.Kind.PE.value:
-            raise Http404()
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        authorization_status = session_data.get("authorization_status")
+        prescriber_org_data = session_data.get("prescriber_org_data")
+        kind = session_data.get("kind")
 
         join_as_orienteur_without_org = kind is None and authorization_status is None and prescriber_org_data is None
 
@@ -409,13 +397,13 @@ class PrescriberUserSignupView(SignupView):
 
         join_authorized_org = (
             authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-            and kind is not None
+            and kind not in [None, PrescriberOrganization.Kind.PE.value]
             and prescriber_org_data is not None
         )
 
-        # Only one value can be True: "There can be only one".
+        # Check session data. There can be only one kind.
         if sum([join_as_orienteur_without_org, join_as_orienteur_with_org, join_authorized_org]) != 1:
-            raise RuntimeError(f"Inconsistent session data {self.session_data}")
+            raise PermissionDenied
 
         try:
             kind = PrescriberOrganization.Kind[kind]
@@ -427,25 +415,35 @@ class PrescriberUserSignupView(SignupView):
         except KeyError:
             authorization_status = None
 
-        self.data = {
-            "authorization_status": authorization_status,
-            "join_as_orienteur_without_org": join_as_orienteur_without_org,
-            "join_as_orienteur_with_org": join_as_orienteur_with_org,
-            "join_authorized_org": join_authorized_org,
-            "kind": kind,
-            "prescriber_org_data": prescriber_org_data,
-        }
+        self.authorization_status = authorization_status
+        self.kind = kind
+        self.prescriber_org_data = prescriber_org_data
+        self.join_as_orienteur_without_org = join_as_orienteur_without_org
+        self.join_authorized_org = join_authorized_org
 
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self, **kwargs):
         kwargs = super().get_form_kwargs(**kwargs)
-        kwargs.update(self.data)
+        kwargs.update(
+            {
+                "authorization_status": self.authorization_status,
+                "kind": self.kind,
+                "prescriber_org_data": self.prescriber_org_data,
+            }
+        )
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(self.data)
+        context.update(
+            {
+                "join_as_orienteur_without_org": self.join_as_orienteur_without_org,
+                "join_authorized_org": self.join_authorized_org,
+                "kind": self.kind,
+                "prescriber_org_data": self.prescriber_org_data,
+            }
+        )
         return context
 
     def form_valid(self, form):

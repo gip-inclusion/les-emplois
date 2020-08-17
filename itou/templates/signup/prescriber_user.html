@@ -17,25 +17,22 @@
         <li class="is-active">{% translate "Vos informations" %}</li>
     </ul>
 
-    {% if join_authorized_org or prescriber_org_data %}
-
+    {% if join_authorized_org and kind.value != "OTHER" %}
+        {# Display display kind's full name if known. #}
         <div class="alert alert-secondary pb-0" role="alert">
-
-            {% if join_authorized_org and kind.value != "OTHER" %}
-                <p class="lead">{{ kind.label }}</p>
-            {% endif %}
-
-            {% if prescriber_org_data %}
-                <p>
-                    <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret }}<br>
-                    {{ prescriber_org_data.address_line_1 }}<br>
-                    {% if prescriber_org_data.address_line_2 %}{{ prescriber_org_data.address_line_2 }}<br>{% endif %}
-                    {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
-                </p>
-            {% endif %}
-
+            <p class="lead">{{ kind.label }}</p>
         </div>
+    {% endif %}
 
+    {% if prescriber_org_data %}
+        <div class="alert alert-secondary pb-0" role="alert">
+            <p>
+                <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret }}<br>
+                {{ prescriber_org_data.address_line_1 }}<br>
+                {% if prescriber_org_data.address_line_2 %}{{ prescriber_org_data.address_line_2 }}<br>{% endif %}
+                {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
+            </p>
+        </div>
     {% endif %}
 
     {% if join_authorized_org and kind.value == "OTHER" %}
@@ -53,7 +50,7 @@
         {% buttons %}
             {% if join_as_orienteur_without_org %}
                 <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_intro_step_pole_emploi' %}">
-                    {% translate "Annuler" %}
+                    {% translate "Retour" %}
                 </a>
             {% else %}
                 <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_siret' %}">

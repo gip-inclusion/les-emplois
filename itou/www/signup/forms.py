@@ -449,9 +449,9 @@ class PrescriberIdentifyKindForm(forms.Form):
     KIND_SOLO = "solo"
 
     KIND_CHOICES = (
-        (KIND_AUTHORIZED_ORG, gettext_lazy("Je travaille pour une organisation habilitée par le préfet")),
-        (KIND_UNAUTHORIZED_ORG, gettext_lazy("Je travaille pour une organisation non-habilitée")),
-        (KIND_SOLO, gettext_lazy("Je travaille seul (sans organisation)")),
+        (KIND_AUTHORIZED_ORG, gettext_lazy("Pour une organisation habilitée par le préfet")),
+        (KIND_UNAUTHORIZED_ORG, gettext_lazy("Pour une organisation non-habilitée")),
+        (KIND_SOLO, gettext_lazy("Seul (sans organisation)")),
     )
 
     kind = forms.ChoiceField(
@@ -486,15 +486,15 @@ class PrescriberSiretForm(forms.Form):
     siret = forms.CharField(
         label=gettext_lazy("Numéro SIRET de votre organisation"),
         min_length=14,
-        max_length=14,
-        validators=[validate_siret],
-        strip=True,
         help_text=gettext_lazy("Le numéro SIRET contient 14 chiffres."),
-        required=False,
     )
 
     def clean_siret(self):
-        siret = self.cleaned_data["siret"]
+
+        # `max_length` is skiped so that we can allow an arbitrary number of spaces in the user-entered value.
+        siret = self.cleaned_data["siret"].replace(" ", "")
+
+        validate_siret(siret)
 
         # Does the org already exists?
         if PrescriberOrganization.objects.filter(siret=siret).exists():
@@ -611,9 +611,6 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
 
     def __init__(self, *args, **kwargs):
         self.authorization_status = kwargs.pop("authorization_status")
-        self.join_as_orienteur_without_org = kwargs.pop("join_as_orienteur_without_org")
-        self.join_as_orienteur_with_org = kwargs.pop("join_as_orienteur_with_org")
-        self.join_authorized_org = kwargs.pop("join_authorized_org")
         self.kind = kwargs.pop("kind")
         self.prescriber_org_data = kwargs.pop("prescriber_org_data")
         super().__init__(*args, **kwargs)
