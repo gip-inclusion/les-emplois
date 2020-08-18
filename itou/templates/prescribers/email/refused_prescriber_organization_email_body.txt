@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Nous sommes au regret de vous informer que nous n'avons pas pu vérifier l'habilitation de votre organisation. Nous vous recontacterons dès que possible afin d'obtenir les renseignements qui nous manquent. N'hésitez pas à contacter notre équipe Support à l'adresse "%}{{ itou_email_contact }}{% translate " si toutefois notre réponse venait à tarder." %}
+{% translate "Nous sommes désolés, nous n'avons pas pu vérifier l'habilitation de votre organisation. Nous vous recontacterons au plus vite afin d'obtenir les renseignements qui nous manquent. Si toutefois nous tardons à revenir vers vous, n'hésitez pas à relancer notre équipe Support à l'adresse "%}{{ itou_email_contact }}
 
 {% translate "Merci de recontacter l'équipe support." %}
 
