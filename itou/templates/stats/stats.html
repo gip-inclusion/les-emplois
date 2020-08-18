@@ -5,59 +5,71 @@
 
 {% block title %}{% translate "Statistiques" %}{{ block.super }}{% endblock %}
 
-{% block extra_head %}
-    {{ block.super }}
-    <script src="{% static "vendor/highcharts.src.js" %}"></script>
-{% endblock %}
-
 {% block content %}
 
-    {% include "stats/includes/department_selector.html" %}
+    <script src="https://stats.inclusion.beta.gouv.fr/app/iframeResizer.js"></script>
 
-    <div class="accordion" id="accordion">
-        <div class="card">
-            <div class="card-header" id="heading-1">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
-                        {% translate "Statistiques des candidatures et embauches" %}
-                    </button>
-                </h5>
-            </div>
+    <iframe
+        src="https://stats.inclusion.beta.gouv.fr/public/dashboard/f1527a13-1508-498d-8014-b2fe487a3a70"
+        width="100%"
+        onload="iFrameResize({}, this)"
+        frameborder="0"
+    ></iframe>
 
-            <div id="collapse-1" class="collapse" aria-labelledby="heading-1" data-parent="#accordion">
-                <div class="card-body">
-                    {% include "stats/includes/stats_job_seeker.html" %}
+    {% comment %}
+
+        {# We keep this code to be able to load old stats page on local dev #}
+
+        <script src="{% static "vendor/highcharts.src.js" %}"></script>
+
+        {% include "stats/includes/department_selector.html" %}
+
+        <div class="accordion" id="accordion">
+            <div class="card">
+                <div class="card-header" id="heading-1">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-1" aria-expanded="true" aria-controls="collapse-1">
+                            {% translate "Statistiques des candidatures et embauches" %}
+                        </button>
+                    </h5>
+                </div>
+
+                <div id="collapse-1" class="collapse" aria-labelledby="heading-1" data-parent="#accordion">
+                    <div class="card-body">
+                        {% include "stats/includes/stats_job_seeker.html" %}
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="heading-2">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
+                            {% translate "Statistiques employeurs" %}
+                        </button>
+                    </h5>
+                </div>
+                <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion">
+                    <div class="card-body">
+                        {% include "stats/includes/stats_employer.html" %}
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header" id="heading-3">
+                    <h5 class="mb-0">
+                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
+                            {% translate "Statistiques prescripteurs" %}
+                        </button>
+                    </h5>
+                </div>
+                <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion">
+                    <div class="card-body">
+                        {% include "stats/includes/stats_prescriber.html" %}
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="card">
-            <div class="card-header" id="heading-2">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-2" aria-expanded="false" aria-controls="collapse-2">
-                        {% translate "Statistiques employeurs" %}
-                    </button>
-                </h5>
-            </div>
-            <div id="collapse-2" class="collapse" aria-labelledby="heading-2" data-parent="#accordion">
-                <div class="card-body">
-                    {% include "stats/includes/stats_employer.html" %}
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="heading-3">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-3" aria-expanded="false" aria-controls="collapse-3">
-                        {% translate "Statistiques prescripteurs" %}
-                    </button>
-                </h5>
-            </div>
-            <div id="collapse-3" class="collapse" aria-labelledby="heading-3" data-parent="#accordion">
-                <div class="card-body">
-                    {% include "stats/includes/stats_prescriber.html" %}
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    {% endcomment %}
 
 {% endblock %}
