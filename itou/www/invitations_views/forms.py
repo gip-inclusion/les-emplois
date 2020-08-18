@@ -1,4 +1,4 @@
-from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib.auth import get_user_model
@@ -253,7 +253,7 @@ class NewUserForm(SignupForm):
 
     def save(self, request):
         self.cleaned_data["email"] = self.email
-        DefaultAccountAdapter().stash_verified_email(request, self.email)
+        get_adapter().stash_verified_email(request, self.email)
         # Possible problem: this causes the user to be saved twice.
         # If we want to save it once, we should override the Allauth method.
         # See https://github.com/pennersr/django-allauth/blob/master/allauth/account/forms.py#L401
