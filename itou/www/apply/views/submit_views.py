@@ -255,8 +255,6 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
     data = request.POST if request.method == "POST" else None
     form_administrative_criteria = AdministrativeCriteriaForm(request.user, siae=None, data=data)
 
-    external_user_data = job_seeker.job_seeker_data if job_seeker.has_external_data else None
-
     if request.method == "POST" and form_administrative_criteria.is_valid():
         EligibilityDiagnosis.create_diagnosis(
             job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
@@ -268,7 +266,6 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         "siae": siae,
         "job_seeker": job_seeker,
         "approvals_wrapper": approvals_wrapper,
-        "external_user_data": external_user_data,
         "form_administrative_criteria": form_administrative_criteria,
     }
     return render(request, template_name, context)

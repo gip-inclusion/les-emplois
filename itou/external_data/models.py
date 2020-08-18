@@ -99,4 +99,7 @@ class JobSeekerExternalData(models.Model):
     )
 
     def __repr__(self):
-        return f"[self.pk] JobSeekerExternalData: user={self.user.pk}, created_at={self.created_at}, data_import={self.data_import.pk}"
+        return (
+            f"[self.pk] JobSeekerExternalData: user={self.user.pk}, "
+            f"created_at={self.created_at}, data_import={self.data_import.pk}"
+        )

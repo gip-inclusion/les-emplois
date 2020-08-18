@@ -63,7 +63,7 @@ def _get_userinfo(token):
         * gender
         * email address
 
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-individu-v1.html
+    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-individu-v1.html  # noqa E501
 
     """
     # Fields of interest
@@ -75,7 +75,7 @@ def _get_birthdate(token):
     """
     Get birthdate of user (format `YYYY-MM-DDTHH:MM:SSZ`), converted as `datetime` object.
 
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-datenaissance-v1.html
+    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-datenaissance-v1.html  # noqa E501
 
     """
     key = "dateDeNaissance"
@@ -95,7 +95,7 @@ def _get_status(token):
         * 0: does not seek a job
         * 1: active jobseeker
 
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-statut-v1.html
+    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-statut-v1.html  # noqa E501
     """
     key = "codeStatutIndividu"
     result = _fields_or_failed(_call_api(ESD_STATUS_API, token), [key])
@@ -121,7 +121,7 @@ def _get_address(token):
 
     Does not return country related fields (only France ATM)
 
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-coordonnees-v1.html
+    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-coordonnees-v1.html   # noqa E501
     """
     keys = ["adresse1", "adresse2", "adresse3", "adresse4", "codePostal", "codeINSEE", "libelleCommune"]
     return _fields_or_failed(_call_api(ESD_COORDS_API, token), keys)
@@ -135,7 +135,7 @@ def _get_compensations(token):
         * beneficiairePrestationSolidarite (has one or more of AER, AAH, ASS, RSA)
         * beneficiaireAssuranceChomage (has ARE or ASP)
 
-    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-indemnisations-v1.html
+    See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-indemnisations-v1.html  # noqa E501
     """
     keys = ["beneficiairePrestationSolidarite", "beneficiaireAssuranceChomage"]
     return _fields_or_failed(_call_api(ESD_COMPENSATION_API, token), keys)
@@ -193,7 +193,8 @@ def _store_user_data(user, status, data):
     Store user data and produce a "report" containing a JSON object, with these fields:
         - fields_fetched (array): successfully imported field names
         - fields_failed (array): fields that could not be fetched (API error...)
-        - fields_updated (array): updated fields in the db each of form: `class_name/pk/field_name` (f.i. `User/10/birthdate`)
+        - fields_updated (array): updated fields in the db each of form:
+            `class_name/pk/field_name` (f.i. `User/10/birthdate`)
 
     Return a ExternalDataImport object containing outcome of the data import
     """
