@@ -742,7 +742,10 @@ class PasswordResetTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Réinitialisation de votre mot de passe", email.subject)
-        self.assertIn("Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous pouvez ignorer ce message", email.body)
+        self.assertIn(
+            "Si vous n'avez pas demandé la réinitialisation de votre mot de passe, vous pouvez ignorer ce message",
+            email.body,
+        )
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
