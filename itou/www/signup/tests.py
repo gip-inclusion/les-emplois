@@ -22,8 +22,10 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.www.signup.forms import SelectSiaeForm
+from itou.www.signup.forms import PrescriberIdentifyKindForm, SelectSiaeForm
 
 
 class SignupTest(TestCase):
@@ -354,13 +356,38 @@ class JobSeekerSignupTest(TestCase):
 
 
 class PrescriberSignupTest(TestCase):
-    def test_poleemploi_prescriber(self):
-        url = reverse("signup:prescriber_poleemploi")
+    def test_create_user_prescriber_member_of_pole_emploi(self):
+        """
+        Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
+        """
+
+        organization = PrescriberPoleEmploiFactory()
+
+        # Step 1: do the user work for PE?
+
+        url = reverse("signup:prescriber_intro_step_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        organization = PrescriberPoleEmploiFactory()
-        password = "!*p4ssw0rd123-"
+        post_data = {
+            "is_pole_emploi": 1,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_pole_emploi_safir_code")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SAFIR code.
+
+        post_data = {
+            "safir_code": organization.code_safir_pole_emploi,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_pole_emploi_user")
+        self.assertRedirects(response, url)
+
+        # Step 3: user info.
 
         # Ensures that the parent form's clean() method is called by testing
         # with a password that does not comply with CNIL recommendations.
@@ -370,21 +397,19 @@ class PrescriberSignupTest(TestCase):
             "email": "john.doe+unregistered@prescriber.com",
             "password1": "foofoofoo",
             "password2": "foofoofoo",
-            "safir_code": organization.code_safir_pole_emploi,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 200)
         self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
 
+        password = "!*p4ssw0rd123-"
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@pole-emploi.fr",
             "password1": password,
             "password2": password,
-            "safir_code": organization.code_safir_pole_emploi,
         }
-
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
@@ -407,256 +432,10 @@ class PrescriberSignupTest(TestCase):
         self.assertIn(user, organization.members.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
 
-        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
-
-        # Check prescriber signup (email already exists).
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form", "email", "Cette adresse email est déjà enregistrée")
-
-    def test_authorized_prescriber_with_organization(self):
-        url = reverse("signup:prescriber_authorized")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
-        password = "!*p4ssw0rd123-"
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "authorized_organization_id": authorized_organization.pk,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "authorized_organization_id": authorized_organization.pk,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": password,
-            "password2": password,
-            "authorized_organization_id": authorized_organization.pk,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # User checks.
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
-        # Check `EmailAddress` state.
-        self.assertEqual(user.emailaddress_set.count(), 1)
-        user_email = user.emailaddress_set.first()
-        self.assertFalse(user_email.verified)
-
-        # Check org.
-        self.assertTrue(authorized_organization.is_authorized)
-        self.assertEqual(
-            authorized_organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED
-        )
-
-        # Check membership.
-        self.assertIn(user, authorized_organization.members.all())
-        self.assertEqual(2, authorized_organization.members.count())
-        self.assertEqual(1, user.prescriberorganization_set.count())
-        membership = user.prescribermembership_set.get(organization=authorized_organization)
-        self.assertFalse(membership.is_admin)
-
-        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
-
-    def test_authorized_prescriber_with_no_member_organization(self):
-        """
-        When a prescriber is linked to an existing prescriber organization without any member,
-        a specific email must be sent.
-        """
-        url = reverse("signup:prescriber_authorized")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        authorized_organization = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
-        password = "!*p4ssw0rd123-"
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "authorized_organization_id": authorized_organization.pk,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": password,
-            "password2": password,
-            "authorized_organization_id": authorized_organization.pk,
-        }
-        response = self.client.post(url, data=post_data)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # See previous tests for user / org assertions.
-        user = get_user_model().objects.get(email=post_data["email"])
-
-        # Check membership.
-        self.assertIn(user, authorized_organization.members.all())
-        self.assertEqual(1, authorized_organization.members.count())
-
-        # Check email has been sent to support (validation/refusal of authorisation needed)
-        self.assertEqual(len(mail.outbox), 2)
-        subject = mail.outbox[0].subject
-        self.assertIn("Première inscription à une organisation existante", subject)
-        subject = mail.outbox[1].subject
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
-
-    def test_authorized_prescriber_without_registered_organization(self):
-        url = reverse("signup:prescriber_authorized")
-        response = self.client.get(url)
-
-        organization_name = "UNREGISTERED_INC"
-        password = "!*p4ssw0rd123-"
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "unregistered_organization": organization_name,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        self.assertEqual(response.status_code, 200)
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": password,
-            "password2": password,
-            "unregistered_organization": organization_name,
-        }
-
-        response = self.client.post(url, data=post_data)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
-
-        # Check `EmailAddress` state.
-        self.assertEqual(user.emailaddress_set.count(), 1)
-        user_email = user.emailaddress_set.first()
-        self.assertFalse(user_email.verified)
-
-        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`
-
-        # Check if a new organization is created.
-        new_org = PrescriberOrganization.objects.get(name=organization_name)
-        self.assertFalse(new_org.is_authorized)
-        self.assertEqual(new_org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
-        self.assertIsNone(new_org.authorization_updated_at)
-        self.assertIsNone(new_org.authorization_updated_by)
-        self.assertEqual(new_org.created_by, user)
-
-        # Check membership.
-        self.assertEqual(1, new_org.members.count())
-        self.assertIn(user, new_org.members.all())
-
-        # Check email has been sent to support (validation/refusal of authorisation needed)
-        self.assertEqual(len(mail.outbox), 2)
-        subject = mail.outbox[0].subject
-        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
-        subject = mail.outbox[1].subject
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
-
-    def test_prescriber_signup_without_code_nor_organization(self):
-        """
-        Prescriber signup (orienter) without code nor organization.
-
-        The full "email confirmation process" is tested here.
-        Further Prescriber's signup tests doesn't have to fully test it again.
-        """
-        url = reverse("signup:prescriber_orienter")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        password = "!*p4ssw0rd123-"
-
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
-
-        post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe@prescriber.com",
-            "password1": password,
-            "password2": password,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-        # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
-        # Check `EmailAddress` state.
-        self.assertEqual(user.emailaddress_set.count(), 1)
-        user_email = user.emailaddress_set.first()
-        self.assertFalse(user_email.verified)
-
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
@@ -678,58 +457,66 @@ class PrescriberSignupTest(TestCase):
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
 
-
-# TODO: NEW
-# ------------------------------------------------------------------------------------------
-
-
-class NewPrescriberSignupTest(TestCase):
-    def test_pole_emploi_signup(self):
+    @mock.patch(
+        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
+    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_user_prescriber_with_authorized_org_of_known_kind(
+        self, mock_api_entreprise, mock_call_ban_geocoding_api
+    ):
         """
-        Test the creation a new user of type prescriber and his joining to a Pole emploi agency.
+        Test the creation of a user of type prescriber with an authorized organization of *known* kind.
         """
 
-        organization = PrescriberPoleEmploiFactory()
+        siret = "11122233300001"
 
         # Step 1: do the user work for PE?
 
-        start_url = reverse("signup:prescriber_intro_step_pole_emploi")
-        response = self.client.get(start_url)
+        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         post_data = {
-            "is_pole_emploi": 1,
+            "is_pole_emploi": 0,
         }
-        response = self.client.post(start_url, data=post_data)
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        safir_url = reverse("signup:prescriber_pole_emploi_safir_code")
-        self.assertRedirects(response, safir_url)
+        url = reverse("signup:prescriber_intro_step_org")
+        self.assertRedirects(response, url)
 
-        # Step 2: ask the user his SAFIR code.
+        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
 
         post_data = {
-            "safir_code": organization.code_safir_pole_emploi,
+            "kind": PrescriberOrganization.Kind.CAP_EMPLOI.value,
         }
-        response = self.client.post(safir_url, data=post_data)
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        user_info_url = reverse("signup:prescriber_pole_emploi_user")
-        self.assertRedirects(response, user_info_url)
+        url = reverse("signup:prescriber_intro_step_authorization")
+        self.assertRedirects(response, url)
 
-        # Step 3: user info.
+        # Step 3: ask the user to confirm the "authorized" character of his organization.
 
-        # Ensures that the parent form's clean() method is called by testing
-        # with a password that does not comply with CNIL recommendations.
         post_data = {
-            "first_name": "John",
-            "last_name": "Doe",
-            "email": "john.doe+unregistered@prescriber.com",
-            "password1": "foofoofoo",
-            "password2": "foofoofoo",
-            "safir_code": organization.code_safir_pole_emploi,
+            "confirm_authorization": 1,
         }
-        response = self.client.post(user_info_url, data=post_data)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(CnilCompositionPasswordValidator.HELP_MSG, response.context["form"].errors["password1"])
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siret")
+        self.assertRedirects(response, url)
+
+        # Step 4: ask the user his SIRET number.
+
+        post_data = {
+            "siret": siret,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+        mock_api_entreprise.assert_called_once()
+        mock_call_ban_geocoding_api.assert_called_once()
+
+        # Step 5: user info.
 
         password = "!*p4ssw0rd123-"
         post_data = {
@@ -738,12 +525,12 @@ class NewPrescriberSignupTest(TestCase):
             "email": "john.doe@pole-emploi.fr",
             "password1": password,
             "password2": password,
-            "safir_code": organization.code_safir_pole_emploi,
         }
-        response = self.client.post(user_info_url, data=post_data)
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
+        # Check `User` state.
         user = get_user_model().objects.get(email=post_data["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
@@ -755,18 +542,316 @@ class NewPrescriberSignupTest(TestCase):
         self.assertFalse(user_email.verified)
 
         # Check org.
-        self.assertTrue(organization.is_authorized)
-        self.assertEqual(organization.authorization_status, PrescriberOrganization.AuthorizationStatus.VALIDATED)
+        org = PrescriberOrganization.objects.get(siret=siret)
+        self.assertFalse(org.is_authorized)
+        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
 
         # Check membership.
-        self.assertIn(user, organization.members.all())
         self.assertEqual(1, user.prescriberorganization_set.count())
+        membership = user.prescribermembership_set.get(organization=org)
+        self.assertTrue(membership.is_admin)
 
-        # User validation via email tested in `test_prescriber_signup_without_code_nor_organization`.
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
 
-        # Ensure that the user cannot access `user_info_url` without a clean session state.
-        response = self.client.post(user_info_url, data=post_data)
-        self.assertEqual(response.status_code, 404)
+        # Check email has been sent to support (validation/refusal of authorisation needed).
+        email = mail.outbox[0]
+        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", email.subject)
+
+        # Check email has been sent to confirm the user's email.
+        email = mail.outbox[1]
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
+        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], user.email)
+
+        # User cannot log in until confirmation.
+        post_data = {"login": user.email, "password": password}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # Confirm email + auto login.
+        confirmation_token = EmailConfirmationHMAC(user_email).key
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("dashboard:index"))
+        user_email = user.emailaddress_set.first()
+        self.assertTrue(user_email.verified)
+
+    @mock.patch(
+        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
+    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_user_prescriber_with_authorized_org_of_unknown_kind(
+        self, mock_api_entreprise, mock_call_ban_geocoding_api
+    ):
+        """
+        Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
+        """
+
+        siret = "11122233300001"
+
+        # Step 1: do the user work for PE?
+
+        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 0,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_org")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+
+        post_data = {
+            "kind": PrescriberOrganization.Kind.OTHER.value,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_kind")
+        self.assertRedirects(response, url)
+
+        # Step 3: ask the user the kind of the organization he's working for.
+        post_data = {
+            "kind": PrescriberIdentifyKindForm.KIND_AUTHORIZED_ORG,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_authorization")
+        self.assertRedirects(response, url)
+
+        # Step 4: ask the user to confirm the "authorized" character of his organization.
+
+        post_data = {
+            "confirm_authorization": 1,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siret")
+        self.assertRedirects(response, url)
+
+        # Step 5: ask the user his SIRET number.
+
+        post_data = {
+            "siret": siret,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+        mock_api_entreprise.assert_called_once()
+        mock_call_ban_geocoding_api.assert_called_once()
+
+        # Step 6: user info.
+
+        password = "!*p4ssw0rd123-"
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@pole-emploi.fr",
+            "password1": password,
+            "password2": password,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # Check `User` state.
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check org.
+        org = PrescriberOrganization.objects.get(siret=siret)
+        self.assertFalse(org.is_authorized)
+        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_SET)
+
+        # Check membership.
+        self.assertEqual(1, user.prescriberorganization_set.count())
+        membership = user.prescribermembership_set.get(organization=org)
+        self.assertTrue(membership.is_admin)
+
+        # Check email has been sent to support (validation/refusal of authorisation needed).
+        self.assertEqual(len(mail.outbox), 2)
+        subject = mail.outbox[0].subject
+        self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
+        subject = mail.outbox[1].subject
+        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subject)
+
+    @mock.patch(
+        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
+    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_user_prescriber_with_unauthorized_org(self, mock_api_entreprise, mock_call_ban_geocoding_api):
+        """
+        Test the creation of a user of type prescriber with an unauthorized organization.
+        """
+
+        siret = "11122233300001"
+
+        # Step 1: do the user work for PE?
+
+        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 0,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_org")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+
+        post_data = {
+            "kind": PrescriberOrganization.Kind.OTHER.value,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_kind")
+        self.assertRedirects(response, url)
+
+        # Step 3: ask the user the kind of the organization he's working for.
+
+        post_data = {
+            "kind": PrescriberIdentifyKindForm.KIND_UNAUTHORIZED_ORG,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siret")
+        self.assertRedirects(response, url)
+
+        # Step 4: ask the user his SIRET number.
+
+        post_data = {
+            "siret": siret,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+        mock_api_entreprise.assert_called_once()
+        mock_call_ban_geocoding_api.assert_called_once()
+
+        # Step 5: user info.
+
+        password = "!*p4ssw0rd123-"
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@pole-emploi.fr",
+            "password1": password,
+            "password2": password,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # Check `User` state.
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check org.
+        org = PrescriberOrganization.objects.get(siret=siret)
+        self.assertFalse(org.is_authorized)
+        self.assertEqual(org.authorization_status, PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED)
+
+        # Check membership.
+        self.assertEqual(1, user.prescriberorganization_set.count())
+        membership = user.prescribermembership_set.get(organization=org)
+        self.assertTrue(membership.is_admin)
+
+    def test_create_user_prescriber_without_org(self):
+        """
+        Test the creation of a user of type prescriber without organization.
+        """
+
+        siret = "11122233300001"
+
+        # Step 1: do the user work for PE?
+
+        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 0,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_org")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+
+        post_data = {
+            "kind": PrescriberOrganization.Kind.OTHER.value,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_intro_step_kind")
+        self.assertRedirects(response, url)
+
+        # Step 3: ask the user the kind of the organization he's working for.
+
+        post_data = {
+            "kind": PrescriberIdentifyKindForm.KIND_SOLO,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+
+        # Step 4: user info.
+
+        password = "!*p4ssw0rd123-"
+        post_data = {
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@pole-emploi.fr",
+            "password1": password,
+            "password2": password,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # Check `User` state.
+        user = get_user_model().objects.get(email=post_data["email"])
+        self.assertFalse(user.is_job_seeker)
+        self.assertTrue(user.is_prescriber)
+        self.assertFalse(user.is_siae_staff)
+
+        # Check `EmailAddress` state.
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        user_email = user.emailaddress_set.first()
+        self.assertFalse(user_email.verified)
+
+        # Check membership.
+        self.assertEqual(0, user.prescriberorganization_set.count())
 
 
 class PasswordResetTest(TestCase):

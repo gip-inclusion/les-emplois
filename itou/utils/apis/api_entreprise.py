@@ -17,35 +17,36 @@ class EtablissementAPI:
     """
 
     def __init__(self, siret, object="Inscription à la Plateforme de l'inclusion"):
+        self.data, self.error = self.get(siret, object)
 
-        self.error = None
+    def get(self, siret, object):
 
-        api_url = f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}"
+        data = None
+        error = None
 
-        args = {
-            "recipient": settings.API_ENTREPRISE_RECIPIENT,
-            "context": settings.API_ENTREPRISE_CONTEXT,
-            "object": object,
-        }
-        query_string = urlencode(args)
+        query_string = urlencode(
+            {
+                "recipient": settings.API_ENTREPRISE_RECIPIENT,
+                "context": settings.API_ENTREPRISE_CONTEXT,
+                "object": object,
+            }
+        )
 
+        url = f"{settings.API_ENTREPRISE_BASE_URL}/etablissements/{siret}?{query_string}"
         headers = {"Authorization": f"Bearer {settings.API_ENTREPRISE_TOKEN}"}
-
-        url = f"{api_url}?{query_string}"
 
         try:
             r = requests.get(url, headers=headers)
             r.raise_for_status()
+            data = r.json()
         except requests.exceptions.HTTPError as e:
             logger.error("Error while fetching `%s`: %s", url, e)
-            self.error = _("Erreur de connexion à API Entreprise.")
-            return
+            error = _("Erreur de connexion à l'API Entreprise.")
 
-        r = requests.get(url, headers=headers)
-        self.data = r.json()
+        if data and data.get("errors"):
+            error = data["errors"][0]
 
-        if self.data.get("errors"):
-            self.error = self.data["errors"][0]
+        return data, error
 
     @property
     def name(self):

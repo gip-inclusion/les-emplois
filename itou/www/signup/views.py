@@ -196,7 +196,7 @@ def prescriber_intro_step_pole_emploi(request, template_name="signup/prescriber_
 @valid_prescriber_signup_session_required
 def prescriber_intro_step_org(request, template_name="signup/prescriber_intro_step_org.html"):
     """
-    Ask the user the kind of the organization he's working for.
+    Ask the user to choose the organization he's working for in a pre-existing list.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
