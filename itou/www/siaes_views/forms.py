@@ -3,7 +3,6 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
-from django.utils.text import format_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
@@ -71,9 +70,11 @@ class CreateSiaeForm(forms.ModelForm):
                 """
             )
 
-            error_message_siret = _("en précisant votre numéro de SIRET (si existant),"
-                                    " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
-                                    " pour être contacté(e) si nécessaire.")
+            error_message_siret = _(
+                "en précisant votre numéro de SIRET (si existant),"
+                " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
+                " pour être contacté(e) si nécessaire."
+            )
             mail_to = settings.ITOU_EMAIL_ASSISTANCE
             mail_subject = _("Se rattacher à une structure existante - Plateforme de l'inclusion")
 
