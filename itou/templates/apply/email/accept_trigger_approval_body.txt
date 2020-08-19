@@ -3,7 +3,7 @@
 {% block body %}
 Nouvelle embauche sur Itou.
 
-Informations pour l'obtention d'un PASS IAE.
+{% translate "Informations pour l'obtention d'un Pass IAE suite à l'embauche de votre candidat via la Plateforme de l'inclusion :" %}
 
 {% translate "*Candidat* :" %}
 
@@ -22,7 +22,7 @@ Informations pour l'obtention d'un PASS IAE.
 - Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y" }}{% endif %}{% if accepted_by %}
 - Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
 
-Ajouter un numéro d'agrément dans l'admin :
+{% translate "Ajouter un numéro d'agrément dans l'admin :"%}
 {{ itou_protocol }}://{{ itou_fqdn }}{{ admin_manually_add_approval_url }}
 
 {% endblock body %}

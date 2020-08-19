@@ -20,7 +20,7 @@ class ModelTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Un nouvel utilisateur vient de rejoindre votre organisation", email.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
+        self.assertIn("Si cette personne n'est pas un collaborateur ou une collaboratrice", email.body)
         self.assertIn(new_user.first_name, email.body)
         self.assertIn(new_user.last_name, email.body)
         self.assertIn(new_user.email, email.body)

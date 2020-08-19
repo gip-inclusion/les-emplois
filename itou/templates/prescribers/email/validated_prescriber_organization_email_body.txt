@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "La vérification de l'habilitation de l'organisation que vous avez saisie lors de votre inscription est terminée." %}
+{% translate "Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur la Plateforme !" %}
 
 {% translate "*Structure* :" %}
 

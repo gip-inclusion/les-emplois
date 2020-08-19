@@ -461,7 +461,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn("Pass IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_job_seeker_with_valid_approval(self):
         job_seeker = JobSeekerFactory()
@@ -479,7 +479,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn("Pass IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self):
         job_seeker = JobSeekerFactory(
@@ -509,7 +509,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn("Pass IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -524,7 +524,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn("Pass IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self):
         user = JobSeekerFactory()
@@ -547,7 +547,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn("Pass IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(self):
         user = JobSeekerFactory()
@@ -578,7 +578,7 @@ class JobApplicationWorkflowTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("Délivrance d'un PASS IAE pour", mail.outbox[1].subject)
+        self.assertIn("Pass IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_siae_with_no_approval(self):
         """

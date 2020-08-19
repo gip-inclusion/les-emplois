@@ -5,7 +5,7 @@
 {% if job_application.is_sent_by_proxy %}
 
 {% blocktranslate with sender_full_name=job_application.sender.get_full_name job_seeker_full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
-La candidature de {{ job_seeker_full_name }} envoyée par {{ sender_full_name }} a été acceptée par {{ to_siae }}.
+Nous sommes ravis de vous annoncer que la candidature de {{ job_seeker_full_name }}, adressée par {{ sender_full_name }}, a été acceptée par {{ to_siae }}.
 {% endblocktranslate %}
 
 {% else %}
@@ -23,11 +23,11 @@ Votre candidature a été acceptée par {{ to_siae }}.
 {% endif %}
 
 {% blocktranslate %}
-La Plateforme de l’inclusion a-t-elle permis que votre candidat(e) soit embauché(e) plus rapidement ?
-{% endblocktranslate %}
+Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
 
-{% blocktranslate %}
-Donnez votre avis en cliquant sur ce lien: {{ survey_link }}
+Prenez 30'' pour nous donnez votre avis ! Cliquez sur : {{ survey_link }}
+
+Merci de votre participation et à très bientôt sur la Plateforme !
 {% endblocktranslate %}
 
 {% endblock body %}
