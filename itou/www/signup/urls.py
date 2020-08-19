@@ -8,17 +8,13 @@ app_name = "signup"
 
 urlpatterns = [
     # Prescriber.
-    path(
-        "prescriber/who_are_you/step1",
-        views.prescriber_intro_step_pole_emploi,
-        name="prescriber_intro_step_pole_emploi",
-    ),
-    path("prescriber/who_are_you/step2", views.prescriber_intro_step_org, name="prescriber_intro_step_org",),
-    path("prescriber/who_are_you/step3", views.prescriber_intro_step_kind, name="prescriber_intro_step_kind",),
+    path("prescriber/who_are_you/step1", views.prescriber_is_pole_emploi, name="prescriber_is_pole_emploi",),
+    path("prescriber/who_are_you/step2", views.prescriber_is_known_org, name="prescriber_is_known_org",),
+    path("prescriber/who_are_you/step3", views.prescriber_ask_kind, name="prescriber_ask_kind",),
     path(
         "prescriber/who_are_you/step4",
-        views.prescriber_intro_step_authorization,
-        name="prescriber_intro_step_authorization",
+        views.prescriber_confirm_authorization,
+        name="prescriber_confirm_authorization",
     ),
     path("prescriber/siret", views.prescriber_siret, name="prescriber_siret",),
     path(

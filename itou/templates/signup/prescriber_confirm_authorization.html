@@ -3,13 +3,14 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Prescripteur/Orienteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Inscription | Connexion" %}{{ block.super }}{% endblock %}
+
 
 {% block content %}
 
     <h1>
         {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
+        <small class="text-muted">{% translate "Prescripteur habilité" %}</small>
     </h1>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -18,8 +19,10 @@
 
         {% bootstrap_form form %}
 
+        {% include "signup/includes/authorization_proof.html" %}
+
         {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_intro_step_pole_emploi' %}">
+            <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_ask_kind' %}">
                 {% translate "Retour" %}
             </a>
             <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>

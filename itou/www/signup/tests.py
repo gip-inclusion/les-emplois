@@ -361,7 +361,7 @@ class PrescriberSignupTest(TestCase):
 
         # Step 1: do the user work for PE?
 
-        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -431,7 +431,7 @@ class PrescriberSignupTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
@@ -468,7 +468,7 @@ class PrescriberSignupTest(TestCase):
 
         # Step 1: do the user work for PE?
 
-        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -477,7 +477,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_org")
+        url = reverse("signup:prescriber_is_known_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -487,7 +487,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_authorization")
+        url = reverse("signup:prescriber_confirm_authorization")
         self.assertRedirects(response, url)
 
         # Step 3: ask the user to confirm the "authorized" character of his organization.
@@ -556,7 +556,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check email has been sent to confirm the user's email.
         email = mail.outbox[1]
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", email.subject)
+        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
@@ -591,9 +591,9 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: do the user work for PE?
+        # Step 1: Does the user work  for PE?
 
-        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -602,7 +602,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_org")
+        url = reverse("signup:prescriber_is_known_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -612,16 +612,16 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_kind")
+        url = reverse("signup:prescriber_ask_kind")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user the kind of the organization he's working for.
+        # Step 3: ask the user his kind of prescriber.
         post_data = {
             "kind": PrescriberIdentifyKindForm.KIND_AUTHORIZED_ORG,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_authorization")
+        url = reverse("signup:prescriber_confirm_authorization")
         self.assertRedirects(response, url)
 
         # Step 4: ask the user to confirm the "authorized" character of his organization.
@@ -685,8 +685,9 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 2)
         subject = mail.outbox[0].subject
         self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
+        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
         subject = mail.outbox[1].subject
-        self.assertIn("Confirmer l'adresse email pour la Plateforme de l'inclusion", subject)
+        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
 
     @mock.patch(
         "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
@@ -699,9 +700,9 @@ class PrescriberSignupTest(TestCase):
 
         siret = "11122233300001"
 
-        # Step 1: do the user work for PE?
+        # Step 1: Does the user work  for PE?
 
-        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -710,7 +711,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_org")
+        url = reverse("signup:prescriber_is_known_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -720,10 +721,10 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_kind")
+        url = reverse("signup:prescriber_ask_kind")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user the kind of the organization he's working for.
+        # Step 3: ask the user his kind of prescriber.
 
         post_data = {
             "kind": PrescriberIdentifyKindForm.KIND_UNAUTHORIZED_ORG,
@@ -780,14 +781,19 @@ class PrescriberSignupTest(TestCase):
         membership = user.prescribermembership_set.get(organization=org)
         self.assertTrue(membership.is_admin)
 
+        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
+        self.assertEqual(len(mail.outbox), 1)
+        subject = mail.outbox[0].subject
+        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
+
     def test_create_user_prescriber_without_org(self):
         """
         Test the creation of a user of type prescriber without organization.
         """
 
-        # Step 1: do the user work for PE?
+        # Step 1: Does the user work  for PE?
 
-        url = reverse("signup:prescriber_intro_step_pole_emploi")
+        url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -796,7 +802,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_org")
+        url = reverse("signup:prescriber_is_known_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -806,10 +812,10 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_intro_step_kind")
+        url = reverse("signup:prescriber_ask_kind")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user the kind of the organization he's working for.
+        # Step 3: ask the user his kind of prescriber.
 
         post_data = {
             "kind": PrescriberIdentifyKindForm.KIND_SOLO,
@@ -846,6 +852,11 @@ class PrescriberSignupTest(TestCase):
 
         # Check membership.
         self.assertEqual(0, user.prescriberorganization_set.count())
+
+        # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
+        self.assertEqual(len(mail.outbox), 1)
+        subject = mail.outbox[0].subject
+        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
 
 
 class PasswordResetTest(TestCase):

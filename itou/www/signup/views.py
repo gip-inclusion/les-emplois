@@ -127,11 +127,11 @@ def valid_prescriber_signup_session_required(function=None):
     return decorated
 
 
-def prescriber_intro_step_pole_emploi(request, template_name="signup/prescriber_intro_step_pole_emploi.html"):
+def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_emploi.html"):
     """
     Entry point of the signup process for prescribers/orienteurs.
 
-    80% of prescribers on Itou are Pôle emploi members: ask the user if this is the case.
+    As 80% of prescribers on Itou are Pôle emploi members, do the user work for PE?
     """
 
     # Start a fresh session.
@@ -152,16 +152,16 @@ def prescriber_intro_step_pole_emploi(request, template_name="signup/prescriber_
             session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
             session_data["kind"] = PrescriberOrganization.Kind.PE.value
             return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
-        return HttpResponseRedirect(reverse("signup:prescriber_intro_step_org"))
+        return HttpResponseRedirect(reverse("signup:prescriber_is_known_org"))
 
     context = {"form": form}
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-def prescriber_intro_step_org(request, template_name="signup/prescriber_intro_step_org.html"):
+def prescriber_is_known_org(request, template_name="signup/prescriber_is_known_org.html"):
     """
-    Ask the user to choose the organization he's working for in a pre-existing list.
+    Does the user work in an organization whose `kind` is in a pre-existing list?
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -178,17 +178,17 @@ def prescriber_intro_step_org(request, template_name="signup/prescriber_intro_st
 
         if prescriber_kind == PrescriberOrganization.Kind.OTHER.value:
             session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
-            return HttpResponseRedirect(reverse("signup:prescriber_intro_step_kind"))
+            return HttpResponseRedirect(reverse("signup:prescriber_ask_kind"))
 
         session_data["kind"] = prescriber_kind
-        return HttpResponseRedirect(reverse("signup:prescriber_intro_step_authorization"))
+        return HttpResponseRedirect(reverse("signup:prescriber_confirm_authorization"))
 
     context = {"form": form}
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
-def prescriber_intro_step_kind(request, template_name="signup/prescriber_intro_step_kind.html"):
+def prescriber_ask_kind(request, template_name="signup/prescriber_ask_kind.html"):
     """
     If the user hasn't found his organization, ask him other questions to identify his kind.
     """
@@ -203,7 +203,7 @@ def prescriber_intro_step_kind(request, template_name="signup/prescriber_intro_s
 
         if prescriber_kind == form.KIND_AUTHORIZED_ORG:
             session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
-            return HttpResponseRedirect(reverse("signup:prescriber_intro_step_authorization"))
+            return HttpResponseRedirect(reverse("signup:prescriber_confirm_authorization"))
 
         if prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
             session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
@@ -221,9 +221,9 @@ def prescriber_intro_step_kind(request, template_name="signup/prescriber_intro_s
 
 
 @valid_prescriber_signup_session_required
-def prescriber_intro_step_authorization(request, template_name="signup/prescriber_intro_step_authorization.html"):
+def prescriber_confirm_authorization(request, template_name="signup/prescriber_confirm_authorization.html"):
     """
-    Ask the user to confirm that his organization is authorized.
+    Ask the user to confirm the "authorized" character of his organization.
 
     That should help support with illegitimate or erroneous requests.
     """
@@ -240,7 +240,7 @@ def prescriber_intro_step_authorization(request, template_name="signup/prescribe
             return HttpResponseRedirect(reverse("signup:prescriber_siret"))
 
         session_data["authorization_status"] = None
-        return HttpResponseRedirect(reverse("signup:prescriber_intro_step_kind"))
+        return HttpResponseRedirect(reverse("signup:prescriber_ask_kind"))
 
     context = {"form": form}
     return render(request, template_name, context)
