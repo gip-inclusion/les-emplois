@@ -487,20 +487,10 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_confirm_authorization")
-        self.assertRedirects(response, url)
-
-        # Step 3: ask the user to confirm the "authorized" character of his organization.
-
-        post_data = {
-            "confirm_authorization": 1,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 4: ask the user his SIRET number.
+        # Step 3: ask the user his SIRET number.
 
         post_data = {
             "siret": siret,
@@ -512,7 +502,7 @@ class PrescriberSignupTest(TestCase):
         mock_api_entreprise.assert_called_once()
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 5: user info.
+        # Step 4: user info.
 
         password = "!*p4ssw0rd123-"
         post_data = {

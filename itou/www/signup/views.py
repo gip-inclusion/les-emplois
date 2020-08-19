@@ -181,7 +181,8 @@ def prescriber_is_known_org(request, template_name="signup/prescriber_is_known_o
             return HttpResponseRedirect(reverse("signup:prescriber_ask_kind"))
 
         session_data["kind"] = prescriber_kind
-        return HttpResponseRedirect(reverse("signup:prescriber_confirm_authorization"))
+        session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
+        return HttpResponseRedirect(reverse("signup:prescriber_siret"))
 
     context = {"form": form}
     return render(request, template_name, context)
