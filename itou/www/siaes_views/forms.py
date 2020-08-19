@@ -95,7 +95,7 @@ class CreateSiaeForm(forms.ModelForm):
                 f'<a href="mailto:{mail_to}?subject={mail_subject}&body={mail_body}"'
                 f' target="_blank" class="alert-link">{mail_to}</a>'
             )
-            error_message = f"{error_message} {mailto_html} {error_message_siret}"
+            error_message = mark_safe(f"{error_message} {mailto_html} {error_message_siret}")
             raise forms.ValidationError(error_message)
 
         if not siret.startswith(self.current_siae.siren):
