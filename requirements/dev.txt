@@ -20,4 +20,5 @@ django-debug-toolbar==2.2  # https://github.com/jazzband/django-debug-toolbar
 django-extensions==3.0.5  # https://github.com/django-extensions/django-extensions
 
 # Test & Mock
+# ------------------------------------------------------------------------------
 requests-mock==1.8.0  # https://github.com/jamielennox/requests-mock
