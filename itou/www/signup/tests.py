@@ -13,11 +13,7 @@ from django.utils.translation import gettext as _
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.prescribers.factories import (
-    AuthorizedPrescriberOrganizationWithMembershipFactory,
-    PrescriberOrganizationFactory,
-    PrescriberPoleEmploiFactory,
-)
+from itou.prescribers.factories import PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
@@ -788,8 +784,6 @@ class PrescriberSignupTest(TestCase):
         """
         Test the creation of a user of type prescriber without organization.
         """
-
-        siret = "11122233300001"
 
         # Step 1: do the user work for PE?
 

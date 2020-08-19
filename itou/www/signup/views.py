@@ -113,42 +113,7 @@ class JobSeekerSignupView(SignupView):
         return super().post(request, *args, **kwargs)
 
 
-# OLD
-
-
-def select_prescriber_type(request):
-    """
-    New signup process for prescribers, can be one of:
-    * orienter
-    * Pole Emploi prescriber
-    * authorized prescriber
-    """
-    return render(request, "signup/signup_select_prescriber_type.html")
-
-
-class PrescriberSignup(SignupView):
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
-
-
-class OrienterPrescriberView(PrescriberSignup):
-    template_name = "signup/signup_prescriber_orienter.html"
-    form_class = forms.OrienterPrescriberForm
-
-
-class PoleEmploiPrescriberView(PrescriberSignup):
-    template_name = "signup/signup_prescriber_poleemploi.html"
-    form_class = forms.PoleEmploiPrescriberForm
-
-
-class AuthorizedPrescriberView(PrescriberSignup):
-    template_name = "signup/signup_prescriber_authorized.html"
-    form_class = forms.AuthorizedPrescriberForm
-
-
-# TODO: NEW
+# Prescribers signup.
 # ------------------------------------------------------------------------------------------
 
 
