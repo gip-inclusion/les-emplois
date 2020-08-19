@@ -494,9 +494,4 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
             if prescriber_org.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET:
                 prescriber_org.must_validate_prescriber_organization_email().send()
 
-            # # For *existing* organization with no member.
-            # # Pôle emploi agencies doesn't require a manual check, skip email notification.
-            # if not self.new_organization and organization.kind != organization.Kind.PE:
-            #     organization.organization_with_no_member_email(user).send()
-
         return user

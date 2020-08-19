@@ -237,18 +237,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def organization_with_no_member_email(self, user):
-        """
-        Send an email to the support:
-        signup of an **exisiting** prescriber organization, without any member (hence not validated)
-        => prescriber organization authorization must be validated
-        """
-        to = [settings.ITOU_EMAIL_CONTACT]
-        context = {"organization": self, "new_user": user}
-        subject = "prescribers/email/organization_with_no_member_email_subject.txt"
-        body = "prescribers/email/organization_with_no_member_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""
