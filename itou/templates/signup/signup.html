@@ -13,7 +13,7 @@
                     <span class="d-block">{% translate "Vous êtes un employeur solidaire" %}</span>
                     <span class="d-block">{% translate "(SIAE, GEIQ, EA, ...)" %}</span>
                 </h5>
-                <a class="btn btn-primary" href="{% url 'signup:select_siae' %}">
+                <a class="btn btn-primary" href="{% url 'signup:select_siae' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     {% translate "Créer un compte" %}
                 </a>
             </div>
@@ -24,7 +24,7 @@
                 <h5 class="card-title font-weight-light mb-4">
                     {% translate "Vous êtes prescripteur ou orienteur" %}
                 </h5>
-                <a class="btn btn-primary" href="{% url 'signup:prescriber_is_pole_emploi' %}">
+                <a class="btn btn-primary" href="{% url 'signup:prescriber_is_pole_emploi' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     {% translate "Créer un compte" %}
                 </a>
             </div>
@@ -35,7 +35,7 @@
                 <h5 class="card-title font-weight-light mb-4">
                     {% translate "Vous êtes en recherche d'un emploi et souhaitez postuler" %}
                 </h5>
-                <a class="btn btn-primary" href="{% url 'signup:job_seeker' %}">
+                <a class="btn btn-primary" href="{% url 'signup:job_seeker' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     {% translate "Créer un compte" %}
                 </a>
             </div>

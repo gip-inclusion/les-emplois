@@ -142,6 +142,9 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
         "prescriber_org_data": None,
         "prescriber_org_pk": None,
         "safir_code": None,
+        # TODO: the `next` redirect chain looks broken in allauth
+        # https://github.com/pennersr/django-allauth/blob/845aa5/allauth/account/utils.py#L153-L157
+        "next": get_safe_url(request, "next"),
     }
 
     form = forms.PrescriberEntryPointForm(data=request.POST or None)
