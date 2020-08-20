@@ -17,9 +17,9 @@
 
         {% csrf_token %}
 
-        {% bootstrap_form form %}
-
         {% include "signup/includes/authorization_proof.html" %}
+
+        {% bootstrap_form form %}
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_ask_kind' %}">
