@@ -46,28 +46,35 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     The "prescriber" has the possibility of being a member of an organisation represented by a
     `PrescriberOrganization` object through `PrescriberMembership`.
 
-    However it is not required for a "prescriber" to be a member of an organization. There are 3 possible cases:
+    However it is not required for a "prescriber" to be a member of an organization.
+
+    There are 3 possible cases:
 
     Case 1
-    A "prescriber" is alone (e.g. "éducateur de rue"). In this case there is only a `User` object
-        - User.is_prescriber = True
+        A "prescriber" is alone (e.g. "éducateur de rue"). In this case there is only a `User` object
+            - User.is_prescriber = True
 
     Case 2
-    A "prescriber" is a member of an organization (e.g. an association of unemployed people etc.)
-    and uses the platform with 0 or n collaborators. In this case there are 3 objects:
-        - User.is_prescriber = True
-        - PrescriberOrganization
-        - PrescriberMembership
+        A "prescriber" is a member of an organization (e.g. an association of unemployed people etc.)
+        and uses the platform with 0 or n collaborators.
+        In this case there are 3 objects:
+            - User.is_prescriber = True
+            - PrescriberOrganization.is_authorized = False
+            - PrescriberMembership
 
     Case 3
-    This case is a variant of case 2 where the organization is "authorized" at national level or by
-    the Prefect (e.g. Pôle emploi, CCAS, Cap emploi…). This is similar to case 2  with an additional
-    flag for the organization:
-        - User.is_prescriber = True
-        - PrescriberOrganization.is_authorized = True
-        - PrescriberMembership
+        This case is a variant of case 2 where the organization is "authorized" at national level or by
+        the Prefect (e.g. Pôle emploi, CCAS, Cap emploi…). This is similar to case 2  with an additional
+        flag for the organization:
+            - User.is_prescriber = True
+            - PrescriberOrganization.is_authorized = True
+            - PrescriberMembership
 
     In the last 2 cases, there can be n members by organization.
+
+    In case 1 and case 2, we talk about "orienteur" in French.
+
+    In case 3, we talk about "prescripteur habilité" in French.
     """
 
     class Kind(models.TextChoices):
@@ -188,9 +195,17 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
             return None
         return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
-    @property
-    def has_unset_authorization(self):
-        return self.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+    def pending_authorization(self):
+        """
+        Pending manual verification of authorization by support staff.
+        """
+        return self.authorization_status == self.AuthorizationStatus.NOT_SET
+
+    def pending_authorization_proof(self):
+        """
+        An unknown organization claiming to be authorized must provide a written proof.
+        """
+        return self.kind == self.Kind.OTHER and self.authorization_status == self.AuthorizationStatus.NOT_SET
 
     def get_admins(self):
         return self.members.filter(is_active=True, prescribermembership__is_admin=True)

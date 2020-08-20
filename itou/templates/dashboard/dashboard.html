@@ -24,15 +24,20 @@
         </div>
     {% endif %}
 
-    {% if current_prescriber_organization and prescriber_authorization_status_not_set %}
-        <div class="alert alert-warning" role="alert">
-            <div>
-                {% trans "Afin d'enregistrer votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique,  merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :" %}
-                <a href="https://startupsbeta.typeform.com/to/w1XTUer7" rel="noopener" target="_blank">
-                    {% trans "cliquez ici pour l'envoyer" %}
-                    {% include "includes/icon.html" with icon="external-link" %}
-                </a>
-            </div>
+    {% if current_prescriber_organization and current_prescriber_organization.pending_authorization %}
+        <div class="alert alert-warning pb-0" role="alert">
+            <p>
+                {% trans "Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes." %}
+            </p>
+            {% if pending_authorization_proof %}
+                <p>
+                    {% trans "Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :" %}
+                    <a href="https://startupsbeta.typeform.com/to/w1XTUer7" rel="noopener" target="_blank">
+                        {% trans "cliquez ici pour l'envoyer" %}
+                        {% include "includes/icon.html" with icon="external-link" %}
+                    </a>
+                </p>
+            {% endif %}
         </div>
     {% endif %}
 

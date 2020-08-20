@@ -254,7 +254,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 # ------------------------------------------------------------------------------------------
 
 
-class PrescriberEntryPointForm(forms.Form):
+class PrescriberIsPoleEmploiForm(forms.Form):
 
     IS_POLE_EMPLOI_CHOICES = (
         (1, gettext_lazy("Oui")),
@@ -269,7 +269,7 @@ class PrescriberEntryPointForm(forms.Form):
     )
 
 
-class PrescriberIdentifyOrganizationKindForm(forms.Form):
+class PrescriberChooseOrgKindForm(forms.Form):
 
     kind = forms.ChoiceField(
         label=gettext_lazy("Pour qui travaillez-vous ?"),
@@ -278,7 +278,7 @@ class PrescriberIdentifyOrganizationKindForm(forms.Form):
     )
 
 
-class PrescriberIdentifyKindForm(forms.Form):
+class PrescriberChooseKindForm(forms.Form):
 
     KIND_AUTHORIZED_ORG = "authorized_org"
     KIND_UNAUTHORIZED_ORG = "unauthorized_org"
@@ -383,7 +383,7 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.prescriber_organization = None
+        self.pole_emploi_org = None
 
     safir_code = forms.CharField(
         max_length=5,
@@ -394,8 +394,8 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
 
     def clean_safir_code(self):
         safir_code = self.cleaned_data["safir_code"]
-        self.prescriber_organization = PrescriberOrganization.objects.by_safir_code(safir_code)
-        if not self.prescriber_organization:
+        self.pole_emploi_org = PrescriberOrganization.objects.by_safir_code(safir_code)
+        if not self.pole_emploi_org:
             error = _("Ce code SAFIR est inconnu.")
             raise forms.ValidationError(error)
         return safir_code
@@ -407,7 +407,7 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
     """
 
     def __init__(self, *args, **kwargs):
-        self.prescriber_organization = kwargs.pop("prescriber_organization")
+        self.pole_emploi_org = kwargs.pop("pole_emploi_org")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
         self.fields["email"].help_text = _("Exemple : nom.prenom@pole-emploi.fr")
@@ -430,14 +430,14 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         # The member becomes a member of the PE agency.
         membership = PrescriberMembership()
         membership.user = user
-        membership.organization = self.prescriber_organization
+        membership.organization = self.pole_emploi_org
         # The first member becomes an admin.
         membership.is_admin = membership.organization.members.count() == 0
         membership.save()
 
         # Send a notification to existing members.
-        if self.prescriber_organization.active_members.count() > 1:
-            self.prescriber_organization.new_signup_warning_email_to_existing_members(user).send()
+        if self.pole_emploi_org.active_members.count() > 1:
+            self.pole_emploi_org.new_signup_warning_email_to_existing_members(user).send()
 
         return user
 

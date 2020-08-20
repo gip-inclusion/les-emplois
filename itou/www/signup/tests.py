@@ -21,7 +21,7 @@ from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.www.signup.forms import PrescriberIdentifyKindForm, SelectSiaeForm
+from itou.www.signup.forms import PrescriberChooseKindForm, SelectSiaeForm
 
 
 class SignupTest(TestCase):
@@ -477,7 +477,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_is_known_org")
+        url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -592,7 +592,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_is_known_org")
+        url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -602,12 +602,12 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_ask_kind")
+        url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
         # Step 3: ask the user his kind of prescriber.
         post_data = {
-            "kind": PrescriberIdentifyKindForm.KIND_AUTHORIZED_ORG,
+            "kind": PrescriberChooseKindForm.KIND_AUTHORIZED_ORG,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -701,7 +701,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_is_known_org")
+        url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -711,13 +711,13 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_ask_kind")
+        url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
         # Step 3: ask the user his kind of prescriber.
 
         post_data = {
-            "kind": PrescriberIdentifyKindForm.KIND_UNAUTHORIZED_ORG,
+            "kind": PrescriberChooseKindForm.KIND_UNAUTHORIZED_ORG,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -792,7 +792,7 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_is_known_org")
+        url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
         # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
@@ -802,13 +802,13 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_ask_kind")
+        url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
         # Step 3: ask the user his kind of prescriber.
 
         post_data = {
-            "kind": PrescriberIdentifyKindForm.KIND_SOLO,
+            "kind": PrescriberChooseKindForm.KIND_SOLO,
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)

@@ -121,6 +121,8 @@ def valid_prescriber_signup_session_required(function=None):
     def decorated(request, *args, **kwargs):
         session_data = request.session.get(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
         if not session_data:
+            # Someone tries to use the direct link of a step inside the process
+            # without going through the beginning.
             raise PermissionDenied
         return function(request, *args, **kwargs)
 
@@ -129,8 +131,10 @@ def valid_prescriber_signup_session_required(function=None):
 
 def push_url_in_history(request):
     """
-    Keep track of the navigation history through the prescriber signup process.
-    This must be triggered after a form submit.
+    Since there are many possible paths through the prescriber signup process,
+    keep track of the navigation history to easily retrive the previous step.
+
+    It must be triggered just before redirecting the user to another step.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -151,7 +155,7 @@ def push_url_in_history(request):
 
 def get_prev_url_from_history(request):
     """
-    Get the previous URL in the prescriber signup process history.
+    Find previous step's URL in the signup navigation history.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -159,7 +163,7 @@ def get_prev_url_from_history(request):
 
     current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
     if current_url in url_history:
-        # The URL has already been visited, return the preceding URL.
+        # The URL has already been visited, return its preceding URL.
         current_url_index = url_history.index(current_url)
         return session_data["url_history"][current_url_index - 1]
 
@@ -170,35 +174,39 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
     """
     Entry point of the signup process for prescribers/orienteurs.
 
-    As 80% of prescribers on Itou are Pôle emploi members, do the user work for PE?
+    The signup process consists of several steps during which the user answers
+    a series of questions to determine the `kind` of his organization if any.
+
+    At the end of the process a user will be created and he will be:
+    - added to the members of a pre-existing Pôle emploi agency ("prescripteur habilité")
+    - added to the members of a new authorized organization ("prescripteur habilité")
+    - added to the members of a new unauthorized organization ("orienteur")
+    - without any organization ("orienteur")
+
+    Step 1: as 80% of prescribers on Itou are Pôle emploi members,
+    ask the user if he works for PE.
     """
 
-    # Start a fresh session.
-    # It will be used through the multiple steps of the signup process.
+    # Start a fresh session that will be used during the signup process.
+    # Since we can go back-and-forth, or someone always has the option
+    # of using a direct link, its state must be kept clean in each step.
     request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {
         "authorization_status": None,
         "kind": None,
         "prescriber_org_data": None,
-        "prescriber_org_pk": None,
+        "pole_emploi_org_pk": None,
         "safir_code": None,
         "url_history": [reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")],
-        # TODO: the `next` redirect chain looks broken in allauth when ACCOUNT_EMAIL_VERIFICATION is "mandatory".
-        # https://github.com/pennersr/django-allauth/blob/845aa5/allauth/account/utils.py#L153-L157
         "next": get_safe_url(request, "next"),
     }
 
-    form = forms.PrescriberEntryPointForm(data=request.POST or None)
+    form = forms.PrescriberIsPoleEmploiForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
-        is_pole_emploi = form.cleaned_data["is_pole_emploi"]
+        next_url = reverse("signup:prescriber_choose_org")
 
-        if not is_pole_emploi:
-            next_url = reverse("signup:prescriber_is_known_org")
-
-        else:
-            session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-            session_data["kind"] = PrescriberOrganization.Kind.PE.value
+        if form.cleaned_data["is_pole_emploi"]:
             next_url = reverse("signup:prescriber_pole_emploi_safir_code")
 
         push_url_in_history(request)
@@ -209,32 +217,40 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
 
 
 @valid_prescriber_signup_session_required
-def prescriber_is_known_org(request, template_name="signup/prescriber_is_known_org.html"):
+def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.html"):
     """
-    Does the user work in an organization whose `kind` is in a pre-existing list?
+    Ask the user to choose his organization in a pre-existing list of authorized organization.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    form = forms.PrescriberIdentifyOrganizationKindForm(data=request.POST or None)
+    form = forms.PrescriberChooseOrgKindForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
         prescriber_kind = form.cleaned_data["kind"]
+        authorization_status = None
 
         if prescriber_kind == PrescriberOrganization.Kind.PE.value:
-            session_data["kind"] = PrescriberOrganization.Kind.PE.value
             next_url = reverse("signup:prescriber_pole_emploi_safir_code")
 
         elif prescriber_kind == PrescriberOrganization.Kind.OTHER.value:
-            session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
-            next_url = reverse("signup:prescriber_ask_kind")
+            next_url = reverse("signup:prescriber_choose_kind")
 
         else:
-            session_data["kind"] = prescriber_kind
-            session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
+            # A pre-existing kind of authorized organization was chosen.
+            authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
             next_url = reverse("signup:prescriber_siret")
 
+        session_data.update(
+            {
+                "authorization_status": authorization_status,
+                "kind": prescriber_kind,
+                "prescriber_org_data": None,
+                "pole_emploi_org_pk": None,
+                "safir_code": None,
+            }
+        )
         push_url_in_history(request)
         return HttpResponseRedirect(next_url)
 
@@ -243,34 +259,42 @@ def prescriber_is_known_org(request, template_name="signup/prescriber_is_known_o
 
 
 @valid_prescriber_signup_session_required
-def prescriber_ask_kind(request, template_name="signup/prescriber_ask_kind.html"):
+def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind.html"):
     """
-    If the user hasn't found his organization, ask him other questions to identify his kind.
+    If the user hasn't found his organization in the pre-existing list, ask him to choose his kind.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    form = forms.PrescriberIdentifyKindForm(data=request.POST or None)
+    form = forms.PrescriberChooseKindForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
         prescriber_kind = form.cleaned_data["kind"]
+        authorization_status = None
+        kind = None
 
         if prescriber_kind == form.KIND_AUTHORIZED_ORG:
-            session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
             next_url = reverse("signup:prescriber_confirm_authorization")
 
         elif prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
-            session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
-            session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
+            authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
+            kind = PrescriberOrganization.Kind.OTHER.value
             next_url = reverse("signup:prescriber_siret")
 
-        # Go to sign up screen without organization.
         elif prescriber_kind == form.KIND_SOLO:
-            session_data["kind"] = None
-            session_data["authorization_status"] = None
+            # Go to sign up screen without organization.
             next_url = reverse("signup:prescriber_user")
 
+        session_data.update(
+            {
+                "authorization_status": authorization_status,
+                "kind": kind,
+                "prescriber_org_data": None,
+                "pole_emploi_org_pk": None,
+                "safir_code": None,
+            }
+        )
         push_url_in_history(request)
         return HttpResponseRedirect(next_url)
 
@@ -283,7 +307,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     """
     Ask the user to confirm the "authorized" character of his organization.
 
-    That should help support with illegitimate or erroneous requests.
+    That should help the support team with illegitimate or erroneous requests.
     """
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -291,12 +315,16 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
     form = forms.PrescriberConfirmAuthorizationForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-
-        session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
-
-        if form.cleaned_data["confirm_authorization"]:
-            session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-
+        authorization_status = "NOT_SET" if form.cleaned_data["confirm_authorization"] else "NOT_REQUIRED"
+        session_data.update(
+            {
+                "authorization_status": PrescriberOrganization.AuthorizationStatus[authorization_status].value,
+                "kind": PrescriberOrganization.Kind.OTHER.value,
+                "prescriber_org_data": None,
+                "pole_emploi_org_pk": None,
+                "safir_code": None,
+            }
+        )
         push_url_in_history(request)
         next_url = reverse("signup:prescriber_siret")
         return HttpResponseRedirect(next_url)
@@ -316,9 +344,15 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
     form = forms.PrescriberPoleEmploiSafirCodeForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-        session_data["prescriber_org_pk"] = form.prescriber_organization.pk
-        session_data["safir_code"] = form.cleaned_data["safir_code"]
+        session_data.update(
+            {
+                "authorization_status": None,
+                "kind": PrescriberOrganization.Kind.PE.value,
+                "prescriber_org_data": None,
+                "pole_emploi_org_pk": form.pole_emploi_org.pk,
+                "safir_code": form.cleaned_data["safir_code"],
+            }
+        )
         push_url_in_history(request)
         next_url = reverse("signup:prescriber_pole_emploi_user")
         return HttpResponseRedirect(next_url)
@@ -330,7 +364,10 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
 @valid_prescriber_signup_session_required
 def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     """
-    Get info about the prescriber's organization from a given SIRET.
+    Automatically fetch info about the prescriber's organization from a given SIRET.
+
+    This step is common to users who are members of any type of organization.
+    So `prescriber_org_data` will be the only modified value in the session.
 
     The SIRET is also the best way we have yet found to avoid duplicate organizations in the DB.
     """
@@ -363,45 +400,52 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
 
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         kind = session_data.get("kind")
-        prescriber_org_pk = session_data.get("prescriber_org_pk")
+        pole_emploi_org_pk = session_data.get("pole_emploi_org_pk")
 
         # Check session data.
-        if not prescriber_org_pk or kind != PrescriberOrganization.Kind.PE.value:
+        if not pole_emploi_org_pk or kind != PrescriberOrganization.Kind.PE.value:
             raise PermissionDenied
 
-        self.prescriber_organization = get_object_or_404(
-            PrescriberOrganization, pk=prescriber_org_pk, kind=PrescriberOrganization.Kind.PE.value
+        self.pole_emploi_org = get_object_or_404(
+            PrescriberOrganization, pk=pole_emploi_org_pk, kind=PrescriberOrganization.Kind.PE.value
         )
+
+        self.next = session_data.get("next")
 
         return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self, **kwargs):
         kwargs = super().get_form_kwargs(**kwargs)
-        # Pass the PrescriberOrganization instance to the form.
-        kwargs["prescriber_organization"] = self.prescriber_organization
+        kwargs["pole_emploi_org"] = self.pole_emploi_org
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["prescriber_organization"] = self.prescriber_organization
+        context["pole_emploi_org"] = self.pole_emploi_org
         context["prev_url"] = get_prev_url_from_history(self.request)
         return context
 
     def form_valid(self, form):
+        # Drop the signup session.
         del self.request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         return super().form_valid(form)
+
+    def get_success_url(self):
+        # A ?next=URL param takes precedence.
+        if self.next:
+            return self.next
+        return super().get_success_url()
 
 
 class PrescriberUserSignupView(SignupView):
     """
-    Create:
+    Create a new user of kind prescriber:
 
-    - a user of type prescriber with an authorized organization
-    - or: a user of type prescriber with an unauthorized organization ("orienteur")
-    - or: a user of type prescriber without organization ("orienteur")
+    - member of a new authorized organization ("prescripteur habilité")
+    - or member of a new unauthorized organization ("orienteur")
+    - or without any organization ("orienteur")
 
-    If required, the "authorized" character of an organization is still to be validated
-    by the support.
+    The "authorized" character of a new organization is still to be validated by the support.
     """
 
     form_class = forms.PrescriberUserSignupForm
@@ -449,6 +493,7 @@ class PrescriberUserSignupView(SignupView):
         self.prescriber_org_data = prescriber_org_data
         self.join_as_orienteur_without_org = join_as_orienteur_without_org
         self.join_authorized_org = join_authorized_org
+        self.next = session_data.get("next")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -477,5 +522,12 @@ class PrescriberUserSignupView(SignupView):
         return context
 
     def form_valid(self, form):
+        # Drop the signup session.
         del self.request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         return super().form_valid(form)
+
+    def get_success_url(self):
+        # A ?next=URL param takes precedence.
+        if self.next:
+            return self.next
+        return super().get_success_url()

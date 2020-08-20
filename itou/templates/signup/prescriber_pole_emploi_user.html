@@ -12,14 +12,14 @@
     </h1>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li>{% translate "Qui êtes-vous ?" %}</li>
+        <li>{% translate "Type de prescripteur" %}</li>
         <li>{% translate "Code SAFIR" %}</li>
         <li class="is-active">{% translate "Vos informations" %}</li>
     </ul>
 
     <div class="alert alert-secondary" role="alert">
         <p class="lead mb-0">
-            {% blocktranslate with org_name=prescriber_organization.display_name %}Vous allez rejoindre <b>{{ org_name }}</b>{% endblocktranslate %}
+            {% blocktranslate with org_name=pole_emploi_org.display_name %}Vous allez rejoindre <b>{{ org_name }}</b>{% endblocktranslate %}
         </p>
     </div>
 

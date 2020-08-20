@@ -375,6 +375,13 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
 
 /* Responsive Multi-Step Progress Bar.
 https://codepen.io/athimannil/pen/wWPYkQ
+
+Usage:
+    <ul class="list-unstyled multi-steps">
+        <li>Type de prescripteur</li>
+        <li class="is-active">SIRET</li>
+        <li>Vos informations</li>
+    </ul>
 --------------------------------------------------------------------------- */
 
 .multi-steps > li.is-active:before, .multi-steps > li.is-active ~ li:before {
