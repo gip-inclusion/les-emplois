@@ -84,7 +84,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         ),
     )
     inlines = (MembersInline,)
-    list_display = ("pk", "name", "post_code", "city", "department", "member_count")
+    list_display = ("pk", "siret", "name", "post_code", "city", "department", "member_count")
     list_display_links = ("pk", "name")
     list_filter = (AuthorizationValidationRequired, HasMembersFilter, "is_authorized", "kind", "department")
     raw_id_fields = ("created_by",)

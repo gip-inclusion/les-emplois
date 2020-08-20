@@ -192,6 +192,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def has_unset_authorization(self):
         return self.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
 
+    def get_admins(self):
+        return self.members.filter(is_active=True, prescribermembership__is_admin=True)
+
     def new_signup_warning_email_to_existing_members(self, user):
         """
         Send a warning fyi-only email to all existing users of the organization

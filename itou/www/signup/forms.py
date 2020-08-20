@@ -333,9 +333,13 @@ class PrescriberSiretForm(forms.Form):
         validate_siret(siret)
 
         # Does the org already exists?
-        if PrescriberOrganization.objects.filter(siret=siret).exists():
+        org = PrescriberOrganization.objects.filter(siret=siret).first()
+        if org:
+            admin = org.get_admins().first()
             error = _(
-                "Une organisation avec ce SIRET existe déjà. Vous devez obtenir une invitation pour la rejoindre."
+                f'"{org.display_name}" utilise déjà ce SIRET. '
+                f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
+                f"{admin.first_name.title()} {admin.last_name[0].upper()}."
             )
             raise forms.ValidationError(error)
 
