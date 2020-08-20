@@ -131,11 +131,10 @@
                                 </a>
                             {% endif %}
                         </p>
-
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
                             <a href="{% url 'prescribers_views:members' %}">
-                                {% translate "Collaborateurs" %}
+                                {% translate "Voir et inviter vos collaborateurs" %}
                             </a>
                             <span class="badge badge-info">{% translate "Nouveau" %}</span>
                         </p>
@@ -161,12 +160,10 @@
                         {% include "includes/icon.html" with icon="message-square" %}
                         <a href="{% url 'apply:list_for_prescriber' %}">{% translate "Suivi des candidatures" %}</a>
                     </p>
-
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="user-check" %}
                         <a href="/">{% translate "Postuler pour un candidat" %}</a>
                     </p>
-
                 </div>
             </div>
 
@@ -192,7 +189,7 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="users" %}
                         <a href="{% url 'siaes_views:members' %}">
-                            {% translate "Collaborateurs" %}
+                            {% translate "Voir et inviter vos collaborateurs" %}
                         </a>
                     </p>
                     <p class="card-text">
