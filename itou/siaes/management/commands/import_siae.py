@@ -502,6 +502,7 @@ class Command(BaseCommand):
     def manage_siae_activation(self):
         activations = 0
         deactivations = 0
+        deletions = 0
         refused_job_applications = 0
         active_until_updates = 0
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP):
@@ -512,15 +513,21 @@ class Command(BaseCommand):
                     self.activate_siae(siae)
                     activations += 1
             else:
+                if self.siae_can_be_deleted(siae):
+                    self.log(f"siae.id={siae.id} is inactive and without data thus will be deleted")
+                    self.delete_siae(siae)
+                    deletions += 1
+                    continue
                 if siae.is_active:
                     self.deactivate_siae(siae)
                     deactivations += 1
                 refused_job_applications += self.reject_pending_job_applications(siae)
             active_until_updates += self.update_siae_active_until(siae)
 
-        self.log(f"{deactivations} siaes will be deactivated.")
+        self.log(f"{deletions} siaes will be deleted as inactive and without data.")
+        self.log(f"{deactivations} siaes will be deactivated (NOT APPLIED AS OF NOW).")
         self.log(f"{activations} siaes will be activated.")
-        self.log(f"{refused_job_applications} job applications will be refused.")
+        self.log(f"{refused_job_applications} job applications will be refused (NOT APPLIED AS OF NOW).")
         self.log(f"{active_until_updates} siae.active_until fields will be updated.")
 
         # FIXME deactivate children as well - will be done at a later step.
