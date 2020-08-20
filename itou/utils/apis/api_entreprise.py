@@ -40,8 +40,11 @@ class EtablissementAPI:
             r.raise_for_status()
             data = r.json()
         except requests.exceptions.HTTPError as e:
-            logger.error("Error while fetching `%s`: %s", url, e)
-            error = _("Erreur de connexion à l'API Entreprise.")
+            if e.response.status_code == 422:
+                error = _("SIRET non reconnu.")
+            else:
+                logger.error("Error while fetching `%s`: %s", url, e)
+                error = _("Problème de connexion à l'API Entreprise. Veuillez réessayer ultérieurement.")
 
         if data and data.get("errors"):
             error = data["errors"][0]
