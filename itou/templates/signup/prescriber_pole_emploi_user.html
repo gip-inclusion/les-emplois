@@ -32,7 +32,7 @@
         {% include "signup/includes/submit_rgpd.html" %}
 
         {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
                 {% translate "Retour" %}
             </a>
         {% endbuttons %}

@@ -48,15 +48,9 @@
         {% include "signup/includes/submit_rgpd.html" %}
 
         {% buttons %}
-            {% if join_as_orienteur_without_org %}
-                <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_is_pole_emploi' %}">
-                    {% translate "Retour" %}
-                </a>
-            {% else %}
-                <a class="btn btn btn-outline-secondary" href="{% url 'signup:prescriber_siret' %}">
-                    {% translate "Retour" %}
-                </a>
-            {% endif %}
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+                {% translate "Retour" %}
+            </a>
         {% endbuttons %}
 
     </form>

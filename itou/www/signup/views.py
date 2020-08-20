@@ -127,6 +127,45 @@ def valid_prescriber_signup_session_required(function=None):
     return decorated
 
 
+def push_url_in_history(request):
+    """
+    Keep track of the navigation history through the prescriber signup process.
+    This must be triggered after a form submit.
+    """
+
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    url_history = session_data["url_history"]
+
+    current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
+    if current_url not in url_history:
+        # The user has gone forwards: a form that was never visited is submitted.
+        url_history.append(current_url)
+    else:
+        # Otherwise the user has gone backwards: a form that was already submitted is submitted again.
+        # Clear all history after the current url.
+        current_url_index = url_history.index(current_url)
+        url_history = url_history[: current_url_index + 1]
+
+    session_data["url_history"] = url_history
+
+
+def get_prev_url_from_history(request):
+    """
+    Get the previous URL in the prescriber signup process history.
+    """
+
+    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+    url_history = session_data["url_history"]
+
+    current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
+    if current_url in url_history:
+        # The URL has already been visited, return the preceding URL.
+        current_url_index = url_history.index(current_url)
+        return session_data["url_history"][current_url_index - 1]
+
+    return session_data["url_history"][-1]
+
+
 def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_emploi.html"):
     """
     Entry point of the signup process for prescribers/orienteurs.
@@ -142,7 +181,8 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
         "prescriber_org_data": None,
         "prescriber_org_pk": None,
         "safir_code": None,
-        # TODO: the `next` redirect chain looks broken in allauth
+        "url_history": [reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")],
+        # TODO: the `next` redirect chain looks broken in allauth when ACCOUNT_EMAIL_VERIFICATION is "mandatory".
         # https://github.com/pennersr/django-allauth/blob/845aa5/allauth/account/utils.py#L153-L157
         "next": get_safe_url(request, "next"),
     }
@@ -150,12 +190,19 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
     form = forms.PrescriberEntryPointForm(data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
+
         is_pole_emploi = form.cleaned_data["is_pole_emploi"]
-        if is_pole_emploi:
+
+        if not is_pole_emploi:
+            next_url = reverse("signup:prescriber_is_known_org")
+
+        else:
             session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
             session_data["kind"] = PrescriberOrganization.Kind.PE.value
-            return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
-        return HttpResponseRedirect(reverse("signup:prescriber_is_known_org"))
+            next_url = reverse("signup:prescriber_pole_emploi_safir_code")
+
+        push_url_in_history(request)
+        return HttpResponseRedirect(next_url)
 
     context = {"form": form}
     return render(request, template_name, context)
@@ -177,17 +224,21 @@ def prescriber_is_known_org(request, template_name="signup/prescriber_is_known_o
 
         if prescriber_kind == PrescriberOrganization.Kind.PE.value:
             session_data["kind"] = PrescriberOrganization.Kind.PE.value
-            return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_safir_code"))
+            next_url = reverse("signup:prescriber_pole_emploi_safir_code")
 
-        if prescriber_kind == PrescriberOrganization.Kind.OTHER.value:
+        elif prescriber_kind == PrescriberOrganization.Kind.OTHER.value:
             session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
-            return HttpResponseRedirect(reverse("signup:prescriber_ask_kind"))
+            next_url = reverse("signup:prescriber_ask_kind")
 
-        session_data["kind"] = prescriber_kind
-        session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-        return HttpResponseRedirect(reverse("signup:prescriber_siret"))
+        else:
+            session_data["kind"] = prescriber_kind
+            session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
+            next_url = reverse("signup:prescriber_siret")
 
-    context = {"form": form}
+        push_url_in_history(request)
+        return HttpResponseRedirect(next_url)
+
+    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
     return render(request, template_name, context)
 
 
@@ -207,20 +258,23 @@ def prescriber_ask_kind(request, template_name="signup/prescriber_ask_kind.html"
 
         if prescriber_kind == form.KIND_AUTHORIZED_ORG:
             session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
-            return HttpResponseRedirect(reverse("signup:prescriber_confirm_authorization"))
+            next_url = reverse("signup:prescriber_confirm_authorization")
 
-        if prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
+        elif prescriber_kind == form.KIND_UNAUTHORIZED_ORG:
             session_data["kind"] = PrescriberOrganization.Kind.OTHER.value
             session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
-            return HttpResponseRedirect(reverse("signup:prescriber_siret"))
+            next_url = reverse("signup:prescriber_siret")
 
         # Go to sign up screen without organization.
-        if prescriber_kind == form.KIND_SOLO:
+        elif prescriber_kind == form.KIND_SOLO:
             session_data["kind"] = None
             session_data["authorization_status"] = None
-            return HttpResponseRedirect(reverse("signup:prescriber_user"))
+            next_url = reverse("signup:prescriber_user")
 
-    context = {"form": form}
+        push_url_in_history(request)
+        return HttpResponseRedirect(next_url)
+
+    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
     return render(request, template_name, context)
 
 
@@ -243,9 +297,11 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
         if form.cleaned_data["confirm_authorization"]:
             session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
 
-        return HttpResponseRedirect(reverse("signup:prescriber_siret"))
+        push_url_in_history(request)
+        next_url = reverse("signup:prescriber_siret")
+        return HttpResponseRedirect(next_url)
 
-    context = {"form": form}
+    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
     return render(request, template_name, context)
 
 
@@ -263,9 +319,11 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         session_data["prescriber_org_pk"] = form.prescriber_organization.pk
         session_data["safir_code"] = form.cleaned_data["safir_code"]
-        return HttpResponseRedirect(reverse("signup:prescriber_pole_emploi_user"))
+        push_url_in_history(request)
+        next_url = reverse("signup:prescriber_pole_emploi_user")
+        return HttpResponseRedirect(next_url)
 
-    context = {"form": form}
+    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
     return render(request, template_name, context)
 
 
@@ -283,9 +341,11 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data
-        return HttpResponseRedirect(reverse("signup:prescriber_user"))
+        push_url_in_history(request)
+        next_url = reverse("signup:prescriber_user")
+        return HttpResponseRedirect(next_url)
 
-    context = {"form": form}
+    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
     return render(request, template_name, context)
 
 
@@ -324,6 +384,7 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["prescriber_organization"] = self.prescriber_organization
+        context["prev_url"] = get_prev_url_from_history(self.request)
         return context
 
     def form_valid(self, form):
@@ -410,6 +471,7 @@ class PrescriberUserSignupView(SignupView):
                 "join_authorized_org": self.join_authorized_org,
                 "kind": self.kind,
                 "prescriber_org_data": self.prescriber_org_data,
+                "prev_url": get_prev_url_from_history(self.request),
             }
         )
         return context
