@@ -285,7 +285,7 @@ class PrescriberIdentifyKindForm(forms.Form):
     KIND_SOLO = "solo"
 
     KIND_CHOICES = (
-        (KIND_AUTHORIZED_ORG, gettext_lazy("Pour une organisation habilitée par le préfet")),
+        (KIND_AUTHORIZED_ORG, gettext_lazy("Pour une organisation habilitée par le Préfet")),
         (KIND_UNAUTHORIZED_ORG, gettext_lazy("Pour une organisation non-habilitée")),
         (KIND_SOLO, gettext_lazy("Seul (sans organisation)")),
     )
@@ -298,8 +298,8 @@ class PrescriberIdentifyKindForm(forms.Form):
 class PrescriberConfirmAuthorizationForm(forms.Form):
 
     CONFIRM_AUTHORIZATION_CHOICES = (
-        (1, gettext_lazy("Oui, je confirme que mon organisation est habilitée par le préfet")),
-        (0, gettext_lazy("Non, mon organisation n’est pas habilitée par le préfet")),
+        (1, gettext_lazy("Oui, je confirme que mon organisation est habilitée par le Préfet")),
+        (0, gettext_lazy("Non, mon organisation n’est pas habilitée par le Préfet")),
     )
 
     confirm_authorization = forms.TypedChoiceField(

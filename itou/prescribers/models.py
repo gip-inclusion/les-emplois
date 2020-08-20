@@ -118,7 +118,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     is_authorized = models.BooleanField(
         verbose_name=_("Habilitation"),
         default=False,
-        help_text=_("Précise si l'organisation est habilitée par le préfet."),
+        help_text=_("Précise si l'organisation est habilitée par le Préfet."),
     )
     code_safir_pole_emploi = models.CharField(
         verbose_name=_("Code Safir"),
