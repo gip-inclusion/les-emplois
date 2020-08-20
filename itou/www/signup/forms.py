@@ -406,9 +406,7 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         self.prescriber_organization = kwargs.pop("prescriber_organization")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = _(
-            "Utilisez votre dresse e-mail professionnelle se terminant par @pole-emploi.fr"
-        )
+        self.fields["email"].help_text = _("Exemple : nom.prenom@pole-emploi.fr")
 
     def clean_email(self):
         email = super().clean_email()
