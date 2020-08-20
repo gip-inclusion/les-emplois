@@ -5,11 +5,13 @@
 
 {% block messages %}
     {{ block.super }}
+
     {% if current_siae %}
         <div class="alert alert-warning" role="alert">
             {% translate "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
         </div>
     {% endif %}
+
     {% if current_siae and not current_siae.has_reliable_coords %}
         <div class="alert alert-warning" role="alert">
             {% url 'siaes_views:edit_siae' as edit_siae_url %}
@@ -21,16 +23,15 @@
             {% endblocktranslate %}
         </div>
     {% endif %}
+
     {% if current_prescriber_organization and prescriber_authorization_status_not_set %}
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Fermer">
-                <span aria-hidden="true">&times;</span>
-            </button>
+        <div class="alert alert-warning" role="alert">
             <div>
-                {% blocktranslate %}
-                    Vous êtes membre d'une organisation dont l'habilitation est en cours de vérification.
-                    Vous serez notifié par e-mail lorsque cette vérification sera terminée.
-                {% endblocktranslate %}
+                {% trans "Afin d'enregistrer votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique,  merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :" %}
+                <a href="https://startupsbeta.typeform.com/to/w1XTUer7" rel="noopener" target="_blank">
+                    {% trans "cliquez ici pour l'envoyer" %}
+                    {% include "includes/icon.html" with icon="external-link" %}
+                </a>
             </div>
         </div>
     {% endif %}
