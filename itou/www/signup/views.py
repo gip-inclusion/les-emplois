@@ -235,13 +235,12 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
 
     if request.method == "POST" and form.is_valid():
 
-        confirm_authorization = form.cleaned_data["confirm_authorization"]
-        if confirm_authorization:
-            session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
-            return HttpResponseRedirect(reverse("signup:prescriber_siret"))
+        session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED.value
 
-        session_data["authorization_status"] = None
-        return HttpResponseRedirect(reverse("signup:prescriber_ask_kind"))
+        if form.cleaned_data["confirm_authorization"]:
+            session_data["authorization_status"] = PrescriberOrganization.AuthorizationStatus.NOT_SET.value
+
+        return HttpResponseRedirect(reverse("signup:prescriber_siret"))
 
     context = {"form": form}
     return render(request, template_name, context)
