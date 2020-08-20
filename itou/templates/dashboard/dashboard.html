@@ -113,15 +113,11 @@
         {% endif %}
 
         {% if user.is_prescriber %}
-            <div class="card">
-                <h5 class="card-header">{% translate "Organisation" %}</h5>
-                <div class="card-body">
-                    {% if not current_prescriber_organization %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon="plus-square" %}
-                            <a href="{% url 'prescribers_views:create_organization' %}">{% translate "Créer une organisation" %}</a>
-                        </p>
-                    {% else %}
+
+            {% if current_prescriber_organization %}
+                <div class="card">
+                    <h5 class="card-header">{% translate "Organisation" %}</h5>
+                    <div class="card-body">
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
                             <a href="{% url 'prescribers_views:edit_organization' %}">
@@ -153,9 +149,10 @@
                                 </span>
                             </p>
                         {% endif %}
-                    {% endif %}
+                    </div>
                 </div>
-            </div>
+            {% endif %}
+
             <div class="card">
                 <h5 class="card-header">{% translate "Candidatures" %}</h5>
                 <div class="card-body">
@@ -171,6 +168,7 @@
 
                 </div>
             </div>
+
         {% endif %}
 
         {% if user.is_siae_staff %}
