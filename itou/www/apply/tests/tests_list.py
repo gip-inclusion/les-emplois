@@ -37,7 +37,7 @@ class ProcessListTest(TestCase):
 
         # Pole Emploi
         pole_emploi = AuthorizedPrescriberOrganizationWithMembershipFactory(
-            name="Pôle Emploi", membership__user__first_name="Thibault"
+            name="Pôle emploi", membership__user__first_name="Thibault"
         )
         PrescriberMembershipFactory(organization=pole_emploi, user__first_name="Laurie")
         thibault_pe = pole_emploi.members.get(first_name="Thibault")
@@ -215,7 +215,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
     def test_view__filtered_by_sender_organization_name(self):
         """
-        Eddie wants to see applications sent by Pôle Emploi.
+        Eddie wants to see applications sent by Pôle emploi.
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender_organization = self.pole_emploi
@@ -232,7 +232,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
     def test_view__filtered_by_sender_name(self):
         """
-        Eddie wants to see applications sent by a member of Pôle Emploi.
+        Eddie wants to see applications sent by a member of Pôle emploi.
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         sender = self.thibault_pe
@@ -266,7 +266,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
     def test_view__filtered_by_many_organization_names(self):
         """
-        Eddie wants to see applications sent by Pôle Emploi and L'Envol.
+        Eddie wants to see applications sent by Pôle emploi and L'Envol.
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
@@ -291,7 +291,7 @@ class ProcessListPrescriberTest(ProcessListTest):
     def test_list_for_prescriber_view(self):
         """
         Connect as Thibault to see a list of job applications
-        sent by his organization (Pôle Emploi).
+        sent by his organization (Pôle emploi).
         """
         self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
         response = self.client.get(self.prescriber_base_url)

@@ -336,7 +336,7 @@ API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
-# PEAM stands for Pôle Emploi Access Management.
+# PEAM stands for Pôle emploi Access Management.
 # Technically there are two PEAM distinct systems:
 # - PEAM "Entreprise", PEAM-E or PEAME for short.
 # - PEAM "Utilisateur", PEAM-U or PEAMU for short.
