@@ -28,10 +28,14 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             {
                 "name": _("Candidatures à traiter"),
                 "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
+                "icon": "user-plus",
+                "badge": "badge-danger",
             },
             {
                 "name": _("Candidatures acceptées et embauches prévues"),
                 "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED],
+                "icon": "user-check",
+                "badge": "badge-secondary",
             },
             {
                 "name": _("Candidatures refusées/annulées"),
@@ -40,6 +44,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     JobApplicationWorkflow.STATE_CANCELLED,
                     JobApplicationWorkflow.STATE_OBSOLETE,
                 ],
+                "icon": "user-x",
+                "badge": "badge-secondary",
             },
         ]
         siae = get_current_siae_or_404(request)
