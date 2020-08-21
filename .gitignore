@@ -128,9 +128,9 @@ ENV/
 # IPython
 .ipython
 
-# Pylint
+# Code quality
 .pylint.d
-
+*.isorted
 
 # Editors
 .tm_properties
