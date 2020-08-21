@@ -393,6 +393,20 @@ class Command(BaseCommand):
             else:
                 self.log(f"siae.id={siae.id} without external_id has data and thus cannot be deleted")
 
+    def delete_user_created_orphan_siaes(self):
+        """
+        Siaes created by a user usually have at least one member, their creator.
+        However in some cases, itou staff deletes some users, leaving
+        potentially orphan user created siaes.
+        Those siaes cannot be joined by any way and thus would stay orphan forever.
+        Let's clean them up.
+        """
+        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED).all():
+            if not siae.has_members:
+                assert self.siae_can_be_deleted(siae)
+                self.log(f"siae.id={siae.id} is orphan and user created thus will be deleted")
+                self.delete_siae(siae)
+
     def update_existing_siaes(self):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
             row = get_main_df_row_as_dict(external_id=siae.external_id)
@@ -679,6 +693,8 @@ class Command(BaseCommand):
         self.fix_missing_external_ids()
 
         self.delete_siaes_without_external_id()
+
+        self.delete_user_created_orphan_siaes()
 
         self.update_existing_siaes()
 
