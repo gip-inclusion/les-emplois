@@ -107,7 +107,7 @@ class SiaeAdmin(admin.ModelAdmin):
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields["source"].initial = models.Siae.SOURCE_USER_CREATED
+        form.base_fields["source"].initial = models.Siae.SOURCE_STAFF_CREATED
         return form
 
     def save_model(self, request, obj, form, change):

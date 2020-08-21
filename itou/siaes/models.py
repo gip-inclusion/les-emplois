@@ -107,11 +107,13 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     SOURCE_ASP = "ASP"
     SOURCE_GEIQ = "GEIQ"
     SOURCE_USER_CREATED = "USER_CREATED"
+    SOURCE_STAFF_CREATED = "STAFF_CREATED"
 
     SOURCE_CHOICES = (
         (SOURCE_ASP, _("Export ASP")),
         (SOURCE_GEIQ, _("Export GEIQ")),
         (SOURCE_USER_CREATED, _("Utilisateur")),
+        (SOURCE_STAFF_CREATED, _("Staff Itou")),
     )
 
     ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI]
