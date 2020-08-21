@@ -213,13 +213,13 @@
             <div class="card">
                 <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
                 <div class="card-body">
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_siae' %}">{% translate "Répondre aux candidatures reçues" %}</a>
-                        {% if job_applications_counter > 0 %}
-                            <span class="badge badge-danger">{{ job_applications_counter }}</span>
-                        {% endif %}
-                    </p>
+                    {% for category in job_applications_categories %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="message-square" %}
+                            <a href="{{ category.url }}">{{ category.name }}</a>
+                            <span class="badge badge-danger">{{ category.counter }}</span>
+                        </p>
+                    {% endfor %}
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="user-check" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
