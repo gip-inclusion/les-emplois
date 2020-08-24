@@ -2,9 +2,8 @@ import re
 
 from django.conf import settings
 from django.core import mail
-from django.template.loader import get_template
 from django.core.mail.backends.base import BaseEmailBackend
-
+from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
 
@@ -58,7 +57,6 @@ def _async_proces_email(email_message):
 
 
 class DummyAsyncEmailBackend(BaseEmailBackend):
-
     def open(self):
         pass
 
