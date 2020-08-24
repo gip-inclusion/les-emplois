@@ -234,52 +234,8 @@ class SiaeSignupTest(TestCase):
             post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, siae.signup_magic_link)
-
-            # Create user.
-            url = reverse("signup:siae")
-            post_data = {
-                # Hidden fields.
-                "encoded_siae_id": siae.get_encoded_siae_id(),
-                "token": siae.get_token(),
-                # Readonly fields.
-                "siret": siae.siret,
-                "kind": siae.kind,
-                "siae_name": siae.display_name,
-                # Regular fields.
-                "first_name": user_first_name,
-                "last_name": "Doe",
-                "email": user_email,
-                "password1": "!*p4ssw0rd123-",
-                "password2": "!*p4ssw0rd123-",
-            }
-            response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, reverse("account_email_verification_sent"))
-
-            # Check `User` state.
-            user = get_user_model().objects.get(email=user_email)
-            self.assertFalse(user.is_job_seeker)
-            self.assertFalse(user.is_prescriber)
-            self.assertTrue(user.is_siae_staff)
-            self.assertTrue(user.is_active)
-            self.assertEqual(user.first_name, user_first_name)
-            self.assertEqual(user.last_name, post_data["last_name"])
-            self.assertEqual(user.email, user_email)
-            # Check `Membership` state.
-            self.assertTrue(siae.has_admin(existing_admin_user))
-            self.assertFalse(siae.has_admin(user))
-            self.assertEqual(2, siae.members.count())
-            # Check `EmailAddress` state.
-            self.assertEqual(user.emailaddress_set.count(), 1)
-            user_email = user.emailaddress_set.first()
-            self.assertFalse(user_email.verified)
-
-            # Check sent emails.
-            self.assertEqual(len(mail.outbox), 2)
-            subjects = [email.subject for email in mail.outbox]
-            self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure !", subjects)
-            self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subjects)
+            # Joining a structure with members is allowed only using the invitations feature.
+            self.assertRedirects(response, "/")
 
     def test_cannot_join_an_inactive_siae(self):
         """

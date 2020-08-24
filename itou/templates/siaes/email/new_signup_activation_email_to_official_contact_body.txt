@@ -14,7 +14,7 @@
 
 {% translate "Ouvrez le lien suivant pour procéder à l'inscription" %} : {{ signup_magic_link }}
 
-{% translate "Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un collaborateur ou d'une collaboratrice. translateférez-lui cet email pour lui permettre de s'inscrire." %}
+{% translate "Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un collaborateur ou d'une collaboratrice. Transférez-lui cet email pour lui permettre de s'inscrire." %}
 
 {% translate "Si vous êtes certain que cette demande n'émane d'aucun de vos collaborateurs ou collaboratrices, vous pouvez simplement ignorer notre e-mail." %}
 
