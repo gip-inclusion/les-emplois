@@ -335,12 +335,14 @@ class PrescriberSiretForm(forms.Form):
         # Does the org already exists?
         org = PrescriberOrganization.objects.filter(siret=siret).first()
         if org:
+            error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
             admin = org.get_admins().first()
-            error = _(
-                f'"{org.display_name}" utilise déjà ce SIRET. '
-                f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
-                f"{admin.first_name.title()} {admin.last_name[0].upper()}."
-            )
+            if admin:
+                error += _(
+                    f" "
+                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
+                    f"{admin.first_name.title()} {admin.last_name[0].upper()}."
+                )
             raise forms.ValidationError(error)
 
         # Fetch name and address from API entreprise.
