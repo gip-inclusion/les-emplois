@@ -1,4 +1,3 @@
-import datetime
 import logging
 import os
 
@@ -61,24 +60,27 @@ class Command(BaseCommand):
         chunk_size = 5000
 
         df = pd.read_excel(file_path)
+        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format="%d/%m/%y")
+        df.sort_values("DATE_HISTO")
+        first_approval_date = df.iloc[0].DATE_HISTO.strftime("%m/%d/%y")
+        last_approval_date = df.iloc[-1].DATE_HISTO.strftime("%m/%d/%y")
+
+        df["DATE_DEB"] = pd.to_datetime(df.DATE_DEB, format="%d/%m/%y")
+        df["DATE_FIN"] = pd.to_datetime(df.DATE_FIN, format="%d/%m/%y")
+        df["DATE_NAISS_BENE"] = pd.to_datetime(df.DATE_NAISS_BENE, format="%d/%m/%y")
 
         self.stdout.write("Ready.")
+        self.stdout.write(f"Importing approvals from {first_approval_date} to {last_approval_date}")
         self.stdout.write("Creating approvals… 0%")
 
         last_progress = 0
-        for i, row in df.iterrows():
+        for idx, row in df.iterrows():
 
-            if i == 0:
+            if idx == 0:
                 # Skip XLSX header.
                 continue
 
-            if not row[0]:
-                # It should only concern the last XLSX line.
-                self.stderr.write("EmptyCell found, skipping…")
-                self.stderr.write(str(row))
-                continue
-
-            progress = int((100 * i) / df.shape[0])
+            progress = int((100 * idx) / len(df))
             if progress > last_progress + 5:
                 self.stdout.write(f"Creating approvals… {progress}%")
                 last_progress = progress
@@ -126,8 +128,8 @@ class Command(BaseCommand):
                 suffix = NUM_AGR_DEC[12:]
                 unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
-            DATE_DEB_AGR_DEC = datetime.datetime.strptime(row["DATE_DEB"].strip(), "%d/%m/%y").date()
-            DATE_FIN_AGR_DEC = datetime.datetime.strptime(row["DATE_FIN"].strip(), "%d/%m/%y").date()
+            DATE_DEB_AGR_DEC = row["DATE_DEB"]
+            DATE_FIN_AGR_DEC = row["DATE_FIN"]
 
             # Same start and end dates means that the approval has been canceled.
             if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
@@ -137,7 +139,7 @@ class Command(BaseCommand):
                 self.logger.debug("%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE)
                 continue
 
-            DATE_NAISS_BENE = datetime.datetime.strptime(row["DATE_NAISS_BENE"].strip(), "%d/%m/%y").date()
+            DATE_NAISS_BENE = row["DATE_NAISS_BENE"]
 
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
