@@ -175,7 +175,10 @@
 
         {% if user.is_siae_staff %}
             <div class="card">
-                <h5 class="card-header">{% translate "Employeur solidaire" %}</h5>
+                <h5 class="card-header">
+                    {% translate "Ma structure" %}
+                    (ID {{ current_siae.id }})
+                </h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
@@ -208,7 +211,7 @@
                 </div>
             </div>
             <div class="card">
-                <h5 class="card-header">{% translate "Candidatures" %}</h5>
+                <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
