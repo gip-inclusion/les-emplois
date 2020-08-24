@@ -5,6 +5,7 @@ from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -31,7 +32,7 @@ class ItouPasswordResetView(PasswordResetView):
 
 
 @require_GET
-def signup(request, template_name="signup/signup.html", redirect_field_name="next"):
+def signup(request, template_name="signup/signup.html", redirect_field_name=REDIRECT_FIELD_NAME):
     """
     Override allauth `account_signup` URL
     (the route is defined in config.urls).
