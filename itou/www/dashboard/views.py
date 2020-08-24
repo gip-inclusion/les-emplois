@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
@@ -67,7 +67,7 @@ class ItouLogoutView(LogoutView):
         peamu_id_token = self.request.user.peamu_id_token
         ajax_response = super().post(*args, **kwargs)
         if peamu_id_token:
-            hp_url = self.request.build_absolute_uri(reverse("home:hp"))
+            hp_url = self.request.build_absolute_uri("/")
             params = {"id_token_hint": peamu_id_token, "redirect_uri": hp_url}
             peamu_logout_url = f"{settings.PEAMU_AUTH_BASE_URL}/compte/deconnexion?{urlencode(params)}"
             return HttpResponseRedirect(peamu_logout_url)

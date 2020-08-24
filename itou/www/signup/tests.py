@@ -122,7 +122,7 @@ class SiaeSignupTest(TestCase):
             post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, reverse("home:hp"))
+            self.assertRedirects(response, "/")
 
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]

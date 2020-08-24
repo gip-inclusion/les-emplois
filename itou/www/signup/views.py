@@ -61,7 +61,7 @@ def select_siae(request, template_name="signup/signup_select_siae.html"):
                 f"de réception."
             )
             messages.success(request, message)
-        return HttpResponseRedirect(reverse("home:hp"))
+        return HttpResponseRedirect("/")
 
     context = {"form": form}
     return render(request, template_name, context)
