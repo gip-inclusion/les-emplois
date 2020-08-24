@@ -3,23 +3,23 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Un nouvel utilisateur souhaite rejoindre votre structure sur la plateforme de l'inclusion !" %}
+{% translate "Un nouvel utilisateur souhaite rejoindre votre structure sur la Plateforme de l'inclusion !" %}
 
-{% translate "*Structure* :" %}
+{% translate "Structure :" %}
 
 - {% translate "Nom" %} : {{ siae.display_name }}
 - {% translate "SIRET" %} : {{ siae.siret }}
 - {% translate "Type" %} : {{ siae.kind }}
 - {% translate "Email de contact" %} : {{ siae.auth_email }}
 
-{% translate "Si vous êtes à l'origine de cette demande, veuillez ouvrir le lien suivant pour continuer votre inscription" %} : {{ signup_magic_link }}
+{% translate "Ouvrez le lien suivant pour procéder à l'inscription" %} : {{ signup_magic_link }}
 
-{% translate "Si vous n'êtes pas à l'origine de cette demande d'inscription, il est probable qu'un(e) de vos collaborateurs(trices) le soit. Veuillez lui transférer cet email afin qu'il ou elle puisse continuer son inscription." %}
+{% translate "Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un collaborateur ou d'une collaboratrice. Transférez-lui cet email pour lui permettre de s'inscrire." %}
 
-{% translate "Si vous êtes sûr(e) que cette demande d'inscription n'émane pas d'un(e) de vos collaborateurs(trices), veuillez simplement ignorer cet email." %}
+{% translate "Si vous êtes certain que cette demande n'émane d'aucun de vos collaborateurs ou collaboratrices, vous pouvez simplement ignorer notre e-mail." %}
 
-{% translate "Cet email a été envoyé à" %}
+{% translate "Cet e-mail a été envoyé à" %}
 {{ siae.auth_email }}
-{% translate "qui est l'addresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (ASP, GEIQ...)." %}
+{% translate "adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (ASP, GEIQ...)." %}
 
 {% endblock body %}

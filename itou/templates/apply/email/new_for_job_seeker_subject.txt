@@ -5,7 +5,7 @@
 {% if job_application.is_sent_by_proxy %}
 
 {% blocktranslate with siae_name=job_application.to_siae.display_name sender=job_application.sender.get_full_name %}
-    {{ sender }} a candidaté pour vous chez {{ siae_name }}
+    {{ sender }} a envoyé votre candidature chez {{ siae_name }}
 {% endblocktranslate %}
 
 {% else %}

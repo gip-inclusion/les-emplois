@@ -69,7 +69,13 @@ class CreateSiaeForm(forms.ModelForm):
                 connue de nos services. Merci de nous contacter à l'adresse
                 """
             )
-            mail_to = settings.ITOU_EMAIL_CONTACT
+
+            error_message_siret = _(
+                "en précisant votre numéro de SIRET (si existant),"
+                " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
+                " pour être contacté(e) si nécessaire."
+            )
+            mail_to = settings.ITOU_EMAIL_ASSISTANCE
             mail_subject = _("Se rattacher à une structure existante - Plateforme de l'inclusion")
 
             mail_body = _(
@@ -89,7 +95,7 @@ class CreateSiaeForm(forms.ModelForm):
                 f'<a href="mailto:{mail_to}?subject={mail_subject}&body={mail_body}"'
                 f' target="_blank" class="alert-link">{mail_to}</a>'
             )
-            error_message = f"{error_message} {mailto_html}."
+            error_message = mark_safe(f"{error_message} {mailto_html} {error_message_siret}")
             raise forms.ValidationError(error_message)
 
         if not siret.startswith(self.current_siae.siren):

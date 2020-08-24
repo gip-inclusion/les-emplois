@@ -218,9 +218,7 @@ class SelectSiaeForm(forms.Form):
         max_length=14,
         validators=[validate_siret],
         strip=True,
-        help_text=gettext_lazy(
-            "Saisissez 14 chiffres. Numéro connu possiblement de l'Agence de services et de paiement (ASP)"
-        ),
+        help_text=gettext_lazy("Saisissez 14 chiffres."),
         required=False,
     )
 

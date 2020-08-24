@@ -111,6 +111,5 @@ def switch_siae(request):
     queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
-    messages.success(request, _(f"Vous travaillez sur {siae.display_name}"))
 
     return HttpResponseRedirect(dashboard_url)

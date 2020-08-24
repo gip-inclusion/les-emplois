@@ -127,7 +127,7 @@ class ModelTest(TestCase):
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
             self.assertIn("Un nouvel utilisateur souhaite rejoindre votre structure", email.subject)
-            self.assertIn("veuillez ouvrir le lien suivant pour continuer votre inscription", email.body)
+            self.assertIn("Ouvrez le lien suivant pour procéder à l'inscription", email.body)
             self.assertIn(siae.signup_magic_link, email.body)
             self.assertIn(siae.display_name, email.body)
             self.assertIn(siae.siret, email.body)
@@ -150,7 +150,7 @@ class ModelTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", email.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne veuillez nous contacter", email.body)
+        self.assertIn("Si vous ne connaissez pas cette personne, n'hésitez pas à nous prévenir par e-mail", email.body)
         self.assertIn(new_user.first_name, email.body)
         self.assertIn(new_user.last_name, email.body)
         self.assertIn(new_user.email, email.body)

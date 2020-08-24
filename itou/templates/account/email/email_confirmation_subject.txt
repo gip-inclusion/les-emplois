@@ -1,4 +1,4 @@
 {% load i18n %}
 {% autoescape off %}
-{% if itou_environment == "DEMO" %}[DEMO] {% endif %}{% blocktranslate %}Confirmer l'adresse email pour la Plateforme de l'inclusion{% endblocktranslate %}
+{% if itou_environment == "DEMO" %}[DEMO] {% endif %}{% blocktranslate %}Confirmez votre adresse e-mail pour la Plateforme{% endblocktranslate %}
 {% endautoescape %}

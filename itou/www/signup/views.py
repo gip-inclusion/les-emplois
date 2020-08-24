@@ -48,15 +48,19 @@ def select_siae(request, template_name="signup/signup_select_siae.html"):
         siae = form.selected_siae
 
         if siae.has_members:
-            return HttpResponseRedirect(siae.signup_magic_link)
-
-        siae.new_signup_activation_email_to_official_contact(request).send()
-        message = _(
-            f"Nous venons de vous envoyer un e-mail à l'adresse {siae.obfuscated_auth_email} "
-            f"pour continuer votre inscription. Veuillez consulter votre boite "
-            f"de réception."
-        )
-        messages.success(request, message)
+            message = _(
+                "Cette structure a déjà des membres. Pour des raisons de sécurité, "
+                "merci de contacter les autres membres afin qu'ils vous invitent."
+            )
+            messages.warning(request, message)
+        else:
+            siae.new_signup_activation_email_to_official_contact(request).send()
+            message = _(
+                f"Nous venons de vous envoyer un e-mail à l'adresse {siae.obfuscated_auth_email} "
+                f"pour continuer votre inscription. Veuillez consulter votre boite "
+                f"de réception."
+            )
+            messages.success(request, message)
         return HttpResponseRedirect(reverse("home:hp"))
 
     context = {"form": form}

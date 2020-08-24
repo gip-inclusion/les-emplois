@@ -2,9 +2,9 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktranslate %}Vous avez déclaré l'embauche d'un candidat sur la Plateforme de l'inclusion. Nous vous confirmons la délivrance d'un PASS IAE (valant agrément pour le compte de Pôle emploi conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail).
-
-Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktranslate %}
+{% blocktranslate %}
+Merci d'avoir confirmé l'embauche d'un candidat sur la Plateforme de l'inclusion. Vous trouverez ci-dessous votre Pass IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :
+{% endblocktranslate %}
 
 {% translate "PASS IAE N° :" %} {{ job_application.approval.number_with_spaces }}
 
@@ -29,10 +29,11 @@ Veuillez trouver ci-après les caractéristiques du PASS IAE,{% endblocktranslat
 {% translate "Votre contact :" %}
 {{ itou_email_contact }}
 
-{% translate "La plateforme de l’inclusion vous a-t-elle permis d’embaucher plus rapidement ?" %}
-
 {% blocktranslate %}
-Donnez votre avis en cliquant sur ce lien: {{ survey_link }}
+Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
+Prenez 30'' pour nous donnez votre avis ! Cliquez sur : {{ survey_link }}
+
+Merci de votre participation et à très bientôt sur la Plateforme !
 {% endblocktranslate %}
 
 {% endblock body %}
