@@ -11,17 +11,8 @@ def fix_siae_source(apps, schema_editor):
     for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED):
         user = siae.created_by
         if user:
-            assert not user.is_prescriber
-            assert not user.is_superuser
-            if user.is_siae_staff:
-                # Siae created by a regular siae user - do not touch.
-                assert not user.is_job_seeker
-                assert not user.is_staff
-            else:
+            if user.is_staff:
                 # Siae created by our staff. Should be STAFF_CREATED.
-                assert user.is_staff
-                # Some staff users are job seekers ¯\_(ツ)_/¯
-                # assert not user.is_job_seeker
                 siae.source = Siae.SOURCE_STAFF_CREATED
                 siae.save()
         else:
