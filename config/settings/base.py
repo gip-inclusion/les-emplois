@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "bootstrap_datepicker_plus",
     "django_select2",
     "mathfilters",
+    "huey.contrib.djhuey",
 ]
 
 
@@ -403,3 +404,13 @@ METABASE_SHOW_SQL_REQUESTS = False
 # by batch of 100 => 5s
 # by batch of 1000 => 5s
 METABASE_INSERT_BATCH_SIZE = 1000
+
+# Huey
+# ------------------------------------------------------------------------------
+HUEY = {"name": "ITOU",
+        "url": os.environ.get("HUEY_REDIS_URL"),
+        # "consumer": {"workers": 4, "worker_type": "thread", },
+        "immediate": False,
+        }
+
+print(HUEY)

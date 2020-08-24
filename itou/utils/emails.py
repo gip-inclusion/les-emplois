@@ -3,6 +3,9 @@ import re
 from django.conf import settings
 from django.core import mail
 from django.template.loader import get_template
+from django.core.mail.backends.base import BaseEmailBackend
+
+from huey.contrib.djhuey import task
 
 
 def remove_extra_line_breaks(text):
@@ -36,3 +39,40 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
         subject=subject_prefix + get_email_text_template(subject, context),
         body=get_email_text_template(body, context),
     )
+
+
+# EXPERIMENTAL:
+# ---
+# Custom dummy async email backend
+
+
+@task(retries=100, retry_delay=10)
+def _async_proces_email(email_message):
+    """
+    Idiotic email sender: print raw messages, retries 100 times every 10 sec.
+    """
+    print(f"From: {email_message.from_email}")
+    print(f"To: {email_message.to}")
+    print(f"Subject: {email_message.subject}")
+    print(f"Body:\n{email_message.body}")
+
+
+class DummyAsyncEmailBackend(BaseEmailBackend):
+
+    def open(self):
+        pass
+
+    def close(self):
+        pass
+
+    def send_messages(self, email_messages):
+        if not email_messages:
+            return
+
+        nb_sent = 0
+
+        for message in email_messages:
+            _async_proces_email(message)
+            nb_sent += 1
+
+        return nb_sent

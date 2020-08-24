@@ -51,3 +51,9 @@ tqdm==4.46.1  # https://github.com/tqdm/tqdm
 
 # Turn HTML files into PDF
 pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
+
+# EXPERIMENTAL:
+# Huey for async processing
+# https://huey.readthedocs.io/en/latest/
+huey==2.3.0  # https://github.com/coleifer/huey
+redis==3.5.3  # https://github.com/andymccurdy/redis-py
