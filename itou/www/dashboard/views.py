@@ -20,14 +20,41 @@ from itou.www.dashboard.forms import EditUserInfoForm
 
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
-    job_applications_counter = 0
+    job_applications_categories = []
     prescriber_authorization_status_not_set = None
 
     if request.user.is_siae_staff:
+        job_applications_categories = [
+            {
+                "name": _("Candidatures à traiter"),
+                "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
+                "icon": "user-plus",
+                "badge": "badge-danger",
+            },
+            {
+                "name": _("Candidatures acceptées et embauches prévues"),
+                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED],
+                "icon": "user-check",
+                "badge": "badge-secondary",
+            },
+            {
+                "name": _("Candidatures refusées/annulées"),
+                "states": [
+                    JobApplicationWorkflow.STATE_REFUSED,
+                    JobApplicationWorkflow.STATE_CANCELLED,
+                    JobApplicationWorkflow.STATE_OBSOLETE,
+                ],
+                "icon": "user-x",
+                "badge": "badge-secondary",
+            },
+        ]
         siae = get_current_siae_or_404(request)
-        job_applications_counter = siae.job_applications_received.filter(
-            state=JobApplicationWorkflow.STATE_NEW
-        ).count()
+        job_applications = siae.job_applications_received.values("state").all()
+        for category in job_applications_categories:
+            category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
+            category[
+                "url"
+            ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
     # See template for display message while authorized organization is being validated (prescriber path)
 
@@ -38,7 +65,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         )
 
     context = {
-        "job_applications_counter": job_applications_counter,
+        "job_applications_categories": job_applications_categories,
         "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
     }
 
