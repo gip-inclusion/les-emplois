@@ -3,7 +3,8 @@ import re
 from django.conf import settings
 from django.core import mail
 from django.core.mail.backends.base import BaseEmailBackend
-from django.core.mail.backends.smtp import EmailBackend
+from django.core.mail.message import EmailMessage
+from django.core.mail import get_connection
 from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
@@ -77,16 +78,42 @@ class DummyAsyncEmailBackend(BaseEmailBackend):
         return nb_sent
 
 
+def _serializeEmailMessage(email_message):
+    return {"subject": email_message.subject,
+            "to": email_message.to,
+            "from_email": email_message.from_email,
+            "cc": email_message.cc,
+            "bcc": email_message.bcc,
+            "body": email_message.body,
+            }
+
+
+def _deserializeEmailMessage(serialized_email_message):
+    return EmailMessage(connection=get_connection(backend=settings.ASYNC_EMAIL_BACKEND), **serialized_email_message)
+
+
 @task(retries=settings.SEND_EMAIL_NB_RETRIES, retry_delay=settings.SEND_EMAIL_RETRY_DELAY)
-def _async_send_messages(backend, email_messages):
-    backend.send_messages(email_messages)
+def _async_send_messages(serializable_email_messages):
+    count = 0
+
+    for message in [_deserializeEmailMessage(email) for email in serializable_email_messages]:
+        message.send()
+        count += 1
+
+    return count
 
 
-class AsyncEmailBackend(EmailBackend):
+class AsyncEmailBackend(BaseEmailBackend):
     """Decorating a method does not work (no object context)
        Only functions can be Huey tasks
        This workaround exposes the default email backend `send_messages` method to Huey scheduler.
     """
 
     def send_messages(self, email_messages):
-        _async_send_messages(super(), email_messages)
+        # Turn emails into something serializable
+        if not email_messages:
+            return
+
+        emails = [_serializeEmailMessage(email) for email in email_messages]
+
+        return _async_send_messages(emails)
