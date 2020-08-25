@@ -213,15 +213,15 @@
             <div class="card">
                 <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
                 <div class="card-body">
+                    {% for category in job_applications_categories %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon=category.icon %}
+                            <a href="{{ category.url }}">{{ category.name }}</a>
+                            <span class="badge {{ category.badge }}">{{ category.counter }}</span>
+                        </p>
+                    {% endfor %}
                     <p class="card-text">
-                        {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_siae' %}">{% translate "Répondre aux candidatures reçues" %}</a>
-                        {% if job_applications_counter > 0 %}
-                            <span class="badge badge-danger">{{ job_applications_counter }}</span>
-                        {% endif %}
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="user-check" %}
+                        {% include "includes/icon.html" with icon="log-in" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
                             {% if current_siae.is_subject_to_eligibility_rules %}
                                 {% translate "Obtenir un PASS IAE (candidature spontanée)" %}
@@ -248,7 +248,6 @@
                                 target="_blank">
                                     {% translate "Liste des critères d'éligibilité" %}
                             </a>
-                            <span class="badge badge-info">{% translate "Nouveau" %}</span>
                         </p>
                     {% endif %}
                 </div>

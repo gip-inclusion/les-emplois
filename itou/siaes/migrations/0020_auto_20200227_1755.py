@@ -81,5 +81,5 @@ class Migration(migrations.Migration):
     dependencies = [("siaes", "0019_auto_20200210_1626")]
 
     # Forward migration was deactivated on purpose following
-    # the deletion of CSV files whith sensitive data.
+    # the deletion of CSV files with sensitive data.
     operations = [migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]

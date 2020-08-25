@@ -122,7 +122,7 @@ class SiaeSignupTest(TestCase):
             post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
             response = self.client.post(url, data=post_data)
             self.assertEqual(response.status_code, 302)
-            self.assertRedirects(response, reverse("home:hp"))
+            self.assertRedirects(response, "/")
 
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
@@ -214,7 +214,7 @@ class SiaeSignupTest(TestCase):
         A user joins an SIAE with an existing member.
         """
 
-        user_first_name = "Jessica"
+        user_first_name = "Jessica"  # noqa F841
         user_email = "jessica.doe@siae.com"
 
         siae = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
@@ -224,7 +224,6 @@ class SiaeSignupTest(TestCase):
         with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
 
             self.assertEqual(len(siae.active_admin_members), 1)
-            existing_admin_user = siae.active_admin_members.first()
 
             url = reverse("signup:select_siae")
             response = self.client.get(url)
