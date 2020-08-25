@@ -393,19 +393,24 @@ class Command(BaseCommand):
             else:
                 self.log(f"siae.id={siae.id} without external_id has data and thus cannot be deleted")
 
-    def delete_user_created_orphan_siaes(self):
+    def delete_user_created_siaes_without_members(self):
         """
         Siaes created by a user usually have at least one member, their creator.
         However in some cases, itou staff deletes some users, leaving
-        potentially orphan user created siaes.
-        Those siaes cannot be joined by any way and thus would stay orphan forever.
+        potentially user created siaes without member.
+        Those siaes cannot be joined by any way and thus are useless.
         Let's clean them up.
         """
         for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED).all():
             if not siae.has_members:
-                assert self.siae_can_be_deleted(siae)
-                self.log(f"siae.id={siae.id} is orphan and user created thus will be deleted")
-                self.delete_siae(siae)
+                if self.siae_can_be_deleted(siae):
+                    self.log(f"siae.id={siae.id} is user created and has no member thus will be deleted")
+                    self.delete_siae(siae)
+                else:
+                    self.log(
+                        f"siae.id={siae.id} is user created and "
+                        f"has no member but has job applications thus cannot be deleted"
+                    )
 
     def update_existing_siaes(self):
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
@@ -694,7 +699,7 @@ class Command(BaseCommand):
 
         self.delete_siaes_without_external_id()
 
-        self.delete_user_created_orphan_siaes()
+        self.delete_user_created_siaes_without_members()
 
         self.update_existing_siaes()
 
@@ -707,7 +712,7 @@ class Command(BaseCommand):
         for siae in Siae.objects.all():
             if not siae.has_members and not siae.auth_email:
                 msg = (
-                    f"Signup is impossible for siae siret={siae.siret} "
+                    f"Signup is impossible for siae id={siae.id} siret={siae.siret} "
                     f"kind={siae.kind} dpt={siae.department} source={siae.source} "
                     f"created_by={siae.created_by} siae_email={siae.email}"
                 )
