@@ -30,4 +30,4 @@ class Migration(migrations.Migration):
         ("siaes", "0028_auto_20200821_1616"),
     ]
 
-    operations = [migrations.RunPython(fix_siae_source, migrations.RunPython.noop)]
+    operations = [migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]
