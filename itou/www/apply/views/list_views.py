@@ -45,8 +45,9 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
     if request.user.is_prescriber_with_org:
         prescriber_organization = get_current_org_or_404(request)
-        # Show all applications organization-wide + applications sent by the current user
-        # prior to the creation of the organization.
+        # Show all applications organization-wide + applications sent by the
+        # current user for backward compatibility (in the past, a user could
+        # create his prescriber's organization later on).
         job_applications = JobApplication.objects.filter(
             Q(sender=request.user) | Q(sender_prescriber_organization=prescriber_organization)
         )
