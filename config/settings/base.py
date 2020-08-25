@@ -334,7 +334,7 @@ API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 # To avoid confusion between the two when contacting ESD support,
 # we get the habit to always explicitely state that we are using PEAM*U*.
 PEAMU_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
-SOCIALACCOUNT_PROVIDERS={
+SOCIALACCOUNT_PROVIDERS = {
     "peamu": {
         "APP": {
             "key": "peamu",
@@ -405,12 +405,23 @@ METABASE_SHOW_SQL_REQUESTS = False
 # by batch of 1000 => 5s
 METABASE_INSERT_BATCH_SIZE = 1000
 
-# Huey
+# Huey / async
 # ------------------------------------------------------------------------------
+
+# Redis server URL:
+# override in secrets with complete redis URL (containing the instance password)
+HUEY_REDIS_URL = os.environ.get("HUEY_REDIS_URL")
+
+# Huey instance
 HUEY = {"name": "ITOU",
-        "url": os.environ.get("HUEY_REDIS_URL"),
-        # "consumer": {"workers": 4, "worker_type": "thread", },
+        "url": HUEY_REDIS_URL,
+        "consumer": {"workers": 2, "worker_type": "thread", },
         "immediate": False,
         }
 
-print(HUEY)
+# Asynchronous email backend
+EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
+
+# Number of retries & retry delay parameters for emails (for async process)
+SEND_EMAIL_NB_RETRIES = 5
+SEND_EMAIL_RETRY_DELAY = 60

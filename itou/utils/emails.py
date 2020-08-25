@@ -2,6 +2,7 @@ import re
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail.backends.smtp import EmailBackend
 from django.core.mail.backends.base import BaseEmailBackend
 from django.template.loader import get_template
 from huey.contrib.djhuey import task
@@ -42,7 +43,7 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 
 # EXPERIMENTAL:
 # ---
-# Custom dummy async email backend
+# Custom async email backends
 
 
 @task(retries=100, retry_delay=10)
@@ -74,3 +75,17 @@ class DummyAsyncEmailBackend(BaseEmailBackend):
             nb_sent += 1
 
         return nb_sent
+
+
+@task(retries=settings.SEND_EMAIL_NB_RETRIES, retry_delay=settings.SEND_EMAIL_RETRY_DELAY)
+def _async_send_messages(backend, email_messages):
+    backend.send_messages(email_messages)
+
+
+class AsyncEmailBackend(EmailBackend):
+    """Decorating a method does not work (no object context)
+       Only functions can be Huey tasks
+       This workaround exposes the default email backend `send_messages` method to Huey scheduler.
+    """
+    def send_messages(self, email_messages):
+        _async_send_messages(super(), email_messages)
