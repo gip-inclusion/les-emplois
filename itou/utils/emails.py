@@ -2,9 +2,9 @@ import re
 
 from django.conf import settings
 from django.core import mail
+from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
-from django.core.mail import get_connection
 from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
@@ -79,13 +79,14 @@ class DummyAsyncEmailBackend(BaseEmailBackend):
 
 
 def _serializeEmailMessage(email_message):
-    return {"subject": email_message.subject,
-            "to": email_message.to,
-            "from_email": email_message.from_email,
-            "cc": email_message.cc,
-            "bcc": email_message.bcc,
-            "body": email_message.body,
-            }
+    return {
+        "subject": email_message.subject,
+        "to": email_message.to,
+        "from_email": email_message.from_email,
+        "cc": email_message.cc,
+        "bcc": email_message.bcc,
+        "body": email_message.body,
+    }
 
 
 def _deserializeEmailMessage(serialized_email_message):

@@ -421,11 +421,12 @@ HUEY = {"name": "ITOU",
         }
 
 # Asynchronous email backend
-# EMAIL_BACKEND points to an async wrapper of a "real" email backend defined by ASYNC_EMAIL_BACKEND
-# ASYNC_EMAIL_BACKEND *AND* iASYNC_EMAIL_BACKEND must be defined when using "itou.utils.emails.AsyncEmailBackend"   
+# ------------------------------------------------------------------------------
 
+# EMAIL_BACKEND points to an async wrapper of a "real" email backend defined by ASYNC_EMAIL_BACKEND
+# ASYNC_EMAIL_BACKEND *AND* ASYNC_EMAIL_BACKEND must be defined when using "itou.utils.emails.AsyncEmailBackend"  
 EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
-ASYNC_EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 
 # Number of retries & retry delay parameters for emails (for async process)
 SEND_EMAIL_NB_RETRIES = 5
