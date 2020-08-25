@@ -1,8 +1,7 @@
-import datetime
 import logging
 import os
 
-import openpyxl
+import pandas as pd
 from django.core.management.base import BaseCommand
 
 from itou.approvals.models import PoleEmploiApproval
@@ -60,36 +59,37 @@ class Command(BaseCommand):
         bulk_create_queue = []
         chunk_size = 5000
 
-        # https://openpyxl.readthedocs.io/en/latest/optimized.html#read-only-mode
-        wb = openpyxl.load_workbook(file_path, read_only=True)
-        ws = wb.active
+        df = pd.read_excel(file_path)
+        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format="%d/%m/%y")
+        df.sort_values("DATE_HISTO")
+        first_approval_date = df.iloc[0].DATE_HISTO.strftime("%m/%d/%y")
+        last_approval_date = df.iloc[-1].DATE_HISTO.strftime("%m/%d/%y")
+
+        df["DATE_DEB"] = pd.to_datetime(df.DATE_DEB, format="%d/%m/%y")
+        df["DATE_FIN"] = pd.to_datetime(df.DATE_FIN, format="%d/%m/%y")
+        df["DATE_NAISS_BENE"] = pd.to_datetime(df.DATE_NAISS_BENE, format="%d/%m/%y")
 
         self.stdout.write("Ready.")
+        self.stdout.write(f"Importing approvals from {first_approval_date} to {last_approval_date}")
         self.stdout.write("Creating approvals… 0%")
 
         last_progress = 0
-        for i, row in enumerate(ws.rows):
+        for idx, row in df.iterrows():
 
-            if i == 0:
+            if idx == 0:
                 # Skip XLSX header.
                 continue
 
-            if not row[0].value:
-                # It should only concern the last XLSX line.
-                self.stderr.write("EmptyCell found, skipping…")
-                self.stderr.write(str(row))
-                continue
-
-            progress = int((100 * i) / ws.max_row)
+            progress = int((100 * idx) / len(df))
             if progress > last_progress + 5:
                 self.stdout.write(f"Creating approvals… {progress}%")
                 last_progress = progress
 
-            CODE_STRUCT_AFFECT_BENE = str(row[6].value)
+            CODE_STRUCT_AFFECT_BENE = str(row["CODE_STRUCT_AFFECT_BENE"])
             assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
 
             # This is known as "Identifiant Pôle emploi".
-            ID_REGIONAL_BENE = row[0].value.strip()
+            ID_REGIONAL_BENE = row["ID_REGIONAL_BENE"].strip()
             assert len(ID_REGIONAL_BENE) == 8
             # Check the format of ID_REGIONAL_BENE.
             # First 7 chars should be digits.
@@ -97,19 +97,19 @@ class Command(BaseCommand):
             # Last char should be alphanumeric.
             assert ID_REGIONAL_BENE[7:].isalnum()
 
-            NOM_USAGE_BENE = row[2].value.strip()
+            NOM_USAGE_BENE = row["NOM_USAGE_BENE"].strip()
             assert "  " not in NOM_USAGE_BENE
             # max length 29
 
-            PRENOM_BENE = row[4].value.strip()
+            PRENOM_BENE = row["PRENOM_BENE"].strip()
             assert "  " not in PRENOM_BENE
             # max length 13
 
-            NOM_NAISS_BENE = row[3].value.strip()
+            NOM_NAISS_BENE = row["NOM_NAISS_BENE"].strip()
             assert "  " not in NOM_NAISS_BENE
             # max length 25
 
-            NUM_AGR_DEC = row[7].value.strip().replace(" ", "")
+            NUM_AGR_DEC = row["NUM_AGR_DEC"].strip().replace(" ", "")
             assert " " not in NUM_AGR_DEC
             if len(NUM_AGR_DEC) not in [12, 15]:
                 self.stderr.write("-" * 80)
@@ -128,9 +128,8 @@ class Command(BaseCommand):
                 suffix = NUM_AGR_DEC[12:]
                 unique_approval_suffixes[suffix] = unique_approval_suffixes.get(suffix, 0) + 1
 
-            DATE_DEB_AGR_DEC = datetime.datetime.strptime(row[8].value.strip(), "%d/%m/%y").date()
-
-            DATE_FIN_AGR_DEC = datetime.datetime.strptime(row[9].value.strip(), "%d/%m/%y").date()
+            DATE_DEB_AGR_DEC = row["DATE_DEB"]
+            DATE_FIN_AGR_DEC = row["DATE_FIN"]
 
             # Same start and end dates means that the approval has been canceled.
             if DATE_DEB_AGR_DEC == DATE_FIN_AGR_DEC:
@@ -140,7 +139,7 @@ class Command(BaseCommand):
                 self.logger.debug("%s - %s - %s", NUM_AGR_DEC, NOM_USAGE_BENE, PRENOM_BENE)
                 continue
 
-            DATE_NAISS_BENE = datetime.datetime.strptime(row[5].value.strip(), "%d/%m/%y").date()
+            DATE_NAISS_BENE = row["DATE_NAISS_BENE"]
 
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
