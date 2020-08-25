@@ -2,8 +2,8 @@ import re
 
 from django.conf import settings
 from django.core import mail
-from django.core.mail.backends.smtp import EmailBackend
 from django.core.mail.backends.base import BaseEmailBackend
+from django.core.mail.backends.smtp import EmailBackend
 from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
@@ -87,5 +87,6 @@ class AsyncEmailBackend(EmailBackend):
        Only functions can be Huey tasks
        This workaround exposes the default email backend `send_messages` method to Huey scheduler.
     """
+
     def send_messages(self, email_messages):
         _async_send_messages(super(), email_messages)

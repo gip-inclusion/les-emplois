@@ -409,12 +409,13 @@ METABASE_INSERT_BATCH_SIZE = 1000
 # ------------------------------------------------------------------------------
 
 # Redis server URL:
-# override in secrets with complete redis URL (containing the instance password)
-HUEY_REDIS_URL = os.environ.get("HUEY_REDIS_URL")
+# Provided by the Redis addon (itou-redis)
+# Complete URL (containing the instance password)
+REDIS_URL = os.environ.get("REDIS_URL")
 
 # Huey instance
 HUEY = {"name": "ITOU",
-        "url": HUEY_REDIS_URL,
+        "url": REDIS_URL,
         "consumer": {"workers": 2, "worker_type": "thread", },
         "immediate": False,
         }
