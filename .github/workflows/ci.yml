@@ -1,0 +1,73 @@
+name: 🔮 Tests
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - master_clever
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+    env:
+      PYTHONPATH: .
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgis/postgis:12-master
+        env:
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: 🌍 Install spatial libraries
+      run: sudo apt-get install binutils libproj-dev gdal-bin
+    - name: 🧩 Add extentions to Postgres
+      run: |
+        psql <<SQL
+            \c template1;
+            CREATE EXTENSION IF NOT EXISTS pg_trgm;
+            CREATE EXTENSION IF NOT EXISTS postgis;
+            CREATE EXTENSION IF NOT EXISTS unaccent;
+            DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
+            CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
+            ALTER TEXT SEARCH CONFIGURATION french_unaccent
+            ALTER MAPPING FOR hword, hword_part, word
+            WITH unaccent, french_stem;
+        SQL
+      env:
+        PGPASSWORD: password
+        PGHOST: localhost
+        PGUSER: postgres
+    - name: 💂 Install Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: 📥 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements/dev.txt
+    - name: 🤹‍ Django tests
+      run: django-admin test --noinput --failfast --parallel=2
+      env:
+        DJANGO_DEBUG: True
+        DJANGO_SETTINGS_MODULE: config.settings.test
+        DJANGO_SECRET_KEY: ministryofsillywalks
+        ITOU_POSTGRES_PASSWORD: password
+        ITOU_POSTGRES_USER: postgres
+    - name: 🌟 Black, isort and Flake8
+      run: |
+        black --check --line-length 119 itou
+        isort --check-only itou
+        flake8 itou --count --show-source --statistics
