@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import admin
 from django.http import HttpResponse
 from django.urls import path
@@ -104,6 +106,32 @@ class ApprovalAdmin(admin.ModelAdmin):
         return additional_urls + super().get_urls()
 
 
+class ImportDateFilter(admin.SimpleListFilter):
+    """
+    Allow to filter results by import date.
+    """
+
+    DATE_FORMAT = "%d-%m-%Y"
+    title = _("Date de l'import")
+    parameter_name = "import_date"
+
+    def lookups(self, request, model_admin):
+        return [
+            (import_date.strftime(self.DATE_FORMAT), import_date.strftime(self.DATE_FORMAT))
+            for import_date in models.PoleEmploiApproval.objects.get_import_dates()
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value:
+            try:
+                import_date = datetime.datetime.strptime(value, self.DATE_FORMAT).date()
+                return queryset.filter(created_at__date=import_date)
+            except ValueError:
+                pass
+        return queryset
+
+
 @admin.register(models.PoleEmploiApproval)
 class PoleEmploiApprovalAdmin(admin.ModelAdmin):
     list_display = (
@@ -117,9 +145,10 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         "start_at",
         "end_at",
         "is_valid",
+        "created_at",
     )
     search_fields = ("pk", "pole_emploi_id", "number", "first_name", "last_name", "birth_name")
-    list_filter = (IsValidFilter,)
+    list_filter = (IsValidFilter, ImportDateFilter)
     date_hierarchy = "birthdate"
 
     def is_valid(self, obj):
