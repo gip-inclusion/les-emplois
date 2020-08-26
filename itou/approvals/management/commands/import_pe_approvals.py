@@ -52,6 +52,7 @@ class Command(BaseCommand):
         self.set_logger(options.get("verbosity"))
 
         now = timezone.now().date()
+        DATE_FORMAT = "%d/%m/%y"
 
         count_before = PoleEmploiApproval.objects.count()
         count_canceled_approvals = 0
@@ -64,14 +65,14 @@ class Command(BaseCommand):
         chunk_size = 5000
 
         df = pd.read_excel(file_path)
-        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format="%d/%m/%y")
+        df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format=DATE_FORMAT)
         df.sort_values("DATE_HISTO")
-        first_approval_date = df.iloc[0].DATE_HISTO.strftime("%m/%d/%y")
-        last_approval_date = df.iloc[-1].DATE_HISTO.strftime("%m/%d/%y")
+        first_approval_date = df.iloc[0].DATE_HISTO.strftime(DATE_FORMAT)
+        last_approval_date = df.iloc[-1].DATE_HISTO.strftime(DATE_FORMAT)
 
-        df["DATE_DEB"] = pd.to_datetime(df.DATE_DEB, format="%d/%m/%y")
-        df["DATE_FIN"] = pd.to_datetime(df.DATE_FIN, format="%d/%m/%y")
-        df["DATE_NAISS_BENE"] = pd.to_datetime(df.DATE_NAISS_BENE, format="%d/%m/%y")
+        df["DATE_DEB"] = pd.to_datetime(df.DATE_DEB, format=DATE_FORMAT)
+        df["DATE_FIN"] = pd.to_datetime(df.DATE_FIN, format=DATE_FORMAT)
+        df["DATE_NAISS_BENE"] = pd.to_datetime(df.DATE_NAISS_BENE, format=DATE_FORMAT)
 
         self.stdout.write("Ready.")
         self.stdout.write(f"Importing approvals from {first_approval_date} to {last_approval_date}")
