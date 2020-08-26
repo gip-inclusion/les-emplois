@@ -152,6 +152,7 @@ class Command(BaseCommand):
             # datetime.date(2068, 3, 14)
             if DATE_NAISS_BENE.year > now.year:
                 str_d = DATE_NAISS_BENE.strftime("%Y-%m-%d")
+                # Replace the first 2 digits by "19".
                 str_d = f"19{str_d[2:]}"
                 DATE_NAISS_BENE = datetime.datetime.strptime(str_d, "%Y-%m-%d")
 
