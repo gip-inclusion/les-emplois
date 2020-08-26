@@ -2,7 +2,9 @@ import logging
 import os
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from itou.approvals.models import PoleEmploiApproval
 
@@ -48,6 +50,8 @@ class Command(BaseCommand):
     def handle(self, file_path, dry_run=False, **options):
 
         self.set_logger(options.get("verbosity"))
+
+        now = timezone.now().date()
 
         count_before = PoleEmploiApproval.objects.count()
         count_canceled_approvals = 0
@@ -140,6 +144,13 @@ class Command(BaseCommand):
                 continue
 
             DATE_NAISS_BENE = row["DATE_NAISS_BENE"]
+
+            # Pôle emploi sends us the year in a two-digit format ("14/03/68")
+            # but strptime() will set it in the future:
+            # >>> datetime.datetime.strptime("14/03/68", "%d/%m/%y").date()
+            # datetime.date(2068, 3, 14)
+            if DATE_NAISS_BENE.year > now.year:
+                DATE_NAISS_BENE = DATE_NAISS_BENE - relativedelta(years=100)
 
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
