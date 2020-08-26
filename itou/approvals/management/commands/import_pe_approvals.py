@@ -1,8 +1,8 @@
+import datetime
 import logging
 import os
 
 import pandas as pd
-from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
@@ -151,7 +151,9 @@ class Command(BaseCommand):
             # >>> datetime.datetime.strptime("14/03/68", "%d/%m/%y").date()
             # datetime.date(2068, 3, 14)
             if DATE_NAISS_BENE.year > now.year:
-                DATE_NAISS_BENE = DATE_NAISS_BENE - relativedelta(years=100)
+                str_d = DATE_NAISS_BENE.strftime("%Y-%m-%d")
+                str_d = f"19{str_d[2:]}"
+                DATE_NAISS_BENE = datetime.datetime.strptime(str_d, "%Y-%m-%d")
 
             if not dry_run:
                 pe_approval = PoleEmploiApproval()
