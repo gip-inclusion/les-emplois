@@ -13,7 +13,14 @@ jobs:
       matrix:
         python-version: [3.7]
     env:
+      DJANGO_SETTINGS_MODULE: config.settings.test
+      DJANGO_SECRET_KEY: ministryofsillywalks
       PYTHONPATH: .
+      PGPASSWORD: password
+      PGHOST: localhost
+      PGUSER: postgres
+      ITOU_POSTGRES_USER: postgres
+      ITOU_POSTGRES_PASSWORD: password
     services:
       postgres:
         # Docker Hub image
@@ -33,7 +40,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: 🌍 Install spatial libraries
       run: sudo apt-get install binutils libproj-dev gdal-bin
-    - name: 🧩 Add extentions to Postgres
+    - name: 🧩 Add extentions to Postgres and create a database to check migrations
       run: |
         psql <<SQL
             \c template1;
@@ -45,11 +52,8 @@ jobs:
             ALTER TEXT SEARCH CONFIGURATION french_unaccent
             ALTER MAPPING FOR hword, hword_part, word
             WITH unaccent, french_stem;
+            CREATE DATABASE itou;
         SQL
-      env:
-        PGPASSWORD: password
-        PGHOST: localhost
-        PGUSER: postgres
     - name: 💂 Install Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -62,11 +66,9 @@ jobs:
       run: django-admin test --noinput --failfast --parallel=2
       env:
         DJANGO_DEBUG: True
-        DJANGO_SETTINGS_MODULE: config.settings.test
-        DJANGO_SECRET_KEY: ministryofsillywalks
-        ITOU_POSTGRES_PASSWORD: password
-        ITOU_POSTGRES_USER: postgres
-    - name: 🌟 Black, isort and Flake8
+    - name: 🚧 Check pending migrations
+      run: django-admin makemigrations --check --dry-run --noinput
+    - name: ✨ Black, isort and Flake8
       run: |
         black --check --line-length 119 itou
         isort --check-only itou
