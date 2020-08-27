@@ -124,10 +124,11 @@ class SelectSiaeForm(forms.Form):
 
             if not email_exists:
                 error_message = _(
-                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus.<br>Merci de "
+                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus. <br>Merci de "
                     f'<a href="{self.DOC_OPENING_SCHEDULE_URL}">vérifier que la plateforme '
                     f"est disponible sur votre territoire</a> ou veuillez nous contacter "
-                    f"à l'adresse suivante : {settings.ITOU_EMAIL_CONTACT}"
+                    'en utilisant <a href="https://itou.typeform.com/to/RYfNLR79" rel="noopener" '
+                    'target="_blank">ce formulaire.</a>'
                 )
                 raise forms.ValidationError(mark_safe(error_message))
 
