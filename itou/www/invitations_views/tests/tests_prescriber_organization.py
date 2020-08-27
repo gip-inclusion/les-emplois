@@ -7,7 +7,8 @@ from django.test import TestCase
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -21,7 +22,7 @@ from itou.www.invitations_views.forms import NewPrescriberWithOrgInvitationForm
 
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
-        self.org = PrescriberOrganizationWithMembershipFactory()
+        self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.org.members.first()
         self.guest = UserFactory.build(first_name="Léonie", last_name="Bathiat")
         self.post_data = {
@@ -58,10 +59,24 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.post_data["form-0-email"] = self.guest.email
         self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
 
+    def test_pe_organization_invitation_successful(self):
+        self.client.logout()
+
+        self.org = PrescriberPoleEmploiFactory()
+        self.org.members.add(PrescriberFactory())
+        self.sender = self.org.members.first()
+        self.guest = UserFactory.build(email="sabine.lagrange@pole-emploi.fr")
+        self.post_data["form-0-first_name"] = self.guest.first_name
+        self.post_data["form-0-last_name"] = self.guest.last_name
+        self.post_data["form-0-email"] = self.guest.email
+
+        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
-        self.org = PrescriberOrganizationWithMembershipFactory()
+        self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.org.members.first()
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
         self.invitations_model = PrescriberWithOrgInvitation
@@ -114,6 +129,20 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_existing_user_belongs_to_another_organization(self):
         guest = PrescriberOrganizationWithMembershipFactory().members.first()
+        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        self.post_data.update(
+            {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
+        )
+        self.response = self.client.post(self.send_invitation_url, data=self.post_data)
+        # Make sure form is not valid
+        self.assertFalse(self.response.context["formset"].is_valid())
+        self.assertTrue(self.response.context["formset"].errors[0].get("email"))
+
+    def test_pe_organization_invitation_unsuccessful(self):
+        self.org = PrescriberPoleEmploiFactory()
+        self.org.members.add(PrescriberFactory())
+        self.sender = self.org.members.first()
+        guest = UserFactory.build()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}

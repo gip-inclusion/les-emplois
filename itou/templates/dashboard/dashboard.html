@@ -6,7 +6,7 @@
 {% block messages %}
     {{ block.super }}
 
-    {% if current_siae %}
+    {% if current_siae and not current_siae.jobs.exists %}
         <div class="alert alert-warning" role="alert">
             {% translate "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
         </div>

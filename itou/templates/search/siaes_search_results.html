@@ -1,5 +1,6 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
+{% load static %}
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
@@ -43,60 +44,128 @@
             {% endwith %}
         </h4>
 
-        {% for siae in siaes_page %}
-            <div class="card d-block my-4">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
-                        -
-                        <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            {{ siae.display_name }}
-                        </a>
-                        {# Display non-user-edited name too. #}
-                        {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
-                    </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
-                    <p class="card-text">
-                        {% blocktranslate with distance=siae.distance.km|floatformat:1 %}
-                            <span class="badge badge-dark">{{ distance }} Km</span>
-                            de votre lieu de recherche
-                        {% endblocktranslate %}
-                    </p>
-                    {% if siae.job_description_through.exists and not siae.block_job_applications %}
-                        <h6 class="border-bottom border-gray pb-2">{% translate "Métiers proposés" %}</h6>
-                        <ul class="mb-0">
-                        {% for job in siae.job_description_through.all %}
-                            <li>
-                                <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
-                                    {{ job.display_name }}
+        <div class="row">
+            <div class="col">
+                {% for siae in siaes_page %}
+                    <div class="card d-block my-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <b><abbr title="{{ siae.get_kind_display }}">{{ siae.kind }}</abbr></b>
+                                -
+                                <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                    {{ siae.display_name }}
                                 </a>
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
+                                {# Display non-user-edited name too. #}
+                                {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
+                            </h5>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
+                            <p class="card-text">
+                                {% blocktranslate with distance=siae.distance.km|floatformat:1 %}
+                                    <span class="badge badge-dark">{{ distance }} Km</span>
+                                    de votre lieu de recherche
+                                {% endblocktranslate %}
+                            </p>
+                            {% if siae.job_description_through.exists and not siae.block_job_applications %}
+                                <h6 class="border-bottom border-gray pb-2">{% translate "Métiers proposés" %}</h6>
+                                <ul class="mb-0">
+                                {% for job in siae.job_description_through.all %}
+                                    <li>
+                                        <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                            {{ job.display_name }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer">
+                            {% if not siae.has_active_members %}
+                                <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                                    {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                                </a>
+                                <small>{% translate "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
+                            {% elif siae.block_job_applications %}
+                                <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                                    {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                                </a>
+                                <small>{% translate "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
+                            {% else %}
+                                <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                                    {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                                </a>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+                {% endfor %}
+            </div> <!-- end left column -->
+
+            <div class="col col-sm-3 mt-4">
+                <a  href="#"
+                    class="matomo-event text-decoration-none"
+                    data-toggle="modal"
+                    data-target="#mapModal"
+                    data-matomo-category="experimentation"
+                    data-matomo-action="clic"
+                    data-matomo-option="carte-recherche"
+                >
+                    <div id="bg-map"
+                         class="img-fluid"
+                    >
+                        <button
+                            type="button"
+                            class="btn btn-light"
+                            data-toggle="modal"
+                            data-target="#mapModal"
+                        >
+                            {% include "includes/icon.html" with icon="map" %}
+                            &nbsp;
+                            {% blocktranslate count counter=siaes_page.paginator.count %}
+                                1 entreprise
+                            {% plural %}
+                                {{ counter }} entreprises
+                            {% endblocktranslate %}
+                            {% translate "à voir sur la carte" %}
+                        </button>
+                    </div>
+                    <!-- <img src="{% static 'img/test-carte.png' %}" class="img-fluid"> -->
+                </a>
+
+
+
+                <!-- Modal to test that a map is really needed by users -->
+                <div class="modal fade" id="mapModal" tabindex="-1" role="dialog" aria-labelledby="mapModal" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-body p-4">
+                                <h5 class="modal-title text-center" id="mapModalLabel">En cours de conception 💡</h5>
+                                <p class="pt-2">Nous réfléchissons à afficher les résultats sur une carte.
+                                Votez pour nous donner votre avis !</p>
+                                <div id="mapPoll">
+                                    <div class="row buttonsContainer">
+                                        <div class="col pr-2">
+                                            <button type="button" class="btn btn-outline-primary w-100">
+                                                <span class="h4">👍</span> <span class="d-block">Je veux voir</span> la carte !
+                                            </button>
+                                        </div>
+                                        <div class="col pl-2">
+                                            <button type="button" class="btn btn-outline-primary w-100">
+                                                <span class="h4">👎</span> <span class="d-block">La carte ne</span> m'intéresse pas.
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <button type="button" class="btn btn-primary w-100 mt-3 mb-2" data-dismiss="modal" aria-label="Close">Fermer</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-
-                <div class="card-footer">
-                    {% if not siae.has_active_members %}
-                        <a class="btn btn-sm btn-outline-secondary disabled" href="">
-                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
-                        </a>
-                        <small>{% translate "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
-                    {% elif siae.block_job_applications %}
-                        <a class="btn btn-sm btn-outline-secondary disabled" href="">
-                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
-                        </a>
-                        <small>{% translate "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
-                    {% else %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
-                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
-                        </a>
-                    {% endif %}
-
-                </div>
-
-            </div>
-        {% endfor %}
+                <!-- Modal end -->
+            </div> <!-- end right column -->
+        </div> <!-- end row -->
 
         {% include "includes/pagination.html" with page=siaes_page %}
 
