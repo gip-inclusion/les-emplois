@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
 
@@ -129,53 +130,14 @@ def valid_prescriber_signup_session_required(function=None):
     return decorated
 
 
-def push_url_in_history(request):
-    """
-    Since there are many possible paths through the prescriber signup process,
-    keep track of the navigation history to easily retrive the previous step.
-
-    It must be triggered just before redirecting the user to another step.
-    """
-
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    url_history = session_data["url_history"]
-
-    current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
-    if current_url not in url_history:
-        # The user has gone forwards: a form that was never visited is submitted.
-        url_history.append(current_url)
-    else:
-        # Otherwise the user has gone backwards: a form that was already submitted is submitted again.
-        # Clear all history after the current url.
-        current_url_index = url_history.index(current_url)
-        url_history = url_history[: current_url_index + 1]
-
-    session_data["url_history"] = url_history
-
-
-def get_prev_url_from_history(request):
-    """
-    Find previous step's URL in the signup navigation history.
-    """
-
-    session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
-    url_history = session_data["url_history"]
-
-    current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
-    if current_url in url_history:
-        # The URL has already been visited, return its preceding URL.
-        current_url_index = url_history.index(current_url)
-        return session_data["url_history"][current_url_index - 1]
-
-    return session_data["url_history"][-1]
-
-
 def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_emploi.html"):
     """
     Entry point of the signup process for prescribers/orienteurs.
 
     The signup process consists of several steps during which the user answers
     a series of questions to determine the `kind` of his organization if any.
+
+    Answers are kept in session.
 
     At the end of the process a user will be created and he will be:
     - added to the members of a pre-existing Pôle emploi agency ("prescripteur habilité")
@@ -209,7 +171,6 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
         if form.cleaned_data["is_pole_emploi"]:
             next_url = reverse("signup:prescriber_pole_emploi_safir_code")
 
-        push_url_in_history(request)
         return HttpResponseRedirect(next_url)
 
     context = {"form": form}
@@ -217,6 +178,7 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
 
 
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.html"):
     """
     Ask the user to choose his organization in a pre-existing list of authorized organization.
@@ -251,14 +213,17 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
                 "safir_code": None,
             }
         )
-        push_url_in_history(request)
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
+    context = {
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind.html"):
     """
     If the user hasn't found his organization in the pre-existing list, ask him to choose his kind.
@@ -295,14 +260,17 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
                 "safir_code": None,
             }
         )
-        push_url_in_history(request)
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
+    context = {
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_confirm_authorization(request, template_name="signup/prescriber_confirm_authorization.html"):
     """
     Ask the user to confirm the "authorized" character of his organization.
@@ -325,15 +293,18 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
                 "safir_code": None,
             }
         )
-        push_url_in_history(request)
         next_url = reverse("signup:prescriber_siret")
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
+    context = {
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_pole_emploi_safir_code.html"):
     """
     Find a pre-existing Pôle emploi organization from a given SAFIR code.
@@ -353,15 +324,18 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
                 "safir_code": form.cleaned_data["safir_code"],
             }
         )
-        push_url_in_history(request)
         next_url = reverse("signup:prescriber_pole_emploi_user")
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
+    context = {
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
 @valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
 def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
     """
     Automatically fetch info about the prescriber's organization from a given SIRET.
@@ -378,11 +352,13 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data
-        push_url_in_history(request)
         next_url = reverse("signup:prescriber_user")
         return HttpResponseRedirect(next_url)
 
-    context = {"form": form, "prev_url": get_prev_url_from_history(request)}
+    context = {
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
@@ -396,6 +372,7 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
 
     @transaction.atomic
     @method_decorator(valid_prescriber_signup_session_required)
+    @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
     def dispatch(self, request, *args, **kwargs):
 
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -422,7 +399,7 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["pole_emploi_org"] = self.pole_emploi_org
-        context["prev_url"] = get_prev_url_from_history(self.request)
+        context["prev_url"] = get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
         return context
 
     def form_valid(self, form):
@@ -453,6 +430,7 @@ class PrescriberUserSignupView(SignupView):
 
     @transaction.atomic
     @method_decorator(valid_prescriber_signup_session_required)
+    @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
     def dispatch(self, request, *args, **kwargs):
 
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
@@ -516,7 +494,7 @@ class PrescriberUserSignupView(SignupView):
                 "join_authorized_org": self.join_authorized_org,
                 "kind": self.kind,
                 "prescriber_org_data": self.prescriber_org_data,
-                "prev_url": get_prev_url_from_history(self.request),
+                "prev_url": get_prev_url_from_history(self.request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
             }
         )
         return context
