@@ -111,6 +111,9 @@ def _async_send_messages(serializable_email_messages):
 
         Making `EmailMessage` serializable is the purpose of `_serializeEmailMessage` and `_deserializeEmailMessage`.
 
+        If there are many async tasks to be defined or for specific objects,
+        it may be better to use a custom serializer.
+
         By design, this function must return the number of email correctly processed.
     """
 
