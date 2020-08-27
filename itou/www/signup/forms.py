@@ -2,18 +2,20 @@ from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.urls import reverse_lazy
 from django.utils.http import urlsafe_base64_decode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
+from itou.utils.apis.api_entreprise import EtablissementAPI
+from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_siret
+from itou.utils.validators import validate_code_safir, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -33,169 +35,6 @@ class FullnameFormMixin(forms.Form):
         required=True,
         strip=True,
     )
-
-
-class PrescriberForm(FullnameFormMixin, SignupForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.organization = None
-        self.new_organization = None
-        self.fields["email"].widget.attrs["placeholder"] = _("Adresse e-mail professionnelle")
-        self.fields["email"].help_text = _(
-            "Utilisez plutôt votre adresse e-mail professionnelle, "
-            "cela nous permettra de vous identifier plus facilement comme membre de votre structure."
-        )
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-
-    def clean_email(self):
-        # Must check if already exists
-        email = self.cleaned_data["email"]
-        if get_user_model().email_already_exists(email):
-            raise ValidationError(gettext_lazy("Cette adresse email est déjà enregistrée"))
-        return email
-
-    def save(self, request):
-        user = super().save(request)
-
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.is_prescriber = True
-        user.save()
-
-        # Join organization.
-        if self.new_organization:
-            self.new_organization.created_by = user
-            self.new_organization.save()
-            organization = self.new_organization
-            organization.must_validate_prescriber_organization_email().send()
-        else:
-            organization = self.organization
-
-        # At this step, `organization` might still be None because
-        # a prescriber may not belong to any organization.
-
-        if organization:
-            if organization.has_members:
-                organization.new_signup_warning_email_to_existing_members(user).send()
-            else:
-                # For *existing* organization with no member.
-                # Pôle emploi agencies doesn't require a manual check, skip email notification.
-                if not self.new_organization and organization.kind != organization.Kind.PE:
-                    organization.organization_with_no_member_email(user).send()
-
-            membership = PrescriberMembership()
-            membership.user = user
-            membership.organization = organization
-            # The first member becomes an admin.
-            membership.is_admin = membership.organization.members.count() == 0
-            membership.save()
-
-        return user
-
-
-class OrienterPrescriberForm(PrescriberForm):
-    pass
-
-
-class PoleEmploiPrescriberForm(PrescriberForm):
-    safir_code = forms.CharField(max_length=5, label=gettext_lazy("Code SAFIR"))
-
-    def clean_email(self):
-        email = super().clean_email()
-
-        if not email.endswith("@pole-emploi.fr"):
-            raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi"))
-
-        return email
-
-    def clean_safir_code(self):
-        safir_code = self.cleaned_data["safir_code"]
-        self.organization = PrescriberOrganization.objects.by_safir_code(safir_code)
-        if not self.organization:
-            raise ValidationError(gettext_lazy("Ce code SAFIR est inconnu"))
-        return safir_code
-
-
-class AuthorizedPrescriberForm(PrescriberForm):
-
-    PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:prescriber_authorized_organizations")
-    AUTHORIZED_PRESCRIBER_LIST_URL = "https://doc.inclusion.beta.gouv.fr/presentation/prescripteurs-habilites"
-    _authorized_organization_helt_text = gettext_lazy("Liste des prescripteurs habilités par le Préfet.")
-
-    authorized_organization_id = forms.CharField(
-        required=False, widget=forms.HiddenInput(attrs={"class": "js-prescriber-organization-autocomplete-hidden"})
-    )
-
-    authorized_organization = forms.CharField(
-        label=gettext_lazy("Si vous êtes un prescripteur habilité, saisissez votre organisation"),
-        required=False,
-        help_text=mark_safe(f"<a href='{AUTHORIZED_PRESCRIBER_LIST_URL}'>{_authorized_organization_helt_text}</a>"),
-        widget=forms.TextInput(
-            attrs={
-                "class": "js-prescriber-organization-autocomplete-input form-control",
-                "data-autocomplete-source-url": PRESCRIBER_ORGANIZATION_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": gettext_lazy("Saisissez une organisation"),
-                "autocomplete": "off",
-            }
-        ),
-        strip=True,
-    )
-
-    unregistered_organization = forms.CharField(
-        label=gettext_lazy(
-            "Si vous faites partie d'une organisation habilitée qui ne figure pas dans la liste, "
-            "saisissez son nom dans le bloc ci-dessous"
-        ),
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Saisissez le nom d'une organisation habilitée")}),
-        strip=True,
-    )
-
-    def clean(self):
-        """
-        User must enter one of:
-        * an unregistered organization
-        * a registered one in the auto-complete list
-        Not both or none
-        """
-        super().clean()
-        unregistered_organization = self.cleaned_data["unregistered_organization"]
-        authorized_organization_id = self.cleaned_data["authorized_organization_id"]
-
-        if not (unregistered_organization or authorized_organization_id):
-            raise ValidationError(gettext_lazy("Vous devez choisir une organisation"))
-
-        if (unregistered_organization and authorized_organization_id) or not (
-            unregistered_organization or authorized_organization_id
-        ):
-            raise ValidationError(
-                gettext_lazy(
-                    "Vous devez choisir entre une organisation déjà habilitée "
-                    "et une organisation habilitée à valider ultérieurement"
-                )
-            )
-
-        if unregistered_organization:
-            if PrescriberOrganization.objects.filter(name=unregistered_organization).exists():
-                raise ValidationError(
-                    gettext_lazy(
-                        f"Cette organisation existe ({unregistered_organization})."
-                        "Veuillez la sélectionner dans la liste des organisations habilitées"
-                    )
-                )
-            self.new_organization = PrescriberOrganization(name=unregistered_organization)
-        elif authorized_organization_id:
-            authorized_organization = PrescriberOrganization.objects.get(
-                pk=self.cleaned_data["authorized_organization_id"]
-            )
-            if not authorized_organization:
-                raise ValidationError(
-                    gettext_lazy(
-                        f"Impossible de trouver cette organisation (id: {authorized_organization_id}). "
-                        "Veuillez contacter le support"
-                    )
-                )
-            self.organization = authorized_organization
 
 
 class SelectSiaeForm(forms.Form):
@@ -407,5 +246,256 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 
         user.is_job_seeker = True
         user.save()
+
+        return user
+
+
+# Prescribers signup.
+# ------------------------------------------------------------------------------------------
+
+
+class PrescriberIsPoleEmploiForm(forms.Form):
+
+    IS_POLE_EMPLOI_CHOICES = (
+        (1, gettext_lazy("Oui")),
+        (0, gettext_lazy("Non")),
+    )
+
+    is_pole_emploi = forms.TypedChoiceField(
+        label=gettext_lazy("Travaillez-vous pour Pôle emploi ?"),
+        choices=IS_POLE_EMPLOI_CHOICES,
+        widget=forms.RadioSelect,
+        coerce=int,
+    )
+
+
+class PrescriberChooseOrgKindForm(forms.Form):
+
+    kind = forms.ChoiceField(
+        label=gettext_lazy("Pour qui travaillez-vous ?"),
+        widget=forms.RadioSelect,
+        choices=PrescriberOrganization.Kind.choices,
+    )
+
+
+class PrescriberChooseKindForm(forms.Form):
+
+    KIND_AUTHORIZED_ORG = "authorized_org"
+    KIND_UNAUTHORIZED_ORG = "unauthorized_org"
+    KIND_SOLO = "solo"
+
+    KIND_CHOICES = (
+        (KIND_AUTHORIZED_ORG, gettext_lazy("Pour une organisation habilitée par le Préfet")),
+        (KIND_UNAUTHORIZED_ORG, gettext_lazy("Pour une organisation non-habilitée")),
+        (KIND_SOLO, gettext_lazy("Seul (sans organisation)")),
+    )
+
+    kind = forms.ChoiceField(
+        label=gettext_lazy("Pour qui travaillez-vous ?"), choices=KIND_CHOICES, widget=forms.RadioSelect,
+    )
+
+
+class PrescriberConfirmAuthorizationForm(forms.Form):
+
+    CONFIRM_AUTHORIZATION_CHOICES = (
+        (1, gettext_lazy("Oui, je confirme que mon organisation est habilitée par le Préfet")),
+        (0, gettext_lazy("Non, mon organisation n’est pas habilitée par le Préfet")),
+    )
+
+    confirm_authorization = forms.TypedChoiceField(
+        label=gettext_lazy("Votre habilitation est-elle officialisée par arrêté préfectoral ?"),
+        choices=CONFIRM_AUTHORIZATION_CHOICES,
+        widget=forms.RadioSelect,
+        coerce=int,
+    )
+
+
+class PrescriberSiretForm(forms.Form):
+    """
+    Retrieve info about an organization from a given SIRET.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.org_data = None
+
+    siret = forms.CharField(
+        label=gettext_lazy("Numéro SIRET de votre organisation"),
+        min_length=14,
+        help_text=gettext_lazy("Le numéro SIRET contient 14 chiffres."),
+    )
+
+    def clean_siret(self):
+
+        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
+        siret = self.cleaned_data["siret"].replace(" ", "")
+
+        validate_siret(siret)
+
+        # Does the org already exists?
+        org = PrescriberOrganization.objects.filter(siret=siret).first()
+        if org:
+            error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
+            admin = org.get_admins().first()
+            if admin:
+                error += _(
+                    f" "
+                    f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
+                    f"{admin.first_name.title()} {admin.last_name[0].upper()}."
+                )
+            raise forms.ValidationError(error)
+
+        # Fetch name and address from API entreprise.
+        etablissement = EtablissementAPI(siret)
+
+        if etablissement.error:
+            raise forms.ValidationError(etablissement.error)
+
+        # Perform another API call to fetch geocoding data.
+        address_fields = [
+            etablissement.address_line_1,
+            etablissement.address_line_2,
+            etablissement.post_code,
+            etablissement.city,
+            etablissement.department,
+        ]
+        address_on_one_line = ", ".join([field for field in address_fields if field])
+        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code)
+
+        self.org_data = {
+            "siret": siret,
+            "name": etablissement.name,
+            "address_line_1": etablissement.address_line_1,
+            "address_line_2": etablissement.address_line_2,
+            "post_code": etablissement.post_code,
+            "city": etablissement.city,
+            "department": etablissement.department,
+            "longitude": geocoding_data["longitude"],
+            "latitude": geocoding_data["latitude"],
+            "geocoding_score": geocoding_data["score"],
+        }
+
+        return siret
+
+
+class PrescriberPoleEmploiSafirCodeForm(forms.Form):
+    """
+    Retrieve a PrescriberOrganization from the SAFIR code.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pole_emploi_org = None
+
+    safir_code = forms.CharField(
+        max_length=5,
+        label=gettext_lazy("Code SAFIR"),
+        validators=[validate_code_safir],
+        help_text=gettext_lazy("Le code SAFIR contient 5 chiffres."),
+    )
+
+    def clean_safir_code(self):
+        safir_code = self.cleaned_data["safir_code"]
+        self.pole_emploi_org = PrescriberOrganization.objects.by_safir_code(safir_code)
+        if not self.pole_emploi_org:
+            error = _("Ce code SAFIR est inconnu.")
+            raise forms.ValidationError(error)
+        return safir_code
+
+
+class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
+    """
+    Create a new user of type prescriber and add it to the members of the given prescriber organization.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.pole_emploi_org = kwargs.pop("pole_emploi_org")
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        self.fields["email"].help_text = _("Exemple : nom.prenom@pole-emploi.fr")
+
+    def clean_email(self):
+        email = super().clean_email()
+        if not email.endswith("@pole-emploi.fr"):
+            raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi."))
+        return email
+
+    def save(self, request):
+
+        # Create the user.
+        user = super().save(request)
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+        user.is_prescriber = True
+        user.save()
+
+        # The member becomes a member of the PE agency.
+        membership = PrescriberMembership()
+        membership.user = user
+        membership.organization = self.pole_emploi_org
+        # The first member becomes an admin.
+        membership.is_admin = membership.organization.members.count() == 0
+        membership.save()
+
+        # Send a notification to existing members.
+        if self.pole_emploi_org.active_members.count() > 1:
+            self.pole_emploi_org.new_signup_warning_email_to_existing_members(user).send()
+
+        return user
+
+
+class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
+    """
+    Create a new user of type prescriber and his organization (if any).
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.authorization_status = kwargs.pop("authorization_status")
+        self.kind = kwargs.pop("kind")
+        self.prescriber_org_data = kwargs.pop("prescriber_org_data")
+        super().__init__(*args, **kwargs)
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
+        self.fields["email"].help_text = _("Utilisez une adresse e-mail professionnelle.")
+
+    def save(self, request):
+
+        # Create the user.
+        user = super().save(request)
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+        user.is_prescriber = True
+        user.save()
+
+        # Create the organization if any: an orienteur may not belong to any organization.
+        if self.prescriber_org_data:
+
+            prescriber_org = PrescriberOrganization()
+            prescriber_org.siret = self.prescriber_org_data["siret"]
+            prescriber_org.name = self.prescriber_org_data["name"]
+            prescriber_org.address_line_1 = self.prescriber_org_data["address_line_1"]
+            prescriber_org.address_line_2 = self.prescriber_org_data["address_line_2"] or ""
+            prescriber_org.post_code = self.prescriber_org_data["post_code"]
+            prescriber_org.city = self.prescriber_org_data["city"]
+            prescriber_org.department = self.prescriber_org_data["department"]
+            longitude = self.prescriber_org_data["longitude"]
+            latitude = self.prescriber_org_data["latitude"]
+            prescriber_org.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
+            prescriber_org.geocoding_score = self.prescriber_org_data["geocoding_score"]
+            prescriber_org.kind = self.kind
+            prescriber_org.authorization_status = self.authorization_status
+            prescriber_org.created_by = user
+            prescriber_org.save()
+
+            # The member becomes a member of the organization.
+            membership = PrescriberMembership()
+            membership.user = user
+            membership.organization = prescriber_org
+            # The first member becomes an admin.
+            membership.is_admin = membership.organization.members.count() == 0
+            membership.save()
+
+            # Notify support.
+            if prescriber_org.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET:
+                prescriber_org.must_validate_prescriber_organization_email().send()
 
         return user

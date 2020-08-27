@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
-from django.core.validators import RegexValidator
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -10,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.validators import validate_siret
+from itou.utils.validators import validate_code_safir, validate_siret
 
 
 class PrescriberOrganizationQuerySet(models.QuerySet):
@@ -47,28 +46,35 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     The "prescriber" has the possibility of being a member of an organisation represented by a
     `PrescriberOrganization` object through `PrescriberMembership`.
 
-    However it is not required for a "prescriber" to be a member of an organization. There are 3 possible cases:
+    However it is not required for a "prescriber" to be a member of an organization.
+
+    There are 3 possible cases:
 
     Case 1
-    A "prescriber" is alone (e.g. "éducateur de rue"). In this case there is only a `User` object
-        - User.is_prescriber = True
+        A "prescriber" is alone (e.g. "éducateur de rue"). In this case there is only a `User` object
+            - User.is_prescriber = True
 
     Case 2
-    A "prescriber" is a member of an organization (e.g. an association of unemployed people etc.)
-    and uses the platform with 0 or n collaborators. In this case there are 3 objects:
-        - User.is_prescriber = True
-        - PrescriberOrganization
-        - PrescriberMembership
+        A "prescriber" is a member of an organization (e.g. an association of unemployed people etc.)
+        and uses the platform with 0 or n collaborators.
+        In this case there are 3 objects:
+            - User.is_prescriber = True
+            - PrescriberOrganization.is_authorized = False
+            - PrescriberMembership
 
     Case 3
-    This case is a variant of case 2 where the organization is "authorized" at national level or by
-    the Prefect (e.g. Pôle emploi, CCAS, Cap emploi…). This is similar to case 2  with an additional
-    flag for the organization:
-        - User.is_prescriber = True
-        - PrescriberOrganization.is_authorized = True
-        - PrescriberMembership
+        This case is a variant of case 2 where the organization is "authorized" at national level or by
+        the Prefect (e.g. Pôle emploi, CCAS, Cap emploi…). This is similar to case 2  with an additional
+        flag for the organization:
+            - User.is_prescriber = True
+            - PrescriberOrganization.is_authorized = True
+            - PrescriberMembership
 
     In the last 2 cases, there can be n members by organization.
+
+    In case 1 and case 2, we talk about "orienteur" in French.
+
+    In case 3, we talk about "prescripteur habilité" in French.
     """
 
     class Kind(models.TextChoices):
@@ -98,7 +104,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
                 "d'accueil communautaire et d'activité solidaire"
             ),
         )
-        OTHER = "OTHER", _("Autre structure")
+        OTHER = "OTHER", _("Autre")
 
     class AuthorizationStatus(models.TextChoices):
         NOT_SET = "NOT_SET", _("Habilitation en attente de validation")
@@ -119,12 +125,12 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     is_authorized = models.BooleanField(
         verbose_name=_("Habilitation"),
         default=False,
-        help_text=_("Précise si l'organisation est habilitée par le préfet."),
+        help_text=_("Précise si l'organisation est habilitée par le Préfet."),
     )
     code_safir_pole_emploi = models.CharField(
         verbose_name=_("Code Safir"),
         help_text=_("Code unique d'une agence Pole emploi."),
-        validators=[RegexValidator("^[0-9]{5}$", message=_("Le code SAFIR est erroné"))],
+        validators=[validate_code_safir],
         max_length=5,
         null=True,
         unique=True,
@@ -189,9 +195,20 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
             return None
         return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
-    @property
-    def has_unset_authorization(self):
-        return self.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
+    def pending_authorization(self):
+        """
+        Pending manual verification of authorization by support staff.
+        """
+        return self.authorization_status == self.AuthorizationStatus.NOT_SET
+
+    def pending_authorization_proof(self):
+        """
+        An unknown organization claiming to be authorized must provide a written proof.
+        """
+        return self.kind == self.Kind.OTHER and self.authorization_status == self.AuthorizationStatus.NOT_SET
+
+    def get_admins(self):
+        return self.members.filter(is_active=True, prescribermembership__is_admin=True)
 
     def new_signup_warning_email_to_existing_members(self, user):
         """
@@ -236,18 +253,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         context = {"organization": self}
         subject = "prescribers/email/must_validate_prescriber_organization_email_subject.txt"
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def organization_with_no_member_email(self, user):
-        """
-        Send an email to the support:
-        signup of an **exisiting** prescriber organization, without any member (hence not validated)
-        => prescriber organization authorization must be validated
-        """
-        to = [settings.ITOU_EMAIL_CONTACT]
-        context = {"organization": self, "new_user": user}
-        subject = "prescribers/email/organization_with_no_member_email_subject.txt"
-        body = "prescribers/email/organization_with_no_member_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 

@@ -17,8 +17,10 @@ from itou.siaes.models import Siae, SiaeMembership
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.address.departments import department_from_postcode
+from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
+from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -30,6 +32,7 @@ from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.utils.validators import (
     alphanumeric,
     validate_birthdate,
+    validate_code_safir,
     validate_naf,
     validate_pole_emploi_id,
     validate_post_code,
@@ -271,6 +274,11 @@ class UtilsValidatorsTest(TestCase):
     def test_validate_alphanumeric(self):
         self.assertRaises(ValidationError, alphanumeric, "1245a_89871")
         alphanumeric("6201Z")
+
+    def test_validate_code_safir(self):
+        self.assertRaises(ValidationError, validate_code_safir, "1a3v5")
+        self.assertRaises(ValidationError, validate_code_safir, "123456")
+        alphanumeric("12345")
 
     def test_validate_naf(self):
         self.assertRaises(ValidationError, validate_naf, "1")
@@ -588,3 +596,17 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
 
     def test_help_text(self):
         self.assertEqual(CnilCompositionPasswordValidator().get_help_text(), CnilCompositionPasswordValidator.HELP_MSG)
+
+
+class ApiEntrepriseTest(SimpleTestCase):
+    @mock.patch(
+        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
+    )
+    def test_etablissement_api(self, mock_api_entreprise):
+        etablissement = EtablissementAPI("26570134200148")
+
+        self.assertEqual(etablissement.name, "CENTRE COMMUNAL D'ACTION SOCIALE")
+        self.assertEqual(etablissement.address_line_1, "22 RUE DU WAD BILLY")
+        self.assertEqual(etablissement.address_line_2, "22-24")
+        self.assertEqual(etablissement.post_code, "57000")
+        self.assertEqual(etablissement.city, "METZ")

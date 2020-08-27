@@ -16,7 +16,7 @@ class ItouLoginView(LoginView):
     # a cryptic loop import error in config/urls.py
     ACCOUNT_TYPE_TO_SIGNUP_URL = {
         "job_seeker": "signup:job_seeker",
-        "prescriber": "signup:select_prescriber_type",
+        "prescriber": "signup:prescriber_is_pole_emploi",
         "siae": "signup:select_siae",
     }
 

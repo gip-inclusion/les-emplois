@@ -1,0 +1,36 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% translate "Inscription" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% translate "Inscription" %}
+        <small class="text-muted">{% translate "Prescripteur Pôle emploi" %}</small>
+    </h1>
+
+    <ul class="list-unstyled multi-steps my-5">
+        <li>{% translate "Type de prescripteur" %}</li>
+        <li class="is-active">{% translate "Code SAFIR" %}</li>
+        <li>{% translate "Vos informations" %}</li>
+    </ul>
+
+    <form method="post" action="" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+                {% translate "Retour" %}
+            </a>
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}

@@ -6,7 +6,6 @@ from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
 from itou.jobs.models import Appellation
-from itou.prescribers.models import PrescriberOrganization
 from itou.utils.swear_words import get_city_swear_words_slugs
 
 
@@ -54,25 +53,3 @@ def jobs_autocomplete(request):
         ]
 
     return HttpResponse(json.dumps(appellations), "application/json")
-
-
-def prescriber_authorized_organizations_autocomplete(request):
-    term = request.GET.get("term", "").strip()
-
-    organizations = (
-        [
-            {"value": org.name, "id": org.id}
-            for org in PrescriberOrganization.objects.exclude(kind=PrescriberOrganization.Kind.PE)
-            .filter(
-                authorization_status__in=[
-                    PrescriberOrganization.AuthorizationStatus.NOT_SET,
-                    PrescriberOrganization.AuthorizationStatus.VALIDATED,
-                ]
-            )
-            .autocomplete(term, limit=20)
-        ]
-        if term
-        else []
-    )
-
-    return HttpResponse(json.dumps(organizations), "application/json")

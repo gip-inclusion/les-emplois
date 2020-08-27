@@ -1,0 +1,30 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% translate "Prescripteur/Orienteur - Inscription" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% translate "Inscription" %}
+        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
+    </h1>
+
+    <form method="post" action="" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
+                {% translate "Retour" %}
+            </a>
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}

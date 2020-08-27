@@ -5,7 +5,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
@@ -243,6 +244,24 @@ class Approval(CommonApprovalMixin):
 
 
 class PoleEmploiApprovalManager(models.Manager):
+    def get_import_dates(self):
+        """
+        Return a list of import dates.
+        [
+            datetime.date(2020, 2, 23),
+            datetime.date(2020, 4, 8),
+            …
+        ]
+        """
+        return list(
+            self
+            # Remove default `Meta.ordering` to avoid an extra field being added to the GROUP BY clause.
+            .order_by()
+            .annotate(import_date=TruncDate("created_at"))
+            .values_list("import_date", flat=True)
+            .annotate(c=Count("id"))
+        )
+
     def find_for(self, user):
         """
         Find existing Pôle emploi's approvals for the given user.

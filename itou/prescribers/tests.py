@@ -2,11 +2,31 @@ from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 
-from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberOrganizationFactory,
+)
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import PrescriberFactory
 
 
 class ModelTest(TestCase):
+    def test_pending_authorization_proof(self):
+
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganization.Kind.OTHER,
+            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+        )
+        self.assertTrue(org.pending_authorization())
+        self.assertTrue(org.pending_authorization_proof())
+
+        org = PrescriberOrganizationFactory(
+            kind=PrescriberOrganization.Kind.CAP_EMPLOI,
+            authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
+        )
+        self.assertTrue(org.pending_authorization())
+        self.assertFalse(org.pending_authorization_proof())
+
     def test_new_signup_warning_email_to_existing_members(self):
         authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
 

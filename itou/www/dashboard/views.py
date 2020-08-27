@@ -10,7 +10,6 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -56,13 +55,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    # See template for display message while authorized organization is being validated (prescriber path)
-
     if request.user.is_prescriber_with_org:
-        prescriber_organization = get_current_org_or_404(request)
-        prescriber_authorization_status_not_set = (
-            prescriber_organization.authorization_status == PrescriberOrganization.AuthorizationStatus.NOT_SET
-        )
+        get_current_org_or_404(request)
 
     context = {
         "job_applications_categories": job_applications_categories,

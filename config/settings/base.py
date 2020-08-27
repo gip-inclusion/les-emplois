@@ -318,6 +318,14 @@ API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 API_INSEE_KEY = os.environ["API_INSEE_KEY"]
 API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
 
+# API Entreprise
+# https://dashboard.entreprise.api.gouv.fr/login (login is done through auth.api.gouv.fr)
+# https://doc.entreprise.api.gouv.fr/
+API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
+API_ENTREPRISE_CONTEXT = "inclusion.beta.gouv.fr"
+API_ENTREPRISE_RECIPIENT = os.environ["API_ENTREPRISE_RECIPIENT"]
+API_ENTREPRISE_TOKEN = os.environ["API_ENTREPRISE_TOKEN"]
+
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
 API_ESD_KEY = os.environ["API_ESD_KEY"]
@@ -326,7 +334,7 @@ API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
-# PEAM stands for Pôle Emploi Access Management.
+# PEAM stands for Pôle emploi Access Management.
 # Technically there are two PEAM distinct systems:
 # - PEAM "Entreprise", PEAM-E or PEAME for short.
 # - PEAM "Utilisateur", PEAM-U or PEAMU for short.
@@ -358,11 +366,13 @@ ITOU_PROTOCOL = "https"
 ITOU_FQDN = "inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 ITOU_EMAIL_ASSISTANCE = "assistance@inclusion.beta.gouv.fr"
+
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
+ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 
 # Typeform survey links to include in some emails
 ITOU_EMAIL_APPROVAL_SURVEY_LINK = "https://startupsbeta.typeform.com/to/au9d8P"

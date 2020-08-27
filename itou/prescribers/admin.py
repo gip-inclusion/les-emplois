@@ -6,6 +6,51 @@ from django.utils.translation import gettext as _
 from itou.prescribers import models
 
 
+class TmpMissingSiretFilter(admin.SimpleListFilter):
+    """
+    Temporary filter to list organizations without SIRET (except Pôle emploi).
+    They were created prior to the new Prescriber's signup process.
+    Delete this filter when all SIRETs are filled in.
+    """
+
+    title = _("SIRET à renseigner")
+    parameter_name = "missing_siret"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")),)
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return (
+                queryset.exclude(kind=models.PrescriberOrganization.Kind.PE.value)
+                .exclude(members=None)
+                .filter(siret="")
+            )
+        return queryset
+
+
+class TmpCanBeDeletedFilter(admin.SimpleListFilter):
+    """
+    Temporary filter to list organizations without members (except Pôle emploi).
+    They were created by us prior to the new Prescriber's signup process based
+    on various sources of data and assumptions.
+    Delete this filter when they are all deleted.
+    """
+
+    title = _("Sans membres à supprimer")
+    parameter_name = "missing_members"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")),)
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(members=None).exclude(kind=models.PrescriberOrganization.Kind.PE.value)
+        return queryset
+
+
 class HasMembersFilter(admin.SimpleListFilter):
     title = _("A des membres")
     parameter_name = "has_members"
@@ -84,9 +129,17 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         ),
     )
     inlines = (MembersInline,)
-    list_display = ("pk", "name", "post_code", "city", "department", "member_count")
+    list_display = ("pk", "siret", "name", "kind", "post_code", "city", "department", "is_authorized", "member_count")
     list_display_links = ("pk", "name")
-    list_filter = (AuthorizationValidationRequired, HasMembersFilter, "is_authorized", "kind", "department")
+    list_filter = (
+        AuthorizationValidationRequired,
+        TmpMissingSiretFilter,
+        TmpCanBeDeletedFilter,
+        HasMembersFilter,
+        "is_authorized",
+        "kind",
+        "department",
+    )
     raw_id_fields = ("created_by",)
     readonly_fields = (
         "code_safir_pole_emploi",

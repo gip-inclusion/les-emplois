@@ -7,7 +7,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Seuls les caractères alphanumériques sont autorisés.")
+alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", _("Seuls les caractères alphanumériques sont autorisés."))
+
+
+validate_code_safir = RegexValidator(r"^[0-9]{5}$", _("Le code SAFIR doit être composé de 5 chiffres."))
 
 
 def validate_post_code(post_code):

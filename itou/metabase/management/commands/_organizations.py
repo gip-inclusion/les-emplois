@@ -71,7 +71,7 @@ TABLE_COLUMNS = (
         {
             "name": "habilitée",
             "type": "boolean",
-            "comment": "Organisation habilitée par le préfet",
+            "comment": "Organisation habilitée par le Préfet",
             "lambda": lambda o: o.is_authorized,
         },
     ]
