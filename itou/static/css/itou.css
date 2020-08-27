@@ -372,8 +372,6 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
     background: #e2f2ff;
 }
 
-<<<<<<< HEAD
-
 /* Responsive Multi-Step Progress Bar.
 https://codepen.io/athimannil/pen/wWPYkQ
 
@@ -449,6 +447,7 @@ Usage:
 .multi-steps > li.is-active ~ li:before {
     background-color: #ededed;
     border-color: #ededed;
+}
 
 /* Experiments */
 #bg-map {
