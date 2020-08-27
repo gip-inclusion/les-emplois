@@ -1,9 +1,8 @@
-name: 🔮 Tests
+name: 🔮 CI
 
 on:
   push:
     branches-ignore:
-      - master
       - master_clever
 
 jobs:
@@ -66,8 +65,10 @@ jobs:
       run: django-admin test --noinput --failfast --parallel=2
       env:
         DJANGO_DEBUG: True
-    - name: 🚧 Check pending migrations
-      run: django-admin makemigrations --check --dry-run --noinput
+    # Don't check migrations until the OAuth bug is solved.
+    # See https://trello.com/c/txewyFOm
+    # - name: 🚧 Check pending migrations
+    #   run: django-admin makemigrations --check --dry-run --noinput
     - name: ✨ Black, isort and Flake8
       run: |
         black --check --line-length 119 itou
