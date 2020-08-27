@@ -7,8 +7,6 @@ many possible paths are possible.
 The session must contain an `url_history` entry.
 """
 
-from django.urls import reverse
-
 
 def push_url_in_history(session_key):
     """
@@ -18,7 +16,7 @@ def push_url_in_history(session_key):
     which must set an `url_history` entry in session, e.g.:
 
     request.session[session_key] = {
-        "url_history": [reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")],
+        "url_history": [request.path],
     }
     """
 
@@ -28,7 +26,7 @@ def push_url_in_history(session_key):
             session_data = request.session[session_key]
             url_history = session_data["url_history"]
 
-            current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
+            current_url = request.path
             if current_url not in url_history:
                 # The user has gone forwards: the page was never visited.
                 url_history.append(current_url)
@@ -55,7 +53,7 @@ def get_prev_url_from_history(request, session_key):
     session_data = request.session[session_key]
     url_history = session_data["url_history"]
 
-    current_url = reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")
+    current_url = request.path
 
     current_url_index = url_history.index(current_url)
     return session_data["url_history"][current_url_index - 1]

@@ -158,7 +158,7 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
         "prescriber_org_data": None,
         "pole_emploi_org_pk": None,
         "safir_code": None,
-        "url_history": [reverse(f"{request.resolver_match.namespace}:{request.resolver_match.url_name}")],
+        "url_history": [request.path],
         "next": get_safe_url(request, "next"),
     }
 

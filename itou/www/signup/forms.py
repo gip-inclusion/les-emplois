@@ -327,7 +327,7 @@ class PrescriberSiretForm(forms.Form):
 
     def clean_siret(self):
 
-        # `max_length` is skiped so that we can allow an arbitrary number of spaces in the user-entered value.
+        # `max_length` is skipped so that we can allow an arbitrary number of spaces in the user-entered value.
         siret = self.cleaned_data["siret"].replace(" ", "")
 
         validate_siret(siret)
@@ -455,7 +455,7 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
         self.prescriber_org_data = kwargs.pop("prescriber_org_data")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = _("Utilisez une dresse e-mail professionnelle.")
+        self.fields["email"].help_text = _("Utilisez une adresse e-mail professionnelle.")
 
     def save(self, request):
 
