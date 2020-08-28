@@ -94,7 +94,16 @@ class User(AbstractUser, AddressMixin):
         # There is no unicity constraint on `email` at the DB level.
         # It's in anticipation of other authentication methods to
         # authenticate against something else, e.g. username/password.
-        if not already_exists and hasattr(self, "email") and User.email_already_exists(self.email):
+        if already_exists:
+            if User.email_already_exists(self.email, exclude_pk=self.pk):
+                # This case happens e.g. in step 2 of 2 of creating a user
+                # in the admin, when setting up the user email, in case
+                # a case insensitive match of the same email already exists.
+                raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
+        # We have to filter out the user.email == "" case here because
+        # this legit case happens e.g. in step 1 of 2 of creating a user
+        # in the admin, as the user with no email yet is stored in db.
+        elif hasattr(self, "email") and self.email != "" and User.email_already_exists(self.email):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
         # Update department from postal code (if possible)
@@ -167,13 +176,16 @@ class User(AbstractUser, AddressMixin):
         return user
 
     @classmethod
-    def email_already_exists(cls, email):
+    def email_already_exists(cls, email, exclude_pk=None):
         """
         RFC 5321 Part 2.4 states that only the domain portion of an email
         is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
         the same email.
         """
-        return cls.objects.filter(email__iexact=email).exists()
+        queryset = cls.objects.filter(email__iexact=email)
+        if exclude_pk:
+            queryset = queryset.exclude(pk=exclude_pk)
+        return queryset.exists()
 
     @staticmethod
     def clean_pole_emploi_fields(pole_emploi_id, lack_of_pole_emploi_id_reason):
