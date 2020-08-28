@@ -167,7 +167,7 @@ class CreateSiaeViewTest(TestCase):
 
         post_data = {
             "siret": new_siret,
-            "kind": Siae.KIND_ETTI,
+            "kind": siae.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Siae.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
@@ -229,7 +229,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
-    def test_cannot_create_siae_with_same_siret_and_same_type(self):
+    def test_cannot_create_siae_with_same_siret_and_same_kind(self):
 
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
@@ -265,7 +265,7 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_can_create_siae_with_same_siret_and_different_type(self, mock_call_ban_geocoding_api):
+    def test_cannot_create_siae_with_same_siret_and_different_kind(self, mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         siae.kind = Siae.KIND_ETTI
         siae.save()
@@ -292,38 +292,48 @@ class CreateSiaeViewTest(TestCase):
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
-        new_siae = Siae.objects.get(name=post_data["name"])
-
-        self.assertNotEqual(new_siae.pk, siae.pk)
-        self.assertEqual(siae.source, Siae.SOURCE_ASP)
-        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
-        self.assertTrue(new_siae.has_admin(user))
-        self.assertEqual(new_siae.siret, post_data["siret"])
-        self.assertEqual(new_siae.kind, post_data["kind"])
-        self.assertEqual(new_siae.name, post_data["name"])
-        self.assertEqual(new_siae.address_line_1, post_data["address_line_1"])
-        self.assertEqual(new_siae.address_line_2, "")
-        self.assertEqual(new_siae.city, post_data["city"])
-        self.assertEqual(new_siae.post_code, post_data["post_code"])
-        self.assertEqual(new_siae.department, post_data["department"])
-        self.assertEqual(new_siae.email, post_data["email"])
-        self.assertEqual(new_siae.phone, post_data["phone"])
-        self.assertEqual(new_siae.website, post_data["website"])
-        self.assertEqual(new_siae.description, post_data["description"])
-        self.assertEqual(new_siae.created_by, user)
-        self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
-        self.assertTrue(new_siae.is_active)
-
-        # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
-        self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")
-        self.assertEqual(new_siae.latitude, 48.838411)
-        self.assertEqual(new_siae.longitude, 2.316754)
-        self.assertEqual(new_siae.geocoding_score, 0.587663373207207)
+        self.assertEqual(Siae.objects.filter(siret=post_data["siret"]).count(), 1)
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_siae_with_different_siret(self, mock_call_ban_geocoding_api):
+    def test_cannot_create_siae_with_same_siren_and_different_kind(self, mock_call_ban_geocoding_api):
+        siae = SiaeWithMembershipFactory()
+        siae.kind = Siae.KIND_ETTI
+        siae.save()
+        user = siae.members.first()
+
+        new_siret = siae.siren + "12345"
+        self.assertNotEqual(siae.siret, new_siret)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("siaes_views:create_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "siret": new_siret,
+            "kind": Siae.KIND_ACI,
+            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "source": Siae.SOURCE_USER_CREATED,
+            "address_line_1": "2 Rue de Soufflenheim",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
+            "email": "",
+            "phone": "0610203050",
+            "website": "https://famous-siae.com",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Siae.objects.filter(siret=siae.siret).count(), 1)
+        self.assertEqual(Siae.objects.filter(siret=new_siret).count(), 0)
+
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
 
@@ -333,12 +343,12 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        new_siret = siae.siren + "99999"
+        new_siret = siae.siren + "12345"
         self.assertNotEqual(siae.siret, new_siret)
 
         post_data = {
             "siret": new_siret,
-            "kind": Siae.KIND_ACI,
+            "kind": siae.kind,
             "name": "FAMOUS SIAE SUB STRUCTURE",
             "source": Siae.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
