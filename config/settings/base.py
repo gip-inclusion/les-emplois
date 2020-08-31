@@ -413,3 +413,8 @@ METABASE_SHOW_SQL_REQUESTS = False
 # by batch of 100 => 5s
 # by batch of 1000 => 5s
 METABASE_INSERT_BATCH_SIZE = 1000
+
+# Dramatiq
+ASYNC_EMAIL_BACKEND = ""
+
+
