@@ -6,7 +6,6 @@ from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.template.loader import get_template
-
 from dramatiq import actor
 
 
