@@ -4,6 +4,39 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2020-08-27
+
+### Ajouté
+- Import des agréments Pôle emploi d'Août 2020
+- Nouvelle page stats basée sur Metabase
+- Affichage de l'ID des SIAE dans le tableau de bord (pour faciliter le support)
+- Possibilité de distinguer facilement les antennes de structures créées par le support de celles créées par les utilisateurs
+- Passage de nos bases de données de staging et de prod en mode "Encrytion at rest"
+- Expérimentation : affichage d'une fausse carte dans la page de résultats de recherche
+
+### Modifié
+- Nouveau parcours d'inscription des prescripteurs/orienteurs
+- Intégrations des modifications de *wording* des e-mails de Nathalie
+- Impossible de s'inscrire dans une SIAE qui a déjà des membres (il faut désormais recevoir une invitation)
+- Le lien "Répondre aux candidatures reçues" du tableau de bord est transformé en plusieurs liens :
+    - "Candidatures à traiter"
+    - "Candidatures acceptées et embauches prévues"
+    - "Candidatures refusées/annulées"
+- Agréments Pôle emploi :
+    - amélioration du script d'import pour se baser sur le nom des colonnes plutôt que sur leur ordre dans le fichier source
+    - possibilité de filter par date d'import dans l'admin
+    - correction d'un bug avec des dates de naissance dans le futur à cause d'un format d'année transmis sur 2 chiffres et transformé en 2068 plutôt que 1968
+- Si une fiche de poste est renseignée, le message "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." n'est plus affiché
+- Modification du message d'erreur qui apparait lors de l'inscription Employeur si le SIRET n'est pas reconnu.
+- Invitations Prescripteurs : un membre d'une organisation Pôle emploi ne peut inviter que des personnes dont l'adresse e-mail finit en "@pole-emploi.fr".
+- Evolution des _fixtures_ pour refléter les derniers changements. 
+
+### Supprimé
+- 154 SIAE fantômes pour débloquer les créations légitimes d'antennes
+- 7 SIAE sans membres
+- 43 organisations de prescripteurs sans membres
+- Ancienne application `stats`
+
 ## [1.0.9] - 2020-08-13
 
 ### Ajouté
