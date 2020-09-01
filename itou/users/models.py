@@ -90,19 +90,15 @@ class User(AbstractUser, AddressMixin):
         return self.email
 
     def save(self, *args, **kwargs):
-        already_exists = bool(self.pk)
+
         # There is no unicity constraint on `email` at the DB level.
         # It's in anticipation of other authentication methods to
         # authenticate against something else, e.g. username/password.
-        if already_exists:
-            # Sometimes our staff will change the email of an existing user,
-            # we need to ensure the new email does not already exist in db.
-            if User.email_already_exists(self.email, exclude_pk=self.pk):
-                raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
-        elif hasattr(self, "email") and self.email and User.email_already_exists(self.email):
+        has_email = hasattr(self, "email") and self.email
+        if has_email and User.email_already_exists(self.email, exclude_pk=self.pk):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
-        # Update department from postal code (if possible)
+        # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
 
         super().save(*args, **kwargs)
