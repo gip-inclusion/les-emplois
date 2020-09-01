@@ -95,15 +95,11 @@ class User(AbstractUser, AddressMixin):
         # It's in anticipation of other authentication methods to
         # authenticate against something else, e.g. username/password.
         if already_exists:
+            # Sometimes our staff will change the email of an existing user,
+            # we need to ensure the new email does not already exist in db.
             if User.email_already_exists(self.email, exclude_pk=self.pk):
-                # This case happens e.g. in step 2 of 2 of creating a user
-                # in the admin, when setting up the user email, in case
-                # a case insensitive match of the same email already exists.
                 raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
-        # We have to filter out the user.email == "" case here because
-        # this legit case happens e.g. in step 1 of 2 of creating a user
-        # in the admin, as the user with no email yet is stored in db.
-        elif hasattr(self, "email") and self.email != "" and User.email_already_exists(self.email):
+        elif hasattr(self, "email") and self.email and User.email_already_exists(self.email):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
         # Update department from postal code (if possible)
