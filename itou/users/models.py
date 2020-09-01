@@ -94,7 +94,12 @@ class User(AbstractUser, AddressMixin):
         # There is no unicity constraint on `email` at the DB level.
         # It's in anticipation of other authentication methods to
         # authenticate against something else, e.g. username/password.
-        if not already_exists and hasattr(self, "email") and User.email_already_exists(self.email):
+        if already_exists:
+            # Sometimes our staff will change the email of an existing user,
+            # we need to ensure the new email does not already exist in db.
+            if User.email_already_exists(self.email, exclude_pk=self.pk):
+                raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
+        elif hasattr(self, "email") and self.email and User.email_already_exists(self.email):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
         # Update department from postal code (if possible)
@@ -167,13 +172,16 @@ class User(AbstractUser, AddressMixin):
         return user
 
     @classmethod
-    def email_already_exists(cls, email):
+    def email_already_exists(cls, email, exclude_pk=None):
         """
         RFC 5321 Part 2.4 states that only the domain portion of an email
         is case-insensitive. Consider toto@toto.com and TOTO@toto.com as
         the same email.
         """
-        return cls.objects.filter(email__iexact=email).exists()
+        queryset = cls.objects.filter(email__iexact=email)
+        if exclude_pk:
+            queryset = queryset.exclude(pk=exclude_pk)
+        return queryset.exists()
 
     @staticmethod
     def clean_pole_emploi_fields(pole_emploi_id, lack_of_pole_emploi_id_reason):
