@@ -15,4 +15,4 @@ class ExternalDataConfig(AppConfig):
         When the app is loaded:
         import / activate registration to allauth login signals
         """
-        import itou.external_data.signals  # noqa: F401
+        import itou.external_data.signals  # noqa F401
