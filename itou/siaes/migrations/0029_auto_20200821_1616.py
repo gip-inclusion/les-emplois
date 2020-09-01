@@ -30,4 +30,5 @@ class Migration(migrations.Migration):
         ("siaes", "0028_auto_20200821_1616"),
     ]
 
+    # Forward migration was deactivated on purpose.
     operations = [migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]

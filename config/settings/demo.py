@@ -1,10 +1,6 @@
-from .base import *  # noqa
+from .base import *
+from ._sentry import sentry_init
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import ignore_logger
-
-ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
 ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", ITOU_FQDN]
 
 DATABASES = {
@@ -20,13 +16,12 @@ DATABASES = {
 
 ITOU_ENVIRONMENT = "DEMO"
 ITOU_PROTOCOL = "https"
+ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact+demo@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+demo@inclusion.beta.gouv.fr"
 
-sentry_sdk.init(dsn=os.environ["SENTRY_DSN_DEMO"], integrations=[DjangoIntegration()])
-ignore_logger("django.security.DisallowedHost")
+sentry_init(dsn=os.environ["SENTRY_DSN_DEMO"])
 
-ITOU_ENVIRONMENT = "DEMO"
 ASP_ITOU_PREFIX = "XXXXX"
 
 # Override allauth DefaultAccountAdapter: provides custom context to email templates
