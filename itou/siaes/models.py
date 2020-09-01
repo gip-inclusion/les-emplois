@@ -90,6 +90,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_AI = "AI"
     KIND_ACI = "ACI"
     KIND_ETTI = "ETTI"
+    KIND_EITI = "EITI"
     KIND_GEIQ = "GEIQ"
     KIND_EA = "EA"
     KIND_EATT = "EATT"
@@ -99,6 +100,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_AI, _("Association intermédiaire")),
         (KIND_ACI, _("Atelier chantier d'insertion")),
         (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
+        (KIND_EITI, _("Entreprise d'insertion par le travail indépendant")),
         (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
         (KIND_EA, _("Entreprise adaptée")),
         (KIND_EATT, _("Entreprise adaptée de travail temporaire")),
@@ -116,7 +118,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (SOURCE_STAFF_CREATED, _("Staff Itou")),
     )
 
-    ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI]
+    # https://code.travail.gouv.fr/code-du-travail/l5132-4
+    # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
+    ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True)
