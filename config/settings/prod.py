@@ -32,6 +32,7 @@ sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 # Database connection data is overriden, so we must repeat this part:
 # ---
 DRAMATIQ_BROKER = {**DRAMATIQ_BROKER_BASE,
-                   "OPTIONS": {"url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}", }}
+                   "OPTIONS": {"url": f"postgres://{DATABASES[DRAMATIQ_DB_ALIAS]['USER']}:{DATABASES[DRAMATIQ_DB_ALIAS]['PASSWORD']}@{DATABASES[DRAMATIQ_DB_ALIAS]['HOST']}:{DATABASES[DRAMATIQ_DB_ALIAS]['PORT']}/{DATABASES[DRAMATIQ_DB_ALIAS]['NAME']}", }}
 
+# Must be defined after broker
 DRAMATIQ_REGISTRY = DRAMATIQ_REGISTRY_BASE
