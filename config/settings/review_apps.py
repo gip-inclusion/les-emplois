@@ -27,3 +27,20 @@ SHOW_TEST_ACCOUNTS_BANNER = True
 
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_STAGING"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")
+
+# database connection data is overriden, so we must repeat this part:
+
+_DRMTQ_DB = DATABASES[DRAMATIQ_DB_ALIAS]
+
+DRAMATIQ_BROKER = {
+    "OPTIONS": {
+        "url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}"
+    },
+    "MIDDLEWARE": [
+        "dramatiq.middleware.TimeLimit",
+        "dramatiq.middleware.Callbacks",
+        "dramatiq.middleware.Retries",
+        "dramatiq.results.Results",
+    ],
+}
+DRAMATIQ_REGISTRY = 'itou.utils.actors.REGISTRY'
