@@ -4,6 +4,7 @@ import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
 
+INSTALLED_APPS += ["django_dramatiq_pg"]
 
 ALLOWED_HOSTS = ["itou-prod.cleverapps.io", "inclusion.beta.gouv.fr"]
 

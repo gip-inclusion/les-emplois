@@ -51,7 +51,6 @@ THIRD_PARTY_APPS = [
     "bootstrap_datepicker_plus",
     "django_select2",
     "mathfilters",
-    "django_dramatiq_pg",
 ]
 
 
