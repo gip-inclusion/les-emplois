@@ -48,11 +48,13 @@ def get_current_organization_and_perms(request):
         "user_is_siae_admin": user_is_siae_admin,
         "user_siae_set": user_siae_set,
     }
+
     context.update(
         get_matomo_context(
             user=request.user, prescriber_organization=prescriber_organization, user_is_siae_admin=user_is_siae_admin
         )
     )
+
     return context
 
 

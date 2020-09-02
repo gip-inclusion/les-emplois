@@ -102,3 +102,26 @@ class ModelTest(TestCase):
         User = get_user_model()
         self.assertTrue(User.email_already_exists("foo@bar.com"))
         self.assertTrue(User.email_already_exists("FOO@bar.com"))
+
+    def test_save_for_unique_email_on_create_and_update(self):
+        """
+        Ensure `email` is unique when using the save() method for creating or updating a User instance.
+        """
+        User = get_user_model()
+
+        unique_email = "foo@foo.com"
+
+        User.objects.create(username="foo", email=unique_email)
+
+        with self.assertRaises(ValidationError):
+            # Creating a user with an existing email should raise an error.
+            User.objects.create(username="foo2", email=unique_email)
+
+        bar = User.objects.create(username="bar", email="bar@bar.com")
+        # Update email.
+        bar.email = "baz@baz.com"
+        bar.save()
+        with self.assertRaises(ValidationError):
+            # Updating a user with an existing email should raise an error.
+            bar.email = unique_email
+            bar.save()

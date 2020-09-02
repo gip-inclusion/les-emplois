@@ -27,6 +27,7 @@ DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_PROD"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")
+sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 
 # Database connection data is overriden, so we must repeat this part:
 # ---

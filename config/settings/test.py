@@ -1,6 +1,6 @@
 import logging
 
-from .base import *  # noqa
+from .base import *
 
 
 # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.

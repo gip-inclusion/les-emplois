@@ -21,7 +21,7 @@ EXPORT_DIR = f"{ROOT_DIR}/exports"
 
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
-DEBUG = os.environ["DJANGO_DEBUG"] == "True"
+DEBUG = os.environ.get("DJANGO_DEBUG") == "True"
 
 ALLOWED_HOSTS = []
 
@@ -260,8 +260,8 @@ ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 SEND_EMAIL_NB_RETRIES = 5
 
 ANYMAIL = {
-    "MAILJET_API_KEY": os.environ["API_MAILJET_KEY"],
-    "MAILJET_SECRET_KEY": os.environ["API_MAILJET_SECRET"],
+    "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
+    "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
 }
 
 MAILJET_API_URL = "https://api.mailjet.com/v3"
@@ -318,21 +318,21 @@ API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 # https://github.com/sne3ks/api_insee
 # > Autorise 30 requêtes par minute pour chaque application des utilisateurs.
 # > Quota par défaut pour tout nouveau compte.
-API_INSEE_KEY = os.environ["API_INSEE_KEY"]
-API_INSEE_SECRET = os.environ["API_INSEE_SECRET"]
+API_INSEE_KEY = os.environ.get("API_INSEE_KEY")
+API_INSEE_SECRET = os.environ.get("API_INSEE_SECRET")
 
 # API Entreprise
 # https://dashboard.entreprise.api.gouv.fr/login (login is done through auth.api.gouv.fr)
 # https://doc.entreprise.api.gouv.fr/
 API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
 API_ENTREPRISE_CONTEXT = "inclusion.beta.gouv.fr"
-API_ENTREPRISE_RECIPIENT = os.environ["API_ENTREPRISE_RECIPIENT"]
-API_ENTREPRISE_TOKEN = os.environ["API_ENTREPRISE_TOKEN"]
+API_ENTREPRISE_RECIPIENT = os.environ.get("API_ENTREPRISE_RECIPIENT")
+API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
-API_ESD_KEY = os.environ["API_ESD_KEY"]
-API_ESD_SECRET = os.environ["API_ESD_SECRET"]
+API_ESD_KEY = os.environ.get("API_ESD_KEY")
+API_ESD_SECRET = os.environ.get("API_ESD_SECRET")
 API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
@@ -357,7 +357,7 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ADAPTER = "itou.allauth.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # PDFShift
-PDFSHIFT_API_KEY = os.environ["PDFSHIFT_API_KEY"]
+PDFSHIFT_API_KEY = os.environ.get("PDFSHIFT_API_KEY")
 PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 
 # Itou.
