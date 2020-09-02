@@ -6,7 +6,7 @@ from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.template.loader import get_template
-from dramatiq import actor
+import itou.utils.actors.email as actors
 
 
 def remove_extra_line_breaks(text):
@@ -45,9 +45,9 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 # EXPERIMENTAL:
 # ---
 # Custom async email backend wrapper
+# Dramatiq version
 
-
-def _serializeEmailMessage(email_message):
+def serializeEmailMessage(email_message):
     """
     Returns a dict with `EmailMessage` instance content serializable via Pickle (remote data sending concern).
 
@@ -58,7 +58,7 @@ def _serializeEmailMessage(email_message):
 
     Just the bare minimum used by the app is kept for serialization.
 
-    This functions works in pair with `_deserializeEmailMessage`.
+    This functions works in pair with `deserializeEmailMessage`.
     """
     return {
         "subject": email_message.subject,
@@ -70,12 +70,12 @@ def _serializeEmailMessage(email_message):
     }
 
 
-def _deserializeEmailMessage(serialized_email_message):
+def deserializeEmailMessage(serialized_email_message):
     """ 
         Creates a "light" version of the original `EmailMessage` passed to the email backend.
 
         In order to be serializable, we:
-        * only get the fields actually used by the app (defined in counterpart `_serializeEmailMessage`)
+        * only get the fields actually used by the app (defined in counterpart `serializeEmailMessage`)
         * add a reference to the "synchronous" email backend (for convenience)
 
         *Tip*: use non-serializable objects only when deserialization is over... (f.i. email backends)
@@ -83,58 +83,15 @@ def _deserializeEmailMessage(serialized_email_message):
     return EmailMessage(connection=get_connection(backend=settings.ASYNC_EMAIL_BACKEND), **serialized_email_message)
 
 
-@actor(max_retries=settings.SEND_EMAIL_NB_RETRIES)
-def _async_send_messages(serializable_email_messages):
-    """ Async email sending "delegate" 
-
-        This function sends emails with the backend defined in `settings.ASYNC_EMAIL_BACKEND`
-        and is trigerred by an email backend wrappper: `AsyncEmailBackend`.
-
-        As it is decorated as a Dramatiq actor, all parameters must be serializable via a JSON dump.
-
-        Huey stores some data via the broker persistance mechanism (Redis | RabbitMQ)
-        for RPC/async/retry purposes.
-
-        In order to send data to a remote broker and perform callback function call on the client,
-        Huey must use a serialization mechanism to send "over the wire" (Pickle here).
-
-        In this case for a `@actor`, data sent by Huey are:
-        * the function name (to use as a callback)
-        * its call parameters (to make the call)
-
-        The main parameter is a list of `EmailMessage` objects to be send.
-
-        By design, an `EmailMessage` instance holds references to some non-serializable ressources:
-        * a connection to the email backend (if not `None`)
-        * inner locks for atomic/threadsafe operations
-        * ...
-
-        Making `EmailMessage` serializable is the purpose of `_serializeEmailMessage` and `_deserializeEmailMessage`.
-
-        If there are many async tasks to be defined or for specific objects,
-        it may be better to use a custom serializer.
-
-        By design, this function must return the number of email correctly processed.
-    """
-
-    count = 0
-
-    for message in [_deserializeEmailMessage(email) for email in serializable_email_messages]:
-        message.send()
-        count += 1
-
-    return count
-
-
 class AsyncEmailBackend(BaseEmailBackend):
     """ Custom async email backend wrapper
 
-        Decorating a method with `@task` does not work (no static context).
+        Decorating a method with `@actor` does not work (no static context).
         Only functions can be Huey tasks.
 
         This class:
         * wraps an email backend defined in `settings.ASYNC_EMAIL_BACKEND`
-        * delegate the actual email sending to a function with *serializable* parameters 
+        * delegate the actual email sending to a function with *serializable* parameters
 
         See:
         * `base.py` section "Dramatiq" for details on `ASYNC_EMAIL_BACKEND`
@@ -142,10 +99,10 @@ class AsyncEmailBackend(BaseEmailBackend):
     """
 
     def send_messages(self, email_messages):
-        # Turn emails into something serializable
+        # Turn emails/parameters into a JSON payload (serializable)
         if not email_messages:
             return
 
-        emails = [_serializeEmailMessage(email) for email in email_messages]
+        emails = [serializeEmailMessage(email) for email in email_messages]
 
-        return _async_send_messages(emails)
+        return actors.async_send_messages.send(emails)

@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "bootstrap_datepicker_plus",
     "django_select2",
     "mathfilters",
+    "django_dramatiq_pg",
 ]
 
 
@@ -250,11 +251,14 @@ LOGGING = {
     },
 }
 
-# Email.
+# Email & async wrapper for:
 # https://anymail.readthedocs.io/en/stable/esps/mailjet/
 # ------------------------------------------------------------------------------
 
-EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
+ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+
+SEND_EMAIL_NB_RETRIES = 5
 
 ANYMAIL = {
     "MAILJET_API_KEY": os.environ["API_MAILJET_KEY"],
@@ -414,7 +418,20 @@ METABASE_SHOW_SQL_REQUESTS = False
 # by batch of 1000 => 5s
 METABASE_INSERT_BATCH_SIZE = 1000
 
-# Dramatiq
-ASYNC_EMAIL_BACKEND = ""
+# Dramatiq / Async
+# ------------------------------------------------------------------------------
+DRAMATIQ_DB_ALIAS = "default"
+_DRMTQ_DB = DATABASES[DRAMATIQ_DB_ALIAS]
 
-
+DRAMATIQ_BROKER = {
+    "OPTIONS": {
+        "url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}"
+    },
+    "MIDDLEWARE": [
+        "dramatiq.middleware.TimeLimit",
+        "dramatiq.middleware.Callbacks",
+        "dramatiq.middleware.Retries",
+        "dramatiq.results.Results",
+    ],
+}
+DRAMATIQ_REGISTRY = 'itou.utils.actors.REGISTRY'

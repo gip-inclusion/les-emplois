@@ -54,3 +54,8 @@ xlrd==1.2.0  # https://pypi.org/project/xlrd/
 
 # Turn HTML files into PDF
 pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
+
+
+# Aync processing
+dramatiq==1.9.0  # https://dramatiq.io 
+django_dramatiq_pg==1.2.0  # https://github.com/uptick/django-dramatiq-pg
