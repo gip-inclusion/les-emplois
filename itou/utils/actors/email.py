@@ -7,8 +7,7 @@ from itou.utils.actors import REGISTRY
 # Must init a Registry object for django_dramatiq_pg
 # For convenience, REGISTRY is defined in `__init__.py`
 
-# store_results=True, 
-@REGISTRY.actor(max_retries=settings.SEND_EMAIL_NB_RETRIES)
+@REGISTRY.actor(max_retries=settings.SEND_EMAIL_NB_RETRIES, store_results=True)
 def async_send_messages(serializable_email_messages):
     """
         Async email sending "delegate"
