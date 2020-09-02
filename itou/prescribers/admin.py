@@ -94,7 +94,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         css = {"all": ("css/itou-admin.css",)}
 
     change_form_template = "admin/prescribers/change_form.html"
-
     fieldsets = (
         (
             _("Structure"),
