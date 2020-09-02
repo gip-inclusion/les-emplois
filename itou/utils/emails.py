@@ -73,7 +73,7 @@ def serializeEmailMessage(email_message):
 
 
 def deserializeEmailMessage(serialized_email_message):
-    """ 
+    """
         Creates a "light" version of the original `EmailMessage` passed to the email backend.
 
         In order to be serializable, we:

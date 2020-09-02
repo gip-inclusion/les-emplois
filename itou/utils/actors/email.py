@@ -10,7 +10,8 @@ from itou.utils.actors import REGISTRY
 
 @REGISTRY.actor(store_results=True, max_retries=settings.SEND_EMAIL_NB_RETRIES)
 def async_send_messages(serializable_email_messages):
-    """ Async email sending "delegate" 
+    """
+        Async email sending "delegate"
 
         This function sends emails with the backend defined in `settings.ASYNC_EMAIL_BACKEND`
         and is trigerred by an email backend wrappper: `AsyncEmailBackend`.
