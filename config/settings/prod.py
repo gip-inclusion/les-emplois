@@ -26,3 +26,10 @@ DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_PROD"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")
+
+# Database connection data is overriden, so we must repeat this part:
+# ---
+DRAMATIQ_BROKER = {**DRAMATIQ_BROKER_BASE,
+                   "OPTIONS": {"url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}", }}
+
+DRAMATIQ_REGISTRY = DRAMATIQ_REGISTRY_BASE

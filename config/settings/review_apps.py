@@ -31,17 +31,7 @@ ignore_logger("django.security.DisallowedHost")
 
 # Database connection data is overriden, so we must repeat this part:
 # ---
-# _DRMTQ_DB = DATABASES[DRAMATIQ_DB_ALIAS]
+DRAMATIQ_BROKER = {**DRAMATIQ_BROKER_BASE,
+                   "OPTIONS": {"url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}", }}
 
-# DRAMATIQ_BROKER = {
-#     "OPTIONS": {
-#         "url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}"
-#     },
-#     "MIDDLEWARE": [
-#         "dramatiq.middleware.TimeLimit",
-#         "dramatiq.middleware.Callbacks",
-#         "dramatiq.middleware.Retries",
-#         "dramatiq.results.Results",
-#     ],
-# }
-# DRAMATIQ_REGISTRY = 'itou.utils.actors.REGISTRY'
+DRAMATIQ_REGISTRY = DRAMATIQ_REGISTRY_BASE

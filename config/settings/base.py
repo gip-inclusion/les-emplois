@@ -421,17 +421,15 @@ METABASE_INSERT_BATCH_SIZE = 1000
 # Dramatiq / Async
 # ------------------------------------------------------------------------------
 DRAMATIQ_DB_ALIAS = "default"
-# _DRMTQ_DB = DATABASES[DRAMATIQ_DB_ALIAS]
 
-# DRAMATIQ_BROKER = {
-#     "OPTIONS": {
-#         "url": f"postgres://{_DRMTQ_DB['USER']}:{_DRMTQ_DB['PASSWORD']}@{_DRMTQ_DB['HOST']}:{_DRMTQ_DB['PORT']}/{_DRMTQ_DB['NAME']}"
-#     },
-#     "MIDDLEWARE": [
-#         "dramatiq.middleware.TimeLimit",
-#         "dramatiq.middleware.Callbacks",
-#         "dramatiq.middleware.Retries",
-#         "dramatiq.results.Results",
-#     ],
-# }
-# DRAMATIQ_REGISTRY = 'itou.utils.actors.REGISTRY'
+# For Dramatig broker configuration, see override in `[prod|dev|staging|review_apps].py`
+_DRMTQ_DB = DATABASES[DRAMATIQ_DB_ALIAS]
+DRAMATIQ_BROKER_BASE = {
+    "MIDDLEWARE": [
+        "dramatiq.middleware.TimeLimit",
+        "dramatiq.middleware.Callbacks",
+        "dramatiq.middleware.Retries",
+        "dramatiq.results.Results",
+    ],
+}
+DRAMATIQ_REGISTRY_BASE = 'itou.utils.actors.REGISTRY'
