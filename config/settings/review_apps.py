@@ -1,5 +1,8 @@
 from .base import *
-from ._sentry import sentry_init
+
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import ignore_logger
 
 INSTALLED_APPS += ["django_dramatiq_pg",]
 
@@ -22,11 +25,10 @@ ITOU_FQDN = os.environ.get("DEPLOY_URL", "staging.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
+SHOW_TEST_ACCOUNTS_BANNER = True
+
 sentry_sdk.init(dsn=os.environ["SENTRY_DSN_STAGING"], integrations=[DjangoIntegration()])
 ignore_logger("django.security.DisallowedHost")
-sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
-
-SHOW_TEST_ACCOUNTS_BANNER = True
 
 # Database connection data is overriden, so we must repeat this part:
 # ---
