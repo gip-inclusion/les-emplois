@@ -6,6 +6,7 @@ from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
 from django.template.loader import get_template
+
 import itou.utils.actors.email as actors
 
 
@@ -46,6 +47,7 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 # ---
 # Custom async email backend wrapper
 # Dramatiq version
+
 
 def serializeEmailMessage(email_message):
     """
