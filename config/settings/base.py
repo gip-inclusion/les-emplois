@@ -422,8 +422,7 @@ METABASE_INSERT_BATCH_SIZE = 1000
 # ------------------------------------------------------------------------------
 DRAMATIQ_DB_ALIAS = "default"
 
-# For Dramatig broker configuration, see override in `[prod|dev|staging|review_apps].py`
-_DRMTQ_DB = DATABASES[DRAMATIQ_DB_ALIAS]
+# For Dramatig broker / url configuration, see override in `[prod|dev|staging|review_apps].py`
 DRAMATIQ_BROKER_BASE = {
     "MIDDLEWARE": [
         "dramatiq.middleware.TimeLimit",
