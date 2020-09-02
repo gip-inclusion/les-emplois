@@ -7,7 +7,7 @@ from itou.utils.actors import REGISTRY
 # Must init a Registry object for django_dramatiq_pg
 # For convenience, REGISTRY is defined in `__init__.py`
 
-@REGISTRY.actor(max_retries=settings.SEND_EMAIL_NB_RETRIES, store_results=True)
+@REGISTRY.actor(max_retries=settings.SEND_EMAIL_NB_RETRIES)
 def async_send_messages(serializable_email_messages):
     """
         Async email sending "delegate"
@@ -39,13 +39,12 @@ def async_send_messages(serializable_email_messages):
         If there are many async tasks to be defined or for specific objects,
         it may be better to use a custom serializer.
 
-        By design, this function must return the number of email correctly processed.
+        By design, this function *should* return the number of email correctly processed, however:
+        * Dramatiq documentation does not recommend to store results
+        * `django_dramatiq_pg` does a poor job configuring/initializing result *backend* ...
+        * ... resulting in non blocking errors on the client (post-processing signals)
+        * results of actors will not be used on the consumer side, so we don't care
     """
-
-    count = 0
 
     for message in serializable_email_messages:
         emails.deserializeEmailMessage(message).send()
-        count += 1
-
-    return count

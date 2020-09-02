@@ -107,4 +107,7 @@ class AsyncEmailBackend(BaseEmailBackend):
 
         emails = [serializeEmailMessage(email) for email in email_messages]
 
-        return actors.async_send_messages.send(emails)
+        actors.async_send_messages.send(emails)
+
+        # We don't care about returning a result (and we can't without blocking)
+        return len(email_messages)

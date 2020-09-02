@@ -427,7 +427,6 @@ DRAMATIQ_BROKER_BASE = {
         "dramatiq.middleware.TimeLimit",
         "dramatiq.middleware.Callbacks",
         "dramatiq.middleware.Retries",
-        "dramatiq.results.Results",
     ],
 }
 DRAMATIQ_REGISTRY_BASE = 'itou.utils.actors.REGISTRY'
