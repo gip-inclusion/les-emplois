@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
+from itou.users.models import User
 
 
 # PE Connect API data retrieval tools
@@ -251,10 +252,9 @@ def _store_user_data(user, status, data):
 
 #  Public
 
-
 def async_import_user_data(user, token):
     """
-    Asynchronous update of user data:
+    Asynchronous update of user data with asyncio/loops:
 
     This part of the app has to be processed asynchronously:
         - many (blocking) HTTP requests are made sequentially in order to fetch data from PE,
@@ -318,12 +318,16 @@ def async_import_user_data(user, token):
     loop.run_in_executor(None, import_user_data, user, token)
 
 
-def import_user_data(user, token):
+def import_user_data(user_pk, token):
     """
     Import external user data via PE Connect
+    
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
-    This function is *synchronous*
+
+    This function is *synchronous* by default, and annotated for asynchronous
+    behaviour when using a broker.
     """
+    user = User.objects.get(pk=user_pk)
     data_import, _ = ExternalDataImport.objects.get_or_create(
         source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user
     )
