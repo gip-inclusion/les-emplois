@@ -252,6 +252,7 @@ def _store_user_data(user, status, data):
 
 #  Public
 
+
 def async_import_user_data(user, token):
     """
     Asynchronous update of user data with asyncio/loops:
@@ -321,7 +322,7 @@ def async_import_user_data(user, token):
 def import_user_data(user_pk, token):
     """
     Import external user data via PE Connect
-    
+
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
 
     This function is *synchronous* by default, and annotated for asynchronous

@@ -3,8 +3,8 @@ from django.dispatch import receiver
 
 from itou.allauth.peamu.provider import PEAMUProvider
 
-from .models import ExternalDataImport
 from .actors import async_import_user_data
+from .models import ExternalDataImport
 
 
 @receiver(user_logged_in)
