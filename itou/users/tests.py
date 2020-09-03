@@ -6,7 +6,12 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.approvals.factories import PoleEmploiApprovalFactory
-from itou.eligibility.factories import EligibilityDiagnosisFactory, ExpiredEligibilityDiagnosisFactory
+from itou.eligibility.factories import (
+    ExpiredPrescriberEligibilityDiagnosisFactory,
+    ExpiredSiaeEligibilityDiagnosisFactory,
+    PrescriberEligibilityDiagnosisFactory,
+    SiaeEligibilityDiagnosisFactory,
+)
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 
 
@@ -44,35 +49,73 @@ class ModelTest(TestCase):
         with self.assertRaises(ValidationError):
             User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
-    def test_has_valid_eligibility_diagnosis(self):
+    def test_has_valid_prescriber_eligibility_diagnosis(self):
 
         # No diagnosis.
         job_seeker = JobSeekerFactory()
-        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
-        # Has Itou diagnosis.
+        # Has a diagnosis made by a prescriber.
         job_seeker = JobSeekerFactory()
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
-        self.assertTrue(job_seeker.has_valid_eligibility_diagnosis)
+        PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertTrue(job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
-        # Has valid Pôle emploi diagnosis.
+        # Has a diagnosis made by an SIAE.
+        job_seeker = JobSeekerFactory()
+        SiaeEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertFalse(job_seeker.has_valid_prescriber_eligibility_diagnosis)
+
+        # Has a valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
         PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
-        self.assertTrue(job_seeker.has_valid_eligibility_diagnosis)
+        self.assertTrue(job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
-        # Has expired Pôle emploi diagnosis.
+        # Has an expired Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate, start_at=start_at, end_at=end_at
         )
-        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
-        # Has an expired diagnosis
+        # Has an expired diagnosis made by a Prescriber
         job_seeker = JobSeekerFactory()
-        ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
-        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
+        ExpiredPrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertFalse(job_seeker.has_valid_prescriber_eligibility_diagnosis)
+
+        # Has an expired diagnosis made by an Employer
+        job_seeker = JobSeekerFactory()
+        ExpiredSiaeEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertFalse(job_seeker.has_valid_prescriber_eligibility_diagnosis)
+
+    def test_get_eligibility_diagnosis(self):
+        # No eligibility_diagnosis
+        job_seeker = JobSeekerFactory()
+        self.assertFalse(job_seeker.get_eligibility_diagnosis())
+
+        # Diagnosis from prescribers
+        job_seeker = JobSeekerFactory()
+        diagnosis = PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertEqual(job_seeker.get_eligibility_diagnosis(), diagnosis)
+
+        # Diagnosis from prescribers and SIAE. Last diagnosis is from an SIAE.
+        job_seeker = JobSeekerFactory()
+        PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        diagnosis = SiaeEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertEqual(job_seeker.get_eligibility_diagnosis(siae=diagnosis.author_siae), diagnosis)
+
+        # Diagnosis from prescribers and SIAE. Last diagnosis is from a prescriber.
+        job_seeker = JobSeekerFactory()
+        SiaeEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        diagnosis = PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertEqual(job_seeker.get_eligibility_diagnosis(siae=diagnosis.author_siae), diagnosis)
+
+        # Diagnosis from prescribers and SIAE. Get only prescribers diagnosis.
+        job_seeker = JobSeekerFactory()
+        prescriber_diagnosis = PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        SiaeEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        self.assertEqual(job_seeker.get_eligibility_diagnosis(), prescriber_diagnosis)
 
     def test_clean_pole_emploi_fields(self):
 

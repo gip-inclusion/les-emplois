@@ -6,7 +6,11 @@ from django.urls import reverse
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.factories import (
+    ExpiredPrescriberEligibilityDiagnosisFactory,
+    PrescriberEligibilityDiagnosisFactory,
+    SiaeEligibilityDiagnosisFactory,
+)
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -14,6 +18,7 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
@@ -213,7 +218,8 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(job_application.has_valid_siae_eligibility_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -243,15 +249,10 @@ class ProcessViewsTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
-        # In order to avoid calling the database too often, `has_eligibility_diagnoses`
-        # is a cached property.
-        # Delete the attribute to refresh it.
-        # See https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.functional.cached_property
-        delattr(job_application.job_seeker, "has_eligibility_diagnoses")
-        self.assertTrue(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        self.assertTrue(job_application.has_valid_siae_eligibility_diagnosis)
 
         # Check diagnosis.
-        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
+        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis(siae=job_application.to_siae)
         self.assertEqual(eligibility_diagnosis.author, siae_user)
         self.assertEqual(eligibility_diagnosis.author_kind, EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF)
         self.assertEqual(eligibility_diagnosis.author_siae, job_application.to_siae)
@@ -376,11 +377,12 @@ class ProcessTemplatesTest(TestCase):
         self.assertContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
+        self.assertNotContains(response, "Critères d'éligibilité")
 
-    def test_details_template_for_state_postponed_valid_diagnosis(self):
+    def test_details_template_for_state_postponed_valid_prescriber_diagnosis(self):
         """Test actions available when the state is postponed."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        diagnosis = PrescriberEligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -390,6 +392,53 @@ class ProcessTemplatesTest(TestCase):
         self.assertContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
         self.assertContains(response, self.url_accept)
+        self.assertContains(response, diagnosis.author.get_full_name())
+
+    def test_details_template_for_state_processing_valid_siae_diagnosis(self):
+        """Test actions available when the state is postponed."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        siae = self.job_application.to_siae
+        diagnosis = SiaeEligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker, author_siae=siae)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+        self.assertContains(response, diagnosis.author.get_full_name())
+
+    def test_details_template_for_state_processing_valid_other_siae_diagnosis(self):
+        """Test actions available when the state is postponed."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        diagnosis = SiaeEligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+        self.assertNotContains(response, diagnosis.author.get_full_name())
+
+    def test_details_template_for_state_processing_expired_prescriber_diagnosis(self):
+        """Test actions available when the state is postponed."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        diagnosis = ExpiredPrescriberEligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+        self.assertContains(response, diagnosis.author.get_full_name())
 
     def test_details_template_for_other_states(self):
         """Test actions available for other states."""

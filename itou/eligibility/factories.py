@@ -3,7 +3,8 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.eligibility import models
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.siaes.factories import SiaeFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 
 
 class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
@@ -13,12 +14,26 @@ class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
         model = models.EligibilityDiagnosis
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
+
+
+class PrescriberEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
     author = factory.SubFactory(PrescriberFactory)
     author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER
 
 
-class ExpiredEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
+class SiaeEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
+    author = factory.SubFactory(SiaeStaffFactory)
+    author_kind = models.EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF
+    author_siae = factory.SubFactory(SiaeFactory)
 
+
+class ExpiredPrescriberEligibilityDiagnosisFactory(PrescriberEligibilityDiagnosisFactory):
+    created_at = factory.LazyAttribute(
+        lambda self: timezone.now() - relativedelta(months=models.EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS, days=1)
+    )
+
+
+class ExpiredSiaeEligibilityDiagnosisFactory(SiaeEligibilityDiagnosisFactory):
     created_at = factory.LazyAttribute(
         lambda self: timezone.now() - relativedelta(months=models.EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS, days=1)
     )

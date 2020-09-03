@@ -11,6 +11,11 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.eligibility.factories import (
+    ExpiredSiaeEligibilityDiagnosisFactory,
+    PrescriberEligibilityDiagnosisFactory,
+    SiaeEligibilityDiagnosisFactory,
+)
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -35,13 +40,13 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_prescriber_eligibility_diagnosis)
         self.assertFalse(job_application.eligibility_diagnosis_by_siae_required)
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_EI
         )
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_prescriber_eligibility_diagnosis)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
     def test_accepted_by(self):
@@ -51,6 +56,32 @@ class JobApplicationModelTest(TestCase):
         user = job_application.to_siae.members.first()
         job_application.accept(user=user)
         self.assertEqual(job_application.accepted_by, user)
+
+    def test_has_valid_siae_eligibility_diagnosis(self):
+        # No diagnosis.
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        self.assertFalse(job_application.has_valid_siae_eligibility_diagnosis)
+
+        # Has a diagnosis made by a prescriber.
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        PrescriberEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker)
+        self.assertFalse(job_application.has_valid_siae_eligibility_diagnosis)
+
+        # Has a diagnosis made by an SIAE.
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        SiaeEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, author_siae=job_application.to_siae)
+        self.assertTrue(job_application.has_valid_siae_eligibility_diagnosis)
+
+        # Has a valid Pôle emploi diagnosis.
+        job_seeker = JobSeekerFactory()
+        PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker)
+        self.assertFalse(job_application.has_valid_siae_eligibility_diagnosis)
+
+        # Has an expired diagnosis made by an Employer
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        ExpiredSiaeEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker)
+        self.assertFalse(job_application.has_valid_siae_eligibility_diagnosis)
 
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()

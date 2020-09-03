@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
 from itou.cities.factories import create_test_cities
+from itou.eligibility.factories import ExpiredPrescriberEligibilityDiagnosisFactory, SiaeEligibilityDiagnosisFactory
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
@@ -291,18 +292,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(new_job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(new_job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        # In order to avoid calling the database too often, `has_eligibility_diagnoses`
-        # is a cached property.
-        # Delete the attribute to refresh it.
-        # See https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.functional.cached_property
-        delattr(new_job_seeker, "has_eligibility_diagnoses")
-
-        self.assertTrue(new_job_seeker.has_valid_eligibility_diagnosis)
+        self.assertTrue(new_job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -478,7 +473,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        self.assertFalse(new_job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(new_job_seeker.has_valid_prescriber_eligibility_diagnosis)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -509,6 +504,84 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 2)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
+
+
+class ApplyAsAuthorizedPrescriberEligibilityTest(TestCase):
+    """
+    The Eligibility step is tricky as it follows many different rules:
+    - A diagnosis can be made by an authorized prescriber or by an employer,
+    - Its scope depends on the author kind
+    - It can expire after a period of time.
+    The following tests check that each scenario works as expected.
+    """
+
+    def login_and_start_application_process(self, siae, job_seeker):
+        """
+        Login as an authorized prescriber and perform
+        application steps until the eligibility one.
+        """
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(is_authorized=True)
+        user = prescriber_organization.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        start_url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        response = self.client.get(start_url, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_job_seeker", kwargs={"siae_pk": siae.pk}))
+
+        post_data = {"email": job_seeker.email}
+        return self.client.post(last_url, data=post_data, follow=True)
+
+    def test_valid_siae_diagnosis_exists(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        job_seeker = JobSeekerFactory()
+
+        # A JobApplication sent by this job_seeker to this siae
+        # should already exist as an eligibility diagnosis have been made. Create it?
+        SiaeEligibilityDiagnosisFactory(job_seeker=job_seeker, author=siae.members.first(), author_siae=siae)
+
+        # Login as an authorized prescriber and go through
+        # the first application steps…
+        response = self.login_and_start_application_process(siae=siae, job_seeker=job_seeker)
+
+        # …until the eligibility step which should trigger a 200 OK
+        # as a new diagnosis is needed.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk}))
+
+    def test_valid_pe_approval_exists(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        job_seeker = JobSeekerFactory()
+
+        PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
+
+        # Login as an authorized prescriber and go through
+        # the first application steps…
+        response = self.login_and_start_application_process(siae=siae, job_seeker=job_seeker)
+
+        # …until the application step. The eligibility step should be skipped
+        # since a valid approval exists.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_application", kwargs={"siae_pk": siae.pk}))
+
+    def test_expired_prescriber_diagnosis_exists(self):
+        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        job_seeker = JobSeekerFactory()
+
+        ExpiredPrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+
+        # Login as an authorized prescriber and go through
+        # the first application steps…
+        response = self.login_and_start_application_process(siae=siae, job_seeker=job_seeker)
+
+        # …until the eligibility step which should trigger a 200 OK
+        # as a new diagnosis is needed.
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk}))
 
 
 class ApplyAsPrescriberTest(TestCase):

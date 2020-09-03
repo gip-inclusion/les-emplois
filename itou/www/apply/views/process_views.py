@@ -45,7 +45,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
 
     eligibility_diagnosis = None
     if job_application.job_seeker.has_eligibility_diagnoses:
-        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
+        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis(siae=job_application.to_siae)
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,

@@ -3,6 +3,7 @@ import logging
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -10,6 +11,17 @@ from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_ST
 
 
 logger = logging.getLogger(__name__)
+
+
+class EligibilityDiagnosisQuerySet(models.QuerySet):
+    def by_prescribers(self):
+        return self.filter(author_kind=KIND_PRESCRIBER)
+
+    def by_siae(self, siae):
+        return self.filter(author_kind=KIND_SIAE_STAFF, author_siae=siae)
+
+    def by_prescribers_or_siae(self, siae):
+        return self.filter(Q(author_kind=KIND_PRESCRIBER) | Q(author_siae=siae))
 
 
 class EligibilityDiagnosis(models.Model):
@@ -66,6 +78,8 @@ class EligibilityDiagnosis(models.Model):
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
+
+    objects = models.Manager.from_queryset(EligibilityDiagnosisQuerySet)()
 
     class Meta:
         verbose_name = _("Diagnostic d'éligibilité")

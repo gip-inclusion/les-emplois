@@ -1,11 +1,10 @@
 from unittest.mock import PropertyMock, patch
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 from requests import exceptions as requests_exceptions
 
-from itou.eligibility.factories import EligibilityDiagnosisFactory
+from itou.eligibility.factories import PrescriberEligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.users.factories import DEFAULT_PASSWORD
@@ -20,7 +19,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
         job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
@@ -42,7 +41,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         job_application = JobApplicationFactory()
         siae_member = job_application.to_siae.members.first()
         job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
         response = self.client.get(
@@ -55,7 +54,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
         job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
@@ -71,7 +70,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         # An approval has been delivered but it does not come from Itou.
         # Therefore, the linked diagnosis exists but is not in our database.
         # Don't create a diagnosis.
-        # EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        # PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
@@ -89,9 +88,9 @@ class TestDownloadApprovalAsPDF(TestCase):
 
         # An approval has been delivered by Itou but there is no diagnosis.
         # It should raise an error.
-        # EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        # PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
-        with self.assertRaises(ObjectDoesNotExist):
+        with self.assertRaises(AttributeError):
             self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))

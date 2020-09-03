@@ -312,10 +312,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Returns True if an eligibility diagnosis must be made by an SIAE
         when processing an application, False otherwise.
         """
+        has_valid_diagnosis = (
+            self.has_valid_siae_eligibility_diagnosis or self.job_seeker.has_valid_prescriber_eligibility_diagnosis
+        )
         return (
             (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.has_valid_eligibility_diagnosis
+            and not has_valid_diagnosis
         )
 
     @property
@@ -328,6 +331,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and self.approval_delivery_mode == self.APPROVAL_DELIVERY_MODE_MANUAL
             and not self.approval_number_sent_by_email
         )
+
+    @property
+    def has_valid_siae_eligibility_diagnosis(self):
+        diagnoses = self.job_seeker.eligibility_diagnoses.by_siae(siae=self.to_siae)
+        if diagnoses and not diagnoses.latest("created_at").has_expired:
+            return True
 
     @property
     def accepted_by(self):

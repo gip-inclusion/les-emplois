@@ -1,6 +1,9 @@
 from django.test import TestCase
 
-from itou.eligibility.factories import EligibilityDiagnosisFactory, ExpiredEligibilityDiagnosisFactory
+from itou.eligibility.factories import (
+    ExpiredPrescriberEligibilityDiagnosisFactory,
+    PrescriberEligibilityDiagnosisFactory,
+)
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipFactory
@@ -62,10 +65,10 @@ class EligibilityDiagnosisModelTest(TestCase):
         self.assertIn(criteria3, administrative_criteria)
 
     def test_has_expired(self):
-        diagnosis = EligibilityDiagnosisFactory()
+        diagnosis = PrescriberEligibilityDiagnosisFactory()
         self.assertFalse(diagnosis.has_expired)
 
-        self.diagnosis = ExpiredEligibilityDiagnosisFactory()
+        self.diagnosis = ExpiredPrescriberEligibilityDiagnosisFactory()
         self.assertTrue(self.diagnosis.has_expired)
 
 

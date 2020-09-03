@@ -113,15 +113,16 @@ class User(AbstractUser, AddressMixin):
         return ApprovalsWrapper(self)
 
     @property
-    def has_valid_eligibility_diagnosis(self):
+    def has_valid_prescriber_eligibility_diagnosis(self):
         """
-        Returns True if an ongoing diagnosis exists, False otherwise.
+        Returns True if an ongoing diagnosis made by a prescriber exists,
+        False otherwise.
         """
         if not self.is_job_seeker:
             return False
-        if self.has_eligibility_diagnoses:
-            if not self.eligibility_diagnoses.latest("created_at").has_expired:
-                return True
+        diagnoses = self.eligibility_diagnoses.by_prescribers()
+        if diagnoses and not diagnoses.latest("created_at").has_expired:
+            return True
         # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
         # has been made outside of Itou.
         latest_approval = self.approvals_wrapper.latest_approval
@@ -131,12 +132,22 @@ class User(AbstractUser, AddressMixin):
     def has_eligibility_diagnoses(self):
         return self.eligibility_diagnoses.exists()
 
-    def get_eligibility_diagnosis(self):
+    def get_eligibility_diagnosis(self, siae=None):
+        """
+        Returns job_seeker's last eligibility diagnosis.
+        By default, only diagnosis made by prescribers are returned.
+        If `siae` is specified, it also looks for diagnosis made by
+        this specific siae.
+        """
         if not self.is_job_seeker:
             return None
-        return self.eligibility_diagnoses.select_related(
-            "author", "author_siae", "author_prescriber_organization"
-        ).latest("created_at")
+
+        return (
+            self.eligibility_diagnoses.by_prescribers_or_siae(siae=siae)
+            .select_related("author", "author_siae", "author_prescriber_organization")
+            .order_by("created_at")
+            .last()
+        )
 
     @cached_property
     def is_peamu(self):
