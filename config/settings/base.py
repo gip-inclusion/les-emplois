@@ -254,9 +254,12 @@ LOGGING = {
 # https://anymail.readthedocs.io/en/stable/esps/mailjet/
 # ------------------------------------------------------------------------------
 
+# EMAIL_BACKEND is a wrapper around the "real" email backend
+# Used to add asynchronous behaviour
 EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
 ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 
+# How many retries for a failed email delivery ?
 SEND_EMAIL_NB_RETRIES = 5
 
 ANYMAIL = {

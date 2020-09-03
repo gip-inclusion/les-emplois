@@ -43,8 +43,6 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
     )
 
 
-# EXPERIMENTAL:
-# ---
 # Custom async email backend wrapper
 # Dramatiq version
 

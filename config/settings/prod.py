@@ -29,7 +29,8 @@ sentry_sdk.init(dsn=os.environ["SENTRY_DSN_PROD"], integrations=[DjangoIntegrati
 ignore_logger("django.security.DisallowedHost")
 sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
 
-# Database connection data is overriden, so we must repeat this part:
+# DB connection settings are overriden in env file, 
+# so we must repeat this part:
 # ---
 DRAMATIQ_BROKER = {**DRAMATIQ_BROKER_BASE,
                    "OPTIONS": {"url": f"postgres://{DATABASES[DRAMATIQ_DB_ALIAS]['USER']}:{DATABASES[DRAMATIQ_DB_ALIAS]['PASSWORD']}@{DATABASES[DRAMATIQ_DB_ALIAS]['HOST']}:{DATABASES[DRAMATIQ_DB_ALIAS]['PORT']}/{DATABASES[DRAMATIQ_DB_ALIAS]['NAME']}", }}

@@ -327,6 +327,8 @@ def import_user_data(user_pk, token):
 
     This function is *synchronous* by default, and annotated for asynchronous
     behaviour when using a broker.
+
+    This function is called at emission & reception: its parameters must be JSON serializable.
     """
     user = User.objects.get(pk=user_pk)
     data_import, _ = ExternalDataImport.objects.get_or_create(
