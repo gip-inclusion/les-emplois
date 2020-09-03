@@ -9,6 +9,10 @@ from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
 
+# This is the "real" email backend used by the async wrapper / email backend
+ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+
+
 def remove_extra_line_breaks(text):
     """
     Replaces multiple line breaks with just one.
@@ -42,9 +46,8 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
     )
 
 
-# EXPERIMENTAL:
-# ---
 # Custom async email backend wrapper
+# ----------------------------------
 
 
 def _serializeEmailMessage(email_message):
@@ -71,7 +74,7 @@ def _serializeEmailMessage(email_message):
 
 
 def _deserializeEmailMessage(serialized_email_message):
-    """ 
+    """
         Creates a "light" version of the original `EmailMessage` passed to the email backend.
 
         In order to be serializable, we:
@@ -80,14 +83,14 @@ def _deserializeEmailMessage(serialized_email_message):
 
         *Tip*: use non-serializable objects only when deserialization is over... (f.i. email backends)
     """
-    return EmailMessage(connection=get_connection(backend=settings.ASYNC_EMAIL_BACKEND), **serialized_email_message)
+    return EmailMessage(connection=get_connection(backend=ASYNC_EMAIL_BACKEND), **serialized_email_message)
 
 
 @task(retries=settings.SEND_EMAIL_NB_RETRIES, retry_delay=settings.SEND_EMAIL_RETRY_DELAY)
 def _async_send_messages(serializable_email_messages):
-    """ Async email sending "delegate" 
+    """ Async email sending "delegate"
 
-        This function sends emails with the backend defined in `settings.ASYNC_EMAIL_BACKEND`
+        This function sends emails with the backend defined in `ASYNC_EMAIL_BACKEND`
         and is trigerred by an email backend wrappper: `AsyncEmailBackend`.
 
         As it is decorated as a Huey task, all parameters must be serializable via Pickle.
@@ -134,7 +137,7 @@ class AsyncEmailBackend(BaseEmailBackend):
 
         This class:
         * wraps an email backend defined in `settings.ASYNC_EMAIL_BACKEND`
-        * delegate the actual email sending to a function with *serializable* parameters 
+        * delegate the actual email sending to a function with *serializable* parameters
 
         See:
         * `base.py` section "Huey" for details on `ASYNC_EMAIL_BACKEND`

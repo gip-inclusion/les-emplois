@@ -3,7 +3,6 @@ from django.dispatch import receiver
 
 from itou.allauth.peamu.provider import PEAMUProvider
 
-from .apis.pe_connect import async_import_user_data
 from .models import ExternalDataImport
 from .tasks import import_pe_data
 
@@ -27,10 +26,7 @@ def user_logged_in_receiver(sender, **kwargs):
         # If no data for user or import failed last time
         if not pe_data_import.exists() or pe_data_import.first().status != ExternalDataImport.STATUS_OK:
             # SYNC can be done like:
-            # import_user_data(user, login.token)
+            # import_user_data(user.pk, login.token)
 
-            # ASYNC (default):
-            # async_import_user_data(user, login.token)
-
-            # Async via Huey (experimental):
-            import_pe_data(user, login.token)
+            # Async via Huey:
+            import_pe_data(user.pk, str(login.token))
