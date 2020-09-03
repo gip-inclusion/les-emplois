@@ -92,7 +92,7 @@ class SiaeAdmin(admin.ModelAdmin):
             },
         ),
     )
-    search_fields = ("pk", "siret", "name")
+    search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
     inlines = (MembersInline, JobsInline)
 
     def member_count(self, obj):

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
@@ -177,6 +178,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    def clean(self, *args, **kwargs):
+        if self.kind != self.Kind.PE:  # SIRET is not required for PE agencies.
+            if not self.siret:
+                raise ValidationError({"siret": _("Le SIRET est obligatoire.")})
+            if self._meta.model.objects.filter(siret=self.siret).exclude(pk=self.pk).exists():
+                raise ValidationError({"siret": _("Ce SIRET est déjà utilisé.")})
 
     @property
     def display_name(self):

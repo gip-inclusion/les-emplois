@@ -38,7 +38,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created_at", "updated_at", "approval_number_delivered_by")
     inlines = (JobsInline, TransitionLogInline)
-    search_fields = ("pk", "to_siae__siret", "job_seeker__email")
+    search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
     def bulk_send_approval_by_email(self, request, queryset):
         queryset = queryset.exclude(approval=None).filter(approval_number_sent_by_email=False)
