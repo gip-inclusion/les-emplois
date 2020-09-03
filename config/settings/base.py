@@ -410,23 +410,29 @@ METABASE_INSERT_BATCH_SIZE = 1000
 
 # Redis server URL:
 # Provided by the Redis addon (itou-redis)
+# Redis database to use with async (must be different for each environement)
+# 1 <= REDIS_DB <= 100 (number of dbs available on CleverCloud)
+REDIS_DB = os.environ.get("REDIS_DB", 1)
 # Complete URL (containing the instance password)
-REDIS_URL = os.environ.get("REDIS_URL")
+REDIS_URL = os.environ.get("REDIS_URL",)
 
 # Huey instance
+# If any performance issue, increasing the number of workers *can* be a good idea
+# Parameter `immediate` means `synchronous` (async here)
 HUEY = {"name": "ITOU",
         "url": REDIS_URL,
         "consumer": {"workers": 2, "worker_type": "thread", },
         "immediate": False,
+        # "serializer": "itou.utils.serializers.JSONSerializer",
         }
 
 # Asynchronous email backend
 # ------------------------------------------------------------------------------
 
-# EMAIL_BACKEND points to an async wrapper of a "real" email backend defined by ASYNC_EMAIL_BACKEND
-# ASYNC_EMAIL_BACKEND *AND* ASYNC_EMAIL_BACKEND must be defined when using "itou.utils.emails.AsyncEmailBackend"  
+# EMAIL_BACKEND points to an async wrapper of a "real" email backend
+# The real backend is hardcoded in the wrapper to avoid multiple and
+# confusing parameters in Django settings.
 EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
-ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 
 # Number of retries & retry delay parameters for emails (for async process)
 SEND_EMAIL_NB_RETRIES = 5
