@@ -44,11 +44,17 @@
         {% buttons %}
             <a class="btn btn-secondary"
                href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% translate "Annuler" %}</a>
-            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% translate "Je l'embauche" %}</a>
-
-        {% endbuttons %}
             
-        <!-- Do we really need an approval ? -->
+            {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% translate "Je l'embauche" %}</a>
+            {% else %}
+                <button class="btn btn-success" type="submit">{% translate "Je l'embauche" %}</button>
+            {% endif %}
+        
+            {% endbuttons %}
+            
+        <!-- Do we really need an approval ? 
+             Only valid for some SIAE (is_subject_to_eligibility_rules) -->
         <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModal" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
