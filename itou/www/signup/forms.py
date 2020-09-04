@@ -153,7 +153,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         if not self.get_encoded_siae_id():
             return None
         siae_id = int(urlsafe_base64_decode(self.get_encoded_siae_id()))
-        siae = Siae.active.filter(pk=siae_id).first()
+        siae = Siae.objects.active().filter(pk=siae_id).first()
         return siae
 
     def check_siae_signup_credentials(self):

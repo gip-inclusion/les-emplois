@@ -82,7 +82,7 @@
                                     </div>
                                 </div>
 
-                            {% if user.is_siae_staff and user_siae_set|length > 1 %}
+                            {% if user.is_siae_staff and user_siaes|length > 1 %}
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
                                         {% translate "Changer de structure" %}
@@ -90,7 +90,7 @@
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
                                         <form action="{% url 'dashboard:switch_siae' %}" method="post">
                                             {% csrf_token %}
-                                            {% for s in user.siae_set.all %}
+                                            {% for s in user_siaes %}
                                                 <button
                                                     class="dropdown-item text-primary"
                                                     type="submit"

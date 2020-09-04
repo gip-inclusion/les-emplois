@@ -24,6 +24,17 @@
         </div>
     {% endif %}
 
+    {% if current_siae_is_in_grace_period %}
+        <div class="alert alert-warning" role="alert">
+            {% blocktranslate with grace_period_end_date=current_siae.grace_period_end_date|date:"d F Y" %}
+                La DGEFP nous indique que votre structure n'est plus conventionnée.
+                En conséquence elle n'est plus référencée et plus aucun collaborateur ne peut y être rattaché.
+                A compter du {{ grace_period_end_date }} l'accès à son tableau de bord ne sera plus possible.
+                Pour toutes questions contacter notre support.
+            {% endblocktranslate %}
+        </div>
+    {% endif %}
+
     {% if current_prescriber_organization and current_prescriber_organization.pending_authorization %}
         <div class="alert alert-warning pb-0" role="alert">
             <p>
