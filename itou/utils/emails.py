@@ -67,8 +67,10 @@ def _serializeEmailMessage(email_message):
         "subject": email_message.subject,
         "to": email_message.to,
         "from_email": email_message.from_email,
+        "reply_to": email_message.reply_to,
         "cc": email_message.cc,
         "bcc": email_message.bcc,
+        "headers": email_message.headers,
         "body": email_message.body,
     }
 
@@ -91,7 +93,7 @@ def _async_send_messages(serializable_email_messages):
     """ Async email sending "delegate"
 
         This function sends emails with the backend defined in `ASYNC_EMAIL_BACKEND`
-        and is trigerred by an email backend wrappper: `AsyncEmailBackend`.
+        and is triggerred by an email backend wrappper: `AsyncEmailBackend`.
 
         As it is decorated as a Huey task, all parameters must be serializable via Pickle.
 
@@ -117,16 +119,16 @@ def _async_send_messages(serializable_email_messages):
         If there are many async tasks to be defined or for specific objects,
         it may be better to use a custom serializer.
 
-        By design, this function must return the number of email correctly processed.
+        By design (see `BaseEmailBackend.send_messages`), this function must return
+        the number of email correctly processed.
     """
 
-    count = 0
-
-    for message in [_deserializeEmailMessage(email) for email in serializable_email_messages]:
+    for email in serializable_email_messages:
+        message = _deserializeEmailMessage(email)
         message.send()
-        count += 1
 
-    return count
+    # This part is processed by an external worker. Return count is irrelevant, so:
+    return len(serializable_email_messages)
 
 
 class AsyncEmailBackend(BaseEmailBackend):

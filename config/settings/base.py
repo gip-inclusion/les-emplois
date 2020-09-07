@@ -414,16 +414,15 @@ METABASE_INSERT_BATCH_SIZE = 1000
 # 1 <= REDIS_DB <= 100 (number of dbs available on CleverCloud)
 REDIS_DB = os.environ.get("REDIS_DB", 1)
 # Complete URL (containing the instance password)
-REDIS_URL = os.environ.get("REDIS_URL",)
+REDIS_URL = os.environ.get("REDIS_URL")
 
 # Huey instance
 # If any performance issue, increasing the number of workers *can* be a good idea
 # Parameter `immediate` means `synchronous` (async here)
 HUEY = {"name": "ITOU",
-        "url": REDIS_URL,
+        "url": REDIS_URL + f"/?db={REDIS_DB}",
         "consumer": {"workers": 2, "worker_type": "thread", },
         "immediate": False,
-        # "serializer": "itou.utils.serializers.JSONSerializer",
         }
 
 # Asynchronous email backend
@@ -435,5 +434,5 @@ HUEY = {"name": "ITOU",
 EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
 
 # Number of retries & retry delay parameters for emails (for async process)
-SEND_EMAIL_NB_RETRIES = 5
-SEND_EMAIL_RETRY_DELAY = 60
+SEND_EMAIL_RETRY_DELAY = 5 * 60
+SEND_EMAIL_NB_RETRIES = 24 * 3600 / SEND_EMAIL_RETRY_DELAY
