@@ -100,14 +100,14 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 @login_required
 def create_siae(request, template_name="siaes/create_siae.html"):
     """
-    Create a new SIAE (Agence / Etablissement in French).
+    Create a new SIAE (Antenne in French).
     """
     current_siae = get_current_siae_or_404(request)
     form = CreateSiaeForm(
         current_siae=current_siae,
         current_user=request.user,
         data=request.POST or None,
-        initial={"siret": current_siae.siret},
+        initial={"siret": current_siae.siret, "kind": current_siae.kind, "department": current_siae.department},
     )
 
     if request.method == "POST" and form.is_valid():

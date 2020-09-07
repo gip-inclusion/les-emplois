@@ -96,7 +96,7 @@ class ExternalDataImportTest(TestCase):
         # Mock all PE APIs
         _status_ok(m)
 
-        result = import_user_data(user, FOO_TOKEN)
+        result = import_user_data(user.pk, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
 
         report = result.report
@@ -112,7 +112,7 @@ class ExternalDataImportTest(TestCase):
         user = JobSeekerFactory()
         _status_partial(m)
 
-        result = import_user_data(user, FOO_TOKEN)
+        result = import_user_data(user.pk, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
 
         report = result.report
@@ -130,7 +130,7 @@ class ExternalDataImportTest(TestCase):
         user = JobSeekerFactory()
         _status_failed(m)
 
-        result = import_user_data(user, FOO_TOKEN)
+        result = import_user_data(user.pk, FOO_TOKEN)
         self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
 
         report = result.report
@@ -148,8 +148,10 @@ class JobSeekerExternalDataTest(TestCase):
 
         # Check override of birthdate / of a field
         user.birthdate = None
+        user.save()
 
-        result = import_user_data(user, FOO_TOKEN)
+        result = import_user_data(user.pk, FOO_TOKEN)
+        user.refresh_from_db()
         self.assertTrue(user.has_external_data)
 
         data = user.jobseekerexternaldata
@@ -159,7 +161,7 @@ class JobSeekerExternalDataTest(TestCase):
 
         self.assertEquals(user.address_line_1, "4, Privet Drive")
         self.assertEquals(user.address_line_2, "The cupboard under the stairs")
-        self.assertEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
+        self.assertEquals(str(user.birthdate), "1970-01-01")
 
         report = result.report
         self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
@@ -170,7 +172,7 @@ class JobSeekerExternalDataTest(TestCase):
         user = JobSeekerFactory()
         birthdate = user.birthdate
 
-        report = import_user_data(user, FOO_TOKEN).report
+        report = import_user_data(user.pk, FOO_TOKEN).report
 
         user.refresh_from_db()
 
@@ -182,7 +184,8 @@ class JobSeekerExternalDataTest(TestCase):
         _status_partial(m)
 
         user = JobSeekerFactory()
-        import_user_data(user, FOO_TOKEN)
+        import_user_data(user.pk, FOO_TOKEN)
+        user.refresh_from_db()
         self.assertTrue(user.has_external_data)
 
         data = user.jobseekerexternaldata
@@ -192,14 +195,15 @@ class JobSeekerExternalDataTest(TestCase):
 
         self.assertEquals(user.address_line_1, "4, Privet Drive")
         self.assertEquals(user.address_line_2, "The cupboard under the stairs")
-        self.assertNotEquals(str(user.birthdate), "1970-01-01 00:00:00+01:00")
+        self.assertNotEquals(str(user.birthdate), "1970-01-01")
 
     @requests_mock.Mocker()
     def test_import_failed(self, m):
         _status_failed(m)
 
         user = JobSeekerFactory()
-        import_user_data(user, FOO_TOKEN)
+        import_user_data(user.pk, FOO_TOKEN)
+        user.refresh_from_db()
         self.assertTrue(user.has_external_data)
 
         data = user.jobseekerexternaldata
@@ -213,7 +217,8 @@ class JobSeekerExternalDataTest(TestCase):
         user1 = JobSeekerFactory()
         user2 = JobSeekerFactory()
 
-        import_user_data(user1, FOO_TOKEN)
+        import_user_data(user1.pk, FOO_TOKEN)
+        user1.refresh_from_db()
 
         self.assertTrue(user1.has_external_data)
         self.assertFalse(user2.has_external_data)
