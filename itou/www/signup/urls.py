@@ -7,6 +7,8 @@ from itou.www.signup import views
 app_name = "signup"
 
 urlpatterns = [
+    # Job seeker.
+    path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
     # Prescriber.
     path("prescriber/is_pole_emploi", views.prescriber_is_pole_emploi, name="prescriber_is_pole_emploi",),
     path("prescriber/choose_org", views.prescriber_choose_org, name="prescriber_choose_org",),
@@ -29,9 +31,6 @@ urlpatterns = [
     ),
     path("prescriber/user", views.PrescriberUserSignupView.as_view(), name="prescriber_user",),
     # SIAE.
-    path("select_siae", views.select_siae, name="select_siae"),
+    path("siae/select", views.siae_select, name="siae_select"),
     path("siae/<str:encoded_siae_id>/<str:token>", views.SiaeSignupView.as_view(), name="siae"),
-    path("siae", views.SiaeSignupView.as_view(), name="siae"),
-    # Job seeker.
-    path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
 ]

@@ -17,7 +17,7 @@ class ItouLoginView(LoginView):
     ACCOUNT_TYPE_TO_SIGNUP_URL = {
         "job_seeker": "signup:job_seeker",
         "prescriber": "signup:prescriber_is_pole_emploi",
-        "siae": "signup:select_siae",
+        "siae": "signup:siae_select",
     }
 
     template_name = "account/login.html"

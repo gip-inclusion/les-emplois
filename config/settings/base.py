@@ -373,6 +373,9 @@ ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 
+ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
+ITOU_DOC_OPENING_SCHEDULE_URL = f"{ITOU_DOC_URL}/presentation/quel-est-le-calendrier-de-deploiement-de-la-plateforme"
+
 # Approvals
 # ------------------------------------------------------------------------------
 # Approval numbering prefix can be different for non-production envs

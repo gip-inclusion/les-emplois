@@ -20,6 +20,9 @@ from itou.utils.validators import validate_naf, validate_siret
 
 
 class SiaeQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
     def within(self, point, distance_km):
         return (
             self.filter(coords__distance_lte=(point, D(km=distance_km)))

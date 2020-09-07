@@ -1,0 +1,151 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% translate "Employeur solidaire - Inscription" %}{{ block.super }}{% endblock %}
+
+
+{% block content %}
+
+<h1>
+    {% translate "Inscription" %}
+    <small class="text-muted">{% translate "Employeur solidaire" %}</small>
+</h1>
+
+<div class="alert alert-warning" role="info">
+    {% blocktranslate with url=DOC_OPENING_SCHEDULE_URL %}
+        Les inscriptions s'ouvrent aux régions progressivement. <a href="{{ url }}" rel="noopener" target="_blank">Vérifiez que la Plateforme est bien disponible sur votre territoire.</a> Seules les ETTI sont ouvertes en France entière.
+    {% endblocktranslate %}
+</div>
+
+<form method="get" action="" role="form">
+
+    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+    {% bootstrap_form sirene_form %}
+
+    {% buttons %}
+        <button type="submit" class="btn btn-primary">{% translate "Rechercher" %}</button>
+    {% endbuttons %}
+
+</form>
+
+
+{% if sirene_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
+    <div class="alert alert-secondary mt-5" role="info">
+        {% blocktranslate with sirene=sirene_form.cleaned_data.sirene %}
+            Aucun résultat pour <b>{{ sirene }}</b>.
+        {% endblocktranslate %}
+    </div>
+{% endif %}
+
+
+{% if siaes_without_members and siae_select_form %}
+    <div class="mt-5">
+
+        <h3>{% translate "Entreprises disponibles" %}</h3>
+
+        <div class="alert alert-secondary" role="info">
+            <i>{% translate "Les données sont fournies par l'ASP." %}</i>
+        </div>
+
+        <form method="post" action="" class="js-prevent-multiple-submit">
+
+            {% csrf_token %}
+
+            {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+
+            {% comment %}
+            A ModelChoiceField's iterator only returns a tuple with (value, label).
+            This means that using e.g. {% bootstrap_field form.siaes %} would only display
+            a radio input and a label.
+            The best solution I've yet found to display more info to the user than just a
+            label is to manually render the inputs.
+            {% endcomment %}
+            <ul>
+                {% for siae in siaes_without_members %}
+                    <li>
+                        <p>
+                            <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
+                                <input
+                                    type="radio"
+                                    name="{{ siae_select_form.siaes.html_name }}"
+                                    value="{{ siae.pk }}"
+                                    id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}"
+                                    required>
+                                <b>{{ siae.siret|slice:":9" }} {{ siae.siret|slice:"9:14" }}</b> - {{ siae.kind }}
+                                <br>
+                                {{ siae.display_name }}
+                                <br>
+                                {{ siae.address_line_1 }},
+                                {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                                {{ siae.post_code }} {{ siae.city }}
+                            </label>
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="alert alert-warning pb-0" role="alert">
+                <p>
+                    {% translate "Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé à une personne référencée dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure." %}
+                </p>
+                {% buttons %}
+                    <button type="submit" class="btn btn-primary">{% translate "Continuer l'inscription" %}</button>
+                {% endbuttons %}
+            </div>
+
+        </form>
+
+    </div>
+{% endif %}
+
+
+{% if siaes_with_members %}
+    <div class="mt-5">
+
+        <h3>{% translate "Entreprises déjà inscrites" %}</h3>
+
+        <div class="alert alert-secondary" role="info">
+            <i>{% translate "Par sécurité vous devez obtenir une invitation pour rejoindre ces structures." %}</i>
+        </div>
+
+        <ul>
+            {% for siae in siaes_with_members %}
+                <li>
+                    <p>
+                        <b>{{ siae.siret|slice:":9" }} {{ siae.siret|slice:"9:14" }}</b> - {{ siae.kind }}
+                        <br>
+                        {{ siae.display_name }}
+                        <br>
+                        {{ siae.address_line_1 }},
+                        {% if siae.address_line_2 %}{{ siae.address_line_2 }},{% endif %}
+                        {{ siae.post_code }} {{ siae.city }}
+                        <br>
+                        {% if siae.active_admin_members %}
+                            {% with siae.active_admin_members.first as admin %}
+                                {# For security, display only the first char of the last name. #}
+                                {% blocktranslate with first_name=admin.first_name|title last_name_first_char=admin.last_name|slice:1 %}
+                                    <i>Pour obtenir une invitation, contactez {{ first_name }} {{ last_name_first_char }}.</i>
+                                {% endblocktranslate %}
+                            {% endwith %}
+                        {% endif %}
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+{% endif %}
+
+
+{% if siaes_without_members or siaes_with_members %}
+    <div class="mt-5">
+        <p>
+            {% blocktranslate %}En cas de problème contactez-nous : <a href="mailto:{{ ITOU_EMAIL_ASSISTANCE }}">{{ ITOU_EMAIL_ASSISTANCE }}</a>{% endblocktranslate %}
+        </p>
+    </div>
+{% endif %}
+
+
+{% endblock %}
