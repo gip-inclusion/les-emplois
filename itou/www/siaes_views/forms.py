@@ -5,7 +5,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
-from itou.www.signup.forms import SelectSiaeForm
 
 
 class CreateSiaeForm(forms.ModelForm):
@@ -51,7 +50,7 @@ class CreateSiaeForm(forms.ModelForm):
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
             "department": gettext_lazy(
                 "Les inscriptions s'ouvrent aux régions progressivement. "
-                f'<a href="{ SelectSiaeForm.DOC_OPENING_SCHEDULE_URL }" rel="noopener" target="_blank">'
+                f'<a href="{settings.ITOU_DOC_OPENING_SCHEDULE_URL}" rel="noopener" target="_blank">'
                 "Vérifiez que la Plateforme est bien disponible sur votre territoire."
                 "</a> "
                 "Seules les ETTI sont ouvertes en France entière."
@@ -189,7 +188,7 @@ class EditSiaeForm(forms.ModelForm):
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
             "department": gettext_lazy(
                 "Les inscriptions s'ouvrent aux régions progressivement. "
-                f'<a href="{ SelectSiaeForm.DOC_OPENING_SCHEDULE_URL }" rel="noopener" target="_blank">'
+                f'<a href="{settings.ITOU_DOC_OPENING_SCHEDULE_URL}" rel="noopener" target="_blank">'
                 "Vérifiez que la Plateforme est bien disponible sur votre territoire."
                 "</a> "
                 "Seules les ETTI sont ouvertes en France entière."
