@@ -45,8 +45,7 @@ class CreateSiaeForm(forms.ModelForm):
         ]
         help_texts = {
             "siret": gettext_lazy(
-                "Saisissez 14 chiffres. "
-                "Doit être le SIRET de votre structure actuelle ou un SIRET avec le même SIREN."
+                "Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."
             ),
             "kind": gettext_lazy("Votre nouvelle structure doit avoir le même type que votre structure actuelle."),
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
