@@ -431,6 +431,7 @@ HUEY = {"name": "ITOU",
 # EMAIL_BACKEND points to an async wrapper of a "real" email backend
 # The real backend is hardcoded in the wrapper to avoid multiple and
 # confusing parameters in Django settings.
+# Switch to a "standard" Django backend to get the synchronous behaviour back.
 EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
 
 # Number of retries & retry delay parameters for emails (for async process)

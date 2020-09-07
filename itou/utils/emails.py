@@ -50,7 +50,9 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 # ----------------------------------
 
 # Settings are explicit for humans, but this is what Huey needs
-_NB_RETRIES = int(settings.SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS / settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
+_NB_RETRIES = int(
+    settings.SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS / settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS
+)
 
 
 def _serializeEmailMessage(email_message):
