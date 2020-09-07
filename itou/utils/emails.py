@@ -76,7 +76,7 @@ def _serializeEmailMessage(email_message):
         "reply_to": email_message.reply_to,
         "cc": email_message.cc,
         "bcc": email_message.bcc,
-        "headers": email_message.headers,
+        # FIXME: "headers": email_message.headers,
         "body": email_message.body,
     }
 
