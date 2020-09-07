@@ -434,5 +434,5 @@ HUEY = {"name": "ITOU",
 EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
 
 # Number of retries & retry delay parameters for emails (for async process)
-SEND_EMAIL_RETRY_DELAY = 5 * 60
-SEND_EMAIL_NB_RETRIES = 24 * 3600 / SEND_EMAIL_RETRY_DELAY
+SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
+SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600

@@ -49,6 +49,9 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 # Custom async email backend wrapper
 # ----------------------------------
 
+# Settings are explicit for humans, but this is what Huey needs
+_NB_RETRIES = int(settings.SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS / settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
+
 
 def _serializeEmailMessage(email_message):
     """
@@ -88,7 +91,7 @@ def _deserializeEmailMessage(serialized_email_message):
     return EmailMessage(connection=get_connection(backend=ASYNC_EMAIL_BACKEND), **serialized_email_message)
 
 
-@task(retries=settings.SEND_EMAIL_NB_RETRIES, retry_delay=settings.SEND_EMAIL_RETRY_DELAY)
+@task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
 def _async_send_messages(serializable_email_messages):
     """ Async email sending "delegate"
 
