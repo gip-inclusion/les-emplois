@@ -18,7 +18,7 @@ class CreateSiaeForm(forms.ModelForm):
         self.current_user = current_user
         super().__init__(*args, **kwargs)
 
-        self.fields["kind"].widget.attrs["disabled"] = "disabled"
+        self.fields["kind"].choices = [(current_siae.kind, dict(Siae.KIND_CHOICES)[current_siae.kind])]
 
         self.fields["department"].choices = [("", "---")] + list(current_siae.open_departments.items())
 
@@ -63,13 +63,7 @@ class CreateSiaeForm(forms.ModelForm):
         }
 
     def clean_kind(self):
-        kind = self.cleaned_data["kind"]
-        if kind != self.current_siae.kind:
-            # This should never happen as the field is disabled/uneditable.
-            raise forms.ValidationError(
-                _("Votre nouvelle structure doit avoir le même type que votre structure actuelle.")
-            )
-        return kind
+        return self.current_siae.kind
 
     def clean_department(self):
         department = self.cleaned_data["department"]
