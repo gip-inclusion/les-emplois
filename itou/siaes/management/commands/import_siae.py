@@ -25,14 +25,6 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.management.commands.import_deleted_siae import (
-    DEPARTMENTS_TO_OPEN_ON_06_07_2020,
-    DEPARTMENTS_TO_OPEN_ON_14_04_2020,
-    DEPARTMENTS_TO_OPEN_ON_20_04_2020,
-    DEPARTMENTS_TO_OPEN_ON_22_06_2020,
-    DEPARTMENTS_TO_OPEN_ON_27_04_2020,
-    DEPARTMENTS_TO_OPEN_ON_29_06_2020,
-)
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -45,19 +37,6 @@ MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_27072020_122717.c
 SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_07_24_siae_auth_email_and_external_id.csv"
 
 VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_30_fluxIAE_AnnexeFinanciere_29062020_063002.csv"
-
-# ETTI are deployed all over France without restriction.
-SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
-
-# For other kinds of siaes, only some regions are deployed.
-SIAE_CREATION_ALLOWED_DEPARTMENTS = (
-    DEPARTMENTS_TO_OPEN_ON_14_04_2020
-    + DEPARTMENTS_TO_OPEN_ON_20_04_2020
-    + DEPARTMENTS_TO_OPEN_ON_27_04_2020
-    + DEPARTMENTS_TO_OPEN_ON_22_06_2020
-    + DEPARTMENTS_TO_OPEN_ON_29_06_2020
-    + DEPARTMENTS_TO_OPEN_ON_06_07_2020
-)
 
 # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
 # This score is arbitrarily set based on general observation.
@@ -305,11 +284,7 @@ VALID_EXTERNAL_IDS = [
 
 
 def should_siae_be_created(siae):
-    if siae.external_id not in VALID_EXTERNAL_IDS:
-        return False
-    if siae.kind in SIAE_CREATION_ALLOWED_KINDS:
-        return True
-    return siae.department in SIAE_CREATION_ALLOWED_DEPARTMENTS
+    return siae.external_id in VALID_EXTERNAL_IDS and siae.is_in_open_department
 
 
 class Command(BaseCommand):
