@@ -424,7 +424,7 @@ METABASE_INSERT_BATCH_SIZE = 1000
 # 1 <= REDIS_DB <= 100 (number of dbs available on CleverCloud)
 REDIS_DB = os.environ.get("REDIS_DB", 1)
 # Complete URL (containing the instance password)
-REDIS_URL = os.environ.get("REDIS_URL")
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
 # Huey instance
 # If any performance issue, increasing the number of workers *can* be a good idea
