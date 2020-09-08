@@ -296,7 +296,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
-
         self.assertTrue(new_job_seeker.has_valid_prescriber_diagnosis)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})

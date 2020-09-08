@@ -20,7 +20,6 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm

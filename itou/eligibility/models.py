@@ -17,9 +17,6 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
     def by_prescribers(self):
         return self.filter(author_kind=KIND_PRESCRIBER)
 
-    def by_siae(self, siae):
-        return self.filter(author_kind=KIND_SIAE_STAFF, author_siae=siae)
-
     def by_prescribers_or_siae(self, siae):
         return self.filter(Q(author_kind=KIND_PRESCRIBER) | Q(author_siae=siae))
 

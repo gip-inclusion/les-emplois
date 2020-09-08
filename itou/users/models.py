@@ -106,11 +106,24 @@ class User(AbstractUser, AddressMixin):
         if has_email and User.email_already_exists(self.email, exclude_pk=self.pk):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
-    @property
+    @cached_property
     def approvals_wrapper(self):
         if not self.is_job_seeker:
             return None
         return ApprovalsWrapper(self)
+
+    @cached_property
+    def has_valid_approval(self):
+        return self.approvals_wrapper.has_valid
+
+    @property
+    def latest_valid_approval_is_from_pe(self):
+        latest_approval = self.approvals_wrapper.latest_approval
+        return self.has_valid_approval and not latest_approval.originates_from_itou
+
+    @cached_property
+    def has_eligibility_diagnoses(self):
+        return self.eligibility_diagnoses.exists()
 
     @property
     def has_valid_prescriber_diagnosis(self):
@@ -125,17 +138,7 @@ class User(AbstractUser, AddressMixin):
             return True
         # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
         # has been made outside of Itou.
-        latest_approval = self.approvals_wrapper.latest_approval
-        return latest_approval and latest_approval.is_valid and not latest_approval.originates_from_itou
-
-    @property
-    def has_valid_approval(self):
-        approval = self.approvals_wrapper.latest_approval
-        return approval and approval.is_valid
-
-    @cached_property
-    def has_eligibility_diagnoses(self):
-        return self.eligibility_diagnoses.exists()
+        return self.latest_valid_approval_is_from_pe
 
     def get_eligibility_diagnosis(self, siae=None):
         """

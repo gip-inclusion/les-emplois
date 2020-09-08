@@ -65,18 +65,23 @@ class JobApplicationModelTest(TestCase):
         # Has a diagnosis made by a prescriber.
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
         PrescriberEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker)
-        self.assertFalse(job_application.has_valid_siae_diagnosis)
+        self.assertTrue(job_application.has_valid_siae_diagnosis)
 
-        # Has a diagnosis made by an SIAE.
+        # Has a diagnosis made by the same SIAE.
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
         SiaeEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, author_siae=job_application.to_siae)
         self.assertTrue(job_application.has_valid_siae_diagnosis)
+
+        # Has a diagnosis from another SIAE
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        SiaeEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker)
+        self.assertFalse(job_application.has_valid_siae_diagnosis)
 
         # Has a valid Pôle emploi diagnosis.
         job_seeker = JobSeekerFactory()
         PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker)
-        self.assertFalse(job_application.has_valid_siae_diagnosis)
+        self.assertTrue(job_application.has_valid_siae_diagnosis)
 
         # Has an expired diagnosis made by an Employer
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING)

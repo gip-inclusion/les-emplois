@@ -317,11 +317,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.job_seeker.has_valid_approval:
             return False
 
-        has_valid_diagnosis = self.has_valid_siae_diagnosis or self.job_seeker.has_valid_prescriber_diagnosis
         return (
             (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
-            and not has_valid_diagnosis
+            and not self.has_valid_siae_diagnosis
         )
 
     @property
@@ -337,9 +336,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def has_valid_siae_diagnosis(self):
-        diagnoses = self.job_seeker.eligibility_diagnoses.by_siae(siae=self.to_siae)
+        diagnoses = self.job_seeker.eligibility_diagnoses.by_prescribers_or_siae(siae=self.to_siae)
         if diagnoses and not diagnoses.latest("created_at").has_expired:
             return True
+
+        return self.job_seeker.latest_valid_approval_is_from_pe
 
     @property
     def accepted_by(self):
