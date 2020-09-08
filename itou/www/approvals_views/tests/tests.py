@@ -1,5 +1,6 @@
 from unittest.mock import PropertyMock, patch
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 from requests import exceptions as requests_exceptions
@@ -92,5 +93,5 @@ class TestDownloadApprovalAsPDF(TestCase):
 
         self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
 
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(ObjectDoesNotExist):
             self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))

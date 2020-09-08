@@ -43,9 +43,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
     cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
-    eligibility_diagnosis = None
-    if job_application.job_seeker.has_eligibility_diagnoses:
-        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis(siae=job_application.to_siae)
+    eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis(siae=job_application.to_siae)
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,

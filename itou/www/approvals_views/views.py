@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
@@ -40,7 +41,9 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     # exist in the real world but not in our database.
     # Raise an error only if the diagnosis does not exist for an Itou approval.
     if job_application.approval.originates_from_itou:
-        diagnosis = job_seeker.get_eligibility_diagnosis()
+        diagnosis = job_seeker.get_eligibility_diagnosis(siae=siae)
+        if not diagnosis:
+            raise ObjectDoesNotExist
         diagnosis_author = diagnosis.author.get_full_name()
         diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
         if diagnosis_author_org:
