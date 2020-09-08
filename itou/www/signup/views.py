@@ -62,7 +62,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
     """
     Entry point of the signup process for SIAEs which consists of 2 steps.
 
-    The user is asked to select an SIAE based on a selection that match a given SIRENE number.
+    The user is asked to select an SIAE based on a selection that match a given SIREN number.
     """
 
     siaes_without_members = None
@@ -70,17 +70,17 @@ def siae_select(request, template_name="signup/siae_select.html"):
 
     next_url = get_safe_url(request, "next")
 
-    sirene_form = forms.SiaeSearchBySireneForm(data=request.GET or None)
+    siren_form = forms.SiaeSearchBySirenForm(data=request.GET or None)
     siae_select_form = None
 
-    # The SIRENE, when available, is always passed in the querystring.
-    if request.method in ["GET", "POST"] and sirene_form.is_valid():
+    # The SIREN, when available, is always passed in the querystring.
+    if request.method in ["GET", "POST"] and siren_form.is_valid():
         # Make sure to look only for active structures.
-        siaes_for_sirene = Siae.active.filter(siret__startswith=sirene_form.cleaned_data["sirene"])
+        siaes_for_siren = Siae.active.filter(siret__startswith=siren_form.cleaned_data["siren"])
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.
-        siaes_with_members = siaes_for_sirene.exclude(members=None)
-        siaes_without_members = siaes_for_sirene.filter(members=None)
+        siaes_with_members = siaes_for_siren.exclude(members=None)
+        siaes_without_members = siaes_for_siren.filter(members=None)
         siae_select_form = forms.SiaeSelectForm(data=request.POST or None, siaes=siaes_without_members)
 
     if request.method == "POST" and siae_select_form and siae_select_form.is_valid():
@@ -100,7 +100,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
         "siaes_without_members": siaes_without_members,
         "siaes_with_members": siaes_with_members,
         "siae_select_form": siae_select_form,
-        "sirene_form": sirene_form,
+        "siren_form": siren_form,
     }
     return render(request, template_name, context)
 

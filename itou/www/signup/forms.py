@@ -12,7 +12,7 @@ from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_code_safir, validate_sirene, validate_siret
+from itou.utils.validators import validate_code_safir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -55,14 +55,14 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 # ------------------------------------------------------------------------------------------
 
 
-class SiaeSearchBySireneForm(forms.Form):
+class SiaeSearchBySirenForm(forms.Form):
 
-    sirene = forms.CharField(
-        label=gettext_lazy("Numéro SIRENE de votre structure"),
+    siren = forms.CharField(
+        label=gettext_lazy("Numéro SIREN de votre structure"),
         min_length=9,
         max_length=9,
-        validators=[validate_sirene],
-        help_text=gettext_lazy("Le numéro SIRENE contient 9 chiffres."),
+        validators=[validate_siren],
+        help_text=gettext_lazy("Le numéro SIREN contient 9 chiffres."),
     )
 
 

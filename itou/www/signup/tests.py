@@ -60,14 +60,14 @@ class SiaeSignupTest(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-            # Find an SIAE by SIRENE.
-            response = self.client.get(url, {"sirene": siae.siret[:9]})
+            # Find an SIAE by SIREN.
+            response = self.client.get(url, {"siren": siae.siret[:9]})
             self.assertEqual(response.status_code, 200)
 
             # Choose an SIAE between results.
             post_data = {"siaes": siae.pk}
-            # Pass `sirene` in request.GET.
-            response = self.client.post(f"{url}?sirene={siae.siret[:9]}", data=post_data)
+            # Pass `siren` in request.GET.
+            response = self.client.post(f"{url}?siren={siae.siret[:9]}", data=post_data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, "/")
 

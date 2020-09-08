@@ -22,7 +22,7 @@
 
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
-    {% bootstrap_form sirene_form %}
+    {% bootstrap_form siren_form %}
 
     {% buttons %}
         <button type="submit" class="btn btn-primary">{% translate "Rechercher" %}</button>
@@ -31,10 +31,10 @@
 </form>
 
 
-{% if sirene_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
+{% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
     <div class="alert alert-secondary mt-5" role="info">
-        {% blocktranslate with sirene=sirene_form.cleaned_data.sirene %}
-            Aucun résultat pour <b>{{ sirene }}</b>.
+        {% blocktranslate with siren=siren_form.cleaned_data.siren %}
+            Aucun résultat pour <b>{{ siren }}</b>.
         {% endblocktranslate %}
     </div>
 {% endif %}
