@@ -251,19 +251,6 @@ LOGGING = {
     },
 }
 
-# Email.
-# https://anymail.readthedocs.io/en/stable/esps/mailjet/
-# ------------------------------------------------------------------------------
-
-EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
-
-ANYMAIL = {
-    "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
-    "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
-}
-
-MAILJET_API_URL = "https://api.mailjet.com/v3"
-
 # Auth.
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 # ------------------------------------------------------------------------------
@@ -416,6 +403,7 @@ METABASE_SHOW_SQL_REQUESTS = False
 METABASE_INSERT_BATCH_SIZE = 1000
 
 # Huey / async
+# Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.
 # ------------------------------------------------------------------------------
 
 # Redis server URL:
@@ -429,15 +417,25 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 # Huey instance
 # If any performance issue, increasing the number of workers *can* be a good idea
 # Parameter `immediate` means `synchronous` (async here)
-HUEY = {"name": "ITOU",
-        "url": REDIS_URL + f"/?db={REDIS_DB}",
-        "consumer": {"workers": 2, "worker_type": "thread", },
-        "immediate": False,
-        }
+HUEY = {
+    "name": "ITOU",
+    "url": REDIS_URL + f"/?db={REDIS_DB}",
+    "consumer": {"workers": 2, "worker_type": "thread", },
+    "immediate": False,
+}
 
-# Asynchronous email backend
+# Email.
+# https://anymail.readthedocs.io/en/stable/esps/mailjet/
 # ------------------------------------------------------------------------------
 
+ANYMAIL = {
+    "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
+    "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
+}
+
+MAILJET_API_URL = "https://api.mailjet.com/v3"
+
+# Asynchronous email backend
 # EMAIL_BACKEND points to an async wrapper of a "real" email backend
 # The real backend is hardcoded in the wrapper to avoid multiple and
 # confusing parameters in Django settings.
