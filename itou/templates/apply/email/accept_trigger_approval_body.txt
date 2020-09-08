@@ -3,7 +3,7 @@
 {% block body %}
 Nouvelle embauche sur Itou.
 
-{% translate "Informations pour l'obtention d'un Pass IAE suite à l'embauche de votre candidat via la Plateforme de l'inclusion :" %}
+{% translate "Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candidat via la Plateforme de l'inclusion :" %}
 
 {% translate "*Candidat* :" %}
 

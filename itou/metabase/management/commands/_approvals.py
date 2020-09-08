@@ -39,7 +39,7 @@ def get_approval_type(approval):
     """
     if isinstance(approval, Approval):
         if approval.number.startswith(settings.ASP_ITOU_PREFIX):
-            return f"Pass IAE ({settings.ASP_ITOU_PREFIX})"
+            return f"PASS IAE ({settings.ASP_ITOU_PREFIX})"
         else:
             return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
     elif isinstance(approval, PoleEmploiApproval):
@@ -68,36 +68,36 @@ TABLE_COLUMNS = [
     # {
     #     "name": "date_de_délivrance",
     #     "type": "date",
-    #     "comment": "Date de délivrance si Pass IAE",
+    #     "comment": "Date de délivrance si PASS IAE",
     #     "lambda": lambda o: o.created_at if isinstance(o, Approval) else None,
     # },
     # ------------------------------------------------------
     {
         "name": "id_structure",
         "type": "integer",
-        "comment": "ID structure qui a embauché si Pass IAE",
+        "comment": "ID structure qui a embauché si PASS IAE",
         "lambda": lambda o: getattr(get_siae_from_approval(o), "id", None),
     },
     {
         "name": "type_structure",
         "type": "varchar",
-        "comment": "Type de la structure qui a embauché si Pass IAE",
+        "comment": "Type de la structure qui a embauché si PASS IAE",
         "lambda": lambda o: getattr(get_siae_from_approval(o), "kind", None),
     },
     {
         "name": "siret_structure",
         "type": "varchar",
-        "comment": "SIRET de la structure qui a embauché si Pass IAE",
+        "comment": "SIRET de la structure qui a embauché si PASS IAE",
         "lambda": lambda o: getattr(get_siae_from_approval(o), "siret", None),
     },
     {
         "name": "nom_structure",
         "type": "varchar",
-        "comment": "Nom de la structure qui a embauché si Pass IAE",
+        "comment": "Nom de la structure qui a embauché si PASS IAE",
         "lambda": lambda o: getattr(get_siae_from_approval(o), "display_name", None),
     },
 ] + get_department_and_region_columns(
     name_suffix="_structure_ou_org_pe",
-    comment_suffix=(" de la structure qui a embauché si Pass IAE ou" " du PE qui a délivré l agrément si Agrément PE"),
+    comment_suffix=(" de la structure qui a embauché si PASS IAE ou" " du PE qui a délivré l agrément si Agrément PE"),
     custom_lambda=get_siae_or_pe_org_from_approval,
 )
