@@ -220,8 +220,8 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        self.assertFalse(job_application.has_valid_siae_eligibility_diagnosis)
-        self.assertFalse(job_application.job_seeker.has_valid_prescriber_eligibility_diagnosis)
+        self.assertFalse(job_application.has_valid_siae_diagnosis)
+        self.assertFalse(job_application.job_seeker.has_valid_prescriber_diagnosis)
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -251,7 +251,7 @@ class ProcessViewsTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
-        self.assertTrue(job_application.has_valid_siae_eligibility_diagnosis)
+        self.assertTrue(job_application.has_valid_siae_diagnosis)
 
         # Check diagnosis.
         eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis(siae=job_application.to_siae)

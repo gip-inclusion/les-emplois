@@ -292,12 +292,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(new_job_seeker.has_valid_prescriber_eligibility_diagnosis)
+        self.assertFalse(new_job_seeker.has_valid_prescriber_diagnosis)
 
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(new_job_seeker.has_valid_prescriber_eligibility_diagnosis)
+        self.assertTrue(new_job_seeker.has_valid_prescriber_diagnosis)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -473,7 +473,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        self.assertFalse(new_job_seeker.has_valid_prescriber_eligibility_diagnosis)
+        self.assertFalse(new_job_seeker.has_valid_prescriber_diagnosis)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)

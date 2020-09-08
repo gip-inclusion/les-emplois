@@ -113,7 +113,7 @@ class User(AbstractUser, AddressMixin):
         return ApprovalsWrapper(self)
 
     @property
-    def has_valid_prescriber_eligibility_diagnosis(self):
+    def has_valid_prescriber_diagnosis(self):
         """
         Returns True if an ongoing diagnosis made by a prescriber exists,
         False otherwise.
