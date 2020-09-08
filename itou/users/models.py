@@ -80,7 +80,7 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
 
-    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), null=True)
+    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), blank=True)
 
     created_by = models.ForeignKey(
         "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True

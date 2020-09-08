@@ -88,6 +88,7 @@ class ItouUserAdmin(UserAdmin):
                 "fields": (
                     "birthdate",
                     "phone",
+                    "resume_link",
                     "address_line_1",
                     "address_line_2",
                     "post_code",
