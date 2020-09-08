@@ -257,6 +257,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return self.siret[:9]
 
     @property
+    def siret_nic(self):
+        """
+        The second part of SIRET is called the NIC (numéro interne de classement).
+        https://www.insee.fr/fr/metadonnees/definition/c1981
+        """
+        return self.siret[9:14]
+
+    @property
     def is_subject_to_eligibility_rules(self):
         return self.kind in self.ELIGIBILITY_REQUIRED_KINDS
 

@@ -73,7 +73,7 @@
                                     value="{{ siae.pk }}"
                                     id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}"
                                     required>
-                                <b>{{ siae.siret|slice:":9" }} {{ siae.siret|slice:"9:14" }}</b> - {{ siae.kind }}
+                                <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
                                 <br>
                                 {{ siae.display_name }}
                                 <br>
@@ -114,7 +114,7 @@
             {% for siae in siaes_with_members %}
                 <li>
                     <p>
-                        <b>{{ siae.siret|slice:":9" }} {{ siae.siret|slice:"9:14" }}</b> - {{ siae.kind }}
+                        <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
                         <br>
                         {{ siae.display_name }}
                         <br>

@@ -48,6 +48,11 @@ class FactoriesTest(TestCase):
 
 
 class ModelTest(TestCase):
+    def test_siren_and_nic(self):
+        siae = SiaeFactory(siret="12345678900001")
+        self.assertEqual(siae.siren, "123456789")
+        self.assertEqual(siae.siret_nic, "00001")
+
     def test_is_subject_to_eligibility_rules(self):
         siae = SiaeFactory(kind=Siae.KIND_GEIQ)
         self.assertFalse(siae.is_subject_to_eligibility_rules)
