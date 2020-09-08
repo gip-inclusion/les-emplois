@@ -3,7 +3,9 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import (
@@ -429,8 +431,68 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available when the state is postponed."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
         diagnosis = ExpiredPrescriberEligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
-        self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
         self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+        self.assertContains(response, diagnosis.author.get_full_name())
+
+    def test_details_template_for_state_processing_valid_pe_approval(self):
+        """
+        A valid PE approval exists, meaning the job seeker is in an IAE pathway.
+        Therefore, a diagnosis is not needed.
+        """
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        job_seeker = self.job_application.job_seeker
+        PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+
+    def test_details_template_for_state_processing_valid_approval(self):
+        """
+        An approval exists, meaning the job seeker is in an IAE pathway.
+        Therefore, a diagnosis is not needed.
+        """
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        job_seeker = self.job_application.job_seeker
+        diagnosis = PrescriberEligibilityDiagnosisFactory(job_seeker=job_seeker)
+        ApprovalFactory(user=job_seeker)
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertContains(response, self.url_refuse)
+        self.assertContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+        self.assertContains(response, diagnosis.author.get_full_name())
+
+    def test_details_template_for_state_processing_old_approval(self):
+        """
+        An approval exists but is not valid anymore.
+        The prescriber should be invited to do a new diagnosis.
+        """
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.save()
+        job_seeker = self.job_application.job_seeker
+        start_date = timezone.now() - relativedelta(years=3)
+        end_date = start_date + relativedelta(years=2)
+        diagnosis = PrescriberEligibilityDiagnosisFactory(created_at=start_date, job_seeker=job_seeker)
+        ApprovalFactory(start_at=start_date, end_at=end_date, user=job_seeker)
         response = self.client.get(self.url_details)
         # Test template content.
         self.assertNotContains(response, self.url_process)

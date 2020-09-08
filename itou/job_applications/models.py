@@ -312,6 +312,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Returns True if an eligibility diagnosis must be made by an SIAE
         when processing an application, False otherwise.
         """
+        # If a job seeker started an IAE pathway,
+        # doing a new diagnosis is useless.
+        if self.job_seeker.has_valid_approval:
+            return False
+
         has_valid_diagnosis = (
             self.has_valid_siae_eligibility_diagnosis or self.job_seeker.has_valid_prescriber_eligibility_diagnosis
         )

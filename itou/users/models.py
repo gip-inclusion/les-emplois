@@ -128,6 +128,11 @@ class User(AbstractUser, AddressMixin):
         latest_approval = self.approvals_wrapper.latest_approval
         return latest_approval and latest_approval.is_valid and not latest_approval.originates_from_itou
 
+    @property
+    def has_valid_approval(self):
+        approval = self.approvals_wrapper.latest_approval
+        return approval and approval.is_valid
+
     @cached_property
     def has_eligibility_diagnoses(self):
         return self.eligibility_diagnoses.exists()
