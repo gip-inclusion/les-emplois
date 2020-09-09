@@ -46,7 +46,7 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
 class JobSeekerSignupView(SignupView):
 
     form_class = forms.JobSeekerSignupForm
-    template_name = "signup/signup_job_seeker.html"
+    template_name = "signup/job_seeker_signup.html"
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -108,7 +108,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
 class SiaeSignupView(SignupView):
 
     form_class = forms.SiaeSignupForm
-    template_name = "signup/signup_siae.html"
+    template_name = "signup/siae_signup.html"
 
     def warn_and_redirect(self, request):
         messages.warning(
@@ -447,7 +447,7 @@ class PrescriberUserSignupView(SignupView):
     """
 
     form_class = forms.PrescriberUserSignupForm
-    template_name = "signup/prescriber_user.html"
+    template_name = "signup/prescriber_signup.html"
 
     @transaction.atomic
     @method_decorator(valid_prescriber_signup_session_required)
