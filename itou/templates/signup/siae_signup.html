@@ -11,13 +11,7 @@
     <small class="text-muted">{% translate "Employeur solidaire" %}</small>
 </h1>
 
-<div class="alert alert-warning" role="info">
-    {% blocktranslate with doc_opening_schedule_url=form.DOC_OPENING_SCHEDULE_URL %}
-        Les inscriptions s'ouvrent aux régions progressivement. <a href="{{ doc_opening_schedule_url }}" rel="noopener" target="_blank">Vérifiez que la Plateforme est bien disponible sur votre territoire.</a> Seules les ETTI sont ouvertes en France entière.
-    {% endblocktranslate %}
-</div>
-
-<form method="post" action="{% url 'signup:select_siae' %}" role="form">
+<form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
@@ -27,17 +21,21 @@
         <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
     {% endif %}
 
+    {% bootstrap_field form.encoded_siae_id %}
+    {% bootstrap_field form.token %}
+
     {% bootstrap_field form.kind %}
     {% bootstrap_field form.siret %}
+    {% bootstrap_field form.siae_name %}
+    {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.last_name %}
     {% bootstrap_field form.email %}
+    {% bootstrap_field form.password1 %}
+    {% bootstrap_field form.password2 %}
 
     {% include "signup/includes/submit_rgpd.html" %}
 
 </form>
-
-<p>
-    {% blocktranslate %}En cas de problème ou pour plus d'informations, veuillez nous contacter à l'adresse <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">{{ ITOU_EMAIL_CONTACT }}</a>{% endblocktranslate %}.
-</p>
 
 <hr>
 

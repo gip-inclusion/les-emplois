@@ -36,6 +36,7 @@ from itou.utils.validators import (
     validate_naf,
     validate_pole_emploi_id,
     validate_post_code,
+    validate_siren,
     validate_siret,
 )
 
@@ -286,6 +287,13 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_naf, "abcde")
         self.assertRaises(ValidationError, validate_naf, "1245789871")
         validate_naf("6201Z")
+
+    def test_validate_siren(self):
+        self.assertRaises(ValidationError, validate_siren, "12000015")
+        self.assertRaises(ValidationError, validate_siren, "1200001531")
+        self.assertRaises(ValidationError, validate_siren, "12000015a")
+        self.assertRaises(ValidationError, validate_siren, "azertyqwe")
+        validate_siren("120000153")
 
     def test_validate_siret(self):
         self.assertRaises(ValidationError, validate_siret, "1200001530001")

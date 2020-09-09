@@ -3,9 +3,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.utils.http import urlsafe_base64_decode
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
@@ -14,7 +12,7 @@ from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_code_safir, validate_siret
+from itou.utils.validators import validate_code_safir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -36,105 +34,45 @@ class FullnameFormMixin(forms.Form):
     )
 
 
-class SelectSiaeForm(forms.Form):
-    """
-    First of two forms of siae signup process.
-    This first form allows the user to select which siae will be joined.
-    """
+class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
+    def __init__(self, *args, **kwargs):
+        super(JobSeekerSignupForm, self).__init__(*args, **kwargs)
+        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
 
-    DOC_OPENING_SCHEDULE_URL = (
-        "https://doc.inclusion.beta.gouv.fr/presentation/quel-est-le-calendrier-de-deploiement-de-la-plateforme"
+    def save(self, request):
+        user = super().save(request)
+
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+
+        user.is_job_seeker = True
+        user.save()
+
+        return user
+
+
+# SIAEs signup.
+# ------------------------------------------------------------------------------------------
+
+
+class SiaeSearchBySirenForm(forms.Form):
+
+    siren = forms.CharField(
+        label=gettext_lazy("Numéro SIREN de votre structure"),
+        min_length=9,
+        max_length=9,
+        validators=[validate_siren],
+        help_text=gettext_lazy("Le numéro SIREN contient 9 chiffres."),
     )
 
-    kind = forms.ChoiceField(
-        label=gettext_lazy("Type de structure"), choices=BLANK_CHOICE + Siae.KIND_CHOICES, required=True
-    )
 
-    siret = forms.CharField(
-        label=gettext_lazy("Numéro de SIRET"),
-        min_length=14,
-        max_length=14,
-        validators=[validate_siret],
-        strip=True,
-        help_text=gettext_lazy("Saisissez 14 chiffres."),
-        required=False,
-    )
+class SiaeSelectForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.siaes = kwargs.pop("siaes")
+        super().__init__(*args, **kwargs)
+        self.fields["siaes"].queryset = self.siaes
 
-    email = forms.EmailField(
-        label=gettext_lazy("E-mail"),
-        help_text=gettext_lazy(
-            "Vous êtes une SIAE ? Attention, indiquez l'e-mail utilisé "
-            "par le référent technique ASP et non votre e-mail de connexion."
-        ),
-        required=False,
-    )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        kind = cleaned_data.get("kind")
-        siret = cleaned_data.get("siret")
-        email = cleaned_data.get("email")
-
-        if not (siret or email):
-            error_message = _(
-                "Merci de renseigner l'e-mail utilisé par le référent technique ASP "
-                "ou un numéro de SIRET connu de nos services."
-            )
-            raise forms.ValidationError(error_message)
-
-        siaes = Siae.objects.filter(kind=kind)
-        if siret and email:
-            # We match siaes having any of the two correct fields.
-            siaes = siaes.filter(Q(siret=siret) | Q(auth_email=email))
-        elif email:
-            siaes = siaes.filter(auth_email=email)
-        else:
-            siaes = siaes.filter(siret=siret)
-        # Hit the database only once.
-        siaes = list(siaes)
-        siaes_matching_siret = [s for s in siaes if s.siret == siret]
-        # There can be at most one siret match due to (kind, siret) unicity.
-        siret_exists = len(siaes_matching_siret) == 1
-
-        def raise_form_error_for_inactive_siae():
-            error_message = _("La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
-            raise forms.ValidationError(mark_safe(error_message))
-
-        if siret_exists:
-            if siaes_matching_siret[0].is_active:
-                self.selected_siae = siaes_matching_siret[0]
-            else:
-                raise_form_error_for_inactive_siae()
-        else:
-            siaes_matching_email = [s for s in siaes if s.auth_email == email]
-            email_exists = len(siaes_matching_email) > 0
-            active_siaes_matching_email = [s for s in siaes_matching_email if s.is_active]
-            several_siaes_share_same_email = len(active_siaes_matching_email) > 1
-            email_exists_in_active_siae = len(active_siaes_matching_email) > 0
-
-            if several_siaes_share_same_email:
-                error_message = _(
-                    "Votre e-mail est partagé par plusieurs structures "
-                    "et votre numéro de SIRET nous est inconnu.<br>"
-                    "Merci de vous rapprocher de votre service gestion "
-                    "afin d'obtenir votre numéro de SIRET."
-                )
-                raise forms.ValidationError(mark_safe(error_message))
-
-            if not email_exists:
-                error_message = _(
-                    f"Votre numéro de SIRET ou votre e-mail nous sont inconnus. <br>Merci de "
-                    f'<a href="{self.DOC_OPENING_SCHEDULE_URL}">vérifier que la plateforme '
-                    f"est disponible sur votre territoire</a> ou veuillez nous contacter "
-                    'en utilisant <a href="https://itou.typeform.com/to/RYfNLR79" rel="noopener" '
-                    'target="_blank">ce formulaire.</a>'
-                )
-                raise forms.ValidationError(mark_safe(error_message))
-
-            if not email_exists_in_active_siae:
-                raise_form_error_for_inactive_siae()
-
-            self.selected_siae = active_siaes_matching_email[0]
+    siaes = forms.ModelChoiceField(queryset=None, widget=forms.RadioSelect)
 
 
 class SiaeSignupForm(FullnameFormMixin, SignupForm):
@@ -231,23 +169,6 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
             "kind": siae.kind,
             "siae_name": siae.display_name,
         }
-
-
-class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
-    def __init__(self, *args, **kwargs):
-        super(JobSeekerSignupForm, self).__init__(*args, **kwargs)
-        self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-
-    def save(self, request):
-        user = super().save(request)
-
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-
-        user.is_job_seeker = True
-        user.save()
-
-        return user
 
 
 # Prescribers signup.
