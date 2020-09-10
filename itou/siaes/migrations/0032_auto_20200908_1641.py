@@ -18,4 +18,4 @@ class Migration(migrations.Migration):
         ("siaes", "0031_auto_20200904_1157"),
     ]
 
-    operations = [migrations.RunPython(start_grace_period_for_existing_inactive_siaes, migrations.RunPython.noop)]
+    operations = [migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop)]

@@ -41,7 +41,7 @@ class SiaeAdmin(admin.ModelAdmin):
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by",)
     readonly_fields = (
-        "active_until",
+        "convention_end_date",
         "deactivated_at",
         "reactivated_by",
         "reactivated_at",
@@ -67,7 +67,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "description",
                     "source",
                     "is_active",
-                    "active_until",
+                    "convention_end_date",
                     "deactivated_at",
                     "reactivated_by",
                     "reactivated_at",

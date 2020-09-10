@@ -158,9 +158,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             "la plateforme."
         ),
     )
-    # This convention end date is only stored for information, for admin and/or metabase uses.
+    # This convention end date is only applicable to SIAE (ASP), not GEIQ etc.
     # It can be either in the future or in the past.
-    active_until = models.DateTimeField(
+    convention_end_date = models.DateTimeField(
         verbose_name=_("Date de fin de conventionnement selon la DGEFP"), blank=True, null=True
     )
     # Grace period starts from this date.
