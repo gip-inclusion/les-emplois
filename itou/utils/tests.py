@@ -618,3 +618,4 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.address_line_2, "22-24")
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
+        self.assertFalse(etablissement.is_closed)

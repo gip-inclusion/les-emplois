@@ -3,7 +3,7 @@ import logging
 import requests
 from django.conf import settings
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.utils.address.departments import department_from_postcode
 
@@ -15,6 +15,8 @@ class EtablissementAPI:
     """
     https://doc.entreprise.api.gouv.fr/?json#etablissements-v2
     """
+
+    ERROR_IS_CLOSED = gettext_lazy("La base Sirene indique que l'état administratif de l'établissement est fermé.")
 
     def __init__(self, siret, object="Inscription à la Plateforme de l'inclusion"):
         self.data, self.error = self.get(siret, object)
@@ -44,7 +46,7 @@ class EtablissementAPI:
                 error = _("SIRET non reconnu.")
             else:
                 logger.error("Error while fetching `%s`: %s", url, e)
-                error = _("Problème de connexion à l'API Entreprise. Veuillez réessayer ultérieurement.")
+                error = _("Problème de connexion à la base Sirene. Veuillez réessayer ultérieurement.")
 
         if data and data.get("errors"):
             error = data["errors"][0]
@@ -74,3 +76,7 @@ class EtablissementAPI:
     @property
     def department(self):
         return department_from_postcode(self.post_code)
+
+    @property
+    def is_closed(self):
+        return self.data["etablissement"]["etat_administratif"]["value"] == "F"
