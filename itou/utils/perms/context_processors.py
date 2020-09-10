@@ -13,7 +13,6 @@ def get_current_organization_and_perms(request):
 
     prescriber_organization = None
     siae = None
-    siae_is_in_grace_period = False
     user_is_prescriber_org_admin = False
     user_is_siae_admin = False
     user_siaes = []
@@ -33,7 +32,6 @@ def get_current_organization_and_perms(request):
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
                     user_is_siae_admin = membership.is_siae_admin
-                    siae_is_in_grace_period = not siae.is_active
                     break
             if siae is None:
                 if request.path != reverse("account_logout"):
@@ -50,7 +48,6 @@ def get_current_organization_and_perms(request):
     context = {
         "current_prescriber_organization": prescriber_organization,
         "current_siae": siae,
-        "current_siae_is_in_grace_period": siae_is_in_grace_period,
         "user_is_prescriber_org_admin": user_is_prescriber_org_admin,
         "user_is_siae_admin": user_is_siae_admin,
         "user_siaes": user_siaes,

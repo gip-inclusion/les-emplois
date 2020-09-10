@@ -63,7 +63,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": None,
                 "current_siae": siae,
-                "current_siae_is_in_grace_period": False,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": True,
                 "user_siaes": [siae],
@@ -100,7 +99,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": None,
                 "current_siae": siae3,
-                "current_siae_is_in_grace_period": False,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": False,
                 "user_siaes": [siae1, siae2, siae3],
@@ -133,7 +131,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
             expected = {
                 "current_prescriber_organization": organization,
                 "current_siae": None,
-                "current_siae_is_in_grace_period": False,
                 "user_is_prescriber_org_admin": True,
                 "user_is_siae_admin": False,
                 "user_siaes": [],
