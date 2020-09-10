@@ -76,7 +76,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
     # The SIREN, when available, is always passed in the querystring.
     if request.method in ["GET", "POST"] and siren_form.is_valid():
         # Make sure to look only for active structures.
-        siaes_for_siren = Siae.active.filter(siret__startswith=siren_form.cleaned_data["siren"])
+        siaes_for_siren = Siae.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"])
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.
         siaes_with_members = siaes_for_siren.exclude(members=None)
