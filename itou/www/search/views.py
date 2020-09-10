@@ -29,7 +29,8 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         kind = form.cleaned_data["kind"]
 
         siaes = (
-            Siae.active.within(city.coords, distance_km)
+            Siae.objects.active()
+            .within(city.coords, distance_km)
             .add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).

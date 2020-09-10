@@ -25,8 +25,9 @@ class ItouCurrentOrganizationMiddleware:
 
             if user.is_siae_staff:
                 current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-                if not user.siae_set(manager="active").filter(pk=current_siae_pk).exists():
-                    first_active_siae = user.siae_set(manager="active").first()
+                siae_set = user.siae_set.active_or_in_grace_period()
+                if not siae_set.filter(pk=current_siae_pk).exists():
+                    first_active_siae = siae_set.first()
                     if first_active_siae:
                         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
                     elif request.path not in [

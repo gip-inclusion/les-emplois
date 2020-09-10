@@ -15,15 +15,19 @@ def get_current_organization_and_perms(request):
     siae = None
     user_is_prescriber_org_admin = False
     user_is_siae_admin = False
-    user_siae_set = []
+    user_siaes = []
 
     if request.user.is_authenticated:
 
         siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
-            # Get all info in 1 SQL query.
-            memberships = request.user.siaemembership_set.select_related("siae").filter(siae__is_active=True).all()
-            user_siae_set = [membership.siae for membership in memberships]
+            # Sorry I could not find an elegant DNRY one-query solution ¯\_(ツ)_/¯
+            user_siae_set_pks = request.user.siae_set.active_or_in_grace_period().values_list("pk", flat=True)
+            memberships = (
+                request.user.siaemembership_set.select_related("siae").filter(siae__pk__in=user_siae_set_pks).all()
+            )
+            user_siaes = [membership.siae for membership in memberships]
+
             for membership in memberships:
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
@@ -46,7 +50,7 @@ def get_current_organization_and_perms(request):
         "current_siae": siae,
         "user_is_prescriber_org_admin": user_is_prescriber_org_admin,
         "user_is_siae_admin": user_is_siae_admin,
-        "user_siae_set": user_siae_set,
+        "user_siaes": user_siaes,
     }
 
     context.update(

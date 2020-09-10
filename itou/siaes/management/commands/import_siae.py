@@ -480,8 +480,9 @@ class Command(BaseCommand):
         # We no longer deactivate any siae for now, only reactivate them,
         # to avoid overriding reactivations made by support.
         #
-        # if not self.dry_run:
+        # if siae.is_active and not self.dry_run:
         #     siae.is_active = False
+        #     siae.deactivated_at = timezone.now()
         #     siae.save()
 
     def manage_siae_activation(self):
