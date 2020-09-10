@@ -7,6 +7,13 @@
 
     <b>{{ job_application.to_siae.display_name }}</b>
 
+    {% if job_application.to_siae.grace_period_has_expired %}
+        <span class="badge badge-danger">
+            Structure déconventionnée depuis le
+            {{ job_application.to_siae.grace_period_end_date|date:"d F Y" }}
+        </span>
+    {% endif %}
+
     <br>
 
     <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>

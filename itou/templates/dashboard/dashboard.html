@@ -24,6 +24,17 @@
         </div>
     {% endif %}
 
+    {% if not current_siae.is_active %}
+        <div class="alert alert-warning" role="alert">
+            {% blocktranslate with grace_period_end_date=current_siae.grace_period_end_date|date:"d F Y" %}
+                La DGEFP nous indique que votre structure n'est plus conventionnée.
+                Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
+                A compter du {{ grace_period_end_date }}, l'accès à ce tableau de bord ne sera plus possible.
+                Pour toute question, veuillez contacter notre support.
+            {% endblocktranslate %}
+        </div>
+    {% endif %}
+
     {% if current_prescriber_organization and current_prescriber_organization.pending_authorization %}
         <div class="alert alert-warning pb-0" role="alert">
             <p>
@@ -191,19 +202,21 @@
                             {% translate "Voir la fiche publique" %}
                         </a>
                     </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="users" %}
-                        <a href="{% url 'siaes_views:members' %}">
-                            {% translate "Voir et inviter vos collaborateurs" %}
-                        </a>
-                    </p>
+                    {% if current_siae.is_active %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="users" %}
+                            <a href="{% url 'siaes_views:members' %}">
+                                {% translate "Voir et inviter vos collaborateurs" %}
+                            </a>
+                        </p>
+                    {% endif %}
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'siaes_views:configure_jobs' %}">
                             {% translate "Configurer les descriptions de postes" %}
                         </a>
                     </p>
-                    {% if user_is_siae_admin %}
+                    {% if current_siae.is_active and user_is_siae_admin %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
                             <a href="{% url 'siaes_views:create_siae' %}">{% translate "Créer/rejoindre une autre structure" %}</a>

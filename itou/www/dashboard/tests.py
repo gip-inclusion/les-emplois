@@ -3,8 +3,13 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.siaes.factories import (
+    SiaeAfterGracePeriodFactory,
+    SiaeFactory,
+    SiaePendingGracePeriodFactory,
+    SiaeWithMembershipFactory,
+)
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
 
 
 class DashboardViewTest(TestCase):
@@ -17,9 +22,20 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_user_with_single_inactive_siae_cannot_login(self):
-        siae = SiaeWithMembershipFactory(is_active=False)
-        user = siae.members.first()
+    def test_user_with_inactive_siae_can_still_login_during_grace_period(self):
+        siae = SiaePendingGracePeriodFactory()
+        user = SiaeStaffFactory()
+        siae.members.add(user)
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_with_inactive_siae_cannot_login_after_grace_period(self):
+        siae = SiaeAfterGracePeriodFactory()
+        user = SiaeStaffFactory()
+        siae.members.add(user)
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
         url = reverse("dashboard:index")
@@ -100,12 +116,12 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)
 
-    def test_cannot_switch_to_inactive_siae(self):
+    def test_can_still_switch_to_inactive_siae_during_grace_period(self):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        related_siae = SiaeFactory(is_active=False)
+        related_siae = SiaePendingGracePeriodFactory()
         related_siae.members.add(user)
 
         url = reverse("dashboard:index")
@@ -116,6 +132,31 @@ class SwitchSiaeTest(TestCase):
         url = reverse("dashboard:switch_siae")
         response = self.client.post(url, data={"siae_id": related_siae.pk})
         self.assertEqual(response.status_code, 302)
+
+        # User has indeed switched.
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["current_siae"], related_siae)
+
+    def test_cannot_switch_to_inactive_siae_after_grace_period(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        related_siae = SiaeAfterGracePeriodFactory()
+        related_siae.members.add(user)
+
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["current_siae"], siae)
+
+        # Switching to that siae is not even possible in practice because
+        # it does not even show up in the menu.
+        url = reverse("dashboard:switch_siae")
+        response = self.client.post(url, data={"siae_id": related_siae.pk})
+        self.assertEqual(response.status_code, 404)
 
         # User is still working on the main active siae.
         url = reverse("dashboard:index")

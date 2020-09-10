@@ -42,6 +42,7 @@ class SiaeAdmin(admin.ModelAdmin):
     raw_id_fields = ("created_by",)
     readonly_fields = (
         "active_until",
+        "deactivated_at",
         "reactivated_by",
         "reactivated_at",
         "created_by",
@@ -67,6 +68,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "source",
                     "is_active",
                     "active_until",
+                    "deactivated_at",
                     "reactivated_by",
                     "reactivated_at",
                     "created_by",
@@ -134,7 +136,10 @@ class SiaeAdmin(admin.ModelAdmin):
         if obj.source == models.Siae.SOURCE_ASP and not obj.auth_email:
             messages.warning(
                 request,
-                "Cette structure mère ASP n'ayant pas d'email d'authentification il est impossible de s'y inscrire.",
+                (
+                    "Cette structure de source ASP n'ayant pas d'email "
+                    "d'authentification il est impossible de s'y inscrire."
+                ),
             )
 
         super().save_model(request, obj, form, change)

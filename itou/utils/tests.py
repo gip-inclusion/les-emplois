@@ -65,7 +65,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": True,
-                "user_siae_set": [siae],
+                "user_siaes": [siae],
                 "matomo_custom_variables": OrderedDict(
                     [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
                 ),
@@ -101,7 +101,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae3,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": False,
-                "user_siae_set": [siae1, siae2, siae3],
+                "user_siaes": [siae1, siae2, siae3],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -133,7 +133,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": None,
                 "user_is_prescriber_org_admin": True,
                 "user_is_siae_admin": False,
-                "user_siae_set": [],
+                "user_siaes": [],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
