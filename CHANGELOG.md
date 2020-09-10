@@ -2,7 +2,32 @@
 
 Toutes les modifications notables apportées au projet seront documentées dans ce fichier.
 
-Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet adhère au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html).
+Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2.
+
+## [2] - 2020-09-10
+
+### Ajouté
+- Mise en place d'une architecture de traitement asynchrone des tâches (avec Huey et Redis)
+- Import SIAE ASP avec 23 nouvelles structures et 4 structures réactivées
+- Ajout du champ SIRET dans le formulaire de modification des organisations de prescripteurs
+- Ajout du type EITI avec ses 5 structures
+- Limitation de la création d'antennes au même type et seulement dans les départements autorisés pour ce type (France entière ETTI, départements ouverts pour les autres)
+- Simplification de l'inscription des SIAE, on ne demande plus que le SIREN
+
+### Modifié
+- Remplacement du logo CIE par le logo du Ministère dans les attestations PDF (exemple)
+- Admin
+    - le SIRET des organisations de prescripteurs devient unique
+    - fix pour une erreur 500 quand l'email d'un utilisateur existe déjà
+    - élargissement des champs de recherche
+        - organisations de prescripteurs : recherche aussi dans "ville", "département", "code postal", "adresse"
+        - candidature : recherche aussi dans "émetteur de la candidature" (e-mail)
+        - SIAE : recherche aussi dans "département", "ville", "code postal", "adresse"
+    - affichage du champ CV dans l'admin des utilisateurs
+    - ajout de liens direct vers les SIAEs ou organisations de prescripteurs en bas de l'admin des utilisateurs
+    - nouveau filtre et lien direct pour trouver et délivrer des PASS IAE en attente de délivrance
+- On refuse les SIRET indiqués fermés par la base SIRENE lors de l'inscription des prescripteurs
+- Assouplissement des conséquences du déconventionnement d'une structure pendant un délai de grâce de 30 jours
 
 ## [1.1.0] - 2020-08-27
 
