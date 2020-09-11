@@ -143,24 +143,40 @@ DEPARTMENTS = {
 }
 
 
-# Ile-de-France - note that department 93 was already open.
-DEPARTMENTS_TO_OPEN_ON_14_04_2020 = ["75", "77", "78", "91", "92", "93", "94", "95"]
+DEPARTMENTS_TO_OPEN_ON_14_04_2020 = REGIONS["Île-de-France"]
 
-# Grand Est - note that department 67 was already open.
-DEPARTMENTS_TO_OPEN_ON_20_04_2020 = ["08", "10", "51", "52", "54", "55", "57", "67", "68", "88"]
+DEPARTMENTS_TO_OPEN_ON_20_04_2020 = REGIONS["Grand Est"]
 
-# Hauts-de-France - note that department 62 was already open.
-DEPARTMENTS_TO_OPEN_ON_27_04_2020 = ["02", "59", "60", "62", "80"]
+DEPARTMENTS_TO_OPEN_ON_27_04_2020 = REGIONS["Hauts-de-France"]
 
-# BFC - Bourgogne-Franche-Comté
-DEPARTMENTS_TO_OPEN_ON_22_06_2020 = ["21", "25", "39", "58", "70", "71", "89", "90"]
+DEPARTMENTS_TO_OPEN_ON_22_06_2020 = REGIONS["Bourgogne-Franche-Comté"]
 
-# ARA - Auvergne-Rhône-Alpes
-DEPARTMENTS_TO_OPEN_ON_29_06_2020 = ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"]
+DEPARTMENTS_TO_OPEN_ON_29_06_2020 = REGIONS["Auvergne-Rhône-Alpes"]
 
-# Corse + PACA - Provence-Alpes-Côte d'Azur
-DEPARTMENTS_TO_OPEN_ON_06_07_2020 = ["2A", "2B", "04", "05", "06", "13", "83", "84"]
+DEPARTMENTS_TO_OPEN_ON_06_07_2020 = REGIONS["Corse"] + REGIONS["Provence-Alpes-Côte d'Azur"]
 
+DEPARTMENTS_TO_OPEN_ON_14_09_2020 = REGIONS["Occitanie"]
+
+DEPARTMENTS_TO_OPEN_ON_21_09_2020 = REGIONS["Centre-Val de Loire"]
+
+DEPARTMENTS_TO_OPEN_ON_28_09_2020 = REGIONS["Nouvelle-Aquitaine"]
+
+DEPARTMENTS_TO_OPEN_ON_02_11_2020 = REGIONS["Bretagne"]
+
+# France Outre-Mer
+DEPARTMENTS_TO_OPEN_ON_09_11_2020 = (
+    REGIONS["Anciens territoires d'outre-mer"]
+    + REGIONS["Collectivités d'outre-mer"]
+    + REGIONS["Mayotte"]
+    + REGIONS["Martinique"]
+    + REGIONS["La Réunion"]
+    + REGIONS["Guyane"]
+    + REGIONS["Guadeloupe"]
+)
+
+DEPARTMENTS_TO_OPEN_ON_16_11_2020 = REGIONS["Pays de la Loire"]
+
+DEPARTMENTS_TO_OPEN_ON_23_11_2020 = REGIONS["Normandie"]
 
 DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES = (
     DEPARTMENTS_TO_OPEN_ON_14_04_2020
@@ -169,6 +185,13 @@ DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES = (
     + DEPARTMENTS_TO_OPEN_ON_22_06_2020
     + DEPARTMENTS_TO_OPEN_ON_29_06_2020
     + DEPARTMENTS_TO_OPEN_ON_06_07_2020
+    + DEPARTMENTS_TO_OPEN_ON_14_09_2020
+    # + DEPARTMENTS_TO_OPEN_ON_21_09_2020
+    # + DEPARTMENTS_TO_OPEN_ON_28_09_2020
+    # + DEPARTMENTS_TO_OPEN_ON_02_11_2020
+    # + DEPARTMENTS_TO_OPEN_ON_09_11_2020
+    # + DEPARTMENTS_TO_OPEN_ON_16_11_2020
+    # + DEPARTMENTS_TO_OPEN_ON_23_11_2020
 )
 
 
