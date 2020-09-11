@@ -21,12 +21,25 @@ from itou.utils.validators import validate_af_number, validate_convention_number
 
 class SiaeQuerySet(models.QuerySet):
     def active(self):
-        return self.filter(is_active=True)
+        # `~` means NOT, similarly to dataframes.
+        return self.select_related("convention").filter(
+            # GEIQ, EA... have no convention logic and thus are always active.
+            ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
+            # User created siaes and staff created siaes do not yet have convention logic.
+            | ~Q(source=Siae.SOURCE_ASP)
+            # A siae is active if and only if it has an active convention.
+            | Q(convention__is_active=True)
+        )
 
     def active_or_in_grace_period(self):
         now = timezone.now()
-        grace_period = timezone.timedelta(days=Siae.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
-        return self.filter(Q(is_active=True) | Q(deactivated_at__gte=now - grace_period))
+        grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        return self.select_related("convention").filter(
+            ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
+            | ~Q(source=Siae.SOURCE_ASP)
+            | Q(convention__is_active=True)
+            | Q(convention__deactivated_at__gte=now - grace_period)
+        )
 
     def within(self, point, distance_km):
         return (
@@ -126,10 +139,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
     ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
 
-    # When a siae is deactivated it still has a partial access to the platform
-    # during this grace period.
-    DEACTIVATION_GRACE_PERIOD_IN_DAYS = 30
-
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
@@ -139,55 +148,15 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
     email = models.EmailField(verbose_name=_("E-mail"), blank=True)
     # All siaes without any existing user require this auth_email
-    # for the siae secure signup process to even be possible.
+    # for the siae secure signup process to be possible.
     # Comes from external exports (ASP, GEIQ...)
     auth_email = models.EmailField(verbose_name=_("E-mail d'authentification"), blank=True)
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
 
-    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
-    # It is still there for now, kept in sync, but will eventually be deleted.
-    is_active = models.BooleanField(
-        verbose_name=_("Active"),
-        default=True,
-        help_text=_(
-            "Précise pour les SIAE si la structure a un "
-            "conventionnement valide à ce jour et pour les autres "
-            "types de structures si elle est autorisée à utiliser "
-            "la plateforme."
-        ),
-    )
-    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
-    # It is still there for now, kept in sync, but will eventually be deleted.
-    convention_end_date = models.DateTimeField(
-        verbose_name=_("Date de fin de conventionnement selon la DGEFP"), blank=True, null=True
-    )
-    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
-    # It is still there for now, kept in sync, but will eventually be deleted.
-    deactivated_at = models.DateTimeField(
-        verbose_name=_("Date de  désactivation et début de délai de grâce"), blank=True, null=True, db_index=True,
-    )
-    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
-    # It is still there for now, kept in sync, but will eventually be deleted.
-    reactivated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Réactivée manuellement par"),
-        related_name="reactivated_siae_set",
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-    )
-    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
-    # It is still there for now, kept in sync, but will eventually be deleted.
-    reactivated_at = models.DateTimeField(verbose_name=_("Date de réactivation manuelle"), blank=True, null=True)
-
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
-
-    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
-    # It is still there for now, kept in sync, but will eventually be deleted.
-    external_id = models.IntegerField(verbose_name=_("ID externe"), null=True, blank=True)
 
     jobs = models.ManyToManyField(
         "jobs.Appellation", verbose_name=_("Métiers"), through="SiaeJobDescription", blank=True
@@ -238,6 +207,22 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if self.brand:
             return self.brand
         return self.name.capitalize()
+
+    @property
+    def is_active(self):
+        if self.kind not in Siae.ELIGIBILITY_REQUIRED_KINDS:
+            # GEIQ, EA... have no convention logic and thus are always active.
+            return True
+        if self.source != Siae.SOURCE_ASP:
+            # User created siaes and staff created siaes do not yet have convention logic.
+            return True
+        return self.convention and self.convention.is_active
+
+    @property
+    def external_id(self):
+        if self.convention:
+            return self.convention.asp_id
+        return None
 
     @property
     def has_members(self):
@@ -341,7 +326,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def grace_period_end_date(self):
-        return self.deactivated_at + timezone.timedelta(days=Siae.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        return self.convention.deactivated_at + timezone.timedelta(
+            days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS
+        )
 
     @property
     def grace_period_has_expired(self):
@@ -413,6 +400,10 @@ class SiaeConvention(models.Model):
     A SiaeConvention has many SiaeFinancialAnnex related objects.
     """
 
+    # When a convention is deactivated its siaes still have a partial access
+    # to the platform during this grace period.
+    DEACTIVATION_GRACE_PERIOD_IN_DAYS = 30
+
     KIND_EI = "EI"
     KIND_AI = "AI"
     KIND_ACI = "ACI"
@@ -429,10 +420,7 @@ class SiaeConvention(models.Model):
 
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
     siret_signature = models.CharField(
-        verbose_name=_("Siret à la signature de la convention"),
-        max_length=14,
-        validators=[validate_siret],
-        db_index=True,
+        verbose_name=_("Siret à la signature"), max_length=14, validators=[validate_siret], db_index=True,
     )
     # Ideally convention.is_active would be a property and not a field.
     # However we have to live with the fact that some of ASP's data is
@@ -455,7 +443,7 @@ class SiaeConvention(models.Model):
     deactivated_at = models.DateTimeField(
         verbose_name=_("Date de  désactivation et début de délai de grâce"), blank=True, null=True, db_index=True,
     )
-    # When itou staff manually reactivates an inactive siae, store who did it and when.
+    # When itou staff manually reactivates an inactive convention, store who did it and when.
     reactivated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Réactivée manuellement par"),
@@ -494,6 +482,10 @@ class SiaeConvention(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    @property
+    def siren_signature(self):
+        return self.siret_signature[:9]
+
 
 class SiaeFinancialAnnex(models.Model):
     """
@@ -512,14 +504,14 @@ class SiaeFinancialAnnex(models.Model):
     STATE_REJECTED = "REJETE"
 
     STATE_CHOICES = (
-        (STATE_VALID, _("Valide")),
+        (STATE_VALID, _("Validée")),
         (STATE_PROVISIONAL, _("Provisoire (valide)")),
-        (STATE_ARCHIVED, _("Archivé (invalide)")),
-        (STATE_CANCELLED, _("Annulé")),
-        (STATE_ENTERED, _("Saisi (invalide)")),
+        (STATE_ARCHIVED, _("Archivée (invalide)")),
+        (STATE_CANCELLED, _("Annulée")),
+        (STATE_ENTERED, _("Saisie (invalide)")),
         (STATE_DRAFT, _("Brouillon (invalide)")),
-        (STATE_CLOSED, _("Cloturé (invalide)")),
-        (STATE_REJECTED, _("Rejeté")),
+        (STATE_CLOSED, _("Cloturée (invalide)")),
+        (STATE_REJECTED, _("Rejetée")),
     )
 
     STATES_ACTIVE = [STATE_VALID, STATE_PROVISIONAL]
@@ -557,3 +549,7 @@ class SiaeFinancialAnnex(models.Model):
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def is_active(self):
+        return self.state in SiaeFinancialAnnex.STATES_ACTIVE and self.end_at > timezone.now()

@@ -11,8 +11,7 @@ As a reminder, an external_id is not enough to uniquely identify an siae à la i
 since an ACI and an ETTI can share the same SIRET and the same external_id.
 
 When such an ACI and an ETTI share the same SIRET and the same external_id,
-they each have their own convention, their own financial annexes and
-thus their own convention end date.
+they each have their own convention and their own financial annexes.
 
 For convenience we systematically call such an (external_id, kind) identifier
 an "siae_key" throughout the import_siae.py script code.
@@ -168,9 +167,9 @@ AF_NUMBER_TO_ROW = get_af_number_to_row()
 
 def get_siae_key(siae):
     """
-    Each unique (external_id, kind) couple corresponds to a unique siae à la itou.
+    Each unique (asp_id, kind) couple corresponds to a unique siae à la itou.
     This key is important when using ASP exports.
-    External_id itself is not enough nor unique from our point of view.
+    Asp_id itself is not enough nor unique from our point of view.
 
     Input: siae is normally a siae, but can also be a dataframe row instead.
     """
@@ -197,11 +196,8 @@ def get_siae_key_to_convention_end_date():
     return siae_key_to_convention_end_date
 
 
-SIAE_KEY_TO_CONVENTION_END_DATE = get_siae_key_to_convention_end_date()
-
-
 ACTIVE_SIAE_KEYS = [
     siae_key
-    for siae_key, convention_end_date in SIAE_KEY_TO_CONVENTION_END_DATE.items()
+    for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
     if timezone.now() < convention_end_date
 ]

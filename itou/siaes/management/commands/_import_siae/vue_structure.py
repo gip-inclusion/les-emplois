@@ -95,6 +95,7 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
         validate_naf(row.naf)
         assert " " not in row.auth_email
         assert "@" in row.auth_email
+        assert row.siret[:9] == row.siret_signature[:9]
 
     return df
 
