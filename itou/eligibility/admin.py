@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.utils.formats import date_format
+from django.template.defaultfilters import date as date_filter
 from django.utils.translation import gettext as _
 
 from itou.eligibility import models
@@ -12,28 +12,54 @@ class AdministrativeCriteriaInline(admin.TabularInline):
     readonly_fields = ("created_at",)
 
 
+class IsValidFilter(admin.SimpleListFilter):
+    title = _("En cours de validité")
+    parameter_name = "is_valid"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.valid()
+        if value == "no":
+            return queryset.expired()
+        return queryset
+
+
 @admin.register(models.EligibilityDiagnosis)
 class EligibilityDiagnosisAdmin(admin.ModelAdmin):
-    list_display = ("pk", "job_seeker", "author", "author_kind", "created_at", "has_expired")
+    list_display = ("pk", "job_seeker", "author", "author_kind", "created_at", "is_valid", "expires_at")
     list_display_links = ("pk", "job_seeker")
-    list_filter = ("author_kind",)
+    list_filter = (IsValidFilter, "author_kind")
     raw_id_fields = ("job_seeker", "author", "author_siae", "author_prescriber_organization")
-    readonly_fields = ("created_at", "updated_at", "expires_at", "has_expired")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "expires_at",
+        "is_valid",
+        "is_considered_valid",
+    )
     search_fields = ("job_seeker__email", "author__email")
     inlines = (AdministrativeCriteriaInline,)
 
-    def has_expired(self, obj):
-        value = _("Non")
-        if obj.has_expired:
-            value = _("Oui")
-        return value
+    def is_valid(self, obj):
+        return obj.is_valid
 
-    has_expired.short_description = _("Expiré")
+    is_valid.boolean = True
+    is_valid.short_description = _("En cours de validité")
 
     def expires_at(self, obj):
-        return date_format(obj.expires_at)
+        return date_filter(obj.expires_at, "d F Y H:i")
 
     expires_at.short_description = _("Date d'expiration")
+
+    def is_considered_valid(self, obj):
+        return obj.is_considered_valid
+
+    is_considered_valid.boolean = True
+    is_considered_valid.short_description = _("Considéré valide car PASS IAE en cours")
 
 
 @admin.register(models.AdministrativeCriteria)
