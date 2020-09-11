@@ -24,7 +24,7 @@
         </div>
     {% endif %}
 
-    {% if not current_siae.is_active %}
+    {% if current_siae and not current_siae.is_active %}
         <div class="alert alert-warning" role="alert">
             {% blocktranslate with grace_period_end_date=current_siae.grace_period_end_date|date:"d F Y" %}
                 La DGEFP nous indique que votre structure n'est plus conventionnée.

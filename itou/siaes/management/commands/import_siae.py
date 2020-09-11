@@ -476,14 +476,12 @@ class Command(BaseCommand):
             siae.save()
 
     def deactivate_siae(self, siae):
-        pass
-        # We no longer deactivate any siae for now, only reactivate them,
-        # to avoid overriding reactivations made by support.
-        #
-        # if siae.is_active and not self.dry_run:
-        #     siae.is_active = False
-        #     siae.deactivated_at = timezone.now()
-        #     siae.save()
+        assert siae.is_active
+        if not self.dry_run:
+            siae.is_active = False
+            # This starts the grace period.
+            siae.deactivated_at = timezone.now()
+            siae.save()
 
     def manage_siae_activation(self):
         activations = 0
@@ -504,12 +502,15 @@ class Command(BaseCommand):
                     deletions += 1
                     continue
                 if siae.is_active:
+                    self.log(
+                        f"siae.id={siae.id} kind={siae.kind} name='{siae.display_name}' will be deactivated but has data"
+                    )
                     self.deactivate_siae(siae)
                     deactivations += 1
             active_until_updates += self.update_siae_active_until(siae)
 
         self.log(f"{deletions} siaes will be deleted as inactive and without data.")
-        self.log(f"{deactivations} siaes will be deactivated (NOT APPLIED AS OF NOW).")
+        self.log(f"{deactivations} siaes will be deactivated.")
         self.log(f"{activations} siaes will be activated.")
         self.log(f"{active_until_updates} siae.active_until fields will be updated.")
 
