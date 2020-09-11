@@ -1,3 +1,10 @@
+"""
+
+This script is still needed until we complete the national opening, end of November 2020.
+
+It does ressucitate GEIQ structures as well whereas `import_siae.py` doesn't.
+
+"""
 import json
 import os
 
@@ -13,7 +20,7 @@ JSON_FILE = f"{CURRENT_DIR}/data/deleted_siae.json"
 
 
 # Carefully pick your choice.
-DEPARTMENTS_TO_OPEN = departments.DEPARTMENTS_TO_OPEN_ON_06_07_2020
+DEPARTMENTS_TO_OPEN = departments.DEPARTMENTS_TO_OPEN_ON_14_09_2020
 
 
 class Command(BaseCommand):
