@@ -124,6 +124,7 @@ class CreateSiaeForm(forms.ModelForm):
             siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
             siae.created_by = request.user
             siae.source = Siae.SOURCE_USER_CREATED
+            siae.convention = self.current_siae.convention
             siae.save()
             membership = SiaeMembership()
             membership.user = request.user

@@ -16,7 +16,7 @@ from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_OPEN_FOR_NON
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_naf, validate_siret
+from itou.utils.validators import validate_af_number, validate_convention_number, validate_naf, validate_siret
 
 
 class SiaeQuerySet(models.QuerySet):
@@ -118,7 +118,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     SOURCE_CHOICES = (
         (SOURCE_ASP, _("Export ASP")),
         (SOURCE_GEIQ, _("Export GEIQ")),
-        (SOURCE_USER_CREATED, _("Utilisateur")),
+        (SOURCE_USER_CREATED, _("Utilisateur (Antenne)")),
         (SOURCE_STAFF_CREATED, _("Staff Itou")),
     )
 
@@ -145,9 +145,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
 
-    # An active structure means:
-    # - (for SIAE) it is authorized by ASP ("conventionnée" in French).
-    # - (for non SIAE) it is allowed to use the service.
+    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
+    # It is still there for now, kept in sync, but will eventually be deleted.
     is_active = models.BooleanField(
         verbose_name=_("Active"),
         default=True,
@@ -158,16 +157,18 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             "la plateforme."
         ),
     )
-    # This convention end date is only applicable to SIAE (ASP), not GEIQ etc.
-    # It can be either in the future or in the past.
+    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
+    # It is still there for now, kept in sync, but will eventually be deleted.
     convention_end_date = models.DateTimeField(
         verbose_name=_("Date de fin de conventionnement selon la DGEFP"), blank=True, null=True
     )
-    # Grace period starts from this date.
+    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
+    # It is still there for now, kept in sync, but will eventually be deleted.
     deactivated_at = models.DateTimeField(
         verbose_name=_("Date de  désactivation et début de délai de grâce"), blank=True, null=True, db_index=True,
     )
-    # When itou staff manually reactivates an inactive siae, store who did it and when.
+    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
+    # It is still there for now, kept in sync, but will eventually be deleted.
     reactivated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Réactivée manuellement par"),
@@ -176,19 +177,16 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         blank=True,
         on_delete=models.SET_NULL,
     )
+    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
+    # It is still there for now, kept in sync, but will eventually be deleted.
     reactivated_at = models.DateTimeField(verbose_name=_("Date de réactivation manuelle"), blank=True, null=True)
 
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
 
-    # In the case of exports from the ASP, this external_id is the internal ID of
-    # the siae objects in ASP's own database. These are supposed to never change,
-    # so as long as the ASP keeps including this field in all their exports,
-    # it will be easy for us to accurately match data between exports.
-    # Note that this external_id unicity is based on SIRET only.
-    # In other words, if an EI and a ACI share the same SIRET, they also
-    # share the same external_id in ASP's own database.
+    # *** THIS FIELD HAS BEEN MOVED TO CONVENTION ***
+    # It is still there for now, kept in sync, but will eventually be deleted.
     external_id = models.IntegerField(verbose_name=_("ID externe"), null=True, blank=True)
 
     jobs = models.ManyToManyField(
@@ -213,6 +211,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     block_job_applications = models.BooleanField(verbose_name=_("Blocage des candidatures"), default=False)
     job_applications_blocked_at = models.DateTimeField(
         verbose_name=_("Date du dernier blocage de candidatures"), blank=True, null=True
+    )
+
+    # A convention can only be deleted if it is no longer linked to any siae.
+    convention = models.ForeignKey(
+        "SiaeConvention", on_delete=models.RESTRICT, blank=True, null=True, related_name="siaes",
     )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
@@ -398,3 +401,129 @@ class SiaeJobDescription(models.Model):
 
     def get_absolute_url(self):
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
+
+
+class SiaeConvention(models.Model):
+    """
+    A SiaeConvention encapsulates the logic to decide whether a Siae is active.
+
+    Several siaes can share the same SiaeConvention, however there is always
+    exactly one and only one of them which has an ASP source.
+
+    A SiaeConvention has many SiaeFinancialAnnex related objects.
+    """
+
+    kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=Siae.KIND_CHOICES, default=Siae.KIND_EI)
+    siret_signature = models.CharField(
+        verbose_name=_("Siret à la signature de la convention"),
+        max_length=14,
+        validators=[validate_siret],
+        db_index=True,
+    )
+    is_active = models.BooleanField(
+        verbose_name=_("Active"),
+        default=True,
+        help_text=_(
+            "Précise si la convention est active c.a.d. si elle a au moins une annexe financière valide à ce jour."
+        ),
+        db_index=True,
+    )
+    # Grace period starts from this date.
+    deactivated_at = models.DateTimeField(
+        verbose_name=_("Date de  désactivation et début de délai de grâce"), blank=True, null=True, db_index=True,
+    )
+    # When itou staff manually reactivates an inactive siae, store who did it and when.
+    reactivated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Réactivée manuellement par"),
+        related_name="reactivated_siae_convention_set",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    reactivated_at = models.DateTimeField(verbose_name=_("Date de réactivation manuelle"), blank=True, null=True)
+
+    # External_id is the internal ID of the siae objects in ASP's own database.
+    # These are supposed to never change,
+    # so as long as the ASP keeps including this field in all their exports,
+    # it will be easy for us to accurately sync data between exports.
+    # Note that this external_id unicity is based on SIRET only.
+    # In other words, if an EI and a ACI share the same SIRET, they also
+    # share the same external_id in ASP's own database.
+    # In this example a single siae à la ASP corresponds to two siaes à la Itou.
+    external_id = models.IntegerField(verbose_name=_("ID externe"), null=True, blank=True, db_index=True,)
+
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+
+    class Meta:
+        verbose_name = _("Convention")
+        verbose_name_plural = _("Conventions")
+        unique_together = (
+            ("external_id", "kind"),
+            # Unfortunately the (siret_signature, kind) couple is not unique,
+            # as the two external_ids 2455 and 4281 share the same values.
+            # It is the only exception. Both structures are active.
+            # ("siret_signature", "kind"),
+        )
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+
+class SiaeFinancialAnnex(models.Model):
+    """
+    A SiaeFinancialAnnex allows us to know whether a convention and thus its siaes are active.
+
+    A SiaeFinancialAnnex is considered active if and only if it has an active stats and an end_date in the future.
+    """
+
+    STATE_VALID = "VALIDE"
+    STATE_PROVISIONAL = "PROVISOIRE"
+
+    ACTIVE_STATES = [STATE_VALID, STATE_PROVISIONAL]
+
+    STATE_ARCHIVED = "HISTORISE"
+    STATE_CANCELLED = "ANNULE"
+    STATE_ENTERED = "SAISI"
+    STATE_DRAFT = "BROUILLON"
+    STATE_CLOSED = "CLOTURE"
+    STATE_REJECTED = "REJETE"
+
+    INACTIVE_STATES = [STATE_ARCHIVED, STATE_CANCELLED, STATE_ENTERED, STATE_DRAFT, STATE_CLOSED, STATE_REJECTED]
+
+    ALL_STATES = ACTIVE_STATES + INACTIVE_STATES
+
+    STATE_CHOICES = ((state, state) for state in ALL_STATES)
+
+    number = models.CharField(
+        verbose_name=_("Numéro d'annexe financière"),
+        max_length=17,
+        validators=[validate_af_number],
+        unique=True,
+        db_index=True,
+    )
+    convention_number = models.CharField(
+        verbose_name=_("Numéro de convention"), max_length=19, validators=[validate_convention_number], db_index=True
+    )
+    state = models.CharField(verbose_name=_("Etat"), max_length=20, choices=STATE_CHOICES,)
+    start_at = models.DateTimeField(verbose_name=_("Date de début d'effet"))
+    end_at = models.DateTimeField(verbose_name=_("Date de fin d'effet"))
+
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+
+    # A financial annex cannot exist without a convention, and
+    # deleting a convention will delete all its financial annexes.
+    convention = models.ForeignKey("SiaeConvention", on_delete=models.CASCADE, related_name="financial_annexes",)
+
+    class Meta:
+        verbose_name = _("Annexe financière")
+        verbose_name_plural = _("Annexes financières")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
