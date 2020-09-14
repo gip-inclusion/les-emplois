@@ -255,6 +255,17 @@
             </div>
         {% endif %}
 
+        {% if user.is_sauron %}
+                <script src="https://stats.inclusion.beta.gouv.fr/app/iframeResizer.js"></script>
+
+                <iframe
+                    src="https://stats.inclusion.beta.gouv.fr/public/dashboard/f1527a13-1508-498d-8014-b2fe487a3a70"
+                    width="100%"
+                    onload="iFrameResize({}, this)"
+                    frameborder="0" >
+                </iframe>
+        {% endif %}
+
     </div>
 
 {% endblock %}
