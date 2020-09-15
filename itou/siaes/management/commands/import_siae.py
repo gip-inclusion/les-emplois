@@ -503,7 +503,8 @@ class Command(BaseCommand):
                     continue
                 if siae.is_active:
                     self.log(
-                        f"siae.id={siae.id} kind={siae.kind} name='{siae.display_name}' will be deactivated but has data"
+                        f"siae.id={siae.id} kind={siae.kind} name='{siae.display_name}' "
+                        f"will be deactivated but has data"
                     )
                     self.deactivate_siae(siae)
                     deactivations += 1
