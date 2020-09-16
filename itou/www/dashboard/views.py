@@ -1,3 +1,4 @@
+import jwt
 from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
@@ -136,11 +137,25 @@ def switch_siae(request):
     return HttpResponseRedirect(dashboard_url)
 
 
+# Embedding Metabase dashboard
+
+
+def _get_token(payload):
+    return jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256").decode("utf8")
+
+
 @login_required
 def is_sauron(request, template_name="stats/is_sauron.html"):
     """
     Redirect to reporting data
+
+    Dashboard can be included securely in the app via a signed URL
+    See an embedding sample at:
+    https://github.com/metabase/embedding-reference-apps/blob/master/django/embedded_analytics/user_stats/views.py
     """
-    context = {}
+    payload = {"resource": {"dashboard": 36}, "params": {}}
+    iframeurl = settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload)
+
+    context = {"iframeurl": iframeurl}
 
     return render(request, template_name, context)
