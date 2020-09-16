@@ -134,3 +134,13 @@ def switch_siae(request):
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
 
     return HttpResponseRedirect(dashboard_url)
+
+
+@login_required
+def is_sauron(request, template_name="stats/stats.html"):
+    """
+    Redirect to reporting data
+    """
+    context = {}
+
+    return render(request, template_name, context)
