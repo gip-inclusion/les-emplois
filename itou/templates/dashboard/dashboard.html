@@ -256,16 +256,16 @@
         {% endif %}
 
         {% if user.is_sauron %}
-        <div class="card">
-            <h5 class="card-header">{% translate "Pilotage" %}</h5>
-            <div class="card-body">
-                <p class="card-text">
+            <div class="card">
+                <h5 class="card-header">{% translate "Pilotage" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
                     {% include "includes/icon.html" with icon="activity" %}
                     <a href="{% url "dashboard:is_sauron" %}">{% translate "Voir les données de pilotage"%}</a>
-                </p>
+                    <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                    </p>
+                </div>
             </div>
-        </div>
-
         {% endif %}
 
     </div>
