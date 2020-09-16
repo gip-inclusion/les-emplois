@@ -137,7 +137,7 @@ def switch_siae(request):
 
 
 @login_required
-def is_sauron(request, template_name="stats/stats.html"):
+def is_sauron(request, template_name="stats/is_sauron.html"):
     """
     Redirect to reporting data
     """

@@ -54,3 +54,6 @@ xlrd==1.2.0  # https://pypi.org/project/xlrd/
 
 # Turn HTML files into PDF
 pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
+
+# Embedding Metabase signed dashboards
+PyJWT==1.7.1

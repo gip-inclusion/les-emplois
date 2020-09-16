@@ -10,4 +10,5 @@ urlpatterns = [
     path("", views.dashboard, name="index"),
     path("edit_user_info", views.edit_user_info, name="edit_user_info"),
     path("switch_siae", views.switch_siae, name="switch_siae"),
-    path("is_sauron", views.is_sauron, name="is_sauron"), ]
+    path("is_sauron", views.is_sauron, name="is_sauron"),
+]
