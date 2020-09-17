@@ -436,7 +436,7 @@ ANYMAIL = {
     "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
 }
 
-MAILJET_API_URL = "https://api.mailjet.com/v3"
+MAILJET_API_URL = "https://api.mailjet.com/v3.1"
 
 # Asynchronous email backend
 # EMAIL_BACKEND points to an async wrapper of a "real" email backend
