@@ -67,7 +67,7 @@ urlpatterns = [
     path("siae/", include("itou.www.siaes_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("signup/", include("itou.www.signup.urls")),
-    path("stats/", TemplateView.as_view(template_name="stats/stats.html"), name="stats"),
+    path("stats/", include("itou.www.stats.urls")),
 
     # Errors pages.
     path("403/", TemplateView.as_view(template_name="403.html"), name="403"),

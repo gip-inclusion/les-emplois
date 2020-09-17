@@ -80,6 +80,7 @@ LOCAL_APPS = [
     "itou.www.siaes_views",
     "itou.www.signup",
     "itou.www.invitations_views",
+    "itou.www.stats",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
