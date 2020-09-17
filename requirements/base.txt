@@ -14,7 +14,7 @@ django==3.1.1  # pyup: < 4.0  # https://www.djangoproject.com/
 django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
-django-anymail==7.2.1  # https://github.com/anymail/django-anymail
+django-anymail==8.0  # https://github.com/anymail/django-anymail
 
 # API Insee
 api-insee==1.5  # https://github.com/sne3ks/api_insee

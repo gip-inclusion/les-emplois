@@ -3,14 +3,6 @@
 /* Default Boostrap colors: */
 /* https://github.com/twbs/bootstrap/blob/master/dist/css/bootstrap.css#L7 */
 
-/* Add some Bootstrap colors available in SCSS as custom values. */
-/* Usage: var(--my-custom-value); */
-/* See https://developer.mozilla.org/en-US/docs/Web/CSS/--* */
-:root {
-    --gray-700: #495057;
-    --gray-900: #212529;
-}
-
 /* Layout.
 --------------------------------------------------------------------------- */
 
@@ -19,8 +11,7 @@ body {
 }
 
 html {
-    background: #343a40!important;
-    background: var(--gray-dark);
+    background: #f2f2f2;
 }
 
 .layout {
@@ -187,6 +178,30 @@ main.layout-section {
 
 }
 
+/* Footer.
+--------------------------------------------------------------------------- */
+
+footer {
+    background: #f2f2f2;
+}
+
+footer a {
+    text-decoration: underline;
+}
+
+footer a:focus,
+footer a:active,
+footer a:hover {
+    text-decoration: none;
+}
+
+footer img.footer-logo {
+    max-width: 140px;
+    max-height: 130px;
+    background: #fff;
+    margin: 0 0 20px 0;
+}
+
 /* Spacing.
 --------------------------------------------------------------------------- */
 
@@ -197,10 +212,6 @@ main.layout-section {
 .layout-content > .content-small {
     margin: 0 auto;
     max-width: 600px;
-}
-
-.layout-footer {
-    padding: 1.4rem 1rem;
 }
 
 /* Messages. */
@@ -281,20 +292,9 @@ body:after {
     }
 }
 
-.bg-gray-700 {
-    background-color: #495057; /* max-compatibility */
-    background-color: var(--gray-700);
-}
-
-.bg-gray-900 {
-    background-color: #212529; /* max-compatibility */
-    background-color: var(--gray-900);
-}
-
 a.disabled {
     cursor: not-allowed !important;
     color: #495057;
-    color: var(--gray-700);
 }
 
 a.disabled button, button.disabled {

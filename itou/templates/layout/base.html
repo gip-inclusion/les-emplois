@@ -167,55 +167,21 @@
 
         {% block content_full_viewport %}{% endblock %}
 
-        <footer class="layout-section text-light text-center text-sm-left">
-            <section class="layout layout-column-full bg-gray-700 text-light text-center">
-                <div class="layout-column-main py-3">
-                    <ul class="list-unstyled list-inline h6 mb-0 row">
-                        <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 text-sm-left">
-                            <a href="https://doc.inclusion.beta.gouv.fr/aide-et-support" target="_blank" class="text-reset">
-                                {% translate "Besoin d'aide ?" %}
-                            </a>
-                        <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
-                            <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" class="text-reset" target="_blank">
-                                {% translate "Inscription Newsletter" %}
-                            </a>
-                        </li>
-                        <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
-                            <a href="{% url 'stats' %}" class="text-reset">
-                                {% translate "Statistiques, lexiques et indicateurs" %}
-                            </a>
-                        </li>
-                        <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
-                            <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" class="text-reset" target="_blank">
-                                {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
-                            </a>
-                        </li>
-                        <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2">
-                            <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" class="text-reset" target="_blank">
-                                {% translate "Questions à la communauté" %}
-                            </a>
-                        </li>
-                        <li class="col-sm list-inline-item align-self-center py-1 py-sm-0 pl-2 text-sm-right">
-                            <a href="https://doc.inclusion.beta.gouv.fr/mentions/" class="text-reset" target="_blank">
-                                {% translate "Mentions légales" %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </section>
-
-            <section class="layout layout-column-full bg-dark">
+        <footer class="layout-section text-center text-sm-left">
+            <section class="layout layout-column-full border-top">
                 <div class="layout-column-main py-4">
-                    <div class="row align-items-center">
-                        <div class="col-4 col-sm-2">
-                            <img src="{% static 'img/logo_ministere_du_travail.svg' %}" class="w-sm-75 w-100 bg-white">
+                    <div class="row">
+
+                        <div class="col-sm-2">
+                            <img class="footer-logo" src="{% static 'img/logo_ministere_du_travail.svg' %}" alt="">
                         </div>
-                        <div class="col-8 col-sm-5">
+
+                        <div class="col-sm-4">
                             <p class="h5">
                                 <span class="font-weight-bold">inclusion</span><span>.beta.gouv.fr</span>
                             <p>
                                 <span class="d-block">
-                                    {% translate "Plateforme de l'inclusion en expérimentation" %}
+                                    {% blocktranslate %}Plateforme de l'inclusion <i>en expérimentation</i>{% endblocktranslate %}
                                 </span>
                             </p>
                             <p class="mb-0">
@@ -223,23 +189,60 @@
                             </p>
                             <ul class="list-unstyled">
                                 <li>
-                                    <a href="https://www.linkedin.com/company/la-plateforme-de-l-inclusion/" rel="noopener" target="_blank" class="text-white">
+                                    <a href="https://www.linkedin.com/company/la-plateforme-de-l-inclusion/" rel="noopener" target="_blank">
                                         {% include "includes/icon.html" with icon="linkedin" %}
                                         <small>LinkedIn</small>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank" class="text-white">
+                                    <a href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" rel="noopener" target="_blank">
                                         {% include "includes/icon.html" with icon="youtube" %}
                                         <small>YouTube</small>
                                     </a>
                                 </li>
                             </ul>
                         </div>
+
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled">
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/aide-et-support" rel="noopener" target="_blank">
+                                        {% translate "Besoin d'aide ?" %}
+                                    </a>
+                                <li>
+                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank">
+                                        {% translate "Inscription Newsletter" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'stats' %}">
+                                        {% translate "Statistiques, lexiques et indicateurs" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank">
+                                        {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" rel="noopener" target="_blank">
+                                        {% translate "Questions à la communauté" %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://doc.inclusion.beta.gouv.fr/mentions/" rel="noopener" target="_blank">
+                                        {% translate "Mentions légales" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
                     </div>
                 </div>
             </section>
+
         </footer>
+
     </div>
 
     <script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
