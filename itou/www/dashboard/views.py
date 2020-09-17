@@ -1,4 +1,5 @@
 import jwt
+import time
 from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
 from django.contrib import messages
@@ -138,7 +139,7 @@ def switch_siae(request):
 
 
 # Embedding Metabase dashboard
-
+# FIXME: put somewhere else
 
 def _get_token(payload):
     return jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256").decode("utf8")
@@ -153,7 +154,9 @@ def is_sauron(request, template_name="stats/is_sauron.html"):
     See an embedding sample at:
     https://github.com/metabase/embedding-reference-apps/blob/master/django/embedded_analytics/user_stats/views.py
     """
-    payload = {"resource": {"dashboard": 36}, "params": {}}
+    payload = {"resource": {"dashboard": 36},
+               "params": {},
+               "exp": round(time.time()) + (60 * 10)}
     iframeurl = settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload)
 
     context = {"iframeurl": iframeurl}
