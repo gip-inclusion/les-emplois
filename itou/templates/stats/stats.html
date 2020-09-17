@@ -1,11 +1,16 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
+{% load bootstrap4 %}
 {% load mathfilters %}
 {% load static %}
 
 {% block title %}{% translate "Statistiques" %}{{ block.super }}{% endblock %}
 
 {% block content %}
+
+    <h1>
+        {% translate "Page statistiques" %}
+    </h1>
 
     <script src="https://stats.inclusion.beta.gouv.fr/app/iframeResizer.js"></script>
 
