@@ -14,7 +14,7 @@ django==3.1.1  # pyup: < 4.0  # https://www.djangoproject.com/
 django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
-django-anymail==7.2.1  # https://github.com/anymail/django-anymail
+django-anymail==8.0  # https://github.com/anymail/django-anymail
 
 # API Insee
 api-insee==1.5  # https://github.com/sne3ks/api_insee
@@ -54,6 +54,11 @@ xlrd==1.2.0  # https://pypi.org/project/xlrd/
 
 # Turn HTML files into PDF
 pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
+
+# Huey for async processing
+# https://huey.readthedocs.io/en/latest/
+huey==2.3.0  # https://github.com/coleifer/huey
+redis==3.5.3  # https://github.com/andymccurdy/redis-py
 
 # Embedding Metabase signed dashboards
 PyJWT==1.7.1

@@ -15,13 +15,13 @@ from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.prescribers.factories import PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.www.signup.forms import PrescriberChooseKindForm, SelectSiaeForm
+from itou.www.signup.forms import PrescriberChooseKindForm
 
 
 class SignupTest(TestCase):
@@ -34,62 +34,6 @@ class SignupTest(TestCase):
         self.assertTemplateUsed(response, "signup/signup.html")
         response = self.client.post(ALLAUTH_SIGNUP_URL, data={"foo": "bar"})
         self.assertEqual(response.status_code, 405)
-
-
-class SiaeSignupFormTest(TestCase):
-    def test_select_siae_form_errors(self):
-        """
-        Test SelectSiaeForm errors.
-        """
-
-        # Missing email and SIRET.
-        post_data = {"kind": Siae.KIND_ACI}
-        form = SelectSiaeForm(data=post_data)
-        form.is_valid()
-        expected_error = _(
-            "Merci de renseigner l'e-mail utilisé par le référent technique ASP"
-            " ou un numéro de SIRET connu de nos services."
-        )
-        self.assertIn(expected_error, form.errors["__all__"])
-
-        # (email, kind) or (siret, kind) does not match any siae.
-        post_data = {"email": "daniela.doe@siae.com", "siret": "12345678901234", "kind": Siae.KIND_ACI}
-        form = SelectSiaeForm(data=post_data)
-        form.is_valid()
-        expected_error = _("Votre numéro de SIRET ou votre e-mail nous sont inconnus.")
-        self.assertTrue(form.errors["__all__"][0].startswith(expected_error))
-
-        # (email, kind) matches two siaes, (siret, kind) does not match any siae.
-        user_email = "emilie.doe@siae.com"
-        SiaeFactory.create_batch(2, kind=Siae.KIND_ACI, auth_email=user_email)
-        post_data = {"email": user_email, "siret": "12345678901234", "kind": Siae.KIND_ACI}
-        form = SelectSiaeForm(data=post_data)
-        form.is_valid()
-        expected_error = _("Votre e-mail est partagé par plusieurs structures")
-        self.assertTrue(form.errors["__all__"][0].startswith(expected_error))
-
-    def test_select_siae_form_priority(self):
-        """
-        Test SelectSiaeForm priority.
-        """
-
-        # Priority is given to SIRET match over email match.
-        user_email = "david.doe@siae.com"
-        siae1 = SiaeFactory(kind=Siae.KIND_ACI, auth_email=user_email)
-        siae2 = SiaeFactory(kind=Siae.KIND_ACI, auth_email=user_email)
-        siae3 = SiaeWithMembershipFactory(kind=Siae.KIND_ACI, siret="12345678901234")
-        post_data = {"email": user_email, "siret": siae3.siret, "kind": Siae.KIND_ACI}
-        form = SelectSiaeForm(data=post_data)
-        form.is_valid()
-        self.assertEqual(form.selected_siae, siae3)
-
-        # Priority is given to (siret, kind) when same SIRET is used for 2 SIAEs.
-        siae1 = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
-        siae2 = SiaeFactory(kind=Siae.KIND_ACI, siret=siae1.siret)  # noqa F841
-        post_data = {"email": user_email, "siret": siae1.siret, "kind": siae1.kind}
-        form = SelectSiaeForm(data=post_data)
-        form.is_valid()
-        self.assertEqual(form.selected_siae, siae1)
 
 
 class SiaeSignupTest(TestCase):
@@ -112,13 +56,18 @@ class SiaeSignupTest(TestCase):
         token = siae.get_token()
         with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
 
-            url = reverse("signup:select_siae")
+            url = reverse("signup:siae_select")
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-            # Find an SIAE: (siret, kind) matches one SIAE.
-            post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
-            response = self.client.post(url, data=post_data)
+            # Find an SIAE by SIREN.
+            response = self.client.get(url, {"siren": siae.siret[:9]})
+            self.assertEqual(response.status_code, 200)
+
+            # Choose an SIAE between results.
+            post_data = {"siaes": siae.pk}
+            # Pass `siren` in request.GET.
+            response = self.client.post(f"{url}?siren={siae.siret[:9]}", data=post_data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, "/")
 
@@ -135,7 +84,7 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(response.status_code, 200)
 
             # Create user.
-            url = reverse("signup:siae")
+            url = siae.signup_magic_link
             post_data = {
                 # Hidden fields.
                 "encoded_siae_id": siae.get_encoded_siae_id(),
@@ -183,7 +132,7 @@ class SiaeSignupTest(TestCase):
             response = self.client.get(magic_link, follow=True)
             redirect_url, status_code = response.redirect_chain[-1]
             self.assertEqual(status_code, 302)
-            next_url = reverse("signup:select_siae")
+            next_url = reverse("signup:siae_select")
             self.assertEqual(redirect_url, next_url)
             self.assertEqual(response.status_code, 200)
             expected_message = _(
@@ -206,76 +155,6 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(response.url, reverse("dashboard:index"))
             user_email = user.emailaddress_set.first()
             self.assertTrue(user_email.verified)
-
-    def test_join_an_siae_with_one_member(self):
-        """
-        A user joins an SIAE with an existing member.
-        """
-
-        user_first_name = "Jessica"  # noqa F841
-        user_email = "jessica.doe@siae.com"
-
-        siae = SiaeWithMembershipFactory(kind=Siae.KIND_ETTI)
-        self.assertEqual(1, siae.members.count())
-
-        token = siae.get_token()
-        with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
-
-            self.assertEqual(len(siae.active_admin_members), 1)
-
-            url = reverse("signup:select_siae")
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-
-            # Find an SIAE: (siret, kind) matches one SIAE.
-            post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
-            response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 302)
-            # Joining a structure with members is allowed only using the invitations feature.
-            self.assertRedirects(response, "/")
-
-    def test_cannot_join_an_inactive_siae(self):
-        """
-        A user cannot join an inactive SIAE.
-        """
-
-        user_first_name = "Judas"  # noqa F841
-        user_email = "judas.iscariot@siae.com"
-
-        siae = SiaeFactory(kind=Siae.KIND_ETTI, is_active=False)
-        self.assertEqual(0, siae.members.count())
-
-        token = siae.get_token()
-        with mock.patch("itou.utils.tokens.SiaeSignupTokenGenerator.make_token", return_value=token):
-
-            url = reverse("signup:select_siae")
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 200)
-
-            # Find an SIAE: (siret, kind) matches one SIAE.
-            post_data = {"email": user_email, "siret": siae.siret, "kind": siae.kind}
-            response = self.client.post(url, data=post_data)
-            self.assertEqual(response.status_code, 200)
-
-            expected_message = _("La structure que vous souhaitez rejoindre n'est plus active à ce jour.")
-            self.assertContains(response, expected_message)
-
-    def test_legacy_route(self):
-        """
-        Opening the old route without any magic link credentials
-        should nicely redirect the user to the correct signup url.
-        """
-        url = reverse("signup:siae")
-        response = self.client.get(url, follow=True)
-        redirect_url, status_code = response.redirect_chain[-1]
-        self.assertEqual(status_code, 302)
-        next_url = reverse("signup:select_siae")
-        self.assertEqual(redirect_url, next_url)
-        self.assertEqual(response.status_code, 200)
-        expected_message = _(
-            "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
-        )
-        self.assertContains(response, escape(expected_message))
 
 
 class JobSeekerSignupTest(TestCase):

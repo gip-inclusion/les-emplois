@@ -44,7 +44,7 @@
     "fields": {
       "level": "1",
       "name": "DETLD (+ 24 mois)",
-      "desc": "Demandeur d'emploi de très longue durée (inscrit à Pôle emploi)",
+      "desc": "Demandeur d'emploi de longue durée (inscrit à Pôle emploi)",
       "written_proof": "Attestation Pôle emploi",
       "written_proof_url": "",
       "ui_rank": 4,

@@ -13,7 +13,7 @@
                     <span class="d-block">{% translate "Vous êtes un employeur solidaire" %}</span>
                     <span class="d-block">{% translate "(SIAE, GEIQ, EA, ...)" %}</span>
                 </h5>
-                <a class="btn btn-primary" href="{% url 'signup:select_siae' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                <a class="btn btn-primary" href="{% url 'signup:siae_select' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     {% translate "Créer un compte" %}
                 </a>
             </div>

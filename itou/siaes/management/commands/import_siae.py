@@ -24,15 +24,6 @@ import pandas as pd
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from itou.job_applications.models import JobApplicationWorkflow
-from itou.siaes.management.commands.import_deleted_siae import (
-    DEPARTMENTS_TO_OPEN_ON_06_07_2020,
-    DEPARTMENTS_TO_OPEN_ON_14_04_2020,
-    DEPARTMENTS_TO_OPEN_ON_20_04_2020,
-    DEPARTMENTS_TO_OPEN_ON_22_06_2020,
-    DEPARTMENTS_TO_OPEN_ON_27_04_2020,
-    DEPARTMENTS_TO_OPEN_ON_29_06_2020,
-)
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -40,24 +31,11 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_27072020_122717.csv"
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_07092020_074725.csv"
 
-SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_07_24_siae_auth_email_and_external_id.csv"
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/Liste correspondants techniques SIAE 28 08 2020.xlsx"
 
-VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/2020_06_30_fluxIAE_AnnexeFinanciere_29062020_063002.csv"
-
-# ETTI are deployed all over France without restriction.
-SIAE_CREATION_ALLOWED_KINDS = [Siae.KIND_ETTI]
-
-# For other kinds of siaes, only some regions are deployed.
-SIAE_CREATION_ALLOWED_DEPARTMENTS = (
-    DEPARTMENTS_TO_OPEN_ON_14_04_2020
-    + DEPARTMENTS_TO_OPEN_ON_20_04_2020
-    + DEPARTMENTS_TO_OPEN_ON_27_04_2020
-    + DEPARTMENTS_TO_OPEN_ON_22_06_2020
-    + DEPARTMENTS_TO_OPEN_ON_29_06_2020
-    + DEPARTMENTS_TO_OPEN_ON_06_07_2020
-)
+VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_AnnexeFinanciere_07092020_063002.csv"
 
 # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
 # This score is arbitrarily set based on general observation.
@@ -91,6 +69,14 @@ def get_main_df(filename=MAIN_DATASET_FILENAME):
             "structure_adresse_gestion_cp": str,
             "structure_adresse_gestion_telephone": str,
         },
+        # First and last rows of CSV are weird markers.
+        # Example of first row: DEBStructure31082020_074706
+        # Example of last row: FIN4311
+        # Let's ignore them.
+        skiprows=1,
+        skipfooter=1,
+        # Fix warning caused by using `skipfooter`.
+        engine="python",
     )
 
     df.rename(
@@ -191,17 +177,33 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     - auth_email
     When joined with the first dataset, it somehow constitutes a complete dataset.
     """
-    df = pd.read_csv(filename, converters={"siret": str, "auth_email": str}, sep=",")
+    df = pd.read_excel(filename, converters={"SIRET": str, "Adresse e-mail": str})
+
+    df.rename(
+        columns={
+            "ID Structure": "external_id",
+            "SIRET": "siret",
+            "Dénomination": "name",
+            "Correspondant technique": "auth_username",
+            "Mesure": "kind",
+            "Droit Commun / Milieu Pénitentiaire": "dc_or_mp",
+            "Adresse e-mail": "auth_email",
+        },
+        inplace=True,
+    )
+
+    # Delete irrelevant columns.
+    del df["siret"]
+    del df["name"]
+    del df["auth_username"]
+    del df["dc_or_mp"]
+    assert list(df.columns) == ["external_id", "kind", "auth_email"]
 
     # Filter out rows with irrelevant data.
     df = df[df.kind != "FDI"]
-    df = df[df.auth_email != "#N/A"]
 
-    # Delete superseded siret field to avoid confusion.
-    del df["siret"]
-
-    # Delete unused field to avoid confusion.
-    del df["name"]
+    # Drop rows with missing values (auth_email mainly).
+    df = df.dropna()
 
     # Remove useless suffixes used by ASP.
     df["kind"] = df["kind"].str.replace("_DC", "")
@@ -213,9 +215,6 @@ def get_secondary_df(filename=SECONDARY_DATASET_FILENAME):
     for email in df.auth_email:
         assert " " not in email
         assert "@" in email
-
-    # Replace NaN elements with None.
-    df = df.replace({np.nan: None})
 
     return df
 
@@ -245,8 +244,16 @@ def get_vue_af_df(filename=VUE_AF_DATASET_FILENAME):
         filename,
         sep="|",
         parse_dates=["af_date_fin_effet"],
-        # Fix `DtypeWarning: Columns (84,86) have mixed types.` warning.
-        low_memory=False,
+        # First and last rows of CSV are weird markers.
+        # Example of first row: `DEBAnnexeFinanciere31082020_063002`
+        # Example of last row: `FIN34003|||||||||||||||`
+        # Let's ignore them.
+        skiprows=1,
+        skipfooter=1,
+        # Fix warning caused by using `skipfooter`.
+        engine="python",
+        # Fix `_csv.Error: line contains NULL byte` error.
+        encoding="utf-16",
     )
 
     df.rename(
@@ -305,11 +312,7 @@ VALID_EXTERNAL_IDS = [
 
 
 def should_siae_be_created(siae):
-    if siae.external_id not in VALID_EXTERNAL_IDS:
-        return False
-    if siae.kind in SIAE_CREATION_ALLOWED_KINDS:
-        return True
-    return siae.department in SIAE_CREATION_ALLOWED_DEPARTMENTS
+    return siae.external_id in VALID_EXTERNAL_IDS and siae.is_in_open_department
 
 
 class Command(BaseCommand):
@@ -473,48 +476,17 @@ class Command(BaseCommand):
             siae.save()
 
     def deactivate_siae(self, siae):
-        pass
-        # We no longer deactivate any siae for now, only reactivate them,
-        # to avoid overriding reactivations made by support.
-        #
-        # if not self.dry_run:
-        #     siae.is_active = False
-        #     siae.save()
-
-    def reject_pending_job_applications(self, siae):
-        """
-        Refusing pending job applications will be done at a later step
-        since it is not easy to rollback. We only deactivate siaes
-        for this step, which is very easy to rollback,
-        let's first see whether support is overwhelmed.
-        """
-        pending_job_applications = siae.job_applications_received.filter(
-            state__in=[
-                JobApplicationWorkflow.STATE_NEW,
-                JobApplicationWorkflow.STATE_PROCESSING,
-                JobApplicationWorkflow.STATE_POSTPONED,
-            ]
-        )
-        for ja in pending_job_applications:
-            pass
-            # We are not confident enough yet about deactivations
-            # to refuse all pending job applications for real.
-            #
-            # if not self.dry_run:
-            #     if ja.state == JobApplicationWorkflow.STATE_NEW:
-            #         ja.process()
-            #     ja.refusal_reason = JobApplication.REFUSAL_REASON_DEACTIVATION
-            #     # An email will be sent to the job seeker and its prescriber.
-            #     ja.refuse()
-            #     # FIXME Maybe we should throttle sending so many emails
-            #     # at the same time? Like sleep 1 second between each.
-        return len(pending_job_applications)
+        assert siae.is_active
+        if not self.dry_run:
+            siae.is_active = False
+            # This starts the grace period.
+            siae.deactivated_at = timezone.now()
+            siae.save()
 
     def manage_siae_activation(self):
         activations = 0
         deactivations = 0
         deletions = 0
-        refused_job_applications = 0
         active_until_updates = 0
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP):
             siae_is_valid = siae.external_id in VALID_EXTERNAL_IDS
@@ -530,15 +502,17 @@ class Command(BaseCommand):
                     deletions += 1
                     continue
                 if siae.is_active:
+                    self.log(
+                        f"siae.id={siae.id} kind={siae.kind} name='{siae.display_name}' "
+                        f"will be deactivated but has data"
+                    )
                     self.deactivate_siae(siae)
                     deactivations += 1
-                refused_job_applications += self.reject_pending_job_applications(siae)
             active_until_updates += self.update_siae_active_until(siae)
 
         self.log(f"{deletions} siaes will be deleted as inactive and without data.")
-        self.log(f"{deactivations} siaes will be deactivated (NOT APPLIED AS OF NOW).")
+        self.log(f"{deactivations} siaes will be deactivated.")
         self.log(f"{activations} siaes will be activated.")
-        self.log(f"{refused_job_applications} job applications will be refused (NOT APPLIED AS OF NOW).")
         self.log(f"{active_until_updates} siae.active_until fields will be updated.")
 
         # FIXME deactivate children as well - will be done at a later step.
@@ -585,7 +559,8 @@ class Command(BaseCommand):
         siae.name = main_df_row["name"]
 
         siae.phone = main_df_row["phone"]
-        if len(siae.phone) != 10:  # As we have faulty 9 digits phones.
+        phone_is_valid = siae.phone and len(siae.phone) == 10
+        if not phone_is_valid:
             siae.phone = ""  # siae.phone cannot be null in db
 
         siae.email = ""  # Do not make the authentification email public!

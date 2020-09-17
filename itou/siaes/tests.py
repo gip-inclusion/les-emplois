@@ -5,7 +5,9 @@ from django.core import mail
 from django.test import RequestFactory, TestCase
 
 from itou.siaes.factories import (
+    SiaeAfterGracePeriodFactory,
     SiaeFactory,
+    SiaePendingGracePeriodFactory,
     SiaeWith2MembershipsFactory,
     SiaeWith4MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
@@ -48,6 +50,11 @@ class FactoriesTest(TestCase):
 
 
 class ModelTest(TestCase):
+    def test_siren_and_nic(self):
+        siae = SiaeFactory(siret="12345678900001")
+        self.assertEqual(siae.siren, "123456789")
+        self.assertEqual(siae.siret_nic, "00001")
+
     def test_is_subject_to_eligibility_rules(self):
         siae = SiaeFactory(kind=Siae.KIND_GEIQ)
         self.assertFalse(siae.is_subject_to_eligibility_rules)
@@ -160,3 +167,25 @@ class ModelTest(TestCase):
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
+
+    def test_deactivation_queryset_methods(self):
+        siae = SiaeFactory()
+        self.assertEqual(Siae.objects.count(), 1)
+        self.assertEqual(Siae.objects.active().count(), 1)
+        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
+        siae.delete()
+        self.assertEqual(Siae.objects.count(), 0)
+
+        siae = SiaePendingGracePeriodFactory()
+        self.assertEqual(Siae.objects.count(), 1)
+        self.assertEqual(Siae.objects.active().count(), 0)
+        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
+        siae.delete()
+        self.assertEqual(Siae.objects.count(), 0)
+
+        siae = SiaeAfterGracePeriodFactory()
+        self.assertEqual(Siae.objects.count(), 1)
+        self.assertEqual(Siae.objects.active().count(), 0)
+        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 0)
+        siae.delete()
+        self.assertEqual(Siae.objects.count(), 0)

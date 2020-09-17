@@ -14,6 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.models import Siae
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.urls import get_safe_url
 from itou.www.signup import forms
@@ -42,47 +43,78 @@ def signup(request, template_name="signup/signup.html", redirect_field_name="nex
     return render(request, template_name, context)
 
 
-def select_siae(request, template_name="signup/signup_select_siae.html"):
+class JobSeekerSignupView(SignupView):
+
+    form_class = forms.JobSeekerSignupForm
+    template_name = "signup/job_seeker_signup.html"
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        """Enforce atomicity."""
+        return super().post(request, *args, **kwargs)
+
+
+# SIAEs signup.
+# ------------------------------------------------------------------------------------------
+
+
+def siae_select(request, template_name="signup/siae_select.html"):
     """
-    Select an existing SIAE (Agence / Etablissement in French) to join.
-    This is the first of the two forms of the siae signup process.
+    Entry point of the signup process for SIAEs which consists of 2 steps.
+
+    The user is asked to select an SIAE based on a selection that match a given SIREN number.
     """
-    form = forms.SelectSiaeForm(data=request.POST or None)
 
-    if request.method == "POST" and form.is_valid():
-        siae = form.selected_siae
+    siaes_without_members = None
+    siaes_with_members = None
 
-        if siae.has_members:
-            message = _(
-                "Cette structure a déjà des membres. Pour des raisons de sécurité, "
-                "merci de contacter les autres membres afin qu'ils vous invitent."
-            )
-            messages.warning(request, message)
-        else:
-            siae.new_signup_activation_email_to_official_contact(request).send()
-            message = _(
-                f"Nous venons de vous envoyer un e-mail à l'adresse {siae.obfuscated_auth_email} "
-                f"pour continuer votre inscription. Veuillez consulter votre boite "
-                f"de réception."
-            )
-            messages.success(request, message)
-        return HttpResponseRedirect("/")
+    next_url = get_safe_url(request, "next")
 
-    context = {"form": form}
+    siren_form = forms.SiaeSearchBySirenForm(data=request.GET or None)
+    siae_select_form = None
+
+    # The SIREN, when available, is always passed in the querystring.
+    if request.method in ["GET", "POST"] and siren_form.is_valid():
+        # Make sure to look only for active structures.
+        siaes_for_siren = Siae.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"])
+        # A user cannot join structures that already have members.
+        # Show these structures in the template to make that clear.
+        siaes_with_members = siaes_for_siren.exclude(members=None)
+        siaes_without_members = siaes_for_siren.filter(members=None)
+        siae_select_form = forms.SiaeSelectForm(data=request.POST or None, siaes=siaes_without_members)
+
+    if request.method == "POST" and siae_select_form and siae_select_form.is_valid():
+        siae_selected = siae_select_form.cleaned_data["siaes"]
+        siae_selected.new_signup_activation_email_to_official_contact(request).send()
+        message = _(
+            f"Nous venons d'envoyer un e-mail à l'adresse {siae_selected.obfuscated_auth_email} "
+            f"pour continuer votre inscription. Veuillez consulter votre boite "
+            f"de réception."
+        )
+        messages.success(request, message)
+        return HttpResponseRedirect(next_url or "/")
+
+    context = {
+        "DOC_OPENING_SCHEDULE_URL": settings.ITOU_DOC_OPENING_SCHEDULE_URL,
+        "next_url": next_url,
+        "siaes_without_members": siaes_without_members,
+        "siaes_with_members": siaes_with_members,
+        "siae_select_form": siae_select_form,
+        "siren_form": siren_form,
+    }
     return render(request, template_name, context)
-
-
-def redirect_to_select_siae_form(request):
-    messages.warning(
-        request, _("Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription.")
-    )
-    return HttpResponseRedirect(reverse("signup:select_siae"))
 
 
 class SiaeSignupView(SignupView):
 
     form_class = forms.SiaeSignupForm
-    template_name = "signup/signup_siae.html"
+    template_name = "signup/siae_signup.html"
+
+    def warn_and_redirect(self, request):
+        messages.warning(
+            request, _("Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.")
+        )
+        return HttpResponseRedirect(reverse("signup:siae_select"))
 
     def get(self, request, *args, **kwargs):
         form = forms.SiaeSignupForm(
@@ -91,7 +123,7 @@ class SiaeSignupView(SignupView):
         if form.check_siae_signup_credentials():
             self.initial = form.get_initial()
             return super().get(request, *args, **kwargs)
-        return redirect_to_select_siae_form(request)
+        return self.warn_and_redirect(request)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -100,18 +132,7 @@ class SiaeSignupView(SignupView):
         if form.check_siae_signup_credentials():
             self.initial = form.get_initial()
             return super().post(request, *args, **kwargs)
-        return redirect_to_select_siae_form(request)
-
-
-class JobSeekerSignupView(SignupView):
-
-    form_class = forms.JobSeekerSignupForm
-    template_name = "signup/signup_job_seeker.html"
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        """Enforce atomicity."""
-        return super().post(request, *args, **kwargs)
+        return self.warn_and_redirect(request)
 
 
 # Prescribers signup.
@@ -426,7 +447,7 @@ class PrescriberUserSignupView(SignupView):
     """
 
     form_class = forms.PrescriberUserSignupForm
-    template_name = "signup/prescriber_user.html"
+    template_name = "signup/prescriber_signup.html"
 
     @transaction.atomic
     @method_decorator(valid_prescriber_signup_session_required)

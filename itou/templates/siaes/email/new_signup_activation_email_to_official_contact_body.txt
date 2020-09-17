@@ -20,6 +20,6 @@
 
 {% translate "Cet e-mail a été envoyé à" %}
 {{ siae.auth_email }}
-{% translate "adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (ASP, GEIQ...)." %}
+{% translate "adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (extranet IAE 2.0 de l'ASP, GEIQ...)." %}
 
 {% endblock body %}

@@ -3,6 +3,8 @@ from allauth.socialaccount.models import SocialAccount
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberMembership
@@ -14,21 +16,28 @@ class SiaeMembershipInline(admin.TabularInline):
     model = SiaeMembership
     extra = 0
     raw_id_fields = ("siae",)
-    readonly_fields = ("siae", "siae_id", "joined_at", "is_siae_admin")
+    readonly_fields = ("siae", "siae_id_link", "joined_at", "is_siae_admin")
     can_delete = False
+    show_change_link = True
 
     def has_change_permission(self, request, obj=None):
         return False
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    def siae_id_link(self, obj):
+        app_label = obj.organization._meta.app_label
+        model_name = obj.organization._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.siae_id])
+        return mark_safe(f'<a href="{url}">{obj.organization_id}</a>')
 
 
 class PrescriberMembershipInline(admin.TabularInline):
     model = PrescriberMembership
     extra = 0
     raw_id_fields = ("organization",)
-    readonly_fields = ("organization", "organization_id", "joined_at", "is_admin")
+    readonly_fields = ("organization", "organization_id_link", "joined_at", "is_admin")
     can_delete = False
 
     def has_change_permission(self, request, obj=None):
@@ -36,6 +45,12 @@ class PrescriberMembershipInline(admin.TabularInline):
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    def organization_id_link(self, obj):
+        app_label = obj.organization._meta.app_label
+        model_name = obj.organization._meta.model_name
+        url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.organization_id])
+        return mark_safe(f'<a href="{url}">{obj.organization_id}</a>')
 
 
 class KindFilter(admin.SimpleListFilter):
@@ -91,6 +106,7 @@ class ItouUserAdmin(UserAdmin):
                 "fields": (
                     "birthdate",
                     "phone",
+                    "resume_link",
                     "address_line_1",
                     "address_line_2",
                     "post_code",

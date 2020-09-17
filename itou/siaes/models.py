@@ -5,13 +5,14 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import F, Prefetch
+from django.db.models import F, Prefetch, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
+from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
@@ -19,6 +20,14 @@ from itou.utils.validators import validate_naf, validate_siret
 
 
 class SiaeQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def active_or_in_grace_period(self):
+        now = timezone.now()
+        grace_period = timezone.timedelta(days=Siae.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        return self.filter(Q(is_active=True) | Q(deactivated_at__gte=now - grace_period))
+
     def within(self, point, distance_km):
         return (
             self.filter(coords__distance_lte=(point, D(km=distance_km)))
@@ -72,11 +81,6 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(shuffled_rank=shuffle_expression)
 
 
-class ActiveSiaeManager(models.Manager.from_queryset(SiaeQuerySet)):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_active=True)
-
-
 class Siae(AddressMixin):  # Do not forget the mixin!
     """
     Structures d'insertion par l'activité économique.
@@ -122,6 +126,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
     ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
 
+    # When a siae is deactivated it still has a partial access to the platform
+    # during this grace period.
+    DEACTIVATION_GRACE_PERIOD_IN_DAYS = 30
+
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
@@ -150,25 +158,30 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             "la plateforme."
         ),
     )
-    # This deactivation date is not enforced and only stored for
-    # information, for admin and/or metabase uses.
-    active_until = models.DateTimeField(verbose_name=_("Date de désactivation"), blank=True, null=True)
+    # This convention end date is only stored for information, for admin and/or metabase uses.
+    # It can be either in the future or in the past.
+    active_until = models.DateTimeField(
+        verbose_name=_("Date de fin de conventionnement selon la DGEFP"), blank=True, null=True
+    )
+    # Grace period starts from this date.
+    deactivated_at = models.DateTimeField(
+        verbose_name=_("Date de  désactivation et début de délai de grâce"), blank=True, null=True, db_index=True,
+    )
     # When itou staff manually reactivates an inactive siae, store who did it and when.
     reactivated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Réactivée manuellement en dernier par"),
+        verbose_name=_("Réactivée manuellement par"),
         related_name="reactivated_siae_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
-    reactivated_at = models.DateTimeField(
-        verbose_name=_("Date de dernière réactivation manuelle"), blank=True, null=True
-    )
+    reactivated_at = models.DateTimeField(verbose_name=_("Date de réactivation manuelle"), blank=True, null=True)
 
     source = models.CharField(
         verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
+
     # In the case of exports from the ASP, this external_id is the internal ID of
     # the siae objects in ASP's own database. These are supposed to never change,
     # so as long as the ASP keeps including this field in all their exports,
@@ -203,7 +216,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
-    active = ActiveSiaeManager()
 
     class Meta:
         verbose_name = _("Structure d'insertion par l'activité économique")
@@ -251,6 +263,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def siren(self):
         return self.siret[:9]
+
+    @property
+    def siret_nic(self):
+        """
+        The second part of SIRET is called the NIC (numéro interne de classement).
+        https://www.insee.fr/fr/metadonnees/definition/c1981
+        """
+        return self.siret[9:14]
 
     @property
     def is_subject_to_eligibility_rules(self):
@@ -305,6 +325,24 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         subject = "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def open_departments(self):
+        if self.kind == self.KIND_ETTI:
+            return DEPARTMENTS
+        return {dpt: DEPARTMENTS[dpt] for dpt in sorted(DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES)}
+
+    @property
+    def is_in_open_department(self):
+        return self.department in self.open_departments
+
+    @property
+    def grace_period_end_date(self):
+        return self.deactivated_at + timezone.timedelta(days=Siae.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+
+    @property
+    def grace_period_has_expired(self):
+        return not self.is_active and timezone.now() > self.grace_period_end_date
 
 
 class SiaeMembership(models.Model):

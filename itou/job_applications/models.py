@@ -110,6 +110,16 @@ class JobApplicationQuerySet(models.QuerySet):
         past_dt = timezone.now() - timezone.timedelta(hours=hours)
         return self.filter(created_at__gte=past_dt)
 
+    def manual_approval_delivery_required(self):
+        """
+        Returns objects that require a manual PASS IAE delivery.
+        """
+        return self.filter(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+            approval_number_sent_by_email=False,
+        )
+
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """
@@ -306,6 +316,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
             and not self.job_seeker.has_valid_eligibility_diagnosis
+        )
+
+    @property
+    def manual_approval_delivery_required(self):
+        """
+        Returns True if the current instance require a manual PASS IAE delivery, False otherwise.
+        """
+        return (
+            self.state.is_accepted
+            and self.approval_delivery_mode == self.APPROVAL_DELIVERY_MODE_MANUAL
+            and not self.approval_number_sent_by_email
         )
 
     @property

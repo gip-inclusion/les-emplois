@@ -36,6 +36,7 @@ from itou.utils.validators import (
     validate_naf,
     validate_pole_emploi_id,
     validate_post_code,
+    validate_siren,
     validate_siret,
 )
 
@@ -64,7 +65,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": True,
-                "user_siae_set": [siae],
+                "user_siaes": [siae],
                 "matomo_custom_variables": OrderedDict(
                     [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
                 ),
@@ -100,7 +101,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae3,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": False,
-                "user_siae_set": [siae1, siae2, siae3],
+                "user_siaes": [siae1, siae2, siae3],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -132,7 +133,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": None,
                 "user_is_prescriber_org_admin": True,
                 "user_is_siae_admin": False,
-                "user_siae_set": [],
+                "user_siaes": [],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -286,6 +287,13 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_naf, "abcde")
         self.assertRaises(ValidationError, validate_naf, "1245789871")
         validate_naf("6201Z")
+
+    def test_validate_siren(self):
+        self.assertRaises(ValidationError, validate_siren, "12000015")
+        self.assertRaises(ValidationError, validate_siren, "1200001531")
+        self.assertRaises(ValidationError, validate_siren, "12000015a")
+        self.assertRaises(ValidationError, validate_siren, "azertyqwe")
+        validate_siren("120000153")
 
     def test_validate_siret(self):
         self.assertRaises(ValidationError, validate_siret, "1200001530001")
@@ -610,3 +618,4 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.address_line_2, "22-24")
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
+        self.assertFalse(etablissement.is_closed)

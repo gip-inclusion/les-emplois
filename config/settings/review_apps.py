@@ -20,6 +20,9 @@ ITOU_FQDN = os.environ.get("DEPLOY_URL", "staging.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 
+# Use a sync email backend.
+EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+
 sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 SHOW_TEST_ACCOUNTS_BANNER = True

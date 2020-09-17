@@ -129,7 +129,7 @@ def switch_siae(request):
     dashboard_url = reverse_lazy("dashboard:index")
 
     pk = request.POST["siae_id"]
-    queryset = Siae.objects.member_required(request.user)
+    queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
 

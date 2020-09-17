@@ -1,35 +1,26 @@
+"""
+
+This script is still needed until we complete the national opening, end of November 2020.
+
+It does ressucitate GEIQ structures as well whereas `import_siae.py` doesn't.
+
+"""
 import json
 import os
 
 from django.core.management.base import BaseCommand
 
 from itou.siaes.models import Siae
+from itou.utils.address import departments
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 JSON_FILE = f"{CURRENT_DIR}/data/deleted_siae.json"
 
-# Ile-de-France - note that department 93 was already open.
-DEPARTMENTS_TO_OPEN_ON_14_04_2020 = ["75", "77", "78", "91", "92", "93", "94", "95"]
-
-# Grand Est - note that department 67 was already open.
-DEPARTMENTS_TO_OPEN_ON_20_04_2020 = ["08", "10", "51", "52", "54", "55", "57", "67", "68", "88"]
-
-# Hauts-de-France - note that department 62 was already open.
-DEPARTMENTS_TO_OPEN_ON_27_04_2020 = ["02", "59", "60", "62", "80"]
-
-# BFC - Bourgogne-Franche-Comté
-DEPARTMENTS_TO_OPEN_ON_22_06_2020 = ["21", "25", "39", "58", "70", "71", "89", "90"]
-
-# ARA - Auvergne-Rhône-Alpes
-DEPARTMENTS_TO_OPEN_ON_29_06_2020 = ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"]
-
-# Corse + PACA - Provence-Alpes-Côte d'Azur
-DEPARTMENTS_TO_OPEN_ON_06_07_2020 = ["2A", "2B", "04", "05", "06", "13", "83", "84"]
 
 # Carefully pick your choice.
-DEPARTMENTS_TO_OPEN = DEPARTMENTS_TO_OPEN_ON_06_07_2020
+DEPARTMENTS_TO_OPEN = departments.DEPARTMENTS_TO_OPEN_ON_14_09_2020
 
 
 class Command(BaseCommand):

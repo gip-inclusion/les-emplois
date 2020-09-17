@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -100,14 +101,16 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 @login_required
 def create_siae(request, template_name="siaes/create_siae.html"):
     """
-    Create a new SIAE (Agence / Etablissement in French).
+    Create a new SIAE (Antenne in French).
     """
     current_siae = get_current_siae_or_404(request)
+    if not current_siae.is_active:
+        raise PermissionDenied
     form = CreateSiaeForm(
         current_siae=current_siae,
         current_user=request.user,
         data=request.POST or None,
-        initial={"siret": current_siae.siret},
+        initial={"siret": current_siae.siret, "kind": current_siae.kind, "department": current_siae.department},
     )
 
     if request.method == "POST" and form.is_valid():
@@ -143,6 +146,8 @@ def members(request, template_name="siaes/members.html"):
     List members of an SIAE.
     """
     siae = get_current_siae_or_404(request)
+    if not siae.is_active:
+        raise PermissionDenied
 
     members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
     pending_invitations = siae.invitations.filter(accepted=False).all().order_by("sent_at")

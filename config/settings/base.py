@@ -51,6 +51,7 @@ THIRD_PARTY_APPS = [
     "bootstrap_datepicker_plus",
     "django_select2",
     "mathfilters",
+    "huey.contrib.djhuey",
 ]
 
 
@@ -251,19 +252,6 @@ LOGGING = {
     },
 }
 
-# Email.
-# https://anymail.readthedocs.io/en/stable/esps/mailjet/
-# ------------------------------------------------------------------------------
-
-EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
-
-ANYMAIL = {
-    "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
-    "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
-}
-
-MAILJET_API_URL = "https://api.mailjet.com/v3"
-
 # Auth.
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 # ------------------------------------------------------------------------------
@@ -342,7 +330,7 @@ API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 # To avoid confusion between the two when contacting ESD support,
 # we get the habit to always explicitely state that we are using PEAM*U*.
 PEAMU_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
-SOCIALACCOUNT_PROVIDERS={
+SOCIALACCOUNT_PROVIDERS = {
     "peamu": {
         "APP": {
             "key": "peamu",
@@ -386,6 +374,9 @@ ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 
+ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
+ITOU_DOC_OPENING_SCHEDULE_URL = f"{ITOU_DOC_URL}/presentation/quel-est-le-calendrier-de-deploiement-de-la-plateforme"
+
 # Approvals
 # ------------------------------------------------------------------------------
 # Approval numbering prefix can be different for non-production envs
@@ -418,3 +409,47 @@ METABASE_INSERT_BATCH_SIZE = 1000
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
 METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
+
+# Huey / async
+# Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.
+# ------------------------------------------------------------------------------
+
+# Redis server URL:
+# Provided by the Redis addon (itou-redis)
+# Redis database to use with async (must be different for each environement)
+# 1 <= REDIS_DB <= 100 (number of dbs available on CleverCloud)
+REDIS_DB = os.environ.get("REDIS_DB", 1)
+# Complete URL (containing the instance password)
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
+
+# Huey instance
+# If any performance issue, increasing the number of workers *can* be a good idea
+# Parameter `immediate` means `synchronous` (async here)
+HUEY = {
+    "name": "ITOU",
+    "url": REDIS_URL + f"/?db={REDIS_DB}",
+    "consumer": {"workers": 2, "worker_type": "thread", },
+    "immediate": False,
+}
+
+# Email.
+# https://anymail.readthedocs.io/en/stable/esps/mailjet/
+# ------------------------------------------------------------------------------
+
+ANYMAIL = {
+    "MAILJET_API_KEY": os.environ.get("API_MAILJET_KEY"),
+    "MAILJET_SECRET_KEY": os.environ.get("API_MAILJET_SECRET"),
+}
+
+MAILJET_API_URL = "https://api.mailjet.com/v3.1"
+
+# Asynchronous email backend
+# EMAIL_BACKEND points to an async wrapper of a "real" email backend
+# The real backend is hardcoded in the wrapper to avoid multiple and
+# confusing parameters in Django settings.
+# Switch to a "standard" Django backend to get the synchronous behaviour back.
+EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
+
+# Number of retries & retry delay parameters for emails (for async process)
+SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
+SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600

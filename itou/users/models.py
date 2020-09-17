@@ -81,7 +81,7 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
 
-    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), null=True)
+    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), blank=True)
 
     created_by = models.ForeignKey(
         "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True
@@ -91,18 +91,21 @@ class User(AbstractUser, AddressMixin):
         return self.email
 
     def save(self, *args, **kwargs):
+        self.clean_email()
+        # Update department from postal code (if possible).
+        self.department = department_from_postcode(self.post_code)
+        super().save(*args, **kwargs)
 
+    def clean(self, *args, **kwargs):
+        self.clean_email()
+
+    def clean_email(self):
         # There is no unicity constraint on `email` at the DB level.
         # It's in anticipation of other authentication methods to
         # authenticate against something else, e.g. username/password.
         has_email = hasattr(self, "email") and self.email
         if has_email and User.email_already_exists(self.email, exclude_pk=self.pk):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
-
-        # Update department from postal code (if possible).
-        self.department = department_from_postcode(self.post_code)
-
-        super().save(*args, **kwargs)
 
     @property
     def approvals_wrapper(self):

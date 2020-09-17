@@ -18,6 +18,11 @@ def validate_post_code(post_code):
         raise ValidationError(_("Le code postal doit être composé de 5 chiffres."))
 
 
+def validate_siren(siren):
+    if not siren.isdigit() or len(siren) != 9:
+        raise ValidationError(_("Le numéro SIREN doit être composé de 9 chiffres."))
+
+
 def validate_siret(siret):
     if not siret.isdigit() or len(siret) != 14:
         raise ValidationError(_("Le numéro SIRET doit être composé de 14 chiffres."))
