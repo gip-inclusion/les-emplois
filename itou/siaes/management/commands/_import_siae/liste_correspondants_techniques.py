@@ -17,9 +17,7 @@ from itou.siaes.management.commands._import_siae.utils import timeit
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-LISTE_CORRESPONDANTS_TECHNIQUES_FILENAME = (
-    f"{CURRENT_DIR}/../data/Liste correspondants techniques SIAE 28 08 2020.xlsx"
-)
+LISTE_CORRESPONDANTS_TECHNIQUES_FILENAME = f"{CURRENT_DIR}/../data/Liste correspondant technique SIAE 16092020.xlsx"
 
 
 def get_liste_corresponsants_techniques_df(filename=LISTE_CORRESPONDANTS_TECHNIQUES_FILENAME):
