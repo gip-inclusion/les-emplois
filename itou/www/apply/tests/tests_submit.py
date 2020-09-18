@@ -291,14 +291,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        has_valid_diagnoses = new_job_seeker.eligibility_diagnoses.has_valid(new_job_seeker, for_siae=siae)
-        self.assertFalse(has_valid_diagnoses)
+        self.assertFalse(new_job_seeker.eligibility_diagnoses.has_considered_valid(new_job_seeker, for_siae=siae))
 
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        has_valid_diagnoses = new_job_seeker.eligibility_diagnoses.has_valid(new_job_seeker, for_siae=siae)
-        self.assertTrue(has_valid_diagnoses)
+        self.assertTrue(new_job_seeker.eligibility_diagnoses.has_considered_valid(new_job_seeker, for_siae=siae))
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -474,8 +472,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        has_valid_diagnoses = new_job_seeker.eligibility_diagnoses.has_valid(new_job_seeker, for_siae=siae)
-        self.assertFalse(has_valid_diagnoses)
+        self.assertFalse(new_job_seeker.eligibility_diagnoses.has_considered_valid(new_job_seeker, for_siae=siae))
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)

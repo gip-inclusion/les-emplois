@@ -64,14 +64,11 @@
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
-            {% if eligibility_diagnosis %}
+            {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
 
                 <hr>
-                <h3 class="font-weight-normal text-muted d-flex">
+                <h3 class="font-weight-normal text-muted">
                     {% translate "Critères d'éligibilité" %}
-                    {% if eligibility_diagnosis.has_expired %}
-                        <span class="badge badge-danger ml-3">{% translate "Expirés" %}</span>
-                    {% endif %}
                 </h3>
                 <p>
                     {% translate "Validés par" %}
@@ -110,25 +107,15 @@
                     {% endif %}
                 {% endwith %}
 
-                {% if eligibility_diagnosis.has_expired %}
-                    <p class="text-danger">
-                        {% blocktranslate with date=eligibility_diagnosis.expires_at|date %}
-                            Ce diagnostic est expiré depuis le {{ date }}.
-                        {% endblocktranslate %}
-                        {% if job_application.state.is_processing or job_application.state.is_postponed %}
-                            {% translate "Pour embaucher ce candidat, réalisez un nouveau diagnostic d'éligibilité afin d'évaluer sa situation actuelle." %}
-                        {% endif %}
-                    </p>
-                {% else %}
-                    <p>
-                        {% translate "Ce diagnostic expire le " %} {{ eligibility_diagnosis.expires_at|date }}.
-                    </p>
-                {% endif %}
+                <p>
+                    <i>
+                        {% translate "Ce diagnostic expire le " %}
+                        {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
+                    </i>
+                </p>
 
-            {% elif approvals_wrapper.latest_approval and approvals_wrapper.latest_approval.is_valid and not approvals_wrapper.latest_approval.originates_from_itou %}
+            {% elif approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis %}
 
-                {# The existence of a valid `PoleEmploiApproval` implies that #}
-                {# a diagnosis has been made outside of Itou. #}
                 <hr>
                 <h3 class="font-weight-normal text-muted">{% translate "Critères d'éligibilité" %}</h3>
                 <p>

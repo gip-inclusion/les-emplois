@@ -25,32 +25,24 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
 
 
 class EligibilityDiagnosisManager(models.Manager):
-    def has_valid_from_pole_emploi(self, job_seeker):
+    def has_considered_valid(self, job_seeker, for_siae=None):
         """
-        Returns True if the given job seeker has a valid diagnosis made outside
-        of Itou, False otherwise.
+        Returns True if the given job seeker has a considered valid diagnosis, False otherwise.
+        """
+        return job_seeker.approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis or bool(
+            self.last_considered_valid(job_seeker, for_siae=for_siae)
+        )
 
-        The existence of a valid Pôle emploi's approval implies that a
-        diagnosis has been made outside of Itou.
+    def last_considered_valid(self, job_seeker, for_siae=None):
         """
-        latest_approval = job_seeker.approvals_wrapper.latest_approval
-        return bool(latest_approval and latest_approval.is_valid and not latest_approval.originates_from_itou)
-
-    def has_valid(self, job_seeker, for_siae=None):
-        """
-        Returns True if the given job seeker has a valid diagnosis, False otherwise.
-        """
-        return self.has_valid_from_pole_emploi(job_seeker) or bool(self.last_valid(job_seeker, for_siae=for_siae))
-
-    def last_valid(self, job_seeker, for_siae=None):
-        """
-        Retrieves the last valid diagnosis for the given job seeker, if any.
-
-        A diagnosis made by a prescriber takes precedence.
+        Retrieves the given job seeker's last considered valid diagnosis or None.
 
         If the `for_siae` argument is passed, it means that we are looking for
         a diagnosis from an employer perspective. The scope is restricted to
         avoid showing diagnoses made by other employers.
+
+        A diagnosis made by a prescriber takes precedence even when an employer
+        diagnosis already exists.
         """
 
         last = None
@@ -60,7 +52,8 @@ class EligibilityDiagnosisManager(models.Manager):
             .order_by("created_at")
         )
 
-        # The last diagnosis is considered valid for the duration of an approval.
+        # A diagnosis is considered valid for the duration of an approval,
+        # we just retrieve the last one no matter if it's valid or not.
         if job_seeker.approvals_wrapper.has_valid:
             last = query.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
             if not last:
@@ -69,6 +62,7 @@ class EligibilityDiagnosisManager(models.Manager):
                 # Deals with cases from the past (when there was no restriction).
                 last = query.last()
 
+        # Otherwise, search only in "non expired" diagnosis.
         else:
             last = query.valid().filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
             if not last and for_siae:
@@ -111,7 +105,7 @@ class EligibilityDiagnosis(models.Model):
     author_siae = models.ForeignKey(
         "siaes.Siae", verbose_name=_("SIAE de l'auteur"), null=True, blank=True, on_delete=models.CASCADE
     )
-    # When the author is a prescriber, keep a track of his current organization (if any).
+    # When the author is a prescriber, keep a track of his current organization.
     author_prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
         verbose_name=_("Organisation du prescripteur de l'auteur"),
@@ -140,25 +134,33 @@ class EligibilityDiagnosis(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
     @property
     def is_valid(self):
         return self.created_at > self.get_expiration_dt()
 
     @property
-    def is_considered_valid(self):
-        return self.job_seeker.approvals_wrapper.has_valid
-
-    @property
-    def has_expired(self):
-        return not self.is_valid
-
-    @property
     def expires_at(self):
         return self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
 
-    def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
+    # A diagnosis is considered valid for the whole duration of an approval.
+    # Methods below (whose name contain `considered`) take into account
+    # the existence of an ongoing approval.
+    # They must not be used "as-is" in admin's `list_display` because checking
+    # approvals_wrapper would trigger additional SQL queries for each row.
+
+    @property
+    def is_considered_valid(self):
+        return self.is_valid or self.job_seeker.approvals_wrapper.has_valid
+
+    @property
+    def considered_to_expire_at(self):
+        if self.job_seeker.approvals_wrapper.has_valid:
+            return self.job_seeker.approvals_wrapper.latest_approval.end_at
+        return self.expires_at
 
     @classmethod
     def create_diagnosis(cls, job_seeker, user_info, administrative_criteria=None):

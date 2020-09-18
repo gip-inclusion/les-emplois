@@ -32,9 +32,7 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     job_seeker = job_application.job_seeker
     user_name = job_seeker.get_full_name()
 
-    diagnosis = job_application.job_seeker.eligibility_diagnoses.last_valid(
-        job_application.job_seeker, for_siae=job_application.to_siae
-    )
+    diagnosis = None
     diagnosis_author = None
     diagnosis_author_org = None
     diagnosis_author_org_name = None
@@ -43,6 +41,9 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     # exist in the real world but not in our database.
     # Raise an error only if the diagnosis does not exist for an Itou approval.
     if job_application.approval.originates_from_itou:
+        diagnosis = job_application.job_seeker.eligibility_diagnoses.last_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
         if not diagnosis:
             raise ObjectDoesNotExist
         diagnosis_author = diagnosis.author.get_full_name()

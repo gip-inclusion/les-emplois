@@ -213,10 +213,10 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        has_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_valid(
+        has_considered_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
         )
-        self.assertFalse(has_valid_diagnoses)
+        self.assertFalse(has_considered_valid_diagnoses)
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -246,13 +246,13 @@ class ProcessViewsTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
-        has_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_valid(
+        has_considered_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
         )
-        self.assertTrue(has_valid_diagnoses)
+        self.assertTrue(has_considered_valid_diagnoses)
 
         # Check diagnosis.
-        eligibility_diagnosis = job_application.job_seeker.eligibility_diagnoses.last_valid(
+        eligibility_diagnosis = job_application.job_seeker.eligibility_diagnoses.last_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
         )
         self.assertEqual(eligibility_diagnosis.author, siae_user)

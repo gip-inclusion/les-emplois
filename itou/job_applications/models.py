@@ -315,7 +315,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return (
             (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.eligibility_diagnoses.has_valid(self.job_seeker, for_siae=self.to_siae)
+            and not self.job_seeker.eligibility_diagnoses.has_considered_valid(self.job_seeker, for_siae=self.to_siae)
         )
 
     @property
