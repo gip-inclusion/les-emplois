@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
@@ -31,7 +32,9 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     job_seeker = job_application.job_seeker
     user_name = job_seeker.get_full_name()
 
-    diagnosis = None
+    diagnosis = job_application.job_seeker.eligibility_diagnoses.last_valid(
+        job_application.job_seeker, for_siae=job_application.to_siae
+    )
     diagnosis_author = None
     diagnosis_author_org = None
     diagnosis_author_org_name = None
@@ -40,14 +43,14 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     # exist in the real world but not in our database.
     # Raise an error only if the diagnosis does not exist for an Itou approval.
     if job_application.approval.originates_from_itou:
-        diagnosis = job_seeker.get_eligibility_diagnosis()
+        if not diagnosis:
+            raise ObjectDoesNotExist
         diagnosis_author = diagnosis.author.get_full_name()
         diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
         if diagnosis_author_org:
             diagnosis_author_org_name = diagnosis_author_org.display_name
 
-    # The PDFShift API can load styles only if it has
-    # the full URL.
+    # The PDFShift API can load styles only if it has the full URL.
     base_url = request.build_absolute_uri("/")[:-1]
 
     if settings.DEBUG:

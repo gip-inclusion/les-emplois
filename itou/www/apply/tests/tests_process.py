@@ -213,7 +213,10 @@ class ProcessViewsTest(TestCase):
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        self.assertFalse(has_valid_diagnoses)
 
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
@@ -243,15 +246,15 @@ class ProcessViewsTest(TestCase):
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertEqual(response.url, next_url)
 
-        # In order to avoid calling the database too often, `has_eligibility_diagnoses`
-        # is a cached property.
-        # Delete the attribute to refresh it.
-        # See https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.functional.cached_property
-        delattr(job_application.job_seeker, "has_eligibility_diagnoses")
-        self.assertTrue(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        self.assertTrue(has_valid_diagnoses)
 
         # Check diagnosis.
-        eligibility_diagnosis = job_application.job_seeker.get_eligibility_diagnosis()
+        eligibility_diagnosis = job_application.job_seeker.eligibility_diagnoses.last_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
         self.assertEqual(eligibility_diagnosis.author, siae_user)
         self.assertEqual(eligibility_diagnosis.author_kind, EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF)
         self.assertEqual(eligibility_diagnosis.author_siae, job_application.to_siae)

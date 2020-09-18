@@ -1,12 +1,7 @@
-import datetime
-
-from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from itou.approvals.factories import PoleEmploiApprovalFactory
-from itou.eligibility.factories import EligibilityDiagnosisFactory, ExpiredEligibilityDiagnosisFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory
 
 
@@ -43,36 +38,6 @@ class ModelTest(TestCase):
         # E-mail already exists, this should raise an error.
         with self.assertRaises(ValidationError):
             User.create_job_seeker_by_proxy(proxy_user, **user_data)
-
-    def test_has_valid_eligibility_diagnosis(self):
-
-        # No diagnosis.
-        job_seeker = JobSeekerFactory()
-        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
-
-        # Has Itou diagnosis.
-        job_seeker = JobSeekerFactory()
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
-        self.assertTrue(job_seeker.has_valid_eligibility_diagnosis)
-
-        # Has valid Pôle emploi diagnosis.
-        job_seeker = JobSeekerFactory()
-        PoleEmploiApprovalFactory(pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate)
-        self.assertTrue(job_seeker.has_valid_eligibility_diagnosis)
-
-        # Has expired Pôle emploi diagnosis.
-        job_seeker = JobSeekerFactory()
-        end_at = datetime.date.today() - relativedelta(years=2)
-        start_at = end_at - relativedelta(years=2)
-        PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate, start_at=start_at, end_at=end_at
-        )
-        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
-
-        # Has an expired diagnosis
-        job_seeker = JobSeekerFactory()
-        ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
-        self.assertFalse(job_seeker.has_valid_eligibility_diagnosis)
 
     def test_clean_pole_emploi_fields(self):
 

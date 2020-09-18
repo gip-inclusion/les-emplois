@@ -17,7 +17,7 @@ class User(AbstractUser, AddressMixin):
     Custom user model.
 
     Default fields are listed here:
-    https://github.com/django/django/blob/972eef6b9060aee4a092bedee38a7775fbbe5d0b/django/contrib/auth/models.py#L289
+    https://github.com/django/django/blob/f3901b5899d746dc5b754115d94ce9a045b4db0a/django/contrib/auth/models.py#L321
 
     Auth is managed with django-allauth.
 
@@ -107,37 +107,11 @@ class User(AbstractUser, AddressMixin):
         if has_email and User.email_already_exists(self.email, exclude_pk=self.pk):
             raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
-    @property
+    @cached_property
     def approvals_wrapper(self):
         if not self.is_job_seeker:
             return None
         return ApprovalsWrapper(self)
-
-    @property
-    def has_valid_eligibility_diagnosis(self):
-        """
-        Returns True if an ongoing diagnosis exists, False otherwise.
-        """
-        if not self.is_job_seeker:
-            return False
-        if self.has_eligibility_diagnoses:
-            if not self.eligibility_diagnoses.latest("created_at").has_expired:
-                return True
-        # The existence of a valid `PoleEmploiApproval` implies that a diagnosis
-        # has been made outside of Itou.
-        latest_approval = self.approvals_wrapper.latest_approval
-        return latest_approval and latest_approval.is_valid and not latest_approval.originates_from_itou
-
-    @cached_property
-    def has_eligibility_diagnoses(self):
-        return self.eligibility_diagnoses.exists()
-
-    def get_eligibility_diagnosis(self):
-        if not self.is_job_seeker:
-            return None
-        return self.eligibility_diagnoses.select_related(
-            "author", "author_siae", "author_prescriber_organization"
-        ).latest("created_at")
 
     @cached_property
     def is_peamu(self):

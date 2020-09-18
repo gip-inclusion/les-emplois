@@ -35,13 +35,19 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        self.assertFalse(has_valid_diagnoses)
         self.assertFalse(job_application.eligibility_diagnosis_by_siae_required)
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_EI
         )
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = job_application.job_seeker.eligibility_diagnoses.has_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        self.assertFalse(has_valid_diagnoses)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
     def test_accepted_by(self):

@@ -291,18 +291,14 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(new_job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = new_job_seeker.eligibility_diagnoses.has_valid(new_job_seeker, for_siae=siae)
+        self.assertFalse(has_valid_diagnoses)
 
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        # In order to avoid calling the database too often, `has_eligibility_diagnoses`
-        # is a cached property.
-        # Delete the attribute to refresh it.
-        # See https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.functional.cached_property
-        delattr(new_job_seeker, "has_eligibility_diagnoses")
-
-        self.assertTrue(new_job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = new_job_seeker.eligibility_diagnoses.has_valid(new_job_seeker, for_siae=siae)
+        self.assertTrue(has_valid_diagnoses)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -478,7 +474,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        self.assertFalse(new_job_seeker.has_valid_eligibility_diagnosis)
+        has_valid_diagnoses = new_job_seeker.eligibility_diagnoses.has_valid(new_job_seeker, for_siae=siae)
+        self.assertFalse(has_valid_diagnoses)
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
