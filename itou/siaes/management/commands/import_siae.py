@@ -31,11 +31,11 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_07092020_074725.csv"
+MAIN_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_Structure_14092020_074740.csv"
 
-SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/Liste correspondants techniques SIAE 28 08 2020.xlsx"
+SECONDARY_DATASET_FILENAME = f"{CURRENT_DIR}/data/Liste correspondant technique SIAE 16092020.xlsx"
 
-VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_AnnexeFinanciere_07092020_063002.csv"
+VUE_AF_DATASET_FILENAME = f"{CURRENT_DIR}/data/fluxIAE_AnnexeFinanciere_14092020_063002.txt"
 
 # Below this score, results from `adresse.data.gouv.fr` are considered unreliable.
 # This score is arbitrarily set based on general observation.
