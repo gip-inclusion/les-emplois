@@ -1,4 +1,5 @@
 import logging
+import time
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -416,8 +417,7 @@ class ApprovalsWrapper:
 
     def _merge_approvals(self):
         """
-        Returns a list of merged unique `Approval` and `PoleEmploiApproval`
-        objects ordered by most recent `start_at` dates.
+        Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
         """
         approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
         approvals_numbers = [approval.number for approval in approvals]
@@ -428,5 +428,10 @@ class ApprovalsWrapper:
             if pe_approval not in approvals_numbers
         ]
         merged_approvals = approvals + pe_approvals
-        # Sort by start_at, then by end_at, most recent dates first.
-        return sorted(merged_approvals, key=lambda x: (x.start_at, x.end_at), reverse=True)
+        # Sort by the most distant `end_at`, then by the earliest `start_at`.
+        # This allows to always choose the longest and most recent approval.
+        # Dates are converted to timestamp so that the subtraction operator
+        # can be used in the lambda.
+        return sorted(
+            merged_approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
+        )
