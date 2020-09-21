@@ -31,7 +31,10 @@ def public_stats(request, template_name=_STATS_HTML_TEMPLATE):
     Public link:
     https://stats.inclusion.beta.gouv.fr/public/dashboard/f1527a13-1508-498d-8014-b2fe487a3a70
     """
-    context = {"iframeurl": metabase_embedded_url(PUBLIC_STATS_DASHBOARD_ID)}
+    context = {
+        "iframeurl": metabase_embedded_url(PUBLIC_STATS_DASHBOARD_ID),
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
     return render(request, template_name, context)
 
 
@@ -42,7 +45,10 @@ def advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
     Public link:
     https://stats.inclusion.beta.gouv.fr/public/dashboard/c65faf79-3b89-4416-9faa-ff5182f41468
     """
-    context = {"iframeurl": metabase_embedded_url(ADVANCED_STATS_DASHBOARD_ID)}
+    context = {
+        "iframeurl": metabase_embedded_url(ADVANCED_STATS_DASHBOARD_ID),
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
     return render(request, template_name, context)
 
 
@@ -53,5 +59,8 @@ def reporting(request, template_name=_STATS_HTML_TEMPLATE):
     If the user has the 'is_stats_vip' flag, this Metabase dashboard link
     is displayed on the dashboard page
     """
-    context = {"iframeurl": metabase_embedded_url(DIRECCTE_STATS_DASHBOARD_ID)}
+    context = {
+        "iframeurl": metabase_embedded_url(DIRECCTE_STATS_DASHBOARD_ID),
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
     return render(request, template_name, context)

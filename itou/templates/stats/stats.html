@@ -3,7 +3,7 @@
 
 {% block title %}{% translate "Statistiques et pilotage" %}{{ block.super }}{% endblock %}
 {% block content %}
-    <script src="https://stats.inclusion.beta.gouv.fr/app/iframeResizer.js"></script>
+    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
     <iframe
         src="{{ iframeurl }}"
         width="100%"
