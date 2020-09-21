@@ -11,6 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="user", name="is_reporting", field=models.BooleanField(default=False, verbose_name="Pilotage"),
+            model_name="user", name="is_stats_vip", field=models.BooleanField(default=False, verbose_name="Pilotage"),
         ),
     ]

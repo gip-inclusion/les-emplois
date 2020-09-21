@@ -21,7 +21,7 @@ DIRECCTE_STATS_DASHBOARD_ID = 36
 
 
 def can_view_stats(user):
-    return user.is_reporting
+    return user.is_stats_vip
 
 
 @login_required
@@ -50,7 +50,7 @@ def advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
 @user_passes_test(can_view_stats, login_url="/dashboard")
 def reporting(request, template_name=_STATS_HTML_TEMPLATE):
     """
-    If the user has the 'is_reporting' flag, this Metabase dashboard link
+    If the user has the 'is_stats_vip' flag, this Metabase dashboard link
     is displayed on the dashboard page
     """
     context = {"iframeurl": metabase_embedded_url(DIRECCTE_STATS_DASHBOARD_ID)}

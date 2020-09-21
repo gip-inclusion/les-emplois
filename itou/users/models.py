@@ -56,7 +56,7 @@ class User(AbstractUser, AddressMixin):
     is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)
     is_prescriber = models.BooleanField(verbose_name=_("Prescripteur"), default=False)
     is_siae_staff = models.BooleanField(verbose_name=_("Employeur (SIAE)"), default=False)
-    is_reporting = models.BooleanField(verbose_name=_("Pilotage"), default=False)
+    is_stats_vip = models.BooleanField(verbose_name=_("Pilotage"), default=False)
 
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.

@@ -268,7 +268,7 @@
             </div>
         {% endif %}
 
-        {% if user.is_reporting %}
+        {% if user.is_stats_vip %}
             <div class="card">
                 <h5 class="card-header">{% translate "Statistiques et pilotage" %}</h5>
                 <div class="card-body">
@@ -283,7 +283,7 @@
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{% url 'stats:reporting' %}">{% translate "Voir les données sur mon territoire"%}</a>
+                        <a href="{% url 'stats:stats_vip' %}">{% translate "Voir les données sur mon territoire"%}</a>
                         <span class="badge badge-info">{% translate "Nouveau" %}</span>
                     </p>
                 </div>
