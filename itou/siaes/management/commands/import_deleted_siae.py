@@ -20,7 +20,7 @@ JSON_FILE = f"{CURRENT_DIR}/data/deleted_siae.json"
 
 
 # Carefully pick your choice.
-DEPARTMENTS_TO_OPEN = departments.DEPARTMENTS_TO_OPEN_ON_14_09_2020
+DEPARTMENTS_TO_OPEN = departments.DEPARTMENTS_TO_OPEN_ON_21_09_2020
 
 
 class Command(BaseCommand):

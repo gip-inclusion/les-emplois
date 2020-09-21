@@ -348,7 +348,7 @@ class ApprovalsWrapperTest(TestCase):
     Test ApprovalsWrapper.
     """
 
-    def test_merge_approvals(self):
+    def test_merge_approvals_timeline_case1(self):
 
         user = JobSeekerFactory()
 
@@ -379,6 +379,34 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_1)
         self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_2)
         self.assertEqual(approvals_wrapper.merged_approvals[2], approval)
+
+    def test_merge_approvals_timeline_case2(self):
+
+        user = JobSeekerFactory()
+
+        # PoleEmploiApproval 1.
+        pe_approval_1 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2020, 3, 17),
+            end_at=datetime.date(2020, 6, 16),
+        )
+
+        # PoleEmploiApproval 2.
+        # `start_at` earlier than PoleEmploiApproval 1.
+        # `end_at` after PoleEmploiApproval 1.
+        pe_approval_2 = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=datetime.date(2020, 3, 2),
+            end_at=datetime.date(2022, 3, 2),
+        )
+
+        # Check timeline.
+        approvals_wrapper = ApprovalsWrapper(user)
+        self.assertEqual(len(approvals_wrapper.merged_approvals), 2)
+        self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_2)
+        self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_1)
 
     def test_status_without_approval(self):
         user = JobSeekerFactory()
