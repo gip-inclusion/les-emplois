@@ -12,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 
@@ -315,7 +316,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return (
             (self.state.is_processing or self.state.is_postponed)
             and self.to_siae.is_subject_to_eligibility_rules
-            and not self.job_seeker.eligibility_diagnoses.has_considered_valid(self.job_seeker, for_siae=self.to_siae)
+            and not EligibilityDiagnosis.objects.has_considered_valid(self.job_seeker, for_siae=self.to_siae)
         )
 
     @property

@@ -56,7 +56,7 @@ class EligibilityDiagnosisManager(models.Manager):
         # we just retrieve the last one no matter if it's valid or not.
         if job_seeker.approvals_wrapper.has_valid:
             last = query.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
-            if not last:
+            if not last and for_siae:
                 last = query.filter(author_siae=for_siae).last()
             if not last:
                 # Deals with cases from the past (when there was no restriction).

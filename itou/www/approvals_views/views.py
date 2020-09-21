@@ -7,6 +7,7 @@ from django.template.response import SimpleTemplateResponse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -41,7 +42,7 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     # exist in the real world but not in our database.
     # Raise an error only if the diagnosis does not exist for an Itou approval.
     if job_application.approval.originates_from_itou:
-        diagnosis = job_application.job_seeker.eligibility_diagnoses.last_considered_valid(
+        diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
             job_application.job_seeker, for_siae=job_application.to_siae
         )
         if not diagnosis:
