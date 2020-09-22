@@ -87,7 +87,12 @@ class Command(BaseCommand):
         """
         Any siae which cannot be found in the latest ASP exports
         is a "ghost" siae which should be deleted.
-        Of course we check it does not have data.
+
+        This can happen e.g. after every opening when old siaes imported back in 2019
+        are no longer present in latest ASP exports.
+
+        Of course we only delete it if it does not have any data,
+        otherwise we just show a warning.
         """
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
             if could_siae_be_deleted(siae):

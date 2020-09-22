@@ -10,6 +10,10 @@ which uniquely identify siaes à la itou.
 As a reminder, an external_id is not enough to uniquely identify an siae à la itou
 since an ACI and an ETTI can share the same SIRET and the same external_id.
 
+When such an ACI and an ETTI share the same SIRET and the same external_id,
+they each have their own convention, their own financial annexes and
+thus their own convention end date.
+
 For convenience we systematically call such an (external_id, kind) identifier
 an "siae_key" throughout the import_siae.py script code.
 

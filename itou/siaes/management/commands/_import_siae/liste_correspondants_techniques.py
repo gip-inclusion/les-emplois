@@ -20,7 +20,7 @@ CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 LISTE_CORRESPONDANTS_TECHNIQUES_FILENAME = f"{CURRENT_DIR}/../data/Liste correspondant technique SIAE 16092020.xlsx"
 
 
-def get_liste_corresponsants_techniques_df(filename=LISTE_CORRESPONDANTS_TECHNIQUES_FILENAME):
+def get_liste_correspondants_techniques_df(filename=LISTE_CORRESPONDANTS_TECHNIQUES_FILENAME):
     """
     Only 2 columns are meaningful to us:
     - external_id
@@ -48,7 +48,7 @@ def get_liste_corresponsants_techniques_df(filename=LISTE_CORRESPONDANTS_TECHNIQ
 @timeit
 def get_external_id_to_auth_email():
     external_id_to_auth_email = {}
-    df = get_liste_corresponsants_techniques_df()
+    df = get_liste_correspondants_techniques_df()
     for _, row in df.iterrows():
         external_id = row.external_id
         auth_email = row.auth_email

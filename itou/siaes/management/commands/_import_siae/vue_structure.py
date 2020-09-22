@@ -118,9 +118,17 @@ EXTERNAL_ID_TO_SIAE_ROW = get_external_id_to_siae_row()
 @timeit
 def get_siret_to_external_id():
     """
+    This method allows us to link any preexisting siae (without external_id)
+    in itou database to its ASP counterpart via an external_id.
+
+    Such preexisting siaes are siaes historically imported without external_id,
+    new ones are added everytime we open a new region.
+    Later we will also process preexisting siaes created by itou staff
+    and preexisting siaes created by users ("Antennes").
+
     External_id is a permanent immutable ID in ASP exports used to
-    identify a structure (an ACI and an EI sharing the same SIRET being
-    considered as a single structure). This external_id can be thought as
+    identify a structure à la ASP (an ACI and an EI sharing the same SIRET being
+    considered as a single structure à la ASP). This external_id can be thought as
     a "permanent SIRET".
 
     The SIRET => external_id match is very important to make sure all itou siaes
