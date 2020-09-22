@@ -59,3 +59,6 @@ pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
 # https://huey.readthedocs.io/en/latest/
 huey==2.3.0  # https://github.com/coleifer/huey
 redis==3.5.3  # https://github.com/andymccurdy/redis-py
+
+# Embedding Metabase signed dashboards
+PyJWT==1.7.1  # https://github.com/jpadilla/pyjwt

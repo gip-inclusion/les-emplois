@@ -1,19 +1,13 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
-{% load mathfilters %}
-{% load static %}
 
-{% block title %}{% translate "Statistiques" %}{{ block.super }}{% endblock %}
-
+{% block title %}{% translate "Statistiques et pilotage" %}{{ block.super }}{% endblock %}
 {% block content %}
-
-    <script src="https://stats.inclusion.beta.gouv.fr/app/iframeResizer.js"></script>
-
+    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
     <iframe
-        src="https://stats.inclusion.beta.gouv.fr/public/dashboard/f1527a13-1508-498d-8014-b2fe487a3a70"
+        src="{{ iframeurl }}"
         width="100%"
         onload="iFrameResize({}, this)"
-        frameborder="0"
-    ></iframe>
-
+        frameborder="0">
+    </iframe>
 {% endblock %}

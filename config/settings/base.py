@@ -81,6 +81,7 @@ LOCAL_APPS = [
     "itou.www.siaes_views",
     "itou.www.signup",
     "itou.www.invitations_views",
+    "itou.www.stats",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -404,6 +405,10 @@ METABASE_SHOW_SQL_REQUESTS = False
 # by batch of 100 => 5s
 # by batch of 1000 => 5s
 METABASE_INSERT_BATCH_SIZE = 1000
+
+# Embedding signed Metabase dashboard
+METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
+METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
 # Huey / async
 # Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.

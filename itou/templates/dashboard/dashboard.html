@@ -268,6 +268,28 @@
             </div>
         {% endif %}
 
+        {% if user.is_stats_vip or user.is_superuser %}
+            <div class="card">
+                <h5 class="card-header">{% translate "Statistiques et pilotage" %}</h5>
+                <div class="card-body">
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="activity" %}
+                        <a href="{% url 'stats:public_stats' %}">{% translate "Voir les statistiques de la plateforme"%}</a>
+                    </p>
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="activity" %}
+                        <a href="{% url 'stats:advanced_stats' %}">{% translate "Voir les statistiques avancées"%}</a>
+                        <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                    </p>
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="activity" %}
+                        <a href="{% url 'stats:stats_vip' %}">{% translate "Voir les données sur mon territoire"%}</a>
+                        <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
     </div>
 
 {% endblock %}
