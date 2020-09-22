@@ -32,9 +32,9 @@
 
         {% bootstrap_field form.pole_emploi_id %}
         {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
-        {% bootstrap_field form.resume_link %}
 
         {% buttons %}
+            <button type="submit" class="btn btn-primary" formaction="{{ request.get_full_path }}&resume=True">{% translate "Continuer avec un CV" %}</button>
             <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
         {% endbuttons %}
 

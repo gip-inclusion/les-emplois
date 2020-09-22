@@ -1,0 +1,32 @@
+{% extends "apply/submit_base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    <form method="post" action="" class="js-prevent-multiple-submit" id="job_seeker_form">
+
+        {% csrf_token %}
+
+        {% bootstrap_form_errors form %}
+
+        {% bootstrap_form form %}
+
+        {% include "utils/resume/typeform_form.html" %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+        {% endbuttons %}
+
+    </form>
+
+    {% include "utils/resume/typeform_form.html" %}
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% include "utils/resume/typeform_scripts.html" with user=job_seeker %}
+{% endblock %}

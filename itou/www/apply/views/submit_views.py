@@ -13,6 +13,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
+from itou.utils.resume.forms import ResumeFormMixin
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -179,9 +180,37 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
         job_seeker = form.save()
         session_data["job_seeker_pk"] = job_seeker.pk
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+        if request.GET.get("resume"):
+            next_url = reverse("apply:step_send_resume", kwargs={"siae_pk": siae.pk})
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form}
+    return render(request, template_name, context)
+
+
+@login_required
+@valid_session_required
+def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_resume.html"):
+    """
+    Updates user's resume following the next steps:
+    - Prescriber uploads a file using Typeform's embed form.
+    - When Typeform receives a new entry, it performs a POST on `/save-typeform-resume`
+    - This view updates the job seeker `resume_link` attribute.
+    """
+    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+
+    form = ResumeFormMixin(data=request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            job_seeker.typeform_response_id = form.cleaned_data.get("typeform_response_id")
+            job_seeker.save()
+        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
+        return HttpResponseRedirect(next_url)
+
+    context = {"siae": siae, "job_seeker": job_seeker, "form": form}
     return render(request, template_name, context)
 
 
