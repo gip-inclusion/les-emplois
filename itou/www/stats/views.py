@@ -2,7 +2,8 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 
-from itou.utils.urls import metabase_embedded_url
+from itou.utils.apis.metabase import metabase_embedded_url
+from itou.utils.perms.decorators import can_view_stats
 
 
 # Embedding Metabase dashboards:
@@ -17,10 +18,6 @@ _STATS_HTML_TEMPLATE = "stats/stats.html"
 PUBLIC_STATS_DASHBOARD_ID = 34
 ADVANCED_STATS_DASHBOARD_ID = 43
 DIRECCTE_STATS_DASHBOARD_ID = 36
-
-
-def can_view_stats(user):
-    return user.is_stats_vip
 
 
 @login_required
