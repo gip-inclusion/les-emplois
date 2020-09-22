@@ -268,7 +268,7 @@
             </div>
         {% endif %}
 
-        {% if user.is_stats_vip %}
+        {% if user.is_stats_vip or user.is_superuser %}
             <div class="card">
                 <h5 class="card-header">{% translate "Statistiques et pilotage" %}</h5>
                 <div class="card-body">
