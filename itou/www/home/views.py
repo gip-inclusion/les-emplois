@@ -1,9 +1,14 @@
+import base64
+import hashlib
+import hmac
 import json
 import logging
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import get_object_or_404, render
+from django.utils.encoding import force_bytes
 from django.views.decorators.csrf import csrf_exempt
 
 from itou.www.search.forms import SiaeSearchForm
@@ -19,14 +24,30 @@ def home(request, template_name="home/home.html"):
 
 @csrf_exempt
 def save_typeform_resume(request):
-    response = json.loads(request.read().decode("utf-8"))
+    # 1/ Secure Typeform
+    # https://stackoverflow.com/questions/59114066/securing-typeform-webhook-python
+    # Thanks man!
+    header_signature = request.headers.get("Typeform-Signature")
+    secret_key = settings.TYPEFORM_SECRET
 
-    # TODO: use Typeform Secret to make sure the request comes from Typeform
+    if header_signature is None:
+        return HttpResponseForbidden("Permission denied.")
+
+    sha_name, signature = header_signature.split("=", 1)
+    if sha_name != "sha256":
+        return HttpResponseServerError("Operation not supported.", status=501)
+
+    mac = hmac.new(force_bytes(secret_key), msg=force_bytes(request.body), digestmod=hashlib.sha256)
+    if not hmac.compare_digest(force_bytes(base64.b64encode(mac.digest()).decode()), force_bytes(signature)):
+        return HttpResponseForbidden("Permission denied.")
+
+    # 2/ Now process content
+    response = json.loads(request.read().decode("utf-8"))
 
     # This is very unsecure!
     # TODO: encrypt
-    user_email = response["form_response"]["hidden"]["mailuser"]
-    user = get_object_or_404(get_user_model(), email=user_email)
+    job_seeker_pk = response["form_response"]["hidden"]["job_seeker_pk"]
+    user = get_object_or_404(get_user_model(), pk=job_seeker_pk)
 
     # We can't use this anymore as the response id is known too late.
     # typeform_response_id = response["form_response"]["token"]

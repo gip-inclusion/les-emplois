@@ -3,9 +3,9 @@
   window.addEventListener("DOMContentLoaded", function() {
     let resume_form = document.getElementById("resumeForm");
     let job_seeker_form = $("#job_seeker_form");
-    let user_email = "{{ user.email }}"
+    let job_seeker_pk = "{{ user.pk }}"
     window.typeformEmbed.makeWidget(
-        resume_form, `https://admin.typeform.com/to/e2hX2fUg#mailuser=${user_email}`, {
+        resume_form, `https://admin.typeform.com/to/e2hX2fUg#job_seeker_pk=${job_seeker_pk}`, {
             onSubmit: function(event) {
               $("#typeform_response_id").val(event.response_id);
               job_seeker_form.submit();
