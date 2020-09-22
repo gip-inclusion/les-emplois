@@ -78,6 +78,22 @@ class KindFilter(admin.SimpleListFilter):
         return queryset
 
 
+class CreatedByProxyFilter(admin.SimpleListFilter):
+    title = _("Créé par un tiers")
+    parameter_name = "created_by"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(created_by__isnull=False)
+        if value == "no":
+            return queryset.filter(created_by__isnull=True)
+        return queryset
+
+
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
 
@@ -94,7 +110,7 @@ class ItouUserAdmin(UserAdmin):
         "last_login",
     )
     list_display_links = ("pk", "email")
-    list_filter = UserAdmin.list_filter + (KindFilter,)
+    list_filter = UserAdmin.list_filter + (KindFilter, CreatedByProxyFilter)
     ordering = ("-id",)
     raw_id_fields = ("created_by",)
     search_fields = UserAdmin.search_fields + ("pk",)
@@ -135,10 +151,12 @@ class ItouUserAdmin(UserAdmin):
     has_verified_email.short_description = "Email validé"
 
     def is_created_by_a_proxy(self, obj):
-        return obj.created_by is not None
+        # Use the "hidden" field with an `_id` suffix to avoid hitting the database for each row.
+        # https://docs.djangoproject.com/en/dev/ref/models/fields/#database-representation
+        return bool(obj.created_by)
 
     is_created_by_a_proxy.boolean = True
-    is_created_by_a_proxy.short_description = "créé par proxy"
+    is_created_by_a_proxy.short_description = "créé par un tiers"
 
     def is_peamu(self, obj):
         return obj._is_peamu
