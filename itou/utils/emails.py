@@ -1,4 +1,6 @@
 import re
+from copy import deepcopy
+from itertools import islice
 
 from django.conf import settings
 from django.core import mail
@@ -45,6 +47,55 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
         subject=subject_prefix + get_email_text_template(subject, context),
         body=get_email_text_template(body, context),
     )
+
+
+# Mailjet max number of recipients (CC, BCC, TO)
+_MAILJET_MAX_RECIPIENTS = 50
+
+
+def partition(list, size):
+    it = iter(list)
+    return iter(lambda: tuple(islice(it, size)), ())
+
+
+def sanitize_mailjet_recipients(email_message):
+    """
+    Mailjet API has a **50** number limit for anytype of email recipient:
+    * TO
+    * CC
+    * BCC
+
+    This function:
+    * partitions email recipients with more than 50 elements
+    * creates new emails with a number of recipients in the Mailjet limit
+
+    `email_message` is an EmailMessage object (not serialized)
+
+    Returns a **list** of "sanitized" emails.
+    """
+
+    if (
+        len(email_message.to) <= _MAILJET_MAX_RECIPIENTS
+        # and len(email_message.cc) <= _MAILJET_MAX_RECIPIENTS
+        # and len(email_message.bcc) <= _MAILJET_MAX_RECIPIENTS
+    ):
+        # We're ok, return a list containing the original message
+        return [email_message]
+
+    sanitized_emails = []
+    part_to = partition(email_message.to, _MAILJET_MAX_RECIPIENTS)
+    # We could also combine to, cc and bcc, but it's useless for now
+    # part_cc = partition(email_message.cc, _MAILJET_MAX_RECIPIENTS)
+    # part_bcc = partition(email_message.bcc, _MAILJET_MAX_RECIPIENTS)
+
+    for tos in part_to:
+        copy_email = deepcopy(email_message)
+        copy_email.to = list(tos)
+        sanitized_emails.append(copy_email)
+
+    assert len(sanitized_emails) > 1
+
+    return sanitized_emails
 
 
 # Custom async email backend wrapper
@@ -129,12 +180,16 @@ def _async_send_messages(serializable_email_messages):
         the number of email correctly processed.
     """
 
+    count = 0
+
     for email in serializable_email_messages:
         message = _deserializeEmailMessage(email)
-        message.send()
+        for sanitized_message in sanitize_mailjet_recipients(message):
+            sanitized_message.send()
+            count += 1
 
     # This part is processed by an external worker. Return count is irrelevant, so:
-    return len(serializable_email_messages)
+    return count
 
 
 class AsyncEmailBackend(BaseEmailBackend):
