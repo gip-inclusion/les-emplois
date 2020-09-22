@@ -76,9 +76,13 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     # Drop rows with missing values.
     df = df.dropna()
 
-    # Remove useless suffixes used by ASP.
+    # Examples of native df.kind values:
+    # - ACI_MP, ETTI_MP... (MP == "Milieu Pénitentiaire")
+    # - ACI_DC, ETTI_DC... (DC == "Droit Commun")
+    # Drop MP rows (`~` is the NOT operator for dataframes).
+    df = df[~df["kind"].astype(str).str.endswith("_MP")]
+    # Remove DC suffix.
     df["kind"] = df["kind"].str.replace("_DC", "")
-    df["kind"] = df["kind"].str.replace("_MP", "")
 
     # Filter out rows with irrelevant data.
     df = df[df.kind != "FDI"]
