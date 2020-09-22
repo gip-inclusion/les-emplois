@@ -75,7 +75,8 @@ def sanitize_mailjet_recipients(email_message):
     """
 
     if (
-        len(email_message.to) <= _MAILJET_MAX_RECIPIENTS
+        len(email_message.to)
+        <= _MAILJET_MAX_RECIPIENTS
         # and len(email_message.cc) <= _MAILJET_MAX_RECIPIENTS
         # and len(email_message.bcc) <= _MAILJET_MAX_RECIPIENTS
     ):
