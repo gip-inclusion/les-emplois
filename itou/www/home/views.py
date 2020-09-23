@@ -48,13 +48,10 @@ def save_typeform_resume(request):
     job_seeker_pk = int(resume_signer.unsign(job_seeker_pk))
     user = get_object_or_404(get_user_model(), pk=job_seeker_pk)
 
-    # We can't use this anymore as the response id is known too late.
-    # typeform_response_id = response["form_response"]["token"]
-    # user = get_object_or_404(get_user_model(), typeform_response_id=typeform_response_id)
-
     resume_link = response["form_response"]["answers"][0]["file_url"]
     user.resume_link = resume_link
     user.save()
+
     return HttpResponse(status=200)
 
 

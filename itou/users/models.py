@@ -87,10 +87,6 @@ class User(AbstractUser, AddressMixin):
         "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True
     )
 
-    typeform_response_id = models.CharField(
-        null=True, blank=True, verbose_name=_("Identifiant du CV dans Typeform"), max_length=200
-    )
-
     def __str__(self):
         return self.email
 

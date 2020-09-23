@@ -8,10 +8,6 @@ class ResumeFormMixin(forms.Form):
     Handles resume fields for apply and signup jobseeker forms
     """
 
-    typeform_response_id = forms.CharField(
-        widget=forms.HiddenInput(attrs={"id": "typeform_response_id"}), required=False
-    )
-
     resume_link = forms.URLField(
         label=gettext_lazy("Lien vers un CV"),
         help_text=gettext_lazy("Vous pouvez saisir un lien vers un CV de votre choix (CVDesignR, ...)"),
@@ -21,6 +17,5 @@ class ResumeFormMixin(forms.Form):
 
     class Meta:
         fields = [
-            "typeform_response_id",
             "resume_link",
         ]

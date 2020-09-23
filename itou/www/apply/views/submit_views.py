@@ -207,7 +207,7 @@ def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_res
 
     if request.method == "POST":
         if form.is_valid():
-            job_seeker.typeform_response_id = form.cleaned_data.get("typeform_response_id")
+            job_seeker.resume_link = form.cleaned_data.get("resume_link")
             job_seeker.save()
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         return HttpResponseRedirect(next_url)
