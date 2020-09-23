@@ -48,6 +48,6 @@
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
     {% if request.user.is_job_seeker %}
-        {% include "utils/resume/typeform_scripts.html" %}
+        {% include "utils/resume/typeform_scripts.html" with author_kind="candidat" %}
     {% endif %}
 {% endblock %}

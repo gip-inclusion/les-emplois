@@ -34,8 +34,25 @@
         {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary" formaction="{{ request.get_full_path }}&resume=True">{% translate "Continuer avec un CV" %}</button>
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button
+                type="submit"
+                class="btn btn-primary matomo-event"
+                formaction="{{ request.get_full_path }}&resume=True"
+                data-matomo-category="CV"
+                data-matomo-action="continuer-avec-CV"
+                data-matomo-option="creation-candidat-par-prescripteur"
+            >
+                {% translate "Continuer avec un CV" %}
+            </button>
+            <button
+                type="submit"
+                class="btn btn-primary matomo-event"
+                data-matomo-category="CV"
+                data-matomo-action="continuer-sans-cv"
+                data-matomo-option="creation-candidat-par-prescripteur"
+            >
+                {% translate "Continuer sans CV" %}
+            </button>
         {% endbuttons %}
 
     </form>
