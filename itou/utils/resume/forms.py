@@ -9,10 +9,10 @@ class ResumeFormMixin(forms.Form):
     """
 
     resume_link = forms.URLField(
-        label=gettext_lazy("Lien vers un CV"),
-        help_text=gettext_lazy("Vous pouvez saisir un lien vers un CV de votre choix (CVDesignR, ...)"),
+        label=gettext_lazy("Indiquez le lien d'un CV existant"),
+        help_text=gettext_lazy("Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)"),
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Entrez l'adresse de votre CV")}),
+        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("https://www.mon_cv.fr/dfROS")}),
     )
 
     class Meta:

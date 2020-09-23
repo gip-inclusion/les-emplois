@@ -26,9 +26,14 @@
 
     {% bootstrap_form_errors form %}
 
-    {% bootstrap_form form %}
+    {% bootstrap_form form exclude="resume_link" %}
 
-    {% include "utils/resume/typeform_form.html" %}
+    {% if request.user.is_job_seeker %}
+        {% include "utils/resume/typeform_form.html" %}
+        <p class="lines-on-sides">{% translate "ou" %}</p>
+        {% bootstrap_label content="Lien vers un CV public" %}
+        {% bootstrap_field form.resume_link show_label=False %}
+    {% endif %}
 
     {% buttons %}
         <a class="btn btn-secondary" href="{{ prev_url }}">{% translate "Annuler" %}</a>
@@ -42,5 +47,7 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
-    {% include "utils/resume/typeform_scripts.html" %}
+    {% if request.user.is_job_seeker %}
+        {% include "utils/resume/typeform_scripts.html" %}
+    {% endif %}
 {% endblock %}
