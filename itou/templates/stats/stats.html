@@ -2,7 +2,9 @@
 {% load i18n %}
 
 {% block title %}{% translate "Statistiques et pilotage" %}{{ block.super }}{% endblock %}
+
 {% block content %}
+    <h1>{{ page_title }}</h1>
     <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
     <iframe
         src="{{ iframeurl }}"

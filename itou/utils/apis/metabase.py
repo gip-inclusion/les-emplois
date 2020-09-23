@@ -15,4 +15,4 @@ def _get_token(payload):
 
 def metabase_embedded_url(dashboard_id):
     payload = {"resource": {"dashboard": dashboard_id}, "params": {}, "exp": round(time.time()) + (60 * 10)}
-    return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload)
+    return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + "#titled=false"
