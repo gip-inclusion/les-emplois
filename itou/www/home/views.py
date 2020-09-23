@@ -11,6 +11,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_bytes
 from django.views.decorators.csrf import csrf_exempt
 
+from itou.utils.tokens import resume_signer
 from itou.www.search.forms import SiaeSearchForm
 
 
@@ -43,10 +44,8 @@ def save_typeform_resume(request):
 
     # 2/ Now process content
     response = json.loads(request.read().decode("utf-8"))
-
-    # This is very unsecure!
-    # TODO: encrypt
     job_seeker_pk = response["form_response"]["hidden"]["job_seeker_pk"]
+    job_seeker_pk = int(resume_signer.unsign(job_seeker_pk))
     user = get_object_or_404(get_user_model(), pk=job_seeker_pk)
 
     # We can't use this anymore as the response id is known too late.
