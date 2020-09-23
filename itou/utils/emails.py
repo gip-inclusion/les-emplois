@@ -68,26 +68,20 @@ def sanitize_mailjet_recipients(email_message):
     This function:
     * partitions email recipients with more than 50 elements
     * creates new emails with a number of recipients in the Mailjet limit
+    * **only** checks for `TO` recipients owerflows
 
     `email_message` is an EmailMessage object (not serialized)
 
     Returns a **list** of "sanitized" emails.
     """
 
-    if (
-        len(email_message.to)
-        <= _MAILJET_MAX_RECIPIENTS
-        # and len(email_message.cc) <= _MAILJET_MAX_RECIPIENTS
-        # and len(email_message.bcc) <= _MAILJET_MAX_RECIPIENTS
-    ):
+    if len(email_message.to) <= _MAILJET_MAX_RECIPIENTS:
         # We're ok, return a list containing the original message
         return [email_message]
 
     sanitized_emails = []
     part_to = partition(email_message.to, _MAILJET_MAX_RECIPIENTS)
     # We could also combine to, cc and bcc, but it's useless for now
-    # part_cc = partition(email_message.cc, _MAILJET_MAX_RECIPIENTS)
-    # part_bcc = partition(email_message.bcc, _MAILJET_MAX_RECIPIENTS)
 
     for tos in part_to:
         copy_email = deepcopy(email_message)
