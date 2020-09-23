@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
+from django.utils.translation import gettext_lazy as _
 
 from itou.utils.apis.metabase import metabase_embedded_url
 from itou.utils.perms.decorators import can_view_stats
-from django.utils.translation import gettext_lazy as _
+
 
 # Embedding Metabase dashboards:
 # Metabase dashboards can be included securely in the app via a signed URL
