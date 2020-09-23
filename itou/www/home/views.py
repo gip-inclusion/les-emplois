@@ -24,7 +24,7 @@ def home(request, template_name="home/home.html"):
 
 
 @csrf_exempt
-def save_typeform_resume(request):
+def update_resume_link(request):
     # 1/ Secure Typeform
     # https://stackoverflow.com/questions/59114066/securing-typeform-webhook-python
     # Thanks man!
