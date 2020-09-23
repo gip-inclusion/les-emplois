@@ -10,6 +10,7 @@ from django.utils.http import urlencode
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.approvals.models import ApprovalsWrapper
 from itou.cities.factories import create_test_cities
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
@@ -291,18 +292,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        self.assertFalse(new_job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
 
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        # In order to avoid calling the database too often, `has_eligibility_diagnoses`
-        # is a cached property.
-        # Delete the attribute to refresh it.
-        # See https://docs.djangoproject.com/en/3.0/ref/utils/#django.utils.functional.cached_property
-        delattr(new_job_seeker, "has_eligibility_diagnoses")
-
-        self.assertTrue(new_job_seeker.has_valid_eligibility_diagnosis)
+        self.assertTrue(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)
@@ -478,7 +473,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url)
         self.assertEqual(response.status_code, 302)
 
-        self.assertFalse(new_job_seeker.has_valid_eligibility_diagnosis)
+        self.assertFalse(EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=siae))
 
         next_url = reverse("apply:step_application", kwargs={"siae_pk": siae.pk})
         self.assertEqual(response.url, next_url)

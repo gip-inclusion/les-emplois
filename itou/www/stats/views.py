@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
+from django.utils.translation import gettext_lazy as _
 
 from itou.utils.apis.metabase import metabase_embedded_url
 from itou.utils.perms.decorators import can_view_stats
@@ -20,7 +21,6 @@ ADVANCED_STATS_DASHBOARD_ID = 43
 DIRECCTE_STATS_DASHBOARD_ID = 36
 
 
-@login_required
 def public_stats(request, template_name=_STATS_HTML_TEMPLATE):
     """
     Public stats (signed and embedded version)
@@ -29,12 +29,12 @@ def public_stats(request, template_name=_STATS_HTML_TEMPLATE):
     """
     context = {
         "iframeurl": metabase_embedded_url(PUBLIC_STATS_DASHBOARD_ID),
+        "page_title": _("Page statistique"),
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
 
 
-@login_required
 def advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
     """
     "Advanced" stats reporting data (signed and embedded version)

@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.template.response import SimpleTemplateResponse
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -40,14 +42,17 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     # exist in the real world but not in our database.
     # Raise an error only if the diagnosis does not exist for an Itou approval.
     if job_application.approval.originates_from_itou:
-        diagnosis = job_seeker.get_eligibility_diagnosis()
+        diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        if not diagnosis:
+            raise ObjectDoesNotExist
         diagnosis_author = diagnosis.author.get_full_name()
         diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
         if diagnosis_author_org:
             diagnosis_author_org_name = diagnosis_author_org.display_name
 
-    # The PDFShift API can load styles only if it has
-    # the full URL.
+    # The PDFShift API can load styles only if it has the full URL.
     base_url = request.build_absolute_uri("/")[:-1]
 
     if settings.DEBUG:

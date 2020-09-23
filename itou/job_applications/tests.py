@@ -11,6 +11,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -35,13 +36,19 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        self.assertFalse(has_considered_valid_diagnoses)
         self.assertFalse(job_application.eligibility_diagnosis_by_siae_required)
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_EI
         )
-        self.assertFalse(job_application.job_seeker.has_valid_eligibility_diagnosis)
+        has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
+            job_application.job_seeker, for_siae=job_application.to_siae
+        )
+        self.assertFalse(has_considered_valid_diagnoses)
         self.assertTrue(job_application.eligibility_diagnosis_by_siae_required)
 
     def test_accepted_by(self):

@@ -253,6 +253,9 @@ class PoleEmploiApprovalManager(models.Manager):
             datetime.date(2020, 4, 8),
             …
         ]
+
+        It used to be used in the admin but it slowed it down.
+        It's still used from time to time in django-admin shell.
         """
         return list(
             self
@@ -435,3 +438,11 @@ class ApprovalsWrapper:
         return sorted(
             merged_approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
         )
+
+    @property
+    def has_valid_pole_emploi_eligibility_diagnosis(self):
+        """
+        The existence of a valid `PoleEmploiApproval` implies that a diagnosis
+        has been made outside of Itou.
+        """
+        return self.has_valid and not self.latest_approval.originates_from_itou

@@ -6,10 +6,69 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
+from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
 logger = logging.getLogger(__name__)
+
+
+class EligibilityDiagnosisQuerySet(models.QuerySet):
+    @property
+    def valid_lookup(self):
+        return models.Q(created_at__gt=self.model.get_expiration_dt())
+
+    def valid(self):
+        return self.filter(self.valid_lookup)
+
+    def expired(self):
+        return self.exclude(self.valid_lookup)
+
+
+class EligibilityDiagnosisManager(models.Manager):
+    def has_considered_valid(self, job_seeker, for_siae=None):
+        """
+        Returns True if the given job seeker has a considered valid diagnosis, False otherwise.
+        """
+        return job_seeker.approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis or bool(
+            self.last_considered_valid(job_seeker, for_siae=for_siae)
+        )
+
+    def last_considered_valid(self, job_seeker, for_siae=None):
+        """
+        Retrieves the given job seeker's last considered valid diagnosis or None.
+
+        If the `for_siae` argument is passed, it means that we are looking for
+        a diagnosis from an employer perspective. The scope is restricted to
+        avoid showing diagnoses made by other employers.
+
+        A diagnosis made by a prescriber takes precedence even when an employer
+        diagnosis already exists.
+        """
+
+        last = None
+        query = (
+            self.filter(job_seeker=job_seeker)
+            .select_related("author", "author_siae", "author_prescriber_organization")
+            .order_by("created_at")
+        )
+
+        # A diagnosis is considered valid for the duration of an approval,
+        # we just retrieve the last one no matter if it's valid or not.
+        if job_seeker.approvals_wrapper.has_valid:
+            last = query.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
+            if not last and for_siae:
+                last = query.filter(author_siae=for_siae).last()
+            if not last:
+                # Deals with cases from the past (when there was no restriction).
+                last = query.last()
+
+        # Otherwise, search only in "non expired" diagnosis.
+        else:
+            last = query.valid().filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
+            if not last and for_siae:
+                last = query.valid().filter(author_siae=for_siae).last()
+
+        return last
 
 
 class EligibilityDiagnosis(models.Model):
@@ -17,12 +76,10 @@ class EligibilityDiagnosis(models.Model):
     Store the eligibility diagnosis of a job seeker.
     """
 
-    AUTHOR_KIND_JOB_SEEKER = KIND_JOB_SEEKER
     AUTHOR_KIND_PRESCRIBER = KIND_PRESCRIBER
     AUTHOR_KIND_SIAE_STAFF = KIND_SIAE_STAFF
 
     AUTHOR_KIND_CHOICES = (
-        (AUTHOR_KIND_JOB_SEEKER, _("Demandeur d'emploi")),
         (AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
         (AUTHOR_KIND_SIAE_STAFF, _("Employeur (SIAE)")),
     )
@@ -48,7 +105,7 @@ class EligibilityDiagnosis(models.Model):
     author_siae = models.ForeignKey(
         "siaes.Siae", verbose_name=_("SIAE de l'auteur"), null=True, blank=True, on_delete=models.CASCADE
     )
-    # When the author is a prescriber, keep a track of his current organization (if any).
+    # When the author is a prescriber, keep a track of his current organization.
     author_prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
         verbose_name=_("Organisation du prescripteur de l'auteur"),
@@ -67,6 +124,8 @@ class EligibilityDiagnosis(models.Model):
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
 
+    objects = EligibilityDiagnosisManager.from_queryset(EligibilityDiagnosisQuerySet)()
+
     class Meta:
         verbose_name = _("Diagnostic d'éligibilité")
         verbose_name_plural = _("Diagnostics d'éligibilité")
@@ -75,17 +134,33 @@ class EligibilityDiagnosis(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def save(self, *args, **kwargs):
+        self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    @property
+    def is_valid(self):
+        return self.created_at > self.get_expiration_dt()
+
     @property
     def expires_at(self):
         return self.created_at + relativedelta(months=self.EXPIRATION_DELAY_MONTHS)
 
-    @property
-    def has_expired(self):
-        return timezone.now() > self.expires_at
+    # A diagnosis is considered valid for the whole duration of an approval.
+    # Methods below (whose name contain `considered`) take into account
+    # the existence of an ongoing approval.
+    # They must not be used "as-is" in admin's `list_display` because checking
+    # approvals_wrapper would trigger additional SQL queries for each row.
 
-    def save(self, *args, **kwargs):
-        self.updated_at = timezone.now()
-        return super().save(*args, **kwargs)
+    @property
+    def is_considered_valid(self):
+        return self.is_valid or self.job_seeker.approvals_wrapper.has_valid
+
+    @property
+    def considered_to_expire_at(self):
+        if self.job_seeker.approvals_wrapper.has_valid:
+            return self.job_seeker.approvals_wrapper.latest_approval.end_at
+        return self.expires_at
 
     @classmethod
     def create_diagnosis(cls, job_seeker, user_info, administrative_criteria=None):
@@ -108,6 +183,11 @@ class EligibilityDiagnosis(models.Model):
                 diagnosis.administrative_criteria.add(criteria)
             diagnosis.save()
         return diagnosis
+
+    @staticmethod
+    def get_expiration_dt():
+        # Everything created after this date is valid.
+        return timezone.now() - relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS)
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
