@@ -12,7 +12,15 @@ class ResumeFormMixin(forms.Form):
         widget=forms.HiddenInput(attrs={"id": "typeform_response_id"}), required=False
     )
 
+    resume_link = forms.URLField(
+        label=gettext_lazy("Lien vers un CV"),
+        help_text=gettext_lazy("Vous pouvez saisir un lien vers un CV de votre choix (CVDesignR, ...)"),
+        required=False,
+        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("Entrez l'adresse de votre CV")}),
+    )
+
     class Meta:
         fields = [
             "typeform_response_id",
+            "resume_link",
         ]
