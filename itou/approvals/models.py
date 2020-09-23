@@ -253,6 +253,9 @@ class PoleEmploiApprovalManager(models.Manager):
             datetime.date(2020, 4, 8),
             …
         ]
+
+        It used to be used in the admin but it slowed it down.
+        It's still used from time to time in django-admin shell.
         """
         return list(
             self
