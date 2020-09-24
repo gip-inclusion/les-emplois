@@ -12,6 +12,10 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        required_fields = ["address_line_1", "post_code", "city", "department"]
+        for required_field in required_fields:
+            self.fields[required_field].required = True
+
         if self.instance.is_authorized:
             # Do not edit the name of an authorized prescriber organization.
             del self.fields["name"]
@@ -31,7 +35,19 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
 
     class Meta:
         model = PrescriberOrganization
-        fields = ["siret", "name", "phone", "email", "website", "description"]
+        fields = [
+            "siret",
+            "name",
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "department",
+            "phone",
+            "email",
+            "website",
+            "description",
+        ]
         help_texts = {
             "siret": gettext_lazy("Le numéro SIRET contient 14 chiffres."),
             "phone": gettext_lazy("Par exemple 0610203040"),
@@ -45,3 +61,10 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
             error = _("Ce SIRET est déjà utilisé.")
             raise forms.ValidationError(error)
         return siret
+
+    def save(self, commit=True):
+        prescriber_org = super().save(commit=False)
+        if commit:
+            prescriber_org.set_coords(prescriber_org.address_on_one_line, post_code=prescriber_org.post_code)
+            prescriber_org.save()
+        return prescriber_org
