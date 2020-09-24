@@ -353,6 +353,9 @@ class SiaeMembership(models.Model):
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
 
+    class Meta:
+        unique_together = ("user_id", "siae_id")
+
 
 class SiaeJobDescription(models.Model):
     """
