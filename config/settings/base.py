@@ -346,6 +346,9 @@ SOCIALACCOUNT_ADAPTER = "itou.allauth.peamu.adapter.PEAMUSocialAccountAdapter"
 PDFSHIFT_API_KEY = os.environ.get("PDFSHIFT_API_KEY")
 PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 
+# Typeform
+TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
+
 # Itou.
 # ------------------------------------------------------------------------------
 
