@@ -1,0 +1,24 @@
+{% extends "apply/submit_base.html" %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block content %}
+    {{ block.super }}
+    {% include "utils/resume/typeform_form.html" %}
+    <p class="lines-on-sides">{% translate "ou" %}</p>
+
+    <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
+        {% csrf_token %}
+        {% bootstrap_form_errors form %}
+        {% bootstrap_form form %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% include "utils/resume/typeform_scripts.html" with author_kind="prescripteur" %}
+{% endblock %}

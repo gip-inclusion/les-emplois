@@ -1,6 +1,7 @@
 {% extends "apply/submit_base.html" %}
 {% load bootstrap4 %}
 {% load i18n %}
+{% load url_add_query %}
 
 {% block content %}
 
@@ -32,10 +33,35 @@
 
         {% bootstrap_field form.pole_emploi_id %}
         {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
-        {% bootstrap_field form.resume_link %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <div class="row">
+                <div class="col">
+                    <button
+                        type="submit"
+                        class="btn btn-primary matomo-event w-100"
+                        formaction="{% url_add_query request.get_full_path resume=True %}"
+                        data-matomo-category="CV"
+                        data-matomo-action="continuer-avec-CV"
+                        data-matomo-option="creation-candidat-par-prescripteur"
+                    >
+                        {% include "includes/icon.html" with icon="file-text" fill="#fff" stroke="#007bff" size=30 class="d-block w-100 mb-1" %}
+                        {% translate "Continuer avec un CV" %}
+                    </button>
+                </div>
+                <div class="col">
+                    <button
+                        type="submit"
+                        class="btn btn-primary matomo-event w-100 align-items-center"
+                        data-matomo-category="CV"
+                        data-matomo-action="continuer-sans-cv"
+                        data-matomo-option="creation-candidat-par-prescripteur"
+                    >
+                        {% include "includes/icon.html" with icon="arrow-right-circle" fill="#fff" stroke="#007bff" size=30 class="d-block w-100 mb-1" %}
+                        {% translate "Continuer sans CV" %}
+                    </button>
+                </div>
+            </div>
         {% endbuttons %}
 
     </form>
