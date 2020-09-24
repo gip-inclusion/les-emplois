@@ -38,21 +38,17 @@
     {% endif %}
 
     {% bootstrap_field form.login %}
+
     {% bootstrap_field form.password %}
 
     <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
 
     {% buttons %}
         <button type="submit" class="btn btn-primary">{% translate "Connexion" %}</button>
+        <a class="btn btn-link" href="{% url 'account_reset_password' %}">{% translate "Mot de passe oublié ?" %}</a>
     {% endbuttons %}
 
 </form>
-
-<hr>
-
-<p>
-    <a href="{% url 'account_reset_password' %}">{% translate "Mot de passe oublié ?" %}</a>
-</p>
 
 <hr>
 

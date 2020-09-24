@@ -23,6 +23,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     prescriber_authorization_status_not_set = None
 
     if request.user.is_siae_staff:
+        siae = get_current_siae_or_404(request)
         job_applications_categories = [
             {
                 "name": _("Candidatures à traiter"),
@@ -47,7 +48,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "badge": "badge-secondary",
             },
         ]
-        siae = get_current_siae_or_404(request)
         job_applications = siae.job_applications_received.values("state").all()
         for category in job_applications_categories:
             category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])

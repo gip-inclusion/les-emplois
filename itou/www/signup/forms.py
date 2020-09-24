@@ -39,6 +39,12 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         super(JobSeekerSignupForm, self).__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
 
+    def clean_email(self):
+        email = super().clean_email()
+        if email.endswith("@pole-emploi.fr"):
+            raise ValidationError(gettext_lazy("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat."))
+        return email
+
     def save(self, request):
         user = super().save(request)
 

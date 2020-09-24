@@ -231,7 +231,7 @@
             <p>
                 <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
-                    {% translate "Je veux l'embaucher plus tard" %}
+                    {% translate "Mettre en liste d'attente" %}
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
@@ -241,7 +241,7 @@
         <p>
             <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
                class="btn btn-outline-danger btn-block">
-                {% translate "Je ne veux pas l'embaucher" %}
+                {% translate "Décliner la candidature" %}
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>
@@ -271,7 +271,7 @@
         <p>
             <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
                class="btn btn-outline-danger btn-block">
-                {% translate "Je ne veux pas l'embaucher" %}
+                {% translate "Décliner la candidature" %}
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>

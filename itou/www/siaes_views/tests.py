@@ -363,6 +363,8 @@ class CreateSiaeViewTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
+        mock_call_ban_geocoding_api.assert_called_once()
+
         new_siae = Siae.objects.get(siret=new_siret)
         self.assertTrue(new_siae.has_admin(user))
         self.assertEqual(siae.source, Siae.SOURCE_ASP)

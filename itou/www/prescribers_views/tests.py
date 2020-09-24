@@ -1,9 +1,12 @@
+from unittest import mock
+
 from django.test import TestCase
 from django.urls import reverse
 
 from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
 
 class CardViewTest(TestCase):
@@ -16,7 +19,8 @@ class CardViewTest(TestCase):
 
 
 class EditOrganizationTest(TestCase):
-    def test_edit(self):
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_edit(self, mock_call_ban_geocoding_api):
         """Edit a prescriber organization."""
 
         organization = PrescriberOrganizationWithMembershipFactory()
@@ -31,6 +35,11 @@ class EditOrganizationTest(TestCase):
         post_data = {
             "name": "foo",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "address_line_1": "2 Rue de Soufflenheim",
+            "address_line_2": "",
+            "city": "Betschdorf",
+            "post_code": "67660",
+            "department": "67",
             "email": "",
             "phone": "0610203050",
             "website": "https://famous-siae.com",
@@ -38,12 +47,25 @@ class EditOrganizationTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
+        mock_call_ban_geocoding_api.assert_called_once()
+
         organization = PrescriberOrganization.objects.get(siret=organization.siret)
 
         self.assertEqual(organization.description, post_data["description"])
+        self.assertEqual(organization.address_line_1, post_data["address_line_1"])
+        self.assertEqual(organization.address_line_2, post_data["address_line_2"])
+        self.assertEqual(organization.city, post_data["city"])
+        self.assertEqual(organization.post_code, post_data["post_code"])
+        self.assertEqual(organization.department, post_data["department"])
         self.assertEqual(organization.email, post_data["email"])
         self.assertEqual(organization.phone, post_data["phone"])
         self.assertEqual(organization.website, post_data["website"])
+
+        # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
+        self.assertEqual(organization.coords, "SRID=4326;POINT (2.316754 48.838411)")
+        self.assertEqual(organization.latitude, 48.838411)
+        self.assertEqual(organization.longitude, 2.316754)
+        self.assertEqual(organization.geocoding_score, 0.587663373207207)
 
 
 class MembersTest(TestCase):
