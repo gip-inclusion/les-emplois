@@ -3,9 +3,11 @@ import logging
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from itou.approvals.models import Approval
 from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF
 
 
@@ -22,6 +24,15 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
 
     def expired(self):
         return self.exclude(self.valid_lookup)
+
+    def has_approval(self):
+        """
+        Annotate values with a boolean `_has_approval` attribute which can be
+        filtered, e.g.:
+        EligibilityDiagnosis.objects.has_approval().filter(_has_approval=True)
+        """
+        has_approval = Approval.objects.filter(user=OuterRef("job_seeker")).valid()
+        return self.annotate(_has_approval=Exists(has_approval))
 
 
 class EligibilityDiagnosisManager(models.Manager):
