@@ -271,3 +271,6 @@ class PrescriberMembership(models.Model):
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_admin = models.BooleanField(verbose_name=_("Administrateur de la structure d'accompagnement"), default=False)
+
+    class Meta:
+        unique_together = ("user_id", "organization_id")
