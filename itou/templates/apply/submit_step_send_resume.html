@@ -3,27 +3,19 @@
 {% load i18n %}
 
 {% block content %}
-
     {{ block.super }}
-
     {% include "utils/resume/typeform_form.html" %}
-
     <p class="lines-on-sides">{% translate "ou" %}</p>
 
-    <form method="post" action="" class="js-prevent-multiple-submit" id="job_seeker_form">
-
+    <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
         {% csrf_token %}
-
         {% bootstrap_form_errors form %}
-
         {% bootstrap_form form %}
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
         {% endbuttons %}
-
     </form>
-
 {% endblock %}
 
 {% block script %}

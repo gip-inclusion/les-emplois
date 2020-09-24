@@ -118,10 +118,10 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         return HttpResponseRedirect(success_url)
 
     context = {
-        "form": form,
-        "prev_url": prev_url,
         "extra_data": extra_data,
+        "form": form,
         "job_seeker_signed_pk": job_seeker_signed_pk,
+        "prev_url": prev_url,
     }
 
     return render(request, template_name, context)

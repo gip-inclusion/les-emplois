@@ -1,13 +1,13 @@
 <script src="https://embed.typeform.com/embed.js"></script>
 <script>
   window.addEventListener("DOMContentLoaded", function() {
-    let resume_form = document.getElementById("resumeForm");
-    let job_seeker_form = $("#job_seeker_form");
-    let job_seeker_pk = "{{ job_seeker_signed_pk }}"
+    const resume_form = document.getElementById("resumeForm");
+    const form = $("form.js-submit-with-typeform");
+    const job_seeker_pk = "{{ job_seeker_signed_pk }}"
     window.typeformEmbed.makeWidget(
         resume_form, `https://admin.typeform.com/to/e2hX2fUg#job_seeker_pk=${job_seeker_pk}`, {
             onSubmit: function(event) {
-              job_seeker_form.submit();
+              form.submit();
               _paq.push(['trackEvent', "CV", "envoi-du-CV",  "{{ author_kind }}"]);
             }
         });

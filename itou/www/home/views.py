@@ -25,7 +25,7 @@ def home(request, template_name="home/home.html"):
 
 @csrf_exempt
 def update_resume_link(request):
-    # 1/ Secure Typeform
+    # 1/ Check that the request is coming from Typeform.
     # https://stackoverflow.com/questions/59114066/securing-typeform-webhook-python
     # Thanks man!
     header_signature = request.headers.get("Typeform-Signature")

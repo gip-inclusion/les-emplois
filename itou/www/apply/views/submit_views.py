@@ -195,8 +195,8 @@ def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_res
     """
     Updates user's resume following the next steps:
     - Prescriber uploads a file using Typeform's embed form.
-    - When Typeform receives a new entry, it performs a POST on `/save-typeform-resume`
-    - This view updates the job seeker `resume_link` attribute.
+    - When Typeform receives a new entry, it performs a POST on `/update-resume-link`
+    - This view updates job seeker's `resume_link` attribute.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
@@ -205,6 +205,8 @@ def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_res
 
     form = ResumeFormMixin(data=request.POST or None)
 
+    # Uploading a resume via Typeform without filling in the resume_link field
+    # will submit an empty form, which is an expected behavior.
     if request.method == "POST":
         if form.is_valid():
             job_seeker.resume_link = form.cleaned_data.get("resume_link")

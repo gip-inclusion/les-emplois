@@ -12,7 +12,7 @@
 <div class="alert alert-info">
 
     {% blocktrans with dt_creation=extra_data.created_at|date:"d F Y" %}
-    Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi
+    Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi 
     (récupérés lors de votre connexion du {{dt_creation}}).
     {% endblocktrans %}
 
@@ -20,7 +20,7 @@
 
 {% endif %}
 
-<form method="post" action="" class="js-prevent-multiple-submit">
+<form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
 
     {% csrf_token %}
 
