@@ -27,10 +27,10 @@ class SiaeMembershipInline(admin.TabularInline):
         return False
 
     def siae_id_link(self, obj):
-        app_label = obj.organization._meta.app_label
-        model_name = obj.organization._meta.model_name
+        app_label = obj.siae._meta.app_label
+        model_name = obj.siae._meta.model_name
         url = reverse(f"admin:{app_label}_{model_name}_change", args=[obj.siae_id])
-        return mark_safe(f'<a href="{url}">{obj.organization_id}</a>')
+        return mark_safe(f'<a href="{url}">{obj.siae_id}</a>')
 
 
 class PrescriberMembershipInline(admin.TabularInline):

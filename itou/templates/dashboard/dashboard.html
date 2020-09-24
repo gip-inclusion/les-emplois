@@ -228,11 +228,13 @@
                 <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
                 <div class="card-body">
                     {% for category in job_applications_categories %}
-                        <p class="card-text">
-                            {% include "includes/icon.html" with icon=category.icon %}
-                            <a href="{{ category.url }}">{{ category.name }}</a>
-                            <span class="badge {{ category.badge }}">{{ category.counter }}</span>
-                        </p>
+                        {% if category.counter %}
+                            <p class="card-text">
+                                {% include "includes/icon.html" with icon=category.icon %}
+                                <a href="{{ category.url }}">{{ category.name }}</a>
+                                <span class="badge {{ category.badge }}">{{ category.counter }}</span>
+                            </p>
+                        {% endif %}
                     {% endfor %}
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="log-in" %}
