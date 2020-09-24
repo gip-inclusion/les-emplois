@@ -97,6 +97,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
 
     context = {
         "DOC_OPENING_SCHEDULE_URL": settings.ITOU_DOC_OPENING_SCHEDULE_URL,
+        "typeform_link": settings.ITOU_CHECK_SIRET_LINK,
         "next_url": next_url,
         "siaes_without_members": siaes_without_members,
         "siaes_with_members": siaes_with_members,
