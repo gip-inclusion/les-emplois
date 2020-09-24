@@ -36,19 +36,21 @@
 
         {% buttons %}
             <div class="row">
-                <div class="col">
-                    <button
-                        type="submit"
-                        class="btn btn-primary matomo-event w-100"
-                        formaction="{% url_add_query request.get_full_path resume=True %}"
-                        data-matomo-category="CV"
-                        data-matomo-action="continuer-avec-CV"
-                        data-matomo-option="creation-candidat-par-prescripteur"
-                    >
-                        {% include "includes/icon.html" with icon="file-text" fill="#fff" stroke="#007bff" size=30 class="d-block w-100 mb-1" %}
-                        {% translate "Continuer avec un CV" %}
-                    </button>
-                </div>
+                {% if ITOU_ENVIRONMENT == "PROD" %}
+                    <div class="col">
+                        <button
+                            type="submit"
+                            class="btn btn-primary matomo-event w-100"
+                            formaction="{% url_add_query request.get_full_path resume=True %}"
+                            data-matomo-category="CV"
+                            data-matomo-action="continuer-avec-CV"
+                            data-matomo-option="creation-candidat-par-prescripteur"
+                        >
+                            {% include "includes/icon.html" with icon="file-text" fill="#fff" stroke="#007bff" size=30 class="d-block w-100 mb-1" %}
+                            {% translate "Continuer avec un CV" %}
+                        </button>
+                    </div>
+                {% endif %}
                 <div class="col">
                     <button
                         type="submit"
