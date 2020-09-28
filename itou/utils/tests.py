@@ -7,8 +7,10 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
+from django.core.mail.message import EmailMessage
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
+from factory import Faker
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
@@ -20,6 +22,7 @@ from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
+from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
@@ -39,9 +42,6 @@ from itou.utils.validators import (
     validate_siren,
     validate_siret,
 )
-from django.core.mail.message import EmailMessage
-from factory import Faker
-from itou.utils.emails import sanitize_mailjet_recipients
 
 
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
@@ -629,6 +629,7 @@ class UtilsEmailsSplitRecipientTest(TestCase):
     Test behavior of email backend when sending emails with more than 50 recipients
     (Mailjet API Limit)
     """
+
     def test_dont_split_emails(self):
         recipients = []
         # Only one email is needed
