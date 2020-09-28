@@ -39,6 +39,9 @@ from itou.utils.validators import (
     validate_siren,
     validate_siret,
 )
+from django.core.mail.message import EmailMessage
+from factory import Faker
+from itou.utils.emails import sanitize_mailjet_recipients
 
 
 class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
@@ -619,3 +622,34 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
         self.assertFalse(etablissement.is_closed)
+
+
+class UtilsEmailsSplitRecipientTest(TestCase):
+    """
+    Test behavior of email backend when sending emails with more than 50 recipients
+    (Mailjet API Limit)
+    """
+    def test_dont_split_emails(self):
+        recipients = []
+        # Only one email is needed
+        for i in range(49):
+            recipients.append(Faker("email", locale="fr_FR"))
+
+        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
+        result = sanitize_mailjet_recipients(message)
+
+        self.assertEqual(1, len(result))
+        self.assertEqual(49, len(result[0].to))
+
+    def test_must_split_emails(self):
+        # 2 emails are needed; one with 50 the other with 25
+        recipients = []
+        for i in range(75):
+            recipients.append(Faker("email", locale="fr_FR"))
+
+        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
+        result = sanitize_mailjet_recipients(message)
+
+        self.assertEqual(2, len(result))
+        self.assertEqual(50, len(result[0].to))
+        self.assertEqual(25, len(result[1].to))
