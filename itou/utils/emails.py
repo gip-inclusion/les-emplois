@@ -81,7 +81,7 @@ def sanitize_mailjet_recipients(email_message):
 
     for tos in part_to:
         copy_email = deepcopy(email_message)
-        copy_email.to = list(tos)
+        copy_email.to = tos
         sanitized_emails.append(copy_email)
 
     return sanitized_emails
