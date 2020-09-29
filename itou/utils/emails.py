@@ -9,6 +9,8 @@ from django.core.mail.message import EmailMessage
 from django.template.loader import get_template
 from huey.contrib.djhuey import task
 
+from itou.utils.iterators import chunks
+
 
 # This is the "real" email backend used by the async wrapper / email backend
 ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
@@ -52,14 +54,6 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 _MAILJET_MAX_RECIPIENTS = 50
 
 
-def chunks(lst, n):
-    """
-    Split `lst` in `n` even parts (plus reminder)
-    """
-    for i in range(0, len(lst), n):
-        yield lst[i : i + n]
-
-
 def sanitize_mailjet_recipients(email_message):
     """
     Mailjet API has a **50** number limit for anytype of email recipient:
@@ -89,8 +83,6 @@ def sanitize_mailjet_recipients(email_message):
         copy_email = deepcopy(email_message)
         copy_email.to = list(tos)
         sanitized_emails.append(copy_email)
-
-    assert len(sanitized_emails) > 1
 
     return sanitized_emails
 
