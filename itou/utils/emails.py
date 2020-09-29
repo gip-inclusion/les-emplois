@@ -1,6 +1,5 @@
 import re
 from copy import deepcopy
-from itertools import islice
 
 from django.conf import settings
 from django.core import mail
@@ -53,9 +52,12 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 _MAILJET_MAX_RECIPIENTS = 50
 
 
-def partition(list, size):
-    it = iter(list)
-    return iter(lambda: tuple(islice(it, size)), ())
+def chunks(lst, n):
+    """
+    Split `lst` in `n` even parts (plus reminder)
+    """
+    for i in range(0, len(lst), n):
+        yield lst[i : i + n]
 
 
 def sanitize_mailjet_recipients(email_message):
@@ -80,7 +82,7 @@ def sanitize_mailjet_recipients(email_message):
         return [email_message]
 
     sanitized_emails = []
-    part_to = partition(email_message.to, _MAILJET_MAX_RECIPIENTS)
+    part_to = chunks(email_message.to, _MAILJET_MAX_RECIPIENTS)
     # We could also combine to, cc and bcc, but it's useless for now
 
     for tos in part_to:
