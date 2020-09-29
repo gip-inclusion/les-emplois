@@ -17,11 +17,12 @@ import numpy as np
 import pandas as pd
 
 from itou.siaes.management.commands._import_siae.utils import timeit
+from itou.utils.validators import validate_naf, validate_siret
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-VUE_STRUCTURE_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_Structure_14092020_074740.csv"
+VUE_STRUCTURE_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_Structure_28092020_074907.csv"
 
 
 @timeit
@@ -45,6 +46,7 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
         converters={
             "structure_siret_actualise": str,
             "structure_siret_signature": str,
+            "structure_adresse_mail_corresp_technique": str,
             "structure_adresse_gestion_cp": str,
             "structure_adresse_gestion_telephone": str,
         },
@@ -63,6 +65,7 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
             "structure_siret_actualise": "siret",
             "structure_siret_signature": "siret_signature",
             "structure_id_siae": "external_id",
+            "structure_adresse_mail_corresp_technique": "auth_email",
             "structure_code_naf": "naf",
             "structure_denomination": "name",
             # ASP recommends using *_gestion_* fields rather than *_admin_* ones.
@@ -82,17 +85,18 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
         inplace=True,
     )
 
-    for siret in df.siret:
-        assert len(siret) == 14
-
-    for siret in df.siret_signature:
-        assert len(siret) == 14
-
-    for naf in df.naf:
-        assert len(naf) == 5
-
     # Replace NaN elements with None.
     df = df.replace({np.nan: None})
+
+    # Drop rows without auth_email.
+    df = df[df.auth_email.notnull()]
+
+    for _, row in df.iterrows():
+        validate_siret(row.siret)
+        validate_siret(row.siret_signature)
+        validate_naf(row.naf)
+        assert " " not in row.auth_email
+        assert "@" in row.auth_email
 
     return df
 
