@@ -30,7 +30,7 @@ from itou.siaes.models import Siae
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_14092020_063002.txt"
+VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_28092020_063002.csv"
 
 
 def get_vue_af_df(filename=VUE_AF_FILENAME):
@@ -56,8 +56,6 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
         skipfooter=1,
         # Fix warning caused by using `skipfooter`.
         engine="python",
-        # Fix `_csv.Error: line contains NULL byte` error.
-        encoding="utf-16",
     )
 
     df.rename(

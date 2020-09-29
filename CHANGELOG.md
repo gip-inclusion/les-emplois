@@ -4,6 +4,47 @@ Toutes les modifications notables apportées au projet seront documentées dans 
 
 Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2.
 
+## [3] - 2020-09-24
+
+### Ajouté
+- Déploiement - Nouvelle Aquitaine (22 septembre)
+- Déploiement - Centre Val de Loire (21 septembre)
+- Possibilité de joindre un CV à une candidature
+- Accès "Statistiques et pilotage" avec des sections accessibles sur privilège :
+    - "Voir les statistiques avancées"
+    - "Voir les données sur mon territoire "
+- 4 nouvelles villes dans le moteur de recherche :
+    - Miquelon-Langlade (975)
+    - Saint-Pierre (974)
+    - Saint-Barthélemy (971)
+    - Saint-Martin (971)
+- Possibilité pour tous les prescripteurs de modifier l'adresse postale de leur organisation
+- Ajout d'un filtre dans l'admin des utilisateurs pour pouvoir distinguer les demandeurs d'emploi autonomes
+
+### Modifié
+- Refactoring du script d'import des SIAE en préparation du chantier "conventionnement"
+- Correction d'un bug qui permettait à un utilisateur d'être membre plusieurs fois de la même organisation
+- Précision dans les critères d'éligibilité sur le Niveau d'étude III pour confirmer qu'il s'agit de la nouvelle nomenclature CAP, BEP ou infra
+- Nouvelles règles métier du diagnostic d'éligibilité :
+    - un diagnostic est valide s'il existe un PASS IAE ou un AGREMENT PE valide
+    - un diagnostic réalisé par une SIAE n'est visible que par elle
+    - un diagnostic réalisé par un prescripteur habilité a toujours la priorité même si un diagnostic réalisé par une SIAE existe au préalable
+- Nouveau look du pied de page avec une couleur moins sombre
+- Utilisation du wording "extranet IAE 2.0 de l'ASP" plutôt que "ASP"
+- Mise à niveau de l'API Mailjet pour utiliser la version 3.1
+- On affiche plus de point (`.`) juste après l'e-mail dans le message qui stipule qu'une confirmation d'e-mail a été envoyé
+- Reformulation du bouton "Se connecter" pour "S'inscrire | Se connecter"
+- Reformulation des boutons :
+    - "Je ne veux pas l'embaucher" en "Décliner la candidature"
+    - "Je veux l'embaucher plus tard" en "Mettre en liste d'attente"
+- Interdiction de créer un compte candidat avec un e-mail en `@pole-emploi.fr`
+- Dans le tableau de bord d'une SIAE, on n'affiche plus les liens "_Candidatures à traiter_" ou "_Candidatures acceptées et embauches prévues_" ou "_Candidatures refusées/annulées_" si aucune candidature ne rentre dans ces catégories
+- Déplacement du lien "Mot de passe oublié"
+- Correction d'un bug dans l'admin utilisateur où le lien vers une SIAE n'apparaissait pas
+- La modale "Obtention d'un PASS IAE" n'apparaît plus pour les entreprises non soumises aux règles de l'éligibilité
+- Correction d'une erreur 500 dans l'admin des organisations de prescripteurs quand un objet n'existait pas
+- Optimisation du nombre de requêtes dans l'admin des utilisateurs
+
 ## [2] - 2020-09-10
 
 ### Ajouté

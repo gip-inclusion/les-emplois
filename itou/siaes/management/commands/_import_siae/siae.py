@@ -3,7 +3,6 @@
 Siae object logic used by the import_siae.py script is gathered here.
 
 """
-from itou.siaes.management.commands._import_siae.liste_correspondants_techniques import EXTERNAL_ID_TO_AUTH_EMAIL
 from itou.siaes.management.commands._import_siae.vue_af import (
     SIAE_KEY_TO_CONVENTION_END_DATE,
     VALID_SIAE_KEYS,
@@ -69,7 +68,7 @@ def build_siae(row, kind):
         siae.phone = ""  # siae.phone cannot be null in db
 
     siae.email = ""  # Do not make the authentification email public!
-    siae.auth_email = EXTERNAL_ID_TO_AUTH_EMAIL.get(siae.external_id)
+    siae.auth_email = row.auth_email
 
     street_num = row.street_num
     if street_num:
