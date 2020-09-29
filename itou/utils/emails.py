@@ -1,5 +1,4 @@
 import re
-from copy import deepcopy
 
 from django.conf import settings
 from django.core import mail
@@ -76,12 +75,13 @@ def sanitize_mailjet_recipients(email_message):
         return [email_message]
 
     sanitized_emails = []
-    part_to = chunks(email_message.to, _MAILJET_MAX_RECIPIENTS)
+    to_chunks = chunks(email_message.to, _MAILJET_MAX_RECIPIENTS)
     # We could also combine to, cc and bcc, but it's useless for now
 
-    for tos in part_to:
-        copy_email = deepcopy(email_message)
-        copy_email.to = tos
+    for to_chunk in to_chunks:
+        copy_kvs = {k: email_message.__dict__[k] for k in ("from_email", "cc", "bcc", "subject", "body")}
+        copy_email = EmailMessage(**copy_kvs)
+        copy_email.to = to_chunk
         sanitized_emails.append(copy_email)
 
     return sanitized_emails

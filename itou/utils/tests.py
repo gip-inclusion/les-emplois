@@ -630,6 +630,18 @@ class UtilsEmailsSplitRecipientTest(TestCase):
     (Mailjet API Limit)
     """
 
+    def test_email_copy(self):
+        fake_email = Faker("email", locale="fr_FR")
+        message = EmailMessage(from_email="unit-test@tests.com", body="xxx", to=[fake_email], subject="test")
+        result = sanitize_mailjet_recipients(message)
+
+        self.assertEqual(1, len(result))
+
+        self.assertEqual("xxx", result[0].body)
+        self.assertEqual("unit-test@tests.com", result[0].from_email)
+        self.assertEqual(fake_email, result[0].to[0])
+        self.assertEqual("test", result[0].subject)
+
     def test_dont_split_emails(self):
         recipients = []
         # Only one email is needed
