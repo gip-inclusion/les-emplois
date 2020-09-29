@@ -20,7 +20,6 @@ import logging
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from itou.siaes.management.commands._import_siae.liste_correspondants_techniques import EXTERNAL_ID_TO_AUTH_EMAIL
 from itou.siaes.management.commands._import_siae.siae import (
     build_siae,
     could_siae_be_deleted,
@@ -148,16 +147,16 @@ class Command(BaseCommand):
             if row is None:
                 continue
 
-            new_auth_email = EXTERNAL_ID_TO_AUTH_EMAIL.get(siae.external_id)
+            new_auth_email = row.auth_email
             auth_email_has_changed = new_auth_email and siae.auth_email != new_auth_email
             if auth_email_has_changed:
                 self.update_siae_auth_email(siae, new_auth_email)
 
-            siret_has_changed = row["siret"] != siae.siret
+            siret_has_changed = row.siret != siae.siret
             if not siret_has_changed:
                 continue
 
-            new_siret = row["siret"]
+            new_siret = row.siret
             assert siae.siren == new_siret[:9]
             existing_siae = Siae.objects.filter(siret=new_siret, kind=siae.kind).first()
 
@@ -239,9 +238,7 @@ class Command(BaseCommand):
     @timeit
     def create_new_siaes(self):
         creatable_siae_keys = [
-            (external_id, kind)
-            for (external_id, kind) in VALID_SIAE_KEYS
-            if external_id in EXTERNAL_ID_TO_SIAE_ROW and external_id in EXTERNAL_ID_TO_AUTH_EMAIL
+            (external_id, kind) for (external_id, kind) in VALID_SIAE_KEYS if external_id in EXTERNAL_ID_TO_SIAE_ROW
         ]
 
         creatable_siaes = []
@@ -255,7 +252,11 @@ class Command(BaseCommand):
             if existing_siae_query.exists():
                 # Siae with this external_id already exists, no need to create it.
                 existing_siae = existing_siae_query.get()
-                assert existing_siae.siret == siret
+                if not self.dry_run:
+                    # Siret should have been fixed by
+                    # update_siret_and_auth_email_of_existing_siaes()
+                    # except in a dry-run.
+                    assert existing_siae.siret == siret
                 assert existing_siae.source == Siae.SOURCE_ASP
                 assert existing_siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
                 continue
