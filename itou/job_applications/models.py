@@ -265,13 +265,26 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         choices=APPROVAL_DELIVERY_MODE_CHOICES,
         blank=True,
     )
+    # When a PASS IAE is manually handled, it can be either delivered
+    # or rejected by someone form the support team.
     approval_number_delivered_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("PASS IAE envoyé par"),
+        verbose_name=_("PASS IAE délivré manuellement par"),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="approval_numbers_sent",
+        related_name="approval_numbers_delivered",
+    )
+    approval_number_refused_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("PASS IAE refusé manuellement par"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approval_numbers_refused",
+    )
+    approval_number_refused_at = models.DateTimeField(
+        verbose_name=_("Date de refus manuel du PASS IAE"), blank=True, null=True
     )
 
     hiring_without_approval = models.BooleanField(
@@ -537,15 +550,26 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/approval_number_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def send_approval_number_by_email_manually(self, deliverer):
+    def manually_deliver_approval(self, delivered_by):
         """
-        Manual delivery mode: used when an Itou member has created an approval.
+        Manually deliver an approval.
         """
         email = self.email_approval_number(self.accepted_by)
         email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
-        self.approval_number_delivered_by = deliverer
+        self.approval_number_delivered_by = delivered_by
+        self.save()
+
+    def manually_refuse_approval(self, refused_by):
+        """
+        Manually refuse an approval.
+        """
+        # TODO: email.
+        # email = self.email_approval_number(self.accepted_by)
+        # email.send()
+        self.approval_number_refused_by = refused_by
+        self.approval_number_refused_at = timezone.now()
         self.save()
 
 
