@@ -18,6 +18,19 @@ from itou.utils.urls import get_absolute_url
 logger = logging.getLogger(__name__)
 
 
+class InvitationQuerySet(models.QuerySet):
+    @property
+    def valid_lookup(self):
+        expiration_dt = timezone.now() - relativedelta(days=self.model.EXPIRATION_DAYS)
+        return models.Q(sent_at__gte=expiration_dt)
+
+    def valid(self):
+        return self.filter(self.valid_lookup)
+
+    def expired(self):
+        return self.exclude(self.valid_lookup)
+
+
 class InvitationAbstract(models.Model):
     # String representing the account type to use when logging in.
     # f"reverse("account_login")?account_type={account_type}"
@@ -44,6 +57,8 @@ class InvitationAbstract(models.Model):
     accepted_at = models.DateTimeField(verbose_name=_("Date d'acceptation"), blank=True, null=True, db_index=True)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
     sent_at = models.DateTimeField(verbose_name=_("Date d'envoi"), blank=True, null=True, db_index=True)
+
+    objects = models.Manager.from_queryset(InvitationQuerySet)()
 
     class Meta:
         ordering = ["-created_at"]
