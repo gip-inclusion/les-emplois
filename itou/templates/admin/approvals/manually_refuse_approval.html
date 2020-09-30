@@ -5,6 +5,13 @@
 
 {% block content %}
 
+<p>{% trans "En confirmant le refus, cet email sera envoyé à la personne ayant accepté la candidature :" %}</p>
+
+<pre>
+{{ email_subject_template }}<br>
+{{ email_body_template }}
+</pre>
+
 <form method="post">{% csrf_token %}
 
     <div>

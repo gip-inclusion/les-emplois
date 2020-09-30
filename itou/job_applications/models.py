@@ -250,8 +250,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     hiring_start_at = models.DateField(verbose_name=_("Date de début du contrat"), blank=True, null=True)
     hiring_end_at = models.DateField(verbose_name=_("Date de fin du contrat"), blank=True, null=True)
 
-    # Job applications sent to SIAEs subject to eligibility rules will
-    # obtain an Approval after being accepted.
+    hiring_without_approval = models.BooleanField(
+        default=False, verbose_name=_("L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche")
+    )
+
+    # Job applications sent to SIAEs subject to eligibility rules can obtain an
+    # Approval after being accepted.
     approval = models.ForeignKey(
         "approvals.Approval", verbose_name=_("PASS IAE"), null=True, blank=True, on_delete=models.SET_NULL
     )
@@ -285,10 +289,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     approval_manually_refused_at = models.DateTimeField(
         verbose_name=_("Date de refus manuel du PASS IAE"), blank=True, null=True
-    )
-
-    hiring_without_approval = models.BooleanField(
-        default=False, verbose_name=_("L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche")
     )
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
@@ -408,7 +408,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if approvals_wrapper.has_valid:
                 # Automatically reuse an existing valid Itou or PE approval.
                 self.approval = Approval.get_or_create_from_valid(approvals_wrapper)
-                emails.append(self.email_approval_number(accepted_by))
+                emails.append(self.email_deliver_approval(accepted_by))
             elif (
                 self.job_seeker.pole_emploi_id
                 or self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_NOT_REGISTERED
@@ -422,11 +422,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 )
                 new_approval.save()
                 self.approval = new_approval
-                emails.append(self.email_approval_number(accepted_by))
+                emails.append(self.email_deliver_approval(accepted_by))
             elif self.job_seeker.lack_of_pole_emploi_id_reason == self.job_seeker.REASON_FORGOTTEN:
                 # Trigger a manual approval creation.
                 self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
-                emails.append(self.email_accept_trigger_manual_approval(accepted_by))
+                emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 
@@ -525,7 +525,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/cancel_body.txt"
         return get_email_message(to, context, subject, body, bcc=bcc)
 
-    def email_accept_trigger_manual_approval(self, accepted_by):
+    def email_deliver_approval(self, accepted_by):
+        if not accepted_by:
+            raise RuntimeError(_("Unable to determine the recipient email address."))
+        if not self.approval:
+            raise RuntimeError(_("No approval found for this job application."))
+        to = [accepted_by.email]
+        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_LINK}
+        subject = "approvals/email/deliver_subject.txt"
+        body = "approvals/email/deliver_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def email_manual_approval_delivery_required_notification(self, accepted_by):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "job_application": self,
@@ -535,26 +546,25 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         }
         if accepted_by:
             context["accepted_by"] = accepted_by
-        subject = "apply/email/accept_trigger_approval_subject.txt"
-        body = "apply/email/accept_trigger_approval_body.txt"
+        subject = "approvals/email/manual_delivery_required_notification_subject.txt"
+        body = "approvals/email/manual_delivery_required_notification_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def email_approval_number(self, accepted_by):
-        if not accepted_by:
+    @property
+    def email_manually_refuse_approval(self):
+        if not self.accepted_by:
             raise RuntimeError(_("Unable to determine the recipient email address."))
-        if not self.approval:
-            raise RuntimeError(_("No approval found for this job application."))
-        to = [accepted_by.email]
-        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_LINK}
-        subject = "apply/email/approval_number_subject.txt"
-        body = "apply/email/approval_number_body.txt"
+        to = [self.accepted_by.email]
+        context = {"job_application": self}
+        subject = "approvals/email/refuse_manually_subject.txt"
+        body = "approvals/email/refuse_manually_body.txt"
         return get_email_message(to, context, subject, body)
 
     def manually_deliver_approval(self, delivered_by):
         """
         Manually deliver an approval.
         """
-        email = self.email_approval_number(self.accepted_by)
+        email = self.email_deliver_approval(self.accepted_by)
         email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
@@ -565,12 +575,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         Manually refuse an approval.
         """
-        # TODO: email.
-        # email = self.email_approval_number(self.accepted_by)
-        # email.send()
         self.approval_manually_refused_by = refused_by
         self.approval_manually_refused_at = timezone.now()
         self.save()
+        email = self.email_manually_refuse_approval
+        email.send()
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):

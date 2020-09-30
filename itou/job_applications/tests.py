@@ -318,7 +318,7 @@ class JobApplicationEmailTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED, hiring_start_at=datetime.date.today()
         )
         accepted_by = job_application.to_siae.members.first()
-        email = job_application.email_accept_trigger_manual_approval(accepted_by)
+        email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
         # To.
         self.assertIn(settings.ITOU_EMAIL_CONTACT, email.to)
         self.assertEqual(len(email.to), 1)
@@ -371,14 +371,14 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
 
-    def test_email_approval_number(self):
+    def test_email_deliver_approval(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_ACCEPTED, approval=approval
         )
         accepted_by = job_application.to_siae.members.first()
-        email = job_application.email_approval_number(accepted_by)
+        email = job_application.email_deliver_approval(accepted_by)
         # To.
         self.assertIn(accepted_by.email, email.to)
         self.assertEqual(len(email.to), 1)
@@ -400,7 +400,9 @@ class JobApplicationEmailTest(TestCase):
 
     def test_manually_deliver_approval(self):
         staff_member = UserFactory(is_staff=True)
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+        )
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             job_seeker=job_seeker,
@@ -414,6 +416,28 @@ class JobApplicationEmailTest(TestCase):
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertIsNotNone(job_application.approval_number_sent_at)
         self.assertEqual(job_application.approval_manually_delivered_by, staff_member)
+        self.assertIsNone(job_application.approval_manually_refused_at)
+        self.assertIsNone(job_application.approval_manually_refused_by)
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_manually_refuse_approval(self):
+        staff_member = UserFactory(is_staff=True)
+        job_seeker = JobSeekerFactory(
+            pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
+        )
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+        mail.outbox = []  # Delete previous emails.
+        job_application.manually_refuse_approval(refused_by=staff_member)
+        self.assertEqual(job_application.approval_manually_refused_by, staff_member)
+        self.assertIsNotNone(job_application.approval_manually_refused_at)
+        self.assertFalse(job_application.approval_number_sent_by_email)
+        self.assertIsNone(job_application.approval_manually_delivered_by)
+        self.assertIsNone(job_application.approval_number_sent_at)
         self.assertEqual(len(mail.outbox), 1)
 
     def test_cancel(self):

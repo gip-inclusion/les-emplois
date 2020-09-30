@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 from itou.approvals.admin_forms import ManuallyAddApprovalForm
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.emails import get_email_text_template
 
 
 @transaction.atomic
@@ -23,6 +24,7 @@ def manually_add_approval(
     https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
     """
 
+    admin_site = model_admin.admin_site
     opts = model_admin.model._meta
     app_label = opts.app_label
     codename = get_permission_codename("add", opts)
@@ -52,6 +54,8 @@ def manually_add_approval(
         "created_by": request.user.pk,
     }
     form = ManuallyAddApprovalForm(initial=initial, data=request.POST or None)
+    fieldsets = [(None, {"fields": list(form.base_fields)})]
+    adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
     if request.method == "POST" and form.is_valid():
         approval = form.save()
@@ -62,11 +66,6 @@ def manually_add_approval(
             request, _(f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         )
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
-
-    fieldsets = [(None, {"fields": list(form.base_fields)})]
-    adminForm = admin.helpers.AdminForm(form, fieldsets, {})
-
-    admin_site = model_admin.admin_site
 
     context = {
         "add": True,
@@ -88,9 +87,10 @@ def manually_refuse_approval(
     request, model_admin, job_application_id, template_name="admin/approvals/manually_refuse_approval.html"
 ):
     """
-    Custom admin view to manually refuse an approval.
+    Custom admin view to manually refuse an approval (in the case of a job seeker in waiting period).
     """
 
+    admin_site = model_admin.admin_site
     opts = model_admin.model._meta
     app_label = opts.app_label
     codename = get_permission_codename("add", opts)
@@ -111,17 +111,25 @@ def manually_refuse_approval(
         approval_number_sent_by_email=False,
     )
 
-    admin_site = model_admin.admin_site
-
     if request.method == "POST" and request.POST.get("confirm") == "yes":
         job_application.manually_refuse_approval(refused_by=request.user)
         messages.success(request, _("Délivrance du PASS IAE refusée."))
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
+    # Display a preview of the email that will be send.
+    email_subject_template = get_email_text_template(
+        "approvals/email/refuse_manually_subject.txt", {"job_application": job_application}
+    )
+    email_body_template = get_email_text_template(
+        "approvals/email/refuse_manually_body.txt", {"job_application": job_application}
+    )
+
     context = {
         "add": True,
         "admin_site": admin_site.name,
         "app_label": app_label,
+        "email_body_template": email_body_template,
+        "email_subject_template": email_subject_template,
         "job_application": job_application,
         "opts": opts,
         "title": _("Confirmer le refus manuel d'un numéro d'agrément"),
