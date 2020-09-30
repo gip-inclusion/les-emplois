@@ -37,6 +37,8 @@
                     {% include "approvals/includes/status.html" with approval=job_application.approval %}
                 {% elif job_application.hiring_without_approval %}
                     {% translate "Vous n'avez pas demandé de PASS IAE." %}
+                {% elif job_application.approval_manually_refused_at %}
+                    {% translate "PASS IAE refusé." %}
                 {% else %}
                     {% translate "PASS IAE en cours de délivrance." %}
                 {% endif %}
@@ -45,7 +47,6 @@
             <div class="alert border">
                 {# Employers need to know the expiration date of an approval #}
                 {# to decide whether they may accept a job application or not. #}
-
                 {% translate "Agrément existant" %}
                 <br>
                 {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
