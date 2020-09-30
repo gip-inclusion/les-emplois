@@ -13,18 +13,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="jobapplication", name="approval_number_delivered_by",),
-        migrations.AddField(
+        migrations.RenameField(
             model_name="jobapplication",
-            name="approval_manually_delivered_by",
-            field=models.ForeignKey(
-                blank=True,
-                null=True,
-                on_delete=django.db.models.deletion.SET_NULL,
-                related_name="approval_manually_delivered",
-                to=settings.AUTH_USER_MODEL,
-                verbose_name="PASS IAE délivré manuellement par",
-            ),
+            old_name="approval_number_delivered_by",
+            new_name="approval_manually_delivered_by",
         ),
         migrations.AddField(
             model_name="jobapplication",
