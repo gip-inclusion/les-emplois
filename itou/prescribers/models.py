@@ -83,6 +83,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         CAP_EMPLOI = "CAP_EMPLOI", _("CAP emploi")
         ML = "ML", _("Mission locale")
         DEPT = "DEPT", _("Service social du conseil départemental")
+        DEPT_BRSA = "DEPT_BRSA", _("Dispositif conventionné par le conseil départemental pour le suivi BRSA")
         SPIP = "SPIP", _("SPIP - Service pénitentiaire d'insertion et de probation")
         PJJ = "PJJ", _("PJJ - Protection judiciaire de la jeunesse")
         CCAS = ("CCAS", _("CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale"))

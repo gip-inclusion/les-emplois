@@ -7,8 +7,10 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
+from django.core.mail.message import EmailMessage
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
+from factory import Faker
 
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
@@ -20,6 +22,7 @@ from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import process_geocoding_data
 from itou.utils.apis.siret import process_siret_data
+from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
@@ -619,3 +622,47 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
         self.assertFalse(etablissement.is_closed)
+
+
+class UtilsEmailsSplitRecipientTest(TestCase):
+    """
+    Test behavior of email backend when sending emails with more than 50 recipients
+    (Mailjet API Limit)
+    """
+
+    def test_email_copy(self):
+        fake_email = Faker("email", locale="fr_FR")
+        message = EmailMessage(from_email="unit-test@tests.com", body="xxx", to=[fake_email], subject="test")
+        result = sanitize_mailjet_recipients(message)
+
+        self.assertEqual(1, len(result))
+
+        self.assertEqual("xxx", result[0].body)
+        self.assertEqual("unit-test@tests.com", result[0].from_email)
+        self.assertEqual(fake_email, result[0].to[0])
+        self.assertEqual("test", result[0].subject)
+
+    def test_dont_split_emails(self):
+        recipients = []
+        # Only one email is needed
+        for i in range(49):
+            recipients.append(Faker("email", locale="fr_FR"))
+
+        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
+        result = sanitize_mailjet_recipients(message)
+
+        self.assertEqual(1, len(result))
+        self.assertEqual(49, len(result[0].to))
+
+    def test_must_split_emails(self):
+        # 2 emails are needed; one with 50 the other with 25
+        recipients = []
+        for i in range(75):
+            recipients.append(Faker("email", locale="fr_FR"))
+
+        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
+        result = sanitize_mailjet_recipients(message)
+
+        self.assertEqual(2, len(result))
+        self.assertEqual(50, len(result[0].to))
+        self.assertEqual(25, len(result[1].to))
