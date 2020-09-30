@@ -255,35 +255,35 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     approval = models.ForeignKey(
         "approvals.Approval", verbose_name=_("PASS IAE"), null=True, blank=True, on_delete=models.SET_NULL
     )
-    approval_number_sent_by_email = models.BooleanField(verbose_name=_("PASS IAE envoyé par email"), default=False)
-    approval_number_sent_at = models.DateTimeField(
-        verbose_name=_("Date d'envoi du PASS IAE"), blank=True, null=True, db_index=True
-    )
     approval_delivery_mode = models.CharField(
         verbose_name=_("Mode d'attribution du PASS IAE"),
         max_length=30,
         choices=APPROVAL_DELIVERY_MODE_CHOICES,
         blank=True,
     )
-    # When a PASS IAE is manually handled, it can be either delivered
-    # or rejected by someone form the support team.
-    approval_number_delivered_by = models.ForeignKey(
+    # Fields used for approvals processed both manually or automatically.
+    approval_number_sent_by_email = models.BooleanField(verbose_name=_("PASS IAE envoyé par email"), default=False)
+    approval_number_sent_at = models.DateTimeField(
+        verbose_name=_("Date d'envoi du PASS IAE"), blank=True, null=True, db_index=True
+    )
+    # Fields used only for manual processing.
+    approval_manually_delivered_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("PASS IAE délivré manuellement par"),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="approval_numbers_delivered",
+        related_name="approval_manually_delivered",
     )
-    approval_number_refused_by = models.ForeignKey(
+    approval_manually_refused_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("PASS IAE refusé manuellement par"),
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="approval_numbers_refused",
+        related_name="approval_manually_refused",
     )
-    approval_number_refused_at = models.DateTimeField(
+    approval_manually_refused_at = models.DateTimeField(
         verbose_name=_("Date de refus manuel du PASS IAE"), blank=True, null=True
     )
 
@@ -558,7 +558,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
-        self.approval_number_delivered_by = delivered_by
+        self.approval_manually_delivered_by = delivered_by
         self.save()
 
     def manually_refuse_approval(self, refused_by):
@@ -568,8 +568,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # TODO: email.
         # email = self.email_approval_number(self.accepted_by)
         # email.send()
-        self.approval_number_refused_by = refused_by
-        self.approval_number_refused_at = timezone.now()
+        self.approval_manually_refused_by = refused_by
+        self.approval_manually_refused_at = timezone.now()
         self.save()
 
 

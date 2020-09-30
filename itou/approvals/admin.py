@@ -23,9 +23,9 @@ class JobApplicationInline(admin.StackedInline):
         "approval_number_sent_by_email",
         "approval_number_sent_at",
         "approval_delivery_mode",
-        "approval_number_delivered_by",
+        "approval_manually_delivered_by",
     )
-    raw_id_fields = ("job_seeker", "to_siae", "approval_number_delivered_by")
+    raw_id_fields = ("job_seeker", "to_siae", "approval_manually_delivered_by")
 
     def has_change_permission(self, request, obj=None):
         return False

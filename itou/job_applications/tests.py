@@ -413,7 +413,7 @@ class JobApplicationEmailTest(TestCase):
         job_application.manually_deliver_approval(delivered_by=staff_member)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertIsNotNone(job_application.approval_number_sent_at)
-        self.assertEqual(job_application.approval_number_delivered_by, staff_member)
+        self.assertEqual(job_application.approval_manually_delivered_by, staff_member)
         self.assertEqual(len(mail.outbox), 1)
 
     def test_cancel(self):

@@ -514,7 +514,7 @@ class CustomAdminViewsTest(TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertIsNotNone(job_application.approval_number_sent_at)
-        self.assertEqual(job_application.approval_number_delivered_by, user)
+        self.assertEqual(job_application.approval_manually_delivered_by, user)
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
 
         approval = job_application.approval
