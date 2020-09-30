@@ -51,6 +51,7 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
 
 # Mailjet max number of recipients (CC, BCC, TO)
 _MAILJET_MAX_RECIPIENTS = 50
+_EMAIL_KEYS = ("from_email", "cc", "bcc", "subject", "body")
 
 
 def sanitize_mailjet_recipients(email_message):
@@ -79,7 +80,7 @@ def sanitize_mailjet_recipients(email_message):
     # We could also combine to, cc and bcc, but it's useless for now
 
     for to_chunk in to_chunks:
-        copy_kvs = {k: email_message.__dict__[k] for k in ("from_email", "cc", "bcc", "subject", "body")}
+        copy_kvs = {k: email_message.__dict__[k] for k in _EMAIL_KEYS}
         copy_email = EmailMessage(**copy_kvs)
         copy_email.to = to_chunk
         sanitized_emails.append(copy_email)
@@ -116,7 +117,7 @@ def _serializeEmailMessage(email_message):
         "reply_to": email_message.reply_to,
         "cc": email_message.cc,
         "bcc": email_message.bcc,
-        # FIXME: "headers": email_message.headers,
+        # FIXME: if needed "headers": email_message.headers,
         "body": email_message.body,
     }
 
