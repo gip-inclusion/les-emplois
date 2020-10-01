@@ -47,7 +47,7 @@
         </h4>
 
         {% for prescriber_org in prescriber_orgs_page %}
-            <div class="card d-block my-4">
+            <div class="card my-4">
                 <div class="card-body">
                     <h5 class="card-title">
                         <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
