@@ -1,3 +1,4 @@
+from django.template.defaultfilters import capfirst
 from django.test import TestCase
 from django.utils import timezone
 
@@ -63,12 +64,12 @@ class InvitationEmailsTest(TestCase):
         email = invitation.email_invitation
 
         # Subject
-        self.assertIn(invitation.sender.first_name.lower(), email.subject.lower())
-        self.assertIn(invitation.sender.last_name.lower(), email.subject.lower())
+        self.assertIn(capfirst(invitation.sender.first_name), email.subject)
+        self.assertIn(capfirst(invitation.sender.last_name), email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.acceptance_link, email.body)
 
         self.assertIn(str(invitation.expiration_date.day), email.body)
@@ -100,15 +101,15 @@ class TestPrescriberWithOrgInvitationEmails(TestCase):
         email = invitation.email_accepted_notif_organization_members
 
         # Subject
-        self.assertIn(invitation.first_name.lower(), email.subject.lower())
-        self.assertIn(invitation.last_name.lower(), email.subject.lower())
+        self.assertIn(capfirst(invitation.first_name), email.subject)
+        self.assertIn(capfirst(invitation.last_name), email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.email, email.body)
-        self.assertIn(invitation.sender.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.sender.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.sender.first_name), email.body)
+        self.assertIn(capfirst(invitation.sender.last_name), email.body)
         self.assertIn(invitation.organization.display_name, email.body)
 
         # To
@@ -124,12 +125,12 @@ class TestPrescriberWithOrgInvitationEmails(TestCase):
         email = invitation.email_accepted_notif_sender
 
         # Subject
-        self.assertIn(invitation.first_name.lower(), email.subject.lower())
-        self.assertIn(invitation.last_name.lower(), email.subject.lower())
+        self.assertIn(capfirst(invitation.first_name), email.subject)
+        self.assertIn(capfirst(invitation.last_name), email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.email, email.body)
         self.assertIn(invitation.organization.display_name, email.body)
 
@@ -144,8 +145,8 @@ class TestPrescriberWithOrgInvitationEmails(TestCase):
         self.assertIn(invitation.organization.display_name, email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.acceptance_link, email.body)
         self.assertIn(invitation.organization.display_name, email.body)
 
@@ -171,15 +172,15 @@ class TestSiaeInvitationEmails(TestCase):
         email = invitation.email_accepted_notif_siae_members
 
         # Subject
-        self.assertIn(invitation.first_name.lower(), email.subject.lower())
-        self.assertIn(invitation.last_name.lower(), email.subject.lower())
+        self.assertIn(capfirst(invitation.first_name), email.subject)
+        self.assertIn(capfirst(invitation.last_name), email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.email, email.body)
-        self.assertIn(invitation.sender.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.sender.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.sender.first_name), email.body)
+        self.assertIn(capfirst(invitation.sender.last_name), email.body)
         self.assertIn(invitation.siae.display_name, email.body)
 
         # To
@@ -195,12 +196,12 @@ class TestSiaeInvitationEmails(TestCase):
         email = invitation.email_accepted_notif_sender
 
         # Subject
-        self.assertIn(invitation.first_name.lower(), email.subject.lower())
-        self.assertIn(invitation.last_name.lower(), email.subject.lower())
+        self.assertIn(capfirst(invitation.first_name), email.subject)
+        self.assertIn(capfirst(invitation.last_name), email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.email, email.body)
         self.assertIn(invitation.siae.display_name, email.body)
 
@@ -215,8 +216,8 @@ class TestSiaeInvitationEmails(TestCase):
         self.assertIn(invitation.siae.display_name, email.subject)
 
         # Body
-        self.assertIn(invitation.first_name.lower(), email.body.lower())
-        self.assertIn(invitation.last_name.lower(), email.body.lower())
+        self.assertIn(capfirst(invitation.first_name), email.body)
+        self.assertIn(capfirst(invitation.last_name), email.body)
         self.assertIn(invitation.acceptance_link, email.body)
         self.assertIn(invitation.siae.display_name, email.body)
 
