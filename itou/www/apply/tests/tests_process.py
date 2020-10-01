@@ -302,7 +302,16 @@ class ProcessViewsTest(TestCase):
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "confirm": "true",
+        }
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertEqual(response.url, next_url)
+
         job_application.refresh_from_db()
         self.assertTrue(job_application.state.is_cancelled)
 
@@ -319,6 +328,8 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 302)
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        self.assertEqual(response.url, next_url)
         job_application.refresh_from_db()
         self.assertFalse(job_application.state.is_cancelled)
 
