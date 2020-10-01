@@ -4,8 +4,8 @@ Handle multiple user types sign up with django-allauth.
 from allauth.account.views import PasswordResetView, SignupView
 from django.conf import settings
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -454,7 +454,6 @@ class PrescriberUserSignupView(SignupView):
     @method_decorator(valid_prescriber_signup_session_required)
     @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
     def dispatch(self, request, *args, **kwargs):
-
         session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
         authorization_status = session_data.get("authorization_status")
         prescriber_org_data = session_data.get("prescriber_org_data")

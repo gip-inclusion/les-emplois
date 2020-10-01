@@ -1,5 +1,6 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
@@ -56,9 +57,12 @@ class WelcomingTourTest(TestCase):
         self.assertTemplateUsed(response, "welcoming_tour/job_seeker.html")
 
     def test_new_prescriber_sees_welcoming_tour_test(self):
+        session = self.client.session
+        session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY] = {"url_history": []}
+        session.save()
         prescriber = PrescriberFactory.build()
         self.email = prescriber.email
-        url = reverse("signup:prescriber_orienter")
+        url = reverse("signup:prescriber_user")
         post_data = {
             "first_name": prescriber.first_name,
             "last_name": prescriber.last_name,
@@ -78,7 +82,7 @@ class WelcomingTourTest(TestCase):
         self.email = employer.email
         siae = SiaeWithMembershipFactory()
 
-        url = reverse("signup:siae")
+        url = reverse("signup:siae", kwargs={"encoded_siae_id": siae.get_encoded_siae_id(), "token": siae.get_token()})
         post_data = {
             "encoded_siae_id": siae.get_encoded_siae_id(),
             "token": siae.get_token(),

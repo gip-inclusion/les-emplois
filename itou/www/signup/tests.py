@@ -328,7 +328,7 @@ class PrescriberSignupTest(TestCase):
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("dashboard:index"))
+        self.assertEqual(response.url, reverse("welcoming_tour:index"))
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
 
@@ -446,7 +446,6 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.url, reverse("welcoming_tour:index"))
         user_email = user.emailaddress_set.first()
         self.assertTrue(user_email.verified)
-
 
     @mock.patch(
         "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
