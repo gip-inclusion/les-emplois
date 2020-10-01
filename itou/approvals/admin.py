@@ -4,7 +4,7 @@ from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
-from itou.approvals.admin_views import manually_add_approval
+from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.approvals.export import export_approvals
 from itou.job_applications.models import JobApplication
 
@@ -23,9 +23,9 @@ class JobApplicationInline(admin.StackedInline):
         "approval_number_sent_by_email",
         "approval_number_sent_at",
         "approval_delivery_mode",
-        "approval_number_delivered_by",
+        "approval_manually_delivered_by",
     )
-    raw_id_fields = ("job_seeker", "to_siae", "approval_number_delivered_by")
+    raw_id_fields = ("job_seeker", "to_siae", "approval_manually_delivered_by")
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -79,6 +79,12 @@ class ApprovalAdmin(admin.ModelAdmin):
         """
         return manually_add_approval(request, self, job_application_id)
 
+    def manually_refuse_approval(self, request, job_application_id):
+        """
+        Custom admin view to manually refuse an approval.
+        """
+        return manually_refuse_approval(request, self, job_application_id)
+
     def export_approvals(self, request):
         """
         Custom admin view to export all approvals as an XLSX file.
@@ -94,6 +100,11 @@ class ApprovalAdmin(admin.ModelAdmin):
                 "<uuid:job_application_id>/add_approval",
                 self.admin_site.admin_view(self.manually_add_approval),
                 name="approvals_approval_manually_add_approval",
+            ),
+            path(
+                "<uuid:job_application_id>/refuse_approval",
+                self.admin_site.admin_view(self.manually_refuse_approval),
+                name="approvals_approval_manually_refuse_approval",
             ),
             path(
                 "export_approvals",

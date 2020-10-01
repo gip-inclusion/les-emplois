@@ -216,18 +216,30 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
 
 @login_required
-def cancel(request, job_application_id):
+def cancel(request, job_application_id, template_name="apply/process_cancel.html"):
+    """
+    Trigger the `cancel` transition.
+    """
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
+    approvals_wrapper = job_application.job_seeker.approvals_wrapper
+    check_waiting_period(approvals_wrapper, job_application)
+    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
 
-    if job_application.can_be_cancelled:
+    if not job_application.can_be_cancelled:
+        messages.error(request, _("Vous ne pouvez pas annuler cette embauche."))
+        return HttpResponseRedirect(next_url)
+
+    if request.method == "POST" and request.POST.get("confirm") == "true":
         job_application.cancel(user=request.user)
         messages.success(request, _("L'embauche a bien été annulée."))
-    else:
-        messages.error(request, _("Vous ne pouvez pas annuler cette embauche."))
+        return HttpResponseRedirect(next_url)
 
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
-    return HttpResponseRedirect(next_url)
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "job_application": job_application,
+    }
+    return render(request, template_name, context)
 
 
 @login_required

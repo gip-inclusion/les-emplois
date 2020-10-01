@@ -297,9 +297,8 @@
 
             <h3 class="font-weight-normal text-muted">{% translate "Rétractation" %}</h3>
             <p>
-                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end cancellation_days=cancellation_days %}
-                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit le
-                    {{ cancellation_date }} inclus.
+                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" cancellation_days=cancellation_days %}
+                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ cancellation_date }} inclus.
                 {% endblocktranslate %}
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}

@@ -1,137 +1,60 @@
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
 from .models import PrescriberWithOrgInvitation, SiaeStaffInvitation
 
 
+class IsValidFilter(admin.SimpleListFilter):
+    title = _("En cours de validité")
+    parameter_name = "is_valid"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.valid()
+        if value == "no":
+            return queryset.expired()
+        return queryset
+
+
 class BaseInvitationAdmin(admin.ModelAdmin):
     date_hierarchy = "sent_at"
-    list_display = ("first_name", "last_name", "sender_name", "sent_at")
-
+    list_display = ("email", "first_name", "last_name", "sender", "sent_at", "is_valid", "accepted")
+    ordering = ("-sent_at",)
+    search_fields = ("email", "sender__email")
     # https://code.djangoproject.com/ticket/30354
-    list_filter = ("accepted",)
-    readonly_fields = ("sender_link", "has_expired")
-    fieldsets = [
-        (
-            None,
-            {
-                "fields": [
-                    "first_name",
-                    "last_name",
-                    "email",
-                    "sender_link",
-                    "has_expired",
-                    "sent",
-                    "accepted",
-                    "sent_at",
-                    "accepted_at",
-                ]
-            },
-        )
-    ]
+    list_filter = ("accepted", IsValidFilter)
+    readonly_fields = ("is_valid", "created_at", "sent_at", "accepted_at")
+    raw_id_fields = ("sender",)
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("sender")
 
-    def sender_name(self, obj):
-        return f"{obj.sender.get_full_name()}"
+    def is_valid(self, obj):
+        return not obj.has_expired
 
-    sender_name.short_description = _("Parrain ou Marraine")
-
-    def sender_link(self, obj):
-        link = reverse("admin:users_user_change", kwargs={"object_id": obj.sender.pk})
-        return format_html('<a href="{}">{}</a>', mark_safe(link), obj.sender.get_full_name())
-
-    sender_link.short_description = _("Parrain ou Marraine")
-
-    def has_expired(self, obj):
-        value = _("Non")
-        if obj.sent_at:
-            if obj.has_expired:
-                value = _("Oui")
-        return value
-
-    has_expired.short_description = _("Expirée")
+    is_valid.boolean = True
+    is_valid.short_description = _("En cours de validité")
 
 
 @admin.register(SiaeStaffInvitation)
 class SiaeStaffInvitationAdmin(BaseInvitationAdmin):
-    readonly_fields = BaseInvitationAdmin.readonly_fields + ("siae_link",)
-    list_display = BaseInvitationAdmin.list_display + ("siae_name",)
-
-    fieldsets = [
-        (
-            None,
-            {
-                "fields": [
-                    "first_name",
-                    "last_name",
-                    "email",
-                    "sender_link",
-                    "siae_link",
-                    "has_expired",
-                    "sent",
-                    "sent_at",
-                    "accepted",
-                    "accepted_at",
-                ]
-            },
-        )
-    ]
+    list_display = BaseInvitationAdmin.list_display + ("siae",)
+    raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("siae",)
+    search_fields = BaseInvitationAdmin.search_fields + ("siae__siret",)
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("siae")
 
-    def siae_link(self, obj):
-        link = reverse("admin:siaes_siae_change", kwargs={"object_id": obj.siae.pk})
-        return format_html('<a href="{}">{}</a>', mark_safe(link), obj.siae.display_name)
-
-    siae_link.short_description = _("Structure")
-
-    def siae_name(self, obj):
-        return obj.siae.display_name
-
-    siae_name.short_description = _("Structure")
-
 
 @admin.register(PrescriberWithOrgInvitation)
 class PrescriberWithOrgInvitationAdmin(BaseInvitationAdmin):
-    readonly_fields = BaseInvitationAdmin.readonly_fields + ("org_link",)
-    list_display = BaseInvitationAdmin.list_display + ("org_name",)
-
-    fieldsets = [
-        (
-            None,
-            {
-                "fields": [
-                    "first_name",
-                    "last_name",
-                    "email",
-                    "sender_link",
-                    "org_link",
-                    "has_expired",
-                    "sent",
-                    "sent_at",
-                    "accepted",
-                    "accepted_at",
-                ]
-            },
-        )
-    ]
+    list_display = BaseInvitationAdmin.list_display + ("organization",)
+    raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("organization",)
+    search_fields = BaseInvitationAdmin.search_fields + ("organization__siret",)
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("organization")
-
-    def org_link(self, obj):
-        link = reverse("admin:prescribers_prescriberorganization_change", kwargs={"object_id": obj.organization.pk})
-        return format_html('<a href="{}">{}</a>', mark_safe(link), obj.organization.display_name)
-
-    org_link.short_description = _("Organisation")
-
-    def org_name(self, obj):
-        return obj.organization.display_name
-
-    org_name.short_description = _("Organisation")

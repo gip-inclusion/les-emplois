@@ -52,7 +52,14 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "sender_prescriber_organization__is_authorized",
         "to_siae__department",
     )
-    readonly_fields = ("created_at", "updated_at", "approval_number_delivered_by")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "approval_number_sent_at",
+        "approval_manually_delivered_by",
+        "approval_manually_refused_by",
+        "approval_manually_refused_at",
+    )
     inlines = (JobsInline, TransitionLogInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
 
@@ -64,7 +71,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         if obj and obj.manual_approval_delivery_required:
             url = reverse("admin:approvals_approval_manually_add_approval", args=[obj.pk])
             text = _("Délivrer un PASS IAE dans l'admin")
-            help_texts = {"approval_number_delivered_by": mark_safe(f'<a href="{url}">{text}</a>')}
+            help_texts = {"approval_manually_delivered_by": mark_safe(f'<a href="{url}">{text}</a>')}
             kwargs.update({"help_texts": help_texts})
         return super().get_form(request, obj, **kwargs)
 
