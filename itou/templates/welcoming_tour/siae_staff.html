@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% translate "Bienvenue !" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Bienvenue sur la Plateforme de l'inclusion !" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -16,13 +16,13 @@
     <div class="carousel-inner">
         <div class="carousel-item active">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Bienvenue sur la Plateforme de l'inclusion" %}</h1>
+                <h1 class="text-center">{% translate "Bienvenue sur la Plateforme de l’inclusion !" %}</h1>
 
-                <img src="{% static 'img/welcoming_tour/1.svg' %}" class="d-block mx-auto my-4">
+                <img src="{% static 'img/welcoming_tour/employeur_1.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
                 <p class="w-sm-50 m-auto lead text-center pb-5">
                     {% blocktranslate %}
-                        La Plateforme de l'inclusion facilite la mise en relation des <b>personnes éloignées de l'emploi</b> auprès des <b>employeurs solidaires</b> et des accompagnants <b>prescripteurs</b>.
+                        Découvrez l’outil qui simplifie la mise en relation des candidats à l’insertion avec les employeurs solidaires et facilite tous vos recrutements.
                     {% endblocktranslate %}
                 </p>
                 <p class="pt-3 text-center">
@@ -34,13 +34,14 @@
         </div>
         <div class="carousel-item">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Faites-vous connaître sur la Plateforme" %}</h1>
+                <h1 class="text-center">{% translate "Publiez vos offres, augmentez votre visibilité" %}</h1>
 
-                <img src="{% static 'img/welcoming_tour/2.svg' %}" class="d-block mx-auto my-4">
+                <img src="{% static 'img/welcoming_tour/employeur_2.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
                 <p class="w-sm-50 m-auto lead text-center pb-5">
                     {% blocktranslate %}
-                        En tant qu'<b>employeur solidaire</b>, vous pouvez modifier votre fiche pour y <b>renseigner une description</b> sur votre activité. Vous pouvez également <b>configurer vos fiches de poste</b>.
+                        Grâce à la Plateforme de l’inclusion, disposez d’une plus large diffusion de vos offres auprès des candidats à l’insertion de votre région.<br>
+                        Gagnez en visibilité pour vous faire connaître des prescripteurs locaux.
                     {% endblocktranslate %}
                 </p>
                 <p class="pt-3 text-center">
@@ -55,13 +56,20 @@
         </div>
         <div class="carousel-item">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Gérer des candidatures reçues en ligne" %}</h1>
+                <h1 class="text-center">{% translate "Gérez toutes vos candidatures en ligne !" %}</h1>
 
-                <img src="{% static 'img/welcoming_tour/3.svg' %}" class="d-block mx-auto my-4">
+                <img src="{% static 'img/welcoming_tour/employeur_3.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
-                <p class="w-sm-50 m-auto lead text-center pb-5">
+                <p class="w-sm-50 m-auto lead text-center">
                     {% blocktranslate %}
-                        Vous pouvez traiter une <b>candidature spontanée</b>, créer un compte pour un(e) candidat(e) et recevoir des candidatures. Enfin, pour certaines candidatures, vous pouvez <b>obtenir un agrément</b> IAE (nommé <b>PASS IAE</b>) et embaucher en autonomie.
+                        Renseignez votre profil SIAE, valorisez votre activité, configurez vos fiches de postes... et voilà !<br>
+                        Vous pouvez recruter en toute autonomie, que ce soit en candidature spontanée ou via un orienteur et un prescripteur, et même recevoir votre agrément IAE en ligne (Pass IAE) !
+                    {% endblocktranslate %}
+                </p>
+                <p class="w-sm-50 m-auto lead text-center pb-5 pt-2">
+                    {% blocktranslate %}
+                        À vous de jouer maintenant !<br>
+                        Bonne découverte et bons recrutements.
                     {% endblocktranslate %}
                 </p>
                 <p class="pt-3 text-center">
