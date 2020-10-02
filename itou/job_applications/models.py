@@ -119,6 +119,7 @@ class JobApplicationQuerySet(models.QuerySet):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
             approval_number_sent_by_email=False,
+            approval_manually_refused_at=None,
         )
 
 
@@ -341,6 +342,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.state.is_accepted
             and self.approval_delivery_mode == self.APPROVAL_DELIVERY_MODE_MANUAL
             and not self.approval_number_sent_by_email
+            and self.approval_manually_refused_at is None
         )
 
     @property
