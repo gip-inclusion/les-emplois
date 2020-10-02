@@ -238,6 +238,9 @@ class Command(BaseCommand):
         self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, objects=objects)
 
     def populate_metabase(self):
+        if not settings.ALLOW_POPULATING_METABASE:
+            self.log("Populating metabase is not allowed in this environment.")
+            return
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
             self.conn = conn
