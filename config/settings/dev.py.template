@@ -69,3 +69,8 @@ MIGRATION_MODULES = {
 
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "localhost:8080"
+
+# Metabase.
+# ------------------------------------------------------------------------------
+
+ALLOW_POPULATING_METABASE = True
