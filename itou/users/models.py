@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -80,8 +81,8 @@ class User(AbstractUser, AddressMixin):
         choices=REASON_CHOICES,
         blank=True,
     )
-
     resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), blank=True)
+    has_completed_welcoming_tour = models.BooleanField(verbose_name=_("Parcours de bienvenue effectué"), default=False)
 
     created_by = models.ForeignKey(
         "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True
@@ -177,6 +178,10 @@ class User(AbstractUser, AddressMixin):
     @property
     def has_external_data(self):
         return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
+
+    def joined_recently(self):
+        time_since_date_joined = timezone.now() - self.date_joined
+        return time_since_date_joined.days < 7
 
 
 def get_allauth_account_user_display(user):

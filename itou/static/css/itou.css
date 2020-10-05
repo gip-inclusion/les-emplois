@@ -14,6 +14,15 @@ html {
     background: #f2f2f2;
 }
 
+/*
+  Bootstrap overrides navigators default stylesheet in _reboot.scss.
+  But there is one problem with the b tag. It has the `font-weight: bolder;`
+  property which, oddly, does not work as expected on Linux computers.
+*/
+b {
+    font-weight: 700!important;
+}
+
 .layout {
     /*
     First and last columns are gutters, with a minimum size but the ability
@@ -255,6 +264,20 @@ body:after {
 
 .select2-container {
     display: block !important;
+}
+
+/* Welcoming tour */
+
+#welcoming_tour .carousel-indicators {
+    bottom: 3rem;
+}
+
+#welcoming_tour .carousel-indicators li {
+    background-color: #007bff;
+    background-color: var(--primary);
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
 }
 
 /* Missing Boostrap utilities

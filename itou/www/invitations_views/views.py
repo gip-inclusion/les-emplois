@@ -1,4 +1,4 @@
-from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -46,7 +46,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
             context["form"] = form
             if form.is_valid():
                 user = form.save(request)
-                DefaultAccountAdapter().login(request, user)
+                get_adapter().login(request, user)
                 next_step = redirect(get_safe_url(request, "redirect_to"))
         else:
             next_step = "{}?account_type={}&next={}".format(

@@ -1,0 +1,93 @@
+{% extends "layout/content.html" %}
+{% load static %}
+{% load bootstrap4 %}
+{% load i18n %}
+
+{% block title %}{% translate "Bienvenue sur la Plateforme de l'inclusion !" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div id="welcoming_tour" class="carousel">
+    <ol class="carousel-indicators">
+        <li data-target="#welcoming_tour" data-slide-to="0" class="active"></li>
+        <li data-target="#welcoming_tour" data-slide-to="1"></li>
+        <li data-target="#welcoming_tour" data-slide-to="2"></li>
+    </ol>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <div class="d-block w-100">
+                <h1 class="text-center">{% translate "Bienvenue sur la Plateforme de l’inclusion !" %}</h1>
+
+                <img src="{% static 'img/welcoming_tour/employeur_1.svg' %}" class="d-block mx-auto my-4 w-sm-25">
+
+                <p class="w-sm-50 m-auto lead text-center pb-5">
+                    {% blocktranslate %}
+                        Découvrez l’outil qui simplifie la mise en relation des candidats à l’insertion avec les employeurs solidaires et facilite tous vos recrutements.
+                    {% endblocktranslate %}
+                </p>
+                <p class="pt-3 text-center">
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next" >
+                      <button type="button" class="btn btn-primary">{% translate "Suivant" %}</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="d-block w-100">
+                <h1 class="text-center">{% translate "Publiez vos offres, augmentez votre visibilité" %}</h1>
+
+                <img src="{% static 'img/welcoming_tour/employeur_2.svg' %}" class="d-block mx-auto my-4 w-sm-25">
+
+                <p class="w-sm-50 m-auto lead text-center pb-5">
+                    {% blocktranslate %}
+                        Grâce à la Plateforme de l’inclusion, disposez d’une plus large diffusion de vos offres auprès des candidats à l’insertion de votre région.<br>
+                        Gagnez en visibilité pour vous faire connaître des prescripteurs locaux.
+                    {% endblocktranslate %}
+                </p>
+                <p class="pt-3 text-center">
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev" >
+                      <button type="button" class="btn btn-secondary">{% translate "Précédent" %}</button>
+                    </a>
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next" >
+                      <button type="button" class="btn btn-primary">{% translate "Suivant" %}</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="d-block w-100">
+                <h1 class="text-center">{% translate "Gérez toutes vos candidatures en ligne !" %}</h1>
+
+                <img src="{% static 'img/welcoming_tour/employeur_3.svg' %}" class="d-block mx-auto my-4 w-sm-25">
+
+                <p class="w-sm-50 m-auto lead text-center">
+                    {% blocktranslate %}
+                        Renseignez votre profil SIAE, valorisez votre activité, configurez vos fiches de postes... et voilà !<br>
+                        Vous pouvez recruter en toute autonomie, que ce soit en candidature spontanée ou via un orienteur et un prescripteur, et même recevoir votre agrément IAE en ligne (Pass IAE) !
+                    {% endblocktranslate %}
+                </p>
+                <p class="w-sm-50 m-auto lead text-center pb-5 pt-2">
+                    {% blocktranslate %}
+                        À vous de jouer maintenant !<br>
+                        Bonne découverte et bons recrutements.
+                    {% endblocktranslate %}
+                </p>
+                <p class="pt-3 text-center">
+                    <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev" >
+                      <button type="button" class="btn btn-secondary">{% translate "Précédent" %}</button>
+                    </a>
+                    <a class="text-decoration-none" href="{% url 'dashboard:index' %}" role="button" data-slide="next" >
+                      <button type="button" class="btn btn-primary">{% translate "Terminer" %}</button>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<p class="text-center pt-5 mb-0">
+    <a href="{% url 'dashboard:index' %}">
+        <button type="button" class="btn btn-link">{% translate 'Ignorer la présentation' %}</button>
+    </a>
+</p>
+
+{% endblock content %}
