@@ -80,12 +80,22 @@ class Command(BaseCommand):
     def log(self, message):
         self.logger.debug(message)
 
+    def commit(self):
+        """
+        A single final commit freezes the itou-metabase-db temporarily,
+        making our GUI unable to connect to the db during this commit.
+
+        This is why we instead do small and frequent commits, so that the db
+        stays available throughout the script.
+        """
+        self.conn.commit()
+
     def cleanup_tables(self, table_name):
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_old;")
-        self.conn.commit()
+        self.commit()
 
     def populate_table(self, table_name, table_columns, objects):
         """
@@ -121,7 +131,7 @@ class Command(BaseCommand):
         # Create table.
         statement = ", ".join([f'{c["name"]} {c["type"]}' for c in table_columns])
         self.cur.execute(f"CREATE TABLE {table_name}_new ({statement});")
-        self.conn.commit()
+        self.commit()
 
         # Add comments on table columns.
         for c in table_columns:
@@ -129,7 +139,7 @@ class Command(BaseCommand):
             column_name = c["name"]
             column_comment = c["comment"]
             self.cur.execute(f"comment on column {table_name}_new.{column_name} is '{column_comment}';")
-        self.conn.commit()
+        self.commit()
 
         # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
         column_names = [f'{c["name"]}' for c in table_columns]
@@ -140,14 +150,14 @@ class Command(BaseCommand):
                 data = [[c["lambda"](o) for c in table_columns] for o in chunk]
                 psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
                 progress_bar.update(len(chunk))
-                self.conn.commit()
+                self.commit()
 
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
         self.cur.execute(f"ALTER TABLE {table_name}_new RENAME TO {table_name};")
-        self.conn.commit()
+        self.commit()
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
-        self.conn.commit()
+        self.commit()
 
     def populate_siaes(self):
         """
