@@ -19,6 +19,12 @@
 
         {% csrf_token %}
 
+        {# `is_safe_url` is secure enough to let us use request params here. #}
+        {# See Allauth.account.adapter.DefaultAccountAdapter.is_safe_url #}
+        {% if request.GET.next %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+        {% endif %}
+
         {% buttons %}
                 <button type="submit" class="btn btn-primary">{% translate "Confirmer" %}</button>
         {% endbuttons %}
