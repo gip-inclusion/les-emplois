@@ -22,6 +22,7 @@ import psycopg2
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -79,12 +80,22 @@ class Command(BaseCommand):
     def log(self, message):
         self.logger.debug(message)
 
+    def commit(self):
+        """
+        A single final commit freezes the itou-metabase-db temporarily,
+        making our GUI unable to connect to the db during this commit.
+
+        This is why we instead do small and frequent commits, so that the db
+        stays available throughout the script.
+        """
+        self.conn.commit()
+
     def cleanup_tables(self, table_name):
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_old;")
+        self.commit()
 
     def populate_table(self, table_name, table_columns, objects):
         """
@@ -94,9 +105,19 @@ class Command(BaseCommand):
         """
         self.cleanup_tables(table_name)
 
+        # Ugly workaround until we setup a nightly cronjob.
+        table_columns += [
+            {
+                "name": "date_mise_à_jour_metabase",
+                "type": "date",
+                "comment": "Date de dernière mise à jour de Metabase",
+                "lambda": lambda o: timezone.now(),
+            },
+        ]
+
         if self.dry_run:
             table_name = f"{table_name}_dry_run"
-            objects = random.sample(list(objects), self.max_rows_per_table)
+            objects = random.sample(list(objects), min(self.max_rows_per_table, len(objects)))
 
         # Transform boolean fields into 0-1 integer fields as
         # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
@@ -110,6 +131,7 @@ class Command(BaseCommand):
         # Create table.
         statement = ", ".join([f'{c["name"]} {c["type"]}' for c in table_columns])
         self.cur.execute(f"CREATE TABLE {table_name}_new ({statement});")
+        self.commit()
 
         # Add comments on table columns.
         for c in table_columns:
@@ -117,6 +139,7 @@ class Command(BaseCommand):
             column_name = c["name"]
             column_comment = c["comment"]
             self.cur.execute(f"comment on column {table_name}_new.{column_name} is '{column_comment}';")
+        self.commit()
 
         # Insert rows by batch of settings.METABASE_INSERT_BATCH_SIZE.
         column_names = [f'{c["name"]}' for c in table_columns]
@@ -127,19 +150,30 @@ class Command(BaseCommand):
                 data = [[c["lambda"](o) for c in table_columns] for o in chunk]
                 psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
                 progress_bar.update(len(chunk))
+                self.commit()
 
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
         self.cur.execute(f"ALTER TABLE {table_name}_new RENAME TO {table_name};")
+        self.commit()
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
+        self.commit()
 
     def populate_siaes(self):
         """
         Populate siaes table with various statistics.
         """
-        objects = Siae.objects.prefetch_related("members", "siaemembership_set", "job_applications_received").all()[
-            : self.max_rows_per_table
-        ]
+        objects = (
+            Siae.objects.active()
+            .prefetch_related(
+                "members",
+                "siaemembership_set",
+                "job_applications_received",
+                "job_applications_received__logs",
+                "job_description_through",
+            )
+            .all()[: self.max_rows_per_table]
+        )
 
         self.populate_table(table_name="structures", table_columns=_siaes.TABLE_COLUMNS, objects=objects)
 
@@ -214,8 +248,12 @@ class Command(BaseCommand):
         self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, objects=objects)
 
     def populate_metabase(self):
-        with MetabaseDatabaseCursor() as cur:
+        if not settings.ALLOW_POPULATING_METABASE:
+            self.log("Populating metabase is not allowed in this environment.")
+            return
+        with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
+            self.conn = conn
             self.populate_siaes()
             self.populate_organizations()
             self.populate_job_seekers()

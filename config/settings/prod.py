@@ -21,3 +21,5 @@ ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply@inclusion.beta.gouv.fr"
 
 sentry_init(dsn=os.environ["SENTRY_DSN_PROD"])
+
+ALLOW_POPULATING_METABASE = True

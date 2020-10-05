@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.translation import gettext
 
@@ -133,3 +134,31 @@ def get_address_columns(name_suffix="", comment_suffix=""):
             "lambda": lambda o: o.city,
         },
     ] + get_department_and_region_columns(name_suffix, comment_suffix)
+
+
+def get_establishment_last_login_date_column():
+    return [
+        {
+            "name": "date_dernière_connexion",
+            "type": "date",
+            "comment": "Date de dernière connexion utilisateur",
+            "lambda": lambda o: max([u.last_login for u in o.members.all() if u.last_login], default=None)
+            if o.members.exists()
+            else None,
+        },
+    ]
+
+
+def get_establishment_is_active_column():
+    return [
+        {
+            "name": "active",
+            "type": "boolean",
+            "comment": "Dernière connexion dans les 7 jours",
+            "lambda": lambda o: any(
+                [u.last_login > timezone.now() - timezone.timedelta(days=7) for u in o.members.all() if u.last_login]
+            )
+            if o.members.exists()
+            else False,
+        },
+    ]

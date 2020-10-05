@@ -387,13 +387,19 @@ ASP_ITOU_PREFIX = "99999"
 
 # Metabase
 # ------------------------------------------------------------------------------
+
+# Metabase should only ever be populated:
+# - from production (by clever cloud cronjob)
+# - from local dev (by experimented metabase developers)
+ALLOW_POPULATING_METABASE = False
+
 METABASE_HOST = os.environ.get("METABASE_HOST")
 METABASE_PORT = os.environ.get("METABASE_PORT")
 METABASE_DATABASE = os.environ.get("METABASE_DATABASE")
 METABASE_USER = os.environ.get("METABASE_USER")
 METABASE_PASSWORD = os.environ.get("METABASE_PASSWORD")
 
-METABASE_DRY_RUN_ROWS_PER_TABLE = 100
+METABASE_DRY_RUN_ROWS_PER_TABLE = 1000
 
 # Useful to troobleshoot whether the script runs a deluge of SQL requests.
 METABASE_SHOW_SQL_REQUESTS = False
