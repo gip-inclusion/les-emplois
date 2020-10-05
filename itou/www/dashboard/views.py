@@ -21,7 +21,6 @@ from itou.www.dashboard.forms import EditUserInfoForm
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_categories = []
-    prescriber_authorization_status_not_set = None
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
@@ -56,12 +55,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    if request.user.is_prescriber_with_org:
-        get_current_org_or_404(request)
-
     context = {
         "job_applications_categories": job_applications_categories,
-        "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
     }
 
     return render(request, template_name, context)
@@ -141,3 +136,11 @@ def switch_siae(request):
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
 
     return HttpResponseRedirect(dashboard_url)
+
+
+@login_required
+def switch_prescriber_organization(request):
+    """
+    Switch prescriber organization for a user with multiple memberships
+    """
+    # FIXME: implement

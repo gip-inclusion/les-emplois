@@ -102,6 +102,13 @@
                                     </div>
                                 </div>
                             {% endif %}
+
+                            {% if user.is_prescriber %}
+                                <div class="btn-group">
+                                    Spotted you, prescriber !
+                                </div>
+                            {% endif %}
+
                             </div>
 
                         {% else %}
