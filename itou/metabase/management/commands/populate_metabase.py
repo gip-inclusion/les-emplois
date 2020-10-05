@@ -15,6 +15,7 @@ has all the fields needed and thus never needs to perform joining two tables.
 We maintain a google sheet with extensive documentation about all tables
 and fields. Not linked here but easy to find internally.
 """
+import gc
 import logging
 import random
 
@@ -103,6 +104,7 @@ class Command(BaseCommand):
         Create table with a temporary name, add column comments,
         inject content and finally swap with the target table.
         """
+        gc.collect()  # free up some memory.
         self.cleanup_tables(table_name)
 
         # Ugly workaround until we setup a nightly cronjob.
@@ -158,6 +160,7 @@ class Command(BaseCommand):
         self.commit()
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
         self.commit()
+        gc.collect()  # free up some memory.
 
     def populate_siaes(self):
         """
