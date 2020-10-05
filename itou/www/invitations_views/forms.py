@@ -7,6 +7,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.models import PrescriberOrganization
+from itou.utils.validators import is_email_from_pole_emploi
 
 
 class NewInvitationMixinForm(forms.ModelForm):
@@ -102,7 +103,7 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
 
     def clean_email(self):
         email = super().clean_email()
-        if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith("@pole-emploi.fr"):
+        if self.organization.kind == PrescriberOrganization.Kind.PE and not is_email_from_pole_emploi(email):
             error = forms.ValidationError(_("L'adresse e-mail doit être une adresse Pôle emploi"))
             self.add_error("email", error)
         return email

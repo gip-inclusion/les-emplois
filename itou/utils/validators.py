@@ -57,3 +57,7 @@ def validate_birthdate(birthdate):
         raise ValidationError(_("La date de naissance doit être postérieure à 1900."))
     if birthdate >= get_max_birthdate():
         raise ValidationError(_("La personne doit avoir plus de 16 ans."))
+
+
+def is_email_from_pole_emploi(email):
+    return email.endswith("@pole-emploi.fr") or email.endswith("@pole-emploi.net")

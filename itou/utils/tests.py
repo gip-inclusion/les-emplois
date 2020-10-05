@@ -34,6 +34,7 @@ from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGen
 from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.utils.validators import (
     alphanumeric,
+    is_email_from_pole_emploi,
     validate_birthdate,
     validate_code_safir,
     validate_naf,
@@ -330,6 +331,12 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_birthdate, max_date + datetime.timedelta(days=365))
         self.assertRaises(ValidationError, validate_birthdate, max_date)
         validate_birthdate(max_date - datetime.timedelta(days=3600))
+
+    def test_is_email_from_pole_emploi(self):
+        self.assertTrue(is_email_from_pole_emploi("john.doe@pole-emploi.fr"))
+        self.assertTrue(is_email_from_pole_emploi("john.doe@pole-emploi.net"))
+        self.assertFalse(is_email_from_pole_emploi("john.doe@pole-emploi.com"))
+        self.assertFalse(is_email_from_pole_emploi("john.doe@gmail.com"))
 
 
 class UtilsTemplateTagsTestCase(TestCase):

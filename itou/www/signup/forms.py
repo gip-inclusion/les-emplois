@@ -12,7 +12,7 @@ from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_code_safir, validate_siren, validate_siret
+from itou.utils.validators import is_email_from_pole_emploi, validate_code_safir, validate_siren, validate_siret
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -41,7 +41,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 
     def clean_email(self):
         email = super().clean_email()
-        if email.endswith("@pole-emploi.fr"):
+        if is_email_from_pole_emploi(email):
             raise ValidationError(gettext_lazy("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat."))
         return email
 
@@ -349,7 +349,7 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
 
     def clean_email(self):
         email = super().clean_email()
-        if not email.endswith("@pole-emploi.fr"):
+        if not is_email_from_pole_emploi(email):
             raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi."))
         return email
 
