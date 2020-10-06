@@ -30,7 +30,7 @@ from itou.siaes.models import Siae
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
-VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_28092020_063002.csv"
+VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_05102020_063003.csv"
 
 
 def get_vue_af_df(filename=VUE_AF_FILENAME):
