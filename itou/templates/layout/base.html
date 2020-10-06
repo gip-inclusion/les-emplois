@@ -109,14 +109,14 @@
                                         {% translate "Changer de structure" %}
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
-                                        <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                                        <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
                                             {% csrf_token %}
-                                            {% for s in user_siaes %}
+                                            {% for po in user_prescriberorganizations %}
                                                 <button
                                                     class="dropdown-item text-primary"
                                                     type="submit"
                                                     name="siae_id"
-                                                    value="{{ s.pk }}">{{ s.display_name }}
+                                                    value="{{ po.pk }}">{{ po.display_name }}
                                                 </button>
                                             {% endfor %}
                                         </form>

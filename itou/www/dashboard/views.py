@@ -139,8 +139,11 @@ def switch_siae(request):
 
 
 @login_required
+@require_POST
 def switch_prescriber_organization(request):
     """
     Switch prescriber organization for a user with multiple memberships
     """
     # FIXME: implement
+    dashboard_url = reverse_lazy("dashboard:index")
+    return HttpResponseRedirect(dashboard_url)
