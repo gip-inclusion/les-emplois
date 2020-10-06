@@ -1,2 +1,3 @@
 [
+    "20 13 * * * $ROOT/clevercloud/populate_metabase.sh"
 ]
