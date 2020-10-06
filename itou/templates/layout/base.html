@@ -103,9 +103,24 @@
                                 </div>
                             {% endif %}
 
-                            {% if user.is_prescriber %}
+                            {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
                                 <div class="btn-group">
-                                    Spotted you, prescriber !
+                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                        {% translate "Changer de structure" %}
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
+                                        <form action="{% url 'dashboard:switch_siae' %}" method="post">
+                                            {% csrf_token %}
+                                            {% for s in user_siaes %}
+                                                <button
+                                                    class="dropdown-item text-primary"
+                                                    type="submit"
+                                                    name="siae_id"
+                                                    value="{{ s.pk }}">{{ s.display_name }}
+                                                </button>
+                                            {% endfor %}
+                                        </form>
+                                    </div>
                                 </div>
                             {% endif %}
 

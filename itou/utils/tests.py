@@ -12,7 +12,7 @@ from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from factory import Faker
 
-from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae, SiaeMembership
@@ -69,6 +69,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": True,
                 "user_siaes": [siae],
+                "user_prescriberorganizations": [],
                 "matomo_custom_variables": OrderedDict(
                     [("is_authenticated", "yes"), ("account_type", "employer"), ("account_sub_type", "employer_admin")]
                 ),
@@ -105,6 +106,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": False,
                 "user_siaes": [siae1, siae2, siae3],
+                "user_prescriberorganizations": [],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
@@ -137,6 +139,44 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "user_is_prescriber_org_admin": True,
                 "user_is_siae_admin": False,
                 "user_siaes": [],
+                "user_prescriberorganizations": [organization],
+                "matomo_custom_variables": OrderedDict(
+                    [
+                        ("is_authenticated", "yes"),
+                        ("account_type", "prescriber"),
+                        ("account_sub_type", "prescriber_with_unauthorized_org"),
+                    ]
+                ),
+            }
+            self.assertDictEqual(expected, result)
+
+    def test_prescriber_organization_multiple_membership(self):
+
+        organization1 = PrescriberOrganizationWithMembershipFactory()
+        user = organization1.members.first()
+        self.assertTrue(user.prescribermembership_set.get(organization=organization1).is_admin)
+
+        organization2 = PrescriberOrganizationWithMembershipFactory()
+        organization2.members.add(user)
+        # FIXME: make factory with no admin rights
+
+        factory = RequestFactory()
+        request = factory.get("/")
+        request.user = user
+        middleware = SessionMiddleware()
+        middleware.process_request(request)
+        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = organization1.pk
+        request.session.save()
+
+        with self.assertNumQueries(1):
+            result = get_current_organization_and_perms(request)
+            expected = {
+                "current_prescriber_organization": organization1,
+                "current_siae": None,
+                "user_is_prescriber_org_admin": True,
+                "user_is_siae_admin": False,
+                "user_siaes": [],
+                "user_prescriberorganizations": [organization1, organization2],
                 "matomo_custom_variables": OrderedDict(
                     [
                         ("is_authenticated", "yes"),
