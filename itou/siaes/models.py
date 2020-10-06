@@ -407,13 +407,27 @@ class SiaeConvention(models.Model):
     """
     A SiaeConvention encapsulates the logic to decide whether a Siae is active.
 
-    Several siaes can share the same SiaeConvention, however there is always
-    exactly one and only one of them which has an ASP source.
+    A SiaeConvention is typically shared by one siae of source ASP
+    and zero or several user created siaes ("Antennes").
 
     A SiaeConvention has many SiaeFinancialAnnex related objects.
     """
 
-    kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=Siae.KIND_CHOICES, default=Siae.KIND_EI)
+    KIND_EI = "EI"
+    KIND_AI = "AI"
+    KIND_ACI = "ACI"
+    KIND_ETTI = "ETTI"
+    KIND_EITI = "EITI"
+
+    KIND_CHOICES = (
+        (KIND_EI, _("Entreprise d'insertion")),
+        (KIND_AI, _("Association intermédiaire")),
+        (KIND_ACI, _("Atelier chantier d'insertion")),
+        (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
+        (KIND_EITI, _("Entreprise d'insertion par le travail indépendant")),
+    )
+
+    kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
     siret_signature = models.CharField(
         verbose_name=_("Siret à la signature de la convention"),
         max_length=14,
@@ -443,15 +457,14 @@ class SiaeConvention(models.Model):
     )
     reactivated_at = models.DateTimeField(verbose_name=_("Date de réactivation manuelle"), blank=True, null=True)
 
-    # External_id is the internal ID of the siae objects in ASP's own database.
-    # These are supposed to never change,
+    # Internal ID of siaes à la ASP. This ID is supposed to never change,
     # so as long as the ASP keeps including this field in all their exports,
     # it will be easy for us to accurately sync data between exports.
-    # Note that this external_id unicity is based on SIRET only.
+    # Note that this asp_id unicity is based on SIRET only.
     # In other words, if an EI and a ACI share the same SIRET, they also
-    # share the same external_id in ASP's own database.
+    # share the same asp_id in ASP's own database.
     # In this example a single siae à la ASP corresponds to two siaes à la Itou.
-    external_id = models.IntegerField(verbose_name=_("ID externe"), null=True, blank=True, db_index=True,)
+    asp_id = models.IntegerField(verbose_name=_("ID ASP de la SIAE"), db_index=True,)
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
@@ -460,9 +473,9 @@ class SiaeConvention(models.Model):
         verbose_name = _("Convention")
         verbose_name_plural = _("Conventions")
         unique_together = (
-            ("external_id", "kind"),
+            ("asp_id", "kind"),
             # Unfortunately the (siret_signature, kind) couple is not unique,
-            # as the two external_ids 2455 and 4281 share the same values.
+            # as the two asp_ids 2455 and 4281 share the same values.
             # It is the only exception. Both structures are active.
             # ("siret_signature", "kind"),
         )
@@ -482,9 +495,6 @@ class SiaeFinancialAnnex(models.Model):
 
     STATE_VALID = "VALIDE"
     STATE_PROVISIONAL = "PROVISOIRE"
-
-    ACTIVE_STATES = [STATE_VALID, STATE_PROVISIONAL]
-
     STATE_ARCHIVED = "HISTORISE"
     STATE_CANCELLED = "ANNULE"
     STATE_ENTERED = "SAISI"
@@ -492,11 +502,20 @@ class SiaeFinancialAnnex(models.Model):
     STATE_CLOSED = "CLOTURE"
     STATE_REJECTED = "REJETE"
 
-    INACTIVE_STATES = [STATE_ARCHIVED, STATE_CANCELLED, STATE_ENTERED, STATE_DRAFT, STATE_CLOSED, STATE_REJECTED]
+    STATE_CHOICES = (
+        (STATE_VALID, _("Valide")),
+        (STATE_PROVISIONAL, _("Provisoire (valide)")),
+        (STATE_ARCHIVED, _("Archivé (invalide)")),
+        (STATE_CANCELLED, _("Annulé")),
+        (STATE_ENTERED, _("Saisi (invalide)")),
+        (STATE_DRAFT, _("Brouillon (invalide)")),
+        (STATE_CLOSED, _("Cloturé (invalide)")),
+        (STATE_REJECTED, _("Rejeté")),
+    )
 
-    ALL_STATES = ACTIVE_STATES + INACTIVE_STATES
-
-    STATE_CHOICES = ((state, state) for state in ALL_STATES)
+    STATES_ACTIVE = [STATE_VALID, STATE_PROVISIONAL]
+    STATES_INACTIVE = [STATE_ARCHIVED, STATE_CANCELLED, STATE_ENTERED, STATE_DRAFT, STATE_CLOSED, STATE_REJECTED]
+    STATES_ALL = STATES_ACTIVE + STATES_INACTIVE
 
     number = models.CharField(
         verbose_name=_("Numéro d'annexe financière"),
@@ -505,6 +524,8 @@ class SiaeFinancialAnnex(models.Model):
         unique=True,
         db_index=True,
     )
+    # This field is at SiaeFinancialAnnex level and not at SiaeConvention level
+    # because one SiaeConvention can have financial annexes with different convention numbers.
     convention_number = models.CharField(
         verbose_name=_("Numéro de convention"), max_length=19, validators=[validate_convention_number], db_index=True
     )

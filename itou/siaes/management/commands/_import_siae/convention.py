@@ -25,7 +25,7 @@ def get_creatable_conventions(dry_run):
             assert convention.deactivated_at == siae.deactivated_at
             assert convention.reactivated_by == siae.reactivated_by
             assert convention.reactivated_at == siae.reactivated_at
-            assert convention.external_id == siae.external_id
+            assert convention.asp_id == siae.external_id
 
             if convention.is_active != siae.is_active:
                 convention.is_active = siae.is_active
@@ -48,7 +48,7 @@ def get_creatable_conventions(dry_run):
             deactivated_at=siae.deactivated_at,
             reactivated_by=siae.reactivated_by,
             reactivated_at=siae.reactivated_at,
-            external_id=siae.external_id,
+            asp_id=siae.external_id,
         )
         creatable_conventions.append((convention, siae))
     return creatable_conventions

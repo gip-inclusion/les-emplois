@@ -105,7 +105,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     df["end_date"] = df.end_date.apply(timezone.make_aware)
 
     df["ends_in_the_future"] = df.end_date > timezone.now()
-    df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.ACTIVE_STATES)
+    df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
     df["is_active"] = df.has_active_state & df.ends_in_the_future
 
     # Drop identical duplicate rows.

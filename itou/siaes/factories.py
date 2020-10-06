@@ -139,7 +139,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
     # Don't start a SIRET with 0.
     siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
     kind = models.Siae.KIND_EI
-    external_id = MAIN_EXTERNAL_ID
+    asp_id = MAIN_EXTERNAL_ID
     is_active = True
 
 
