@@ -403,7 +403,7 @@ METABASE_DATABASE = os.environ.get("METABASE_DATABASE")
 METABASE_USER = os.environ.get("METABASE_USER")
 METABASE_PASSWORD = os.environ.get("METABASE_PASSWORD")
 
-METABASE_DRY_RUN_ROWS_PER_TABLE = 1000
+METABASE_DRY_RUN_ROWS_PER_QUERYSET = 1000
 
 # Useful to troobleshoot whether the script runs a deluge of SQL requests.
 METABASE_SHOW_SQL_REQUESTS = False

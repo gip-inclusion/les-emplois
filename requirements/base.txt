@@ -49,6 +49,9 @@ tqdm==4.46.1  # https://github.com/tqdm/tqdm
 # Read Excel files with Pandas
 xlrd==1.2.0  # https://pypi.org/project/xlrd/
 
+# Split large querysets in chunks to minimize memory usage
+django-chunkator==2.0.0  # https://github.com/peopledoc/django-chunkator
+
 # Third-party applications
 # ------------------------------------------------------------------------------
 

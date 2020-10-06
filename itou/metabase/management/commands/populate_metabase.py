@@ -15,11 +15,10 @@ has all the fields needed and thus never needs to perform joining two tables.
 We maintain a google sheet with extensive documentation about all tables
 and fields. Not linked here but easy to find internally.
 """
-import gc
 import logging
-import random
 
 import psycopg2
+from chunkator import chunkator_page
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -30,7 +29,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.job_applications.models import JobApplication
 from itou.metabase.management.commands import _approvals, _job_applications, _job_seekers, _organizations, _siaes
 from itou.metabase.management.commands._database import MetabaseDatabaseCursor
-from itou.metabase.management.commands._utils import chunks, compose, convert_boolean_to_int
+from itou.metabase.management.commands._utils import compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 
@@ -98,16 +97,35 @@ class Command(BaseCommand):
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_old;")
         self.commit()
 
-    def populate_table(self, table_name, table_columns, objects):
+    def inject_page(self, table_columns, page, insert_query):
+        """
+        Insert page of objects into table.
+        """
+        data = [[c["lambda"](o) for c in table_columns] for o in page]
+        psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
+        self.commit()
+
+    def populate_table(self, table_name, table_columns, queryset=None, querysets=None, extra_object=None):
         """
         Generic method to populate each table.
         Create table with a temporary name, add column comments,
         inject content and finally swap with the target table.
         """
-        gc.collect()  # free up some memory.
+        if queryset:
+            assert not querysets
+            querysets = [queryset]
+            queryset = None
+
         self.cleanup_tables(table_name)
 
-        # Ugly workaround until we setup a nightly cronjob.
+        if self.dry_run:
+            table_name = f"{table_name}_dry_run"
+            total_rows = sum(
+                [min(queryset.count(), settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
+            )
+        else:
+            total_rows = sum([queryset.count() for queryset in querysets])
+
         table_columns += [
             {
                 "name": "date_mise_à_jour_metabase",
@@ -117,10 +135,6 @@ class Command(BaseCommand):
             },
         ]
 
-        if self.dry_run:
-            table_name = f"{table_name}_dry_run"
-            objects = random.sample(list(objects), min(self.max_rows_per_table, len(objects)))
-
         # Transform boolean fields into 0-1 integer fields as
         # metabase cannot sum or average boolean columns ¯\_(ツ)_/¯
         for c in table_columns:
@@ -128,7 +142,7 @@ class Command(BaseCommand):
                 c["type"] = "integer"
                 c["lambda"] = compose(convert_boolean_to_int, c["lambda"])
 
-        self.log(f"Injecting {len(objects)} rows with {len(table_columns)} columns into table {table_name}:")
+        self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
         # Create table.
         statement = ", ".join([f'{c["name"]} {c["type"]}' for c in table_columns])
@@ -147,12 +161,25 @@ class Command(BaseCommand):
         column_names = [f'{c["name"]}' for c in table_columns]
         statement = ", ".join(column_names)
         insert_query = f"insert into {table_name}_new ({statement}) values %s"
-        with tqdm(total=len(objects)) as progress_bar:
-            for chunk in chunks(objects, n=settings.METABASE_INSERT_BATCH_SIZE):
-                data = [[c["lambda"](o) for c in table_columns] for o in chunk]
-                psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
-                progress_bar.update(len(chunk))
-                self.commit()
+
+        if extra_object:
+            # Insert extra object without counter/tqdm for simplicity.
+            self.inject_page(table_columns=table_columns, page=[extra_object], insert_query=insert_query)
+
+        with tqdm(total=total_rows) as progress_bar:
+            for queryset in querysets:
+                injections = 0
+                total_injections = queryset.count()
+                if self.dry_run:
+                    total_injections = min(total_injections, settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
+
+                for page in chunkator_page(queryset, settings.METABASE_INSERT_BATCH_SIZE):
+                    injections_left = total_injections - injections
+                    if len(page) > injections_left:
+                        page = page[:injections_left]
+                    self.inject_page(table_columns=table_columns, page=page, insert_query=insert_query)
+                    injections += len(page)
+                    progress_bar.update(len(page))
 
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
@@ -160,13 +187,12 @@ class Command(BaseCommand):
         self.commit()
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
         self.commit()
-        gc.collect()  # free up some memory.
 
     def populate_siaes(self):
         """
         Populate siaes table with various statistics.
         """
-        objects = (
+        queryset = (
             Siae.objects.active()
             .prefetch_related(
                 "members",
@@ -175,10 +201,10 @@ class Command(BaseCommand):
                 "job_applications_received__logs",
                 "job_description_through",
             )
-            .all()[: self.max_rows_per_table]
+            .all()
         )
 
-        self.populate_table(table_name="structures", table_columns=_siaes.TABLE_COLUMNS, objects=objects)
+        self.populate_table(table_name="structures", table_columns=_siaes.TABLE_COLUMNS, queryset=queryset)
 
     def populate_organizations(self):
         """
@@ -186,45 +212,49 @@ class Command(BaseCommand):
         and add a special "ORG_OF_PRESCRIBERS_WITHOUT_ORG" to gather stats
         of prescriber users *without* any organization.
         """
-        objects = [_organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG] + list(
-            PrescriberOrganization.objects.prefetch_related(
-                "prescribermembership_set", "members", "jobapplication_set"
-            ).all()[: self.max_rows_per_table]
-        )
+        queryset = PrescriberOrganization.objects.prefetch_related(
+            "prescribermembership_set", "members", "jobapplication_set"
+        ).all()
 
-        self.populate_table(table_name="organisations", table_columns=_organizations.TABLE_COLUMNS, objects=objects)
+        self.populate_table(
+            table_name="organisations",
+            table_columns=_organizations.TABLE_COLUMNS,
+            queryset=queryset,
+            extra_object=_organizations.ORG_OF_PRESCRIBERS_WITHOUT_ORG,
+        )
 
     def populate_job_applications(self):
         """
         Populate job applications table with various statistics.
         """
-        objects = (
+        queryset = (
             JobApplication.objects.select_related("to_siae", "sender_siae", "sender_prescriber_organization")
             .prefetch_related("logs")
-            .all()[: self.max_rows_per_table]
+            .all()
         )
 
-        self.populate_table(table_name="candidatures", table_columns=_job_applications.TABLE_COLUMNS, objects=objects)
+        self.populate_table(
+            table_name="candidatures", table_columns=_job_applications.TABLE_COLUMNS, queryset=queryset
+        )
 
     def populate_approvals(self):
         """
         Populate approvals table by merging Approvals and PoleEmploiApprovals.
         Some stats are available on both kinds of objects and some only
         on Approvals.
-        We can link PoleEmploApproval back to its PrescriberOrganization via
+        We can link PoleEmploiApproval back to its PrescriberOrganization via
         the SAFIR code.
         """
-        objects = list(
-            Approval.objects.prefetch_related(
-                "user", "user__job_applications", "user__job_applications__to_siae"
-            ).all()[: self.max_rows_per_table / 2]
-        ) + list(
-            PoleEmploiApproval.objects.filter(start_at__gte=_approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE).all()[
-                : self.max_rows_per_table / 2
-            ]
-        )
+        queryset1 = Approval.objects.prefetch_related(
+            "user", "user__job_applications", "user__job_applications__to_siae"
+        ).all()
+        queryset2 = PoleEmploiApproval.objects.filter(
+            start_at__gte=_approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE
+        ).all()
 
-        self.populate_table(table_name="pass_agréments", table_columns=_approvals.TABLE_COLUMNS, objects=objects)
+        self.populate_table(
+            table_name="pass_agréments", table_columns=_approvals.TABLE_COLUMNS, querysets=[queryset1, queryset2]
+        )
 
     def populate_job_seekers(self):
         """
@@ -234,7 +264,7 @@ class Command(BaseCommand):
 
         Note that job seeker id is anonymized.
         """
-        objects = (
+        queryset = (
             get_user_model()
             .objects.filter(is_job_seeker=True)
             .prefetch_related(
@@ -245,10 +275,10 @@ class Command(BaseCommand):
                 "eligibility_diagnoses__author_prescriber_organization",
                 "eligibility_diagnoses__author_siae",
             )
-            .all()[: self.max_rows_per_table]
+            .all()
         )
 
-        self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, objects=objects)
+        self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, queryset=queryset)
 
     def populate_metabase(self):
         if not settings.ALLOW_POPULATING_METABASE:
@@ -266,12 +296,6 @@ class Command(BaseCommand):
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
         self.dry_run = dry_run
-        if dry_run:
-            self.max_rows_per_table = settings.METABASE_DRY_RUN_ROWS_PER_TABLE
-        else:
-            # Clumsy way to set an infinite number.
-            # Makes the code using this constant much simpler to read.
-            self.max_rows_per_table = 1000 * 1000 * 1000
         self.populate_metabase()
         self.log("-" * 80)
         self.log("Done.")
