@@ -10,6 +10,7 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -142,8 +143,13 @@ def switch_siae(request):
 @require_POST
 def switch_prescriber_organization(request):
     """
-    Switch prescriber organization for a user with multiple memberships
+    Switch prescriber organization for a user with multiple memberships.
     """
-    # FIXME: implement
     dashboard_url = reverse_lazy("dashboard:index")
+
+    pk = request.POST["prescriber_organization_id"]
+    queryset = PrescriberOrganization.objects
+    prescriber_organization = get_object_or_404(queryset, pk=pk)
+    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
+
     return HttpResponseRedirect(dashboard_url)

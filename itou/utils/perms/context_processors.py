@@ -42,10 +42,26 @@ def get_current_organization_and_perms(request):
 
         prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
         if prescriber_org_pk:
+            first_idx = 0
             membership = current_user.prescribermembership_set.select_related("organization")
-            user_prescriberorganizations = [po.organization for po in membership]
-            prescriber_organization = user_prescriberorganizations[0]
-            user_is_prescriber_org_admin = membership[0].is_admin
+
+            for idx, m in enumerate(membership):
+                # Same as above:
+                # In order to avoid an extra SQL query, fetch related organizations
+                # and artifially reconstruct the list of organizations the user belongs to
+                # (and other stuff while at it)
+                user_prescriberorganizations.append(m.organization)
+                if m.organization.pk == prescriber_org_pk:
+                    prescriber_organization = m.organization
+                    user_is_prescriber_org_admin = m.is_admin
+                    first_idx = idx
+
+            if first_idx != 0:
+                # Put selected prescriber organization first (UI)
+                user_prescriberorganizations[0], user_prescriberorganizations[first_idx] = (
+                    user_prescriberorganizations[first_idx],
+                    user_prescriberorganizations[0],
+                )
 
     context = {
         "current_prescriber_organization": prescriber_organization,
