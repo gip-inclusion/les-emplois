@@ -92,7 +92,7 @@
                                             {% csrf_token %}
                                             {% for s in user_siaes %}
                                                 <button
-                                                    class="dropdown-item text-primary"
+                                                    class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="siae_id"
                                                     value="{{ s.pk }}">{{ s.display_name }}
