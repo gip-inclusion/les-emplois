@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0013_user_has_completed_welcoming_tour'),
+        ("users", "0013_user_has_completed_welcoming_tour"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='lack_of_pole_emploi_id_reason',
-            field=models.CharField(blank=True, choices=[('FORGOTTEN', 'Identifiant Pôle emploi oublié'), ('NOT_REGISTERED', 'Non inscrit auprès de Pôle emploi')], help_text="Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>Renseigner l'identifiant Pôle emploi des candidats inscrits permet d'instruire instantanément votre demande.<br>Dans le cas contraire un délai de deux jours est nécessaire pour effectuer manuellement les vérifications d’usage.", max_length=30, verbose_name="Pas d'identifiant Pôle emploi\xa0?"),
+            model_name="user",
+            name="lack_of_pole_emploi_id_reason",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("FORGOTTEN", "Identifiant Pôle emploi oublié"),
+                    ("NOT_REGISTERED", "Non inscrit auprès de Pôle emploi"),
+                ],
+                help_text="Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>Renseigner l'identifiant Pôle emploi des candidats inscrits permet d'instruire instantanément votre demande.<br>Dans le cas contraire un délai de deux jours est nécessaire pour effectuer manuellement les vérifications d’usage.",
+                max_length=30,
+                verbose_name="Pas d'identifiant Pôle emploi\xa0?",
+            ),
         ),
     ]
