@@ -210,7 +210,6 @@ class Approval(CommonApprovalMixin):
         return (
             start_at
             + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
-            # TODO: ensure that subtracting 1 day is the right thing to do.
             - relativedelta(days=1)
         )
 
