@@ -143,8 +143,9 @@ class Approval(CommonApprovalMixin):
     def save(self, *args, **kwargs):
         self.clean()
         already_exists = bool(self.pk)
-        # Prevent a database integrity error during automatic creation.
         if not already_exists and hasattr(self, "number") and hasattr(self, "start_at"):
+            # Prevent a database integrity error during automatic creation.
+            # TODO: investigate UPSERT with ON CONFLICT to speed this up.
             if self.number.startswith(self.ASP_ITOU_PREFIX):
                 while Approval.objects.filter(number=self.number).exists():
                     self.number = self.get_next_number(self.start_at)
