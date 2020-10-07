@@ -1,3 +1,4 @@
+import datetime
 import logging
 import time
 
@@ -32,6 +33,12 @@ class CommonApprovalMixin(models.Model):
     # obtain a new one except from an "authorized prescriber".
     WAITING_PERIOD_YEARS = 2
 
+    # Due to COVID lockdown restrictions, the end date of overlapping approvals
+    # has been extended by 3 months.
+    LOCKDOWN_START_AT = datetime.date(2020, 3, 17)
+    LOCKDOWN_END_AT = datetime.date(2020, 6, 16)
+    LOCKDOWN_EXTENSION_DELAY_MONTHS = 3
+
     start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
     end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
@@ -61,6 +68,10 @@ class CommonApprovalMixin(models.Model):
     @property
     def originates_from_itou(self):
         return self.number.startswith(Approval.ASP_ITOU_PREFIX)
+
+    @property
+    def overlaps_covid_lockdown(self):
+        return self.start_at <= self.LOCKDOWN_END_AT and self.end_at >= self.LOCKDOWN_START_AT
 
     @property
     def time_until_waiting_period(self):
@@ -142,13 +153,22 @@ class Approval(CommonApprovalMixin):
 
     def save(self, *args, **kwargs):
         self.clean()
+
         already_exists = bool(self.pk)
+
         if not already_exists and hasattr(self, "number") and hasattr(self, "start_at"):
+
             # Prevent a database integrity error during automatic creation.
             # TODO: investigate UPSERT with ON CONFLICT to speed this up.
-            if self.number.startswith(self.ASP_ITOU_PREFIX):
+            if self.originates_from_itou:
                 while Approval.objects.filter(number=self.number).exists():
                     self.number = self.get_next_number(self.start_at)
+
+            # Handle COVID extensions for approvals originally issued by Pôle emploi.
+            # Approvals issued by Itou have already been extended through SQL.
+            if not self.originates_from_itou and self.overlaps_covid_lockdown:
+                self.end_at = self.end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+
         super().save(*args, **kwargs)
 
     def clean(self):
@@ -207,11 +227,7 @@ class Approval(CommonApprovalMixin):
 
     @staticmethod
     def get_default_end_date(start_at):
-        return (
-            start_at
-            + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
-            - relativedelta(days=1)
-        )
+        return start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS) - relativedelta(days=1)
 
     @classmethod
     def get_or_create_from_valid(cls, approvals_wrapper):

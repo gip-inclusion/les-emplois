@@ -176,6 +176,38 @@ class CommonApprovalMixinTest(TestCase):
         approval = PoleEmploiApprovalFactory(number="625741810182")
         self.assertFalse(approval.originates_from_itou)
 
+    def overlaps_covid_lockdown(self):
+
+        # Overlaps: start before lockdown.
+        start_at = Approval.LOCKDOWN_START_AT - relativedelta(years=1)
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810181", start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.overlaps_covid_lockdown)
+
+        # Overlaps: start same day as lockdown.
+        start_at = Approval.LOCKDOWN_START_AT
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810182", start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.overlaps_covid_lockdown)
+
+        # Overlaps: start same day as end of lockdown.
+        start_at = Approval.LOCKDOWN_END_AT
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810183", start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.overlaps_covid_lockdown)
+
+        # Doesn't overlap: end before lockdown.
+        end_at = Approval.LOCKDOWN_START_AT - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810184", start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.overlaps_covid_lockdown)
+
+        # Doesn't overlap: start after lockdown.
+        start_at = Approval.LOCKDOWN_END_AT + relativedelta(days=1)
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810185", start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.overlaps_covid_lockdown)
+
 
 class ApprovalModelTest(TestCase):
     """
@@ -297,6 +329,46 @@ class ApprovalModelTest(TestCase):
         approval = Approval.get_or_create_from_valid(approvals_wrapper)
         self.assertTrue(isinstance(approval, Approval))
         self.assertEqual(approval, valid_approval)
+
+    def test_covid_lockdown_extension_for_approval_originally_issued_by_pe(self):
+
+        extension_delta_months = relativedelta(months=Approval.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+
+        # Overlaps: start before lockdown.
+        start_at = Approval.LOCKDOWN_START_AT - relativedelta(years=1)
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810181", start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.end_at, end_at + extension_delta_months)  # Should be extended.
+
+        # Overlaps: start same day as lockdown.
+        start_at = Approval.LOCKDOWN_START_AT
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810182", start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.end_at, end_at + extension_delta_months)  # Should be extended.
+
+        # Overlaps: start same day as end of lockdown.
+        start_at = Approval.LOCKDOWN_END_AT
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810183", start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.end_at, end_at + extension_delta_months)  # Should be extended.
+
+        # Doesn't overlap: end before lockdown.
+        end_at = Approval.LOCKDOWN_START_AT - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810184", start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.end_at, end_at)  # Should NOT be extended.
+
+        # Doesn't overlap: start after lockdown.
+        start_at = Approval.LOCKDOWN_END_AT + relativedelta(days=1)
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="625741810185", start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.end_at, end_at)  # Should NOT be extended.
+
+        # An overlapping Itou approval should not be extended.
+        start_at = Approval.LOCKDOWN_START_AT
+        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval = ApprovalFactory(number="999990000001", start_at=start_at, end_at=end_at)
+        self.assertEqual(approval.end_at, end_at)  # Should NOT extended.
 
 
 class PoleEmploiApprovalModelTest(TestCase):
