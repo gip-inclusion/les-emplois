@@ -53,13 +53,15 @@ class ItouCurrentOrganizationMiddleware:
                         return redirect("account_logout")
 
             elif user.is_prescriber:
+                # FIXME: don't take the first one
+
                 if user.prescriberorganization_set.exists():
-                    request.session[
-                        settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-                    ] = user.prescriberorganization_set.first().pk
+                    # request.session[
+                    #    settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
+                    # ] = user.prescriberorganization_set.first().pk
+                    pass
                 elif request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY):
                     del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
-
         response = self.get_response(request)
 
         # After the view is called.
