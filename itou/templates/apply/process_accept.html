@@ -6,7 +6,6 @@
 
     {{ block.super }}
 
-
     <div class="alert alert-info" role="alert">
         {% translate "Confirmez votre choix en renseignant quelques informations supplémentaires." %}
     </div>
@@ -44,32 +43,31 @@
         {% buttons %}
             <a class="btn btn-secondary"
                href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% translate "Annuler" %}</a>
-            
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% translate "Je l'embauche" %}</a>
             {% else %}
                 <button class="btn btn-success" type="submit">{% translate "Je l'embauche" %}</button>
             {% endif %}
-        
+
         {% endbuttons %}
-            
+
         {% if job_application.to_siae.is_subject_to_eligibility_rules %}
             <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModal" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-body p-4">
-                            <h4 class="modal-title text-center" id="mapModalLabel">Obtention d'un PASS IAE</h4>
-                            <p class="pt-2 text-center">Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?</p>
+                            <h4 class="modal-title text-center" id="mapModalLabel">{% translate "Obtention d'un PASS IAE" %}</h4>
+                            <p class="pt-2 text-center">{% translate "Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?" %}</p>
                             <div id="mapPoll">
                                 <div class="row buttonsContainer">
                                     <div class="col pr-2">
                                         <button type="submit" class="btn btn-success w-100">
-                                            Je l'embauche et j'obtiens un PASS IAE
+                                            {% translate "Je l'embauche et j'obtiens un PASS IAE" %}
                                         </button>
                                     </div>
                                     <div class="col pl-2">
                                         <button type="submit" class="btn btn-success w-100" onClick="$(&quot;input[name='hiring_without_approval']&quot;).val('True')">
-                                            Je n'ai pas besoin d'un PASS IAE
+                                            {% translate "Je n'ai pas besoin d'un PASS IAE" %}
                                         </button>
                                     </div>
                                 </div>
