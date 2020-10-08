@@ -174,7 +174,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
-    ERROR_START_IN_PAST = _("La date de début du contrat ne doit pas être dans le passé.")
+    ERROR_START_IN_PAST = _("Il n'est pas possible d'antidater un contrat. Indiquez une date dans le futur.")
     ERROR_END_IS_BEFORE_START = _("La date de fin du contrat doit être postérieure à la date de début.")
     ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
 
