@@ -40,6 +40,7 @@ def get_current_organization_and_perms(request):
             if siae is None:
                 if request.path != reverse("account_logout"):
                     raise PermissionDenied
+
             if first_siae_idx != 0:
                 user_siaes[0], user_siaes[first_siae_idx] = user_siaes[first_siae_idx], user_siaes[0]
 

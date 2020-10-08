@@ -98,6 +98,9 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae3.pk
         request.session.save()
 
+        # Note: the siae are reordered, with the current siae first
+        # (explains the `siae3, siae2, siae1` order below)
+
         with self.assertNumQueries(1):
             result = get_current_organization_and_perms(request)
             expected = {
@@ -105,7 +108,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
                 "current_siae": siae3,
                 "user_is_prescriber_org_admin": False,
                 "user_is_siae_admin": False,
-                "user_siaes": [siae1, siae2, siae3],
+                "user_siaes": [siae3, siae2, siae1],
                 "user_prescriberorganizations": [],
                 "matomo_custom_variables": OrderedDict(
                     [
