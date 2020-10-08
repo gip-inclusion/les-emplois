@@ -30,6 +30,12 @@
 
     {% else %}
 
+        <p>
+            <small>
+                {% trans "Les employeurs solidaires situés dans le rayon choisi sont classés en deux groupes. Les employeurs ayant des fiches de postes actives sont dans le premier groupe et affichés en priorité, les autres employeurs sont dans le second groupe. Chaque jour, l'ordonnancement au sein de ces groupes change pour ne pas favoriser un employeur au détriment d'un autre." %}
+            </small>
+        </p>
+
         <h4 class="font-weight-normal text-muted">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages %}
                 {% blocktranslate count counter=siaes_page.paginator.count %}
