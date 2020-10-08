@@ -20,15 +20,17 @@ import logging
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
+from itou.siaes.management.commands._import_siae.convention import get_creatable_conventions, get_deletable_conventions
+from itou.siaes.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.siaes.management.commands._import_siae.siae import (
     build_siae,
     could_siae_be_deleted,
-    does_siae_have_a_valid_convention,
+    does_siae_have_an_active_convention,
     get_siae_convention_end_date,
     should_siae_be_created,
 )
 from itou.siaes.management.commands._import_siae.utils import timeit
-from itou.siaes.management.commands._import_siae.vue_af import VALID_SIAE_KEYS
+from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import EXTERNAL_ID_TO_SIAE_ROW, SIRET_TO_EXTERNAL_ID
 from itou.siaes.models import Siae
 
@@ -109,7 +111,7 @@ class Command(BaseCommand):
         Those siaes cannot be joined by any way and thus are useless.
         Let's clean them up.
         """
-        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED).all():
+        for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED):
             if not siae.has_members:
                 if could_siae_be_deleted(siae):
                     self.log(f"siae.id={siae.id} is user created and has no member thus will be deleted")
@@ -211,7 +213,7 @@ class Command(BaseCommand):
         deletions = 0
         for siae in Siae.objects.filter(source=Siae.SOURCE_ASP):
             self.update_siae_convention_end_date(siae)
-            if does_siae_have_a_valid_convention(siae):
+            if does_siae_have_an_active_convention(siae):
                 if not siae.is_active:
                     self.reactivate_siae(siae)
                     reactivations += 1
@@ -238,7 +240,7 @@ class Command(BaseCommand):
     @timeit
     def create_new_siaes(self):
         creatable_siae_keys = [
-            (external_id, kind) for (external_id, kind) in VALID_SIAE_KEYS if external_id in EXTERNAL_ID_TO_SIAE_ROW
+            (external_id, kind) for (external_id, kind) in ACTIVE_SIAE_KEYS if external_id in EXTERNAL_ID_TO_SIAE_ROW
         ]
 
         creatable_siaes = []
@@ -309,25 +311,40 @@ class Command(BaseCommand):
                 self.log(msg)
 
     @timeit
+    def manage_conventions(self):
+        creatable_conventions = get_creatable_conventions(dry_run=self.dry_run)
+        self.log(f"will create {len(creatable_conventions)} conventions")
+        for (convention, siae) in creatable_conventions:
+            if not self.dry_run:
+                convention.save()
+                siae.convention = convention
+                siae.save()
+
+        deletable_conventions = get_deletable_conventions()
+        self.log(f"will delete {len(deletable_conventions)} conventions")
+        for convention in deletable_conventions:
+            if not self.dry_run:
+                # This will delete the related financial annexes as well.
+                convention.delete()
+
+    @timeit
+    def manage_financial_annexes(self):
+        creatable_afs, deletable_afs = get_creatable_and_deletable_afs(dry_run=self.dry_run)
+
+        self.log(f"will create {len(creatable_afs)} financial annexes")
+        for af in creatable_afs:
+            if not self.dry_run:
+                af.save()
+
+        self.log(f"will delete {len(deletable_afs)} financial annexes")
+        for af in deletable_afs:
+            if not self.dry_run:
+                af.delete()
+
+    @timeit
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
-
-        # Ugly one-time shot code to fix legacy issue - drop me afterwards!
-        # Most likely in the past the import_siae did incorrectly set an
-        # external_id on siaes of non-ASP source.
-        for siae in Siae.objects.exclude(external_id__isnull=True).exclude(source=Siae.SOURCE_ASP).all():
-            self.log(
-                f"[legacy bugfix] non-ASP siae.id={siae.id} has "
-                f"external_id={siae.external_id} but should not, external_id will be removed"
-            )
-            # Just to be safe.
-            assert siae.external_id
-            assert siae.source != Siae.SOURCE_ASP
-            # Fix even in dry-run otherwise breaks later in the dry-run.
-            siae.external_id = None
-            siae.save()
-        # End of one-time shot code. Drop me ASAP after production!
 
         self.fix_missing_external_ids()
         self.delete_siaes_without_external_id()
@@ -336,3 +353,5 @@ class Command(BaseCommand):
         self.manage_siae_activation()
         self.create_new_siaes()
         self.check_whether_signup_is_possible_for_all_siaes()
+        self.manage_conventions()
+        self.manage_financial_annexes()

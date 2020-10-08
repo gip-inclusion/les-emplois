@@ -16,6 +16,8 @@ NOW = timezone.now()
 GRACE_PERIOD = timezone.timedelta(days=models.Siae.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
 ONE_DAY = timezone.timedelta(days=1)
 
+MAIN_EXTERNAL_ID = 18
+
 
 class SiaeFactory(factory.django.DjangoModelFactory):
     """Generate an Siae() object for unit tests."""
@@ -35,6 +37,8 @@ class SiaeFactory(factory.django.DjangoModelFactory):
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")
+    is_active = True
+    external_id = MAIN_EXTERNAL_ID
 
 
 class SiaeMembershipFactory(factory.django.DjangoModelFactory):
@@ -124,3 +128,20 @@ class SiaeAfterGracePeriodFactory(SiaeFactory):
 
     is_active = False
     deactivated_at = NOW - GRACE_PERIOD - ONE_DAY
+
+
+class SiaeConventionFactory(factory.django.DjangoModelFactory):
+    """Generate an SiaeConvention() object for unit tests."""
+
+    class Meta:
+        model = models.SiaeConvention
+
+    # Don't start a SIRET with 0.
+    siret_signature = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
+    kind = models.Siae.KIND_EI
+    asp_id = MAIN_EXTERNAL_ID
+    is_active = True
+
+
+class SiaeWithMembershipAndConventionFactory(SiaeWithMembershipFactory):
+    convention = factory.SubFactory(SiaeConventionFactory)

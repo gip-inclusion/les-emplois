@@ -23,31 +23,35 @@ import os
 import pandas as pd
 from django.utils import timezone
 
-from itou.siaes.management.commands._import_siae.utils import timeit
-from itou.siaes.models import Siae
+from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
+from itou.siaes.models import Siae, SiaeFinancialAnnex
+from itou.utils.validators import validate_af_number, validate_convention_number
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-
 VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_05102020_063003.csv"
 
 
+@timeit
 def get_vue_af_df(filename=VUE_AF_FILENAME):
     """
     "Vue AF" is short for "Vue Annexes Financières".
     This export makes us able to know which siae is or is not "conventionnée" as of today.
     Meaningful columns:
+    - number (by merging 3 underlying columns)
+    - convention_number
     - external_id
     - kind
-    - af_end_date
-    - state (only consider "VALIDE" and "PROVISOIRE" as valid)
+    - start_date
+    - end_date
+    - state
     """
     df = pd.read_csv(
         filename,
         sep="|",
         converters={"af_id_structure": int},
-        parse_dates=["af_date_fin_effet"],
+        parse_dates=["af_date_debut_effet", "af_date_fin_effet"],
         # First and last rows of CSV are weird markers.
         # Example of first row: `DEBAnnexeFinanciere31082020_063002`
         # Example of last row: `FIN34003|||||||||||||||`
@@ -58,18 +62,18 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
         engine="python",
     )
 
-    df.rename(
-        columns={
-            "af_id_structure": "external_id",
-            "af_mesure_dispositif_code": "kind",
-            "af_date_fin_effet": "af_end_date",
-            "af_etat_annexe_financiere_code": "state",
-        },
-        inplace=True,
-    )
-
-    # Keep only the columns we need.
-    df = df[["external_id", "kind", "af_end_date", "state"]]
+    column_mapping = {
+        "af_numero_annexe_financiere": "number_prefix",
+        "af_numero_avenant_renouvellement": "renewal_number",
+        "af_numero_avenant_modification": "modification_number",
+        "af_numero_convention": "convention_number",
+        "af_id_structure": "external_id",
+        "af_mesure_dispositif_code": "kind",
+        "af_date_debut_effet": "start_date",
+        "af_date_fin_effet": "end_date",
+        "af_etat_annexe_financiere_code": "state",
+    }
+    df = remap_columns(df, column_mapping=column_mapping)
 
     # Drop rows with missing values.
     df = df.dropna()
@@ -82,16 +86,84 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     # Remove DC suffix.
     df["kind"] = df["kind"].str.replace("_DC", "")
 
-    # Filter out rows with irrelevant data.
+    # Filter out rows with irrelevant kind.
     df = df[df.kind != "FDI"]
 
-    for kind in df.kind:
-        assert kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+    # Build complete AF number.
+    df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
 
-    # Filter out invalid AF states.
-    df = df[df.state.isin(["VALIDE", "PROVISOIRE"])]
+    # Remove spaces in convention number.
+    df["convention_number"] = df.convention_number.str.replace(" ", "")
+
+    # Ensure data quality.
+    for _, row in df.iterrows():
+        assert row.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+        validate_af_number(row.number)
+        validate_convention_number(row.convention_number)
+
+    df["start_date"] = df.start_date.apply(timezone.make_aware)
+    df["end_date"] = df.end_date.apply(timezone.make_aware)
+
+    df["ends_in_the_future"] = df.end_date > timezone.now()
+    df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
+    df["is_active"] = df.has_active_state & df.ends_in_the_future
+
+    # Drop identical duplicate rows.
+    df.drop_duplicates(inplace=True)
+
+    # Considering only active AFs, their number is unique.
+    active_rows = df[df.is_active]
+    assert active_rows.number.is_unique
+
+    # Considering all AFs, both active ones and inactive ones, their number
+    # is not unique, nor is the couple (external_id, number).
+    #
+    # In other words, two siaes A and B can each have their own AF,
+    # and both AF share the same number o_O.
+    # This can happen e.g. after two siaes have merged.
+    #
+    # Also, a single siae C can have two AFs sharing the same number.
+    # This can happen as some rows in the Vue AF register minor AF
+    # modifications which do not trigger a modification number increase.
+    # Only major enough modifications do trigger this.
+    assert not df.number.is_unique
+    assert len(df[df.duplicated(["external_id", "number"])]) >= 1
+
+    # Sort dataframe in a smart way before we drop duplicates by
+    # keeping the first occurence in this order.
+    df.sort_values(
+        # In case of duplicates, we will keep:
+        # - the active one if there is one
+        # - if there is no active one, the one with an active state and the latest end_date
+        # - if there is none with an active state, the one with any state and the latest end_date
+        by=["is_active", "has_active_state", "end_date"],
+        ascending=[False, False, False],
+        inplace=True,
+    )
+
+    df.drop_duplicates(
+        subset=["number"], keep="first", inplace=True,
+    )
+
+    assert df.number.is_unique
 
     return df
+
+
+VUE_AF_DF = get_vue_af_df()
+
+
+@timeit
+def get_af_number_to_row():
+    af_number_to_row = {}
+    for _, row in VUE_AF_DF.iterrows():
+        af_number = row.number
+        assert af_number not in af_number_to_row
+        af_number_to_row[af_number] = row
+    return af_number_to_row
+
+
+AF_NUMBER_TO_ROW = get_af_number_to_row()
 
 
 def get_siae_key(siae):
@@ -112,9 +184,10 @@ def get_siae_key_to_convention_end_date():
     This convention end date (future or past) is eventually stored as siae.convention_end_date.
     """
     siae_key_to_convention_end_date = {}
-    af_df = get_vue_af_df()
+    af_df = VUE_AF_DF.copy()  # Leave the main dataframe untouched!
+    af_df = af_df[af_df.has_active_state]
     for _, row in af_df.iterrows():
-        convention_end_date = timezone.make_aware(row.af_end_date)
+        convention_end_date = row.end_date
         siae_key = get_siae_key(row)
         if siae_key in siae_key_to_convention_end_date:
             if convention_end_date > siae_key_to_convention_end_date[siae_key]:
@@ -127,7 +200,7 @@ def get_siae_key_to_convention_end_date():
 SIAE_KEY_TO_CONVENTION_END_DATE = get_siae_key_to_convention_end_date()
 
 
-VALID_SIAE_KEYS = [
+ACTIVE_SIAE_KEYS = [
     siae_key
     for siae_key, convention_end_date in SIAE_KEY_TO_CONVENTION_END_DATE.items()
     if timezone.now() < convention_end_date

@@ -4,8 +4,8 @@ Siae object logic used by the import_siae.py script is gathered here.
 
 """
 from itou.siaes.management.commands._import_siae.vue_af import (
+    ACTIVE_SIAE_KEYS,
     SIAE_KEY_TO_CONVENTION_END_DATE,
-    VALID_SIAE_KEYS,
     get_siae_key,
 )
 from itou.siaes.models import Siae
@@ -14,12 +14,12 @@ from itou.utils.address.models import AddressMixin
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-def does_siae_have_a_valid_convention(siae):
-    return get_siae_key(siae) in VALID_SIAE_KEYS
+def does_siae_have_an_active_convention(siae):
+    return get_siae_key(siae) in ACTIVE_SIAE_KEYS
 
 
 def should_siae_be_created(siae):
-    return does_siae_have_a_valid_convention(siae) and siae.is_in_open_department
+    return does_siae_have_an_active_convention(siae) and siae.is_in_open_department
 
 
 def could_siae_be_deleted(siae):

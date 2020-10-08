@@ -1,4 +1,5 @@
 import datetime
+import re
 
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
@@ -57,3 +58,45 @@ def validate_birthdate(birthdate):
         raise ValidationError(_("La date de naissance doit être postérieure à 1900."))
     if birthdate >= get_max_birthdate():
         raise ValidationError(_("La personne doit avoir plus de 16 ans."))
+
+
+AF_NUMBER_PREFIX_REGEXPS = [
+    r"ACI\d{2}[A-Z\d]\d{6}",
+    r"EI\d{2}[A-Z\d]\d{5}",
+    r"AI\d{2}[A-Z\d]\d{5}",
+    r"ETTI\d{2}[A-Z\d]\d{6}",
+    r"EITI\d{2}[A-Z\d]\d{6}",
+]
+
+
+def validate_af_number(af_number):
+    """
+    Validate a SiaeFinancialAnnex number.
+    """
+    if not af_number or len(af_number) <= 4:
+        raise ValidationError(_("Numéro d'AF vide ou trop court"))
+    suffix = af_number[-4:]  # last 4 characters
+    # e.g. A0M0, A0M1, A1M0.
+    if not re.match(r"A\dM\d", suffix):
+        raise ValidationError(_("Suffixe de numéro d'AF incorrect."))
+
+    prefix = af_number[:-4]  # all but last 4 characters
+    if not any([re.match(r, prefix) for r in AF_NUMBER_PREFIX_REGEXPS]):
+        raise ValidationError(_("Préfixe de numéro d'AF incorrect."))
+
+
+CONVENTION_NUMBER_REGEXPS = [
+    r"\d{2}[A-Z\d]\d{6}ACI\d{5}",
+    r"\d{9}ACI\d{7}",
+    r"\d{2}[A-Z\d]\d{6}AI\d{5}",
+    r"EI\d{2}[A-Z\d]\d{6}",
+    r"ETTI\d{2}[A-Z\d]\d{6}",
+    r"EITI\d{2}[A-Z\d]\d{6}",
+]
+
+
+def validate_convention_number(convention_number):
+    if not convention_number or convention_number == "":
+        raise ValidationError(_("Numéro de convention vide"))
+    if not any([re.match(r, convention_number) for r in CONVENTION_NUMBER_REGEXPS]):
+        raise ValidationError(_("Numéro de convention incorrect."))

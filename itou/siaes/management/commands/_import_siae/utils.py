@@ -31,3 +31,21 @@ def timeit(f):
         return result
 
     return wrap
+
+
+def remap_columns(df, column_mapping):
+    """
+    Rename columns according to mapping and delete all other columns.
+
+    Example of column_mapping :
+
+    {"ID Structure": "external_id", "Adresse e-mail": "auth_email"}
+    """
+    df.rename(
+        columns=column_mapping, inplace=True,
+    )
+
+    # Keep only the columns we need.
+    df = df[column_mapping.values()]
+
+    return df
