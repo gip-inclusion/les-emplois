@@ -30,36 +30,39 @@ def get_current_organization_and_perms(request):
                 request.user.siaemembership_set.select_related("siae").filter(siae__pk__in=user_siae_set_pks).all()
             )
             user_siaes = [membership.siae for membership in memberships]
-
-            for membership in memberships:
+            first_siae_idx = 0
+            for idx, membership in enumerate(memberships):
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
                     user_is_siae_admin = membership.is_siae_admin
+                    first_siae_idx = idx
                     break
             if siae is None:
                 if request.path != reverse("account_logout"):
                     raise PermissionDenied
+            if first_siae_idx != 0:
+                user_siaes[0], user_siaes[first_siae_idx] = user_siaes[first_siae_idx], user_siaes[0]
 
         prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
         if prescriber_org_pk:
-            first_idx = 0
-            membership = current_user.prescribermembership_set.select_related("organization")
+            first_prescriber_idx = 0
+            memberships = current_user.prescribermembership_set.select_related("organization")
 
-            for idx, m in enumerate(membership):
+            for idx, membership in enumerate(memberships):
                 # Same as above:
                 # In order to avoid an extra SQL query, fetch related organizations
                 # and artifially reconstruct the list of organizations the user belongs to
                 # (and other stuff while at it)
-                user_prescriberorganizations.append(m.organization)
-                if m.organization.pk == prescriber_org_pk:
-                    prescriber_organization = m.organization
-                    user_is_prescriber_org_admin = m.is_admin
-                    first_idx = idx
+                user_prescriberorganizations.append(membership.organization)
+                if membership.organization.pk == prescriber_org_pk:
+                    prescriber_organization = membership.organization
+                    user_is_prescriber_org_admin = membership.is_admin
+                    first_prescriber_idx = idx
 
-            if first_idx != 0:
+            if first_prescriber_idx != 0:
                 # Put selected prescriber organization first (UI)
-                user_prescriberorganizations[0], user_prescriberorganizations[first_idx] = (
-                    user_prescriberorganizations[first_idx],
+                user_prescriberorganizations[0], user_prescriberorganizations[first_prescriber_idx] = (
+                    user_prescriberorganizations[first_prescriber_idx],
                     user_prescriberorganizations[0],
                 )
 
