@@ -5,7 +5,7 @@ from itou.siaes.models import Siae
 
 
 def get_current_siae_or_404(request):
-    pk = request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY]
+    pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
     queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     return siae
