@@ -143,9 +143,9 @@
                     <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% translate "Rechercher des prescripteurs" %}</a>
                 {% endif %}
 
-                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="{% translate "Accéder au Forum de l'inclusion (nouvel onglet)" %}">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
 
-                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank" aria-label="{% translate "Accéder à l'espace de documentation (nouvel onglet)" %}">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
 
             </nav>
         </div>
