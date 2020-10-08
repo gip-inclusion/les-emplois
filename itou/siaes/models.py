@@ -434,6 +434,15 @@ class SiaeConvention(models.Model):
         validators=[validate_siret],
         db_index=True,
     )
+    # Ideally convention.is_active would be a property and not a field.
+    # However we have to live with the fact that some of ASP's data is
+    # randomly weeks or even months late, as DIRECTTE sometimes take so
+    # much time to input the data of their department into the ASP extranet.
+    # Thus our staff will regularly need to manually reactivate a convention
+    # for weeks or months until we get up-to-date data for it.
+    # This is why this field is needed. It is manipulated only by:
+    # 1) our staff
+    # 2) the `import_siae.py` script
     is_active = models.BooleanField(
         verbose_name=_("Active"),
         default=True,
