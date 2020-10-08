@@ -4,7 +4,7 @@
     "pk": 1,
     "fields": {
       "level": "1",
-      "name": "Bénéficiaire du RSA",
+      "name": "Bénéficiaire du RSA (socle)",
       "desc": "Revenu de solidarité active",
       "written_proof": "Attestation RSA",
       "written_proof_url": "",
