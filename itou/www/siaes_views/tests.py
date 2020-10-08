@@ -6,7 +6,12 @@ from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import (
+    SiaeFactory,
+    SiaeWithMembershipAndConventionFactory,
+    SiaeWithMembershipAndJobsFactory,
+    SiaeWithMembershipFactory,
+)
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -334,7 +339,7 @@ class CreateSiaeViewTest(TestCase):
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
-        siae = SiaeWithMembershipFactory()
+        siae = SiaeWithMembershipAndConventionFactory()
         user = siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -383,6 +388,8 @@ class CreateSiaeViewTest(TestCase):
         self.assertEqual(new_siae.created_by, user)
         self.assertEqual(new_siae.source, Siae.SOURCE_USER_CREATED)
         self.assertTrue(new_siae.is_active)
+        self.assertTrue(new_siae.convention is not None)
+        self.assertEqual(siae.convention, new_siae.convention)
 
         # This data comes from BAN_GEOCODING_API_RESULT_MOCK.
         self.assertEqual(new_siae.coords, "SRID=4326;POINT (2.316754 48.838411)")

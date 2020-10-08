@@ -84,17 +84,17 @@
 
                 <div class="card-footer">
                     {% if not siae.has_active_members %}
-                        <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                        <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
                         <small>{% translate "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
                     {% elif siae.block_job_applications %}
-                        <a class="btn btn-sm btn-outline-secondary disabled" href="">
+                        <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
                         <small>{% translate "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
                     {% else %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}">
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
                     {% endif %}

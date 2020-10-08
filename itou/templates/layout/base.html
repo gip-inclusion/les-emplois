@@ -36,6 +36,8 @@
 
     {% include "includes/test_accounts.html" %}
 
+    {% translate "Logo de lien vers un nouvel onglet" as external_link_title %}
+
     <div class="layout">
 
         <header class="layout-section layout-section-white">
@@ -143,9 +145,9 @@
                     <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% translate "Rechercher des prescripteurs" %}</a>
                 {% endif %}
 
-                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="{% translate "Accéder au Forum de l'inclusion (nouvel onglet)" %}">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
 
-                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank" aria-label="{% translate "Accéder à l'espace de documentation (nouvel onglet)" %}">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
 
             </nav>
         </div>
@@ -207,12 +209,14 @@
                         <div class="col-sm-6">
                             <ul class="list-unstyled">
                                 <li>
-                                    <a href="https://doc.inclusion.beta.gouv.fr/reponses-a-mes-questions-faq" rel="noopener" target="_blank">
+                                    <a href="https://doc.inclusion.beta.gouv.fr/reponses-a-mes-questions-faq" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Besoin d'aide ?" %}
+                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
                                 <li>
-                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank">
+                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Inscription Newsletter" %}
+                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
                                 </li>
                                 <li>
@@ -221,18 +225,21 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank">
+                                    <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
+                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" rel="noopener" target="_blank">
+                                    <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Questions à la communauté" %}
+                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://doc.inclusion.beta.gouv.fr/mentions/" rel="noopener" target="_blank">
+                                    <a href="https://doc.inclusion.beta.gouv.fr/mentions/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Mentions légales" %}
+                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
                                 </li>
                             </ul>

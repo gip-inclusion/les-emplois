@@ -203,7 +203,10 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer", "hiring_without_approval"]
         help_texts = {
-            "hiring_start_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
+            "hiring_start_at": gettext_lazy(
+                "Au format JJ/MM/AAAA, par exemple  %(date)s. Il n'est pas possible d'antidater un contrat. "
+                "Indiquez une date dans le futur."
+            )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
             "hiring_end_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
             % {

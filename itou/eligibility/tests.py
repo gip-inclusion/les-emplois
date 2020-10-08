@@ -185,7 +185,7 @@ class EligibilityDiagnosisModelTest(TestCase):
 
         level1 = AdministrativeCriteria.Level.LEVEL_1
         level2 = AdministrativeCriteria.Level.LEVEL_2
-        criteria1 = AdministrativeCriteria.objects.get(level=level1, name="Bénéficiaire du RSA")
+        criteria1 = AdministrativeCriteria.objects.get(level=level1, name="Bénéficiaire du RSA (socle)")
         criteria2 = AdministrativeCriteria.objects.get(level=level2, name="Niveau d'étude 3 (CAP, BEP) ou infra")
         criteria3 = AdministrativeCriteria.objects.get(level=level2, name="Senior (+50 ans)")
 

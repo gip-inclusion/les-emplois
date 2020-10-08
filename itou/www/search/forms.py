@@ -17,6 +17,7 @@ class SiaeSearchForm(forms.Form):
     KIND_CHOICES = [("", "---")] + [(k[0], k[0]) for k in Siae.KIND_CHOICES]
 
     distance = forms.ChoiceField(
+        label=gettext_lazy("Distance"),
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
@@ -26,6 +27,7 @@ class SiaeSearchForm(forms.Form):
     # see `city_autocomplete_field.js`.
     city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
     city_name = forms.CharField(
+        label=gettext_lazy("Ville"),
         widget=forms.TextInput(
             attrs={
                 "class": "js-city-autocomplete-input form-control",
@@ -33,10 +35,11 @@ class SiaeSearchForm(forms.Form):
                 "placeholder": gettext_lazy("Autour de (Arras, Bobigny, Strasbourg…)"),
                 "autocomplete": "off",
             }
-        )
+        ),
     )
 
     kind = forms.ChoiceField(
+        label=gettext_lazy("Type de structure"),
         choices=KIND_CHOICES,
         required=False,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
@@ -59,6 +62,7 @@ class PrescriberSearchForm(forms.Form):
     CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
     distance = forms.ChoiceField(
+        label=gettext_lazy("Distance"),
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
@@ -68,6 +72,7 @@ class PrescriberSearchForm(forms.Form):
     # see `city_autocomplete_field.js`.
     city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
     city_name = forms.CharField(
+        label=gettext_lazy("Ville"),
         widget=forms.TextInput(
             attrs={
                 "class": "js-city-autocomplete-input form-control",
@@ -75,7 +80,7 @@ class PrescriberSearchForm(forms.Form):
                 "placeholder": gettext_lazy("Autour de (Arras, Bobigny, Strasbourg…)"),
                 "autocomplete": "off",
             }
-        )
+        ),
     )
 
     def clean_city(self):

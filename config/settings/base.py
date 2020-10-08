@@ -371,8 +371,9 @@ ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 
 # Typeform survey links to include in some emails
-ITOU_EMAIL_APPROVAL_SURVEY_LINK = "https://startupsbeta.typeform.com/to/au9d8P"
-ITOU_EMAIL_PRESCRIBER_NEW_HIRING_LINK = "https://startupsbeta.typeform.com/to/X40eJC"
+ITOU_EMAIL_APPROVAL_SURVEY_URL = "https://startupsbeta.typeform.com/to/au9d8P"
+ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL = "https://startupsbeta.typeform.com/to/X40eJC"
+ITOU_CHECK_SIRET_URL = "https://itou.typeform.com/to/RYfNLR79"
 
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.
@@ -381,8 +382,10 @@ ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 
+# Documentation links
 ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
 ITOU_DOC_OPENING_SCHEDULE_URL = f"{ITOU_DOC_URL}/presentation/quel-est-le-calendrier-de-deploiement-de-la-plateforme"
+ITOU_DOC_PASS_VERIFICATION_URL = f"{ITOU_DOC_URL}/pourquoi-une-plateforme-de-linclusion/pass-iae-agrement-plus-simple-cest-a-dire#verification-des-demandes-de-pass-iae"
 
 # Approvals
 # ------------------------------------------------------------------------------

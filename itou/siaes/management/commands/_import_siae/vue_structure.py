@@ -16,7 +16,7 @@ import os
 import numpy as np
 import pandas as pd
 
-from itou.siaes.management.commands._import_siae.utils import timeit
+from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
 from itou.utils.validators import validate_naf, validate_siret
 
 
@@ -60,30 +60,28 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
         engine="python",
     )
 
-    df.rename(
-        columns={
-            "structure_siret_actualise": "siret",
-            "structure_siret_signature": "siret_signature",
-            "structure_id_siae": "external_id",
-            "structure_adresse_mail_corresp_technique": "auth_email",
-            "structure_code_naf": "naf",
-            "structure_denomination": "name",
-            # ASP recommends using *_gestion_* fields rather than *_admin_* ones.
-            "structure_adresse_gestion_numero": "street_num",
-            "structure_adresse_gestion_cplt_num_voie": "street_num_extra",
-            "structure_adresse_gestion_type_voie": "street_type",
-            "structure_adresse_gestion_nom_voie": "street_name",
-            "structure_adresse_gestion_cp": "zipcode",
-            "structure_adresse_gestion_commune": "city",
-            "structure_adresse_gestion_telephone": "phone",
-            # The extra* fields have very low quality data,
-            # their content does not reflect the field name at all.
-            "structure_adresse_gestion_numero_apt": "extra1",
-            "structure_adresse_gestion_entree": "extra2",
-            "structure_adresse_gestion_cplt_adresse": "extra3",
-        },
-        inplace=True,
-    )
+    column_mapping = {
+        "structure_siret_actualise": "siret",
+        "structure_siret_signature": "siret_signature",
+        "structure_id_siae": "external_id",
+        "structure_adresse_mail_corresp_technique": "auth_email",
+        "structure_code_naf": "naf",
+        "structure_denomination": "name",
+        # ASP recommends using *_gestion_* fields rather than *_admin_* ones.
+        "structure_adresse_gestion_numero": "street_num",
+        "structure_adresse_gestion_cplt_num_voie": "street_num_extra",
+        "structure_adresse_gestion_type_voie": "street_type",
+        "structure_adresse_gestion_nom_voie": "street_name",
+        "structure_adresse_gestion_cp": "zipcode",
+        "structure_adresse_gestion_commune": "city",
+        "structure_adresse_gestion_telephone": "phone",
+        # The extra* fields have very low quality data,
+        # their content does not reflect the field name at all.
+        "structure_adresse_gestion_numero_apt": "extra1",
+        "structure_adresse_gestion_entree": "extra2",
+        "structure_adresse_gestion_cplt_adresse": "extra3",
+    }
+    df = remap_columns(df, column_mapping=column_mapping)
 
     # Replace NaN elements with None.
     df = df.replace({np.nan: None})
@@ -117,6 +115,21 @@ def get_external_id_to_siae_row():
 
 
 EXTERNAL_ID_TO_SIAE_ROW = get_external_id_to_siae_row()
+
+
+@timeit
+def get_external_id_to_siret_signature():
+    """
+    Provide the siret_signature from the "Vue Structure" matching the given external_id.
+    """
+    external_id_to_siret_signature = {}
+    for _, row in VUE_STRUCTURE_DF.iterrows():
+        assert row.external_id not in external_id_to_siret_signature
+        external_id_to_siret_signature[row.external_id] = row.siret_signature
+    return external_id_to_siret_signature
+
+
+EXTERNAL_ID_TO_SIRET_SIGNATURE = get_external_id_to_siret_signature()
 
 
 @timeit

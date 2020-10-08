@@ -174,7 +174,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         (REFUSAL_REASON_OTHER, _("Autre")),
     )
 
-    ERROR_START_IN_PAST = _("La date de début du contrat ne doit pas être dans le passé.")
+    ERROR_START_IN_PAST = _("Il n'est pas possible d'antidater un contrat. Indiquez une date dans le futur.")
     ERROR_END_IS_BEFORE_START = _("La date de fin du contrat doit être postérieure à la date de début.")
     ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
 
@@ -501,7 +501,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         bcc = []
         if self.is_sent_by_proxy:
             bcc.append(self.sender.email)
-        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_PRESCRIBER_NEW_HIRING_LINK}
+        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL}
         subject = "apply/email/accept_subject.txt"
         body = "apply/email/accept_body.txt"
         return get_email_message(to, context, subject, body, bcc=bcc)
@@ -533,7 +533,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.approval:
             raise RuntimeError(_("No approval found for this job application."))
         to = [accepted_by.email]
-        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_LINK}
+        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}
         subject = "approvals/email/deliver_subject.txt"
         body = "approvals/email/deliver_body.txt"
         return get_email_message(to, context, subject, body)

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -176,10 +177,9 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         job_application = form_accept.save()
         job_application.accept(user=request.user)
 
-        messages.success(request, mark_safe(_("Embauche acceptée !")))
-
         if job_application.to_siae.is_subject_to_eligibility_rules:
             if job_application.approval:
+                messages.success(request, mark_safe(_("Embauche acceptée !")))
                 messages.success(
                     request,
                     _(
@@ -188,16 +188,14 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     ),
                 )
             elif not job_application.hiring_without_approval:
+                link = settings.ITOU_DOC_PASS_VERIFICATION_URL
                 messages.success(
                     request,
                     mark_safe(
                         _(
-                            "Il n'est pas nécessaire de demander le numéro d'agrément "
-                            "à votre interlocuteur Pôle emploi.<br>"
-                            "Le numéro d'agrément sera indiqué sur cette page - "
-                            "vous serez prévenu par email dès qu'il sera disponible.<br>"
-                            "Ce numéro pourra être utilisé pour la déclaration de la "
-                            "personne dans l'ASP."
+                            "Votre demande de Pass IAE est en cours de vérification auprès de nos équipes.<br>"
+                            "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
+                            "<a href='" + link + "'>consulter notre espace documentation</a>."
                         )
                     ),
                 )
