@@ -16,7 +16,8 @@
                 </span>
                 {# No loading #}
                 <span class="input-group-text js-city-autocomplete-no-loading">
-                    {% include "includes/icon.html" with icon="map-pin" %}
+                    {% translate "Logo du moteur de recherche" as map_pin_label %}
+                    {% include "includes/icon.html" with icon="map-pin" title=map_pin_label %}
                 </span>
             </div>
             <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
