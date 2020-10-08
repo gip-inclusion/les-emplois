@@ -80,8 +80,10 @@ class User(AbstractUser, AddressMixin):
         help_text=mark_safe(
             _(
                 "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
-                "Renseigner l'identifiant Pôle emploi des candidats inscrits permet d'instruire instantanément votre demande.<br>"
-                "Dans le cas contraire un délai de deux jours est nécessaire pour effectuer manuellement les vérifications d’usage."
+                "Renseigner l'identifiant Pôle emploi des candidats inscrits "
+                "permet d'instruire instantanément votre demande.<br>"
+                "Dans le cas contraire un délai de deux jours est nécessaire "
+                "pour effectuer manuellement les vérifications d’usage."
             )
         ),
         max_length=30,
