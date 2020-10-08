@@ -2,6 +2,7 @@
 <div class="row no-gutters my-3">
     {# Apply bottom margins only on `sm` sizes: https://stackoverflow.com/a/50879258 #}
     <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
+        <label for="{{ form.distance.id_for_label }}" class="sr-only">{{ form.distance.label }}</label>
         {{ form.distance }}
     </div>
     <div class="col-sm mr-1 mb-1 mb-sm-0">
@@ -18,6 +19,7 @@
                     {% include "includes/icon.html" with icon="map-pin" %}
                 </span>
             </div>
+            <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
             {{ form.city_name }}
         </div>
     </div>
