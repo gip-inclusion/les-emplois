@@ -2,7 +2,42 @@
 
 Toutes les modifications notables apportées au projet seront documentées dans ce fichier.
 
-Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/), et ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2.
+Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/).
+
+*Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
+
+## [4] - 2020-10-08
+
+### Ajouté
+- Parcours de bienvenue pour les nouveaux utilisateurs
+- Import des agréments Pôle emploi de Septembre 2020
+- Ajout de la possibilité de refuser les PASS IAE dans l'admin
+- Nouveau type "Dispositif conventionné par le conseil départemental pour le suivi BRSA" pour les organisations de prescripteurs (visible uniquement dans l'admin)
+- Prolongation +3mois COVID pour les agréments existants préalablement côté PE et délivrés par Itou
+- Explication du classement des résultats d'une recherche de SIAE 
+- Rafraîchissement journalier des données Metabase
+- Stockage des conventions et des annexes financières en provenance de l'ASP
+- Ajout d'un lien vers un formulaire Typeform destiné au support pour signaler un problème d'inscription d'une SIAE qui ne trouverait pas sa structure
+- Améliorations de l'accessibilité :
+    - Ajout de `aria-label` aux liens "Forum" et "Documentation"
+    - Ajout de `<label>` aux champs de recherche du moteur de recherche (visibles uniquement aux lecteurs d'écrans)
+    - Ajout de texte alternatif au logo de géolocalisation du moteur de recherche
+    - Ajout de `aria-label` aux boutons "Postuler"
+    - Ajout d'un logo d'ouverture vers un nouvel onglet pour les liens externe du footer
+    - Ajout de `aria-label` au bouton "Se connecter avec Pôle emploi"
+
+### Modifié
+- Demande d'une confirmation avant une annulation de candidature
+- Correction d'un bug Mailjet pour des emails avec plus de 50 destinataires non envoyés
+- Mise à jour de Django en version 3.1.2
+- Affichage de l'email saisi sur l'écran de confirmation de réinitialisation d'un mot de passe
+- Correction d'une erreur 500 quand un DE visitait une page réservée aux SIAE
+- Apport d'une précision sur le critère BRSA en ajoutant "socle" à coté
+- Signalement que l'absence d'identifiant Pôle emploi ralentit le traitement et la délivrance d'un PASS IAE
+- Affichage d'un texte d'aide et d'un message d'erreur pour dire à un employeur qu'une embauche dans le passé est impossible
+
+### Supprimé
+- Fin de l'expérimentation de l'affichage d'une carte dans les résultats d'une recherche
 
 ## [3] - 2020-09-24
 
