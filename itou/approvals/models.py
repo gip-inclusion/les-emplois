@@ -71,7 +71,9 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def overlaps_covid_lockdown(self):
-        return self.start_at <= self.LOCKDOWN_END_AT and self.end_at >= self.LOCKDOWN_START_AT
+        ends_before_lockdown = self.end_at < self.LOCKDOWN_START_AT
+        starts_after_lockdown = self.start_at > self.LOCKDOWN_END_AT
+        return not (ends_before_lockdown or starts_after_lockdown)
 
     @property
     def time_until_waiting_period(self):
