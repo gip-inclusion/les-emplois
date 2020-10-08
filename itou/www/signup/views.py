@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
@@ -22,13 +23,21 @@ from itou.www.signup import forms
 
 
 class ItouPasswordResetView(PasswordResetView):
+    def form_valid(self, form):
+        form.save(self.request)
+        # Pass the email in the querystring so that it can displayed in the template.
+        args = urlencode({"email": form.data["email"]})
+        return HttpResponseRedirect(f"{self.get_success_url()}?{args}")
+
     def form_invalid(self, form):
         """
         Avoid user enumeration: django-allauth displays an error message to the user
         when an email does not exist. We deliberately hide it by redirecting to the
         success page in all cases.
         """
-        return HttpResponseRedirect(self.get_success_url())
+        # Pass the email in the querystring so that it can displayed in the template.
+        args = urlencode({"email": form.data["email"]})
+        return HttpResponseRedirect(f"{self.get_success_url()}?{args}")
 
 
 @require_GET

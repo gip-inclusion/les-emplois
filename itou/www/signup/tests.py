@@ -9,6 +9,7 @@ from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
+from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
 from itou.cities.factories import create_test_cities
@@ -740,7 +741,9 @@ class PasswordResetTest(TestCase):
         post_data = {"email": user.email}
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_reset_password_done"))
+        args = urlencode({"email": user.email})
+        next_url = reverse("account_reset_password_done")
+        self.assertEqual(response.url, f"{next_url}?{args}")
 
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
@@ -778,8 +781,9 @@ class PasswordResetTest(TestCase):
         self.assertEqual(response.status_code, 200)
         post_data = {"email": "nonexistent@email.com"}
         response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("account_reset_password_done"))
+        args = urlencode({"email": post_data["email"]})
+        next_url = reverse("account_reset_password_done")
+        self.assertEqual(response.url, f"{next_url}?{args}")
 
 
 class PasswordChangeTest(TestCase):
