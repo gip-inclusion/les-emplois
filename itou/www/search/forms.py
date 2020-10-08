@@ -35,7 +35,7 @@ class SiaeSearchForm(forms.Form):
                 "placeholder": gettext_lazy("Autour de (Arras, Bobigny, Strasbourg…)"),
                 "autocomplete": "off",
             }
-        )
+        ),
     )
 
     kind = forms.ChoiceField(
@@ -80,7 +80,7 @@ class PrescriberSearchForm(forms.Form):
                 "placeholder": gettext_lazy("Autour de (Arras, Bobigny, Strasbourg…)"),
                 "autocomplete": "off",
             }
-        )
+        ),
     )
 
     def clean_city(self):
