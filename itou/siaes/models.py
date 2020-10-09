@@ -219,7 +219,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return self.convention and self.convention.is_active
 
     @property
-    def external_id(self):
+    def asp_id(self):
         if self.convention:
             return self.convention.asp_id
         return None

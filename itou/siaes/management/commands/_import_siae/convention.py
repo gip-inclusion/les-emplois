@@ -6,10 +6,7 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_active_convention
-from itou.siaes.management.commands._import_siae.vue_structure import (
-    EXTERNAL_ID_TO_SIRET_SIGNATURE,
-    SIRET_TO_EXTERNAL_ID,
-)
+from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIRET_SIGNATURE, SIRET_TO_ASP_ID
 from itou.siaes.models import Siae, SiaeConvention
 
 
@@ -19,13 +16,13 @@ def update_existing_conventions(dry_run):
     and check data integrity on the fly.
     """
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
-        external_id = SIRET_TO_EXTERNAL_ID[siae.siret]
-        siret_signature = EXTERNAL_ID_TO_SIRET_SIGNATURE[external_id]
+        asp_id = SIRET_TO_ASP_ID[siae.siret]
+        siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
         convention = siae.convention
         assert convention.kind == siae.kind
-        assert convention.asp_id == external_id
-        assert external_id in EXTERNAL_ID_TO_SIRET_SIGNATURE
+        assert convention.asp_id == asp_id
+        assert asp_id in ASP_ID_TO_SIRET_SIGNATURE
         assert convention.siret_signature == siret_signature
         assert convention.siren_signature == siae.siren
 
@@ -50,10 +47,10 @@ def get_creatable_conventions():
     creatable_conventions = []
 
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=True).select_related("convention"):
-        external_id = SIRET_TO_EXTERNAL_ID[siae.siret]
-        siret_signature = EXTERNAL_ID_TO_SIRET_SIGNATURE.get(external_id)
+        asp_id = SIRET_TO_ASP_ID[siae.siret]
+        siret_signature = ASP_ID_TO_SIRET_SIGNATURE.get(asp_id)
 
-        if external_id not in EXTERNAL_ID_TO_SIRET_SIGNATURE:
+        if asp_id not in ASP_ID_TO_SIRET_SIGNATURE:
             # Some inactive siaes are absent in the latest ASP exports but
             # are still present in db because they have members and/or job applications.
             # We cannot build a convention object for those.
@@ -64,7 +61,7 @@ def get_creatable_conventions():
             siret_signature=siret_signature,
             kind=siae.kind,
             is_active=does_siae_have_an_active_convention(siae),
-            asp_id=external_id,
+            asp_id=asp_id,
         )
         creatable_conventions.append((convention, siae))
     return creatable_conventions

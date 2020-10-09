@@ -143,7 +143,6 @@ class SiaeAdmin(admin.ModelAdmin):
         return queryset
 
     def save_model(self, request, obj, form, change):
-
         if not change:
             obj.created_by = request.user
             obj.source = models.Siae.SOURCE_STAFF_CREATED
@@ -199,7 +198,6 @@ class SiaeConvention(admin.ModelAdmin):
     inlines = (FinancialAnnexesInline, SiaesInline)
 
     def save_model(self, request, obj, form, change):
-
         if change and obj.is_active:
             old_obj = self.model.objects.get(id=obj.id)
             if not old_obj.is_active:

@@ -28,7 +28,7 @@ from itou.siaes.management.commands._import_siae.financial_annex import get_crea
 from itou.siaes.management.commands._import_siae.siae import build_siae, could_siae_be_deleted, should_siae_be_created
 from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
-from itou.siaes.management.commands._import_siae.vue_structure import EXTERNAL_ID_TO_SIAE_ROW
+from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
 from itou.siaes.models import Siae, SiaeConvention
 
 
@@ -112,8 +112,8 @@ class Command(BaseCommand):
         for siae in Siae.objects.select_related("convention").filter(source=Siae.SOURCE_ASP, convention__isnull=False):
             assert siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
 
-            external_id = siae.external_id
-            row = EXTERNAL_ID_TO_SIAE_ROW.get(external_id)
+            asp_id = siae.asp_id
+            row = ASP_ID_TO_SIAE_ROW.get(asp_id)
 
             if row is None:
                 continue
@@ -172,22 +172,20 @@ class Command(BaseCommand):
 
     @timeit
     def create_new_siaes(self):
-        creatable_siae_keys = [
-            (external_id, kind) for (external_id, kind) in ACTIVE_SIAE_KEYS if external_id in EXTERNAL_ID_TO_SIAE_ROW
-        ]
+        creatable_siae_keys = [(asp_id, kind) for (asp_id, kind) in ACTIVE_SIAE_KEYS if asp_id in ASP_ID_TO_SIAE_ROW]
 
         creatable_siaes = []
 
-        for (external_id, kind) in creatable_siae_keys:
+        for (asp_id, kind) in creatable_siae_keys:
 
-            row = EXTERNAL_ID_TO_SIAE_ROW.get(external_id)
+            row = ASP_ID_TO_SIAE_ROW.get(asp_id)
             siret = row.siret
 
             existing_siae_query = Siae.objects.select_related("convention").filter(
-                convention__asp_id=external_id, kind=kind
+                convention__asp_id=asp_id, kind=kind
             )
             if existing_siae_query.exists():
-                # Siae with this external_id already exists, no need to create it.
+                # Siae with this asp_id already exists, no need to create it.
                 existing_siae = existing_siae_query.get()
                 if not self.dry_run:
                     # Siret should have been fixed by

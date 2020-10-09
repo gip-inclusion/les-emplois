@@ -41,8 +41,8 @@ def get_creatable_and_deletable_afs(dry_run):
                 af.save()
 
         # Sometimes an AF migrates from one structure to another.
-        if af.convention.asp_id != row.external_id:
-            convention_query = SiaeConvention.objects.filter(asp_id=row.external_id)
+        if af.convention.asp_id != row.asp_id:
+            convention_query = SiaeConvention.objects.filter(asp_id=row.asp_id)
             if convention_query.exists():
                 convention = convention_query.get()
                 af.convention = convention
@@ -51,7 +51,7 @@ def get_creatable_and_deletable_afs(dry_run):
             else:
                 deletable_afs.append(af)
                 continue
-        assert af.convention.asp_id == row.external_id
+        assert af.convention.asp_id == row.asp_id
 
     creatable_af_numbers = vue_af_numbers - db_af_numbers
 
@@ -65,7 +65,7 @@ def get_creatable_and_deletable_afs(dry_run):
 
 def build_financial_annex_from_number(number):
     row = AF_NUMBER_TO_ROW[number]
-    convention_query = SiaeConvention.objects.filter(asp_id=row.external_id, kind=row.kind)
+    convention_query = SiaeConvention.objects.filter(asp_id=row.asp_id, kind=row.kind)
     if not convention_query.exists():
         # There is no point in storing an AF in db if there is no related convention.
         return None
