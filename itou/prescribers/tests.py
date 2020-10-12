@@ -11,21 +11,21 @@ from itou.users.factories import PrescriberFactory
 
 
 class ModelTest(TestCase):
-    def test_pending_authorization_proof(self):
+    def test_has_pending_authorization_proof(self):
 
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganization.Kind.OTHER,
             authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
         )
-        self.assertTrue(org.pending_authorization())
-        self.assertTrue(org.pending_authorization_proof())
+        self.assertTrue(org.has_pending_authorization())
+        self.assertTrue(org.has_pending_authorization_proof())
 
         org = PrescriberOrganizationFactory(
             kind=PrescriberOrganization.Kind.CAP_EMPLOI,
             authorization_status=PrescriberOrganization.AuthorizationStatus.NOT_SET,
         )
-        self.assertTrue(org.pending_authorization())
-        self.assertFalse(org.pending_authorization_proof())
+        self.assertTrue(org.has_pending_authorization())
+        self.assertFalse(org.has_pending_authorization_proof())
 
     def test_new_signup_warning_email_to_existing_members(self):
         authorized_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()

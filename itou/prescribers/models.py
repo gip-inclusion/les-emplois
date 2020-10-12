@@ -204,13 +204,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
             return None
         return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
 
-    def pending_authorization(self):
+    def has_pending_authorization(self):
         """
         Pending manual verification of authorization by support staff.
         """
         return self.authorization_status == self.AuthorizationStatus.NOT_SET
 
-    def pending_authorization_proof(self):
+    def has_pending_authorization_proof(self):
         """
         An unknown organization claiming to be authorized must provide a written proof.
         """
