@@ -181,7 +181,6 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         current_org = get_current_org_or_404(self.response.wsgi_request)
         # A user can be member of one or more organizations
         self.assertTrue(current_org in self.user.prescriberorganization_set.all())
-        # self.assertEqual(self.invitation.organization.pk, current_org.pk)
 
     def test_accept_prescriber_org_invitation(self):
         response = self.client.get(self.invitation.acceptance_link, follow=True)

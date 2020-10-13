@@ -98,7 +98,7 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae3.pk
         request.session.save()
 
-        # Note: the siae are reordered, with the current siae first
+        # Note: the siaes Are reordered, with the current siae first
         # (explains the `siae3, siae2, siae1` order below)
 
         with self.assertNumQueries(1):
@@ -161,7 +161,6 @@ class ContextProcessorsGetCurrentOrganizationAndPermsTest(TestCase):
 
         organization2 = PrescriberOrganizationWithMembershipFactory()
         organization2.members.add(user)
-        # FIXME: make factory with no admin rights
 
         factory = RequestFactory()
         request = factory.get("/")
