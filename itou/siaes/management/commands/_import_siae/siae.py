@@ -60,7 +60,8 @@ def build_siae(row, kind):
     siae.convention_end_date = get_siae_convention_end_date(siae)
     siae.naf = row.naf
     siae.source = Siae.SOURCE_ASP
-    siae.name = row.name
+    siae.name = row["name"]  # row.name surprisingly returns the row index.
+    assert not siae.name.isnumeric()
 
     siae.phone = row.phone
     phone_is_valid = siae.phone and len(siae.phone) == 10
