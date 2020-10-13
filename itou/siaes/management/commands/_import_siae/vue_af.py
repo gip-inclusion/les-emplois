@@ -30,7 +30,7 @@ from itou.utils.validators import validate_af_number, validate_convention_number
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_05102020_063003.csv"
+VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_12102020_063002.csv"
 
 
 @timeit
