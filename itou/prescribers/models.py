@@ -134,6 +134,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         help_text=_("Code unique d'une agence Pole emploi."),
         validators=[validate_code_safir],
         max_length=5,
+        blank=True,
+        # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
+        # This avoids unique constraint violations when saving multiple objects with blank values.
         null=True,
         unique=True,
     )
@@ -181,7 +184,22 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         return super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
-        if self.kind != self.Kind.PE:  # SIRET is not required for PE agencies.
+        super().clean()
+        self.clean_code_safir_pole_emploi()
+        self.clean_siret()
+
+    def clean_code_safir_pole_emploi(self):
+        """
+        A code SAFIR can only be set for PE agencies.
+        """
+        if self.kind != self.Kind.PE and self.code_safir_pole_emploi:
+            raise ValidationError({"code_safir_pole_emploi": _("Le Code Safir est réservé aux agences Pôle emploi.")})
+
+    def clean_siret(self):
+        """
+        SIRET is required for all organizations, except for PE agencies.
+        """
+        if self.kind != self.Kind.PE:
             if not self.siret:
                 raise ValidationError({"siret": _("Le SIRET est obligatoire.")})
             if self._meta.model.objects.filter(siret=self.siret).exclude(pk=self.pk).exists():
@@ -203,6 +221,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         if not self.is_authorized:
             return None
         return reverse("prescribers_views:card", kwargs={"org_id": self.pk})
+
+    def has_refused_authorization(self):
+        return self.authorization_status == self.AuthorizationStatus.REFUSED
 
     def has_pending_authorization(self):
         """

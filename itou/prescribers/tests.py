@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.prescribers.factories import (
@@ -11,6 +12,28 @@ from itou.users.factories import PrescriberFactory
 
 
 class ModelTest(TestCase):
+    def test_clean_siret(self):
+        """
+        Test that a SIRET number is required only for non-PE organizations.
+        """
+        org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganization.Kind.PE)
+        org.clean_siret()
+        with self.assertRaises(ValidationError):
+            org = PrescriberOrganizationFactory.build(siret="", kind=PrescriberOrganization.Kind.CAP_EMPLOI)
+            org.clean_siret()
+
+    def test_clean_code_safir_pole_emploi(self):
+        """
+        Test that a code SAFIR can only be set for PE agencies.
+        """
+        org = PrescriberOrganizationFactory.build(code_safir_pole_emploi="12345", kind=PrescriberOrganization.Kind.PE)
+        org.clean_code_safir_pole_emploi()
+        with self.assertRaises(ValidationError):
+            org = PrescriberOrganizationFactory.build(
+                code_safir_pole_emploi="12345", kind=PrescriberOrganization.Kind.CAP_EMPLOI
+            )
+            org.clean_code_safir_pole_emploi()
+
     def test_has_pending_authorization_proof(self):
 
         org = PrescriberOrganizationFactory(
