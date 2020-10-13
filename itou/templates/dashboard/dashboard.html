@@ -73,6 +73,13 @@
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
         <p class="text-muted">
             <span class="badge badge-warning">{% translate "Prescripteur habilité" %}</span>
+            {% if current_prescriber_organization.code_safir_pole_emploi %}
+                <span class="badge badge-light">
+                    {% blocktranslate with code_safir=current_prescriber_organization.code_safir_pole_emploi %}
+                        Code SAFIR {{ code_safir }}
+                    {% endblocktranslate %}
+                </span>
+            {% endif %}
         </p>
     {% endif %}
 
