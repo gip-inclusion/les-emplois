@@ -12,7 +12,6 @@ from django.views.decorators.http import require_POST
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.tokens import resume_signer
 from itou.utils.urls import get_safe_url
