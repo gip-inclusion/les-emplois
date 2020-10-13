@@ -127,17 +127,6 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertFalse(self.response.context["formset"].is_valid())
         self.assertTrue(self.response.context["formset"].errors[0].get("email"))
 
-    def test_existing_user_belongs_to_another_organization(self):
-        guest = PrescriberOrganizationWithMembershipFactory().members.first()
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        self.post_data.update(
-            {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
-        )
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data)
-        # Make sure form is not valid
-        self.assertFalse(self.response.context["formset"].is_valid())
-        self.assertTrue(self.response.context["formset"].errors[0].get("email"))
-
     def test_pe_organization_invitation_unsuccessful(self):
         self.org = PrescriberPoleEmploiFactory()
         self.org.members.add(PrescriberFactory())
@@ -190,7 +179,9 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
 
         # Assert the user sees his new organization dashboard.
         current_org = get_current_org_or_404(self.response.wsgi_request)
-        self.assertEqual(self.invitation.organization.pk, current_org.pk)
+        # A user can be member of one or more organizations
+        self.assertTrue(current_org in self.user.prescriberorganization_set.all())
+        # self.assertEqual(self.invitation.organization.pk, current_org.pk)
 
     def test_accept_prescriber_org_invitation(self):
         response = self.client.get(self.invitation.acceptance_link, follow=True)
@@ -209,6 +200,18 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
 
     def test_accept_existing_user_is_prescriber_without_org(self):
         self.user = PrescriberFactory()
+        self.invitation = PrescriberWithOrgSentInvitationFactory(
+            sender=self.sender,
+            organization=self.org,
+            first_name=self.user.first_name,
+            last_name=self.user.last_name,
+            email=self.user.email,
+        )
+        self.client.login(email=self.user.email, password=DEFAULT_PASSWORD)
+        self.response = self.client.get(self.invitation.acceptance_link, follow=True)
+
+    def test_accept_existing_user_belongs_to_another_organization(self):
+        self.user = PrescriberOrganizationWithMembershipFactory().members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.org,
@@ -252,22 +255,6 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_existing_user_is_not_prescriber(self):
         self.user = SiaeWithMembershipFactory().members.first()
-        self.invitation = PrescriberWithOrgSentInvitationFactory(
-            sender=self.sender,
-            organization=self.org,
-            first_name=self.user.first_name,
-            last_name=self.user.last_name,
-            email=self.user.email,
-        )
-
-        self.client.login(email=self.user.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.invitation.acceptance_link, follow=True)
-
-        self.assertEqual(response.status_code, 403)
-        self.assertFalse(self.invitation.accepted)
-
-    def test_existing_user_belongs_to_another_organization(self):
-        self.user = PrescriberOrganizationWithMembershipFactory().members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.org,

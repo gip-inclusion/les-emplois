@@ -71,8 +71,7 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
     def _invited_user_exists_error(self, email):
         """
         If the guest is already a user, he should be a prescriber
-        but without belonging to another organization.
-        Reminder: we do not handle multi-structure prescribers for the moment.
+        with or without belonging to another organization.
         """
         self.user = get_user_model().objects.filter(email__iexact=email).first()
         if self.user:
@@ -80,15 +79,10 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
                 error = forms.ValidationError(_("Cet utilisateur n'est pas un prescripteur."))
                 self.add_error("email", error)
             else:
-                user_belongs_to_another_org = self.user.prescriberorganization_set.exists()
-                if user_belongs_to_another_org:
-                    error = forms.ValidationError(_("Cette personne est membre d'une autre organisation."))
+                user_is_member = self.organization.members.filter(email=self.user.email).exists()
+                if user_is_member:
+                    error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
                     self.add_error("email", error)
-                else:
-                    user_is_member = self.organization.members.filter(email=self.user.email).exists()
-                    if user_is_member:
-                        error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
-                        self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
