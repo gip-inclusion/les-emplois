@@ -21,7 +21,7 @@ def get_current_organization_and_perms(request):
     current_user = request.user
 
     if current_user.is_authenticated:
-
+        # SIAE ?
         siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
             # Sorry I could not find an elegant DNRY one-query solution ¯\_(ツ)_/¯
@@ -44,7 +44,9 @@ def get_current_organization_and_perms(request):
             if first_siae_idx != 0:
                 user_siaes[0], user_siaes[first_siae_idx] = user_siaes[first_siae_idx], user_siaes[0]
 
+        # Prescriber organization ?
         prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+
         if prescriber_org_pk:
             first_prescriber_idx = 0
             memberships = current_user.prescribermembership_set.select_related("organization")

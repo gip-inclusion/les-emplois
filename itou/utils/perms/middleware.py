@@ -53,12 +53,20 @@ class ItouCurrentOrganizationMiddleware:
                         return redirect("account_logout")
 
             elif user.is_prescriber:
-                # Prescriber user can now select an organization from their dashboard
+                # Prescriber users can now select an organization from their dashboard
                 # (if they are member of several prescriber organizations)
                 if not user.prescriberorganization_set.exists() and request.session.get(
                     settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
                 ):
                     del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
+                else:
+                    # Choose first prescriber organization for user if none selected yet
+                    # (f.i. after login)
+                    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
+                        request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+                        or user.prescriberorganization_set.first().pk
+                    )
+
         response = self.get_response(request)
 
         # After the view is called.
