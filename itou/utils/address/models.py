@@ -108,6 +108,7 @@ class AddressMixin(models.Model):
         self.address_line_1 = geocoding_data["address_line_1"]
         self.address_line_2 = ""
         self.post_code = geocoding_data["post_code"]
+        self.department = department_from_postcode(self.post_code)
         self.city = geocoding_data["city"]
 
     def clean(self):
