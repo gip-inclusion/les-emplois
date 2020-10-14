@@ -141,7 +141,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     )
     raw_id_fields = ("created_by",)
     readonly_fields = (
-        "code_safir_pole_emploi",
         "created_by",
         "created_at",
         "updated_at",
@@ -188,10 +187,11 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
     def response_change(self, request, obj):
-        # Override for custom "actions" in the admin change form for:
-        # * refusing authorization
-        # * validating authorization
-
+        """
+        Override to add custom "actions" in `self.change_form_template` for:
+        * refusing authorization
+        * validating authorization
+        """
         if "_authorization_action_refuse" in request.POST:
             obj.is_authorized = False
             obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.REFUSED
@@ -209,15 +209,3 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             obj.validated_prescriber_organization_email().send()
 
         return super().response_change(request, obj)
-
-    def change_view(self, request, object_id, form_url="", extra_context=None):
-        try:
-            obj = models.PrescriberOrganization.objects.get(pk=object_id)
-        except models.PrescriberOrganization.DoesNotExist:
-            opts = models.PrescriberOrganization._meta
-            return self._get_obj_does_not_exist_redirect(request, opts, object_id)
-        extra_context = extra_context or {}
-        extra_context["authorization_validation_required"] = (
-            obj.authorization_status == models.PrescriberOrganization.AuthorizationStatus.NOT_SET
-        )
-        return super().change_view(request, object_id, form_url, extra_context)

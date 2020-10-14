@@ -346,18 +346,6 @@ class Command(BaseCommand):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
 
-        # BEGINNING OF ONE TIME FIX - WILL BE DROPPED
-        for siae in Siae.objects.filter(source="ASP").all():
-            if siae.name.isnumeric():
-                row = EXTERNAL_ID_TO_SIAE_ROW[siae.external_id]
-                new_name = row["name"]
-                assert not new_name.isnumeric()
-                self.log(f"siae.id={siae.id} will have its name fixed " f"from {siae.name} to {new_name}")
-                if not self.dry_run:
-                    siae.name = new_name
-                    siae.save()
-        # END OF ONE TIME FIX - WILL BE DROPPED
-
         self.fix_missing_external_ids()
         self.delete_siaes_without_external_id()
         self.delete_user_created_siaes_without_members()

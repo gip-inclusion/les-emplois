@@ -107,6 +107,7 @@ class User(AbstractUser, AddressMixin):
         super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
+        super().clean()
         self.clean_email()
 
     def clean_email(self):
