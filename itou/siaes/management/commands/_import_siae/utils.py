@@ -39,7 +39,7 @@ def remap_columns(df, column_mapping):
 
     Example of column_mapping :
 
-    {"ID Structure": "external_id", "Adresse e-mail": "auth_email"}
+    {"ID Structure": "asp_id", "Adresse e-mail": "auth_email"}
     """
     df.rename(
         columns=column_mapping, inplace=True,

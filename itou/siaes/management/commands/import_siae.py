@@ -1,9 +1,8 @@
 """
 
 This script updates existing SIAEs and injects new ones
-by joining the following three ASP datasets:
-- Vue Structure (has most siae data except auth_email and kind)
-- Liste Correspondants Techniques (has auth_email)
+by joining the following two ASP datasets:
+- Vue Structure (has most siae data except kind)
 - Vue AF ("Annexes Financières", has kind and all financial annexes)
 
 It should be played again after each upcoming Opening (HDF, the whole country...)
@@ -18,21 +17,19 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 import logging
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone
+from django.db.models import Q
 
-from itou.siaes.management.commands._import_siae.convention import get_creatable_conventions, get_deletable_conventions
-from itou.siaes.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
-from itou.siaes.management.commands._import_siae.siae import (
-    build_siae,
-    could_siae_be_deleted,
-    does_siae_have_an_active_convention,
-    get_siae_convention_end_date,
-    should_siae_be_created,
+from itou.siaes.management.commands._import_siae.convention import (
+    get_creatable_conventions,
+    get_deletable_conventions,
+    update_existing_conventions,
 )
+from itou.siaes.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
+from itou.siaes.management.commands._import_siae.siae import build_siae, could_siae_be_deleted, should_siae_be_created
 from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
-from itou.siaes.management.commands._import_siae.vue_structure import EXTERNAL_ID_TO_SIAE_ROW, SIRET_TO_EXTERNAL_ID
-from itou.siaes.models import Siae
+from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
+from itou.siaes.models import Siae, SiaeConvention
 
 
 class Command(BaseCommand):
@@ -68,39 +65,10 @@ class Command(BaseCommand):
     def log(self, message):
         self.logger.debug(message)
 
-    @timeit
-    def fix_missing_external_ids(self):
-        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
-            if siae.siret in SIRET_TO_EXTERNAL_ID:
-                external_id = SIRET_TO_EXTERNAL_ID[siae.siret]
-                self.log(f"siae.id={siae.id} will be assigned external_id={external_id}")
-                if not self.dry_run:
-                    siae.external_id = external_id
-                    siae.save()
-
     def delete_siae(self, siae):
         assert could_siae_be_deleted(siae)
         if not self.dry_run:
             siae.delete()
-
-    @timeit
-    def delete_siaes_without_external_id(self):
-        """
-        Any siae which cannot be found in the latest ASP exports
-        is a "ghost" siae which should be deleted.
-
-        This can happen e.g. after every opening when old siaes imported back in 2019
-        are no longer present in latest ASP exports.
-
-        Of course we only delete it if it does not have any data,
-        otherwise we just show a warning.
-        """
-        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, external_id__isnull=True):
-            if could_siae_be_deleted(siae):
-                self.log(f"siae.id={siae.id} without external_id has no data and will be deleted")
-                self.delete_siae(siae)
-            else:
-                self.log(f"siae.id={siae.id} without external_id has data and thus cannot be deleted")
 
     @timeit
     def delete_user_created_siaes_without_members(self):
@@ -109,7 +77,7 @@ class Command(BaseCommand):
         However in some cases, itou staff deletes some users, leaving
         potentially user created siaes without member.
         Those siaes cannot be joined by any way and thus are useless.
-        Let's clean them up.
+        Let's clean them up when possible.
         """
         for siae in Siae.objects.filter(source=Siae.SOURCE_USER_CREATED):
             if not siae.has_members:
@@ -141,10 +109,11 @@ class Command(BaseCommand):
 
     @timeit
     def update_siret_and_auth_email_of_existing_siaes(self):
-        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).exclude(external_id__isnull=True):
+        for siae in Siae.objects.select_related("convention").filter(source=Siae.SOURCE_ASP, convention__isnull=False):
             assert siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
-            assert siae.external_id
-            row = EXTERNAL_ID_TO_SIAE_ROW.get(siae.external_id)
+
+            asp_id = siae.asp_id
+            row = ASP_ID_TO_SIAE_ROW.get(asp_id)
 
             if row is None:
                 continue
@@ -183,90 +152,62 @@ class Command(BaseCommand):
                     f"and both siaes have data (will *not* be fixed)"
                 )
 
-    def update_siae_convention_end_date(self, siae):
-        new_convention_end_date = get_siae_convention_end_date(siae)
-        if siae.convention_end_date != new_convention_end_date:
-            if not self.dry_run:
-                siae.convention_end_date = new_convention_end_date
-                siae.save()
-            return 1
-        return 0
-
-    def reactivate_siae(self, siae):
-        assert not siae.is_active
-        if not self.dry_run:
-            siae.is_active = True
-            siae.save()
-
-    def deactivate_siae(self, siae):
-        assert siae.is_active
-        if not self.dry_run:
-            siae.is_active = False
-            # This starts the grace period.
-            siae.deactivated_at = timezone.now()
-            siae.save()
-
     @timeit
-    def manage_siae_activation(self):
-        reactivations = 0
-        deactivations = 0
+    def delete_inactive_siaes_when_possible(self):
+        blocked_deletions = 0
         deletions = 0
-        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP):
-            self.update_siae_convention_end_date(siae)
-            if does_siae_have_an_active_convention(siae):
-                if not siae.is_active:
-                    self.reactivate_siae(siae)
-                    reactivations += 1
-                continue
-
+        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).filter(
+            Q(convention__isnull=True) | Q(convention__is_active=False)
+        ):
             if could_siae_be_deleted(siae):
                 self.log(f"siae.id={siae.id} is inactive and without data thus will be deleted")
                 self.delete_siae(siae)
                 deletions += 1
                 continue
 
-            if siae.is_active:
-                self.log(
-                    f"siae.id={siae.id} kind={siae.kind} name='{siae.display_name}' will be "
-                    f"deactivated but has data"
-                )
-                self.deactivate_siae(siae)
-                deactivations += 1
+            blocked_deletions += 1
 
-        self.log(f"{deletions} siaes will be deleted as inactive and without data.")
-        self.log(f"{deactivations} siaes will be deactivated.")
-        self.log(f"{reactivations} siaes will be reactivated.")
+        self.log(f"{deletions} siaes will be deleted as inactive and without data")
+        self.log(f"{blocked_deletions} siaes are inactive but cannot be deleted")
 
     @timeit
     def create_new_siaes(self):
-        creatable_siae_keys = [
-            (external_id, kind) for (external_id, kind) in ACTIVE_SIAE_KEYS if external_id in EXTERNAL_ID_TO_SIAE_ROW
-        ]
+        creatable_siae_keys = [(asp_id, kind) for (asp_id, kind) in ACTIVE_SIAE_KEYS if asp_id in ASP_ID_TO_SIAE_ROW]
 
         creatable_siaes = []
 
-        for (external_id, kind) in creatable_siae_keys:
+        for (asp_id, kind) in creatable_siae_keys:
 
-            row = EXTERNAL_ID_TO_SIAE_ROW.get(external_id)
+            row = ASP_ID_TO_SIAE_ROW.get(asp_id)
             siret = row.siret
 
-            existing_siae_query = Siae.objects.filter(external_id=external_id, kind=kind)
+            existing_siae_query = Siae.objects.select_related("convention").filter(
+                convention__asp_id=asp_id, kind=kind
+            )
             if existing_siae_query.exists():
-                # Siae with this external_id already exists, no need to create it.
-                existing_siae = existing_siae_query.get()
-                if not self.dry_run:
-                    # Siret should have been fixed by
-                    # update_siret_and_auth_email_of_existing_siaes()
-                    # except in a dry-run.
-                    assert existing_siae.siret == siret
-                assert existing_siae.source == Siae.SOURCE_ASP
-                assert existing_siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+                # Siaes with this asp_id already exist, no need to create one more.
+                total_existing_siae_with_asp_source = 0
+                for existing_siae in existing_siae_query.all():
+                    assert existing_siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+                    if existing_siae.source == Siae.SOURCE_ASP:
+                        total_existing_siae_with_asp_source += 1
+                        if not self.dry_run:
+                            # Siret should have been fixed by
+                            # update_siret_and_auth_email_of_existing_siaes()
+                            # except in a dry-run.
+                            assert existing_siae.siret == siret
+                    else:
+                        assert existing_siae.source == Siae.SOURCE_USER_CREATED
+                assert total_existing_siae_with_asp_source == 1
                 continue
 
             existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
             if existing_siae_query.exists():
                 # Siae with this siret+kind already exists but with wrong source.
                 existing_siae = existing_siae_query.get()
+                if existing_siae.source == Siae.SOURCE_ASP:
+                    assert self.dry_run
+                    continue
                 assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
                 assert existing_siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
                 self.log(
@@ -276,7 +217,6 @@ class Command(BaseCommand):
                 )
                 if not self.dry_run:
                     existing_siae.source = Siae.SOURCE_ASP
-                    existing_siae.external_id = external_id
                     existing_siae.save()
                 continue
 
@@ -287,11 +227,9 @@ class Command(BaseCommand):
                 creatable_siaes.append(siae)
 
         self.log("--- beginning of CSV output of all creatable_siaes ---")
-        self.log("siret;kind;department;name;external_id;address")
+        self.log("siret;kind;department;name;address")
         for siae in creatable_siaes:
-            self.log(
-                f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.external_id};{siae.address_on_one_line}"
-            )
+            self.log(f"{siae.siret};{siae.kind};{siae.department};{siae.name};{siae.address_on_one_line}")
             if not self.dry_run:
                 siae.save()
         self.log("--- end of CSV output of all creatable_siaes ---")
@@ -312,10 +250,33 @@ class Command(BaseCommand):
 
     @timeit
     def manage_conventions(self):
-        creatable_conventions = get_creatable_conventions(dry_run=self.dry_run)
+        update_existing_conventions(dry_run=self.dry_run)
+
+        creatable_conventions = get_creatable_conventions()
         self.log(f"will create {len(creatable_conventions)} conventions")
         for (convention, siae) in creatable_conventions:
             if not self.dry_run:
+                # ONE TIME FIX - Hopefully we can drop it soon.
+                # In some very rare edge cases an outdated convention already
+                # exists with wrong data, delete it and recreate it.
+                # e.g. asp_id=4724 is the only edge case.
+                existing_convention_query = SiaeConvention.objects.filter(
+                    asp_id=convention.asp_id, kind=convention.kind
+                )
+                if existing_convention_query.exists():
+                    assert convention.asp_id == 4724
+                    existing_convention = existing_convention_query.get()
+                    self.log(
+                        f"delete ghost convention asp_id={convention.asp_id} "
+                        f"kind={convention.kind} with all its ghost siaes "
+                        f"then recreate it"
+                    )
+                    for siae in existing_convention.siaes.all():
+                        assert siae.id == 5058
+                        assert could_siae_be_deleted(siae)
+                        siae.delete()
+                    existing_convention.delete()
+                # END OF ONE TIME FIX - Hopefully we can drop it soon.
                 convention.save()
                 siae.convention = convention
                 siae.save()
@@ -346,12 +307,10 @@ class Command(BaseCommand):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
 
-        self.fix_missing_external_ids()
-        self.delete_siaes_without_external_id()
         self.delete_user_created_siaes_without_members()
         self.update_siret_and_auth_email_of_existing_siaes()
-        self.manage_siae_activation()
         self.create_new_siaes()
-        self.check_whether_signup_is_possible_for_all_siaes()
         self.manage_conventions()
         self.manage_financial_annexes()
+        self.delete_inactive_siaes_when_possible()
+        self.check_whether_signup_is_possible_for_all_siaes()

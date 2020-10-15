@@ -4,17 +4,16 @@ This "Vue AF" export is provided by the DGEFP/ASP.
 "AF" is short for "Annexe Financière" and this export
 contains mainly all Financial Annexes, but also the siae kind.
 
-Only with this export can we actually identify (external_id, kind) couples
+Only with this export can we actually identify (asp_id, kind) couples
 which uniquely identify siaes à la itou.
 
-As a reminder, an external_id is not enough to uniquely identify an siae à la itou
-since an ACI and an ETTI can share the same SIRET and the same external_id.
+As a reminder, an asp_id is not enough to uniquely identify an siae à la itou
+since an ACI and an ETTI can share the same SIRET and the same asp_id.
 
-When such an ACI and an ETTI share the same SIRET and the same external_id,
-they each have their own convention, their own financial annexes and
-thus their own convention end date.
+When such an ACI and an ETTI share the same SIRET and the same asp_id,
+they each have their own convention and their own financial annexes.
 
-For convenience we systematically call such an (external_id, kind) identifier
+For convenience we systematically call such an (asp_id, kind) identifier
 an "siae_key" throughout the import_siae.py script code.
 
 """
@@ -41,7 +40,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     Meaningful columns:
     - number (by merging 3 underlying columns)
     - convention_number
-    - external_id
+    - asp_id
     - kind
     - start_date
     - end_date
@@ -67,7 +66,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
         "af_numero_avenant_renouvellement": "renewal_number",
         "af_numero_avenant_modification": "modification_number",
         "af_numero_convention": "convention_number",
-        "af_id_structure": "external_id",
+        "af_id_structure": "asp_id",
         "af_mesure_dispositif_code": "kind",
         "af_date_debut_effet": "start_date",
         "af_date_fin_effet": "end_date",
@@ -116,7 +115,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     assert active_rows.number.is_unique
 
     # Considering all AFs, both active ones and inactive ones, their number
-    # is not unique, nor is the couple (external_id, number).
+    # is not unique, nor is the couple (asp_id, number).
     #
     # In other words, two siaes A and B can each have their own AF,
     # and both AF share the same number o_O.
@@ -127,7 +126,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     # modifications which do not trigger a modification number increase.
     # Only major enough modifications do trigger this.
     assert not df.number.is_unique
-    assert len(df[df.duplicated(["external_id", "number"])]) >= 1
+    assert len(df[df.duplicated(["asp_id", "number"])]) >= 1
 
     # Sort dataframe in a smart way before we drop duplicates by
     # keeping the first occurence in this order.
@@ -168,19 +167,19 @@ AF_NUMBER_TO_ROW = get_af_number_to_row()
 
 def get_siae_key(siae):
     """
-    Each unique (external_id, kind) couple corresponds to a unique siae à la itou.
+    Each unique (asp_id, kind) couple corresponds to a unique siae à la itou.
     This key is important when using ASP exports.
-    External_id itself is not enough nor unique from our point of view.
+    Asp_id itself is not enough nor unique from our point of view.
 
     Input: siae is normally a siae, but can also be a dataframe row instead.
     """
-    return (siae.external_id, siae.kind)
+    return (siae.asp_id, siae.kind)
 
 
 @timeit
 def get_siae_key_to_convention_end_date():
     """
-    For each siae_key (external_id+kind) we figure out the convention end date.
+    For each siae_key (asp_id+kind) we figure out the convention end date.
     This convention end date (future or past) is eventually stored as siae.convention_end_date.
     """
     siae_key_to_convention_end_date = {}
@@ -197,11 +196,8 @@ def get_siae_key_to_convention_end_date():
     return siae_key_to_convention_end_date
 
 
-SIAE_KEY_TO_CONVENTION_END_DATE = get_siae_key_to_convention_end_date()
-
-
 ACTIVE_SIAE_KEYS = [
     siae_key
-    for siae_key, convention_end_date in SIAE_KEY_TO_CONVENTION_END_DATE.items()
+    for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
     if timezone.now() < convention_end_date
 ]
