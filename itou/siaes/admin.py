@@ -23,7 +23,17 @@ class JobsInline(admin.TabularInline):
 
 class FinancialAnnexesInline(admin.TabularInline):
     model = models.SiaeFinancialAnnex
+    fields = ("number", "state", "convention_number", "start_at", "end_at", "is_active")
+    readonly_fields = ("number", "state", "convention_number", "start_at", "end_at", "is_active")
     can_delete = False
+
+    ordering = ("-number",)
+
+    def is_active(self, obj):
+        return obj.is_active
+
+    is_active.boolean = True
+    is_active.short_description = "Active"
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -70,14 +80,10 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
-    list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "is_active", "department")
+    list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     readonly_fields = (
         "source",
-        "convention_end_date",
-        "deactivated_at",
-        "reactivated_by",
-        "reactivated_at",
         "created_by",
         "created_at",
         "updated_at",
@@ -99,12 +105,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "website",
                     "description",
                     "source",
-                    "is_active",
                     "convention",
-                    "convention_end_date",
-                    "deactivated_at",
-                    "reactivated_by",
-                    "reactivated_at",
                     "created_by",
                     "created_at",
                     "updated_at",
@@ -142,20 +143,12 @@ class SiaeAdmin(admin.ModelAdmin):
         return queryset
 
     def save_model(self, request, obj, form, change):
-
         if not change:
             obj.created_by = request.user
             obj.source = models.Siae.SOURCE_STAFF_CREATED
             if not obj.geocoding_score and obj.address_on_one_line:
                 # Set geocoding.
                 obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
-
-        if change and obj.is_active:
-            old_obj = self.model.objects.get(id=obj.id)
-            if not old_obj.is_active:
-                # Itou staff manually reactivated siae.
-                obj.reactivated_by = request.user
-                obj.reactivated_at = datetime.datetime.now()
 
         if change and obj.address_on_one_line:
             old_obj = self.model.objects.get(id=obj.id)
@@ -192,16 +185,25 @@ class SiaeConvention(admin.ModelAdmin):
         "is_active",
         "deactivated_at",
         "reactivated_by",
+        "reactivated_at",
         "created_at",
         "updated_at",
     )
     fieldsets = (
         (_("Informations"), {"fields": ("kind", "siret_signature",)},),
-        (_("Statut"), {"fields": ("is_active", "deactivated_at", "reactivated_by",)},),
+        (_("Statut"), {"fields": ("is_active", "deactivated_at", "reactivated_by", "reactivated_at",)},),
         (_("Autres"), {"fields": ("created_at", "updated_at",)},),
     )
     search_fields = ("pk", "siret_signature")
     inlines = (FinancialAnnexesInline, SiaesInline)
+
+    def save_model(self, request, obj, form, change):
+        if change and obj.is_active:
+            old_obj = self.model.objects.get(id=obj.id)
+            if not old_obj.is_active:
+                # Itou staff manually reactivated convention.
+                obj.reactivated_by = request.user
+                obj.reactivated_at = datetime.datetime.now()
 
 
 @admin.register(models.SiaeFinancialAnnex)

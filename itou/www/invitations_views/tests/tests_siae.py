@@ -61,7 +61,7 @@ class TestSendSiaeInvitation(TestCase):
         can only be ressucitated by being invited to a new siae.
         We test here that this is indeed possible.
         """
-        self.guest = SiaeWith2MembershipsFactory(is_active=False).members.first()
+        self.guest = SiaeWith2MembershipsFactory(convention__is_active=False).members.first()
         self.post_data["form-0-first_name"] = self.guest.first_name
         self.post_data["form-0-last_name"] = self.guest.last_name
         self.post_data["form-0-email"] = self.guest.email
@@ -231,7 +231,7 @@ class TestAcceptSiaeInvitation(TestCase):
         can only be ressucitated by being invited to a new siae.
         We test here that this is indeed possible.
         """
-        self.user = SiaeWith2MembershipsFactory(is_active=False).members.first()
+        self.user = SiaeWith2MembershipsFactory(convention__is_active=False).members.first()
         self.invitation = SiaeSentInvitationFactory(
             sender=self.sender,
             siae=self.siae,

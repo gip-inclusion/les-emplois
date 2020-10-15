@@ -2,7 +2,7 @@
 
 The "Vue Structure" export is provided by the DGEFP/ASP.
 
-It contains one row per external_id, or in other words one row per SIRET.
+It contains one row per asp_id, or in other words one row per SIRET.
 Thus two siaes à la itou sharing the same SIRET will be considered as
 a single siae à la ASP in this export.
 
@@ -29,7 +29,7 @@ VUE_STRUCTURE_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_Structure_12102020_0749
 def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
     """
     The "Vue Structure" export has the following fields:
-    - external_id
+    - asp_id
     - siret (current)
     - siret (initial aka siret_signature)
     - name
@@ -63,7 +63,7 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
     column_mapping = {
         "structure_siret_actualise": "siret",
         "structure_siret_signature": "siret_signature",
-        "structure_id_siae": "external_id",
+        "structure_id_siae": "asp_id",
         "structure_adresse_mail_corresp_technique": "auth_email",
         "structure_code_naf": "naf",
         "structure_denomination": "name",
@@ -95,6 +95,7 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
         validate_naf(row.naf)
         assert " " not in row.auth_email
         assert "@" in row.auth_email
+        assert row.siret[:9] == row.siret_signature[:9]
 
     return df
 
@@ -103,69 +104,69 @@ VUE_STRUCTURE_DF = get_vue_structure_df()
 
 
 @timeit
-def get_external_id_to_siae_row():
+def get_asp_id_to_siae_row():
     """
-    Provide the row from the "Vue Structure" matching the given external_id.
+    Provide the row from the "Vue Structure" matching the given asp_id.
     """
-    external_id_to_siae_row = {}
+    asp_id_to_siae_row = {}
     for _, row in VUE_STRUCTURE_DF.iterrows():
-        assert row.external_id not in external_id_to_siae_row
-        external_id_to_siae_row[row.external_id] = row
-    return external_id_to_siae_row
+        assert row.asp_id not in asp_id_to_siae_row
+        asp_id_to_siae_row[row.asp_id] = row
+    return asp_id_to_siae_row
 
 
-EXTERNAL_ID_TO_SIAE_ROW = get_external_id_to_siae_row()
+ASP_ID_TO_SIAE_ROW = get_asp_id_to_siae_row()
 
 
 @timeit
-def get_external_id_to_siret_signature():
+def get_asp_id_to_siret_signature():
     """
-    Provide the siret_signature from the "Vue Structure" matching the given external_id.
+    Provide the siret_signature from the "Vue Structure" matching the given asp_id.
     """
-    external_id_to_siret_signature = {}
+    asp_id_to_siret_signature = {}
     for _, row in VUE_STRUCTURE_DF.iterrows():
-        assert row.external_id not in external_id_to_siret_signature
-        external_id_to_siret_signature[row.external_id] = row.siret_signature
-    return external_id_to_siret_signature
+        assert row.asp_id not in asp_id_to_siret_signature
+        asp_id_to_siret_signature[row.asp_id] = row.siret_signature
+    return asp_id_to_siret_signature
 
 
-EXTERNAL_ID_TO_SIRET_SIGNATURE = get_external_id_to_siret_signature()
+ASP_ID_TO_SIRET_SIGNATURE = get_asp_id_to_siret_signature()
 
 
 @timeit
-def get_siret_to_external_id():
+def get_siret_to_asp_id():
     """
-    This method allows us to link any preexisting siae (without external_id)
-    in itou database to its ASP counterpart via an external_id.
+    This method allows us to link any preexisting siae (without asp_id)
+    in itou database to its ASP counterpart via an asp_id.
 
-    Such preexisting siaes are siaes historically imported without external_id,
+    Such preexisting siaes are siaes historically imported without asp_id,
     new ones are added everytime we open a new region.
     Later we will also process preexisting siaes created by itou staff
     and preexisting siaes created by users ("Antennes").
 
-    External_id is a permanent immutable ID in ASP exports used to
+    Asp_id is a permanent immutable ID in ASP exports used to
     identify a structure à la ASP (an ACI and an EI sharing the same SIRET being
-    considered as a single structure à la ASP). This external_id can be thought as
+    considered as a single structure à la ASP). This asp_id can be thought as
     a "permanent SIRET".
 
-    The SIRET => external_id match is very important to make sure all itou siaes
+    The SIRET => asp_id match is very important to make sure all itou siaes
     are matched to their ASP counterpart.
 
     As there are two siret fields in ASP main export (Vue Structures) we
     use both to have a maximum chance to get a match and avoid leaving
     ghost siaes behind.
     """
-    siret_to_external_id = {}
+    siret_to_asp_id = {}
     for _, row in VUE_STRUCTURE_DF.iterrows():
-        siret_to_external_id[row.siret] = row.external_id
+        siret_to_asp_id[row.siret] = row.asp_id
         # Current siret has precedence over siret_signature.
         # FTR necessary subtelty due to a weird edge case in ASP data:
-        # siret=44431048600030 has two different external_ids (2338, 4440)
+        # siret=44431048600030 has two different asp_ids (2338, 4440)
         # one as a siret_signature, the other as a current siret.
         # (╯°□°)╯︵ ┻━┻
-        if row.siret_signature not in siret_to_external_id:
-            siret_to_external_id[row.siret_signature] = row.external_id
-    return siret_to_external_id
+        if row.siret_signature not in siret_to_asp_id:
+            siret_to_asp_id[row.siret_signature] = row.asp_id
+    return siret_to_asp_id
 
 
-SIRET_TO_EXTERNAL_ID = get_siret_to_external_id()
+SIRET_TO_ASP_ID = get_siret_to_asp_id()

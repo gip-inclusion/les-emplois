@@ -3,11 +3,7 @@
 Siae object logic used by the import_siae.py script is gathered here.
 
 """
-from itou.siaes.management.commands._import_siae.vue_af import (
-    ACTIVE_SIAE_KEYS,
-    SIAE_KEY_TO_CONVENTION_END_DATE,
-    get_siae_key,
-)
+from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS, get_siae_key
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
@@ -24,10 +20,6 @@ def should_siae_be_created(siae):
 
 def could_siae_be_deleted(siae):
     return siae.members.count() == 0 and siae.job_applications_received.count() == 0
-
-
-def get_siae_convention_end_date(siae):
-    return SIAE_KEY_TO_CONVENTION_END_DATE.get(get_siae_key(siae))
 
 
 def geocode_siae(siae):
@@ -55,9 +47,7 @@ def geocode_siae(siae):
 def build_siae(row, kind):
     siae = Siae()
     siae.siret = row.siret
-    siae.external_id = row.external_id
     siae.kind = kind
-    siae.convention_end_date = get_siae_convention_end_date(siae)
     siae.naf = row.naf
     siae.source = Siae.SOURCE_ASP
     siae.name = row["name"]  # row.name surprisingly returns the row index.
