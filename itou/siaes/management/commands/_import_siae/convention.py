@@ -20,10 +20,16 @@ def update_existing_conventions(dry_run):
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
         convention = siae.convention
+        # Siret_signature can change from one export to the next!
+        # e.g. asp_id=4948 has changed from 81051848000027 to 81051848000019
+        if convention.siret_signature != siret_signature:
+            if not dry_run:
+                convention.siret_signature = siret_signature
+                convention.save()
+
         assert convention.kind == siae.kind
         assert convention.asp_id == asp_id
         assert asp_id in ASP_ID_TO_SIRET_SIGNATURE
-        assert convention.siret_signature == siret_signature
         assert convention.siren_signature == siae.siren
 
         is_active = does_siae_have_an_active_convention(siae)
