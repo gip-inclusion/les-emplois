@@ -185,15 +185,20 @@ class Command(BaseCommand):
                 convention__asp_id=asp_id, kind=kind
             )
             if existing_siae_query.exists():
-                # Siae with this asp_id already exists, no need to create it.
-                existing_siae = existing_siae_query.get()
-                if not self.dry_run:
-                    # Siret should have been fixed by
-                    # update_siret_and_auth_email_of_existing_siaes()
-                    # except in a dry-run.
-                    assert existing_siae.siret == siret
-                assert existing_siae.source == Siae.SOURCE_ASP
-                assert existing_siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+                # Siaes with this asp_id already exist, no need to create one more.
+                total_existing_siae_with_asp_source = 0
+                for existing_siae in existing_siae_query.all():
+                    assert existing_siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+                    if existing_siae.source == Siae.SOURCE_ASP:
+                        total_existing_siae_with_asp_source += 1
+                        if not self.dry_run:
+                            # Siret should have been fixed by
+                            # update_siret_and_auth_email_of_existing_siaes()
+                            # except in a dry-run.
+                            assert existing_siae.siret == siret
+                    else:
+                        assert existing_siae.source == Siae.SOURCE_USER_CREATED
+                assert total_existing_siae_with_asp_source == 1
                 continue
 
             existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
