@@ -71,7 +71,7 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
     def _invited_user_exists_error(self, email):
         """
         If the guest is already a user, he should be a prescriber
-        with or without belonging to another organization.
+        whether he belongs to another organization or not
         """
         self.user = get_user_model().objects.filter(email__iexact=email).first()
         if self.user:

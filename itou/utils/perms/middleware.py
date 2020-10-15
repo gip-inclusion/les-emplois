@@ -53,7 +53,7 @@ class ItouCurrentOrganizationMiddleware:
                         return redirect("account_logout")
 
             elif user.is_prescriber:
-                # Prescriber users can now select an organization from their dashboard
+                # Prescriber users can now select an organization
                 # (if they are member of several prescriber organizations)
                 if user.prescriberorganization_set.exists():
                     # Choose first prescriber organization for user if none is selected yet
