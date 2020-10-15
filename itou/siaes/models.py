@@ -25,9 +25,10 @@ class SiaeQuerySet(models.QuerySet):
         return self.select_related("convention").filter(
             # GEIQ, EA... have no convention logic and thus are always active.
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
-            # User created siaes and staff created siaes do not yet have convention logic.
-            | ~Q(source=Siae.SOURCE_ASP)
-            # A siae is active if and only if it has an active convention.
+            # User created siaes and staff created siaes do not yet
+            # have convention logic and thus are always active.
+            | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
+            # A siae of ASP source is active if and only if it has an active convention.
             | Q(convention__is_active=True)
         )
 
@@ -36,8 +37,9 @@ class SiaeQuerySet(models.QuerySet):
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
-            | ~Q(source=Siae.SOURCE_ASP)
+            | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
             | Q(convention__is_active=True)
+            # Here we include siaes experiencing their grace period as well.
             | Q(convention__deactivated_at__gte=now - grace_period)
         )
 
@@ -213,7 +215,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if self.kind not in Siae.ELIGIBILITY_REQUIRED_KINDS:
             # GEIQ, EA... have no convention logic and thus are always active.
             return True
-        if self.source != Siae.SOURCE_ASP:
+        if self.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]:
             # User created siaes and staff created siaes do not yet have convention logic.
             return True
         return self.convention and self.convention.is_active
