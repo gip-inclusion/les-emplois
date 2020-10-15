@@ -76,6 +76,8 @@ shell_on_django_container_as_root:
 shell_on_postgres_container:
 	docker exec -ti itou_postgres /bin/bash
 
+# It's never too late, Barney.
+
 # Postgres CLI.
 # =============================================================================
 
