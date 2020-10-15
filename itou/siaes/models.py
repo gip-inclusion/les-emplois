@@ -164,7 +164,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         "jobs.Appellation", verbose_name=_("Métiers"), through="SiaeJobDescription", blank=True
     )
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="SiaeMembership", blank=True
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Membres"),
+        through="SiaeMembership",
+        through_fields=("siae", "user"),
+        blank=True,
     )
 
     created_by = models.ForeignKey(
@@ -336,6 +340,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     def grace_period_has_expired(self):
         return not self.is_active and timezone.now() > self.grace_period_end_date
 
+    @property
+    def members1(self):
+        return self.members
+
 
 class SiaeMembership(models.Model):
     """Intermediary model between `User` and `Siae`."""
@@ -344,6 +352,11 @@ class SiaeMembership(models.Model):
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
+    is_active = models.BooleanField(_("Rattachement actif"), default=True)
+    updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour"), null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, related_name="updated_by", null=True, on_delete=models.CASCADE
+    )
 
     class Meta:
         unique_together = ("user_id", "siae_id")
