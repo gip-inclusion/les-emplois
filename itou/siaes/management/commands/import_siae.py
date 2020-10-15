@@ -29,7 +29,7 @@ from itou.siaes.management.commands._import_siae.siae import build_siae, could_s
 from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
-from itou.siaes.models import Siae, SiaeConvention
+from itou.siaes.models import Siae
 
 
 class Command(BaseCommand):
@@ -256,27 +256,6 @@ class Command(BaseCommand):
         self.log(f"will create {len(creatable_conventions)} conventions")
         for (convention, siae) in creatable_conventions:
             if not self.dry_run:
-                # ONE TIME FIX - Hopefully we can drop it soon.
-                # In some very rare edge cases an outdated convention already
-                # exists with wrong data, delete it and recreate it.
-                # e.g. asp_id=4724 is the only edge case.
-                existing_convention_query = SiaeConvention.objects.filter(
-                    asp_id=convention.asp_id, kind=convention.kind
-                )
-                if existing_convention_query.exists():
-                    assert convention.asp_id == 4724
-                    existing_convention = existing_convention_query.get()
-                    self.log(
-                        f"delete ghost convention asp_id={convention.asp_id} "
-                        f"kind={convention.kind} with all its ghost siaes "
-                        f"then recreate it"
-                    )
-                    for siae in existing_convention.siaes.all():
-                        assert siae.id == 5058
-                        assert could_siae_be_deleted(siae)
-                        siae.delete()
-                    existing_convention.delete()
-                # END OF ONE TIME FIX - Hopefully we can drop it soon.
                 convention.save()
                 siae.convention = convention
                 siae.save()
