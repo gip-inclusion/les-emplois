@@ -182,7 +182,6 @@ class SiaeConvention(admin.ModelAdmin):
     readonly_fields = (
         "kind",
         "siret_signature",
-        "is_active",
         "deactivated_at",
         "reactivated_by",
         "reactivated_at",
@@ -198,12 +197,17 @@ class SiaeConvention(admin.ModelAdmin):
     inlines = (FinancialAnnexesInline, SiaesInline)
 
     def save_model(self, request, obj, form, change):
-        if change and obj.is_active:
+        if change:
             old_obj = self.model.objects.get(id=obj.id)
-            if not old_obj.is_active:
+            if obj.is_active and not old_obj.is_active:
                 # Itou staff manually reactivated convention.
                 obj.reactivated_by = request.user
                 obj.reactivated_at = datetime.datetime.now()
+            if not obj.is_active and old_obj.is_active:
+                # Itou staff manually deactivated convention.
+                # Start grace period.
+                obj.deactivated_at = datetime.datetime.now()
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.SiaeFinancialAnnex)
