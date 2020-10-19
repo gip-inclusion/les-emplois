@@ -94,7 +94,7 @@
                                             {% csrf_token %}
                                             {% for s in user_siaes %}
                                                 <button
-                                                    class="dropdown-item text-primary"
+                                                    class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="siae_id"
                                                     value="{{ s.pk }}">{{ s.display_name }}
@@ -104,6 +104,28 @@
                                     </div>
                                 </div>
                             {% endif %}
+
+                            {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
+                                        {% translate "Changer de structure" %}
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
+                                        <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
+                                            {% csrf_token %}
+                                            {% for po in user_prescriberorganizations %}
+                                                <button
+                                                    class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
+                                                    type="submit"
+                                                    name="prescriber_organization_id"
+                                                    value="{{ po.pk }}">{{ po.display_name }}
+                                                </button>
+                                            {% endfor %}
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
+
                             </div>
 
                         {% else %}

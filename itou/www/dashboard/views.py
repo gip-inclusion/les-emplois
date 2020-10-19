@@ -10,8 +10,8 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.tokens import resume_signer
 from itou.utils.urls import get_safe_url
@@ -21,7 +21,6 @@ from itou.www.dashboard.forms import EditUserInfoForm
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
     job_applications_categories = []
-    prescriber_authorization_status_not_set = None
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
@@ -56,12 +55,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "url"
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
-    if request.user.is_prescriber_with_org:
-        get_current_org_or_404(request)
-
     context = {
         "job_applications_categories": job_applications_categories,
-        "prescriber_authorization_status_not_set": prescriber_authorization_status_not_set,
     }
 
     return render(request, template_name, context)
@@ -139,5 +134,21 @@ def switch_siae(request):
     queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
+
+    return HttpResponseRedirect(dashboard_url)
+
+
+@login_required
+@require_POST
+def switch_prescriber_organization(request):
+    """
+    Switch prescriber organization for a user with multiple memberships.
+    """
+    dashboard_url = reverse_lazy("dashboard:index")
+
+    pk = request.POST["prescriber_organization_id"]
+    queryset = PrescriberOrganization.objects
+    prescriber_organization = get_object_or_404(queryset, pk=pk)
+    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = prescriber_organization.pk
 
     return HttpResponseRedirect(dashboard_url)
