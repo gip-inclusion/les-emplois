@@ -53,11 +53,19 @@ class ItouCurrentOrganizationMiddleware:
                         return redirect("account_logout")
 
             elif user.is_prescriber:
+                # Prescriber users can now select an organization
+                # (if they are member of several prescriber organizations)
                 if user.prescriberorganization_set.exists():
-                    request.session[
-                        settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY
-                    ] = user.prescriberorganization_set.first().pk
+                    # Choose first prescriber organization for user if none is selected yet
+                    # (f.i. after login)
+                    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
+                        request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+                        or user.prescriberorganization_set.first().pk
+                    )
                 elif request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY):
+                    # If the user is an "orienteur"
+                    # => No need to track the current org in session (none)
+                    # => Remove any old session entry if needed
                     del request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY]
 
         response = self.get_response(request)

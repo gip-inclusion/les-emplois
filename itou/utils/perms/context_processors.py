@@ -12,13 +12,16 @@ def get_current_organization_and_perms(request):
     """
 
     prescriber_organization = None
+    user_prescriberorganizations = []
     siae = None
     user_is_prescriber_org_admin = False
     user_is_siae_admin = False
     user_siaes = []
 
-    if request.user.is_authenticated:
+    current_user = request.user
 
+    if current_user.is_authenticated:
+        # SIAE ?
         siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
         if siae_pk:
             # Sorry I could not find an elegant DNRY one-query solution ¯\_(ツ)_/¯
@@ -27,7 +30,6 @@ def get_current_organization_and_perms(request):
                 request.user.siaemembership_set.select_related("siae").filter(siae__pk__in=user_siae_set_pks).all()
             )
             user_siaes = [membership.siae for membership in memberships]
-
             for membership in memberships:
                 if membership.siae_id == siae_pk:
                     siae = membership.siae
@@ -37,13 +39,21 @@ def get_current_organization_and_perms(request):
                 if request.path != reverse("account_logout"):
                     raise PermissionDenied
 
+        # Prescriber organization ?
         prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
+
         if prescriber_org_pk:
-            membership = request.user.prescribermembership_set.select_related("organization").get(
-                organization_id=prescriber_org_pk
-            )
-            prescriber_organization = membership.organization
-            user_is_prescriber_org_admin = membership.is_admin
+            memberships = current_user.prescribermembership_set.select_related("organization")
+
+            for membership in memberships:
+                # Same as above:
+                # In order to avoid an extra SQL query, fetch related organizations
+                # and artifially reconstruct the list of organizations the user belongs to
+                # (and other stuff while at it)
+                user_prescriberorganizations.append(membership.organization)
+                if membership.organization.pk == prescriber_org_pk:
+                    prescriber_organization = membership.organization
+                    user_is_prescriber_org_admin = membership.is_admin
 
     context = {
         "current_prescriber_organization": prescriber_organization,
@@ -51,6 +61,7 @@ def get_current_organization_and_perms(request):
         "user_is_prescriber_org_admin": user_is_prescriber_org_admin,
         "user_is_siae_admin": user_is_siae_admin,
         "user_siaes": user_siaes,
+        "user_prescriberorganizations": user_prescriberorganizations,
     }
 
     context.update(

@@ -179,7 +179,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     def guest_can_join_organization(self, request):
         user = get_object_or_404(get_user_model(), email=self.email)
-        return user == request.user and user.is_prescriber and not user.prescriberorganization_set.exists()
+        return user == request.user and user.is_prescriber
 
     def set_guest_type(self, user):
         user.is_prescriber = True
