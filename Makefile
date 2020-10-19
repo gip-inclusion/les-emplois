@@ -38,7 +38,7 @@ setup_git_pre_commit_hook:
 # make django_admin
 # make django_admin COMMAND=dbshell
 # make django_admin COMMAND=createsuperuser
-# make django_admin COMMAND="dumpdata siaes.Siae" > ~/Desktop/siaes.json
+# make --silent django_admin COMMAND="dumpdata siaes.Siae" > itou/fixtures/django/02_siaes.json
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 
@@ -124,11 +124,23 @@ postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump -d itou -t cities_city > /backups/cities.sql"
 	docker cp itou_postgres:/backups/cities.sql itou/fixtures/postgres/
 
-# Delete and recreate the DB manually.
+# Delete and recreate the DB.
 # =============================================================================
-# docker-compose down
-# docker-compose up --no-deps postgres
-# make shell_on_postgres_container
-# PGPASSWORD=password psql -h postgres -U postgres
-# DROP DATABASE itou;
-# CREATE DATABASE itou OWNER itou;
+
+postgres_recreate:
+	# 1) Drop and recreate an empty db.
+	docker-compose down
+	docker-compose up -d --no-deps postgres
+	sleep 5
+	docker exec -e PGPASSWORD='password' -ti itou_postgres psql -h postgres -U postgres -c 'DROP DATABASE IF EXISTS itou'
+	docker exec -e PGPASSWORD='password' -ti itou_postgres psql -h postgres -U postgres -c 'CREATE DATABASE itou OWNER itou'
+	# 2) Run the migrations.
+	docker-compose up -d django
+	# Wait for migrations to complete.
+	sleep 20
+	# Manually rollback now to an older migration if you want to fix broken fixtures.
+	# 3) Load the fixtures into the db.
+	make populate_db
+	# 4) Run services as normal again.
+	docker-compose down
+	docker-compose up
