@@ -355,7 +355,11 @@ class SiaeMembership(models.Model):
     is_active = models.BooleanField(_("Rattachement actif"), default=True)
     updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour"), null=True)
     updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name="updated_by", null=True, on_delete=models.CASCADE
+        settings.AUTH_USER_MODEL,
+        related_name="updated_by",
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name=_("Mis à jour par"),
     )
 
     class Meta:
