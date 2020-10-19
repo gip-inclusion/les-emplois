@@ -25,8 +25,8 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             self.fields["birthdate"].widget = DatePickerField(
                 {
                     "viewMode": "years",
-                    "minDate": DatePickerField.min_birthdate().strftime("%Y"),
-                    "maxDate": DatePickerField.max_birthdate().strftime("%Y"),
+                    "minDate": DatePickerField.min_birthdate().strftime("%Y/%m/%d"),
+                    "maxDate": DatePickerField.max_birthdate().strftime("%Y/%m/%d"),
                     "useCurrent": False,
                     "allowInputToggle": False,
                 }
