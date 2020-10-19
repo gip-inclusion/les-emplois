@@ -122,7 +122,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="PrescriberMembership", blank=True,
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Membres"),
+        through="PrescriberMembership",
+        blank=True,
         through_fields=("organization", "user"),
     )
     is_authorized = models.BooleanField(
