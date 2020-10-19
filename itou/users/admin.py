@@ -40,6 +40,7 @@ class PrescriberMembershipInline(admin.TabularInline):
     raw_id_fields = ("organization",)
     readonly_fields = ("organization", "organization_id_link", "joined_at", "is_admin")
     can_delete = False
+    fk_name = "user"
 
     def has_change_permission(self, request, obj=None):
         return False

@@ -122,7 +122,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="PrescriberMembership", blank=True
+        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="PrescriberMembership", blank=True,
+        through_fields=("organization", "user"),
     )
     is_authorized = models.BooleanField(
         verbose_name=_("Habilitation"),
@@ -297,7 +298,7 @@ class PrescriberMembership(models.Model):
     updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour"), null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="updated_by",
+        related_name="prescriber_organization_membership_updated_by",
         null=True,
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
