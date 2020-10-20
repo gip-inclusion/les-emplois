@@ -6,9 +6,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 
 from itou.jobs.models import Appellation
-from itou.siaes.models import Siae, SiaeJobDescription
+from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
@@ -152,8 +153,36 @@ def members(request, template_name="siaes/members.html"):
     members = siae.siaemembership_set.filter(is_active=True).select_related("user").all().order_by("joined_at")
     pending_invitations = siae.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    context = {"siae": siae, "members": members, "pending_invitations": pending_invitations}
+    # TODO Optimize: in one query (via SIAE)?
+    deactivated_members = (
+        siae.siaemembership_set.filter(is_active=False).select_related("user").all().order_by("updated_at")
+    )
+
+    context = {
+        "siae": siae,
+        "members": members,
+        "pending_invitations": pending_invitations,
+        "deactivated_members": deactivated_members,
+    }
     return render(request, template_name, context)
+
+
+@login_required
+@require_POST
+def toggle_membership(request, template_name="siaes/members.html"):
+    # activate or deactivate a member of a structure
+    siae = get_current_siae_or_404(request)
+    user = request.user
+    membership = SiaeMembership.objects.get(pk=request.POST["id_member_pk"])
+    print(request.POST["id_member_pk"], membership)
+    # TODO Guards
+    if user != membership.user and user in siae.active_admin_members:
+        membership.is_active = not membership.is_active
+        membership.updated_by = user
+        # membership.updated_at = ...
+        membership.save()
+
+    return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 
 
 @login_required

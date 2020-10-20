@@ -278,6 +278,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return self.members.filter(is_active=True, siaemembership__is_active=True)
 
     @property
+    def deactivated_members(self):
+        """
+        List of previous members of the structure, still active as user (from the model POV)
+        but deactivated by an admin at some point in time.
+        """
+        return self.members(is_active=True, siaemembership__is_active=False)
+
+    @property
     def active_admin_members(self):
         """
         Active admin members:
