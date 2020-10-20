@@ -373,7 +373,6 @@ ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
 # Typeform survey links to include in some emails
 ITOU_EMAIL_APPROVAL_SURVEY_URL = "https://itou.typeform.com/to/S7QwC0yy"
 ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL = "https://startupsbeta.typeform.com/to/X40eJC"
-ITOU_CHECK_SIRET_URL = "https://itou.typeform.com/to/RYfNLR79"
 
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.
