@@ -31,7 +31,7 @@ Merci d'avoir confirmé l'embauche d'un candidat sur la Plateforme de l'inclusio
 
 {% blocktranslate %}
 Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
-Prenez 30'' pour nous donner votre avis ! Cliquez sur : {{ survey_link }}
+Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ survey_link }}
 
 Merci de votre participation et à très bientôt sur la Plateforme !
 {% endblocktranslate %}

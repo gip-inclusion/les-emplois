@@ -204,7 +204,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             request,
             mark_safe(
                 _("Etes-vous satisfait de la Plateforme de l'inclusion ? ")
-                + f"<a href='{settings.ITOU_EMAIL_APPROVAL_SURVEY_LINK}' rel='noopener' target='_blank'>"
+                + f"<a href='{settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}' rel='noopener' target='_blank'>"
                 + _("Je donne mon avis")
                 + "</a>"
             ),
