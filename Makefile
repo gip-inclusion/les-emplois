@@ -38,7 +38,7 @@ setup_git_pre_commit_hook:
 # make django_admin
 # make django_admin COMMAND=dbshell
 # make django_admin COMMAND=createsuperuser
-# make django_admin COMMAND="dumpdata siaes.Siae" > ~/Desktop/siaes.json
+# make --silent django_admin COMMAND="dumpdata siaes.Siae" > itou/fixtures/django/02_siaes.json
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 
@@ -123,12 +123,3 @@ postgres_backups_clean:
 postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump -d itou -t cities_city > /backups/cities.sql"
 	docker cp itou_postgres:/backups/cities.sql itou/fixtures/postgres/
-
-# Delete and recreate the DB manually.
-# =============================================================================
-# docker-compose down
-# docker-compose up --no-deps postgres
-# make shell_on_postgres_container
-# PGPASSWORD=password psql -h postgres -U postgres
-# DROP DATABASE itou;
-# CREATE DATABASE itou OWNER itou;
