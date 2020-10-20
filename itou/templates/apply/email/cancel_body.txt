@@ -3,10 +3,10 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Candidature annulée" %}
+{% translate "Embauche annulée" %}
 
 {% blocktranslate with job_seeker_name=job_application.job_seeker.get_full_name %}
-Nous vous confirmons que la candidature de {{ job_seeker_name }} a bien été annulée.
+Nous vous confirmons que l'embauche de {{ job_seeker_name }} a bien été annulée.
 {% endblocktranslate %}
 
 ----------------------------------------------------------
