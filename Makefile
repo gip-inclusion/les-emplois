@@ -123,11 +123,3 @@ postgres_backups_clean:
 postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump -d itou -t cities_city > /backups/cities.sql"
 	docker cp itou_postgres:/backups/cities.sql itou/fixtures/postgres/
-
-# Delete and recreate the DB.
-# =============================================================================
-
-postgres_recreate:
-	# Drop and recreate an empty db. Run make populate_db afterwards to load fixtures.
-	docker-compose down -v
-	make run
