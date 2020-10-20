@@ -128,19 +128,6 @@ postgres_dump_cities:
 # =============================================================================
 
 postgres_recreate:
-	# 1) Drop and recreate an empty db.
-	docker-compose down
-	docker-compose up -d --no-deps postgres
-	sleep 5
-	docker exec -e PGPASSWORD='password' -ti itou_postgres psql -h postgres -U postgres -c 'DROP DATABASE IF EXISTS itou'
-	docker exec -e PGPASSWORD='password' -ti itou_postgres psql -h postgres -U postgres -c 'CREATE DATABASE itou OWNER itou'
-	# 2) Run the migrations non interactively.
-	docker-compose up -d django
-	# Wait for migrations to complete.
-	sleep 20
-	# Manually stop here and rollback to an older migration if you want to fix broken fixtures.
-	# 3) Load the fixtures into the db.
-	make populate_db
-	# 4) Run services as normal again.
-	docker-compose down
-	docker-compose up
+	# Drop and recreate an empty db. Run make populate_db afterwards to load fixtures.
+	docker-compose down -v
+	make run
