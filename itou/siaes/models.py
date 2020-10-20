@@ -275,11 +275,17 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def active_members(self):
-        return self.members.filter(is_active=True)
+        return self.members.filter(is_active=True, siaemembership__is_active=True)
 
     @property
     def active_admin_members(self):
-        return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self)
+        """
+        Active admin members:
+        active user/admin in this context means both:
+        * user.is_active: user is able to do something on the platform
+        * user.membership.is_active: is a member of this structure
+        """
+        return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self,)
 
     @property
     def signup_magic_link(self):

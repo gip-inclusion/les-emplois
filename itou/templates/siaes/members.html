@@ -24,7 +24,12 @@
             {% for member in members %}
                 <tr>
                     <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ member.user.get_full_name }}</td>
+                    <td>
+                        {{ member.user.get_full_name }}
+                        {% if member.user in siae.active_admin_members %}
+                            {% include "includes/icon.html" with icon="key" %}
+                        {% endif %}
+                    </td>
                     <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
                     <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
                 </tr>
