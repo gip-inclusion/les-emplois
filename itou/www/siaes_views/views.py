@@ -186,7 +186,7 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
         if not membership.is_active:
             # deactivation only for now...
             siae.new_member_deactivation_email(membership.user).send()
-            # If the deactivated member is currently connected, session is killed 
+            # If the deactivated member is currently connected, session is killed
             # (even if they have multiple memberships)
             # If it takes too long, this part can become async
             # If any better solution, I buy it..
