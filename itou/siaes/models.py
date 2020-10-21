@@ -364,10 +364,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     def grace_period_has_expired(self):
         return not self.is_active and timezone.now() > self.grace_period_end_date
 
-    @property
-    def members1(self):
-        return self.members
-
 
 class SiaeMembership(models.Model):
     """Intermediary model between `User` and `Siae`."""

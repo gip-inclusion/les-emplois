@@ -1,11 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
+from django.views.decorators.http import require_POST
 
-from itou.prescribers.models import PrescriberOrganization
+from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
@@ -46,8 +48,53 @@ def members(request, template_name="prescribers/members.html"):
     """
     organization = get_current_org_or_404(request)
 
-    members = organization.prescribermembership_set.select_related("user").all().order_by("joined_at")
+    members = (
+        organization.prescribermembership_set.filter(is_active=True).select_related("user").all().order_by("joined_at")
+    )
     pending_invitations = organization.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    context = {"organization": organization, "members": members, "pending_invitations": pending_invitations}
+    deactivated_members = (
+        organization.prescribermembership_set.filter(is_active=False)
+        .select_related("user")
+        .all()
+        .order_by("updated_at")
+    )
+
+    context = {
+        "organization": organization,
+        "members": members,
+        "pending_invitations": pending_invitations,
+        "deactivated_members": deactivated_members,
+    }
     return render(request, template_name, context)
+
+
+@login_required
+@require_POST
+def toggle_membership(request, membership_id, template_name="prescribers/members.html"):
+    """
+    Deactivate (or later reactivate) a member of a structure
+    """
+    organization = get_current_org_or_404(request)
+    user = request.user
+    membership = PrescriberMembership.objects.get(pk=membership_id)
+
+    if user != membership.user and user in organization.active_admin_members:
+        membership.toggleUserMembership(membership.user)
+        membership.save()
+
+        if not membership.is_active:
+            # only deactivation for now...
+            messages.success(request, _("Retrait du collaborateur effectué !"))
+            organization.new_member_deactivation_email(membership.user).send()
+            # If the deactivated member is currently connected, session is killed
+            # (even if they have multiple memberships)
+            # If it takes too long, this part can become async
+            # If any better solution, I buy it..
+            sessions_to_kill = []
+            for session in Session.objects.all():
+                if session.get_decoded().get("_auth_user_id") == str(membership.user.pk):
+                    sessions_to_kill.append(session)
+            Session.objects.filter(pk__in=sessions_to_kill).delete()
+
+    return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))

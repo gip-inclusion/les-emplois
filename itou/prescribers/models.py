@@ -219,7 +219,25 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     @property
     def active_members(self):
-        return self.members.filter(is_active=True)
+        return self.members.filter(is_active=True, prescribermembership__is_active=True)
+
+    @property
+    def deactivated_members(self):
+        """
+        List of previous members of the structure, still active as user (from the model POV)
+        but deactivated by an admin at some point in time.
+        """
+        return self.members(is_active=True, prescribermembership__is_active=False)
+
+    @property
+    def active_admin_members(self):
+        """
+        Active admin members:
+        active user/admin in this context means both:
+        * user.is_active: user is able to do something on the platform
+        * user.membership.is_active: is a member of this structure
+        """
+        return self.active_members.filter(prescribermembership__is_admin=True, prescribermembership__organization=self)
 
     def get_card_url(self):
         if not self.is_authorized:
@@ -289,6 +307,16 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def new_member_deactivation_email(self, user):
+        """
+        Send email when an admin of the structure disable the membership of a given user (deactivation).
+        """
+        to = [user.email]
+        context = {"siae": self}
+        subject = "siaes/email/new_member_deactivation_email_subject.txt"
+        body = "siaes/email/new_member_deactivation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""
@@ -309,3 +337,11 @@ class PrescriberMembership(models.Model):
 
     class Meta:
         unique_together = ("user_id", "organization_id")
+
+    def toggleUserMembership(self, user):
+        """
+        Toggles the prescriber organization membership of given user
+        """
+        self.is_active = not self.is_active
+        self.updated_at = timezone.now()
+        return self.is_active

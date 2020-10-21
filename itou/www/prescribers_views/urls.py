@@ -10,4 +10,5 @@ urlpatterns = [
     path("edit_organization", views.edit_organization, name="edit_organization"),
     path("colleagues", views.members, name="members"),
     path("<int:org_id>/card", views.card, name="card"),
+    path("toggle_membership/<int:membership_id>", views.toggle_membership, name="toggle_membership"),
 ]
