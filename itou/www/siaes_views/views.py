@@ -169,18 +169,20 @@ def members(request, template_name="siaes/members.html"):
 
 @login_required
 @require_POST
-def toggle_membership(request, template_name="siaes/members.html"):
-    # activate or deactivate a member of a structure
+def toggle_membership(request, membership_id, template_name="siaes/members.html"):
+    """
+    Deactivate (or later reactivate) a member of a structure
+    """
     siae = get_current_siae_or_404(request)
     user = request.user
-    membership = SiaeMembership.objects.get(pk=request.POST["id_member_pk"])
-    print(request.POST["id_member_pk"], membership)
-    # TODO Guards
+    membership = SiaeMembership.objects.get(pk=membership_id)
+
     if user != membership.user and user in siae.active_admin_members:
-        membership.is_active = not membership.is_active
-        membership.updated_by = user
-        # membership.updated_at = ...
+        membership.toggleUserMembership(membership.user)
         membership.save()
+        if not membership.is_active:
+            # deactivation only for now...
+            siae.new_member_deactivation_email(membership.user).send()
 
     return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 
