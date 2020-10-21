@@ -180,9 +180,21 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
     if user != membership.user and user in siae.active_admin_members:
         membership.toggleUserMembership(membership.user)
         membership.save()
+        # Kill active sessions for this user:
+        from django.contrib.sessions.models import Session
+
         if not membership.is_active:
             # deactivation only for now...
             siae.new_member_deactivation_email(membership.user).send()
+            # If the deactivated member is currently connected, session is killed 
+            # (even if they have multiple memberships)
+            # If it takes too long, this part can become async
+            # If any better solution, I buy it..
+            sessions_to_kill = []
+            for session in Session.objects.all():
+                if session.get_decoded().get("_auth_user_id") == str(membership.user.pk):
+                    sessions_to_kill.append(session)
+            Session.objects.filter(pk__in=sessions_to_kill).delete()
 
     return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 
