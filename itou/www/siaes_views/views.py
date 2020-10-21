@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.sessions.models import Session
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -180,8 +181,6 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
     if user != membership.user and user in siae.active_admin_members:
         membership.toggleUserMembership(membership.user)
         membership.save()
-        # Kill active sessions for this user:
-        from django.contrib.sessions.models import Session
 
         if not membership.is_active:
             # deactivation only for now...
