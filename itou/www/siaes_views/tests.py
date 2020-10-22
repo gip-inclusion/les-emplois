@@ -1,12 +1,18 @@
 from unittest import mock
 
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import (
+    SiaeFactory,
+    SiaeWith2MembershipsFactory,
+    SiaeWithMembershipAndJobsFactory,
+    SiaeWithMembershipFactory,
+)
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -513,3 +519,99 @@ class BlockJobApplicationsTest(TestCase):
         siae = Siae.objects.get(siret=siae.siret)
         self.assertTrue(siae.block_job_applications)
         self.assertNotEqual(block_date, siae.job_applications_blocked_at)
+
+
+class UserMembershipDeactivationTest(TestCase):
+    def test_self_deactivation(self):
+        """
+        A user, even if admin, can't self-deactivate
+        (must be done by another admin)
+        """
+        siae = SiaeWithMembershipFactory()
+        admin = siae.members.first()
+        memberships = admin.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Trying to change self membership is not allowed
+        # but does not raise an error (does nothing)
+        membership.refresh_from_db()
+        self.assertTrue(membership.is_active)
+
+    def test_deactivate_user(self):
+        """
+        Standard use case of user deactivation.
+        Everything should be fine ...
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin = siae.members.first()
+        guest = siae.members.all()[1]
+        siae.members.add(guest)
+
+        memberships = guest.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        # User should be deactivated now
+        membership.refresh_from_db()
+        self.assertFalse(membership.is_active)
+
+        # Check mailbox
+        # User must have been notified of deactivation (we're human after all)
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("[Désactivation] Vous n'étes plus membre d'une organisation", email.subject)
+        self.assertIn("Un administrateur vous a retiré d'une structure sur la Plateforme de l'inclusion", email.body)
+        self.assertEqual(email.to[0], guest.email)
+
+    def test_deactivate_with_no_perms(self):
+        """
+        Non-admin user can't change memberships
+        """
+        siae = SiaeWith2MembershipsFactory()
+        guest = siae.members.all()[1]
+        siae.members.add(guest)
+        memberships = guest.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_reactivate_user(self):
+        """
+        Reactivate a previously deactivated user
+        Not yet in scope: but should work
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin = siae.members.first()
+        guest = siae.members.all()[1]
+        siae.members.add(guest)
+
+        memberships = guest.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        # Call a second time to reactivate
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        membership.refresh_from_db()
+        self.assertTrue(membership.is_active)
+
+        # No email sent at the moment (reactivation is not enabled)
+
+    # TODO check login ;w
