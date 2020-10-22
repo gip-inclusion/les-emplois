@@ -28,7 +28,6 @@ class ItouCurrentOrganizationMiddleware:
 
                 if not siae_set.filter(pk=current_siae_pk).exists():
                     first_active_siae = siae_set.first()
-                    print(first_active_siae, siae_set)
                     if first_active_siae:
                         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
                     elif request.path not in [

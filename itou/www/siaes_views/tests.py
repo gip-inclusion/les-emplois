@@ -595,7 +595,6 @@ class UserMembershipDeactivationTest(TestCase):
         siae = SiaeWith2MembershipsFactory()
         admin = siae.members.first()
         guest = siae.members.all()[1]
-        siae.members.add(guest)
 
         memberships = guest.siaemembership_set.all()
         membership = memberships.first()
