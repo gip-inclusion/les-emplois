@@ -22,12 +22,13 @@ class ItouCurrentOrganizationMiddleware:
         user = request.user
 
         if user.is_authenticated:
-
             if user.is_siae_staff:
                 current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-                siae_set = user.siae_set.active_or_in_grace_period()
+                siae_set = user.siae_set.filter(siaemembership__is_active=True).active_or_in_grace_period()
+
                 if not siae_set.filter(pk=current_siae_pk).exists():
                     first_active_siae = siae_set.first()
+                    print(first_active_siae, siae_set)
                     if first_active_siae:
                         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
                     elif request.path not in [
@@ -40,14 +41,22 @@ class ItouCurrentOrganizationMiddleware:
                         # - pages of the invitation process (including login)
                         #   as being invited to a new active siae is the only
                         #   way for an inactive siae user to be ressucitated.
-                        message = (
-                            "Nous sommes désolés, votre compte n'est "
-                            "malheureusement plus actif car la ou les "
-                            "structures associées ne sont plus "
-                            "conventionnées. Nous espérons cependant "
-                            "avoir l'occasion de vous accueillir de "
-                            "nouveau sur la Plateforme."
-                        )
+                        if not user.is_siae_staff_with_org:
+                            message = (
+                                "Nous sommes désolé, votre compte n'est "
+                                "actuellement rattaché à aucune structure.<br>"
+                                "Nous espérons cependant avoir l'occasion de vous accueillir de "
+                                "nouveau sur la Plateforme."
+                            )
+                        else:
+                            message = (
+                                "Nous sommes désolés, votre compte n'est "
+                                "malheureusement plus actif car la ou les "
+                                "structures associées ne sont plus "
+                                "conventionnées. Nous espérons cependant "
+                                "avoir l'occasion de vous accueillir de "
+                                "nouveau sur la Plateforme."
+                            )
                         message = safestring.mark_safe(message)
                         messages.warning(request, _(message))
                         return redirect("account_logout")

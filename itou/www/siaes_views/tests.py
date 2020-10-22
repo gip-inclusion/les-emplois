@@ -614,4 +614,10 @@ class UserMembershipDeactivationTest(TestCase):
 
         # No email sent at the moment (reactivation is not enabled)
 
-    # TODO check login ;w
+    def test_user_with_no_siae_left(self):
+        """
+        Former SIAE members with no SIAE membership left must not
+        be able to log in.
+        They are still "active" technically speaking, so if they
+        are activated/invited again, they will be able to log in.
+        """
