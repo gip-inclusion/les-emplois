@@ -183,7 +183,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def is_prescriber_with_org(self):
-        return self.is_prescriber and self.prescriberorganization_set.exists()
+        return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
 
     @property
     def has_external_data(self):
@@ -192,6 +192,16 @@ class User(AbstractUser, AddressMixin):
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined
         return time_since_date_joined.days < 7
+
+    @property
+    def is_siae_staff_with_org(self):
+        """
+        Useful to identify users deactivated as member of a SIAE
+        and without any membership left.
+        They are in a "dangling" status: still active but unable to login
+        because not member of any SIAE.
+        """
+        return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
 
 def get_allauth_account_user_display(user):

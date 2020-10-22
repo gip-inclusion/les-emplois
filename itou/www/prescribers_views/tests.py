@@ -176,4 +176,27 @@ class UserMembershipDeactivationTest(TestCase):
 
         # No email sent at the moment (reactivation is not enabled)
 
-    # TODO check login ;w
+    def test_deactivated_prescriber_is_orienter(self):
+        """
+        A prescriber deactivated from a prescriber organization
+        and without any membership becomes an "orienteur".
+        As such he must be able to login.
+        """
+        organization = PrescriberOrganizationWithMembershipFactory()
+        admin = organization.members.first()
+        guest = PrescriberFactory()
+        organization.members.add(guest)
+
+        memberships = guest.prescribermembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        # guest is now an orienter
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
