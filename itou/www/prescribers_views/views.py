@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -88,5 +89,7 @@ def toggle_membership(request, membership_id, template_name="prescribers/members
             messages.success(request, _("Retrait du collaborateur effectué !"))
             organization.new_member_deactivation_email(membership.user).send()
             kill_sessions_for_user(membership.user.pk)
+    else:
+        raise PermissionDenied
 
     return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))

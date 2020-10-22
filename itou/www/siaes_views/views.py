@@ -183,10 +183,11 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
         membership.save()
 
         if not membership.is_active:
-            # only deactivation for now...
             messages.success(request, _("Retrait du collaborateur effectué !"))
             siae.new_member_deactivation_email(membership.user).send()
             kill_sessions_for_user(membership.user.pk)
+    else:
+        raise PermissionDenied
 
     return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 

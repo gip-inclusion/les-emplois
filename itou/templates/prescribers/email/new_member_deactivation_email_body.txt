@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Un administrateur vous a retiré d'une structure sur la Plateforme de l'inclusion !" %}
+{% translate "Un administrateur vous a retiré d'une structure sur la Plateforme de l'inclusion" %}
 
 {% translate "Structure :" %}
 

@@ -36,6 +36,7 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(PrescriberFactory)
     organization = factory.SubFactory(PrescriberOrganizationFactory)
     is_admin = True
+    is_active = True
 
 
 class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory):
