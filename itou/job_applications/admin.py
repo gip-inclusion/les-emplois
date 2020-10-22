@@ -21,6 +21,11 @@ class JobsInline(admin.TabularInline):
     model = models.JobApplication.selected_jobs.through
     extra = 1
     raw_id_fields = ("siaejobdescription",)
+    can_delete = False
+    readonly_fields = ("siaejobdescription",)
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
@@ -53,12 +58,27 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "to_siae__department",
     )
     readonly_fields = (
-        "created_at",
-        "updated_at",
+        "job_seeker",
+        "sender",
+        "sender_kind",
+        "sender_siae",
+        "sender_prescriber_organization",
+        "to_siae",
+        "state",
+        "message",
+        "answer",
+        "refusal_reason",
+        "hiring_start_at",
+        "hiring_end_at",
+        "hiring_without_approval",
+        "approval_number_sent_by_email",
+        "approval_delivery_mode",
         "approval_number_sent_at",
         "approval_manually_delivered_by",
         "approval_manually_refused_by",
         "approval_manually_refused_at",
+        "created_at",
+        "updated_at",
     )
     inlines = (JobsInline, TransitionLogInline)
     search_fields = ("pk", "to_siae__siret", "job_seeker__email", "sender__email")
