@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -9,6 +8,7 @@ from django.views.decorators.http import require_POST
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
 
@@ -84,17 +84,9 @@ def toggle_membership(request, membership_id, template_name="prescribers/members
         membership.save()
 
         if not membership.is_active:
-            # only deactivation for now...
+            # Only deactivation for now...
             messages.success(request, _("Retrait du collaborateur effectué !"))
             organization.new_member_deactivation_email(membership.user).send()
-            # If the deactivated member is currently connected, session is killed
-            # (even if they have multiple memberships)
-            # If it takes too long, this part can become async
-            # If any better solution, I buy it..
-            sessions_to_kill = []
-            for session in Session.objects.all():
-                if session.get_decoded().get("_auth_user_id") == str(membership.user.pk):
-                    sessions_to_kill.append(session)
-            Session.objects.filter(pk__in=sessions_to_kill).delete()
+            kill_sessions_for_user(membership.user.pk)
 
     return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))

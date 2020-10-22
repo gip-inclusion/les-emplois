@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.sessions.models import Session
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -12,6 +11,7 @@ from django.views.decorators.http import require_POST
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
 
@@ -186,15 +186,7 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
             # only deactivation for now...
             messages.success(request, _("Retrait du collaborateur effectué !"))
             siae.new_member_deactivation_email(membership.user).send()
-            # If the deactivated member is currently connected, session is killed
-            # (even if they have multiple memberships)
-            # If it takes too long, this part can become async
-            # If any better solution, I buy it..
-            sessions_to_kill = []
-            for session in Session.objects.all():
-                if session.get_decoded().get("_auth_user_id") == str(membership.user.pk):
-                    sessions_to_kill.append(session)
-            Session.objects.filter(pk__in=sessions_to_kill).delete()
+            kill_sessions_for_user(membership.user.pk)
 
     return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 
