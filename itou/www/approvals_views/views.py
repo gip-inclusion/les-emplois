@@ -10,16 +10,15 @@ from django.utils.translation import gettext as _
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.utils.pdf import HtmlToPdf
-from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.perms.siae import require_current_siae_is_active_or_in_grace_period
 
 
 @login_required
-def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
-
-    siae = get_current_siae_or_404(request)
+@require_current_siae_is_active_or_in_grace_period()
+def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html", current_siae=None):
 
     queryset = JobApplication.objects.select_related("job_seeker", "approval", "to_siae")
-    job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
+    job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=current_siae)
 
     if not job_application.can_download_approval_as_pdf:
         raise Http404(

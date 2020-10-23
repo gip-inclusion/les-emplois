@@ -24,14 +24,24 @@
         </div>
     {% endif %}
 
-    {% if current_siae and not current_siae.is_active %}
+    {% if current_siae and must_update_financial_annex %}
         <div class="alert alert-warning" role="alert">
-            {% blocktranslate with grace_period_end_date=current_siae.grace_period_end_date|date:"d F Y" %}
-                La DGEFP nous indique que votre structure n'est plus conventionnée.
-                Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
-                A compter du {{ grace_period_end_date }}, l'accès à ce tableau de bord ne sera plus possible.
-                Pour toute question, veuillez contacter notre support.
-            {% endblocktranslate %}
+            {% trans "La DGEFP nous indique que votre structure n'est plus conventionnée." %}
+            {% if not current_siae.is_active %}
+                {# Not shown for user created siaes. #}
+                {% trans "Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre." %}
+            {% endif %}
+            {% if user_is_siae_admin %}
+                {% trans "Veuillez dès que possible régulariser votre situation en sélectionnant une annexe financière valide" %}
+                <a href="{% url 'siaes_views:show_financial_annexes' %}">{% translate "ici" %}</a>.
+            {% else %}
+                {% with current_siae.active_admin_members.first as admin %}
+                    {# For security, display only the first char of the last name. #}
+                    {% blocktranslate with first_name=admin.first_name|title last_name_first_char=admin.last_name|slice:1 %}
+                        Veuillez contacter votre administrateur ({{ first_name }} {{ last_name_first_char }}) pour qu'il ou elle régularise la situation de votre structure.
+                    {% endblocktranslate %}
+                {% endwith %}
+            {% endif %}
         </div>
     {% endif %}
 
@@ -137,7 +147,7 @@
                 {% endif %}
             {% endwith %}
 
-        {% endif %}
+        {% endif %}{# end of if user.is_job_seeker #}
 
         {% if user.is_prescriber %}
 
@@ -193,25 +203,28 @@
                 </div>
             </div>
 
-        {% endif %}
+        {% endif %}{# end of if user.is_prescriber #}
 
         {% if user.is_siae_staff %}
+
             <div class="card">
                 <h5 class="card-header">
                     {% translate "Ma structure" %}
                     (ID {{ current_siae.id }})
                 </h5>
                 <div class="card-body">
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="box" %}
-                        <a href="{% url 'siaes_views:edit_siae' %}">
-                            {% translate "Modifier les informations de l'établissement" %}
-                        </a>
-                        /
-                        <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            {% translate "Voir la fiche publique" %}
-                        </a>
-                    </p>
+                    {% if current_siae.is_active_or_in_grace_period %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="box" %}
+                            <a href="{% url 'siaes_views:edit_siae' %}">
+                                {% translate "Modifier les informations de l'établissement" %}
+                            </a>
+                            /
+                            <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                {% translate "Voir la fiche publique" %}
+                            </a>
+                        </p>
+                    {% endif %}
                     {% if current_siae.is_active %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
@@ -220,13 +233,30 @@
                             </a>
                         </p>
                     {% endif %}
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="{% url 'siaes_views:configure_jobs' %}">
-                            {% translate "Configurer les descriptions de postes" %}
-                        </a>
-                    </p>
-                    {% if current_siae.is_active and user_is_siae_admin %}
+                    {% if current_siae.is_active_or_in_grace_period %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="briefcase" %}
+                            <a href="{% url 'siaes_views:configure_jobs' %}">
+                                {% translate "Configurer les descriptions de postes" %}
+                            </a>
+                        </p>
+                    {% endif %}
+                    {% if can_show_financial_annexes %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="check-circle" %}
+                            <a href="{% url 'siaes_views:show_financial_annexes' %}">{% translate "Gérer mes annexes financières" %}</a>
+                            {% if must_update_financial_annex %}
+                                <span class="badge badge-danger">{% translate "Action requise" %}</span>
+                            {% endif %}
+                        </p>
+                    {% endif %}
+                    {% if not user_is_siae_admin and not current_siae.is_active_or_in_grace_period %}
+                        <p class="card-text">
+                            {# Empty dashboard. #}
+                            Aucune action possible.
+                        </p>
+                    {% endif %}
+                    {% if user_is_siae_admin and current_siae.is_active %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
                             <a href="{% url 'siaes_views:create_siae' %}">{% translate "Créer/rejoindre une autre structure" %}</a>
@@ -234,53 +264,58 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="card">
-                <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
-                <div class="card-body">
-                    {% for category in job_applications_categories %}
-                        {% if category.counter %}
-                            <p class="card-text">
-                                {% include "includes/icon.html" with icon=category.icon %}
-                                <a href="{{ category.url }}">{{ category.name }}</a>
-                                <span class="badge {{ category.badge }}">{{ category.counter }}</span>
-                            </p>
-                        {% endif %}
-                    {% endfor %}
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="log-in" %}
-                        <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
-                            {% if current_siae.is_subject_to_eligibility_rules %}
-                                {% translate "Obtenir un PASS IAE (candidature spontanée)" %}
-                            {% else %}
-                                {% translate "Candidature spontanée" %}
+
+            {% if current_siae.is_active_or_in_grace_period %}
+                <div class="card">
+                    <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
+                    <div class="card-body">
+                        {% for category in job_applications_categories %}
+                            {% if category.counter %}
+                                <p class="card-text">
+                                    {% include "includes/icon.html" with icon=category.icon %}
+                                    <a href="{{ category.url }}">{{ category.name }}</a>
+                                    <span class="badge {{ category.badge }}">{{ category.counter }}</span>
+                                </p>
                             {% endif %}
-                        </a>
-                    </p>
-                    <p class="card-text">
-                        {% include "includes/icon.html" with icon="settings" %}
-                        <a href="{% url 'siaes_views:block_job_applications' %}">
-                            {% if current_siae.block_job_applications %}
-                                {% translate "Recevoir de nouvelles candidatures "%}
-                            {% else %}
-                                {% translate "Bloquer les nouvelles candidatures "%}
-                            {% endif%}
-                        </a>
-                    </p>
-                    {% if current_siae.is_subject_to_eligibility_rules %}
+                        {% endfor %}
                         <p class="card-text">
-                            {% include "includes/icon.html" with icon="book-open" %}
-                            <a
-                                href="https://doc.inclusion.beta.gouv.fr/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
-                                target="_blank">
-                                    {% translate "Liste des critères d'éligibilité" %}
+                            {% include "includes/icon.html" with icon="log-in" %}
+                            <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
+                                {% if current_siae.is_subject_to_eligibility_rules %}
+                                    {% translate "Obtenir un PASS IAE (candidature spontanée)" %}
+                                {% else %}
+                                    {% translate "Candidature spontanée" %}
+                                {% endif %}
                             </a>
                         </p>
-                    {% endif %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="settings" %}
+                            <a href="{% url 'siaes_views:block_job_applications' %}">
+                                {% if current_siae.block_job_applications %}
+                                    {% translate "Recevoir de nouvelles candidatures "%}
+                                {% else %}
+                                    {% translate "Bloquer les nouvelles candidatures "%}
+                                {% endif%}
+                            </a>
+                        </p>
+                        {% if current_siae.is_subject_to_eligibility_rules %}
+                            <p class="card-text">
+                                {% include "includes/icon.html" with icon="book-open" %}
+                                <a
+                                    href="https://doc.inclusion.beta.gouv.fr/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
+                                    target="_blank">
+                                        {% translate "Liste des critères d'éligibilité" %}
+                                </a>
+                            </p>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+
+        {% endif %}{# end of if user.is_siae_staff #}
 
         {% if user.is_stats_vip or user.is_superuser %}
+
             <div class="card">
                 <h5 class="card-header">{% translate "Statistiques et pilotage" %}</h5>
                 <div class="card-body">
@@ -300,6 +335,7 @@
                     </p>
                 </div>
             </div>
+
         {% endif %}
 
     </div>

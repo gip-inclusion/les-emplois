@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 
 from itou.utils.apis.metabase import metabase_embedded_url
-from itou.utils.perms.decorators import can_view_stats
+from itou.utils.perms.stats import can_view_stats
 
 
 # Embedding Metabase dashboards:

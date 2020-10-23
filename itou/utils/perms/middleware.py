@@ -1,9 +1,4 @@
 from django.conf import settings
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.urls import reverse
-from django.utils import safestring
-from django.utils.translation import gettext as _
 
 
 class ItouCurrentOrganizationMiddleware:
@@ -25,32 +20,13 @@ class ItouCurrentOrganizationMiddleware:
 
             if user.is_siae_staff:
                 current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-                siae_set = user.siae_set.active_or_in_grace_period()
+                siae_set = user.siae_set
                 if not siae_set.filter(pk=current_siae_pk).exists():
-                    first_active_siae = siae_set.first()
-                    if first_active_siae:
-                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
-                    elif request.path not in [
-                        reverse("account_logout"),
-                        reverse("account_login"),
-                    ] and not request.path.startswith("/invitations/"):
-                        # SIAE user has no active SIAE and thus must not be able to access any page,
-                        # thus we force a logout with a few exceptions:
-                        # - logout (to avoid infinite redirect loop)
-                        # - pages of the invitation process (including login)
-                        #   as being invited to a new active siae is the only
-                        #   way for an inactive siae user to be ressucitated.
-                        message = (
-                            "Nous sommes désolés, votre compte n'est "
-                            "malheureusement plus actif car la ou les "
-                            "structures associées ne sont plus "
-                            "conventionnées. Nous espérons cependant "
-                            "avoir l'occasion de vous accueillir de "
-                            "nouveau sur la Plateforme."
-                        )
-                        message = safestring.mark_safe(message)
-                        messages.warning(request, _(message))
-                        return redirect("account_logout")
+                    first_siae = (
+                        siae_set.active().first() or siae_set.active_or_in_grace_period().first() or siae_set.first()
+                    )
+                    if first_siae:
+                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_siae.pk
 
             elif user.is_prescriber:
                 # Prescriber users can now select an organization

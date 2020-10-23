@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _, ngettext as __
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.perms.siae import require_current_siae_is_active_or_in_grace_period
 from itou.utils.urls import get_safe_url
 from itou.www.invitations_views.forms import (
     NewPrescriberWithOrgInvitationFormSet,
@@ -114,9 +114,9 @@ def join_prescriber_organization(request, invitation_id):
 
 
 @login_required
-def invite_siae_staff(request, template_name="invitations_views/create.html"):
-    siae = get_current_siae_or_404(request)
-    form_kwargs = {"sender": request.user, "siae": siae}
+@require_current_siae_is_active_or_in_grace_period()
+def invite_siae_staff(request, template_name="invitations_views/create.html", current_siae=None):
+    form_kwargs = {"sender": request.user, "siae": current_siae}
     formset = NewSiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():

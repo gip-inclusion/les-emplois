@@ -20,10 +20,23 @@ from itou.www.dashboard.forms import EditUserInfoForm
 
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
+    must_update_financial_annex = False
+    can_show_financial_annexes = False
     job_applications_categories = []
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
+
+        # This ugly code will be simplified once we no longer consider
+        # user created siaes as always active. But for now, user created siaes
+        # are considered always active and still we have to anticipate
+        # and push their admins to select a correct AF early.
+        if siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS:
+            must_update_financial_annex = (siae.source == Siae.SOURCE_ASP and not siae.is_active) or (
+                siae.source == Siae.SOURCE_USER_CREATED and (not siae.convention or not siae.convention.is_active)
+            )
+            can_show_financial_annexes = siae.has_admin(request.user)
+
         job_applications_categories = [
             {
                 "name": _("Candidatures à traiter"),
@@ -57,6 +70,8 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
 
     context = {
         "job_applications_categories": job_applications_categories,
+        "must_update_financial_annex": must_update_financial_annex,
+        "can_show_financial_annexes": can_show_financial_annexes,
     }
 
     return render(request, template_name, context)
@@ -126,12 +141,12 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 @require_POST
 def switch_siae(request):
     """
-    Switch to the dashboard of another SIAE of the same SIREN.
+    Switch to the dashboard of another SIAE of the user.
     """
     dashboard_url = reverse_lazy("dashboard:index")
 
     pk = request.POST["siae_id"]
-    queryset = Siae.objects.active_or_in_grace_period().member_required(request.user)
+    queryset = Siae.objects.member_required(request.user)
     siae = get_object_or_404(queryset, pk=pk)
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
 

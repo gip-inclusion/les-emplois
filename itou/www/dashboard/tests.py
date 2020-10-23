@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import gettext as _
 
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
+    SiaeAfterGracePeriodWithMembershipFactory,
     SiaeFactory,
     SiaePendingGracePeriodFactory,
     SiaeWithMembershipFactory,
@@ -32,20 +32,30 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-    def test_user_with_inactive_siae_cannot_login_after_grace_period(self):
-        siae = SiaeAfterGracePeriodFactory()
-        user = SiaeStaffFactory()
-        siae.members.add(user)
+        # User can access basic views.
+        url = reverse("siaes_views:configure_jobs")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_with_inactive_siae_can_still_login_after_grace_period(self):
+        siae = SiaeAfterGracePeriodWithMembershipFactory()
+        user = siae.members.get()
+        assert siae.has_admin(user)
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
         url = reverse("dashboard:index")
-        response = self.client.get(url, follow=True)
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("account_logout"))
 
-        expected_message = _("votre compte n'est malheureusement plus actif")
-        self.assertContains(response, expected_message)
+        # User cannot access basic views.
+        url = reverse("siaes_views:configure_jobs")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        # User can still access AF interface to fix its convention.
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
 
 class EditUserInfoViewTest(TestCase):
@@ -139,7 +149,7 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], related_siae)
 
-    def test_cannot_switch_to_inactive_siae_after_grace_period(self):
+    def test_can_still_switch_to_inactive_siae_after_grace_period(self):
         siae = SiaeWithMembershipFactory()
         user = siae.members.first()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -152,14 +162,12 @@ class SwitchSiaeTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], siae)
 
-        # Switching to that siae is not even possible in practice because
-        # it does not even show up in the menu.
         url = reverse("dashboard:switch_siae")
         response = self.client.post(url, data={"siae_id": related_siae.pk})
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 302)
 
-        # User is still working on the main active siae.
+        # User has indeed switched.
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["current_siae"], siae)
+        self.assertEqual(response.context["current_siae"], related_siae)

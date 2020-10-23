@@ -328,13 +328,21 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def grace_period_end_date(self):
+        if not self.convention:
+            # Fake date for when there is no convention thus we have
+            # no idea when the convention was actually deactivated.
+            # Date is in the past thus we will always consider that
+            # the siae is over its grace period.
+            return self.created_at
+        if not self.convention.deactivated_at:
+            return self.created_at
         return self.convention.deactivated_at + timezone.timedelta(
             days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS
         )
 
     @property
-    def grace_period_has_expired(self):
-        return not self.is_active and timezone.now() > self.grace_period_end_date
+    def is_active_or_in_grace_period(self):
+        return self.is_active or timezone.now() <= self.grace_period_end_date
 
 
 class SiaeMembership(models.Model):
@@ -547,10 +555,21 @@ class SiaeFinancialAnnex(models.Model):
         verbose_name = _("Annexe financière")
         verbose_name_plural = _("Annexes financières")
 
+    def __str__(self):
+        return f"{self.number}"
+
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def number_prefix(self):
+        return self.number[:-4]  # all but last 4 characters
+
+    @property
+    def number_suffix(self):
+        return self.number[-4:]  # last 4 characters
 
     @property
     def is_active(self):

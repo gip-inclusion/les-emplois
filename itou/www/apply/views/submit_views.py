@@ -48,19 +48,21 @@ def get_approvals_wrapper(request, job_seeker):
 
 
 @login_required
-def start(request, siae_pk):
+def start(request, siae_pk, current_siae=None):
     """
     Entry point.
     """
-
     siae = get_object_or_404(Siae, pk=siae_pk)
+
+    if not siae.is_active_or_in_grace_period:
+        raise PermissionDenied(_("Cette structure est déconventionnée et ne peut plus recevoir de candidatures."))
 
     if request.user.is_siae_staff and not siae.has_member(request.user):
         raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
 
     # Refuse all applications except those issued by the SIAE
     if siae.block_job_applications and not siae.has_member(request.user):
-        raise Http404(_("Cette organisation n'accepte plus de candidatures pour le moment."))
+        raise Http404(_("Cette structure n'accepte plus de candidatures pour le moment."))
 
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
