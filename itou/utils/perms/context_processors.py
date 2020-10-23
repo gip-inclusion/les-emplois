@@ -26,8 +26,11 @@ def get_current_organization_and_perms(request):
         if siae_pk:
             # Sorry I could not find an elegant DNRY one-query solution ¯\_(ツ)_/¯
             user_siae_set_pks = request.user.siae_set.active_or_in_grace_period().values_list("pk", flat=True)
+            # SIAE members can be deactivated, hence filtering on `membership.is_active`
             memberships = (
-                request.user.siaemembership_set.select_related("siae").filter(siae__pk__in=user_siae_set_pks).all()
+                request.user.siaemembership_set.select_related("siae")
+                .filter(siae__pk__in=user_siae_set_pks, is_active=True)
+                .all()
             )
             user_siaes = [membership.siae for membership in memberships]
             for membership in memberships:
@@ -43,7 +46,8 @@ def get_current_organization_and_perms(request):
         prescriber_org_pk = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
 
         if prescriber_org_pk:
-            memberships = current_user.prescribermembership_set.select_related("organization")
+            # Membership can now be deactivated, hence filtering on `membership.is_active` (same as SIAE above)
+            memberships = current_user.prescribermembership_set.select_related("organization").filter(is_active=True)
 
             for membership in memberships:
                 # Same as above:
