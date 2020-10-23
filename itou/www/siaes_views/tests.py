@@ -620,3 +620,23 @@ class UserMembershipDeactivationTest(TestCase):
         They are still "active" technically speaking, so if they
         are activated/invited again, they will be able to log in.
         """
+        siae = SiaeWith2MembershipsFactory()
+        admin = siae.members.first()
+        guest = siae.members.all()[1]
+
+        memberships = guest.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.client.logout()
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        # should be redirected to logout
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_logout"))
