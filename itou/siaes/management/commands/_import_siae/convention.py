@@ -53,15 +53,16 @@ def get_creatable_conventions():
     creatable_conventions = []
 
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=True).select_related("convention"):
-        asp_id = SIRET_TO_ASP_ID[siae.siret]
-        siret_signature = ASP_ID_TO_SIRET_SIGNATURE.get(asp_id)
 
+        asp_id = SIRET_TO_ASP_ID.get(siae.siret)
         if asp_id not in ASP_ID_TO_SIRET_SIGNATURE:
             # Some inactive siaes are absent in the latest ASP exports but
             # are still present in db because they have members and/or job applications.
             # We cannot build a convention object for those.
             assert not siae.is_active
             continue
+
+        siret_signature = ASP_ID_TO_SIRET_SIGNATURE.get(asp_id)
 
         convention = SiaeConvention(
             siret_signature=siret_signature,
