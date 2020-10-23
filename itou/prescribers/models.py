@@ -219,6 +219,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     @property
     def active_members(self):
+        """
+        In this context, active == has an active membership AND user is still active
+        """
         return self.members.filter(is_active=True, prescribermembership__is_active=True)
 
     @property
