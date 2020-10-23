@@ -640,3 +640,38 @@ class UserMembershipDeactivationTest(TestCase):
         # should be redirected to logout
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse("account_logout"))
+
+    def test_structure_selector(self):
+        """
+        Check that a deactivated member can't access the structure
+        from the dashboard selector
+        """
+        siae2 = SiaeWithMembershipFactory()
+        guest = siae2.members.first()
+
+        siae = SiaeWith2MembershipsFactory()
+        admin = siae.members.first()
+        siae.members.add(guest)
+
+        memberships = guest.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.assertEqual(len(memberships), 2)
+
+        # Admin remove guest from structure
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:toggle_membership", kwargs={"membership_id": membership.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.client.logout()
+
+        # guest must be able to login
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        # Whereever guest land should give a 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Check reponse context, only one SIAE should remain
+        self.assertEqual(len(response.context["user_siaes"]), 1)
