@@ -79,7 +79,7 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
                 error = forms.ValidationError(_("Cet utilisateur n'est pas un prescripteur."))
                 self.add_error("email", error)
             else:
-                user_is_member = self.organization.members.filter(email=self.user.email).exists()
+                user_is_member = self.organization.active_members.filter(email=self.user.email).exists()
                 if user_is_member:
                     error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
                     self.add_error("email", error)
@@ -159,7 +159,7 @@ class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
                 error = forms.ValidationError(_("Cet utilisateur n'est pas un employeur."))
                 self.add_error("email", error)
             else:
-                user_is_member = self.siae.members.filter(email=self.user.email).exists()
+                user_is_member = self.siae.active_members.filter(email=self.user.email).exists()
                 if user_is_member:
                     error = forms.ValidationError(_("Cette personne fait déjà partie de votre structure."))
                     self.add_error("email", error)
