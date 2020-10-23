@@ -35,7 +35,9 @@
                     <td>
                         {{ member.user.get_full_name }}
                         {% if member.user in siae.active_admin_members %}
-                            {% include "includes/icon.html" with icon="key" %}
+                            <span data-toggle="tooltip" title="{% translate "Administrateur de la structure"%}">
+                                {% include "includes/icon.html" with icon="key" %}
+                            </span>
                         {% endif %}
                     </td>
                     <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
@@ -108,6 +110,7 @@
                     <th scope="col">{% translate "Nom" %}</th>
                     <th scope="col">{% translate "Email" %}</th>
                     <th scope="col">{% translate "Date de désactivation" %}</th>
+                    <th scope="col">{% translate "Par" %}</th>
                     {% if user in siae.active_admin_members %}
                         <th scope="col">{% translate "Action" %}</th>
                     {% endif %}
@@ -125,6 +128,7 @@
                         </td>
                         <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
                         <td>{{ member.updated_at|date:"d F Y à H:i" }}</td>
+                        <td>{{ member.updated_by.get_full_name }}</td>
                         {% if user in siae.active_admin_members %}
                             <td>
                                 <div class="text-center">
