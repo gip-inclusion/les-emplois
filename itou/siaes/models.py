@@ -387,10 +387,14 @@ class SiaeMembership(models.Model):
 
     def toggleUserMembership(self, user):
         """
-        Toggles the SIAE membership of given user
+        Toggles the SIAE membership of a member (reference held by self)
+        `user` is the admin updating this user (`updated_by` field)
         """
+        assert user
+
         self.is_active = not self.is_active
         self.updated_at = timezone.now()
+        self.updated_by = user
         return self.is_active
 
 

@@ -550,7 +550,6 @@ class UserMembershipDeactivationTest(TestCase):
         siae = SiaeWith2MembershipsFactory()
         admin = siae.members.first()
         guest = siae.members.all()[1]
-        siae.members.add(guest)
 
         memberships = guest.siaemembership_set.all()
         membership = memberships.first()
@@ -563,6 +562,8 @@ class UserMembershipDeactivationTest(TestCase):
         # User should be deactivated now
         membership.refresh_from_db()
         self.assertFalse(membership.is_active)
+        self.assertEqual(admin, membership.updated_by)
+        self.assertIsNotNone(membership.updated_at)
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)
@@ -578,7 +579,6 @@ class UserMembershipDeactivationTest(TestCase):
         """
         siae = SiaeWith2MembershipsFactory()
         guest = siae.members.all()[1]
-        siae.members.add(guest)
         memberships = guest.siaemembership_set.all()
         membership = memberships.first()
 

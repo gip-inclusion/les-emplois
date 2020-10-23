@@ -125,6 +125,8 @@ class UserMembershipDeactivationTest(TestCase):
         # User should be deactivated now
         membership.refresh_from_db()
         self.assertFalse(membership.is_active)
+        self.assertEqual(admin, membership.updated_by)
+        self.assertIsNotNone(membership.updated_at)
 
         # Check mailbox
         # User must have been notified of deactivation (we're human after all)

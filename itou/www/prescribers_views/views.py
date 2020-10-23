@@ -81,7 +81,7 @@ def toggle_membership(request, membership_id, template_name="prescribers/members
     membership = PrescriberMembership.objects.get(pk=membership_id)
 
     if user != membership.user and user in organization.active_admin_members:
-        membership.toggleUserMembership(membership.user)
+        membership.toggleUserMembership(user)
         membership.save()
 
         if not membership.is_active:

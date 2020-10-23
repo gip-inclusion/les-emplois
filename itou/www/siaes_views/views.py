@@ -179,7 +179,7 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
     membership = SiaeMembership.objects.get(pk=membership_id)
 
     if user != membership.user and user in siae.active_admin_members:
-        membership.toggleUserMembership(membership.user)
+        membership.toggleUserMembership(user)
         membership.save()
 
         if not membership.is_active:
