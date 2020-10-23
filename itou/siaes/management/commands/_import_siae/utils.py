@@ -7,7 +7,7 @@ from functools import wraps
 from time import time
 
 
-SHOW_IMPORT_SIAE_METHOD_TIMER = True
+SHOW_IMPORT_SIAE_METHOD_TIMER = False
 
 
 def timeit(f):

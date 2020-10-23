@@ -165,17 +165,6 @@ def get_af_number_to_row():
 AF_NUMBER_TO_ROW = get_af_number_to_row()
 
 
-def get_siae_key(siae):
-    """
-    Each unique (asp_id, kind) couple corresponds to a unique siae à la itou.
-    This key is important when using ASP exports.
-    Asp_id itself is not enough nor unique from our point of view.
-
-    Input: siae is normally a siae, but can also be a dataframe row instead.
-    """
-    return (siae.asp_id, siae.kind)
-
-
 @timeit
 def get_siae_key_to_convention_end_date():
     """
@@ -187,7 +176,7 @@ def get_siae_key_to_convention_end_date():
     af_df = af_df[af_df.has_active_state]
     for _, row in af_df.iterrows():
         convention_end_date = row.end_date
-        siae_key = get_siae_key(row)
+        siae_key = (row.asp_id, row.kind)
         if siae_key in siae_key_to_convention_end_date:
             if convention_end_date > siae_key_to_convention_end_date[siae_key]:
                 siae_key_to_convention_end_date[siae_key] = convention_end_date
