@@ -320,6 +320,16 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "siaes/email/new_member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def new_member_activation_email(self, user):
+        """
+        Send email when an admin of the structure activate the membership of a given user.
+        """
+        to = [user.email]
+        context = {"siae": self}
+        subject = "prescribers/email/new_member_activation_email_subject.txt"
+        body = "prescribers/email/new_member_activation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""

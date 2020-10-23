@@ -176,7 +176,16 @@ class UserMembershipDeactivationTest(TestCase):
         membership.refresh_from_db()
         self.assertTrue(membership.is_active)
 
-        # No email sent at the moment (reactivation is not enabled)
+        # Check mailbox
+        # User must have been notified of reactivation
+        self.assertEqual(len(mail.outbox), 2)
+        email = mail.outbox[1]
+        self.assertIn("[Réactivation] Vous avez été ajouté en tant que membre d'une organisation", email.subject)
+        self.assertIn(
+            "Un administrateur vous a ajouté en tant que membre d'une structure sur la Plateforme de l'inclusion",
+            email.body,
+        )
+        self.assertEqual(email.to[0], guest.email)
 
     def test_deactivated_prescriber_is_orienter(self):
         """

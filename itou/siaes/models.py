@@ -347,6 +347,16 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         body = "siaes/email/new_member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def new_member_activation_email(self, user):
+        """
+        Send email when an admin of the structure reactivate the membership of a given user.
+        """
+        to = [user.email]
+        context = {"siae": self}
+        subject = "siaes/email/new_member_activation_email_subject.txt"
+        body = "siaes/email/new_member_activation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
     @property
     def open_departments(self):
         if self.kind == self.KIND_ETTI:

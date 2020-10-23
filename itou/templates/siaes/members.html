@@ -46,13 +46,9 @@
                         <td>
                             <div class="text-center">
                                 {% if member.user != user and user in siae.active_admin_members %}
-                                <form id="deactivation_confirm_form" action="{% url "siaes_views:toggle_membership" member.pk %}" method="POST">
-                                    {% csrf_token %}
-                                        <input type="hidden" name="id_member_pk" value="{{ member.pk }}">
-                                        <button class="btn btn-outline-danger"> 
-                                            {% include "includes/icon.html" with icon="user-minus" %}
-                                        </button>
-                                </form>
+                                    <button class="btn btn-outline-danger" onclick='_updateForm("#deactivation_confirm_form", {{ member.pk }})' data-toggle="modal" data-target="#deactivateModal"> 
+                                        {% include "includes/icon.html" with icon="user-minus" %}
+                                    </button>
                                 {% else %}
                                     {% include "includes/icon.html" with icon="slash" %}
                                 {% endif %}
@@ -66,24 +62,24 @@
 </div>
 
 <script>
-    function getMemberId() {
-        // $('#deactivateModal').attr['data-id']
-        console.log($('#deactivateModal').attr['data-id'])
-    }
+    function _updateForm(form, mpk) { $(form).attr('action', 'toggle_membership/' + mpk); }
 </script>
 
 <div class="modal fade" id="deactivateModal" tabindex="-1" aria-labelledby="deactivateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">{% translate "Désactiver un utilisateur" %}</h5>
+                <h5 class="modal-title">{% translate "Désactiver un utilisateur" %}</h5>
             </div>
             <div class="modal-body">
                 {% translate "Vous allez retirer cet utilisateur des membres de votre structure." %}<br>
             </div>
             <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="alert(getMemberId());">{% translate "Désactiver l'utilisateur" %}</button>
+                <form id="deactivation_confirm_form" action="" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">{% translate "Désactiver l'utilisateur" %}</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">{% translate "Annuler" %}</button>
+                </form>
             </div>
         </div>
     </div>
@@ -97,7 +93,6 @@
 {% if pending_invitations %}
     {% include "invitations_views/includes/pending_invitations.html" %}
 {% endif %}
-
 
 {% if deactivated_members %}
     <h3 class="mt-3">{% translate "Liste des utilisateurs désactivés" %}</h3>
@@ -133,10 +128,7 @@
                             <td>
                                 <div class="text-center">
                                     {% if member.user != user and user in siae.active_admin_members %}
-                                    <form id="form_{{ member.pk }}" action="{% url "siaes_views:toggle_membership" member.pk %}" method="POST">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="id_member_pk" value="{{ member.pk }}">
-                                        <button class="btn btn-outline-success" type="submit">
+                                        <button class="btn btn-outline-success" onclick='_updateForm("#activation_confirm_form", {{ member.pk }})' data-toggle="modal" data-target="#activateModal">
                                             {% include "includes/icon.html" with icon="user-plus" %}
                                         </button>
                                     </form>
@@ -152,5 +144,25 @@
         </table>
     </div>
 {% endif %}
+
+<div class="modal fade" id="activateModal" tabindex="-1" aria-labelledby="activateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{% translate "Réactiver un utilisateur" %}</h5>
+            </div>
+            <div class="modal-body">
+                {% translate "Vous allez réactiver cet utilisateur en tant que membre actif de votre structure." %}<br>
+            </div>
+            <div class="modal-footer">
+                <form id="activation_confirm_form" action="" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">{% translate "Réactiver l'utilisateur" %}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% translate "Annuler" %}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}

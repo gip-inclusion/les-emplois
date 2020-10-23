@@ -1,0 +1,5 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% load i18n %}
+{% block subject %}
+{% blocktranslate %}[Réactivation] Vous avez été ajouté en tant que membre d'une organisation{% endblocktranslate %}
+{% endblock %}

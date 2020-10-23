@@ -85,10 +85,12 @@ def toggle_membership(request, membership_id, template_name="prescribers/members
         membership.save()
 
         if not membership.is_active:
-            # Only deactivation for now...
-            messages.success(request, _("Retrait du collaborateur effectué !"))
+            messages.success(request, _("Le collaborateur a été retiré des membres actifs de cette structure."))
             organization.new_member_deactivation_email(membership.user).send()
             kill_sessions_for_user(membership.user.pk)
+        else:
+            messages.success(request, _("Le collaborateur est à nouveau un membre actif de cette structure."))
+            organization.new_member_activation_email(membership.user).send()
     else:
         raise PermissionDenied
 
