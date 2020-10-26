@@ -3,7 +3,8 @@
 Siae object logic used by the import_siae.py script is gathered here.
 
 """
-from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS, get_siae_key
+from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
+from itou.siaes.management.commands._import_siae.vue_structure import SIRET_TO_ASP_ID
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
@@ -11,7 +12,9 @@ from itou.utils.apis.geocoding import get_geocoding_data
 
 
 def does_siae_have_an_active_convention(siae):
-    return get_siae_key(siae) in ACTIVE_SIAE_KEYS
+    asp_id = SIRET_TO_ASP_ID[siae.siret]
+    siae_key = (asp_id, siae.kind)
+    return siae_key in ACTIVE_SIAE_KEYS
 
 
 def should_siae_be_created(siae):
@@ -82,7 +85,7 @@ def build_siae(row, kind):
         siae.address_line_2 = ""
 
     siae.city = row.city
-    siae.post_code = row.zipcode
+    siae.post_code = row.post_code
     siae.department = department_from_postcode(siae.post_code)
 
     if should_siae_be_created(siae):

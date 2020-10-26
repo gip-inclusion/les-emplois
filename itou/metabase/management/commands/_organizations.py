@@ -109,6 +109,12 @@ TABLE_COLUMNS = (
             "lambda": get_org_first_join_date,
         },
         {
+            "name": "code_safir",
+            "type": "varchar",
+            "comment": "Code SAFIR Pôle Emploi",
+            "lambda": lambda o: o.code_safir_pole_emploi,
+        },
+        {
             "name": "total_membres",
             "type": "integer",
             "comment": "Nombre de comptes prescripteurs rattachés à cette organisation",

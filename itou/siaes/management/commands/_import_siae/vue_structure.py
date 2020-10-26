@@ -72,7 +72,7 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
         "structure_adresse_gestion_cplt_num_voie": "street_num_extra",
         "structure_adresse_gestion_type_voie": "street_type",
         "structure_adresse_gestion_nom_voie": "street_name",
-        "structure_adresse_gestion_cp": "zipcode",
+        "structure_adresse_gestion_cp": "post_code",
         "structure_adresse_gestion_commune": "city",
         "structure_adresse_gestion_telephone": "phone",
         # The extra* fields have very low quality data,
