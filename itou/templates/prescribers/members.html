@@ -35,8 +35,8 @@
                     <td>
                         {{ member.user.get_full_name }}
                         {% if member.user in organization.active_admin_members %}
-                            <span data-toggle="tooltip" title="{% translate "Administrateur de la structure"%}">
-                                {% include "includes/icon.html" with icon="key" %}
+                            <span class="badge badge-info" data-toggle="tooltip" title="{% translate "Administrateur de la structure"%}">
+                                {% translate "admin" %}                            
                             </span>
                         {% endif %}
                     </td>
@@ -46,8 +46,11 @@
                         <td>
                             <div class="text-center">
                                 {% if member.user != user and user in organization.active_admin_members %}
-                                    <button class="btn btn-outline-danger" onclick='_updateForm("#deactivation_confirm_form", {{ member.pk }})' data-toggle="modal" data-target="#deactivateModal"> 
-                                        {% include "includes/icon.html" with icon="user-minus" %}
+                                    <button class="btn btn-danger" onclick='_updateForm("#deactivation_confirm_form", {{ member.pk }})' data-toggle="modal" data-target="#deactivateModal"> 
+                                        <span>
+                                            {% include "includes/icon.html" with icon="user-minus" %}
+                                            <b>{% translate "Retirer de la structure" %}</b>
+                                        </span>
                                     </button>
                                 {% else %}
                                     {% include "includes/icon.html" with icon="slash" %}
@@ -92,76 +95,5 @@
 {% if pending_invitations %}
     {% include "invitations_views/includes/pending_invitations.html" %}
 {% endif %}
-
-
-{% if deactivated_members %}
-    <h3 class="mt-3">{% translate "Liste des utilisateurs désactivés" %}</h3>
-
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">{% translate "Nom" %}</th>
-                    <th scope="col">{% translate "Email" %}</th>
-                    <th scope="col">{% translate "Date de désactivation" %}</th>
-                    <th scope="col">{% translate "Par" %}</th>
-                    {% if user in organization.active_admin_members %}
-                        <th scope="col">{% translate "Action" %}</th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for member in deactivated_members %}
-                    <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
-                        <td>
-                            {{ member.user.get_full_name }}
-                            {% if member.user in organization.active_admin_members %}
-                                {% include "includes/icon.html" with icon="key" %}
-                            {% endif %}
-                        </td>
-                        <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
-                        <td>{{ member.updated_at|date:"d F Y à H:i" }}</td>
-                        <td>{{ member.updated_by.get_full_name }}</td>
-                        {% if user in organization.active_admin_members %}
-                            <td>
-                                <div class="text-center">
-                                    {% if member.user != user and user in organization.active_admin_members %}
-                                        <button class="btn btn-outline-success" onclick='_updateForm("#activation_confirm_form", {{ member.pk }})' data-toggle="modal" data-target="#activateModal">
-                                            {% include "includes/icon.html" with icon="user-plus" %}
-                                        </button>
-                                    {% else %}
-                                        {% include "includes/icon.html" with icon="slash" %}
-                                    {% endif %}
-                                </div>
-                            </td>
-                        {% endif %}
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endif %}
-
-<div class="modal fade" id="activateModal" tabindex="-1" aria-labelledby="activateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{% translate "Réactiver un utilisateur" %}</h5>
-            </div>
-            <div class="modal-body">
-                {% translate "Vous allez réactiver cet utilisateur en tant que membre actif de votre structure." %}<br>
-            </div>
-            <div class="modal-footer">
-                <form id="activation_confirm_form" action="" method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">{% translate "Réactiver l'utilisateur" %}</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% translate "Annuler" %}</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% endblock %}
