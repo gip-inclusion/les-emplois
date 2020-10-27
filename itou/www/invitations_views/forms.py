@@ -87,8 +87,11 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
         invitation = invitation_model.objects.filter(email__iexact=email, organization=self.organization).first()
+        # We can re-invite *deactivated* members,
+        # even if already they already received and invitation
+        user_is_member = self.organization.active_members.filter(email=email).exists()
         if invitation:
-            if invitation.accepted:
+            if invitation.accepted and user_is_member:
                 error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
                 self.add_error("email", error)
             else:
@@ -167,8 +170,11 @@ class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
         invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
+        # We can re-invite *deactivated* members,
+        # even if already they already received and invitation
+        user_is_member = self.siae.active_members.filter(email=email).exists()
         if invitation:
-            if invitation.accepted:
+            if invitation.accepted and user_is_member:
                 error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
                 self.add_error("email", error)
             else:

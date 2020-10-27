@@ -38,7 +38,7 @@ class TestSendSiaeInvitation(TestCase):
         self.send_invitation_url = reverse("invitations_views:invite_siae_staff")
 
     def tearDown(self):
-        invitation_query = self.invitations_model.objects.filter(siae=self.siae)
+        invitation_query = self.invitations_model.objects.filter(siae=self.siae)  # .order_by("-created_at")
         self.assertTrue(invitation_query.exists())
         invitation = invitation_query.first()
         self.assertEqual(invitation.first_name, self.guest.first_name)
@@ -98,6 +98,26 @@ class TestSendSiaeInvitation(TestCase):
         # SIAE 1 should be able to refresh the invitation.
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.client.post(self.send_invitation_url, data=self.post_data)
+
+    def test_invite_former_siae_member(self):
+        """
+        Admins can "deactivate" members of the organization (making the membership inactive).
+        A deactivated member must be able to receive new invitations.
+        """
+        self.guest = SiaeWith2MembershipsFactory().members.first()
+
+        # Deactivate user
+        membership = self.guest.siaemembership_set.first()
+        membership.toggleUserMembership(self.siae.members.first())
+        membership.save()
+
+        self.post_data["form-0-first_name"] = self.guest.first_name
+        self.post_data["form-0-last_name"] = self.guest.last_name
+        self.post_data["form-0-email"] = self.guest.email
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        last_url = response.redirect_chain[-1][0]
+        self.assertEqual(last_url, reverse("invitations_views:invite_siae_staff"))
 
 
 class TestSendSiaeInvitationExceptions(TestCase):
