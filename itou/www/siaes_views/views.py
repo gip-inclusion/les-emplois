@@ -200,8 +200,6 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
         "target_member": target_member,
     }
 
-    print(context)
-
     return render(request, template_name, context)
 
 

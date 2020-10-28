@@ -105,6 +105,4 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
         "target_member": target_member,
     }
 
-    print(context)
-
     return render(request, template_name, context)
