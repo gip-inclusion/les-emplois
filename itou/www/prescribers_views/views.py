@@ -5,9 +5,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
-from django.views.decorators.http import require_POST
 
-from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.sessions import kill_sessions_for_user
@@ -72,33 +71,6 @@ def members(request, template_name="prescribers/members.html"):
         "deactivated_members": deactivated_members,
     }
     return render(request, template_name, context)
-
-
-@login_required
-@require_POST
-def toggle_membership(request, membership_id, template_name="prescribers/members.html"):
-    """
-    Deactivate (or reactivate) a member of a structure
-    """
-    organization = get_current_org_or_404(request)
-    user = request.user
-    membership = PrescriberMembership.objects.get(pk=membership_id)
-
-    if user != membership.user and user in organization.active_admin_members:
-        membership.toggleUserMembership(user)
-        membership.save()
-
-        if not membership.is_active:
-            messages.success(request, _("Le collaborateur a été retiré des membres actifs de cette structure."))
-            organization.new_member_deactivation_email(membership.user).send()
-            kill_sessions_for_user(membership.user.pk)
-        else:
-            messages.success(request, _("Le collaborateur est à nouveau un membre actif de cette structure."))
-            organization.new_member_activation_email(membership.user).send()
-    else:
-        raise PermissionDenied
-
-    return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
 
 
 @login_required

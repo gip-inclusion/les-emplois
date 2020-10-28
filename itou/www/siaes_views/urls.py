@@ -15,5 +15,4 @@ urlpatterns = [
     path("colleagues", views.members, name="members"),
     path("block_job_applications", views.block_job_applications, name="block_job_applications"),
     path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
-    path("toggle_membership/<int:membership_id>", views.toggle_membership, name="toggle_membership"),
 ]

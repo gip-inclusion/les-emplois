@@ -95,7 +95,7 @@ class UserMembershipDeactivationTest(TestCase):
         membership = memberships.first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
-        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
 
@@ -118,7 +118,7 @@ class UserMembershipDeactivationTest(TestCase):
         membership = memberships.first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
-        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
@@ -143,49 +143,11 @@ class UserMembershipDeactivationTest(TestCase):
         organization = PrescriberOrganizationWithMembershipFactory()
         guest = PrescriberFactory()
         organization.members.add(guest)
-        memberships = guest.prescribermembership_set.all()
-        membership = memberships.first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
-        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
-
-    def test_reactivate_user(self):
-        """
-        Reactivate a previously deactivated user
-        Not yet in scope: but should work
-        """
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
-
-        memberships = guest.prescribermembership_set.all()
-        membership = memberships.first()
-
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
-        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
-
-        # Call a second time to reactivate
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 302)
-
-        membership.refresh_from_db()
-        self.assertTrue(membership.is_active)
-
-        # Check mailbox
-        # User must have been notified of reactivation
-        self.assertEqual(len(mail.outbox), 2)
-        email = mail.outbox[1]
-        self.assertIn("[Réactivation] Vous avez été ajouté en tant que membre d'une organisation", email.subject)
-        self.assertIn(
-            "Un administrateur vous a ajouté en tant que membre d'une structure sur la Plateforme de l'inclusion",
-            email.body,
-        )
-        self.assertEqual(email.to[0], guest.email)
 
     def test_deactivated_prescriber_is_orienter(self):
         """
@@ -198,11 +160,8 @@ class UserMembershipDeactivationTest(TestCase):
         guest = PrescriberFactory()
         organization.members.add(guest)
 
-        memberships = guest.prescribermembership_set.all()
-        membership = memberships.first()
-
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
-        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
 
@@ -225,13 +184,11 @@ class UserMembershipDeactivationTest(TestCase):
         organization1.members.add(guest)
 
         memberships = guest.prescribermembership_set.all()
-        membership = memberships.first()
-
         self.assertEqual(len(memberships), 2)
 
         # Admin remove guest from structure
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
-        url = reverse("prescribers_views:toggle_membership", kwargs={"membership_id": membership.id})
+        url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 302)
         self.client.logout()

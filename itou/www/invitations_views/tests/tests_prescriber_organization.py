@@ -88,7 +88,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.org.members.add(self.guest)
         self.guest.save()
         membership = self.guest.prescribermembership_set.first()
-        membership.toggleUserMembership(self.org.members.first())
+        membership.toggle_user_membership(self.org.members.first())
         membership.save()
         self.assertFalse(self.guest in self.org.active_members)
         # Invite user (the revenge)

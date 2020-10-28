@@ -6,10 +6,9 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext as _
-from django.views.decorators.http import require_POST
 
 from itou.jobs.models import Appellation
-from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
+from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.sessions import kill_sessions_for_user
@@ -167,33 +166,6 @@ def members(request, template_name="siaes/members.html"):
         "deactivated_members": deactivated_members,
     }
     return render(request, template_name, context)
-
-
-@login_required
-@require_POST
-def toggle_membership(request, membership_id, template_name="siaes/members.html"):
-    """
-    Deactivate (or later reactivate) a member of a structure
-    """
-    siae = get_current_siae_or_404(request)
-    user = request.user
-    membership = SiaeMembership.objects.get(pk=membership_id)
-
-    if user != membership.user and user in siae.active_admin_members:
-        membership.toggle_user_membership(user)
-        membership.save()
-
-        if not membership.is_active:
-            messages.success(request, _("Le collaborateur a été retiré des membres actifs de cette structure."))
-            siae.new_member_deactivation_email(membership.user).send()
-            kill_sessions_for_user(membership.user.pk)
-        else:
-            messages.success(request, _("Le collaborateur est à nouveau un membre actif de cette structure."))
-            siae.new_member_activation_email(membership.user).send()
-    else:
-        raise PermissionDenied
-
-    return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 
 
 @login_required

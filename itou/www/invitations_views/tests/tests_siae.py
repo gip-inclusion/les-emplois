@@ -108,7 +108,7 @@ class TestSendSiaeInvitation(TestCase):
 
         # Deactivate user
         membership = self.guest.siaemembership_set.first()
-        membership.toggleUserMembership(self.siae.members.first())
+        membership.toggle_user_membership(self.siae.members.first())
         membership.save()
 
         self.post_data["form-0-first_name"] = self.guest.first_name
