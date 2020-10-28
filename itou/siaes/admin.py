@@ -158,9 +158,9 @@ class SiaeAdmin(admin.ModelAdmin):
 
         # Pulled-up the save action:
         # many-to-many relationships / cross-tables references
-        # have to be saved before using them 
+        # have to be saved before using them
         super().save_model(request, obj, form, change)
-        
+
         if obj.members.count() == 0 and not obj.auth_email:
             messages.warning(
                 request,
