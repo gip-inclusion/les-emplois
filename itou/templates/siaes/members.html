@@ -35,8 +35,8 @@
                     <td>
                         {{ member.user.get_full_name }}
                         {% if member.user in siae.active_admin_members %}
-                            <span data-toggle="tooltip" title="{% translate "Administrateur de la structure"%}">
-                                {% include "includes/icon.html" with icon="key" %}
+                            <span class="badge badge-info" data-toggle="tooltip" title="{% translate "Administrateur de la structure"%}">
+                                {% translate "admin" %}                            
                             </span>
                         {% endif %}
                     </td>
@@ -46,9 +46,9 @@
                         <td>
                             <div class="text-center">
                                 {% if member.user != user and user in siae.active_admin_members %}
-                                    <button class="btn btn-outline-danger" onclick='_updateForm("#deactivation_confirm_form", {{ member.pk }})' data-toggle="modal" data-target="#deactivateModal"> 
-                                        {% include "includes/icon.html" with icon="user-minus" %}
-                                    </button>
+                                    <a href="{% url "siaes_views:deactivate_member" member.user.pk %}" role="button">
+                                        {% translate "Retirer de la structure" %}
+                                    </a>
                                 {% else %}
                                     {% include "includes/icon.html" with icon="slash" %}
                                 {% endif %}

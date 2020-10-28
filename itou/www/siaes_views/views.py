@@ -10,6 +10,7 @@ from django.views.decorators.http import require_POST
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
+from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
@@ -179,7 +180,7 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
     membership = SiaeMembership.objects.get(pk=membership_id)
 
     if user != membership.user and user in siae.active_admin_members:
-        membership.toggleUserMembership(user)
+        membership.toggle_user_membership(user)
         membership.save()
 
         if not membership.is_active:
@@ -193,6 +194,43 @@ def toggle_membership(request, membership_id, template_name="siaes/members.html"
         raise PermissionDenied
 
     return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
+
+
+@login_required
+def deactivate_member(request, user_id, template_name="siaes/deactivate_member.html"):
+    siae = get_current_siae_or_404(request)
+    user = request.user
+    target_member = User.objects.get(pk=user_id)
+
+    if target_member not in siae.active_members:
+        raise PermissionDenied
+
+    membership = target_member.siaemembership_set.get(siae=siae)
+
+    if request.method == "POST":
+        if user != target_member and user in siae.active_admin_members:
+            if membership.is_active:
+                membership.toggle_user_membership(user)
+                membership.save()
+                messages.success(
+                    request,
+                    _("%(name)s a été retiré(e) des membres actifs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
+                siae.new_member_deactivation_email(membership.user).send()
+                kill_sessions_for_user(membership.user.pk)
+        else:
+            raise PermissionDenied
+        return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
+
+    context = {
+        "siae": siae,
+        "target_member": target_member,
+    }
+
+    print(context)
+
+    return render(request, template_name, context)
 
 
 @login_required

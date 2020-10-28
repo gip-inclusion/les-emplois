@@ -398,7 +398,7 @@ class SiaeMembership(models.Model):
     class Meta:
         unique_together = ("user_id", "siae_id")
 
-    def toggleUserMembership(self, user):
+    def toggle_user_membership(self, user):
         """
         Toggles the SIAE membership of a member (reference held by self)
         `user` is the admin updating this user (`updated_by` field)

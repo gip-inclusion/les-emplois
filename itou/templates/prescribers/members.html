@@ -46,9 +46,9 @@
                         <td>
                             <div class="text-center">
                                 {% if member.user != user and user in organization.active_admin_members %}
-                                <a href="{% url "prescribers_views:deactivate_member" member.user.pk %}" role="button">
-                                            {% translate "Retirer de la structure" %}
-                                        </a>
+                                    <a href="{% url "prescribers_views:deactivate_member" member.user.pk %}" role="button">
+                                        {% translate "Retirer de la structure" %}
+                                    </a>
                                 {% else %}
                                     {% include "includes/icon.html" with icon="slash" %}
                                 {% endif %}

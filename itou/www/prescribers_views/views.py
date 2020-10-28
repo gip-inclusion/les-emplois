@@ -8,12 +8,11 @@ from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
+from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
-
-from itou.users.models import User
 
 
 def card(request, org_id, template_name="prescribers/card.html"):
@@ -118,7 +117,11 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
             if membership.is_active:
                 membership.toggle_user_membership(user)
                 membership.save()
-                messages.success(request, _("%(name)s a été retiré(e) des membres actifs de cette structure.") % {"name": target_member.get_full_name()})
+                messages.success(
+                    request,
+                    _("%(name)s a été retiré(e) des membres actifs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
                 organization.new_member_deactivation_email(membership.user).send()
                 kill_sessions_for_user(membership.user.pk)
         else:
@@ -133,4 +136,3 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     print(context)
 
     return render(request, template_name, context)
-
