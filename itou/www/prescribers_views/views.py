@@ -13,6 +13,8 @@ from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
 
+from itou.users.models import User
+
 
 def card(request, org_id, template_name="prescribers/card.html"):
     """
@@ -77,7 +79,7 @@ def members(request, template_name="prescribers/members.html"):
 @require_POST
 def toggle_membership(request, membership_id, template_name="prescribers/members.html"):
     """
-    Deactivate (or later reactivate) a member of a structure
+    Deactivate (or reactivate) a member of a structure
     """
     organization = get_current_org_or_404(request)
     user = request.user
@@ -98,3 +100,37 @@ def toggle_membership(request, membership_id, template_name="prescribers/members
         raise PermissionDenied
 
     return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
+
+
+@login_required
+def deactivate_member(request, user_id, template_name="prescribers/deactivate_member.html"):
+    organization = get_current_org_or_404(request)
+    user = request.user
+    target_member = User.objects.get(pk=user_id)
+
+    if target_member not in organization.active_members:
+        raise PermissionDenied
+
+    membership = target_member.prescribermembership_set.get(organization=organization)
+
+    if request.method == "POST":
+        if user != target_member and user in organization.active_admin_members:
+            if membership.is_active:
+                membership.toggle_user_membership(user)
+                membership.save()
+                messages.success(request, _("%(name)s a été retiré(e) des membres actifs de cette structure.") % {"name": target_member.get_full_name()})
+                organization.new_member_deactivation_email(membership.user).send()
+                kill_sessions_for_user(membership.user.pk)
+        else:
+            raise PermissionDenied
+        return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
+
+    context = {
+        "organization": organization,
+        "target_member": target_member,
+    }
+
+    print(context)
+
+    return render(request, template_name, context)
+
