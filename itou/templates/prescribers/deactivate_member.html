@@ -1,0 +1,53 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Retrait d'un collaborateur" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+
+<div class="content-small">
+    <h1>{% translate "Retrait d'un collaborateur" %}</h1>
+    <div class="mt-4 alert alert-warning">
+        {% translate "Vous allez retirer " %}<b>{{ target_member.get_full_name }}</b>
+        {% translate " de votre organisation "%}<b>({{ organization.display_name }})</b>.
+    </div>
+
+    <div class="mt-4">
+        {% blocktranslate %}
+            Le tableau de bord de votre structure ne lui sera plus accessible.
+        {% endblocktranslate %}
+    </div>
+
+    <div class="mt-4">
+        {% blocktranslate %}
+            Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation (candidatures, PASS IAE par ex.).
+        {% endblocktranslate %}
+    </div>
+
+    <div class="mt-4">
+        {% blocktranslate %}
+            Cet utilisateur sera notifié par e-mail de son retrait de votre organisation.
+        {% endblocktranslate %}
+    </div>
+
+    <div class="mt-4">
+        {% blocktranslate %}
+            En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation.
+        {% endblocktranslate %}
+    </div>
+
+    <form action="{% url "prescribers_views:deactivate_member" target_member.pk %}" method="POST">
+        {% csrf_token %}
+        <div class="mt-4 form-group">
+            <a class="btn btn-secondary" href="{% url "prescribers_views:members"%}">
+                {% translate "Annuler" %}
+            </a>
+            <button class="btn btn-primary submit">{% translate "Retirer l'utilisateur" %}</button>
+        </div>
+    </form>
+
+    </div>
+</div>
+
+{% endblock %}
