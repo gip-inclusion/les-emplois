@@ -25,6 +25,9 @@ django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 # Allow basic math (e.g. A/B) in templates
 django-mathfilters==1.0.0  # https://github.com/dbrgn/django-mathfilters
 
+# Django notifications
+django-herald==0.2.1  # https://github.com/worthwhile/django-herald
+
 # Front-end
 # ------------------------------------------------------------------------------
 

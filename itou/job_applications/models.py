@@ -469,16 +469,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # Emails.
 
-    def get_siae_recipents_email_list(self):
-        return list(self.to_siae.members.filter(is_active=True).values_list("email", flat=True))
+    def notify_new_for_siae(self):
+        from .notifications import SiaeNewJobApplicationEmail
 
-    @property
-    def email_new_for_siae(self):
-        to = self.get_siae_recipents_email_list()
-        context = {"job_application": self}
-        subject = "apply/email/new_for_siae_subject.txt"
-        body = "apply/email/new_for_siae_body.txt"
-        return get_email_message(to, context, subject, body)
+        notification = SiaeNewJobApplicationEmail(job_application=self, siae=job_application.to_siae)
 
     @property
     def email_new_for_prescriber(self):
