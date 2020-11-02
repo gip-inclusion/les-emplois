@@ -142,7 +142,6 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
                 organization.remove_admin_email(target_member).send()
                 kill_sessions_for_user(membership.user.pk)
             membership.save()
-            print("MEMBERSHIP.IS_SIAE_ADMIN", membership.is_siae_admin)
         else:
             raise PermissionDenied
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))

@@ -7,17 +7,15 @@
 
 {% blocktranslate %}
 Un administrateur peut ajouter ou retirer:
-
 - des collaborateurs 
 - des administrateurs
-
 {% endblocktranslate %}
 
 {% translate "Structure :" %}
 
-- {% translate "Nom" %}  : {{ organization.display_name }}
-- {% translate "Type" %} : {{ organization.kind }}
-- {% translate "Email de contact" %} : {{ organization.email }}
+- {% translate "Nom" %}  : {{ siae.display_name }}
+- {% translate "Type" %} : {{ siae.kind }}
+- {% translate "Email de contact" %} : {{ siae.email }}
 
 
 {% translate "Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur la Plateforme de l'inclusion." %}
