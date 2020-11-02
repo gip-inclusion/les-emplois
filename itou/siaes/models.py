@@ -357,6 +357,26 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         body = "siaes/email/new_member_activation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def add_admin_email(self, user):
+        """
+        Send info email to a new admin of the SIAE (added)
+        """
+        to = [user.email]
+        context = {"siae": self}
+        subject = "siaes/email/add_admin_email_subject.txt"
+        body = "siaes/email/add_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def remove_admin_email(self, user):
+        """
+        Send info email to a former admin of the SIAE (removed)
+        """
+        to = [user.email]
+        context = {"siae": self}
+        subject = "siaes/email/remove_admin_email_subject.txt"
+        body = "siaes/email/remove_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
     @property
     def open_departments(self):
         if self.kind == self.KIND_ETTI:
@@ -409,6 +429,17 @@ class SiaeMembership(models.Model):
         self.updated_at = timezone.now()
         self.updated_by = user
         return self.is_active
+
+    def set_admin_role(self, active, user):
+        """
+        Set admin role for the given user.
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        assert user
+
+        self.is_siae_admin = active
+        self.updated_at = timezone.now()
+        self.updated_by = user
 
 
 class SiaeJobDescription(models.Model):

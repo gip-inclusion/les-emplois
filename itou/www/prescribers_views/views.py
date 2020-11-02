@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, SuspiciousOperation
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -101,6 +101,54 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
 
     context = {
+        "organization": organization,
+        "target_member": target_member,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def update_admin_role(request, action, user_id, template_name="prescribers/update_admins.html"):
+    if action not in ["add", "remove"]:
+        raise SuspiciousOperation
+
+    organization = get_current_org_or_404(request)
+    user = request.user
+    target_member = User.objects.get(pk=user_id)
+
+    if target_member not in organization.active_members:
+        raise PermissionDenied
+
+    membership = target_member.prescribermembership_set.get(organization=organization)
+
+    if request.method == "POST":
+        if user != target_member and user in organization.active_admin_members and membership.is_active:
+            if action == "add":
+                membership.set_admin_role(True, user)
+                messages.success(
+                    request,
+                    _("%(name)s a été ajouté(e) aux administrateurs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
+                organization.add_admin_email(target_member).send()
+            if action == "remove":
+                membership.set_admin_role(False, user)
+                messages.success(
+                    request,
+                    _("%(name)s a été retiré(e) des administrateurs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
+                organization.remove_admin_email(target_member).send()
+                kill_sessions_for_user(membership.user.pk)
+            membership.save()
+            print("MEMBERSHIP.IS_SIAE_ADMIN", membership.is_siae_admin)
+        else:
+            raise PermissionDenied
+        return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
+
+    context = {
+        "action": action,
         "organization": organization,
         "target_member": target_member,
     }

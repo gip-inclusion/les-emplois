@@ -44,13 +44,25 @@
                     <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
                     {% if user in siae.active_admin_members %}
                         <td>
-                            <div class="text-center">
+                            <div>
                                 {% if member.user != user and user in siae.active_admin_members %}
                                     <a href="{% url "siaes_views:deactivate_member" member.user.pk %}" role="button">
                                         {% translate "Retirer de la structure" %}
                                     </a>
+                                    <br>
+                                    {% if not member.is_siae_admin %}
+                                    <a href="{% url "siaes_views:update_admin_role" "add" member.user.pk %}" role="button">
+                                            Ajouter en tant qu'administrateur
+                                        </a>
+                                    {% else %}
+                                    <a href="{% url "siaes_views:update_admin_role" "remove" member.user.pk %}" role="button">
+                                            Retirer les droits d'administrateur
+                                        </a>
+                                    {% endif %}
                                 {% else %}
-                                    {% include "includes/icon.html" with icon="slash" %}
+                                    <div class="text-center">
+                                        {% include "includes/icon.html" with icon="slash" %}
+                                    </div>
                                 {% endif %}
                             </div>
                         </td>
@@ -60,27 +72,6 @@
         </tbody>
     </table>
 </div>
-
-<div class="modal fade" id="deactivateModal" tabindex="-1" aria-labelledby="deactivateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{% translate "Désactiver un utilisateur" %}</h5>
-            </div>
-            <div class="modal-body">
-                {% translate "Vous allez retirer cet utilisateur des membres de votre structure." %}<br>
-            </div>
-            <div class="modal-footer">
-                <form id="deactivation_confirm_form" action="" method="POST">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">{% translate "Désactiver l'utilisateur" %}</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% translate "Annuler" %}</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
     <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>

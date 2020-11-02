@@ -315,9 +315,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         Send email when an admin of the structure disable the membership of a given user (deactivation).
         """
         to = [user.email]
-        context = {"siae": self}
-        subject = "siaes/email/new_member_deactivation_email_subject.txt"
-        body = "siaes/email/new_member_deactivation_email_body.txt"
+        context = {"organization": self}
+        subject = "prescribers/email/new_member_deactivation_email_subject.txt"
+        body = "prescribers/email/new_member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     def new_member_activation_email(self, user):
@@ -325,9 +325,29 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         Send email when an admin of the structure activate the membership of a given user.
         """
         to = [user.email]
-        context = {"siae": self}
+        context = {"organization": self}
         subject = "prescribers/email/new_member_activation_email_subject.txt"
         body = "prescribers/email/new_member_activation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def add_admin_email(self, user):
+        """
+        Send info email to a new admin of the organization (added)
+        """
+        to = [user.email]
+        context = {"organization": self}
+        subject = "prescribers/email/add_admin_email_subject.txt"
+        body = "prescribers/email/add_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def remove_admin_email(self, user):
+        """
+        Send info email to a former admin of the organization (removed)
+        """
+        to = [user.email]
+        context = {"organization": self}
+        subject = "prescribers/email/remove_admin_email_subject.txt"
+        body = "prescribers/email/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 
@@ -362,3 +382,14 @@ class PrescriberMembership(models.Model):
         self.updated_at = timezone.now()
         self.updated_by = user
         return self.is_active
+
+    def set_admin_role(self, active, user):
+        """
+        Set admin role for the given user.
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        assert user
+
+        self.is_admin = active
+        self.updated_at = timezone.now()
+        self.updated_by = user
