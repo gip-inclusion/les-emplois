@@ -9,13 +9,13 @@
     
     {% if action == "remove" %}
         <h1>{% translate "Retrait des droits d'administrateur" %}</h1>
-        <h2 class="text-muted">{{ organization.display_name }}</h2>
+        <h2 class="text-muted">{{ siae.display_name }}</h2>
         <div class="mt-4 alert alert-warning">
             {% translate "Vous allez retirer les droits d'administrateur de votre structure à " %}<b>{{ target_member.get_full_name }}</b>
         </div>
     {% else %}
         <h1>{% translate "Ajout des droits d'administrateur" %}</h1>
-        <h2 class="text-muted">{{ organization.display_name }}</h2>
+        <h2 class="text-muted">{{ siae.display_name }}</h2>
         <div class="mt-4 alert alert-warning">
             {% translate "Vous allez ajouter les droits d'administrateur de votre structure à " %}<b>{{ target_member.get_full_name }}</b>
         </div>
