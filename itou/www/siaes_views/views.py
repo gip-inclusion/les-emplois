@@ -174,6 +174,9 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     user = request.user
     target_member = User.objects.get(pk=user_id)
 
+    if user not in siae.active_admin_members:
+        raise PermissionDenied
+
     if target_member not in siae.active_members:
         raise PermissionDenied
 
@@ -211,6 +214,9 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
     siae = get_current_siae_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
+
+    if user not in siae.active_admin_members:
+        raise PermissionDenied
 
     if target_member not in siae.active_members:
         raise PermissionDenied

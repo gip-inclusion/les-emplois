@@ -79,6 +79,9 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     user = request.user
     target_member = User.objects.get(pk=user_id)
 
+    if user not in organization.active_admin_members:
+        raise PermissionDenied
+
     if target_member not in organization.active_members:
         raise PermissionDenied
 
@@ -116,6 +119,9 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
     organization = get_current_org_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
+
+    if user not in organization.active_admin_members:
+        raise PermissionDenied
 
     if target_member not in organization.active_members:
         raise PermissionDenied

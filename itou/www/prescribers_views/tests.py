@@ -203,3 +203,121 @@ class UserMembershipDeactivationTest(TestCase):
 
         # Check reponse context, only one prescriber organization should remain
         self.assertEqual(len(response.context["user_prescriberorganizations"]), 1)
+
+
+class PrescribersOrganizationAdminMembersManagementTest(TestCase):
+
+    def test_add_admin(self):
+        """
+        Check the ability for an admin to add another admin to the organization
+        """
+        organization = PrescriberOrganizationWithMembershipFactory()
+        admin = organization.members.first()
+        guest = PrescriberFactory()
+        organization.members.add(guest)
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Confirm action
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        organization.refresh_from_db()
+        self.assertTrue(guest in organization.active_admin_members)
+
+        self.client.logout()
+
+    def test_remove_admin(self):
+        """
+        Check the ability for an admin to remove another admin
+        """
+        organization = PrescriberOrganizationWithMembershipFactory()
+        admin = organization.members.first()
+        guest = PrescriberFactory()
+        organization.members.add(guest)
+
+        membership = guest.prescribermembership_set.first()
+        membership.is_admin = True
+        membership.save()
+        self.assertTrue(guest in organization.active_admin_members)
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Confirm action
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        organization.refresh_from_db()
+        self.assertFalse(guest in organization.active_admin_members)
+
+        self.client.logout()
+
+    def test_admin_management_permissions(self):
+        """
+        Lambda users can't update admin members
+        """
+        organization = PrescriberOrganizationWithMembershipFactory()
+        admin = organization.members.first()
+        guest = PrescriberFactory()
+        organization.members.add(guest)
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Confirm action
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Add self as admin with no privilege
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        self.client.logout()
+
+    def test_suspicious_action(self):
+        """
+        Test "suspicious" actions: action code not registered for use (even if admin)
+        """
+        suspicious_action = "h4ckm3"
+        organization = PrescriberOrganizationWithMembershipFactory()
+        admin = organization.members.first()
+        guest = PrescriberFactory()
+        organization.members.add(guest)
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 400)
+
+        self.client.logout()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("prescribers_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": guest.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 400)
+        self.client.logout()
