@@ -246,6 +246,9 @@ class PrescriberSiretForm(forms.Form):
     """
 
     def __init__(self, *args, **kwargs):
+        # We need the kind of the SIAE to check constraint on SIRET number
+        self.kind = kwargs.pop("kind", None)
+
         super().__init__(*args, **kwargs)
         self.org_data = None
 

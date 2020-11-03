@@ -379,7 +379,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    form = forms.PrescriberSiretForm(data=request.POST or None)
+    form = forms.PrescriberSiretForm(data=request.POST or None, kind=session_data.get("kind"))
 
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data
