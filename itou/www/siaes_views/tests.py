@@ -645,7 +645,6 @@ class UserMembershipDeactivationTest(TestCase):
 
 
 class SIAEAdminMembersManagementTest(TestCase):
-
     def test_add_admin(self):
         """
         Check the ability for an admin to add another admin to the siae
