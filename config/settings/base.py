@@ -75,6 +75,7 @@ LOCAL_APPS = [
     "itou.metabase",
     "itou.asp",
     "itou.employee_record.apps.EmployeeRecordConfig",
+    "itou.fiche_salarie",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",

@@ -1,0 +1,9 @@
+Rme_id;Rme_code_mesure;Rme_code_mesure_disp;Rme_libelle_mesure;Rdi_id;Rme_date_debut_effet;Rme_date_fin_effet;Rme_code_aide
+1;AI;AI_DC;Droit Commun - Association Intermédiaire;1;01/01/2016;/;AI
+2;ACI;ACI_DC;Droit Commun - Atelier et Chantier d'Insertion;1;01/01/2016;/;ACI
+3;EI;EI_DC;Droit Commun -  Entreprise d'Insertion;1;01/01/2016;/;EI
+4;ETTI;ETTI_DC;Droit Commun -  Entreprise de Travail Temporaire d'Insertion;1;01/01/2016;/;ETTI
+5;FDI;FDI_DC;Droit Commun -  Fonds Départemental pour l'Insertion;1;01/01/2016;/;FDI
+6;EI;EI_MP;Milieu Pénitentiaire - Entreprise d'Insertion;2;01/01/2016;/;EI
+7;ACI;ACI_MP;Milieu Pénitentiaire - Atelier et Chantier d'Insertion;2;01/01/2016;/;ACI
+8;EITI;EITI_DC;Entreprise d'Insertion par le Travail Indépendant;1;01/12/2019;/;EITI
