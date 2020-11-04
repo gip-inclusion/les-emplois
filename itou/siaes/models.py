@@ -399,6 +399,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 def notifications_default():
     return {"unsubscribed": []}
 
+
 class SiaeMembership(models.Model):
     """Intermediary model between `User` and `Siae`."""
 
