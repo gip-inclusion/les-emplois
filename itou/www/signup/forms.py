@@ -265,9 +265,9 @@ class PrescriberSiretForm(forms.Form):
 
         validate_siret(siret)
 
-        # Does the org already exists?
+        # Does an org with this SIRET already exist?
         org = PrescriberOrganization.objects.filter(siret=siret).first()
-        if org:
+        if org and org.kind == PrescriberOrganization.Kind.PE:
             error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
             admin = org.get_admins().first()
             if admin:
