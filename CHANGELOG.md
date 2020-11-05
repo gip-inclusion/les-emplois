@@ -6,6 +6,15 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [6] - 2020-11-05
+
+### Ajouté
+- Ouverture de la France d'outre-mer
+
+### Modifié
+- Retrait de la restriction des 24h pour les employeurs avant de pouvoir embaucher à nouveau
+- Correction d'une erreur de geocoding qui bloquait le parcours d'inscription des prescripteurs à la saisie du SIRET
+
 ## [5] - 2020-10-23
 
 ### Ajouté
