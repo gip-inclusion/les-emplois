@@ -1,11 +1,11 @@
 from itou.utils.emails import get_email_message
+from itou.utils.notifications import NotificationBase
 
 
-class NewJobApplicationSiaeEmailNotification:
-    name = "NewJobApplicationSiaeNotification"
-
+class NewJobApplicationSiaeEmailNotification(NotificationBase):
     def __init__(self, job_application=None):
         self.job_application = job_application
+        self.siae = job_application.to_siae
 
     @property
     def email(self):
@@ -15,17 +15,7 @@ class NewJobApplicationSiaeEmailNotification:
         body = "apply/email/new_for_siae_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def send(self):
-        return self.email.send()
-
-    def unsubscribe(self, siae_membership):
-        siae_membership.notifications["unsubscribed"] += self.name
-        siae_membership.save()
-
     def _get_recipients(self):
-        siae = self.job_application.to_siae
-        return (
-            siae.siaemembership_set.exclude(notifications__unsubscribed__contains=self.name)
-            .filter(user__is_active=True)
-            .values_list("user__email", flat=True)
+        return self.siae.siaemembership_set.filter(self.subscribed_lookup, user__is_active=True).values_list(
+            "user__email", flat=True
         )
