@@ -6,7 +6,7 @@ Résumé des changements apportés.
 
 ### Pourquoi ?
 
-Indiquer le problème que nous sommes en train de résoudre et les objectifs métier ou technique sont visés par ces changements.
+Indiquer le problème que nous sommes en train de résoudre et les objectifs métiers ou techniques qui sont visés par ces changements.
 
 ### Comment ?
 
