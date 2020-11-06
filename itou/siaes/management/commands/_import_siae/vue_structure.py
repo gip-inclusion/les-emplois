@@ -22,7 +22,7 @@ from itou.utils.validators import validate_naf, validate_siret
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-VUE_STRUCTURE_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_Structure_12102020_074951.csv"
+VUE_STRUCTURE_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_Structure_02112020_075153.csv"
 
 
 @timeit
