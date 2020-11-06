@@ -20,17 +20,36 @@ def update_existing_conventions(dry_run):
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
         convention = siae.convention
+        assert convention.kind == siae.kind
+        assert asp_id in ASP_ID_TO_SIRET_SIGNATURE
+        assert convention.siren_signature == siae.siren
+
+        # Sometimes the same siret is attached to one asp_id in one export
+        # and is attached to another asp_id in the next export.
+        # In other words, the siae has to be detached from its current
+        # convention and be attached to a new convention.
+        if convention.asp_id != asp_id:
+            print(
+                f"siae.id={siae.id} has changed convention from "
+                f"asp_id={convention.asp_id} to asp_id={asp_id} (will be fixed)"
+            )
+            if not dry_run:
+                # New convention will be created later by get_creatable_conventions()
+                # and then attached to siae.
+                siae.convention = None
+                siae.save()
+            continue
+
         # Siret_signature can change from one export to the next!
         # e.g. asp_id=4948 has changed from 81051848000027 to 81051848000019
         if convention.siret_signature != siret_signature:
+            print(
+                f"convention.id={convention.id} has changed siret_signature from "
+                f"{convention.siret_signature} to {siret_signature} (will be fixed)"
+            )
             if not dry_run:
                 convention.siret_signature = siret_signature
                 convention.save()
-
-        assert convention.kind == siae.kind
-        assert convention.asp_id == asp_id
-        assert asp_id in ASP_ID_TO_SIRET_SIGNATURE
-        assert convention.siren_signature == siae.siren
 
         is_active = does_siae_have_an_active_convention(siae)
         if convention.is_active != is_active:
@@ -45,8 +64,6 @@ def update_existing_conventions(dry_run):
 def get_creatable_conventions():
     """
     Get conventions which should be created.
-
-    Update existing conventions on the fly.
 
     Output : list of (convention, siae) tuples.
     """
@@ -76,3 +93,14 @@ def get_creatable_conventions():
 
 def get_deletable_conventions():
     return SiaeConvention.objects.filter(siaes__isnull=True)
+
+
+def check_each_convention_has_exactly_one_asp_siae(dry_run):
+    for convention in SiaeConvention.objects.prefetch_related("siaes").all():
+        asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Siae.SOURCE_ASP]
+        if dry_run:
+            # During a dry run we might have some zero-siae conventions
+            # which have not been deleted for real.
+            assert len(asp_siaes) in [0, 1]
+        else:
+            assert len(asp_siaes) == 1
