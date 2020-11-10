@@ -240,7 +240,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         * user.is_active: user is able to do something on the platform
         * user.membership.is_active: is a member of this structure
         """
-        return self.active_members.filter(prescribermembership__is_admin=True, prescribermembership__organization=self)
+        return self.active_members.filter(prescribermembership__is_admin=True)
 
     def get_card_url(self):
         if not self.is_authorized:
@@ -376,8 +376,6 @@ class PrescriberMembership(models.Model):
         Toggles the membership of a member (reference held by self)
         `user` is the admin updating this user (`updated_by` field)
         """
-        assert user
-
         self.is_active = not self.is_active
         self.updated_at = timezone.now()
         self.updated_by = user
@@ -388,8 +386,6 @@ class PrescriberMembership(models.Model):
         Set admin role for the given user.
         `user` is the admin updating this user (`updated_by` field)
         """
-        assert user
-
         self.is_admin = active
         self.updated_at = timezone.now()
         self.updated_by = user

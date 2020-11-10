@@ -9,33 +9,16 @@
 <div class="content-small">
     <h1>{% translate "Retrait d'un collaborateur" %}</h1>
     <div class="mt-4 alert alert-warning">
-        {% translate "Vous allez retirer " %}<b>{{ target_member.get_full_name }}</b>
-        {% translate " de votre organisation "%}<b>({{ organization.display_name }})</b>.
+        {% translate "Vous allez retirer" %} <b>{{ target_member.get_full_name }}</b>
+        {% translate " de votre organisation"%} <b>({{ organization.display_name }})</b>.
     </div>
 
-    <div class="mt-4">
-        {% blocktranslate %}
-            Le tableau de bord de votre structure ne lui sera plus accessible.
-        {% endblocktranslate %}
-    </div>
-
-    <div class="mt-4">
-        {% blocktranslate %}
-            Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation (candidatures, PASS IAE par ex.).
-        {% endblocktranslate %}
-    </div>
-
-    <div class="mt-4">
-        {% blocktranslate %}
-            Cet utilisateur sera notifié par e-mail de son retrait de votre organisation.
-        {% endblocktranslate %}
-    </div>
-
-    <div class="mt-4">
-        {% blocktranslate %}
-            En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation.
-        {% endblocktranslate %}
-    </div>
+    <ul>
+        <li>{% translate "Le tableau de bord de votre structure ne lui sera plus accessible." %}</li>
+        <li>{% translate "Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation." %}</li>
+        <li>{% translate "Cet utilisateur sera notifié par e-mail de son retrait de votre organisation." %}</li>
+        <li>{% translate "En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation." %}</li>
+    </ul>
 
     <form action="{% url "prescribers_views:deactivate_member" target_member.pk %}" method="POST">
         {% csrf_token %}
