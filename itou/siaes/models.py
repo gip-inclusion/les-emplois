@@ -296,7 +296,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         * user.is_active: user is able to do something on the platform
         * user.membership.is_active: is a member of this structure
         """
-        return self.active_members.filter(siaemembership__is_siae_admin=True)
+        return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self)
 
     @property
     def signup_magic_link(self):

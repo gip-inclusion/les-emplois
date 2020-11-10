@@ -42,7 +42,7 @@ class ItouCurrentOrganizationMiddleware:
                         #   way for an inactive siae user to be ressucitated.
                         if not user.is_siae_staff_with_org:
                             message = (
-                                "Nous sommes désolé, votre compte n'est "
+                                "Nous sommes désolés, votre compte n'est "
                                 "actuellement rattaché à aucune structure.<br>"
                                 "Nous espérons cependant avoir l'occasion de vous accueillir de "
                                 "nouveau sur la Plateforme."

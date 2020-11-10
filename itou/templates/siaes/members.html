@@ -12,7 +12,7 @@
 </div>
 
 <div class="alert alert-info" role="alert">
-    {% translate "Vous êtes connecté en tant que " %}<b>{{ user.first_name }} {{ user.last_name }}</b> ({{ user.email }})
+    {% translate "Vous êtes connecté en tant que" %} <b>{{ user.get_full_name }}</b> ({{ user.email }})
 </div>
 
 {% with active_admin_members=siae.active_admin_members %}
@@ -46,7 +46,7 @@
                         {% if user in active_admin_members %}
                             <td>
                                 <div>
-                                    {% if member.user != user and user in active_admin_members %}
+                                    {% if member.user != user %}
                                         <a href="{% url "siaes_views:deactivate_member" member.user.pk %}" role="button">
                                             {% translate "Retirer de la structure" %}
                                         </a>

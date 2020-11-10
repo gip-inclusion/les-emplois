@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -154,16 +154,10 @@ def members(request, template_name="siaes/members.html"):
     members = siae.siaemembership_set.filter(is_active=True).select_related("user").all().order_by("joined_at")
     pending_invitations = siae.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    # TODO Optimize: in one query (via SIAE)?
-    deactivated_members = (
-        siae.siaemembership_set.filter(is_active=False).select_related("user").all().order_by("updated_at")
-    )
-
     context = {
         "siae": siae,
         "members": members,
         "pending_invitations": pending_invitations,
-        "deactivated_members": deactivated_members,
     }
     return render(request, template_name, context)
 
@@ -173,8 +167,9 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     siae = get_current_siae_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
+    user_is_admin = user in siae.active_admin_members
 
-    if user not in siae.active_admin_members:
+    if not user_is_admin:
         raise PermissionDenied
 
     if target_member not in siae.active_members:
@@ -183,7 +178,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     membership = target_member.siaemembership_set.get(siae=siae)
 
     if request.method == "POST":
-        if user != target_member and user in siae.active_admin_members:
+        if user != target_member and user_is_admin:
             if membership.is_active:
                 membership.toggle_user_membership(user)
                 membership.save()
@@ -208,14 +203,13 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
 
 @login_required
 def update_admin_role(request, action, user_id, template_name="siaes/update_admins.html"):
-    if action not in ["add", "remove"]:
-        raise SuspiciousOperation
-
     siae = get_current_siae_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
+    # Saves one SQL query
+    user_is_admin = user in siae.active_admin_members
 
-    if user not in siae.active_admin_members:
+    if not user_is_admin:
         raise PermissionDenied
 
     if target_member not in siae.active_members:
@@ -224,7 +218,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
     membership = target_member.siaemembership_set.get(siae=siae)
 
     if request.method == "POST":
-        if user != target_member and user in siae.active_admin_members and membership.is_active:
+        if user != target_member and user_is_admin and membership.is_active:
             if action == "add":
                 membership.set_admin_role(True, user)
                 messages.success(

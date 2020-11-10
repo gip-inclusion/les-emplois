@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -9,7 +9,6 @@ from django.utils.translation import gettext as _
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.prescribers_views.forms import EditPrescriberOrganizationForm
 
@@ -57,18 +56,10 @@ def members(request, template_name="prescribers/members.html"):
     )
     pending_invitations = organization.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    deactivated_members = (
-        organization.prescribermembership_set.filter(is_active=False)
-        .select_related("user")
-        .all()
-        .order_by("updated_at")
-    )
-
     context = {
         "organization": organization,
         "members": members,
         "pending_invitations": pending_invitations,
-        "deactivated_members": deactivated_members,
     }
     return render(request, template_name, context)
 
@@ -78,8 +69,9 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     organization = get_current_org_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
+    user_is_admin = user in organization.active_admin_members
 
-    if user not in organization.active_admin_members:
+    if not user_is_admin:
         raise PermissionDenied
 
     if target_member not in organization.active_members:
@@ -88,7 +80,7 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     membership = target_member.prescribermembership_set.get(organization=organization)
 
     if request.method == "POST":
-        if user != target_member and user in organization.active_admin_members:
+        if user != target_member and user_is_admin:
             if membership.is_active:
                 membership.toggle_user_membership(user)
                 membership.save()
@@ -98,7 +90,6 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
                     % {"name": target_member.get_full_name()},
                 )
                 organization.new_member_deactivation_email(membership.user).send()
-                kill_sessions_for_user(membership.user.pk)
         else:
             raise PermissionDenied
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
@@ -113,14 +104,12 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
 
 @login_required
 def update_admin_role(request, action, user_id, template_name="prescribers/update_admins.html"):
-    if action not in ["add", "remove"]:
-        raise SuspiciousOperation
-
     organization = get_current_org_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
+    user_is_admin = user in organization.active_admin_members
 
-    if user not in organization.active_admin_members:
+    if not user_is_admin:
         raise PermissionDenied
 
     if target_member not in organization.active_members:
@@ -129,7 +118,7 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
     membership = target_member.prescribermembership_set.get(organization=organization)
 
     if request.method == "POST":
-        if user != target_member and user in organization.active_admin_members and membership.is_active:
+        if user != target_member and user_is_admin and membership.is_active:
             if action == "add":
                 membership.set_admin_role(True, user)
                 messages.success(
@@ -146,7 +135,6 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
                     % {"name": target_member.get_full_name()},
                 )
                 organization.remove_admin_email(target_member).send()
-                kill_sessions_for_user(membership.user.pk)
             membership.save()
         else:
             raise PermissionDenied

@@ -3,6 +3,7 @@ from unittest import mock
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
@@ -570,7 +571,7 @@ class UserMembershipDeactivationTest(TestCase):
         # User must have been notified of deactivation (we're human after all)
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("[Désactivation] Vous n'étes plus membre d'une organisation", email.subject)
+        self.assertIn("[Désactivation] Vous n'êtes plus membre d'une organisation", email.subject)
         self.assertIn("Un administrateur vous a retiré d'une structure sur la Plateforme de l'inclusion", email.body)
         self.assertEqual(email.to[0], guest.email)
 
@@ -738,20 +739,6 @@ class SIAEAdminMembersManagementTest(TestCase):
         guest = siae.members.all()[1]
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
-        url = reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 400)
-
-        self.client.logout()
-
-        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
-        url = reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": guest.id})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 400)
-        self.client.logout()
+        # update: less test with RE_PATH
+        with self.assertRaises(NoReverseMatch):
+            reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})

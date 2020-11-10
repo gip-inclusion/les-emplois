@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from itou.www.prescribers_views import views
 
@@ -11,5 +11,8 @@ urlpatterns = [
     path("colleagues", views.members, name="members"),
     path("<int:org_id>/card", views.card, name="card"),
     path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
-    path("admin_role/<str:action>/<int:user_id>", views.update_admin_role, name="update_admin_role"),
+    # Can't mix capture var syntaxes in `re_path`: all path vars expressed as RE
+    re_path(
+        "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
+    ),
 ]
