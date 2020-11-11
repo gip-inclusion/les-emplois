@@ -11,7 +11,6 @@ from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.sessions import kill_sessions_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
 
@@ -188,7 +187,6 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
                     % {"name": target_member.get_full_name()},
                 )
                 siae.new_member_deactivation_email(membership.user).send()
-                kill_sessions_for_user(membership.user.pk)
         else:
             raise PermissionDenied
         return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
@@ -235,7 +233,6 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
                     % {"name": target_member.get_full_name()},
                 )
                 siae.remove_admin_email(target_member).send()
-                kill_sessions_for_user(membership.user.pk)
             membership.save()
         else:
             raise PermissionDenied
