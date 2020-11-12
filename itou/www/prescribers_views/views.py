@@ -69,7 +69,7 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     organization = get_current_org_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
-    user_is_admin = user in organization.active_admin_members
+    user_is_admin = organization.has_admin(user)
 
     if not user_is_admin:
         raise PermissionDenied
@@ -89,7 +89,7 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
                     _("%(name)s a été retiré(e) des membres actifs de cette structure.")
                     % {"name": target_member.get_full_name()},
                 )
-                organization.new_member_deactivation_email(membership.user).send()
+                organization.member_deactivation_email(membership.user).send()
         else:
             raise PermissionDenied
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
@@ -107,7 +107,7 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
     organization = get_current_org_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
-    user_is_admin = user in organization.active_admin_members
+    user_is_admin = organization.has_admin(user)
 
     if not user_is_admin:
         raise PermissionDenied

@@ -6,6 +6,7 @@ from django.test import TestCase
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationFactory,
+    PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
 from itou.prescribers.models import PrescriberOrganization
@@ -92,3 +93,15 @@ class ModelTest(TestCase):
         self.assertEqual(organization2.members.count(), 2)
         self.assertEqual(organization2.active_members.count(), 2)
         self.assertEqual(organization2.active_admin_members.count(), 1)
+
+    def test_active_member_with_many_memberships(self):
+        organization1 = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
+        user = organization1.members.all()[1]
+        organization2 = PrescriberOrganizationWith2MembershipFactory()
+        organization2.members.add(user)
+
+        self.assertFalse(user in organization1.active_members)
+        self.assertEqual(organization1.members.count(), 2)
+        self.assertEqual(organization1.active_members.count(), 1)
+        self.assertEqual(organization2.members.count(), 3)
+        self.assertEqual(organization2.active_members.count(), 3)

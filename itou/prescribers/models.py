@@ -217,6 +217,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def has_members(self):
         return self.active_members.exists()
 
+    def has_admin(self, user):
+        return self.active_admin_members.filter(pk=user.pk).exists()
+
     @property
     def active_members(self):
         """
@@ -318,24 +321,24 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def new_member_deactivation_email(self, user):
+    def member_deactivation_email(self, user):
         """
-        Send email when an admin of the structure disable the membership of a given user (deactivation).
+        Send email when an admin of the structure disables the membership of a given user (deactivation).
         """
         to = [user.email]
         context = {"organization": self}
-        subject = "prescribers/email/new_member_deactivation_email_subject.txt"
-        body = "prescribers/email/new_member_deactivation_email_body.txt"
+        subject = "prescribers/email/member_deactivation_email_subject.txt"
+        body = "prescribers/email/member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def new_member_activation_email(self, user):
+    def member_activation_email(self, user):
         """
-        Send email when an admin of the structure activate the membership of a given user.
+        Send email when an admin of the structure activates the membership of a given user.
         """
         to = [user.email]
         context = {"organization": self}
-        subject = "prescribers/email/new_member_activation_email_subject.txt"
-        body = "prescribers/email/new_member_activation_email_body.txt"
+        subject = "prescribers/email/member_activation_email_subject.txt"
+        body = "prescribers/email/member_activation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     def add_admin_email(self, user):
@@ -367,10 +370,11 @@ class PrescriberMembership(models.Model):
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_admin = models.BooleanField(verbose_name=_("Administrateur de la structure d'accompagnement"), default=False)
     is_active = models.BooleanField(_("Rattachement actif"), default=True)
-    updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour"), null=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="prescriber_organization_membership_updated_by",
+        related_name="updated_prescribermembership_set",
         null=True,
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
@@ -379,13 +383,17 @@ class PrescriberMembership(models.Model):
     class Meta:
         unique_together = ("user_id", "organization_id")
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
     def toggle_user_membership(self, user):
         """
         Toggles the membership of a member (reference held by self)
         `user` is the admin updating this user (`updated_by` field)
         """
         self.is_active = not self.is_active
-        self.updated_at = timezone.now()
         self.updated_by = user
         return self.is_active
 
@@ -395,5 +403,4 @@ class PrescriberMembership(models.Model):
         `user` is the admin updating this user (`updated_by` field)
         """
         self.is_admin = active
-        self.updated_at = timezone.now()
         self.updated_by = user

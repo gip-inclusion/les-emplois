@@ -8,6 +8,7 @@ from django.urls.exceptions import NoReverseMatch
 from itou.prescribers.factories import (
     PrescriberFactory,
     PrescriberOrganizationFactory,
+    PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
 from itou.prescribers.models import PrescriberOrganization
@@ -110,10 +111,8 @@ class UserMembershipDeactivationTest(TestCase):
         Standard use case of user deactivation.
         Everything should be fine ...
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        admin, guest = organization.members.all()
 
         memberships = guest.prescribermembership_set.all()
         membership = memberships.first()
@@ -156,10 +155,8 @@ class UserMembershipDeactivationTest(TestCase):
         and without any membership becomes an "orienteur".
         As such he must be able to login.
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        admin, guest = organization.members.all()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -199,10 +196,10 @@ class UserMembershipDeactivationTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
 
-        # Whereever guest land should give a 200 OK
+        # Wherever guest lands should give a 200 OK
         self.assertEqual(response.status_code, 200)
 
-        # Check reponse context, only one prescriber organization should remain
+        # Check response context, only one prescriber organization should remain
         self.assertEqual(len(response.context["user_prescriberorganizations"]), 1)
 
 
@@ -211,10 +208,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         """
         Check the ability for an admin to add another admin to the organization
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        admin, guest = organization.members.all()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
@@ -230,16 +225,12 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         organization.refresh_from_db()
         self.assertTrue(guest in organization.active_admin_members)
 
-        self.client.logout()
-
     def test_remove_admin(self):
         """
         Check the ability for an admin to remove another admin
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        admin, guest = organization.members.all()
 
         membership = guest.prescribermembership_set.first()
         membership.is_admin = True
@@ -260,16 +251,12 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         organization.refresh_from_db()
         self.assertFalse(guest in organization.active_admin_members)
 
-        self.client.logout()
-
     def test_admin_management_permissions(self):
         """
-        Lambda users can't update admin members
+        Non-admin users can't update admin members
         """
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        admin, guest = organization.members.all()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
@@ -291,17 +278,13 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
 
-        self.client.logout()
-
     def test_suspicious_action(self):
         """
         Test "suspicious" actions: action code not registered for use (even if admin)
         """
         suspicious_action = "h4ckm3"
-        organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
-        guest = PrescriberFactory()
-        organization.members.add(guest)
+        organization = PrescriberOrganizationWith2MembershipFactory()
+        admin, guest = organization.members.all()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
 

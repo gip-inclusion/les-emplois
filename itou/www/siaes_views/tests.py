@@ -594,8 +594,7 @@ class UserMembershipDeactivationTest(TestCase):
         are activated/invited again, they will be able to log in.
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        guest = siae.members.all()[1]
+        admin, guest = siae.members.all()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -638,10 +637,10 @@ class UserMembershipDeactivationTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
 
-        # Whereever guest land should give a 200 OK
+        # Wherever guest lands should give a 200 OK
         self.assertEqual(response.status_code, 200)
 
-        # Check reponse context, only one SIAE should remain
+        # Check response context, only one SIAE should remain
         self.assertEqual(len(response.context["user_siaes"]), 1)
 
 
@@ -651,8 +650,7 @@ class SIAEAdminMembersManagementTest(TestCase):
         Check the ability for an admin to add another admin to the siae
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        guest = siae.members.all()[1]
+        admin, guest = siae.members.all()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
@@ -668,15 +666,12 @@ class SIAEAdminMembersManagementTest(TestCase):
         siae.refresh_from_db()
         self.assertTrue(guest in siae.active_admin_members)
 
-        self.client.logout()
-
     def test_remove_admin(self):
         """
         Check the ability for an admin to remove another admin
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        guest = siae.members.all()[1]
+        admin, guest = siae.members.all()
 
         membership = guest.siaemembership_set.first()
         membership.is_siae_admin = True
@@ -697,15 +692,12 @@ class SIAEAdminMembersManagementTest(TestCase):
         siae.refresh_from_db()
         self.assertFalse(guest in siae.active_admin_members)
 
-        self.client.logout()
-
     def test_admin_management_permissions(self):
         """
-        Lambda users can't update admin members
+        Non-admin users can't update admin members
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        guest = siae.members.all()[1]
+        admin, guest = siae.members.all()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
@@ -727,16 +719,13 @@ class SIAEAdminMembersManagementTest(TestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
 
-        self.client.logout()
-
     def test_suspicious_action(self):
         """
         Test "suspicious" actions: action code not registered for use (even if admin)
         """
         suspicious_action = "h4ckm3"
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        guest = siae.members.all()[1]
+        admin, guest = siae.members.all()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         # update: less test with RE_PATH

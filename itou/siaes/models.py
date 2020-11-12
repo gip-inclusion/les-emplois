@@ -340,24 +340,24 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def new_member_deactivation_email(self, user):
+    def member_deactivation_email(self, user):
         """
-        Send email when an admin of the structure disable the membership of a given user (deactivation).
+        Send email when an admin of the structure disables the membership of a given user (deactivation).
         """
         to = [user.email]
         context = {"siae": self}
-        subject = "siaes/email/new_member_deactivation_email_subject.txt"
-        body = "siaes/email/new_member_deactivation_email_body.txt"
+        subject = "siaes/email/member_deactivation_email_subject.txt"
+        body = "siaes/email/member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def new_member_activation_email(self, user):
+    def member_activation_email(self, user):
         """
-        Send email when an admin of the structure reactivate the membership of a given user.
+        Send email when an admin of the structure reactivates the membership of a given user.
         """
         to = [user.email]
         context = {"siae": self}
-        subject = "siaes/email/new_member_activation_email_subject.txt"
-        body = "siaes/email/new_member_activation_email_body.txt"
+        subject = "siaes/email/member_activation_email_subject.txt"
+        body = "siaes/email/member_activation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     def add_admin_email(self, user):
@@ -409,10 +409,11 @@ class SiaeMembership(models.Model):
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
     is_active = models.BooleanField(_("Rattachement actif"), default=True)
-    updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour"), null=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="siae_membership_updated_by",
+        related_name="updated_siaemembership_set",
         null=True,
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
@@ -421,13 +422,17 @@ class SiaeMembership(models.Model):
     class Meta:
         unique_together = ("user_id", "siae_id")
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
     def toggle_user_membership(self, user):
         """
         Toggles the SIAE membership of a member (reference held by self)
         `user` is the admin updating this user (`updated_by` field)
         """
         self.is_active = not self.is_active
-        self.updated_at = timezone.now()
         self.updated_by = user
         return self.is_active
 
@@ -437,7 +442,6 @@ class SiaeMembership(models.Model):
         `user` is the admin updating this user (`updated_by` field)
         """
         self.is_siae_admin = active
-        self.updated_at = timezone.now()
         self.updated_by = user
 
 

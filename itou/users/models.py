@@ -194,11 +194,11 @@ class User(AbstractUser, AddressMixin):
         return time_since_date_joined.days < 7
 
     @property
-    def is_siae_staff_with_org(self):
+    def is_siae_staff_with_siae(self):
         """
         Useful to identify users deactivated as member of a SIAE
         and without any membership left.
-        They are in a "dangling" status: still active but unable to login
+        They are in a "dangling" status: still active (membership-wise) but unable to login
         because not member of any SIAE.
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()

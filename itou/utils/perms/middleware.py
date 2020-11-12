@@ -40,7 +40,7 @@ class ItouCurrentOrganizationMiddleware:
                         # - pages of the invitation process (including login)
                         #   as being invited to a new active siae is the only
                         #   way for an inactive siae user to be ressucitated.
-                        if not user.is_siae_staff_with_org:
+                        if not user.is_siae_staff_with_siae:
                             message = (
                                 "Nous sommes désolés, votre compte n'est "
                                 "actuellement rattaché à aucune structure.<br>"

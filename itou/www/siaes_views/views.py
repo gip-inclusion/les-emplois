@@ -167,6 +167,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     user = request.user
     target_member = User.objects.get(pk=user_id)
     user_is_admin = user in siae.active_admin_members
+    user_is_admin = siae.has_admin(user)
 
     if not user_is_admin:
         raise PermissionDenied
@@ -186,7 +187,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
                     _("%(name)s a été retiré(e) des membres actifs de cette structure.")
                     % {"name": target_member.get_full_name()},
                 )
-                siae.new_member_deactivation_email(membership.user).send()
+                siae.member_deactivation_email(membership.user).send()
         else:
             raise PermissionDenied
         return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
@@ -204,8 +205,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
     siae = get_current_siae_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
-    # Saves one SQL query
-    user_is_admin = user in siae.active_admin_members
+    user_is_admin = siae.has_admin(user)
 
     if not user_is_admin:
         raise PermissionDenied
