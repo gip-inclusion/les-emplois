@@ -1,0 +1,5 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% load i18n %}
+{% block subject %}
+{% blocktranslate %}[Activation] Vous êtes désormais administrateur de {{ structure.display_name }}{% endblocktranslate %}
+{% endblock %}

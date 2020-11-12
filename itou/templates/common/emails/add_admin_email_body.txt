@@ -13,9 +13,9 @@ Un administrateur peut ajouter ou retirer :
 
 {% translate "Structure :" %}
 
-- {% translate "Nom" %} : {{ organization.display_name }}
-- {% translate "Type" %} : {{ organization.kind }}
-- {% translate "Email de contact" %} : {{ organization.email }}
+- {% translate "Nom" %} : {{ structure.display_name }}
+- {% translate "Type" %} : {{ structure.kind }}
+- {% translate "Email de contact" %} : {{ structure.email }}
 
 {% translate "Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs de cette structure sur la Plateforme de l'inclusion." %}
 

@@ -326,9 +326,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         Send email when an admin of the structure disables the membership of a given user (deactivation).
         """
         to = [user.email]
-        context = {"organization": self}
-        subject = "prescribers/email/member_deactivation_email_subject.txt"
-        body = "prescribers/email/member_deactivation_email_body.txt"
+        context = {"structure": self}
+        subject = "common/emails/member_deactivation_email_subject.txt"
+        body = "common/emails/member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     def member_activation_email(self, user):
@@ -336,9 +336,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         Send email when an admin of the structure activates the membership of a given user.
         """
         to = [user.email]
-        context = {"organization": self}
-        subject = "prescribers/email/member_activation_email_subject.txt"
-        body = "prescribers/email/member_activation_email_body.txt"
+        context = {"structure": self}
+        subject = "common/emails/member_activation_email_subject.txt"
+        body = "common/emails/member_activation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     def add_admin_email(self, user):
@@ -346,9 +346,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         Send info email to a new admin of the organization (added)
         """
         to = [user.email]
-        context = {"organization": self}
-        subject = "prescribers/email/add_admin_email_subject.txt"
-        body = "prescribers/email/add_admin_email_body.txt"
+        context = {"structure": self}
+        subject = "common/emails/add_admin_email_subject.txt"
+        body = "common/emails/add_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
     def remove_admin_email(self, user):
@@ -356,9 +356,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         Send info email to a former admin of the organization (removed)
         """
         to = [user.email]
-        context = {"organization": self}
-        subject = "prescribers/email/remove_admin_email_subject.txt"
-        body = "prescribers/email/remove_admin_email_body.txt"
+        context = {"structure": self}
+        subject = "common/emails/remove_admin_email_subject.txt"
+        body = "common/emails/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
 
 
