@@ -38,7 +38,7 @@ class TestSendSiaeInvitation(TestCase):
         self.send_invitation_url = reverse("invitations_views:invite_siae_staff")
 
     def tearDown(self):
-        invitation_query = self.invitations_model.objects.filter(siae=self.siae)  # .order_by("-created_at")
+        invitation_query = self.invitations_model.objects.filter(siae=self.siae)
         self.assertTrue(invitation_query.exists())
         invitation = invitation_query.first()
         self.assertEqual(invitation.first_name, self.guest.first_name)

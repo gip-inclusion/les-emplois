@@ -92,13 +92,6 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         membership.save()
         self.assertFalse(self.guest in self.org.active_members)
         # Invite user (the revenge)
-        self.post_data.update(
-            {
-                "form-0-first_name": self.guest.first_name,
-                "form-0-last_name": self.guest.last_name,
-                "form-0-email": self.guest.email,
-            }
-        )
         self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
 
 
