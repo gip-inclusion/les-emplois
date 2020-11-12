@@ -7,7 +7,7 @@
 
 {% translate "Structure :" %}
 
-- {% translate "Nom" %}  : {{ siae.display_name }}
+- {% translate "Nom" %} : {{ siae.display_name }}
 - {% translate "Type" %} : {{ siae.kind }}
 - {% translate "Email de contact" %} : {{ siae.email }}
 

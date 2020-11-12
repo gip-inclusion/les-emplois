@@ -7,7 +7,7 @@
 
 {% translate "Structure :" %}
 
-- {% translate "Nom" %}  : {{ organization.display_name }}
+- {% translate "Nom" %} : {{ organization.display_name }}
 - {% translate "Type" %} : {{ organization.kind }}
 - {% translate "Email de contact" %} : {{ organization.email }}
 
