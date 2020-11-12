@@ -220,7 +220,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     @property
     def active_members(self):
         """
-        In this context, active == has an active membership AND user is still active
+        In this context, active == has an active membership AND user is still active.
+
+        Query will be optimized later with Qs.
         """
         return self.members.filter(is_active=True, prescribermembership__is_active=True)
 
@@ -229,8 +231,10 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         """
         List of previous members of the structure, still active as user (from the model POV)
         but deactivated by an admin at some point in time.
+
+        Query will be optimized later with Qs.
         """
-        return self.members(is_active=True, prescribermembership__is_active=False)
+        return self.members.filter(is_active=True, prescribermembership__is_active=False)
 
     @property
     def active_admin_members(self):
@@ -239,8 +243,12 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         active user/admin in this context means both:
         * user.is_active: user is able to do something on the platform
         * user.membership.is_active: is a member of this structure
+
+        Query will be optimized later with Qs.
         """
-        return self.active_members.filter(prescribermembership__is_admin=True)
+        return self.members.filter(
+            is_active=True, prescribermembership__is_admin=True, prescribermembership__is_active=True
+        )
 
     def get_card_url(self):
         if not self.is_authorized:

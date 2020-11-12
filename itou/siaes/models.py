@@ -286,7 +286,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         List of previous members of the structure, still active as user (from the model POV)
         but deactivated by an admin at some point in time.
         """
-        return self.members(is_active=True, siaemembership__is_active=False)
+        return self.members.filter(is_active=True, siaemembership__is_active=False)
 
     @property
     def active_admin_members(self):
@@ -295,8 +295,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         active user/admin in this context means both:
         * user.is_active: user is able to do something on the platform
         * user.membership.is_active: is a member of this structure
+
+        The `self` reference is mandatory even if confusing (many SIAE memberships possible for a given member).
+        Will be optimized later with Qs.
         """
-        return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self)
+        return self.members.filter(is_active=True, siaemembership__is_active=True, siaemembership__is_siae_admin=True)
 
     @property
     def signup_magic_link(self):
