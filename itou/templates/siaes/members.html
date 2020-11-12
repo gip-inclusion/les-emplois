@@ -3,28 +3,27 @@
 
 {% block title %}{% translate "Collaborateurs" %}{{ block.super }}{% endblock %}
 
-
 {% block content %}
 
-<div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
-    <h1>{% translate "Collaborateurs" %}</h1>
-    <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
-</div>
+    <div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
+        <h1>{% translate "Collaborateurs" %}</h1>
+        <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
+    </div>
 
-<div class="alert alert-info" role="alert">
-    {% translate "Vous êtes connecté en tant que" %} <b>{{ user.get_full_name }}</b> ({{ user.email }})
-</div>
+    <div class="alert alert-info" role="alert">
+        {% translate "Vous êtes connecté en tant que" %} <b>{{ user.get_full_name }}</b> ({{ user.email }})
+    </div>
 
-{% with active_admin_members=siae.active_admin_members base_url="siaes_views" %}
-    {% include "includes/members.html" %}
-{% endwith %}
+    {% with active_admin_members=siae.active_admin_members base_url="siaes_views" %}
+        {% include "includes/members.html" %}
+    {% endwith %}
 
-<a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
-    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
-</a>
+    <a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
+        <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
+    </a>
 
-{% if pending_invitations %}
-    {% include "invitations_views/includes/pending_invitations.html" %}
-{% endif %}
+    {% if pending_invitations %}
+        {% include "invitations_views/includes/pending_invitations.html" %}
+    {% endif %}
 
 {% endblock %}

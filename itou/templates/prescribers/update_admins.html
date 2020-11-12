@@ -5,45 +5,8 @@
 
 {% block content %}
 
-<div class="content-small">
-    
-    {% if action == "remove" %}
-        <h1>{% translate "Retrait des droits d'administrateur" %}</h1>
-        <h2 class="text-muted">{{ organization.display_name }}</h2>
-        <div class="mt-4 alert alert-warning">
-            {% translate "Vous allez retirer les droits d'administrateur de votre organisation à" %} <b>{{ target_member.get_full_name }}</b>
-        </div>
-    {% else %}
-        <h1>{% translate "Ajout des droits d'administrateur" %}</h1>
-        <h2 class="text-muted">{{ organization.display_name }}</h2>
-        <div class="mt-4 alert alert-warning">
-            {% translate "Vous allez ajouter les droits d'administrateur de votre organisation à" %} <b>{{ target_member.get_full_name }}</b>
-        </div>
-    {% endif %}
-
-    <ul>
-        <li>{% translate "Le role d'administrateur permet d'ajouter ou de retirer des utilisateurs de votre structure." %}</li>
-        <li>{% translate "Il permet également d'ajouter ou de retirer de nouveaux administrateurs." %}</li>
-        <li>{% translate "Cet utilisateur sera notifié par e-mail de la modification de son rôle." %}</li>
-    </ul>
-
-    <form action="{% url "prescribers_views:update_admin_role" action target_member.pk %}" method="POST">
-        {% csrf_token %}
-        <div class="mt-4 form-group">
-            <a class="btn btn-secondary" href="{% url "prescribers_views:members"%}">
-                {% translate "Annuler" %}
-            </a>
-            <button class="btn btn-primary submit">
-                {% if action == "remove" %}
-                    {% translate "Retirer les droits administrateur" %}
-                {% else %}
-                    {% translate "Ajouter les droits administrateur" %}
-                {% endif %}
-            </button>
-        </div>
-    </form>
-
-    </div>
-</div>
+    {% with base_url="prescribers_views" %}
+        {% include "includes/update_admin.html" %}
+    {% endwith %}
 
 {% endblock %}

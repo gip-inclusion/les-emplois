@@ -35,7 +35,7 @@
                             {% translate "Retirer de la structure" %}
                         </a>
                         <br>
-                        {% if not member.is_siae_admin %}
+                        {% if not member.user in active_admin_members %}
                         <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" role="button">
                             Ajouter en tant qu'administrateur
                         </a>

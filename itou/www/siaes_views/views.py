@@ -193,7 +193,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
         return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
 
     context = {
-        "siae": siae,
+        "structure": siae,
         "target_member": target_member,
     }
 
@@ -240,7 +240,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
 
     context = {
         "action": action,
-        "siae": siae,
+        "structure": siae,
         "target_member": target_member,
     }
 

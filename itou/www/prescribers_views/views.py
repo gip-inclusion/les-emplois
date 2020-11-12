@@ -95,7 +95,7 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
         return HttpResponseRedirect(reverse_lazy("prescribers_views:members"))
 
     context = {
-        "organization": organization,
+        "structure": organization,
         "target_member": target_member,
     }
 
@@ -142,7 +142,7 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
 
     context = {
         "action": action,
-        "organization": organization,
+        "structure": organization,
         "target_member": target_member,
     }
 
