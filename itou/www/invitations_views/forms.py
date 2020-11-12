@@ -88,7 +88,7 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
         invitation_model = self.Meta.model
         invitation = invitation_model.objects.filter(email__iexact=email, organization=self.organization).first()
         # We can re-invite *deactivated* members,
-        # even if they already received and invitation
+        # even if they already received an invitation
         user_is_member = self.organization.active_members.filter(email=email).exists()
         if invitation:
             if invitation.accepted and user_is_member:
@@ -171,7 +171,7 @@ class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
         invitation_model = self.Meta.model
         invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
         # We can re-invite *deactivated* members,
-        # even if they already received and invitation
+        # even if they already received an invitation
         user_is_member = self.siae.active_members.filter(email=email).exists()
         if invitation:
             if invitation.accepted and user_is_member:
