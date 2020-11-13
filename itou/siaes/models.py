@@ -275,6 +275,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def active_admin_members(self):
+        # The awkward `siaemembership__siae=self` is necessary because we have
+        # two chained filters i.e. members.filter(A).filter(B)
+        # It would not be needed with a members.filter(A, B) but that would lose the DNRY.
+        # see https://github.com/betagouv/itou/pull/433#discussion_r521373073
         return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self)
 
     @property
