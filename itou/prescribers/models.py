@@ -174,6 +174,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     class Meta:
         verbose_name = _("Organisation")
         verbose_name_plural = _("Organisations")
+        unique_together = ("siret", "kind")
 
     def __str__(self):
         return f"{self.name}"

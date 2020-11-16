@@ -815,7 +815,7 @@ class PrescriberSignupTest(TestCase):
 
         url = reverse("signup:prescriber_choose_org")
         response = self.client.post(url, data=post_data)
-        
+
         url = reverse("signup:prescriber_siret")
         response = self.client.post(url, data=post_data)
 
