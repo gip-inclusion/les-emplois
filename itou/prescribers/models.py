@@ -175,6 +175,12 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     class Meta:
         verbose_name = _("Organisation")
         verbose_name_plural = _("Organisations")
+        # This DB constraint works with null fields, but not with blank ones
+        # If both org1 and org2 are created:
+        # OK  => org1: (kind="ML", siret=None) + org2: (kind="ML", siret=None)
+        # OK  => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret=None)
+        # OK =>  org1: (kind="ML", siret="12345678900000") + org2; (kind="PLIE", siret="12345678900000")
+        # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
         unique_together = ("siret", "kind")
 
     def __str__(self):
