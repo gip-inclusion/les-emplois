@@ -738,61 +738,30 @@ class PrescriberSignupTest(TestCase):
         """
         A user can create a new prescriber organization with an existing SIRET number,
         provided that:
-        * the kind of the new organization is different from the existing one <-
-        * there is no duplicate of the (kind, siret) pair
+        - the kind of the new organization is different from the existing one
+        - there is no duplicate of the (kind, siret) pair
 
-        f.i.:
-        * user can't create 2 PLIE with the same SIRET
-        * user can create a PLIE and a ML with the same SIRET
+        Example cases:
+        - user can't create 2 PLIE with the same SIRET
+        - user can create a PLIE and a ML with the same SIRET
         """
 
         # same SIRET as mock
         siret = "26570134200148"
-        existing_org_with_siret = PrescriberOrganizationFactory()
-        existing_org_with_siret.siret = siret
-        existing_org_with_siret.kind = PrescriberOrganization.Kind.ML
+        password = "!*p4ssw0rd123-"
+
+        existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
         existing_org_with_siret.save()
 
-        # Step 1: Does the user work  for PE?
+        # Step 1: Does the user work for PE?
 
         url = reverse("signup:prescriber_is_pole_emploi")
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
 
         post_data = {
             "is_pole_emploi": 0,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_choose_org")
-        self.assertRedirects(response, url)
-
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
-
-        post_data = {
             "kind": PrescriberOrganization.Kind.PLIE.value,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_siret")
-        self.assertRedirects(response, url)
-
-        # Step 3: ask the user his SIRET number.
-
-        post_data = {
             "siret": siret,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_user")
-        self.assertRedirects(response, url)
-        mock_api_entreprise.assert_called_once()
-        mock_call_ban_geocoding_api.assert_called_once()
-
-        # Step 4: user info.
-
-        password = "!*p4ssw0rd123-"
-        post_data = {
             "first_name": "John",
             "last_name": "Doe",
             "email": "john.doe@ma-plie.fr",
@@ -800,14 +769,22 @@ class PrescriberSignupTest(TestCase):
             "password2": password,
         }
         response = self.client.post(url, data=post_data)
+        url = reverse("signup:prescriber_choose_org")
+        response = self.client.post(url, data=post_data)
+        url = reverse("signup:prescriber_siret")
+        response = self.client.post(url, data=post_data)
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+        response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
-        self.assertFalse(user.is_job_seeker)
-        self.assertTrue(user.is_prescriber)
-        self.assertFalse(user.is_siae_staff)
+        # Check new org is ok:
+        same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).all()
+        self.assertEqual(2, len(same_siret_orgs))
+        org1, org2 = same_siret_orgs
+        self.assertEqual(PrescriberOrganization.Kind.ML.value, org1.kind)
+        self.assertEqual(PrescriberOrganization.Kind.PLIE.value, org2.kind)
 
     @mock.patch(
         "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
@@ -817,53 +794,31 @@ class PrescriberSignupTest(TestCase):
         self, mock_api_entreprise, mock_call_ban_geocoding_api
     ):
         """
-        A user can create a new prescriber organization with an existing SIRET number,
-        provided that:
-        * the kind of the new organization is different from the existing one
-        * there is no duplicate of the (kind, siret) pair <-
-
-        f.i.:
-        * user can't create 2 PLIE with the same SIRET
-        * user can create a PLIE and a ML with the same SIRET
+        A user can't create a new prescriber organization with an existing SIRET number if:
+        * the kind of the new organization is the same as an existing one
+        * there is no duplicate of the (kind, siret) pair
         """
 
         # same SIRET as mock but with same expected kind
         siret = "26570134200148"
-        existing_org_with_siret = PrescriberOrganizationFactory()
-        existing_org_with_siret.siret = siret
-        existing_org_with_siret.kind = PrescriberOrganization.Kind.PLIE
-        existing_org_with_siret.save()
-
-        # Step 1: Does the user work  for PE?
-
-        url = reverse("signup:prescriber_is_pole_emploi")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE).save()
 
         post_data = {
             "is_pole_emploi": 0,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_choose_org")
-        self.assertRedirects(response, url)
-
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
-
-        post_data = {
             "kind": PrescriberOrganization.Kind.PLIE.value,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_siret")
-        self.assertRedirects(response, url)
-
-        # Step 3: ask the user his SIRET number.
-
-        post_data = {
             "siret": siret,
         }
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
         response = self.client.post(url, data=post_data)
+
+        url = reverse("signup:prescriber_choose_org")
+        response = self.client.post(url, data=post_data)
+        
+        url = reverse("signup:prescriber_siret")
+        response = self.client.post(url, data=post_data)
+
         # Should not be able to go further (not a distinct kind,siret pair)
         # Must not redirect
         self.assertEqual(response.status_code, 200)
