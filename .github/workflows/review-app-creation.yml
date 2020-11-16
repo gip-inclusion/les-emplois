@@ -15,8 +15,8 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   ORGANIZATION_NAME: Itou
-  DB_ADDON: review_apps_databases_DO_NOT_DELETE
-  CONFIGURATION_ADDON: review_apps_config
+  DB_ADDON: c1-review-apps-databases-DO-NOT-DELETE
+  CONFIGURATION_ADDON: c1-review-apps-config
   BRANCH: ${{ github.head_ref }}
   POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
   POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
@@ -38,7 +38,7 @@ jobs:
     # Environment variables
     - name: 🏷 Set review app name
       run:
-        echo ::set-env name=REVIEW_APP_NAME::$(echo "review_$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
+        echo ::set-env name=REVIEW_APP_NAME::$(echo "c1-review-$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
 
     - name: 🏷 Set database name
       run:
