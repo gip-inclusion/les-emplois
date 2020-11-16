@@ -18,7 +18,7 @@ def does_siae_have_an_active_convention(siae):
 
 
 def should_siae_be_created(siae):
-    return does_siae_have_an_active_convention(siae) and siae.is_in_open_department
+    return does_siae_have_an_active_convention(siae)
 
 
 def could_siae_be_deleted(siae):

@@ -8,7 +8,7 @@ from django.core.management.base import BaseCommand
 from itou.siaes.management.commands._import_siae.siae import could_siae_be_deleted, geocode_siae
 from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES, department_from_postcode
+from itou.utils.address.departments import department_from_postcode
 from itou.utils.validators import validate_siret
 
 
@@ -64,9 +64,6 @@ def get_geiq_df(filename=GEIQ_DATASET_FILENAME):
 
     # Drop rows without auth_email.
     df = df[~df.auth_email.isnull()]
-
-    # Only keep GEIQ in opened departments.
-    df = df[df.department.isin(DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES)]
 
     for _, row in df.iterrows():
         validate_siret(row.siret)
