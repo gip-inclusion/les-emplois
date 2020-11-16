@@ -752,11 +752,11 @@ class ResumeFormMixinTest(TestCase):
     def test_pole_emploi_internal_resume_link(self):
         resume_link = "http://ds000-xxxx-00xx000.xxx00.pole-emploi.intra/docnums/portfolio-usager/XXXXXXXXXXX/CV.pdf?Expires=1590485264&Signature=XXXXXXXXXXXXXXXX"  # noqa E501
         form = ResumeFormMixin(data={"resume_link": resume_link})
-        form.is_valid()
+        self.assertFalse(form.is_valid())
         self.assertTrue(form.has_error("resume_link"))
 
     def test_valid_resume_link(self):
         resume_link = "https://www.moncv.fr/vive_moi.pdf"
         form = ResumeFormMixin(data={"resume_link": resume_link})
-        form.is_valid()
+        self.assertTrue(form.is_valid())
         self.assertFalse(form.has_error("resume_link"))
