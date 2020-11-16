@@ -1,5 +1,5 @@
 from itou.utils.emails import get_email_message
-from itou.utils.notifications import NotificationBase
+from itou.utils.notifications.base_class import NotificationBase
 
 
 class NewJobApplicationSiaeEmailNotification(NotificationBase):

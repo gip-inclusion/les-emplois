@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.notifications import siaemembership_notifications_default as notifications_default
+from itou.utils.notifications.list import siaemembership_notifications_default as notifications_default
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
