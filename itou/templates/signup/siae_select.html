@@ -12,12 +12,6 @@
     <small class="text-muted">{% translate "Employeur solidaire" %}</small>
 </h1>
 
-<div class="alert alert-warning" role="info">
-    {% blocktranslate with url=DOC_OPENING_SCHEDULE_URL %}
-        Les inscriptions s'ouvrent aux régions progressivement. <a href="{{ url }}" rel="noopener" target="_blank">Vérifiez que la Plateforme est bien disponible sur votre territoire.</a> Seules les ETTI sont ouvertes en France entière.
-    {% endblocktranslate %}
-</div>
-
 <form method="get" action="" role="form">
 
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}

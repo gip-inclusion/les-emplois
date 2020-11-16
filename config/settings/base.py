@@ -383,7 +383,6 @@ SHOW_TEST_ACCOUNTS_BANNER = False
 
 # Documentation links
 ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
-ITOU_DOC_OPENING_SCHEDULE_URL = f"{ITOU_DOC_URL}/presentation/quel-est-le-calendrier-de-deploiement-de-la-plateforme"
 ITOU_DOC_PASS_VERIFICATION_URL = f"{ITOU_DOC_URL}/pourquoi-une-plateforme-de-linclusion/pass-iae-agrement-plus-simple-cest-a-dire#verification-des-demandes-de-pass-iae"
 
 # Approvals

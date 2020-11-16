@@ -105,7 +105,6 @@ def siae_select(request, template_name="signup/siae_select.html"):
         return HttpResponseRedirect(next_url or "/")
 
     context = {
-        "DOC_OPENING_SCHEDULE_URL": settings.ITOU_DOC_OPENING_SCHEDULE_URL,
         "next_url": next_url,
         "siaes_without_members": siaes_without_members,
         "siaes_with_members": siaes_with_members,
