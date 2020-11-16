@@ -25,6 +25,9 @@ django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 # Allow basic math (e.g. A/B) in templates
 django-mathfilters==1.0.0  # https://github.com/dbrgn/django-mathfilters
 
+# Allow extra Postgres features (ConditionalUniqueIndex)
+django-postgres-extra==2.0.2  # https://github.com/SectorLabs/django-postgres-extra
+
 # Front-end
 # ------------------------------------------------------------------------------
 
