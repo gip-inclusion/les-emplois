@@ -7,6 +7,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from psqlextra.indexes import ConditionalUniqueIndex
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
@@ -114,7 +115,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
         NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
 
-    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
+    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], null=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
