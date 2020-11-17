@@ -10,5 +10,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(name="prescriberorganization", unique_together={("siret", "kind")},),
+        # Operations have been moved in 0024 to avoid triggering a manual SQL query
+        # to replace old `blank` by `null` values in the siret `field`.
+        migrations.RunPython(migrations.RunPython.noop, migrations.RunPython.noop),
     ]
