@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeJobDescription
+from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
@@ -126,7 +127,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
 def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
     Edit an SIAE.
-    """
+   """
     siae = get_current_siae_or_404(request)
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)
@@ -149,10 +150,100 @@ def members(request, template_name="siaes/members.html"):
     if not siae.is_active:
         raise PermissionDenied
 
-    members = siae.siaemembership_set.select_related("user").all().order_by("joined_at")
+    members = siae.siaemembership_set.filter(is_active=True).select_related("user").all().order_by("joined_at")
     pending_invitations = siae.invitations.filter(accepted=False).all().order_by("sent_at")
 
-    context = {"siae": siae, "members": members, "pending_invitations": pending_invitations}
+    context = {
+        "siae": siae,
+        "members": members,
+        "pending_invitations": pending_invitations,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def deactivate_member(request, user_id, template_name="siaes/deactivate_member.html"):
+    siae = get_current_siae_or_404(request)
+    user = request.user
+    target_member = User.objects.get(pk=user_id)
+    user_is_admin = user in siae.active_admin_members
+    user_is_admin = siae.has_admin(user)
+
+    if not user_is_admin:
+        raise PermissionDenied
+
+    if target_member not in siae.active_members:
+        raise PermissionDenied
+
+    membership = target_member.siaemembership_set.get(siae=siae)
+
+    if request.method == "POST":
+        if user != target_member and user_is_admin:
+            if membership.is_active:
+                membership.toggle_user_membership(user)
+                membership.save()
+                messages.success(
+                    request,
+                    _("%(name)s a été retiré(e) des membres actifs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
+                siae.member_deactivation_email(membership.user).send()
+        else:
+            raise PermissionDenied
+        return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
+
+    context = {
+        "structure": siae,
+        "target_member": target_member,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def update_admin_role(request, action, user_id, template_name="siaes/update_admins.html"):
+    siae = get_current_siae_or_404(request)
+    user = request.user
+    target_member = User.objects.get(pk=user_id)
+    user_is_admin = siae.has_admin(user)
+
+    if not user_is_admin:
+        raise PermissionDenied
+
+    if target_member not in siae.active_members:
+        raise PermissionDenied
+
+    membership = target_member.siaemembership_set.get(siae=siae)
+
+    if request.method == "POST":
+        if user != target_member and user_is_admin and membership.is_active:
+            if action == "add":
+                membership.set_admin_role(True, user)
+                messages.success(
+                    request,
+                    _("%(name)s a été ajouté(e) aux administrateurs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
+                siae.add_admin_email(target_member).send()
+            if action == "remove":
+                membership.set_admin_role(False, user)
+                messages.success(
+                    request,
+                    _("%(name)s a été retiré(e) des administrateurs de cette structure.")
+                    % {"name": target_member.get_full_name()},
+                )
+                siae.remove_admin_email(target_member).send()
+            membership.save()
+        else:
+            raise PermissionDenied
+        return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
+
+    context = {
+        "action": action,
+        "structure": siae,
+        "target_member": target_member,
+    }
+
     return render(request, template_name, context)
 
 

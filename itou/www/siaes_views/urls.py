@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from itou.www.siaes_views import views
 
@@ -14,4 +14,12 @@ urlpatterns = [
     path("edit_siae", views.edit_siae, name="edit_siae"),
     path("colleagues", views.members, name="members"),
     path("block_job_applications", views.block_job_applications, name="block_job_applications"),
+    path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
+    # Tricky: when using `re_path` you CAN'T mix re parts with non re ones
+    # here, user_id was defined as <int:user_id> and action as re
+    # as a result the eval of the url fails silently (404)
+    # ROT: if using `re_path`, use RE everywhere
+    re_path(
+        "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
+    ),
 ]

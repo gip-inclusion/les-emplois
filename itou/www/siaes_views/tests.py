@@ -1,12 +1,19 @@
 from unittest import mock
 
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import (
+    SiaeFactory,
+    SiaeWith2MembershipsFactory,
+    SiaeWithMembershipAndJobsFactory,
+    SiaeWithMembershipFactory,
+)
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
@@ -513,3 +520,214 @@ class BlockJobApplicationsTest(TestCase):
         siae = Siae.objects.get(siret=siae.siret)
         self.assertTrue(siae.block_job_applications)
         self.assertNotEqual(block_date, siae.job_applications_blocked_at)
+
+
+class UserMembershipDeactivationTest(TestCase):
+    def test_self_deactivation(self):
+        """
+        A user, even if admin, can't self-deactivate
+        (must be done by another admin)
+        """
+        siae = SiaeWithMembershipFactory()
+        admin = siae.members.first()
+        memberships = admin.siaemembership_set.all()
+        membership = memberships.first()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": admin.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Trying to change self membership is not allowed
+        # but does not raise an error (does nothing)
+        membership.refresh_from_db()
+        self.assertTrue(membership.is_active)
+
+    def test_deactivate_user(self):
+        """
+        Standard use case of user deactivation.
+        Everything should be fine ...
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin = siae.members.first()
+        guest = siae.members.all()[1]
+
+        membership = guest.siaemembership_set.first()
+        self.assertFalse(guest in siae.active_admin_members)
+        self.assertTrue(admin in siae.active_admin_members)
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        # User should be deactivated now
+        membership.refresh_from_db()
+        self.assertFalse(membership.is_active)
+        self.assertEqual(admin, membership.updated_by)
+        self.assertIsNotNone(membership.updated_at)
+
+        # Check mailbox
+        # User must have been notified of deactivation (we're human after all)
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("[Désactivation] Vous n'êtes plus membre de", email.subject)
+        self.assertIn("Un administrateur vous a retiré d'une structure sur la Plateforme de l'inclusion", email.body)
+        self.assertEqual(email.to[0], guest.email)
+
+    def test_deactivate_with_no_perms(self):
+        """
+        Non-admin user can't change memberships
+        """
+        siae = SiaeWith2MembershipsFactory()
+        guest = siae.members.all()[1]
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_with_no_siae_left(self):
+        """
+        Former SIAE members with no SIAE membership left must not
+        be able to log in.
+        They are still "active" technically speaking, so if they
+        are activated/invited again, they will be able to log in.
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin, guest = siae.members.all()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.client.logout()
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        # should be redirected to logout
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_logout"))
+
+    def test_structure_selector(self):
+        """
+        Check that a deactivated member can't access the structure
+        from the dashboard selector
+        """
+        siae2 = SiaeWithMembershipFactory()
+        guest = siae2.members.first()
+
+        siae = SiaeWith2MembershipsFactory()
+        admin = siae.members.first()
+        siae.members.add(guest)
+
+        memberships = guest.siaemembership_set.all()
+        self.assertEqual(len(memberships), 2)
+
+        # Admin remove guest from structure
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.client.logout()
+
+        # guest must be able to login
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+
+        # Wherever guest lands should give a 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Check response context, only one SIAE should remain
+        self.assertEqual(len(response.context["user_siaes"]), 1)
+
+
+class SIAEAdminMembersManagementTest(TestCase):
+    def test_add_admin(self):
+        """
+        Check the ability for an admin to add another admin to the siae
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin, guest = siae.members.all()
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Confirm action
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        siae.refresh_from_db()
+        self.assertTrue(guest in siae.active_admin_members)
+
+    def test_remove_admin(self):
+        """
+        Check the ability for an admin to remove another admin
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin, guest = siae.members.all()
+
+        membership = guest.siaemembership_set.first()
+        membership.is_siae_admin = True
+        membership.save()
+        self.assertTrue(guest in siae.active_admin_members)
+
+        self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Confirm action
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+
+        siae.refresh_from_db()
+        self.assertFalse(guest in siae.active_admin_members)
+
+    def test_admin_management_permissions(self):
+        """
+        Non-admin users can't update admin members
+        """
+        siae = SiaeWith2MembershipsFactory()
+        admin, guest = siae.members.all()
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Confirm action
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        # Add self as admin with no privilege
+        url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_suspicious_action(self):
+        """
+        Test "suspicious" actions: action code not registered for use (even if admin)
+        """
+        suspicious_action = "h4ckm3"
+        siae = SiaeWith2MembershipsFactory()
+        admin, guest = siae.members.all()
+
+        self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
+        # update: less test with RE_PATH
+        with self.assertRaises(NoReverseMatch):
+            reverse("siaes_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})

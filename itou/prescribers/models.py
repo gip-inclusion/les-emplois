@@ -122,7 +122,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     website = models.URLField(verbose_name=_("Site web"), blank=True)
     description = models.TextField(verbose_name=_("Description"), blank=True)
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="PrescriberMembership", blank=True
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Membres"),
+        through="PrescriberMembership",
+        blank=True,
+        through_fields=("organization", "user"),
     )
     is_authorized = models.BooleanField(
         verbose_name=_("Habilitation"),
@@ -220,9 +224,41 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def has_members(self):
         return self.active_members.exists()
 
+    def has_admin(self, user):
+        return self.active_admin_members.filter(pk=user.pk).exists()
+
     @property
     def active_members(self):
-        return self.members.filter(is_active=True)
+        """
+        In this context, active == has an active membership AND user is still active.
+
+        Query will be optimized later with Qs.
+        """
+        return self.members.filter(is_active=True, prescribermembership__is_active=True)
+
+    @property
+    def deactivated_members(self):
+        """
+        List of previous members of the structure, still active as user (from the model POV)
+        but deactivated by an admin at some point in time.
+
+        Query will be optimized later with Qs.
+        """
+        return self.members.filter(is_active=True, prescribermembership__is_active=False)
+
+    @property
+    def active_admin_members(self):
+        """
+        Active admin members:
+        active user/admin in this context means both:
+        * user.is_active: user is able to do something on the platform
+        * user.membership.is_active: is a member of this structure
+
+        Query will be optimized later with Qs.
+        """
+        return self.members.filter(
+            is_active=True, prescribermembership__is_admin=True, prescribermembership__is_active=True
+        )
 
     def get_card_url(self):
         if not self.is_authorized:
@@ -292,6 +328,46 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         body = "prescribers/email/must_validate_prescriber_organization_email_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def member_deactivation_email(self, user):
+        """
+        Send email when an admin of the structure disables the membership of a given user (deactivation).
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_deactivation_email_subject.txt"
+        body = "common/emails/member_deactivation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def member_activation_email(self, user):
+        """
+        Send email when an admin of the structure activates the membership of a given user.
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_activation_email_subject.txt"
+        body = "common/emails/member_activation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def add_admin_email(self, user):
+        """
+        Send info email to a new admin of the organization (added)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/add_admin_email_subject.txt"
+        body = "common/emails/add_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def remove_admin_email(self, user):
+        """
+        Send info email to a former admin of the organization (removed)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/remove_admin_email_subject.txt"
+        body = "common/emails/remove_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
 
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""
@@ -300,6 +376,38 @@ class PrescriberMembership(models.Model):
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_admin = models.BooleanField(verbose_name=_("Administrateur de la structure d'accompagnement"), default=False)
+    is_active = models.BooleanField(_("Rattachement actif"), default=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="updated_prescribermembership_set",
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name=_("Mis à jour par"),
+    )
 
     class Meta:
         unique_together = ("user_id", "organization_id")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    def toggle_user_membership(self, user):
+        """
+        Toggles the membership of a member (reference held by self)
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        self.is_active = not self.is_active
+        self.updated_by = user
+        return self.is_active
+
+    def set_admin_role(self, active, user):
+        """
+        Set admin role for the given user.
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        self.is_admin = active
+        self.updated_by = user

@@ -163,7 +163,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         "jobs.Appellation", verbose_name=_("Métiers"), through="SiaeJobDescription", blank=True
     )
     members = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, verbose_name=_("Membres"), through="SiaeMembership", blank=True
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Membres"),
+        through="SiaeMembership",
+        through_fields=("siae", "user"),
+        blank=True,
     )
 
     created_by = models.ForeignKey(
@@ -270,15 +274,31 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def active_members(self):
-        return self.members.filter(is_active=True)
+        """
+        In this context, active == has an active membership AND user is still active
+        """
+        return self.members.filter(is_active=True, siaemembership__is_active=True)
+
+    @property
+    def deactivated_members(self):
+        """
+        List of previous members of the structure, still active as user (from the model POV)
+        but deactivated by an admin at some point in time.
+        """
+        return self.members.filter(is_active=True, siaemembership__is_active=False)
 
     @property
     def active_admin_members(self):
-        # The awkward `siaemembership__siae=self` is necessary because we have
-        # two chained filters i.e. members.filter(A).filter(B)
-        # It would not be needed with a members.filter(A, B) but that would lose the DNRY.
-        # see https://github.com/betagouv/itou/pull/433#discussion_r521373073
-        return self.active_members.filter(siaemembership__is_siae_admin=True, siaemembership__siae=self)
+        """
+        Active admin members:
+        active user/admin in this context means both:
+        * user.is_active: user is able to do something on the platform
+        * user.membership.is_active: is a member of this structure
+
+        The `self` reference is mandatory even if confusing (many SIAE memberships possible for a given member).
+        Will be optimized later with Qs.
+        """
+        return self.members.filter(is_active=True, siaemembership__is_active=True, siaemembership__is_siae_admin=True)
 
     @property
     def signup_magic_link(self):
@@ -319,6 +339,46 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
 
+    def member_deactivation_email(self, user):
+        """
+        Send email when an admin of the structure disables the membership of a given user (deactivation).
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_deactivation_email_subject.txt"
+        body = "common/emails/member_deactivation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def member_activation_email(self, user):
+        """
+        Send email when an admin of the structure reactivates the membership of a given user.
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/member_activation_email_subject.txt"
+        body = "common/emails/member_activation_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def add_admin_email(self, user):
+        """
+        Send info email to a new admin of the SIAE (added)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/add_admin_email_subject.txt"
+        body = "common/emails/add_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    def remove_admin_email(self, user):
+        """
+        Send info email to a former admin of the SIAE (removed)
+        """
+        to = [user.email]
+        context = {"structure": self}
+        subject = "common/emails/remove_admin_email_subject.txt"
+        body = "common/emails/remove_admin_email_body.txt"
+        return get_email_message(to, context, subject, body)
+
     @property
     def grace_period_end_date(self):
         return self.convention.deactivated_at + timezone.timedelta(
@@ -337,9 +397,41 @@ class SiaeMembership(models.Model):
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
     joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
     is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
+    is_active = models.BooleanField(_("Rattachement actif"), default=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        related_name="updated_siaemembership_set",
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name=_("Mis à jour par"),
+    )
 
     class Meta:
         unique_together = ("user_id", "siae_id")
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        return super().save(*args, **kwargs)
+
+    def toggle_user_membership(self, user):
+        """
+        Toggles the SIAE membership of a member (reference held by self)
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        self.is_active = not self.is_active
+        self.updated_by = user
+        return self.is_active
+
+    def set_admin_role(self, active, user):
+        """
+        Set admin role for the given user.
+        `user` is the admin updating this user (`updated_by` field)
+        """
+        self.is_siae_admin = active
+        self.updated_by = user
 
 
 class SiaeJobDescription(models.Model):

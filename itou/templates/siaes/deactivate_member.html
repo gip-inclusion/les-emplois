@@ -1,0 +1,10 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Retrait d'un collaborateur" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+    {% with base_url="siaes_views" %}
+        {% include "includes/update_admin.html" %}    
+    {% endwith %}
+{% endblock %}

@@ -189,3 +189,17 @@ class ModelTest(TestCase):
         self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 0)
         siae.delete()
         self.assertEqual(Siae.objects.count(), 0)
+
+    def test_active_member_with_many_memberships(self):
+        siae1 = SiaeWith2MembershipsFactory(membership2__is_active=False)
+        user = siae1.members.all()[1]
+        siae2 = SiaeWith2MembershipsFactory()
+        siae2.members.add(user)
+
+        self.assertFalse(user in siae1.active_members)
+        self.assertEqual(siae1.members.count(), 2)
+        self.assertEqual(siae1.active_members.count(), 1)
+        self.assertTrue(user in siae1.deactivated_members)
+        self.assertFalse(user in siae1.active_members)
+        self.assertEqual(siae2.members.count(), 3)
+        self.assertEqual(siae2.active_members.count(), 3)

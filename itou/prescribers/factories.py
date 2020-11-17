@@ -36,6 +36,7 @@ class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(PrescriberFactory)
     organization = factory.SubFactory(PrescriberOrganizationFactory)
     is_admin = True
+    is_active = True
 
 
 class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory):
@@ -46,6 +47,17 @@ class PrescriberOrganizationWithMembershipFactory(PrescriberOrganizationFactory)
     """
 
     membership = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
+
+
+class PrescriberOrganizationWith2MembershipFactory(PrescriberOrganizationFactory):
+    """
+    Returns a PrescriberOrganization() object with 2 PrescriberMembership() objects.
+
+    https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
+    """
+
+    membership1 = factory.RelatedFactory(PrescriberMembershipFactory, "organization")
+    membership2 = factory.RelatedFactory(PrescriberMembershipFactory, "organization", is_admin=False)
 
 
 class AuthorizedPrescriberOrganizationWithMembershipFactory(PrescriberOrganizationWithMembershipFactory):
