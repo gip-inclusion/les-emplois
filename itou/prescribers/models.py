@@ -213,7 +213,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         if self.kind != self.Kind.PE:
             if not self.siret:
                 raise ValidationError({"siret": _("Le SIRET est obligatoire.")})
-            if self._meta.model.objects.filter(siret=self.siret).exclude(pk=self.pk).exists():
+            if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
                 raise ValidationError({"siret": _("Ce SIRET est déjà utilisé.")})
 
     @property

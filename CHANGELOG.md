@@ -6,6 +6,35 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [6] - 2020-11-05
+
+### Ajouté
+- Ouverture de la France d'outre-mer
+
+### Modifié
+- Retrait de la restriction des 24h pour les employeurs avant de pouvoir embaucher à nouveau
+- Correction d'une erreur de geocoding qui bloquait le parcours d'inscription des prescripteurs à la saisie du SIRET
+
+## [5] - 2020-10-23
+
+### Ajouté
+- Un prescripteur peut maintenant travailler sur plusieurs organisations
+- Le code SAFIR est maintenant visible dans l'interface utilisateur
+- Admin :
+    - Ajout de la possibilité de valider une habilitation préalablement refusée
+    - Ajout de la possibilité de saisir ou de modifier le code SAFIR d'une agence Pôle emploi
+- Ouverture de la région Bretagne
+- Import des structures GEIQ
+- Intégration du lien enquête employeur dans la plateforme
+
+### Modifié
+- Correction de la limite minimum de 16 ans du champ date de naissance de divers formulaires
+- Correction des données des recettes jetables
+- Correction des données (fixtures) de la démo
+- Correction en démo du compte EI qui pointait vers une ETTI
+- Remplacement du statut "Candidature annulée" par "Embauche annulée"
+- Amélioration wording pour une structure qui tente de s'inscrire et qui est non référencée
+
 ## [4] - 2020-10-08
 
 ### Ajouté

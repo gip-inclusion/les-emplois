@@ -20,6 +20,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from itou.siaes.management.commands._import_siae.convention import (
+    check_each_convention_has_exactly_one_asp_siae,
     get_creatable_conventions,
     get_deletable_conventions,
     update_existing_conventions,
@@ -29,7 +30,7 @@ from itou.siaes.management.commands._import_siae.siae import build_siae, could_s
 from itou.siaes.management.commands._import_siae.utils import timeit
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeConvention
 
 
 class Command(BaseCommand):
@@ -92,10 +93,6 @@ class Command(BaseCommand):
 
     def update_siae_auth_email(self, siae, new_auth_email):
         assert siae.auth_email != new_auth_email
-        self.log(
-            f"siae.id={siae.id} has changed auth_email from "
-            f"{siae.auth_email} to {new_auth_email} (will be updated)"
-        )
         if not self.dry_run:
             siae.auth_email = new_auth_email
             siae.save()
@@ -109,6 +106,7 @@ class Command(BaseCommand):
 
     @timeit
     def update_siret_and_auth_email_of_existing_siaes(self):
+        auth_email_updates = 0
         for siae in Siae.objects.select_related("convention").filter(source=Siae.SOURCE_ASP, convention__isnull=False):
             assert siae.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
 
@@ -122,6 +120,7 @@ class Command(BaseCommand):
             auth_email_has_changed = new_auth_email and siae.auth_email != new_auth_email
             if auth_email_has_changed:
                 self.update_siae_auth_email(siae, new_auth_email)
+                auth_email_updates += 1
 
             siret_has_changed = row.siret != siae.siret
             if not siret_has_changed:
@@ -151,6 +150,8 @@ class Command(BaseCommand):
                     f"already exists (siae.id={existing_siae.id}) "
                     f"and both siaes have data (will *not* be fixed)"
                 )
+
+        self.log(f"{auth_email_updates} siae.auth_email fields will be updated")
 
     @timeit
     def delete_inactive_siaes_when_possible(self):
@@ -217,6 +218,7 @@ class Command(BaseCommand):
                 )
                 if not self.dry_run:
                     existing_siae.source = Siae.SOURCE_ASP
+                    existing_siae.convention = None
                     existing_siae.save()
                 continue
 
@@ -256,7 +258,11 @@ class Command(BaseCommand):
         self.log(f"will create {len(creatable_conventions)} conventions")
         for (convention, siae) in creatable_conventions:
             if not self.dry_run:
-                convention.save()
+                convention_query = SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind)
+                if convention_query.exists():
+                    convention = convention_query.get()
+                else:
+                    convention.save()
                 siae.convention = convention
                 siae.save()
 
@@ -266,6 +272,14 @@ class Command(BaseCommand):
             if not self.dry_run:
                 # This will delete the related financial annexes as well.
                 convention.delete()
+
+        if not self.dry_run:
+            # Cleanup ghost siaes one more time before checking that
+            # only one asp siae is attached to each convention.
+            # Otherwise some convention might have 2 asp siaes,
+            # but one of them would be deleted by the next script run.
+            self.update_siret_and_auth_email_of_existing_siaes()
+        check_each_convention_has_exactly_one_asp_siae(dry_run=self.dry_run)
 
     @timeit
     def manage_financial_annexes(self):

@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
+from itou.utils.address.departments import DEPARTMENTS
 
 
 class CreateSiaeForm(forms.ModelForm):
@@ -19,7 +20,7 @@ class CreateSiaeForm(forms.ModelForm):
 
         self.fields["kind"].choices = [(current_siae.kind, dict(Siae.KIND_CHOICES)[current_siae.kind])]
 
-        self.fields["department"].choices = [("", "---")] + list(current_siae.open_departments.items())
+        self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
 
         required_fields = ["address_line_1", "post_code", "city", "department", "phone"]
         for required_field in required_fields:
@@ -48,13 +49,6 @@ class CreateSiaeForm(forms.ModelForm):
             ),
             "kind": gettext_lazy("Votre nouvelle structure doit avoir le même type que votre structure actuelle."),
             "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "department": gettext_lazy(
-                "Les inscriptions s'ouvrent aux régions progressivement. "
-                f'<a href="{settings.ITOU_DOC_OPENING_SCHEDULE_URL}" rel="noopener" target="_blank">'
-                "Vérifiez que la Plateforme est bien disponible sur votre territoire."
-                "</a> "
-                "Seules les ETTI sont ouvertes en France entière."
-            ),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
             "description": gettext_lazy("Texte de présentation de votre structure."),
@@ -62,13 +56,6 @@ class CreateSiaeForm(forms.ModelForm):
 
     def clean_kind(self):
         return self.current_siae.kind
-
-    def clean_department(self):
-        department = self.cleaned_data["department"]
-        if department not in self.current_siae.open_departments:
-            # This should never happen as the dropdown only includes open departments.
-            raise forms.ValidationError(_("La Plateforme n'est pas encore ouverte pour ce département."))
-        return department
 
     def clean(self):
         siret = self.cleaned_data.get("siret")
@@ -141,7 +128,7 @@ class EditSiaeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["department"].choices = [("", "---")] + list(self.instance.open_departments.items())
+        self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
 
         required_fields = ["address_line_1", "post_code", "city", "department"]
         for required_field in required_fields:
@@ -187,21 +174,7 @@ class EditSiaeForm(forms.ModelForm):
             "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
-            "department": gettext_lazy(
-                "Les inscriptions s'ouvrent aux régions progressivement. "
-                f'<a href="{settings.ITOU_DOC_OPENING_SCHEDULE_URL}" rel="noopener" target="_blank">'
-                "Vérifiez que la Plateforme est bien disponible sur votre territoire."
-                "</a> "
-                "Seules les ETTI sont ouvertes en France entière."
-            ),
         }
-
-    def clean_department(self):
-        department = self.cleaned_data["department"]
-        if department not in self.instance.open_departments:
-            # This should never happen as the dropdown only includes open departments.
-            raise forms.ValidationError(_("La Plateforme n'est pas encore ouverte pour ce département."))
-        return department
 
     def save(self, commit=True):
         siae = super().save(commit=commit)

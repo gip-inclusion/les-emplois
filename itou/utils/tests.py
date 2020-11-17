@@ -29,6 +29,7 @@ from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
+from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
 from itou.utils.urls import get_absolute_url, get_safe_url
@@ -745,3 +746,17 @@ class UtilsEmailsSplitRecipientTest(TestCase):
         self.assertEqual(2, len(result))
         self.assertEqual(50, len(result[0].to))
         self.assertEqual(25, len(result[1].to))
+
+
+class ResumeFormMixinTest(TestCase):
+    def test_pole_emploi_internal_resume_link(self):
+        resume_link = "http://ds000-xxxx-00xx000.xxx00.pole-emploi.intra/docnums/portfolio-usager/XXXXXXXXXXX/CV.pdf?Expires=1590485264&Signature=XXXXXXXXXXXXXXXX"  # noqa E501
+        form = ResumeFormMixin(data={"resume_link": resume_link})
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.has_error("resume_link"))
+
+    def test_valid_resume_link(self):
+        resume_link = "https://www.moncv.fr/vive_moi.pdf"
+        form = ResumeFormMixin(data={"resume_link": resume_link})
+        self.assertTrue(form.is_valid())
+        self.assertFalse(form.has_error("resume_link"))

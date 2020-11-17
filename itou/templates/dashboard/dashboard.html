@@ -63,7 +63,7 @@
         {% translate "Tableau de bord" %}
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %} -
-            <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
+        <span class="text-muted">{{ current_prescriber_organization.display_name }} - ({{ current_prescriber_organization.kind }})</span>
             {% if current_prescriber_organization.is_authorized %}
                 {% include "includes/icon.html" with icon="award" class="h1 align-middle" size=30 %}
             {% endif %}

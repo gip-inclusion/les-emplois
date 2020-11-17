@@ -105,7 +105,6 @@ def siae_select(request, template_name="signup/siae_select.html"):
         return HttpResponseRedirect(next_url or "/")
 
     context = {
-        "DOC_OPENING_SCHEDULE_URL": settings.ITOU_DOC_OPENING_SCHEDULE_URL,
         "next_url": next_url,
         "siaes_without_members": siaes_without_members,
         "siaes_with_members": siaes_with_members,
@@ -379,7 +378,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    form = forms.PrescriberSiretForm(data=request.POST or None)
+    form = forms.PrescriberSiretForm(data=request.POST or None, kind=session_data.get("kind"))
 
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data

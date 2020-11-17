@@ -12,7 +12,6 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
-from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
@@ -379,16 +378,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         subject = "common/emails/remove_admin_email_subject.txt"
         body = "common/emails/remove_admin_email_body.txt"
         return get_email_message(to, context, subject, body)
-
-    @property
-    def open_departments(self):
-        if self.kind == self.KIND_ETTI:
-            return DEPARTMENTS
-        return {dpt: DEPARTMENTS[dpt] for dpt in sorted(DEPARTMENTS_OPEN_FOR_NON_ETTI_SIAES)}
-
-    @property
-    def is_in_open_department(self):
-        return self.department in self.open_departments
 
     @property
     def grace_period_end_date(self):

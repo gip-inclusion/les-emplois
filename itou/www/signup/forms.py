@@ -246,6 +246,9 @@ class PrescriberSiretForm(forms.Form):
     """
 
     def __init__(self, *args, **kwargs):
+        # We need the kind of the SIAE to check constraint on SIRET number
+        self.kind = kwargs.pop("kind", None)
+
         super().__init__(*args, **kwargs)
         self.org_data = None
 
@@ -262,8 +265,8 @@ class PrescriberSiretForm(forms.Form):
 
         validate_siret(siret)
 
-        # Does the org already exists?
-        org = PrescriberOrganization.objects.filter(siret=siret).first()
+        # Does an org with this SIRET already exist?
+        org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
         if org:
             error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
             admin = org.get_admins().first()
@@ -287,13 +290,13 @@ class PrescriberSiretForm(forms.Form):
         # Perform another API call to fetch geocoding data.
         address_fields = [
             etablissement.address_line_1,
-            etablissement.address_line_2,
+            # `address_line_2` is omitted on purpose because it tends to return no results with the BAN API.
             etablissement.post_code,
             etablissement.city,
             etablissement.department,
         ]
         address_on_one_line = ", ".join([field for field in address_fields if field])
-        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code)
+        geocoding_data = get_geocoding_data(address_on_one_line, post_code=etablissement.post_code) or {}
 
         self.org_data = {
             "siret": siret,
@@ -303,9 +306,9 @@ class PrescriberSiretForm(forms.Form):
             "post_code": etablissement.post_code,
             "city": etablissement.city,
             "department": etablissement.department,
-            "longitude": geocoding_data["longitude"],
-            "latitude": geocoding_data["latitude"],
-            "geocoding_score": geocoding_data["score"],
+            "longitude": geocoding_data.get("longitude"),
+            "latitude": geocoding_data.get("latitude"),
+            "geocoding_score": geocoding_data.get("score"),
         }
 
         return siret
