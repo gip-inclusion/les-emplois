@@ -115,7 +115,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
 
     # Rules:
-    # - a SIRET was not mandatory in the past
+    # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
     # - a SIRET is now required for all organizations, except for Pôle emploi agencies
     # - a SIRET now can have several kinds
     # This is enforced at the DB level with a `unique_together` constraint + `null=True`.
