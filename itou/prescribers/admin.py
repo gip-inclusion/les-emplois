@@ -85,7 +85,7 @@ class AuthorizationValidationRequired(admin.SimpleListFilter):
 class MembersInline(admin.TabularInline):
     model = models.PrescriberOrganization.members.through
     extra = 1
-    raw_id_fields = ("user",)
+    raw_id_fields = ("user", "updated_by")
 
 
 @admin.register(models.PrescriberOrganization)
