@@ -118,7 +118,7 @@
                                                     class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="prescriber_organization_id"
-                                                    value="{{ po.pk }}">{{ po.display_name }}
+                                                    value="{{ po.pk }}">{{ po.display_name }} ({{ po.kind }})
                                                 </button>
                                             {% endfor %}
                                         </form>

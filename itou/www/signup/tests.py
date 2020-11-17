@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.prescribers.factories import PrescriberPoleEmploiFactory
+from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberPoleEmploiFactory
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
@@ -727,6 +727,101 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         subject = mail.outbox[0].subject
         self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
+
+    @mock.patch(
+        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
+    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_user_prescriber_with_same_siret_and_different_kind(
+        self, mock_api_entreprise, mock_call_ban_geocoding_api
+    ):
+        """
+        A user can create a new prescriber organization with an existing SIRET number,
+        provided that:
+        - the kind of the new organization is different from the existing one
+        - there is no duplicate of the (kind, siret) pair
+
+        Example cases:
+        - user can't create 2 PLIE with the same SIRET
+        - user can create a PLIE and a ML with the same SIRET
+        """
+
+        # same SIRET as mock
+        siret = "26570134200148"
+        password = "!*p4ssw0rd123-"
+
+        existing_org_with_siret = PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.ML)
+        existing_org_with_siret.save()
+
+        # Step 1: Does the user work for PE?
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
+
+        post_data = {
+            "is_pole_emploi": 0,
+            "kind": PrescriberOrganization.Kind.PLIE.value,
+            "siret": siret,
+            "first_name": "John",
+            "last_name": "Doe",
+            "email": "john.doe@ma-plie.fr",
+            "password1": password,
+            "password2": password,
+        }
+        response = self.client.post(url, data=post_data)
+        url = reverse("signup:prescriber_choose_org")
+        response = self.client.post(url, data=post_data)
+        url = reverse("signup:prescriber_siret")
+        response = self.client.post(url, data=post_data)
+        url = reverse("signup:prescriber_user")
+        self.assertRedirects(response, url)
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("account_email_verification_sent"))
+
+        # Check new org is ok:
+        same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).all()
+        self.assertEqual(2, len(same_siret_orgs))
+        org1, org2 = same_siret_orgs
+        self.assertEqual(PrescriberOrganization.Kind.ML.value, org1.kind)
+        self.assertEqual(PrescriberOrganization.Kind.PLIE.value, org2.kind)
+
+    @mock.patch(
+        "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
+    )
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_create_user_prescriber_with_same_siret_and_same_kind(
+        self, mock_api_entreprise, mock_call_ban_geocoding_api
+    ):
+        """
+        A user can't create a new prescriber organization with an existing SIRET number if:
+        * the kind of the new organization is the same as an existing one
+        * there is no duplicate of the (kind, siret) pair
+        """
+
+        # same SIRET as mock but with same expected kind
+        siret = "26570134200148"
+        PrescriberOrganizationFactory(siret=siret, kind=PrescriberOrganization.Kind.PLIE).save()
+
+        post_data = {
+            "is_pole_emploi": 0,
+            "kind": PrescriberOrganization.Kind.PLIE.value,
+            "siret": siret,
+        }
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
+        response = self.client.post(url, data=post_data)
+
+        url = reverse("signup:prescriber_choose_org")
+        response = self.client.post(url, data=post_data)
+
+        url = reverse("signup:prescriber_siret")
+        response = self.client.post(url, data=post_data)
+
+        # Should not be able to go further (not a distinct kind,siret pair)
+        # Must not redirect
+        self.assertEqual(response.status_code, 200)
 
 
 class PasswordResetTest(TestCase):

@@ -246,6 +246,9 @@ class PrescriberSiretForm(forms.Form):
     """
 
     def __init__(self, *args, **kwargs):
+        # We need the kind of the SIAE to check constraint on SIRET number
+        self.kind = kwargs.pop("kind", None)
+
         super().__init__(*args, **kwargs)
         self.org_data = None
 
@@ -262,8 +265,8 @@ class PrescriberSiretForm(forms.Form):
 
         validate_siret(siret)
 
-        # Does the org already exists?
-        org = PrescriberOrganization.objects.filter(siret=siret).first()
+        # Does an org with this SIRET already exist?
+        org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
         if org:
             error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
             admin = org.get_admins().first()
