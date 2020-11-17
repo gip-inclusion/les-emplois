@@ -48,4 +48,8 @@
 
 {% endif %}
 
+{% blocktranslate %}
+Toute demande de PASS IAE doit être effectuée au plus tard le jour de l'embauche. Les demandes rétroactives ne sont pas autorisées.
+{% endblocktranslate %}
+
 {% endblock body %}
