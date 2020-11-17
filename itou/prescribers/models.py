@@ -114,7 +114,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
         NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
 
-    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], blank=True)
+    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], null=True)
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
@@ -178,6 +178,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     class Meta:
         verbose_name = _("Organisation")
         verbose_name_plural = _("Organisations")
+        # This DB constraint works with null fields, but not with blank ones
+        # If both org1 and org2 are created:
+        # OK  => org1: (kind="ML", siret=None) + org2: (kind="ML", siret=None)
+        # OK  => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret=None)
+        # OK =>  org1: (kind="ML", siret="12345678900000") + org2; (kind="PLIE", siret="12345678900000")
+        # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
+        unique_together = ("siret", "kind")
 
     def __str__(self):
         return f"{self.name}"
