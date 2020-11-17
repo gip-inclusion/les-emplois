@@ -6,6 +6,8 @@ from django.test import TestCase
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationFactory,
+    PrescriberOrganizationWith2MembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.factories import PrescriberFactory
@@ -73,3 +75,33 @@ class ModelTest(TestCase):
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
+
+    def test_active_admin_members(self):
+        """
+        Test that if a user is admin of org1 and regular user
+        of org2 it does not get considered as admin of org2.
+        """
+        organization1 = PrescriberOrganizationWithMembershipFactory()
+        organization1_admin_user = organization1.active_admin_members.get()
+        organization2 = PrescriberOrganizationWithMembershipFactory()
+        organization2.members.add(organization1_admin_user)
+
+        self.assertEqual(organization1.members.count(), 1)
+        self.assertEqual(organization1.active_members.count(), 1)
+        self.assertEqual(organization1.active_admin_members.count(), 1)
+
+        self.assertEqual(organization2.members.count(), 2)
+        self.assertEqual(organization2.active_members.count(), 2)
+        self.assertEqual(organization2.active_admin_members.count(), 1)
+
+    def test_active_member_with_many_memberships(self):
+        organization1 = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
+        user = organization1.members.all()[1]
+        organization2 = PrescriberOrganizationWith2MembershipFactory()
+        organization2.members.add(user)
+
+        self.assertFalse(user in organization1.active_members)
+        self.assertEqual(organization1.members.count(), 2)
+        self.assertEqual(organization1.active_members.count(), 1)
+        self.assertEqual(organization2.members.count(), 3)
+        self.assertEqual(organization2.active_members.count(), 3)

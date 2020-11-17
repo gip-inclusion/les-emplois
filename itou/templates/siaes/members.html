@@ -5,39 +5,25 @@
 
 {% block content %}
 
-<div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
-    <h1>{% translate "Collaborateurs" %}</h1>
-    <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
-</div>
+    <div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
+        <h1>{% translate "Collaborateurs" %}</h1>
+        <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
+    </div>
 
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">{% translate "Nom" %}</th>
-                <th scope="col">{% translate "Email" %}</th>
-                <th scope="col">{% translate "Date d'inscription" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for member in members %}
-                <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>{{ member.user.get_full_name }}</td>
-                    <td><a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a></td>
-                    <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
-    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
-</a>
+    <div class="alert alert-info" role="alert">
+        {% translate "Vous êtes connecté en tant que" %} <b>{{ user.get_full_name }}</b> ({{ user.email }})
+    </div>
 
-{% if pending_invitations %}
-    {% include "invitations_views/includes/pending_invitations.html" %}
-{% endif %}
+    {% with active_admin_members=siae.active_admin_members base_url="siaes_views" %}
+        {% include "includes/members.html" %}
+    {% endwith %}
+
+    <a href="{% url 'invitations_views:invite_siae_staff' %}" class="align-self-center">
+        <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
+    </a>
+
+    {% if pending_invitations %}
+        {% include "invitations_views/includes/pending_invitations.html" %}
+    {% endif %}
 
 {% endblock %}
