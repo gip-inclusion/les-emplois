@@ -13,7 +13,7 @@ class MembersInline(admin.TabularInline):
     model = models.Siae.members.through
     extra = 1
     raw_id_fields = ("user",)
-    readonly_fields = ("updated_by",)
+    readonly_fields = ("is_active", "created_at", "updated_at", "updated_by")
 
 
 class JobsInline(admin.TabularInline):

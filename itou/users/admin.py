@@ -16,7 +16,16 @@ class SiaeMembershipInline(admin.TabularInline):
     model = SiaeMembership
     extra = 0
     raw_id_fields = ("siae",)
-    readonly_fields = ("siae", "siae_id_link", "joined_at", "is_siae_admin")
+    readonly_fields = (
+        "siae",
+        "siae_id_link",
+        "joined_at",
+        "is_siae_admin",
+        "is_active",
+        "created_at",
+        "updated_at",
+        "updated_by",
+    )
     can_delete = False
     show_change_link = True
     fk_name = "user"
@@ -38,7 +47,16 @@ class PrescriberMembershipInline(admin.TabularInline):
     model = PrescriberMembership
     extra = 0
     raw_id_fields = ("organization",)
-    readonly_fields = ("organization", "organization_id_link", "joined_at", "is_admin")
+    readonly_fields = (
+        "organization",
+        "organization_id_link",
+        "joined_at",
+        "is_admin",
+        "is_active",
+        "created_at",
+        "updated_at",
+        "updated_by",
+    )
     can_delete = False
     fk_name = "user"
 
