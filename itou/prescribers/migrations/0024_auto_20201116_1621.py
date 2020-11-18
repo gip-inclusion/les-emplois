@@ -5,6 +5,14 @@ from django.db import migrations, models
 import itou.utils.validators
 
 
+def move_data_forward(apps, schema_editor):
+    """
+    Replace old `blank` by `null` values.
+    """
+    PrescriberOrganization = apps.get_model("prescribers", "PrescriberOrganization")
+    PrescriberOrganization.objects.filter(siret="").update(siret=None)
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -12,6 +20,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        # Set null=True.
         migrations.AlterField(
             model_name="prescriberorganization",
             name="siret",
@@ -19,4 +28,8 @@ class Migration(migrations.Migration):
                 max_length=14, null=True, validators=[itou.utils.validators.validate_siret], verbose_name="Siret"
             ),
         ),
+        # Replace old `blank` by `null` values.
+        migrations.RunPython(move_data_forward, migrations.RunPython.noop),
+        # Add a unique together constraint.
+        migrations.AlterUniqueTogether(name="prescriberorganization", unique_together={("siret", "kind")},),
     ]

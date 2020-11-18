@@ -114,7 +114,18 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
         NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
 
-    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], null=True)
+    # Rules:
+    # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
+    # - a SIRET is now required for all organizations, except for Pôle emploi agencies
+    # - a SIRET now can have several kinds
+    # This is enforced at the DB level with a `unique_together` constraint + `null=True`.
+    # `null=True` is required to avoid unique constraint violations when saving multiple
+    # objects with "blank" values (e.g. Pôle emploi agencies or old entries that existed
+    # prior to the mandatory siret).
+    # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
+    siret = models.CharField(
+        verbose_name=_("Siret"), max_length=14, validators=[validate_siret], null=True, blank=True
+    )
     kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
