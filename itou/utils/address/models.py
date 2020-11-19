@@ -90,6 +90,19 @@ class AddressMixin(models.Model):
         fields = [self.address_line_1, self.address_line_2, f"{self.post_code} {self.city}"]
         return ", ".join([field for field in fields if field])
 
+    @property
+    def geocoding_address(self):
+        """
+        Using `address_on_one_line` field for geocoding can lead to poor scores
+        (because of `address_line_2` field).
+        - use `address_on_one_line` for display
+        - use `geocoding_address` for geocoding process
+        """
+        if not all([self.address_line_1, self.post_code, self.city]):
+            return None
+        fields = [self.address_line_1, f"{self.post_code} {self.city}"]
+        return ", ".join([field for field in fields if field])
+
     def set_coords(self, address, post_code=None):
         geocoding_data = get_geocoding_data(address, post_code=post_code)
         if not geocoding_data:

@@ -26,9 +26,9 @@ def could_siae_be_deleted(siae):
 
 
 def geocode_siae(siae):
-    assert siae.address_on_one_line
+    assert siae.geocoding_address
 
-    geocoding_data = get_geocoding_data(siae.address_on_one_line, post_code=siae.post_code)
+    geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
 
     if geocoding_data:
         siae.geocoding_score = geocoding_data["score"]

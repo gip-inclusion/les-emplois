@@ -175,15 +175,15 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
 
         if not change:
             obj.created_by = request.user
-            if not obj.geocoding_score and obj.address_on_one_line:
+            if not obj.geocoding_score and obj.geocoding_address:
                 # Set geocoding.
-                obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
-        if change and obj.address_on_one_line:
+        if change and obj.geocoding_address:
             old_obj = self.model.objects.get(id=obj.id)
-            if obj.address_on_one_line != old_obj.address_on_one_line:
+            if obj.geocoding_address != old_obj.geocoding_address:
                 # Refresh geocoding.
-                obj.set_coords(obj.address_on_one_line, post_code=obj.post_code)
+                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
         super().save_model(request, obj, form, change)
 

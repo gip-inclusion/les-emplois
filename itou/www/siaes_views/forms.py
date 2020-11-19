@@ -108,7 +108,7 @@ class CreateSiaeForm(forms.ModelForm):
     def save(self, request, commit=True):
         siae = super().save(commit=commit)
         if commit:
-            siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
+            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
             siae.created_by = request.user
             siae.source = Siae.SOURCE_USER_CREATED
             siae.convention = self.current_siae.convention
@@ -182,7 +182,7 @@ class EditSiaeForm(forms.ModelForm):
     def save(self, commit=True):
         siae = super().save(commit=commit)
         if commit:
-            siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
+            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
             siae.save()
         return siae
 
