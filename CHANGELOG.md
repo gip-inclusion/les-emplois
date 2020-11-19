@@ -6,6 +6,28 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [7] - 2020-11-19
+
+### Ajouté
+- Ouverture région Normandie
+- Ajout d'un lien vers le décret concernant les critères d’eligibilité
+- Ajout d'un message d'information dans la liste des candidatures en attente et dans l'email de nouvelle candidature
+- Ouverture région Pays de la Loire
+- Inscription possible de plusieurs structures ayant un même SIRET mais des types différents
+- Un administrateur de structure peut gérer ses collaborateurs
+- Possibilité d'avoir plusieurs administrateurs par structure
+- Ajout du lien de la place de marché dans le tableau de bord de certaines SIAE
+- Correction d'une erreur d'affichage sur Microsoft Edge et Internet Explorer
+- Ajout du type de structure sur le tableau de bord et dans la liste de sélection multi-structure
+
+### Modifié
+- Modification de la couleur du bouton lors d'une demande de PASS IAE
+- Filtrage des liens internes Pôle emploi pour les CV (adresses locales)
+- Modification des informations d'inscription d'un employeur solidaire
+- Simplification du code d'ouverture d'une région
+- Modification du champ "enseigne" dans la fiche SIAE
+- La géolocalisation ne tient plus compte du complément d'adresse (baisse de qualité du score) 
+
 ## [6] - 2020-11-05
 
 ### Ajouté
