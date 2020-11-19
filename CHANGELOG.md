@@ -19,14 +19,17 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Ajout du lien de la place de marché dans le tableau de bord de certaines SIAE
 - Correction d'une erreur d'affichage sur Microsoft Edge et Internet Explorer
 - Ajout du type de structure sur le tableau de bord et dans la liste de sélection multi-structure
+- Lors d'une candidature, il est désormais impossible d'ajouter un CV hébergé par l'intranet de Pôle emploi
+- Les prescripteurs peuvent voir le message de refus des candidatures suivies
 
 ### Modifié
 - Modification de la couleur du bouton de validation lors d'une demande de PASS IAE
-- Filtrage des liens internes Pôle emploi pour les CV (adresses locales)
 - Modification des informations d'inscription d'un employeur solidaire
 - Simplification du code d'ouverture d'une région
 - Modification du champ "enseigne" dans la fiche SIAE
-- La géolocalisation ne tient plus compte du complément d'adresse (baisse de qualité du score) 
+- La géolocalisation ne tient plus compte du complément d'adresse (baisse de qualité du score)
+- Correction du fonctionnement des recettes jetables
+- Modification du mot de passe du super administrateur dans la démo
 
 ## [6] - 2020-11-05
 
