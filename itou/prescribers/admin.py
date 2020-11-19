@@ -25,7 +25,7 @@ class TmpMissingSiretFilter(admin.SimpleListFilter):
             return (
                 queryset.exclude(kind=models.PrescriberOrganization.Kind.PE.value)
                 .exclude(members=None)
-                .filter(siret="")
+                .filter(siret__isnull=True)
             )
         return queryset
 
