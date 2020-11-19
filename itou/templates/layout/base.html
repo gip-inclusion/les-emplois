@@ -97,7 +97,7 @@
                                                     class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="siae_id"
-                                                    value="{{ s.pk }}">{{ s.display_name }}
+                                                    value="{{ s.pk }}">{{ s.display_name }} <span class="badge badge-primary">{{ s.kind }}</span> 
                                                 </button>
                                             {% endfor %}
                                         </form>
@@ -118,7 +118,7 @@
                                                     class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="prescriber_organization_id"
-                                                    value="{{ po.pk }}">{{ po.display_name }} ({{ po.kind }})
+                                                    value="{{ po.pk }}">{{ po.display_name }} <span class="badge badge-primary">{{ s.kind }}</span> 
                                                 </button>
                                             {% endfor %}
                                         </form>
