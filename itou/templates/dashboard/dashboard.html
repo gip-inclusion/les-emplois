@@ -63,7 +63,7 @@
         {% translate "Tableau de bord" %}
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %} -
-        <span class="text-muted">{{ current_prescriber_organization.display_name }} - ({{ current_prescriber_organization.kind }})</span>
+        <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
             {% if current_prescriber_organization.is_authorized %}
                 {% include "includes/icon.html" with icon="award" class="h1 align-middle" size=30 %}
             {% endif %}
@@ -143,7 +143,9 @@
 
             {% if current_prescriber_organization %}
                 <div class="card">
-                    <h5 class="card-header">{% translate "Organisation" %}</h5>
+                    <h5 class="card-header">
+                        {% translate "Organisation" %} <span class="ml-1 badge badge-secondary">{{ current_prescriber_organization.kind }} - ID {{ current_prescriber_organization.id }}</span>
+                    </h5>
                     <div class="card-body">
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
@@ -199,7 +201,7 @@
             <div class="card">
                 <h5 class="card-header">
                     {% translate "Ma structure" %}
-                    (ID {{ current_siae.id }})
+                    <span class="ml-1 badge badge-secondary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
                 </h5>
                 <div class="card-body">
                     <p class="card-text">
@@ -304,4 +306,15 @@
 
     </div>
 
+    {% if current_siae and current_siae.region in lemarche_regions %}
+        <div class="layout layout-column-full border-top bg-light text-center p-4 mt-5 card">
+            <p class="h5 mb-3">{% translate "Développez votre clientèle avec le marché de l'inclusion" %}</p>
+            <p class="mb-1">
+                <a href="https://lemarche.inclusion.beta.gouv.fr" rel="noopener" target="_blank" class="btn btn-primary">
+                    {% translate "C'est parti !" %}
+                    {% include "includes/icon.html" with icon="external-link" %}
+                </a>
+            </p>
+        </div>
+    {% endif %}
 {% endblock %}

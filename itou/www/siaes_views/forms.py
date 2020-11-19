@@ -108,7 +108,7 @@ class CreateSiaeForm(forms.ModelForm):
     def save(self, request, commit=True):
         siae = super().save(commit=commit)
         if commit:
-            siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
+            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
             siae.created_by = request.user
             siae.source = Siae.SOURCE_USER_CREATED
             siae.convention = self.current_siae.convention
@@ -170,7 +170,10 @@ class EditSiaeForm(forms.ModelForm):
             "department",
         ]
         help_texts = {
-            "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
+            "brand": gettext_lazy(
+                "Si ce champ est renseigné, il sera utilisé en tant que nom "
+                "sur la fiche et dans les résultats de recherche."
+            ),
             "description": gettext_lazy("Texte de présentation de votre structure."),
             "phone": gettext_lazy("Par exemple 0610203040"),
             "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
@@ -179,7 +182,7 @@ class EditSiaeForm(forms.ModelForm):
     def save(self, commit=True):
         siae = super().save(commit=commit)
         if commit:
-            siae.set_coords(siae.address_on_one_line, post_code=siae.post_code)
+            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
             siae.save()
         return siae
 

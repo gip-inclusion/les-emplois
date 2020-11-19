@@ -74,3 +74,7 @@ ITOU_FQDN = "localhost:8080"
 # ------------------------------------------------------------------------------
 
 ALLOW_POPULATING_METABASE = True
+
+# Le marché de l'inclusion
+# Match open regions with SIAE created by our fixtures.
+LEMARCHE_OPEN_REGIONS = ["Occitanie"]

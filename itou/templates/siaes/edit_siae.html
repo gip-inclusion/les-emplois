@@ -10,13 +10,7 @@
 
 <h2 class="text-muted">
     {{ siae.display_name }}
-    {# Display non-user-edited name too. #}
-    {% if siae.brand %}<small>({{ siae.name|title }})</small>{% endif %}
 </h2>
-
-<div class="alert alert-info" role="alert">
-    {% blocktranslate %}Si vous devez modifier le nom de votre structure, <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">contactez-nous</a>.{% endblocktranslate %}
-</div>
 
 <form method="post" action="" class="js-prevent-multiple-submit">
 
@@ -26,7 +20,10 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form form %}
+    {% bootstrap_label "Nom à afficher sur la plateforme" label_title="a" label_for=form.brand.id  %}
+    {% bootstrap_field form.brand show_label=False %}
+
+    {% bootstrap_form form exclude="brand" %}
 
     <div class="alert alert-warning" role="alert">
         <p>

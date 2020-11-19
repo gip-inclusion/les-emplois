@@ -28,11 +28,11 @@ jobs:
 
     - name: 🏷 Set review app name
       run:
-        echo ::set-env name=REVIEW_APP_NAME::$(echo "c1-review-$BRANCH" | sed -r 's/[-;\\/._]+/-/g')
+        echo "REVIEW_APP_NAME=`echo \"c1-review-$BRANCH\" | sed -r 's/[-;\\/._]+/-/g'`" >> $GITHUB_ENV
 
     - name: 🏷 Set database name
       run:
-        echo ::set-env name=REVIEW_APP_DB_NAME::$(echo $REVIEW_APP_NAME | sed -r 's/-/_/g')
+        echo "REVIEW_APP_DB_NAME=`echo $REVIEW_APP_NAME | sed -r 's/-/_/g'`" >> $GITHUB_ENV
 
     - name: 🤝 Find the application on Clever Cloud
       run: |
