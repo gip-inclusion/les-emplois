@@ -10,8 +10,8 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 ### Ajouté
 - Ouverture région Normandie
-- Ajout d'un lien vers le décret concernant les critères d’eligibilité
-- Ajout d'un message d'information dans la liste des candidatures en attente et dans l'email de nouvelle candidature
+- Ajout d'un lien vers le décret concernant les critères d’éligibilité
+- Ajout d'un message d'information dans la liste des candidatures en attente et dans l'e-mail de nouvelle candidature
 - Ouverture région Pays de la Loire
 - Inscription possible de plusieurs structures ayant un même SIRET mais des types différents
 - Un administrateur de structure peut gérer ses collaborateurs
@@ -21,7 +21,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Ajout du type de structure sur le tableau de bord et dans la liste de sélection multi-structure
 
 ### Modifié
-- Modification de la couleur du bouton lors d'une demande de PASS IAE
+- Modification de la couleur du bouton de validation lors d'une demande de PASS IAE
 - Filtrage des liens internes Pôle emploi pour les CV (adresses locales)
 - Modification des informations d'inscription d'un employeur solidaire
 - Simplification du code d'ouverture d'une région
