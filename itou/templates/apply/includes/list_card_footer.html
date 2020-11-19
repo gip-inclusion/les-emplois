@@ -14,13 +14,22 @@
         <div>
             {{ job_application.message|linebreaks }}
         </div>
-        {% if job_application.state.is_refused and job_application.answer %}
-            <p>
-                <b>{% translate "Réponse :" %}</b>
-            </p>
-            <div>
-                {{ job_application.answer|linebreaks }}
-            </div>
+        {% if job_application.state.is_refused %}
+            {% if user.is_prescriber %}
+                <p>
+                    <b>{% translate "Motif du refus :" %}</b>
+                </p>
+                <p>{{ job_application.get_refusal_reason_display }}</p>
+            {% endif %}
+
+            {% if job_application.answer %}
+                <p>
+                    <b>{% translate "Réponse :" %}</b>
+                </p>
+                <div>
+                    {{ job_application.answer|linebreaks }}
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 </div>

@@ -304,4 +304,15 @@
 
     </div>
 
+    {% if current_siae and current_siae.region in lemarche_regions %}
+        <div class="layout layout-column-full border-top bg-light text-center p-4 mt-5 card">
+            <p class="h5 mb-3">{% translate "Développez votre clientèle avec le marché de l'inclusion" %}</p>
+            <p class="mb-1">
+                <a href="https://lemarche.inclusion.beta.gouv.fr" rel="noopener" target="_blank" class="btn btn-primary">
+                    {% translate "C'est parti !" %}
+                    {% include "includes/icon.html" with icon="external-link" %}
+                </a>
+            </p>
+        </div>
+    {% endif %}
 {% endblock %}

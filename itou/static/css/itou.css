@@ -94,15 +94,10 @@ b {
     z-index: 1;
 }
 
-/* Add shadow at the bottom of the banner. */
-.layout-banner-container::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    box-shadow: 0 18px 20px -20px gray;
+/* Add shadow at the bottom of the banner.
+Don't use :after pseudo-selector as it introduced a bug in IE and Edge. */
+.banner-bottom-shadow {
+    box-shadow: 0 18px 20px -20px grey;
 }
 
 .layout-banner {

@@ -56,6 +56,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
     context = {
+        "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
         "job_applications_categories": job_applications_categories,
     }
 

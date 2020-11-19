@@ -472,3 +472,6 @@ EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
 # Number of retries & retry delay parameters for emails (for async process)
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
+
+# Le marché de l'inclusion
+LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
