@@ -24,7 +24,7 @@ from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
 from itou.siaes.models import Siae, SiaeFinancialAnnex
-from itou.utils.validators import validate_af_number, validate_convention_number
+from itou.utils.validators import validate_af_number
 
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
@@ -39,7 +39,6 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     This export makes us able to know which siae is or is not "conventionnée" as of today.
     Meaningful columns:
     - number (by merging 3 underlying columns)
-    - convention_number
     - asp_id
     - kind
     - start_date
@@ -65,7 +64,6 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
         "af_numero_annexe_financiere": "number_prefix",
         "af_numero_avenant_renouvellement": "renewal_number",
         "af_numero_avenant_modification": "modification_number",
-        "af_numero_convention": "convention_number",
         "af_id_structure": "asp_id",
         "af_mesure_dispositif_code": "kind",
         "af_date_debut_effet": "start_date",
@@ -91,14 +89,10 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     # Build complete AF number.
     df["number"] = df.number_prefix + "A" + df.renewal_number.astype(str) + "M" + df.modification_number.astype(str)
 
-    # Remove spaces in convention number.
-    df["convention_number"] = df.convention_number.str.replace(" ", "")
-
     # Ensure data quality.
     for _, row in df.iterrows():
         assert row.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
         validate_af_number(row.number)
-        validate_convention_number(row.convention_number)
 
     df["start_date"] = df.start_date.apply(timezone.make_aware)
     df["end_date"] = df.end_date.apply(timezone.make_aware)

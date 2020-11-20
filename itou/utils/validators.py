@@ -83,20 +83,3 @@ def validate_af_number(af_number):
     prefix = af_number[:-4]  # all but last 4 characters
     if not any([re.match(r, prefix) for r in AF_NUMBER_PREFIX_REGEXPS]):
         raise ValidationError(_("Préfixe de numéro d'AF incorrect."))
-
-
-CONVENTION_NUMBER_REGEXPS = [
-    r"\d{2}[A-Z\d]\d{6}ACI\d{5}",
-    r"\d{9}ACI\d{7}",
-    r"\d{2}[A-Z\d]\d{6}AI\d{5}",
-    r"EI\d{2}[A-Z\d]\d{6}",
-    r"ETTI\d{2}[A-Z\d]\d{6}",
-    r"EITI\d{2}[A-Z\d]\d{6}",
-]
-
-
-def validate_convention_number(convention_number):
-    if not convention_number or convention_number == "":
-        raise ValidationError(_("Numéro de convention vide"))
-    if not any([re.match(r, convention_number) for r in CONVENTION_NUMBER_REGEXPS]):
-        raise ValidationError(_("Numéro de convention incorrect."))
