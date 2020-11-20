@@ -29,7 +29,6 @@ def get_creatable_and_deletable_afs(dry_run):
         # The AF already exists in db. Let's check if some of its fields have changed.
         row = AF_NUMBER_TO_ROW[af.number]
         assert af.number == row.number
-        assert af.convention_number == row.convention_number
         assert af.start_at == row.start_date
         assert af.end_at == row.end_date
         assert af.convention.kind == row.kind
@@ -71,7 +70,6 @@ def build_financial_annex_from_number(number):
         return None
     return SiaeFinancialAnnex(
         number=row.number,
-        convention_number=row.convention_number,
         state=row.state,
         start_at=row.start_date,
         end_at=row.end_date,

@@ -15,7 +15,7 @@ from django.utils.translation import gettext_lazy as _
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import siae_signup_token_generator
-from itou.utils.validators import validate_af_number, validate_convention_number, validate_naf, validate_siret
+from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
 
 class SiaeQuerySet(models.QuerySet):
@@ -215,7 +215,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def is_active(self):
-        if self.kind not in Siae.ELIGIBILITY_REQUIRED_KINDS:
+        if not self.is_subject_to_eligibility_rules:
             # GEIQ, EA... have no convention logic and thus are always active.
             return True
         if self.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]:
@@ -611,11 +611,6 @@ class SiaeFinancialAnnex(models.Model):
         validators=[validate_af_number],
         unique=True,
         db_index=True,
-    )
-    # This field is at SiaeFinancialAnnex level and not at SiaeConvention level
-    # because one SiaeConvention can have financial annexes with different convention numbers.
-    convention_number = models.CharField(
-        verbose_name=_("Numéro de convention"), max_length=19, validators=[validate_convention_number], db_index=True
     )
     state = models.CharField(verbose_name=_("Etat"), max_length=20, choices=STATE_CHOICES,)
     start_at = models.DateTimeField(verbose_name=_("Date de début d'effet"))
