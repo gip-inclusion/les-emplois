@@ -24,8 +24,8 @@ class JobsInline(admin.TabularInline):
 
 class FinancialAnnexesInline(admin.TabularInline):
     model = models.SiaeFinancialAnnex
-    fields = ("number", "state", "convention_number", "start_at", "end_at", "is_active")
-    readonly_fields = ("number", "state", "convention_number", "start_at", "end_at", "is_active")
+    fields = ("number", "state", "start_at", "end_at", "is_active")
+    readonly_fields = ("number", "state", "start_at", "end_at", "is_active")
     can_delete = False
 
     ordering = ("-number",)
@@ -216,12 +216,11 @@ class SiaeConvention(admin.ModelAdmin):
 
 @admin.register(models.SiaeFinancialAnnex)
 class SiaeFinancialAnnex(admin.ModelAdmin):
-    list_display = ("number", "convention_number", "state", "start_at", "end_at")
+    list_display = ("number", "state", "start_at", "end_at")
     list_filter = ("state",)
     raw_id_fields = ("convention",)
     readonly_fields = (
         "number",
-        "convention_number",
         "state",
         "start_at",
         "end_at",
@@ -229,8 +228,8 @@ class SiaeFinancialAnnex(admin.ModelAdmin):
         "updated_at",
     )
     fieldsets = (
-        (_("Informations"), {"fields": ("number", "convention_number", "convention",)},),
+        (_("Informations"), {"fields": ("number", "convention",)},),
         (_("Statut"), {"fields": ("state", "start_at", "end_at",)},),
         (_("Autres"), {"fields": ("created_at", "updated_at",)},),
     )
-    search_fields = ("pk", "number", "convention_number")
+    search_fields = ("pk", "number")

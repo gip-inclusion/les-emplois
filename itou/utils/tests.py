@@ -38,7 +38,6 @@ from itou.utils.validators import (
     validate_af_number,
     validate_birthdate,
     validate_code_safir,
-    validate_convention_number,
     validate_naf,
     validate_pole_emploi_id,
     validate_post_code,
@@ -391,25 +390,6 @@ class UtilsValidatorsTest(TestCase):
         validate_af_number("AI088160001A1M1")
         validate_af_number("ETTI080180002A1M1")
         validate_af_number("ETTI59L181001A1M1")
-
-    def test_validate_convention_number(self):
-        # Dubious values.
-        self.assertRaises(ValidationError, validate_convention_number, "")
-        self.assertRaises(ValidationError, validate_convention_number, None)
-        self.assertRaises(ValidationError, validate_convention_number, "ABC")
-        self.assertRaises(ValidationError, validate_convention_number, "EX080180002")
-
-        # Correct values.
-        validate_convention_number("063010517ACI00007")
-        validate_convention_number("59L010118ACI01001")
-        validate_convention_number("047010117ACI0001003")
-        validate_convention_number("088010116AI00001")
-        validate_convention_number("59L010118AI01001")
-        validate_convention_number("EI080180002")
-        validate_convention_number("EI59V182019")
-        validate_convention_number("ETTI080180002")
-        validate_convention_number("ETTI59L181001")
-        validate_convention_number("EITI076200002")
 
 
 class UtilsTemplateTagsTestCase(TestCase):
