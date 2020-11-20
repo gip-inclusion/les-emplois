@@ -215,7 +215,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def is_active(self):
-        if self.kind not in Siae.ELIGIBILITY_REQUIRED_KINDS:
+        if not self.is_subject_to_eligibility_rules:
             # GEIQ, EA... have no convention logic and thus are always active.
             return True
         if self.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]:
