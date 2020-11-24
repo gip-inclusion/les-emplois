@@ -142,6 +142,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     )
     raw_id_fields = ("created_by",)
     readonly_fields = (
+        "coords",  # Quick tip to disable GeoDjango's Openlayers map.
         "created_by",
         "created_at",
         "updated_at",

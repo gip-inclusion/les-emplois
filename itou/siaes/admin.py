@@ -84,6 +84,7 @@ class SiaeAdmin(admin.ModelAdmin):
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     readonly_fields = (
+        "coords",  # Quick tip to disable GeoDjango's Openlayers map.
         "source",
         "created_by",
         "created_at",
