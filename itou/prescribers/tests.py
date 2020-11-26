@@ -96,7 +96,7 @@ class ModelTest(TestCase):
 
     def test_active_member_with_many_memberships(self):
         organization1 = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
-        user = organization1.members.all()[1]
+        user = organization1.members.filter(prescribermembership__is_admin=False).first()
         organization2 = PrescriberOrganizationWith2MembershipFactory()
         organization2.members.add(user)
 

@@ -529,7 +529,7 @@ class UserMembershipDeactivationTest(TestCase):
         (must be done by another admin)
         """
         siae = SiaeWithMembershipFactory()
-        admin = siae.members.first()
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
         memberships = admin.siaemembership_set.all()
         membership = memberships.first()
 
@@ -549,8 +549,8 @@ class UserMembershipDeactivationTest(TestCase):
         Everything should be fine ...
         """
         siae = SiaeWith2MembershipsFactory()
-        admin = siae.members.first()
-        guest = siae.members.all()[1]
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
 
         membership = guest.siaemembership_set.first()
         self.assertFalse(guest in siae.active_admin_members)
@@ -580,7 +580,7 @@ class UserMembershipDeactivationTest(TestCase):
         Non-admin user can't change memberships
         """
         siae = SiaeWith2MembershipsFactory()
-        guest = siae.members.all()[1]
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
         response = self.client.post(url)
@@ -594,7 +594,8 @@ class UserMembershipDeactivationTest(TestCase):
         are activated/invited again, they will be able to log in.
         """
         siae = SiaeWith2MembershipsFactory()
-        admin, guest = siae.members.all()
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -650,7 +651,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         Check the ability for an admin to add another admin to the siae
         """
         siae = SiaeWith2MembershipsFactory()
-        admin, guest = siae.members.all()
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
@@ -671,7 +673,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         Check the ability for an admin to remove another admin
         """
         siae = SiaeWith2MembershipsFactory()
-        admin, guest = siae.members.all()
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
 
         membership = guest.siaemembership_set.first()
         membership.is_siae_admin = True
@@ -697,7 +700,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         Non-admin users can't update admin members
         """
         siae = SiaeWith2MembershipsFactory()
-        admin, guest = siae.members.all()
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("siaes_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
@@ -725,7 +729,8 @@ class SIAEAdminMembersManagementTest(TestCase):
         """
         suspicious_action = "h4ckm3"
         siae = SiaeWith2MembershipsFactory()
-        admin, guest = siae.members.all()
+        admin = siae.members.filter(siaemembership__is_siae_admin=True).first()
+        guest = siae.members.filter(siaemembership__is_siae_admin=False).first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         # update: less test with RE_PATH

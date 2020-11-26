@@ -30,6 +30,7 @@ def get_current_organization_and_perms(request):
             memberships = (
                 request.user.siaemembership_set.select_related("siae")
                 .filter(siae__pk__in=user_siae_set_pks, is_active=True)
+                .order_by("created_at")
                 .all()
             )
             user_siaes = [membership.siae for membership in memberships]
@@ -47,7 +48,11 @@ def get_current_organization_and_perms(request):
 
         if prescriber_org_pk:
             # Membership can now be deactivated, hence filtering on `membership.is_active` (same as SIAE above)
-            memberships = current_user.prescribermembership_set.filter(is_active=True).select_related("organization")
+            memberships = (
+                current_user.prescribermembership_set.filter(is_active=True)
+                .order_by("created_at")
+                .select_related("organization")
+            )
 
             for membership in memberships:
                 # Same as above:

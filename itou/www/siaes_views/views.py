@@ -166,7 +166,6 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     siae = get_current_siae_or_404(request)
     user = request.user
     target_member = User.objects.get(pk=user_id)
-    user_is_admin = user in siae.active_admin_members
     user_is_admin = siae.has_admin(user)
 
     if not user_is_admin:
