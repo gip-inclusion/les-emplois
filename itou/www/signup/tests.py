@@ -780,7 +780,7 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check new org is ok:
-        same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).all()
+        same_siret_orgs = PrescriberOrganization.objects.filter(siret=siret).order_by("kind").all()
         self.assertEqual(2, len(same_siret_orgs))
         org1, org2 = same_siret_orgs
         self.assertEqual(PrescriberOrganization.Kind.ML.value, org1.kind)

@@ -192,7 +192,7 @@ class ModelTest(TestCase):
 
     def test_active_member_with_many_memberships(self):
         siae1 = SiaeWith2MembershipsFactory(membership2__is_active=False)
-        user = siae1.members.all()[1]
+        user = siae1.members.filter(siaemembership__is_siae_admin=False).first()
         siae2 = SiaeWith2MembershipsFactory()
         siae2.members.add(user)
 

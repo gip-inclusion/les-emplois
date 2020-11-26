@@ -132,7 +132,7 @@ class UserMembershipDeactivationTest(TestCase):
         (must be done by another admin)
         """
         organization = PrescriberOrganizationWithMembershipFactory()
-        admin = organization.members.first()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
         memberships = admin.prescribermembership_set.all()
         membership = memberships.first()
 
@@ -152,7 +152,8 @@ class UserMembershipDeactivationTest(TestCase):
         Everything should be fine ...
         """
         organization = PrescriberOrganizationWith2MembershipFactory()
-        admin, guest = organization.members.all()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         memberships = guest.prescribermembership_set.all()
         membership = memberships.first()
@@ -196,7 +197,8 @@ class UserMembershipDeactivationTest(TestCase):
         As such he must be able to login.
         """
         organization = PrescriberOrganizationWith2MembershipFactory()
-        admin, guest = organization.members.all()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
@@ -249,7 +251,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         Check the ability for an admin to add another admin to the organization
         """
         organization = PrescriberOrganizationWith2MembershipFactory()
-        admin, guest = organization.members.all()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         self.client.login(username=admin.email, password=DEFAULT_PASSWORD)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
@@ -270,7 +273,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         Check the ability for an admin to remove another admin
         """
         organization = PrescriberOrganizationWith2MembershipFactory()
-        admin, guest = organization.members.all()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         membership = guest.prescribermembership_set.first()
         membership.is_admin = True
@@ -296,7 +300,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         Non-admin users can't update admin members
         """
         organization = PrescriberOrganizationWith2MembershipFactory()
-        admin, guest = organization.members.all()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
@@ -324,7 +329,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         """
         suspicious_action = "h4ckm3"
         organization = PrescriberOrganizationWith2MembershipFactory()
-        admin, guest = organization.members.all()
+        admin = organization.members.filter(prescribermembership__is_admin=True).first()
+        guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
         self.client.login(username=guest.email, password=DEFAULT_PASSWORD)
 
