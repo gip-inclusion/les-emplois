@@ -4,17 +4,19 @@ from django.conf import settings
 
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.metabase.management.commands._utils import get_department_and_region_columns, get_hiring_siae
-from itou.prescribers.models import PrescriberOrganization
+
+
+# from itou.prescribers.models import PrescriberOrganization
 
 
 POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE = datetime(2018, 1, 1)
 
-# Preload association for best performance and to avoid having to make
-# PoleEmploiApproval.pe_structure_code a foreign key.
-CODE_SAFIR_TO_PE_ORG = {
-    org.code_safir_pole_emploi: org
-    for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).all()
-}
+# # Preload association for best performance and to avoid having to make
+# # PoleEmploiApproval.pe_structure_code a foreign key.
+# CODE_SAFIR_TO_PE_ORG = {
+#     org.code_safir_pole_emploi: org
+#     for org in PrescriberOrganization.objects.filter(code_safir_pole_emploi__isnull=False).all()
+# }
 
 
 def get_siae_from_approval(approval):
@@ -28,9 +30,10 @@ def get_siae_or_pe_org_from_approval(approval):
     if isinstance(approval, Approval):
         return get_siae_from_approval(approval)
     assert isinstance(approval, PoleEmploiApproval)
-    code_safir = approval.pe_structure_code
-    pe_org = CODE_SAFIR_TO_PE_ORG.get(code_safir)
-    return pe_org
+    # code_safir = approval.pe_structure_code
+    # pe_org = CODE_SAFIR_TO_PE_ORG.get(code_safir)
+    # return pe_org
+    return None
 
 
 def get_approval_type(approval):
