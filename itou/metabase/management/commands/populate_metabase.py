@@ -22,6 +22,7 @@ import psycopg2
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from django.db import reset_queries
 from django.utils import timezone
 from tqdm import tqdm
 
@@ -180,8 +181,9 @@ class Command(BaseCommand):
                     injections += chunk_qs.count()
                     progress_bar.update(chunk_qs.count())
 
-                # Trigger garbage collection to optimize memory use.
-                gc.collect()
+                    # Optimize memory use.
+                    gc.collect()
+                    reset_queries()
 
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")

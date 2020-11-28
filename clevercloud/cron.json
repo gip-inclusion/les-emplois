@@ -1,3 +1,3 @@
 [
-    "58 13 * * * $ROOT/clevercloud/populate_metabase.sh"
+    "10 14 * * * $ROOT/clevercloud/populate_metabase.sh"
 ]
