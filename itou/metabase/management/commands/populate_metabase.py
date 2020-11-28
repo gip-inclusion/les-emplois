@@ -94,8 +94,6 @@ class Command(BaseCommand):
     def cleanup_tables(self, table_name):
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_new;")
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_new;")
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_dry_run_old;")
         self.commit()
 
     def inject_page(self, table_columns, page, insert_query):
@@ -117,10 +115,11 @@ class Command(BaseCommand):
             querysets = [queryset]
             queryset = None
 
+        if self.dry_run:
+            table_name = f"{table_name}_dry_run"
         self.cleanup_tables(table_name)
 
         if self.dry_run:
-            table_name = f"{table_name}_dry_run"
             total_rows = sum(
                 [min(queryset.count(), settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET) for queryset in querysets]
             )
