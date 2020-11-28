@@ -19,7 +19,6 @@ import gc
 import logging
 
 import psycopg2
-from chunkator import chunkator_page
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
@@ -30,7 +29,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.job_applications.models import JobApplication
 from itou.metabase.management.commands import _approvals, _job_applications, _job_seekers, _organizations, _siaes
 from itou.metabase.management.commands._database import MetabaseDatabaseCursor
-from itou.metabase.management.commands._utils import compose, convert_boolean_to_int
+from itou.metabase.management.commands._utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 
@@ -96,11 +95,11 @@ class Command(BaseCommand):
         self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
         self.commit()
 
-    def inject_page(self, table_columns, page, insert_query):
+    def inject_chunk(self, table_columns, chunk, insert_query):
         """
-        Insert page of objects into table.
+        Insert chunk of objects into table.
         """
-        data = [[c["lambda"](o) for c in table_columns] for o in page]
+        data = [[c["lambda"](o) for c in table_columns] for o in chunk]
         psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
         self.commit()
 
@@ -164,7 +163,7 @@ class Command(BaseCommand):
 
         if extra_object:
             # Insert extra object without counter/tqdm for simplicity.
-            self.inject_page(table_columns=table_columns, page=[extra_object], insert_query=insert_query)
+            self.inject_chunk(table_columns=table_columns, chunk=[extra_object], insert_query=insert_query)
 
         with tqdm(total=total_rows) as progress_bar:
             for queryset in querysets:
@@ -173,13 +172,13 @@ class Command(BaseCommand):
                 if self.dry_run:
                     total_injections = min(total_injections, settings.METABASE_DRY_RUN_ROWS_PER_QUERYSET)
 
-                for page in chunkator_page(queryset, settings.METABASE_INSERT_BATCH_SIZE):
+                for chunk_qs in chunked_queryset(queryset, chunk_size=settings.METABASE_INSERT_BATCH_SIZE):
                     injections_left = total_injections - injections
-                    if len(page) > injections_left:
-                        page = page[:injections_left]
-                    self.inject_page(table_columns=table_columns, page=page, insert_query=insert_query)
-                    injections += len(page)
-                    progress_bar.update(len(page))
+                    if chunk_qs.count() > injections_left:
+                        chunk_qs = chunk_qs[:injections_left]
+                    self.inject_chunk(table_columns=table_columns, chunk=chunk_qs, insert_query=insert_query)
+                    injections += chunk_qs.count()
+                    progress_bar.update(chunk_qs.count())
 
                 # Trigger garbage collection to optimize memory use.
                 gc.collect()
