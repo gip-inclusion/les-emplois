@@ -15,6 +15,7 @@ has all the fields needed and thus never needs to perform joining two tables.
 We maintain a google sheet with extensive documentation about all tables
 and fields. Not linked here but easy to find internally.
 """
+import gc
 import logging
 
 import psycopg2
@@ -181,6 +182,9 @@ class Command(BaseCommand):
                     injections += len(page)
                     progress_bar.update(len(page))
 
+                # Trigger garbage collection to optimize memory use.
+                gc.collect()
+
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
         self.cur.execute(f"ALTER TABLE {table_name}_new RENAME TO {table_name};")
@@ -268,12 +272,12 @@ class Command(BaseCommand):
             get_user_model()
             .objects.filter(is_job_seeker=True)
             .prefetch_related(
-                "job_applications",
                 "eligibility_diagnoses",
                 "eligibility_diagnoses__administrative_criteria",
-                "socialaccount_set",
                 "eligibility_diagnoses__author_prescriber_organization",
                 "eligibility_diagnoses__author_siae",
+                "job_applications",
+                "socialaccount_set",
             )
             .all()
         )
