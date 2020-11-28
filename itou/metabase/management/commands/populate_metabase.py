@@ -109,7 +109,7 @@ class Command(BaseCommand):
         Create table with a temporary name, add column comments,
         inject content and finally swap with the target table.
         """
-        if queryset:
+        if queryset is not None:
             assert not querysets
             querysets = [queryset]
             queryset = None
