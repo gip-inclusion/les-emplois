@@ -15,6 +15,7 @@ has all the fields needed and thus never needs to perform joining two tables.
 We maintain a google sheet with extensive documentation about all tables
 and fields. Not linked here but easy to find internally.
 """
+import gc
 import logging
 
 import psycopg2
@@ -180,6 +181,9 @@ class Command(BaseCommand):
                     self.inject_page(table_columns=table_columns, page=page, insert_query=insert_query)
                     injections += len(page)
                     progress_bar.update(len(page))
+
+                # Trigger garbage collection to optimize memory use.
+                gc.collect()
 
         # Swap new and old table nicely to minimize downtime.
         self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
