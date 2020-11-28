@@ -1,9 +1,11 @@
+from operator import attrgetter
+
 from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.translation import gettext
 
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
@@ -57,31 +59,21 @@ def get_first_membership_join_date(memberships):
     return None
 
 
-def _get_job_seeker_id_to_hiring_siae():
+def get_hiring_siae(job_seeker):
     """
     Ideally the job_seeker would have a unique hiring so that we can
     properly link the approval back to the siae. However we already
     have many job_seekers with two or more hirings. In this case
     we consider the latest hiring, which is an ugly workaround
-    around the issue that we do not have a proper approval=>siae
+    around the fact that we do not have a proper approval=>siae
     link yet.
-
-    Preload this association data for best performance.
     """
-    # Order by created_at so that most recent hiring overrides older ones.
-    hirings = (
-        JobApplication.objects.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        .order_by("created_at")
-        .select_related("to_siae")
-    )
-    job_seeker_id_to_hiring_siae = {}
-    for hiring in hirings:
-        job_seeker_id = hiring.job_seeker_id
-        job_seeker_id_to_hiring_siae[job_seeker_id] = hiring.to_siae
-    return job_seeker_id_to_hiring_siae
-
-
-JOB_SEEKER_ID_TO_HIRING_SIAE = _get_job_seeker_id_to_hiring_siae()
+    assert job_seeker.is_job_seeker
+    hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
+    if hirings:
+        latest_hiring = max(hirings, key=attrgetter("created_at"))
+        return latest_hiring.to_siae
+    return None
 
 
 def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_lambda=lambda o: o):

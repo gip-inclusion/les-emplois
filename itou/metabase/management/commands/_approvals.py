@@ -3,7 +3,7 @@ from datetime import datetime
 from django.conf import settings
 
 from itou.approvals.models import Approval, PoleEmploiApproval
-from itou.metabase.management.commands._utils import JOB_SEEKER_ID_TO_HIRING_SIAE, get_department_and_region_columns
+from itou.metabase.management.commands._utils import get_department_and_region_columns, get_hiring_siae
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -21,7 +21,7 @@ def get_siae_from_approval(approval):
     if isinstance(approval, PoleEmploiApproval):
         return None
     assert isinstance(approval, Approval)
-    return JOB_SEEKER_ID_TO_HIRING_SIAE.get(approval.user_id)
+    return get_hiring_siae(approval.user)
 
 
 def get_siae_or_pe_org_from_approval(approval):
@@ -98,6 +98,6 @@ TABLE_COLUMNS = [
     },
 ] + get_department_and_region_columns(
     name_suffix="_structure_ou_org_pe",
-    comment_suffix=(" de la structure qui a embauché si PASS IAE ou" " du PE qui a délivré l agrément si Agrément PE"),
+    comment_suffix=(" de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"),
     custom_lambda=get_siae_or_pe_org_from_approval,
 )

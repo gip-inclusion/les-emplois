@@ -8,10 +8,10 @@ from django.utils.translation import gettext_lazy as _
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
-    JOB_SEEKER_ID_TO_HIRING_SIAE,
     anonymize,
     get_choice,
     get_department_and_region_columns,
+    get_hiring_siae,
 )
 
 
@@ -174,9 +174,7 @@ TABLE_COLUMNS = (
             "name": "type_structure_dernière_embauche",
             "type": "varchar",
             "comment": "Type de la structure destinataire de la dernière embauche du candidat",
-            "lambda": lambda o: JOB_SEEKER_ID_TO_HIRING_SIAE[o.id].kind
-            if JOB_SEEKER_ID_TO_HIRING_SIAE.get(o.id)
-            else None,
+            "lambda": lambda o: get_hiring_siae(o).kind if get_hiring_siae(o) else None,
         },
         {
             "name": "total_critères_niveau_1",

@@ -277,6 +277,7 @@ class Command(BaseCommand):
                 "eligibility_diagnoses__author_prescriber_organization",
                 "eligibility_diagnoses__author_siae",
                 "job_applications",
+                "job_applications__to_siae",
                 "socialaccount_set",
             )
             .all()
