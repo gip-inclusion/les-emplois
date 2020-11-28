@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from functools import partial
+from operator import attrgetter
 
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -27,29 +28,11 @@ def get_user_age_in_years(user):
     return None
 
 
-def _get_job_seeker_id_to_latest_diagnosis():
-    """
-    Preload this association once and for all for best performance.
-    """
-    # Order by created_at so that most recent diagnoses overrides older ones.
-    diagnoses = (
-        EligibilityDiagnosis.objects.order_by("created_at")
-        .select_related("author_siae", "author_prescriber_organization")
-        .prefetch_related("administrative_criteria")
-    )
-    job_seeker_id_to_latest_diagnosis = {}
-    for diagnosis in diagnoses:
-        job_seeker_id = diagnosis.job_seeker_id
-        job_seeker_id_to_latest_diagnosis[job_seeker_id] = diagnosis
-    return job_seeker_id_to_latest_diagnosis
-
-
-JOB_SEEKER_ID_TO_LATEST_DIAGNOSIS = _get_job_seeker_id_to_latest_diagnosis()
-
-
 def get_latest_diagnosis(job_seeker):
     assert job_seeker.is_job_seeker
-    return JOB_SEEKER_ID_TO_LATEST_DIAGNOSIS.get(job_seeker.id)
+    if job_seeker.eligibility_diagnoses.count() == 0:
+        return None
+    return max(job_seeker.eligibility_diagnoses.all(), key=attrgetter("created_at"))
 
 
 def get_latest_diagnosis_author_sub_kind(job_seeker):

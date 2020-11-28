@@ -272,12 +272,12 @@ class Command(BaseCommand):
             get_user_model()
             .objects.filter(is_job_seeker=True)
             .prefetch_related(
-                "job_applications",
                 "eligibility_diagnoses",
                 "eligibility_diagnoses__administrative_criteria",
-                "socialaccount_set",
                 "eligibility_diagnoses__author_prescriber_organization",
                 "eligibility_diagnoses__author_siae",
+                "job_applications",
+                "socialaccount_set",
             )
             .all()
         )
