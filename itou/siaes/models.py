@@ -479,12 +479,49 @@ class SiaeJobDescription(models.Model):
 
 class SiaeConvention(models.Model):
     """
-    A SiaeConvention encapsulates the logic to decide whether a Siae is active.
+    A SiaeConvention encapsulates the ASP-specific logic to decide whether
+    the siaes attached to this SiaeConvention are officially allowed
+    to hire within the "Insertion par l'activité économique" system
+    and get subventions.
 
-    A SiaeConvention is typically shared by one siae of source ASP
-    and zero or several user created siaes ("Antennes").
+    A SiaeConvention is shared by exactly one siae of ASP source
+    and zero or more user created siaes ("Antennes").
 
-    A SiaeConvention has many SiaeFinancialAnnex related objects.
+    A SiaeConvention has many SiaeFinancialAnnex related objects, and will
+    be considered active if and only if at least one SiaeFinancialAnnex is active.
+
+    Note that SiaeConvention is an abstraction of potentially several ASP
+    conventions. Ideally a single ASP SIAE has a single ASP convention,
+    however in many instances a single ASP SIAE has several active ASP conventions
+    at the same time, which we abstract here as a single SiaeConvention object.
+
+    This SiaeConvention abstraction, as there is only one per siae of source ASP,
+    is technically equivalent to an siae of ASP source. But we prefer to store
+    all those fields in a separate SiaeConvention object instead of storing them
+    directly in the Siae model.
+
+    Let's clarify this potentially confusing model on a few examples:
+
+    Example 1)
+    One ASP SIAE has one ASP convention with 3 financial annexes.
+
+    Result:
+    One Siae has one SiaeConvention with 3 SiaeFinancialAnnex instances.
+
+    Example 2)
+    One ASP SIAE has 3 ASP conventions each one having 3 financial annexes.
+
+    Result:
+    One Siae has one SiaeConvention with 3x3=9 SiaeFinancialAnnex instances.
+
+    Example 3)
+    One ASP SIAE having 2 "mesures" (EI+AI) has 2 ASP conventions (1 for each "mesure")
+    and each ASP Convention has 3 financial annexes.
+
+    Result:
+    Two Siae instances:
+    - one EI Siae with one SiaeConvention (EI) having 3 SiaeFinancialAnnex instances.
+    - one AI Siae with one SiaeConvention (AI) having 3 SiaeFinancialAnnex instances.
     """
 
     # When a convention is deactivated its siaes still have a partial access
@@ -506,9 +543,18 @@ class SiaeConvention(models.Model):
     )
 
     kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
+
+    # This field is stored for reference but never actually used.
+    # Siaes in ASP's "Vue Structure" not only have a "SIRET actualisé",
+    # which is the main SIRET we store in `siae.siret` and which often changes
+    # over time e.g. when the siae moves to a new location, but they also
+    # have a second SIRET field called "SIRET à la signature" in this export.
+    # This field is almost unique (one exception, see unique_together clause below)
+    # and is almost constant over time, at least much more than the "SIRET actualisé".
     siret_signature = models.CharField(
         verbose_name=_("Siret à la signature"), max_length=14, validators=[validate_siret], db_index=True,
     )
+
     # Ideally convention.is_active would be a property and not a field.
     # However we have to live with the fact that some of ASP's data is
     # randomly weeks or even months late, as DIRECTTE sometimes take so
@@ -559,7 +605,7 @@ class SiaeConvention(models.Model):
         unique_together = (
             ("asp_id", "kind"),
             # Unfortunately the (siret_signature, kind) couple is not unique,
-            # as the two asp_ids 2455 and 4281 share the same values.
+            # as the two asp_ids 2455 and 4281 share the same siret_signature.
             # It is the only exception. Both structures are active.
             # ("siret_signature", "kind"),
         )
@@ -577,6 +623,8 @@ class SiaeConvention(models.Model):
 class SiaeFinancialAnnex(models.Model):
     """
     A SiaeFinancialAnnex allows us to know whether a convention and thus its siaes are active.
+
+    It is often abbreviated as AF ("Annexe Financière") in the codebase.
 
     A SiaeFinancialAnnex is considered active if and only if it has an active stats and an end_date in the future.
     """
@@ -605,6 +653,15 @@ class SiaeFinancialAnnex(models.Model):
     STATES_INACTIVE = [STATE_ARCHIVED, STATE_CANCELLED, STATE_ENTERED, STATE_DRAFT, STATE_CLOSED, STATE_REJECTED]
     STATES_ALL = STATES_ACTIVE + STATES_INACTIVE
 
+    # An AF number is structured as follow (e.g. ACI051170013A0M1):
+    # 1) Prefix part:
+    # - ACI is the "mesure" (ASP term for "type de structure").
+    # - 051 is the department (sometimes two digits and one letter).
+    # - 17 are the last 2 digits of the "millésime".
+    # - 0013 is the "numéro d'ordre".
+    # 2) Suffix part:
+    # - A0, A1, A2… is the "numéro d'avenant".
+    # - M0, M1, M2… is the "numéro de modification de l'avenant".
     number = models.CharField(
         verbose_name=_("Numéro d'annexe financière"),
         max_length=17,
