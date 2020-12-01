@@ -1,92 +1,152 @@
 [
 {
-    "model": "account.emailaddress",
-    "pk": 1,
-    "fields": {
-        "user": 1,
-        "email": "admin@test.com",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 1,
+   "fields": {
+      "user": 1,
+      "email": "admin@test.com",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 2,
-    "fields": {
-        "user": 2,
-        "email": "job@test.com",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 2,
+   "fields": {
+      "user": 2,
+      "email": "job@test.com",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 3,
-    "fields": {
-        "user": 4,
-        "email": "siae@test.com",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 3,
+   "fields": {
+      "user": 4,
+      "email": "siae@test.com",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 4,
-    "fields": {
-        "user": 3,
-        "email": "prescriber@test.com",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 4,
+   "fields": {
+      "user": 3,
+      "email": "prescriber@test.com",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 5,
-    "fields": {
-        "user": 5,
-        "email": "prescriber-solo@test.com",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 5,
+   "fields": {
+      "user": 5,
+      "email": "prescriber-solo@test.com",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 6,
-    "fields": {
-        "user": 6,
-        "email": "contact+siae2@inclusion.beta.gouv.fr",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 6,
+   "fields": {
+      "user": 6,
+      "email": "contact+siae2@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 7,
-    "fields": {
-        "user": 7,
-        "email": "contact+orienteur@inclusion.beta.gouv.fr",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 7,
+   "fields": {
+      "user": 7,
+      "email": "contact+orienteur@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 8,
-    "fields": {
-        "user": 8,
-        "email": "contact+de2@inclusion.beta.gouv.fr",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 8,
+   "fields": {
+      "user": 8,
+      "email": "contact+de2@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
 },
 {
-    "model": "account.emailaddress",
-    "pk": 9,
-    "fields": {
-        "user": 9,
-        "email": "test+geiq@inclusion.beta.gouv.fr",
-        "verified": true,
-        "primary": true
-    }
+   "model": "account.emailaddress",
+   "pk": 9,
+   "fields": {
+      "user": 9,
+      "email": "test+geiq@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 10,
+   "fields": {
+      "user": 10,
+      "email": "z.hadji01+milo@gmail.com",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 11,
+   "fields": {
+      "user": 11,
+      "email": "z.hadji01+milo1@gmail.com",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 12,
+   "fields": {
+      "user": 12,
+      "email": "z.hadji02+milo1@gmail.com",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 13,
+   "fields": {
+      "user": 13,
+      "email": "z.hadji03+milo1@gmail.com",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 14,
+   "fields": {
+      "user": 14,
+      "email": "z.hadji02+milo4@gmail.com",
+      "verified": true,
+      "primary": true
+   }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 15,
+   "fields": {
+      "user": 15,
+      "email": "adrien.monk@faux123.com",
+      "verified": true,
+      "primary": true
+   }
 }
 ]
