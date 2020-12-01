@@ -46,6 +46,11 @@
                           {% bootstrap_field filters_form.sender_organizations form_group_class="form_group m-3" %}
                     {% endif %}
 
+                    {% if filters_form.to_siaes %}
+                        <h5 class="mt-4">{% translate "Structures destinataires" %}</h5>
+                        {% bootstrap_field filters_form.to_siaes form_group_class="form_group m-3" show_label=False %}
+                    {% endif %}
+
                     {% if filters_form.job_seekers %}
                         <h5 class="mt-4">{{ filters_form.job_seekers.label }}</h5>
                         {% bootstrap_field filters_form.job_seekers form_group_class="form_group m-3" show_label=False%}
