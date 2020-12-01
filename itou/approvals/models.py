@@ -112,15 +112,13 @@ class CommonApprovalQuerySet(models.QuerySet):
 
 class Approval(CommonApprovalMixin):
     """
-    Store approvals (`agréments` in French). Another name is `PASS IAE`.
+    Store "PASS IAE" whose former name was "approval" ("agréments" in French)
+    issued by Itou.
 
-    A number starting with `ASP_ITOU_PREFIX` means it has been delivered
-    through ITOU. Otherwise, it was delivered by Pôle emploi and initially
-    found in `PoleEmploiApproval`.
+    A number starting with `ASP_ITOU_PREFIX` means it has been created by Itou.
 
-    If an approval exists in this table it means that:
-    - it has been delivered through Itou
-    - but was created by either Itou or Pôle emploi
+    Otherwise, it was previously created by Pôle emploi (and initially found
+    in `PoleEmploiApproval`) and re-issued by Itou.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
