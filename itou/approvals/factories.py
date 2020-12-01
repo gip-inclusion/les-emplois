@@ -6,7 +6,7 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 
-from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.users.factories import JobSeekerFactory
 
 
@@ -23,6 +23,18 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = datetime.date.today()
     end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
+
+
+class SuspensionFactory(factory.django.DjangoModelFactory):
+    """Generate a Suspension() object for unit tests."""
+
+    class Meta:
+        model = Suspension
+
+    approval = factory.SubFactory(ApprovalFactory)
+    start_at = datetime.date.today()
+    end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS))
+    created_by = factory.SubFactory(JobSeekerFactory)
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
