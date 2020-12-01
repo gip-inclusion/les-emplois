@@ -340,10 +340,33 @@ class Suspension(models.Model):
     def __str__(self):
         return f"{self.pk}"
 
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+        # TODO: When an SIAE validates a suspension, the end date of its IAE PASS is automatically pushed back.
+
+    def clean(self):
+        super().clean()
+        self.clean_end_at()
+
+    def clean_end_at(self):
+        max_end_at = self.get_max_end_at(self.start_at)
+        if self.end_at > max_end_at:
+            raise ValidationError(
+                _(
+                    f"La durée totale ne peut excéder {self.MAX_DURATION_MONTHS} mois. "
+                    f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                )
+            )
+
     @property
     def is_in_progress(self):
         now = timezone.now().date()
         return self.start_at <= now <= self.end_at
+
+    @staticmethod
+    def get_max_end_at(start_at):
+        return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):

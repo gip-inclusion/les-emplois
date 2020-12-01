@@ -9,8 +9,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
@@ -597,3 +597,33 @@ class CustomAdminViewsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn(approval.number_with_spaces, email.body)
+
+
+class SuspensionModelTest(TestCase):
+    """
+    Test Suspension model.
+    """
+
+    def clean_end_at(self):
+        """
+        An exception should be raised when a suspension exceeds the maximum duration.
+        """
+        start_at = datetime.date.today()
+        end_at = Suspension.get_max_end_at(start_at) + relativedelta(days=1)
+        suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
+        with self.assertRaises(ValidationError):
+            suspension.save()
+
+    def test_is_in_progress(self):
+
+        # In progress: started 10 days ago.
+        start_at = datetime.date.today() - relativedelta(days=10)
+        end_at = Suspension.get_max_end_at(start_at)
+        suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(suspension.is_in_progress)
+
+        # In the past.
+        twice_max_months_ago = datetime.date.today() - relativedelta(months=Suspension.MAX_DURATION_MONTHS * 2)
+        end_at = Suspension.get_max_end_at(twice_max_months_ago)
+        suspension = SuspensionFactory(start_at=twice_max_months_ago, end_at=end_at)
+        self.assertFalse(suspension.is_in_progress)
