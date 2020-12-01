@@ -115,6 +115,12 @@ class ApprovalAdmin(admin.ModelAdmin):
         return additional_urls + super().get_urls()
 
 
+@admin.register(models.Suspension)
+class SuspensionAdmin(admin.ModelAdmin):
+    list_display = ("pk", "start_at", "end_at")
+    raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+
+
 @admin.register(models.PoleEmploiApproval)
 class PoleEmploiApprovalAdmin(admin.ModelAdmin):
     list_display = (

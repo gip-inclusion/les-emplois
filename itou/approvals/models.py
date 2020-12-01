@@ -4,10 +4,12 @@ import time
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import DateRangeField, RangeBoundary, RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Count, Q
+from django.db.models import Count, Func, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.timesince import timeuntil
@@ -260,6 +262,11 @@ class Approval(CommonApprovalMixin):
         return approval_from_pe
 
 
+class DateRange(Func):
+    function = "daterange"
+    output_field = DateRangeField()
+
+
 class Suspension(models.Model):
     """
     A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
@@ -316,9 +323,27 @@ class Suspension(models.Model):
         verbose_name = _("Suspension")
         verbose_name_plural = _("Suspensions")
         ordering = ["-created_at"]
+        # Use an exclusion constraint to prevent overlapping date ranges.
+        # This requires the btree_gist extension on PostgreSQL.
+        # See "Tip of the Week" https://postgresweekly.com/issues/289
+        # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
+        constraints = [
+            ExclusionConstraint(
+                name="exclude_overlapping_suspensions",
+                expressions=(
+                    (DateRange("start_at", "end_at", RangeBoundary()), RangeOperators.OVERLAPS),
+                    ("approval", RangeOperators.EQUAL),
+                ),
+            ),
+        ]
 
     def __str__(self):
-        return self.pk
+        return f"{self.pk}"
+
+    @property
+    def is_in_progress(self):
+        now = timezone.now().date()
+        return self.start_at <= now <= self.end_at
 
 
 class PoleEmploiApprovalManager(models.Manager):
