@@ -37,8 +37,11 @@
                       </div>
                       {% endfor %}
 
-                    {% if filters_form.senders %}
+                    {% if filters_form.senders or filters_form.sender_organizations %}
                         <h5 class="mt-4">{% translate "Emetteur" %}</h5>
+                    {% endif %}
+
+                    {% if filters_form.senders %}
                         {% bootstrap_field filters_form.senders form_group_class="form_group m-3" %}
                     {% endif %}
 
