@@ -34,6 +34,21 @@ class JobApplicationInline(admin.StackedInline):
         return False
 
 
+class SuspensionInline(admin.StackedInline):
+    model = models.Suspension
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    fields = ("start_at", "end_at", "reason", "created_by", "siae")
+    raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
 class IsValidFilter(admin.SimpleListFilter):
     title = _("En cours de validité")
     parameter_name = "is_valid"
@@ -59,7 +74,10 @@ class ApprovalAdmin(admin.ModelAdmin):
     raw_id_fields = ("user", "created_by")
     readonly_fields = ("created_at", "created_by")
     date_hierarchy = "start_at"
-    inlines = (JobApplicationInline,)
+    inlines = (
+        SuspensionInline,
+        JobApplicationInline,
+    )
     actions = ["export_approvals"]
 
     def save_model(self, request, obj, form, change):
@@ -117,8 +135,11 @@ class ApprovalAdmin(admin.ModelAdmin):
 
 @admin.register(models.Suspension)
 class SuspensionAdmin(admin.ModelAdmin):
-    list_display = ("pk", "start_at", "end_at")
+    list_display = ("pk", "approval", "start_at", "end_at", "siae", "reason", "created_at", "updated_at")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+    list_filter = ("reason",)
+    readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
+    date_hierarchy = "start_at"
 
 
 @admin.register(models.PoleEmploiApproval)
