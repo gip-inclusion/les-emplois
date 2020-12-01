@@ -260,6 +260,67 @@ class Approval(CommonApprovalMixin):
         return approval_from_pe
 
 
+class Suspension(models.Model):
+    """
+    A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
+    without intervention of a prescriber or a posteriori control.
+
+    When an SIAE validates a suspension, the end date of its IAE PASS is automatically
+    pushed back.
+    """
+
+    # Min duration: none.
+    # Max duration: 6 months (could be adjusted according to user feedback).
+    # It's possible to have succesive 6-month suspensions: no limit.
+    MAX_DURATION_MONTHS = 6
+
+    class Reason(models.TextChoices):
+        SICKNESS = "SICKNESS", _("Arrêt pour longue maladie")
+        MATERNITY = "MATERNITY", _("Congé de maternité")
+        INCARCERATION = "INCARCERATION", _("Incarcération")
+        TRIAL_OUTSIDE_IAE = (
+            "TRIAL_OUTSIDE_IAE",
+            _("Période d'essai auprès d'un employeur ne relevant pas de l'insertion par l'activité économique"),
+        )
+        DETOXIFICATION = "DETOXIFICATION", _("Période de cure pour désintoxication")
+        FORCE_MAJEURE = (
+            "FORCE_MAJEURE",
+            _(
+                "Raison de force majeure conduisant le salarié à quitter son emploi ou toute autre "
+                "situation faisant l'objet d'un accord entre les acteurs membres du CTA"
+            ),
+        )
+
+    approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    siae = models.ForeignKey(
+        "siaes.Siae", verbose_name=_("SIAE"), null=True, on_delete=models.SET_NULL, related_name="approvals_suspended",
+    )
+    reason = models.CharField(verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.SICKNESS)
+    reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_suspended_set",
+    )
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("Mis à jour par"), null=True, blank=True, on_delete=models.SET_NULL,
+    )
+
+    class Meta:
+        verbose_name = _("Suspension")
+        verbose_name_plural = _("Suspensions")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.pk
+
+
 class PoleEmploiApprovalManager(models.Manager):
     def get_import_dates(self):
         """
