@@ -43,10 +43,11 @@ jobs:
       run: |
         psql <<SQL
             \c template1;
+            CREATE EXTENSION IF NOT EXISTS btree_gist;
+            CREATE EXTENSION IF NOT EXISTS citext;
             CREATE EXTENSION IF NOT EXISTS pg_trgm;
             CREATE EXTENSION IF NOT EXISTS postgis;
             CREATE EXTENSION IF NOT EXISTS unaccent;
-            CREATE EXTENSION IF NOT EXISTS citext;
             DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
             CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
             ALTER TEXT SEARCH CONFIGURATION french_unaccent
