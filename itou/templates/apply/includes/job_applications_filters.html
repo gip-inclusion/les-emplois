@@ -39,11 +39,11 @@
 
                     {% if filters_form.senders %}
                         <h5 class="mt-4">{% translate "Emetteur" %}</h5>
-                          {% bootstrap_field filters_form.senders form_group_class="form_group m-3" %}
+                        {% bootstrap_field filters_form.senders form_group_class="form_group m-3" %}
                     {% endif %}
 
                     {% if filters_form.sender_organizations %}
-                          {% bootstrap_field filters_form.sender_organizations form_group_class="form_group m-3" %}
+                        {% bootstrap_field filters_form.sender_organizations form_group_class="form_group m-3" %}
                     {% endif %}
 
                     {% if filters_form.to_siaes %}
@@ -53,7 +53,7 @@
 
                     {% if filters_form.job_seekers %}
                         <h5 class="mt-4">{{ filters_form.job_seekers.label }}</h5>
-                        {% bootstrap_field filters_form.job_seekers form_group_class="form_group m-3" show_label=False%}
+                        {% bootstrap_field filters_form.job_seekers form_group_class="form_group m-3" show_label=False %}
                     {% endif %}
 
                 </div>
