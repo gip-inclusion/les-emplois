@@ -387,7 +387,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     admin command on a regular basis with data shared by Pôle emploi.
 
     If a valid Pôle emploi's approval is found, it's copied in the `Approval`
-    model when it is attached to a JobApplication.
+    at the time of issuance.
     """
 
     # Matches prescriber_organisation.code_safir_pole_emploi
