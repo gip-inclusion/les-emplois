@@ -348,8 +348,21 @@ class PoleEmploiApproval(CommonApprovalMixin):
         # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
         S = "suspension", _("Suspension")
 
-    # The last two digits refer to the act number (e.g. E02 = second extension).
-    # Suffixes are not taken into account in Itou yet but that might change.
+    # Parts of an Approval number:
+    #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
+    #     - next 2 digits = 2-digit year of delivery
+    #     - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
+    #         - decisions are starting with 1
+    #         - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
+    #     - next 3 chars (optional suffix) = status change, e.g.: 75631 14 10001 E01
+    #         - first char = kind of amendment:
+    #             - E for "Extension"
+    #             - S for "Suspension"
+    #             - P for "Prolongation"
+    #             - A for "Interruption"
+    #         - next 2 digits = refer to the act number (e.g. E02 = second extension)
+    # An Approval number is not modifiable, there is a new entry for each new status change.
+    # Suffixes are not taken into account in Itou.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
     pole_emploi_id = models.CharField(_("Identifiant Pôle emploi"), max_length=8)
     first_name = models.CharField(_("Prénom"), max_length=150)
