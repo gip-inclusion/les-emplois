@@ -263,6 +263,19 @@ class Approval(CommonApprovalMixin):
         return approval_from_pe
 
 
+class SuspensionQuerySet(models.QuerySet):
+    @property
+    def in_progress_lookup(self):
+        now = timezone.now().date()
+        return models.Q(start_at__lte=now, end_at__gte=now)
+
+    def in_progress(self):
+        return self.filter(self.in_progress_lookup)
+
+    def not_in_progress(self):
+        return self.exclude(self.in_progress_lookup)
+
+
 class Suspension(models.Model):
     """
     A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
@@ -315,6 +328,8 @@ class Suspension(models.Model):
         settings.AUTH_USER_MODEL, verbose_name=_("Mis à jour par"), null=True, blank=True, on_delete=models.SET_NULL,
     )
 
+    objects = models.Manager.from_queryset(SuspensionQuerySet)()
+
     class Meta:
         verbose_name = _("Suspension")
         verbose_name_plural = _("Suspensions")
@@ -337,7 +352,7 @@ class Suspension(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.pk}"
+        return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
 
     def save(self, *args, **kwargs):
         self.clean()

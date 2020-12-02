@@ -599,27 +599,47 @@ class CustomAdminViewsTest(TestCase):
         self.assertIn(approval.number_with_spaces, email.body)
 
 
+class SuspensionQuerySetTest(TestCase):
+    """
+    Test SuspensionQuerySet.
+    """
+
+    def test_in_progress(self):
+        # In progress: started today.
+        start_at = datetime.date.today()
+        expected_num = 5
+        SuspensionFactory.create_batch(expected_num, start_at=start_at)
+        self.assertEqual(expected_num, Suspension.objects.in_progress().count())
+
+    def test_not_in_progress(self):
+        # In the past.
+        twice_max_months_ago = datetime.date.today() - relativedelta(months=Suspension.MAX_DURATION_MONTHS * 2)
+        expected_num = 3
+        SuspensionFactory.create_batch(expected_num, start_at=twice_max_months_ago)
+        self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
+
+
 class SuspensionModelTest(TestCase):
     """
     Test Suspension model.
     """
 
-    def clean_start_at(self):
+    def test_clean_start_at(self):
         """
         An exception should be raised when a suspension starts in the future.
         """
         start_at = datetime.date.today() + relativedelta(days=1)
-        suspension = SuspensionFactory(start_at=start_at)
+        suspension = SuspensionFactory.build(start_at=start_at)
         with self.assertRaises(ValidationError):
             suspension.save()
 
-    def clean_end_at(self):
+    def test_clean_end_at(self):
         """
         An exception should be raised when a suspension exceeds the maximum duration.
         """
         start_at = datetime.date.today()
         end_at = Suspension.get_max_end_at(start_at) + relativedelta(days=1)
-        suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
+        suspension = SuspensionFactory.build(start_at=start_at, end_at=end_at)
         with self.assertRaises(ValidationError):
             suspension.save()
 
@@ -627,12 +647,10 @@ class SuspensionModelTest(TestCase):
 
         # In progress: started 10 days ago.
         start_at = datetime.date.today() - relativedelta(days=10)
-        end_at = Suspension.get_max_end_at(start_at)
-        suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
+        suspension = SuspensionFactory(start_at=start_at)
         self.assertTrue(suspension.is_in_progress)
 
         # In the past.
         twice_max_months_ago = datetime.date.today() - relativedelta(months=Suspension.MAX_DURATION_MONTHS * 2)
-        end_at = Suspension.get_max_end_at(twice_max_months_ago)
-        suspension = SuspensionFactory(start_at=twice_max_months_ago, end_at=end_at)
+        suspension = SuspensionFactory(start_at=twice_max_months_ago)
         self.assertFalse(suspension.is_in_progress)

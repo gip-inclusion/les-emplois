@@ -133,13 +133,43 @@ class ApprovalAdmin(admin.ModelAdmin):
         return additional_urls + super().get_urls()
 
 
+class IsInProgressFilter(admin.SimpleListFilter):
+    title = _("En cours")
+    parameter_name = "is_progress"
+
+    def lookups(self, request, model_admin):
+        return (("yes", _("Oui")), ("no", _("Non")))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.in_progress()
+        if value == "no":
+            return queryset.not_in_progress()
+        return queryset
+
+
 @admin.register(models.Suspension)
 class SuspensionAdmin(admin.ModelAdmin):
-    list_display = ("pk", "approval", "start_at", "end_at", "siae", "reason", "created_at", "updated_at")
+    list_display = ("pk", "approval", "start_at", "end_at", "reason", "created_at", "is_in_progress")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
-    list_filter = ("reason",)
+    list_filter = (
+        IsInProgressFilter,
+        "reason",
+    )
     readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
     date_hierarchy = "start_at"
+
+    def is_in_progress(self, obj):
+        return obj.is_in_progress
+
+    is_in_progress.boolean = True
+    is_in_progress.short_description = _("En cours")
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
 
 
 @admin.register(models.PoleEmploiApproval)
