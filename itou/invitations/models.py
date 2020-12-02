@@ -194,7 +194,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
     # Emails
     @property
     def email_accepted_notif_organization_members(self):
-        members = self.organization.members.exclude(email__in=[self.sender.email, self.email])
+        members = self.organization.active_members.exclude(email__in=[self.sender.email, self.email])
         to = [member.email for member in members]
         context = {
             "first_name": self.first_name,
@@ -287,7 +287,7 @@ class SiaeStaffInvitation(InvitationAbstract):
     # Emails
     @property
     def email_accepted_notif_siae_members(self):
-        members = self.siae.members.exclude(email__in=[self.sender.email, self.email])
+        members = self.siae.active_members.exclude(email__in=[self.sender.email, self.email])
         to = [member.email for member in members]
         context = {
             "first_name": self.first_name,
