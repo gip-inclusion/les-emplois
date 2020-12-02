@@ -654,3 +654,64 @@ class SuspensionModelTest(TestCase):
         twice_max_months_ago = datetime.date.today() - relativedelta(months=Suspension.MAX_DURATION_MONTHS * 2)
         suspension = SuspensionFactory(start_at=twice_max_months_ago)
         self.assertFalse(suspension.is_in_progress)
+
+    def test_save(self):
+        """
+        Test that an approval's `end_at` is automatically pushed forward when it's suspended.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
+        suspension.save()
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + suspension.duration)
+
+    def test_delete(self):
+        """
+        Test that an approval's `end_at` is automatically pushed back when it's suspended.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        suspension = SuspensionFactory(approval=approval, start_at=start_at)
+        suspension.delete()
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
+    def test_save_and_edit(self):
+        """
+        Test that an approval's `end_at` is automatically pushed back and forth
+        when one of its suspension is saved, then edited to be shorter.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        # New suspension.
+        suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
+        suspension.save()
+        suspension_duration_1 = suspension.duration
+        approval.refresh_from_db()
+        approval_duration_2 = approval.duration
+
+        # Edit suspension to be shorter.
+        suspension.end_at -= relativedelta(months=2)
+        suspension.save()
+        suspension_duration_2 = suspension.duration
+        approval.refresh_from_db()
+        approval_duration_3 = approval.duration
+
+        # Check suspension duration.
+        self.assertNotEqual(suspension_duration_1, suspension_duration_2)
+        # Check approval duration.
+        self.assertNotEqual(initial_duration, approval_duration_2)
+        self.assertNotEqual(approval_duration_2, approval_duration_3)
+        self.assertEqual(approval_duration_3, initial_duration + suspension_duration_2)

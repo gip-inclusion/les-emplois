@@ -22,7 +22,7 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
     user = factory.SubFactory(JobSeekerFactory)
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = datetime.date.today()
-    end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(years=2) - relativedelta(days=1))
+    end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))
 
 
 class SuspensionFactory(factory.django.DjangoModelFactory):
@@ -34,7 +34,6 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
     approval = factory.SubFactory(ApprovalFactory)
     start_at = datetime.date.today()
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
-    created_by = factory.SubFactory(JobSeekerFactory)
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):

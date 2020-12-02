@@ -73,6 +73,10 @@ class CommonApprovalMixin(models.Model):
         return self.number.startswith(Approval.ASP_ITOU_PREFIX)
 
     @property
+    def duration(self):
+        return self.end_at - self.start_at
+
+    @property
     def overlaps_covid_lockdown(self):
         ends_before_lockdown = self.end_at < self.LOCKDOWN_START_AT
         starts_after_lockdown = self.start_at > self.LOCKDOWN_END_AT
@@ -281,8 +285,8 @@ class Suspension(models.Model):
     A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
     without intervention of a prescriber or a posteriori control.
 
-    When an SIAE validates a suspension, the end date of its IAE PASS is automatically
-    pushed back.
+    When a suspension is saved/edited/deleted, the end date of its approval is
+    automatically pushed back or forth.
     """
 
     # Min duration: none.
@@ -356,8 +360,20 @@ class Suspension(models.Model):
 
     def save(self, *args, **kwargs):
         self.clean()
+        already_exists = bool(self.pk)
+        prev_instance = Suspension.objects.get(pk=self.pk) if already_exists else None
         super().save(*args, **kwargs)
-        # TODO: When an SIAE validates a suspension, the end date of its IAE PASS is automatically pushed back.
+        # When a suspension is saved, the end date of its approval is automatically pushed forward.
+        if prev_instance:
+            # If a suspension is edited, subtract old duration.
+            self.approval.end_at -= prev_instance.duration
+        self.approval.end_at += self.duration
+        self.approval.save()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self.approval.end_at -= self.duration
+        self.approval.save()
 
     def clean(self):
         super().clean()
@@ -377,6 +393,10 @@ class Suspension(models.Model):
                     f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
                 )
             )
+
+    @property
+    def duration(self):
+        return self.end_at - self.start_at
 
     @property
     def is_in_progress(self):
