@@ -470,7 +470,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Emails.
 
     def get_siae_recipents_email_list(self):
-        return list(self.to_siae.members.filter(is_active=True).values_list("email", flat=True))
+        return list(self.to_siae.active_members.values_list("email", flat=True))
 
     @property
     def email_new_for_siae(self):
