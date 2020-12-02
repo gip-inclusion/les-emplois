@@ -361,11 +361,18 @@ class Suspension(models.Model):
     def save(self, *args, **kwargs):
         self.clean()
         already_exists = bool(self.pk)
+        # `prev_instance` must be fetched before `super().save()`.
         prev_instance = Suspension.objects.get(pk=self.pk) if already_exists else None
         super().save(*args, **kwargs)
-        # When a suspension is saved, the end date of its approval is automatically pushed forward.
+        # At save time, the approval's end date is pushed forward.
+        # At edit time, the approval's end date is first reset before being
+        # pushed forward, e.g.:
+        #     - step 1 "create new 90 days suspension":
+        #         - extend approval: approval.end_date + 90 days
+        #     - step 2 "edit 60 days instead of 90 days":
+        #         - reset approval: approval.end_date - 90 days
+        #         - extend approval: approval.end_date + 60 days
         if prev_instance:
-            # If a suspension is edited, subtract old duration.
             self.approval.end_at -= prev_instance.duration
         self.approval.end_at += self.duration
         self.approval.save()
