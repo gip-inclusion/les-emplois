@@ -377,14 +377,12 @@ class Suspension(models.Model):
 
     def clean(self):
         super().clean()
-        self.clean_start_at()
-        self.clean_end_at()
 
-    def clean_start_at(self):
-        if self.start_at > timezone.now().date():
+        # A suspension cannot be in the future.
+        if self.is_in_future(self.start_at):
             raise ValidationError(_("La suspension ne peut pas commencer dans le futur."))
 
-    def clean_end_at(self):
+        # A suspension cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at)
         if self.end_at > max_end_at:
             raise ValidationError(
@@ -394,14 +392,30 @@ class Suspension(models.Model):
                 )
             )
 
+        # A suspension start_at must be contained in its approval boundaries.
+        if not self.start_in_approval_boundaries(self.start_at, self.approval):
+            raise ValidationError(
+                _(
+                    f"La suspension ne peut commencer ou finir au delà des limites du PASS IAE "
+                    f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
+                )
+            )
+
     @property
     def duration(self):
         return self.end_at - self.start_at
 
     @property
     def is_in_progress(self):
-        now = timezone.now().date()
-        return self.start_at <= now <= self.end_at
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    @staticmethod
+    def is_in_future(start_at):
+        return start_at > timezone.now().date()
+
+    @staticmethod
+    def start_in_approval_boundaries(start_at, approval):
+        return approval.start_at <= start_at <= approval.end_at
 
     @staticmethod
     def get_max_end_at(start_at):

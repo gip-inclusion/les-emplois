@@ -612,10 +612,17 @@ class SuspensionQuerySetTest(TestCase):
         self.assertEqual(expected_num, Suspension.objects.in_progress().count())
 
     def test_not_in_progress(self):
-        # In the past.
-        twice_max_months_ago = datetime.date.today() - relativedelta(months=Suspension.MAX_DURATION_MONTHS * 2)
+        # Create "in progress" suspensions because Factory.create_batch() with
+        # a `start_at` in the past will trigger Suspension.save(), then
+        # Suspension.clean() and fail the validation.
+        start_at = datetime.date.today()
         expected_num = 3
-        SuspensionFactory.create_batch(expected_num, start_at=twice_max_months_ago)
+        SuspensionFactory.create_batch(expected_num, start_at=start_at)
+        # Then make suspensions go back in time using a batch update() that
+        # won't trigger Suspension.save() nor Suspension.clean().
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = Suspension.get_max_end_at(start_at)
+        Suspension.objects.all().update(start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
 
 
@@ -624,36 +631,40 @@ class SuspensionModelTest(TestCase):
     Test Suspension model.
     """
 
-    def test_clean_start_at(self):
-        """
-        An exception should be raised when a suspension starts in the future.
-        """
-        start_at = datetime.date.today() + relativedelta(days=1)
-        suspension = SuspensionFactory.build(start_at=start_at)
-        with self.assertRaises(ValidationError):
-            suspension.save()
-
-    def test_clean_end_at(self):
-        """
-        An exception should be raised when a suspension exceeds the maximum duration.
-        """
+    def test_duration(self):
+        expected_duration = datetime.timedelta(days=2)
         start_at = datetime.date.today()
-        end_at = Suspension.get_max_end_at(start_at) + relativedelta(days=1)
-        suspension = SuspensionFactory.build(start_at=start_at, end_at=end_at)
-        with self.assertRaises(ValidationError):
-            suspension.save()
+        end_at = start_at + expected_duration
+        suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
+        self.assertEqual(suspension.duration, expected_duration)
+
+    def test_is_in_future(self):
+        start_at = datetime.date.today() + relativedelta(days=10)
+        self.assertTrue(Suspension.is_in_future(start_at))
+
+    def test_start_in_approval_boundaries(self):
+        start_at = datetime.date.today()
+        end_at = start_at + relativedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        # Equal to lower boundary.
+        self.assertTrue(Suspension.start_in_approval_boundaries(start_at, approval))
+        # In boundaries.
+        start_at = approval.start_at + relativedelta(days=5)
+        self.assertTrue(Suspension.start_in_approval_boundaries(start_at, approval))
+        # Equal to upper boundary.
+        start_at = approval.end_at
+        self.assertTrue(Suspension.start_in_approval_boundaries(start_at, approval))
+        # Before lower boundary.
+        start_at = approval.start_at - relativedelta(days=1)
+        self.assertFalse(Suspension.start_in_approval_boundaries(start_at, approval))
+        # After upper boundary.
+        start_at = approval.end_at + relativedelta(days=1)
+        self.assertFalse(Suspension.start_in_approval_boundaries(start_at, approval))
 
     def test_is_in_progress(self):
-
-        # In progress: started 10 days ago.
         start_at = datetime.date.today() - relativedelta(days=10)
-        suspension = SuspensionFactory(start_at=start_at)
+        suspension = SuspensionFactory.build(start_at=start_at)
         self.assertTrue(suspension.is_in_progress)
-
-        # In the past.
-        twice_max_months_ago = datetime.date.today() - relativedelta(months=Suspension.MAX_DURATION_MONTHS * 2)
-        suspension = SuspensionFactory(start_at=twice_max_months_ago)
-        self.assertFalse(suspension.is_in_progress)
 
     def test_save(self):
         """
@@ -664,8 +675,7 @@ class SuspensionModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
 
-        suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
-        suspension.save()
+        suspension = SuspensionFactory(approval=approval, start_at=start_at)
 
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration + suspension.duration)
@@ -696,8 +706,7 @@ class SuspensionModelTest(TestCase):
         initial_duration = approval.duration
 
         # New suspension.
-        suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
-        suspension.save()
+        suspension = SuspensionFactory(approval=approval, start_at=start_at)
         suspension_duration_1 = suspension.duration
         approval.refresh_from_db()
         approval_duration_2 = approval.duration
