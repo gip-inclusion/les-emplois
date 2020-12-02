@@ -1,58 +1,86 @@
 [
 {
-    "model": "siaes.siaejobdescription",
-    "pk": 1,
-    "fields": {
-        "appellation": "16464",
-        "siae": 3850,
-        "created_at": "2020-04-09T13:36:58Z",
-        "updated_at": "2020-04-09T14:44:59.861Z",
-        "is_active": true,
-        "custom_name": "",
-        "description": "",
-        "ui_rank": 32767
-    }
+   "model": "siaes.siaejobdescription",
+   "pk": 1,
+   "fields": {
+      "appellation": "16464",
+      "siae": 3850,
+      "created_at": "2020-04-09T13:36:58Z",
+      "updated_at": "2020-04-09T14:44:59.861Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
 },
 {
-    "model": "siaes.siaejobdescription",
-    "pk": 2,
-    "fields": {
-        "appellation": "12150",
-        "siae": 3850,
-        "created_at": "2020-04-09T13:36:58Z",
-        "updated_at": "2020-04-09T14:44:59.870Z",
-        "is_active": true,
-        "custom_name": "",
-        "description": "",
-        "ui_rank": 32767
-    }
+   "model": "siaes.siaejobdescription",
+   "pk": 2,
+   "fields": {
+      "appellation": "12150",
+      "siae": 3850,
+      "created_at": "2020-04-09T13:36:58Z",
+      "updated_at": "2020-04-09T14:44:59.870Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
 },
 {
-    "model": "siaes.siaejobdescription",
-    "pk": 3,
-    "fields": {
-        "appellation": "15078",
-        "siae": 2653,
-        "created_at": "2020-04-09T13:38:41Z",
-        "updated_at": "2020-04-09T14:39:32.610Z",
-        "is_active": true,
-        "custom_name": "",
-        "description": "",
-        "ui_rank": 32767
-    }
+   "model": "siaes.siaejobdescription",
+   "pk": 3,
+   "fields": {
+      "appellation": "15078",
+      "siae": 2653,
+      "created_at": "2020-04-09T13:38:41Z",
+      "updated_at": "2020-04-09T14:39:32.610Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
 },
 {
-    "model": "siaes.siaejobdescription",
-    "pk": 4,
-    "fields": {
-        "appellation": "16235",
-        "siae": 3851,
-        "created_at": "2020-04-14T16:09:20Z",
-        "updated_at": null,
-        "is_active": true,
-        "custom_name": "",
-        "description": "",
-        "ui_rank": 32767
-    }
+   "model": "siaes.siaejobdescription",
+   "pk": 4,
+   "fields": {
+      "appellation": "16235",
+      "siae": 3851,
+      "created_at": "2020-04-14T16:09:20Z",
+      "updated_at": null,
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 5,
+   "fields": {
+      "appellation": "10666",
+      "siae": 3852,
+      "created_at": "2020-12-01T10:31:05Z",
+      "updated_at": null,
+      "is_active": true,
+      "custom_name": "Agent d'entretien balayage voirie H/F",
+      "description": "L’agent de service assure des prestations à partir d’instructions précises, sous le contrôle de sa hiérarchie. Il effectue des travaux d’entretien manuel et mécanique des voies publiques sur des itinéraires pré-définis. Il assure également la viabilité hivernale\r\n• Organiser son travail en fonction des exigences de l’activité et du temps qui est imparti\r\n• Préparer le matériel et baliser les zones de travail\r\n• Balayer tous les détritus visibles sur tous les espaces publics\r\n• Enlever les mauvaises herbes sur tous les espaces publics\r\n• Vider les corbeilles de propreté\r\n• Surveiller et alerter son responsable de la présence de dépôt sauvage\r\n• Dégager de la neige en création de cheminement permettant la circulation en\r\ntoute sécurité des piétons par l’enlèvement de la neige\r\n• Epandre du sable et du sel de déneigement sur les cheminements créés.\r\n• S’assurer de la propreté de son itinéraire\r\n• Prévenir son responsable de tout problème ou de toute modification intervenant sur son itinéraire",
+      "ui_rank": 32767
+   }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 6,
+   "fields": {
+      "appellation": "10571",
+      "siae": 3852,
+      "created_at": "2020-12-01T10:30:23Z",
+      "updated_at": null,
+      "is_active": true,
+      "custom_name": "Agent de propreté des locaux H/F",
+      "description": "L’agent de service assure des prestations à partir d’instructions précises, sous le contrôle de sa hiérarchie. Il effectue des travaux d’entretien courant consistant en un enchaînement de tâches simples et répétitives.\r\n• Organiser son travail en fonction des exigences de l’activité et du temps qui est imparti\r\n• Préparer le matériel, les produits nettoyants et baliser les zones glissantes\r\n• Enlever les poussières des surfaces, les détritus, trier et vider les corbeilles\r\n• Nettoyer et laver les sols, les mobiliers\r\n• Nettoyer les sanitaires, cuisines et approvisionner les distributeurs d'essuie-mains, de savon,...\r\n• Eliminer par aération, désodorisation, les pollutions de lieux\r\n• Renseigner les supports de suivi (horaire, lieu, ...) et informer l'interlocuteur concerné des anomalies constatées\r\n• Nettoyer et entretenir le matériel\r\n• Ouverture et fermeture du site",
+      "ui_rank": 32767
+   }
 }
 ]
