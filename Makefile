@@ -38,7 +38,7 @@ setup_git_pre_commit_hook:
 # make django_admin
 # make django_admin COMMAND=dbshell
 # make django_admin COMMAND=createsuperuser
-# make --silent django_admin COMMAND="dumpdata siaes.Siae" > itou/fixtures/django/02_siaes.json
+# make --silent django_admin COMMAND="dumpdata siaes.Siae --indent=3" > itou/fixtures/django/02_siaes.json
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 

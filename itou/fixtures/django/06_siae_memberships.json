@@ -1,42 +1,72 @@
 [
 {
-    "model": "siaes.siaemembership",
-    "pk": 1,
-    "fields": {
-        "user": 4,
-        "siae": 2653,
-        "joined_at": "2019-10-31T14:56:50Z",
-        "is_siae_admin": true
-    }
+   "model": "siaes.siaemembership",
+   "pk": 1,
+   "fields": {
+      "user": 4,
+      "siae": 2653,
+      "joined_at": "2019-10-31T14:56:50Z",
+      "is_siae_admin": true,
+      "is_active": true,
+      "created_at": "2020-12-01T10:08:03.596Z",
+      "updated_at": null,
+      "updated_by": null
+   }
 },
 {
-    "model": "siaes.siaemembership",
-    "pk": 2,
-    "fields": {
-        "user": 6,
-        "siae": 3850,
-        "joined_at": "2020-04-09T13:32:00Z",
-        "is_siae_admin": true
-    }
+   "model": "siaes.siaemembership",
+   "pk": 2,
+   "fields": {
+      "user": 6,
+      "siae": 3850,
+      "joined_at": "2020-04-09T13:32:00Z",
+      "is_siae_admin": true,
+      "is_active": true,
+      "created_at": "2020-12-01T10:08:03.598Z",
+      "updated_at": null,
+      "updated_by": null
+   }
 },
 {
-    "model": "siaes.siaemembership",
-    "pk": 3,
-    "fields": {
-        "user": 4,
-        "siae": 3850,
-        "joined_at": "2020-04-09T13:38:13Z",
-        "is_siae_admin": false
-    }
+   "model": "siaes.siaemembership",
+   "pk": 3,
+   "fields": {
+      "user": 4,
+      "siae": 3850,
+      "joined_at": "2020-04-09T13:38:13Z",
+      "is_siae_admin": false,
+      "is_active": true,
+      "created_at": "2020-12-01T10:08:03.599Z",
+      "updated_at": null,
+      "updated_by": null
+   }
 },
 {
-    "model": "siaes.siaemembership",
-    "pk": 5,
-    "fields": {
-        "user": 9,
-        "siae": 3851,
-        "joined_at": "2020-04-14T16:09:20Z",
-        "is_siae_admin": false
-    }
+   "model": "siaes.siaemembership",
+   "pk": 5,
+   "fields": {
+      "user": 9,
+      "siae": 3851,
+      "joined_at": "2020-04-14T16:09:20Z",
+      "is_siae_admin": false,
+      "is_active": true,
+      "created_at": "2020-12-01T10:08:03.600Z",
+      "updated_at": null,
+      "updated_by": null
+   }
+},
+{
+   "model": "siaes.siaemembership",
+   "pk": 6,
+   "fields": {
+      "user": 6,
+      "siae": 3852,
+      "joined_at": "2020-12-01T10:28:57Z",
+      "is_siae_admin": true,
+      "is_active": true,
+      "created_at": "2020-12-01T10:30:23.026Z",
+      "updated_at": "2020-12-01T10:31:37.930Z",
+      "updated_by": null
+   }
 }
 ]
