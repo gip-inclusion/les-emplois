@@ -106,7 +106,11 @@ class Migration(migrations.Migration):
                 expressions=(
                     (
                         itou.approvals.models.DateRange(
-                            "start_at", "end_at", django.contrib.postgres.fields.ranges.RangeBoundary()
+                            "start_at",
+                            "end_at",
+                            django.contrib.postgres.fields.ranges.RangeBoundary(
+                                inclusive_lower=True, inclusive_upper=True
+                            ),
                         ),
                         "&&",
                     ),

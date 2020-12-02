@@ -5,17 +5,18 @@ import time
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.postgres.constraints import ExclusionConstraint
-from django.contrib.postgres.fields import DateRangeField, RangeBoundary, RangeOperators
+from django.contrib.postgres.fields import RangeBoundary, RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Count, Func, Q
+from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
+from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
 
@@ -262,11 +263,6 @@ class Approval(CommonApprovalMixin):
         return approval_from_pe
 
 
-class DateRange(Func):
-    function = "daterange"
-    output_field = DateRangeField()
-
-
 class Suspension(models.Model):
     """
     A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
@@ -331,7 +327,10 @@ class Suspension(models.Model):
             ExclusionConstraint(
                 name="exclude_overlapping_suspensions",
                 expressions=(
-                    (DateRange("start_at", "end_at", RangeBoundary()), RangeOperators.OVERLAPS),
+                    (
+                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=True)),
+                        RangeOperators.OVERLAPS,
+                    ),
                     ("approval", RangeOperators.EQUAL),
                 ),
             ),
