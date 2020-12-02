@@ -347,7 +347,12 @@ class Suspension(models.Model):
 
     def clean(self):
         super().clean()
+        self.clean_start_at()
         self.clean_end_at()
+
+    def clean_start_at(self):
+        if self.start_at > timezone.now().date():
+            raise ValidationError(_("La suspension ne peut pas commencer dans le futur."))
 
     def clean_end_at(self):
         max_end_at = self.get_max_end_at(self.start_at)

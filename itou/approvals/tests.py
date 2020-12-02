@@ -604,6 +604,15 @@ class SuspensionModelTest(TestCase):
     Test Suspension model.
     """
 
+    def clean_start_at(self):
+        """
+        An exception should be raised when a suspension starts in the future.
+        """
+        start_at = datetime.date.today() + relativedelta(days=1)
+        suspension = SuspensionFactory(start_at=start_at)
+        with self.assertRaises(ValidationError):
+            suspension.save()
+
     def clean_end_at(self):
         """
         An exception should be raised when a suspension exceeds the maximum duration.

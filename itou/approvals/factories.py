@@ -33,7 +33,7 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
 
     approval = factory.SubFactory(ApprovalFactory)
     start_at = datetime.date.today()
-    end_at = factory.LazyAttribute(lambda obj: obj.start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS))
+    end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
     created_by = factory.SubFactory(JobSeekerFactory)
 
 
