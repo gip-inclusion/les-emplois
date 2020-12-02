@@ -380,25 +380,29 @@ class Suspension(models.Model):
 
         # A suspension cannot be in the future.
         if self.is_in_future(self.start_at):
-            raise ValidationError(_("La suspension ne peut pas commencer dans le futur."))
+            raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
+
+        # The start of a suspension must be contained in its approval boundaries.
+        if not self.start_in_approval_boundaries(self.start_at, self.approval):
+            raise ValidationError(
+                {
+                    "start_at": _(
+                        f"La suspension ne peut commencer ou finir au delà des limites du PASS IAE "
+                        f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
 
         # A suspension cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at)
         if self.end_at > max_end_at:
             raise ValidationError(
-                _(
-                    f"La durée totale ne peut excéder {self.MAX_DURATION_MONTHS} mois. "
-                    f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
-                )
-            )
-
-        # A suspension start_at must be contained in its approval boundaries.
-        if not self.start_in_approval_boundaries(self.start_at, self.approval):
-            raise ValidationError(
-                _(
-                    f"La suspension ne peut commencer ou finir au delà des limites du PASS IAE "
-                    f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
-                )
+                {
+                    "end_at": _(
+                        f"La durée totale ne peut excéder {self.MAX_DURATION_MONTHS} mois. "
+                        f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
             )
 
     @property
