@@ -6,6 +6,24 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [8] - 2020-12-03
+
+### Ajouté
+- Les prescripteurs peuvent filtrer les candidatures envoyées par structure de destination
+- Affichage de l'e-mail de la personne connectée dans le menu déroulant
+- Affichage du SIRET dans le tableau de bord des employeurs
+
+### Modifié
+- Amélioration du lien "Besoin d'aide ?" qui pointe maintenant directement vers le champ recherche de la FAQ 
+- Réparation des tests de la plateforme d'intégration continue
+- Pérennisation de nouvelles données dans l'espace DEMO
+- Anonymisation des téléphones des siaes et organisations dans les fixtures
+- Import des agréments PE du mois d'octobre
+- Résolution d'un problème d'envoi d'e-mails inopportuns à des utilisateurs désactivés
+
+### Supprimé
+- Retrait de la carte montrant la géolocalisation des structures dans l'interface d'administration
+
 ## [7] - 2020-11-19
 
 ### Ajouté
