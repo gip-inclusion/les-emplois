@@ -27,7 +27,7 @@
     {% bootstrap_form_errors form %}
     {% bootstrap_form form exclude="resume_link" %}
 
-    {% if ITOU_ENVIRONMENT == "PROD" %}
+    {% if ITOU_ENVIRONMENT == "REVIEW_APP" %}
         {% if request.user.is_job_seeker %}
             {% include "utils/resume/typeform_form.html" %}
             <p class="lines-on-sides">{% translate "ou" %}</p>
