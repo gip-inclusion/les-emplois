@@ -11,6 +11,11 @@
 <h2 class="text-muted">
     {{ siae.display_name }}
 </h2>
+<p class="text-muted">
+    {% if siae.siret %}
+        {% translate "SIRET :" %} {{ siae.siret }}
+    {% endif %}
+</p>
 
 <form method="post" action="" class="js-prevent-multiple-submit">
 

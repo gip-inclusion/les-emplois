@@ -11,6 +11,7 @@ from django_select2.forms import Select2MultipleWidget
 from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.models import Siae
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField
@@ -484,4 +485,39 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
     Job applications filters for Prescribers only.
     """
 
-    pass
+    to_siaes = forms.MultipleChoiceField(required=False, label=_("Structure"), widget=Select2MultipleWidget)
+
+    def __init__(self, job_applications_qs, *args, **kwargs):
+        super().__init__(job_applications_qs, *args, **kwargs)
+        self.fields["to_siaes"].choices += self.get_to_siaes_choices()
+
+    def get_qs_filters(self):
+        qs_list = super().get_qs_filters()
+        data = self.cleaned_data
+        to_siaes = data.get("to_siaes")
+
+        if to_siaes:
+            qs = Q(to_siae__id__in=to_siaes)
+            qs_list.append(qs)
+
+        return qs_list
+
+    def get_to_siaes_choices(self):
+        to_siaes = self.job_applications_qs.get_unique_fk_objects("to_siae")
+        to_siaes = [siae for siae in to_siaes if siae.display_name]
+        to_siaes = [(siae.id, siae.display_name.title()) for siae in to_siaes]
+        return sorted(to_siaes, key=lambda l: l[1])
+
+    def humanize_filters(self):
+        humanized_filters = super().humanize_filters()
+        to_siaes = self.cleaned_data.get("to_siaes")
+
+        if to_siaes:
+            values = [Siae.objects.get(pk=int(siae_pk)).display_name.title() for siae_pk in to_siaes]
+            value = ", ".join(values)
+            label = self.base_fields.get("to_siaes").label
+            label = f"{label}s" if (len(values) > 1) else label
+
+            humanized_filters.append({"label": label, "value": value})
+
+        return humanized_filters

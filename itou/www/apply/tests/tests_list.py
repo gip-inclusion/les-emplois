@@ -350,3 +350,19 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         for application in applications:
             self.assertIn(application.job_seeker.id, job_seekers_ids)
+
+    def test_view__filtered_by_siae_name(self):
+        """
+        Thibault wants to see applications sent to Hit Pit.
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        to_siaes_ids = [self.hit_pit.pk]
+        params = urlencode({"to_siaes": to_siaes_ids}, True)
+        url = f"{self.prescriber_base_url}?{params}"
+        response = self.client.get(url)
+
+        applications = response.context["job_applications_page"].object_list
+        self.assertGreater(len(applications), 0)
+
+        for application in applications:
+            self.assertIn(application.to_siae.pk, to_siaes_ids)
