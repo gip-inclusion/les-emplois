@@ -1,6 +1,6 @@
 from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
-from django.contrib import messages
+from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -15,7 +15,7 @@ from itou.siaes.models import Siae
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.tokens import resume_signer
 from itou.utils.urls import get_safe_url
-from itou.www.dashboard.forms import EditUserInfoForm
+from itou.www.dashboard.forms import EditUserEmailForm, EditUserInfoForm
 
 
 @login_required
@@ -94,6 +94,23 @@ class ItouLogoutView(LogoutView):
 
 
 logout = login_required(ItouLogoutView.as_view())
+
+
+@login_required
+def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
+    form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
+    if request.method == "POST" and form.is_valid():
+        request.user.email = form.cleaned_data["email"]
+        request.user.save()
+        request.user.emailaddress_set.first().delete()
+        auth.logout(request)
+        return HttpResponseRedirect("/")
+
+    context = {
+        "form": form,
+    }
+
+    return render(request, template_name, context)
 
 
 @login_required
