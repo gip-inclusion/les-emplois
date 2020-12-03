@@ -1,12 +1,12 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from itou.utils.validators import validate_siret
-from itou.users.models import User
-from itou.siae.models import FinancialAnnex
-from itou.eligibility.models import EligibilityDiagnosis
 from itou.approvals.models import Approval
+from itou.eligibility.models import EligibilityDiagnosis
+from itou.siae.models import FinancialAnnex
+from itou.users.models import User
+from itou.utils.validators import validate_siret
 
 
 class EmployeeRecord(models.Model):
