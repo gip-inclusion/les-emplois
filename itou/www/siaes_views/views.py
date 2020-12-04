@@ -4,15 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
-from itou.siaes.models import Siae, SiaeJobDescription
+from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm, FinancialAnnexSelectForm
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
@@ -96,6 +96,106 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
             return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+def show_financial_annexes(request, template_name="siaes/show_financial_annexes.html"):
+    """
+    Show a summary of the financial annexes of the convention to the siae admin user.
+    Financial annexes are grouped by suffix, and only the most relevant one
+    is shown for each suffix.
+    """
+    current_siae = get_current_siae_or_404(request)
+    if not current_siae.convention_can_be_accessed_by(request.user):
+        raise PermissionDenied
+
+    if current_siae.is_active:
+        messages.success(
+            request,
+            _(
+                "Votre structure est active car elle est associée à au moins une "
+                "annexe financière valide listée ci-dessous ou bien elle a été "
+                "manuellement activée par notre support. Vous n'avez rien à faire."
+            ),
+        )
+    elif current_siae.source == Siae.SOURCE_ASP:
+        # Inactive siaes of ASP source cannot be fixed by user.
+        messages.error(
+            request,
+            _(
+                f"Votre structure est inactive car n'est associée à aucune annexe "
+                f"financière valide. Contactez nous : {settings.ITOU_EMAIL_ASSISTANCE}"
+            ),
+        )
+    elif current_siae.source == Siae.SOURCE_USER_CREATED:
+        # Inactive user created siaes can be fixed by the user.
+        messages.error(
+            request,
+            _(
+                "Votre structure sera prochainement désactivée car n'est "
+                "associée à aucune annexe financière valide. "
+                "Veuillez dès que possible procéder à la sélection d'une "
+                "annexe financière valide ci-dessous."
+            ),
+        )
+
+    financial_annexes = []
+    if current_siae.convention:
+        financial_annexes = current_siae.convention.financial_annexes.all()
+
+    # For each group of AFs sharing the same number prefix, show only the most relevant AF.
+    # We do this to avoid showing too many AFs and confusing the user.
+    prefix_to_af = {}
+    for af in financial_annexes:
+        prefix = af.number_prefix
+        if prefix not in prefix_to_af or af.is_active:
+            # Always show an active AF when there is one.
+            prefix_to_af[prefix] = af
+            continue
+        old_suffix = prefix_to_af[prefix].number_suffix
+        new_suffix = af.number_suffix
+        if new_suffix > old_suffix:
+            # Show the AF with the latest suffix when there is no active one.
+            prefix_to_af[prefix] = af
+            continue
+
+    financial_annexes = prefix_to_af.values()
+
+    context = {
+        "siae": current_siae,
+        "convention": current_siae.convention,
+        "financial_annexes": financial_annexes,
+        "can_select_af": current_siae.convention_can_be_changed_by(request.user),
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def select_financial_annex(request, template_name="siaes/select_financial_annex.html"):
+    """
+    Let siae admin user select a new convention via a financial annex number.
+    """
+    current_siae = get_current_siae_or_404(request)
+    if not current_siae.convention_can_be_changed_by(request.user):
+        raise PermissionDenied
+
+    # We only allow the user to select an AF under the same SIREN as the current siae.
+    financial_annexes = SiaeFinancialAnnex.objects.select_related("convention").filter(
+        convention__kind=current_siae.kind, convention__siret_signature__startswith=current_siae.siren
+    )
+
+    select_form = FinancialAnnexSelectForm(data=request.POST or None, financial_annexes=financial_annexes)
+
+    if request.method == "POST" and select_form.is_valid():
+        financial_annex = select_form.cleaned_data["financial_annexes"]
+        current_siae.convention = financial_annex.convention
+        current_siae.save()
+        message = _(f"Nous avons bien attaché votre structure à l'annexe financière {financial_annex.number}.")
+        messages.success(request, message)
+        return HttpResponseRedirect(reverse("siaes_views:show_financial_annexes"))
+
+    context = {"select_form": select_form}
     return render(request, template_name, context)
 
 

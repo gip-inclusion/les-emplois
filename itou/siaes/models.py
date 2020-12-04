@@ -401,8 +401,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def grace_period_end_date(self):
         """
-        This method is only called for inactive siaes in other
-        words siaes during or after their grace period.
+        This method is only called for inactive siaes,
+        in other words siaes during or after their grace period,
+        to figure out the exact end date of their grace period.
         """
         if self.source == self.SOURCE_USER_CREATED and not self.convention:
             # All user created siaes should have a convention but a small
@@ -412,20 +413,45 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             # select their convention.
             # We consider them as experiencing their grace period.
             return timezone.now() + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
-        if not self.convention or not self.convention.deactivated_at:
-            # Fake date for when there is no convention or the
-            # convention has no deactivation date thus we have
-            # no idea when the convention was actually deactivated.
-            # Date is in the past thus we will always consider that
-            # the siae is over its grace period.
-            return self.created_at
-        return self.convention.deactivated_at + timezone.timedelta(
-            days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS
-        )
+
+        grace_period_start_date = self.convention.deactivated_at
+        return grace_period_start_date + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
 
     @property
     def grace_period_has_expired(self):
         return not self.is_active and timezone.now() > self.grace_period_end_date
+
+    def convention_can_be_accessed_by(self, user):
+        """
+        Decides whether the user can show the siae convention or not.
+        In other words, whether the user can access the "My AFs" interface.
+        Note that the convention itself does not necesserarily exist yet
+        e.g. in the case of old user created siaes without convention yet.
+        """
+        if not user.is_siae_staff or not self.has_admin(user):
+            return False
+        if not self.is_subject_to_eligibility_rules:
+            # AF interfaces only makes sense for SIAE, not for GEIQ EA etc.
+            return False
+        if self.source not in [self.SOURCE_ASP, self.SOURCE_USER_CREATED]:
+            # AF interfaces do not make sense for staff created siaes, which
+            # have no convention yet, and will eventually be converted into
+            # siaes of ASP source by `import_siae.py` script.
+            return False
+        return True
+
+    def convention_can_be_changed_by(self, user):
+        """
+        Decides whether the user can change the siae convention or not.
+        In other words, whether the user can not only access the "My AFs" interface
+        but also use it to select a different convention for the siae.
+        """
+        if not self.convention_can_be_accessed_by(user):
+            return False
+        # The link between an ASP source siae and its convention
+        # is immutable. Only user created siaes can have their
+        # convention changed by the user.
+        return self.source == self.SOURCE_USER_CREATED
 
 
 class SiaeMembership(models.Model):
@@ -722,10 +748,21 @@ class SiaeFinancialAnnex(models.Model):
         verbose_name = _("Annexe financière")
         verbose_name_plural = _("Annexes financières")
 
+    def __str__(self):
+        return f"{self.number}"
+
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def number_prefix(self):
+        return self.number[:-4]  # all but last 4 characters
+
+    @property
+    def number_suffix(self):
+        return self.number[-4:]  # last 4 characters
 
     @property
     def is_active(self):

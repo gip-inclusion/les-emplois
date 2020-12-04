@@ -9,6 +9,7 @@ from django.utils.html import escape
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import (
+    SiaeConventionFactory,
     SiaeFactory,
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
@@ -153,6 +154,133 @@ class ConfigureJobsViewTest(TestCase):
             )
         )
         self.assertTrue(self.siae.job_description_through.get(appellation_id=16361, is_active=False))
+
+
+class ShowAndSelectFinancialAnnexTest(TestCase):
+    def test_asp_source_siae_admin_can_see_but_cannot_select_af(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        self.assertTrue(siae.has_admin(user))
+        self.assertTrue(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_ASP)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_created_siae_admin_can_see_and_select_af(self):
+        siae = SiaeWithMembershipFactory(source=Siae.SOURCE_USER_CREATED,)
+        user = siae.members.first()
+        old_convention = siae.convention
+        # Only conventions of the same SIREN can be selected.
+        new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
+
+        self.assertTrue(siae.has_admin(user))
+        self.assertTrue(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(siae.convention, old_convention)
+        self.assertNotEqual(siae.convention, new_convention)
+
+        post_data = {
+            "financial_annexes": new_convention.financial_annexes.get().id,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae.refresh_from_db()
+        self.assertNotEqual(siae.convention, old_convention)
+        self.assertEqual(siae.convention, new_convention)
+
+    def test_staff_created_siae_admin_cannot_see_nor_select_af(self):
+        siae = SiaeWithMembershipFactory(source=Siae.SOURCE_STAFF_CREATED)
+        user = siae.members.first()
+        self.assertTrue(siae.has_admin(user))
+        self.assertTrue(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_STAFF_CREATED)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
+        siae = SiaeWithMembershipFactory(membership__is_siae_admin=False)
+        user = siae.members.first()
+        self.assertFalse(siae.has_admin(user))
+        self.assertTrue(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_ASP)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_import_created_geiq_admin_cannot_see_nor_select_af(self):
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_GEIQ, source=Siae.SOURCE_GEIQ)
+        user = siae.members.first()
+        self.assertTrue(siae.has_admin(user))
+        self.assertFalse(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_GEIQ)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_user_created_geiq_admin_cannot_see_nor_select_af(self):
+        siae = SiaeWithMembershipFactory(kind=Siae.KIND_GEIQ, source=Siae.SOURCE_USER_CREATED)
+        user = siae.members.first()
+        self.assertTrue(siae.has_admin(user))
+        self.assertFalse(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
 
 
 class CreateSiaeViewTest(TestCase):

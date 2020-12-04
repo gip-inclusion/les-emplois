@@ -207,3 +207,22 @@ class BlockJobApplicationsForm(forms.ModelForm):
             siae.block_job_applications = block_job_applications
             siae.save()
         return siae
+
+
+class FinancialAnnexSelectForm(forms.Form):
+    """
+    Select a financial annex matching the same SIREN and kind as the convention
+    of the current siae.
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.financial_annexes = kwargs.pop("financial_annexes")
+        super().__init__(*args, **kwargs)
+        self.fields["financial_annexes"].queryset = self.financial_annexes
+
+    financial_annexes = forms.ModelChoiceField(
+        label=gettext_lazy("Numéro d'annexe financière de votre structure"),
+        queryset=None,
+        widget=forms.Select,
+        help_text=gettext_lazy("Veuillez sélectionner un numéro existant."),
+    )

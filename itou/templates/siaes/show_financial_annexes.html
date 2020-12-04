@@ -1,0 +1,49 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Mes annexes financières" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
+    <h1>{% translate "Mes annexes financières" %}</h1>
+    <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">{% translate "Numéro d'annexe financière" %}</th>
+                <th scope="col">{% translate "Validité à ce jour" %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if financial_annexes %}
+                {% for financial_annex in financial_annexes %}
+                    <tr>
+                        <td>{{ financial_annex.number }}</td>
+                        {% if financial_annex.is_active %}
+                            <td><span class="badge badge-success">Valide</span></td>
+                        {% else %}
+                            <td><span class="badge badge-danger">Invalide</span></td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>Aucune annexe financière associée à cette structure.</td>
+                    <td></td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+{% if can_select_af %}
+    <a href="{% url 'siaes_views:select_financial_annex' %}" class="align-self-center">
+        <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Sélectionner une autre annexe financière" %}</button>
+    </a>
+{% endif %}
+
+{% endblock %}
