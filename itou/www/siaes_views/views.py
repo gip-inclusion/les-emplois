@@ -4,15 +4,15 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
-from itou.siaes.models import Siae, SiaeJobDescription
+from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm
+from itou.www.siaes_views.forms import BlockJobApplicationsForm, CreateSiaeForm, EditSiaeForm, FinancialAnnexSelectForm
 
 
 def card(request, siae_id, template_name="siaes/card.html"):
@@ -100,12 +100,94 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
 
 
 @login_required
+def show_financial_annexes(request, template_name="siaes/show_financial_annexes.html"):
+    """
+    Show a summary of the financial annexes of the convention to the siae admin user.
+    Financial annexes are grouped by suffix, and only the most relevant one is shown for each suffix.
+    """
+    current_siae = get_current_siae_or_404(request)
+    if not current_siae.convention_can_be_accessed_by(request.user):
+        raise PermissionDenied
+
+    financial_annexes = []
+    if current_siae.convention:
+        financial_annexes = current_siae.convention.financial_annexes.all()
+
+    # For each group of AFs sharing the same number prefix, show only the most relevant AF.
+    # We do this to avoid showing too many AFs and confusing the user.
+    prefix_to_af = {}
+    for af in financial_annexes:
+        prefix = af.number_prefix
+        if prefix not in prefix_to_af or af.is_active:
+            # Always show an active AF when there is one.
+            prefix_to_af[prefix] = af
+            continue
+        old_suffix = prefix_to_af[prefix].number_suffix
+        new_suffix = af.number_suffix
+        if new_suffix > old_suffix:
+            # Show the AF with the latest suffix when there is no active one.
+            prefix_to_af[prefix] = af
+            continue
+
+    financial_annexes = list(prefix_to_af.values())
+    financial_annexes.sort(key=lambda af: af.number, reverse=True)
+
+    context = {
+        "siae": current_siae,
+        "convention": current_siae.convention,
+        "financial_annexes": financial_annexes,
+        "can_select_af": current_siae.convention_can_be_changed_by(request.user),
+        "current_siae_is_asp": current_siae.source == Siae.SOURCE_ASP,
+        "current_siae_is_user_created": current_siae.source == Siae.SOURCE_USER_CREATED,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def select_financial_annex(request, template_name="siaes/select_financial_annex.html"):
+    """
+    Let siae admin user select a new convention via a financial annex number.
+    """
+    current_siae = get_current_siae_or_404(request)
+    if not current_siae.convention_can_be_changed_by(request.user):
+        raise PermissionDenied
+
+    # We only allow the user to select an AF under the same SIREN as the current siae.
+    financial_annexes = (
+        SiaeFinancialAnnex.objects.select_related("convention")
+        .filter(convention__kind=current_siae.kind, convention__siret_signature__startswith=current_siae.siren)
+        .order_by("-number")
+    )
+
+    # Show only one AF for each AF number prefix to significantly reduce the length of the dropdown when there are
+    # many AFs in the same SIREN.
+    prefix_to_af = {af.number_prefix: af for af in financial_annexes.all()}
+    # The form expects a queryset and not a list.
+    financial_annexes = financial_annexes.filter(pk__in=[af.pk for af in prefix_to_af.values()])
+
+    select_form = FinancialAnnexSelectForm(data=request.POST or None, financial_annexes=financial_annexes)
+
+    if request.method == "POST" and select_form.is_valid():
+        financial_annex = select_form.cleaned_data["financial_annexes"]
+        current_siae.convention = financial_annex.convention
+        current_siae.save()
+        message = _(
+            f"Nous avons bien attaché votre structure à l'annexe financière {financial_annex.number_prefix_with_spaces}."
+        )
+        messages.success(request, message)
+        return HttpResponseRedirect(reverse("siaes_views:show_financial_annexes"))
+
+    context = {"select_form": select_form}
+    return render(request, template_name, context)
+
+
+@login_required
 def create_siae(request, template_name="siaes/create_siae.html"):
     """
     Create a new SIAE (Antenne in French).
     """
     current_siae = get_current_siae_or_404(request)
-    if not current_siae.is_active:
+    if not current_siae.is_active or not current_siae.has_admin(request.user):
         raise PermissionDenied
     form = CreateSiaeForm(
         current_siae=current_siae,
