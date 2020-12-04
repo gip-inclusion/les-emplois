@@ -105,7 +105,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     Create a new SIAE (Antenne in French).
     """
     current_siae = get_current_siae_or_404(request)
-    if not current_siae.is_active:
+    if not current_siae.is_active or not current_siae.has_admin(request.user):
         raise PermissionDenied
     form = CreateSiaeForm(
         current_siae=current_siae,
