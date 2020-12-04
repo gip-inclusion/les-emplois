@@ -20,14 +20,15 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 
 class SiaeQuerySet(models.QuerySet):
     def active(self):
-        # `~` means NOT, similarly to dataframes.
         return self.select_related("convention").filter(
             # GEIQ, EA... have no convention logic and thus are always active.
+            # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
-            # User created siaes and staff created siaes do not yet
-            # have convention logic and thus are always active.
-            | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
-            # A siae of ASP source is active if and only if it has an active convention.
+            # Staff created siaes are always active until eventually
+            # converted to ASP source siaes by import_siae script.
+            | Q(source=Siae.SOURCE_STAFF_CREATED)
+            # ASP source siaes and user created siaes are active if and only
+            # if they have an active convention.
             | Q(convention__is_active=True)
         )
 
@@ -35,10 +36,23 @@ class SiaeQuerySet(models.QuerySet):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
+            # GEIQ, EA... have no convention logic and thus are always active.
+            # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
-            | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
+            # Staff created siaes are always active until eventually
+            # converted to ASP source siaes by import_siae script.
+            | Q(source=Siae.SOURCE_STAFF_CREATED)
+            # ASP source siaes and user created siaes are active if and only
+            # if they have an active convention.
             | Q(convention__is_active=True)
-            # Here we include siaes experiencing their grace period as well.
+            # All user created siaes should have a convention but a small
+            # number of them (58 as of November 2020) don't because they
+            # were created before convention assignment was automated.
+            # This number will only decrease over time as siae admin users
+            # select their convention.
+            # We consider them as experiencing their grace period.
+            | Q(source=Siae.SOURCE_USER_CREATED, convention__isnull=True)
+            # Include siaes experiencing their grace period.
             | Q(convention__deactivated_at__gte=now - grace_period)
         )
 
@@ -220,9 +234,12 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if not self.is_subject_to_eligibility_rules:
             # GEIQ, EA... have no convention logic and thus are always active.
             return True
-        if self.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]:
-            # User created siaes and staff created siaes do not yet have convention logic.
+        if self.source == Siae.SOURCE_STAFF_CREATED:
+            # Staff created siaes are always active until eventually
+            # converted to ASP source siaes by import_siae script.
             return True
+        # ASP source siaes and user created siaes are active if and only
+        # if they have an active convention.
         return self.convention and self.convention.is_active
 
     @property
@@ -383,6 +400,25 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def grace_period_end_date(self):
+        """
+        This method is only called for inactive siaes in other
+        words siaes during or after their grace period.
+        """
+        if self.source == self.SOURCE_USER_CREATED and not self.convention:
+            # All user created siaes should have a convention but a small
+            # number of them (58 as of November 2020) don't because they
+            # were created before convention assignment was automated.
+            # This number will only decrease over time as siae admin users
+            # select their convention.
+            # We consider them as experiencing their grace period.
+            return timezone.now() + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        if not self.convention or not self.convention.deactivated_at:
+            # Fake date for when there is no convention or the
+            # convention has no deactivation date thus we have
+            # no idea when the convention was actually deactivated.
+            # Date is in the past thus we will always consider that
+            # the siae is over its grace period.
+            return self.created_at
         return self.convention.deactivated_at + timezone.timedelta(
             days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS
         )
