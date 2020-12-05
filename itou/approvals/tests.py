@@ -480,6 +480,17 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.merged_approvals[0], pe_approval_2)
         self.assertEqual(approvals_wrapper.merged_approvals[1], pe_approval_1)
 
+    def test_is_pass_iae(self):
+        user = JobSeekerFactory()
+        # PoleEmploiApproval.
+        PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        approvals_wrapper = ApprovalsWrapper(user)
+        self.assertFalse(approvals_wrapper.is_pass_iae)
+        # Approval.
+        ApprovalFactory(user=user)
+        approvals_wrapper = ApprovalsWrapper(user)
+        self.assertTrue(approvals_wrapper.is_pass_iae)
+
     def test_status_without_approval(self):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)

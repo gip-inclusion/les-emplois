@@ -648,7 +648,7 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if isinstance(self.latest_approval, Approval) and self.latest_approval.is_suspended:
+            if self.is_pass_iae and self.latest_approval.is_suspended:
                 self.status = self.SUSPENDED
             elif self.latest_approval.is_valid:
                 self.status = self.VALID
@@ -690,3 +690,11 @@ class ApprovalsWrapper:
         has been made outside of Itou.
         """
         return self.has_valid and not self.latest_approval.originates_from_itou
+
+    @property
+    def is_pass_iae(self):
+        return isinstance(self.latest_approval, Approval)
+
+    @property
+    def can_be_suspended(self):
+        return self.is_pass_iae and self.has_valid
