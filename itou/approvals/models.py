@@ -390,7 +390,7 @@ class Suspension(models.Model):
             raise ValidationError(
                 {
                     "start_at": _(
-                        f"La suspension ne peut commencer ou finir au delà des limites du PASS IAE "
+                        f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
                         f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
                     )
                 }
