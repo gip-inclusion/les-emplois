@@ -699,7 +699,7 @@ class SuspensionModelTest(TestCase):
 
         # Start same day as suspension1.
         # Build provides a local object without saving it to the database.
-        suspension2 = SuspensionFactory.build(approval=approval, start_at=start_at)
+        suspension2 = SuspensionFactory.build(approval=approval, siae=suspension1.siae, start_at=start_at)
         self.assertTrue(suspension2.get_overlaps().exists())
 
         # Start at suspension1.end_at.

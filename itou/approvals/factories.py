@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 
 
@@ -34,6 +35,7 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
+    siae = factory.SubFactory(SiaeFactory)
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
