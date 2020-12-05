@@ -212,6 +212,10 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
+    @property
+    def is_suspended(self):
+        return self.suspension_set.in_progress().exists()
+
     @staticmethod
     def get_next_number(hiring_start_at=None):
         """
@@ -379,6 +383,7 @@ class Suspension(models.Model):
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
+        # At delete time, the approval's end date is pushed back.
         self.approval.end_at -= self.duration
         self.approval.save()
 
@@ -582,6 +587,7 @@ class ApprovalsWrapper:
     # Status codes.
     NONE_FOUND = "NONE_FOUND"
     VALID = "VALID"
+    SUSPENDED = "SUSPENDED"
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
     WAITING_PERIOD_HAS_ELAPSED = "WAITING_PERIOD_HAS_ELAPSED"
 
@@ -609,7 +615,9 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if self.latest_approval.is_valid:
+            if isinstance(self.latest_approval, Approval) and self.latest_approval.is_suspended:
+                self.status = self.SUSPENDED
+            elif self.latest_approval.is_valid:
                 self.status = self.VALID
             elif self.latest_approval.waiting_period_has_elapsed:
                 self.status = self.WAITING_PERIOD_HAS_ELAPSED
@@ -618,6 +626,7 @@ class ApprovalsWrapper:
 
         # Only one of the following attributes can be True at a time.
         self.has_valid = self.status == self.VALID
+        self.has_suspended = self.status == self.SUSPENDED
         self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):
