@@ -685,7 +685,8 @@ class SuspensionModelTest(TestCase):
 
     def test_save(self):
         """
-        Test that an approval's `end_at` is automatically pushed forward when it's suspended.
+        Test `trigger_update_approval_end_at` with SQL INSERT.
+        An approval's `end_at` is automatically pushed forward when it's suspended.
         """
         start_at = datetime.date.today()
 
@@ -699,7 +700,8 @@ class SuspensionModelTest(TestCase):
 
     def test_delete(self):
         """
-        Test that an approval's `end_at` is automatically pushed back when it's suspended.
+        Test `trigger_update_approval_end_at` with SQL DELETE.
+        An approval's `end_at` is automatically pushed back when it's suspended.
         """
         start_at = datetime.date.today()
 
@@ -714,8 +716,9 @@ class SuspensionModelTest(TestCase):
 
     def test_save_and_edit(self):
         """
-        Test that an approval's `end_at` is automatically pushed back and forth
-        when one of its suspension is saved, then edited to be shorter.
+        Test `trigger_update_approval_end_at` with SQL UPDATE.
+        An approval's `end_at` is automatically pushed back and forth when
+        one of its suspension is saved, then edited to be shorter.
         """
         start_at = datetime.date.today()
 

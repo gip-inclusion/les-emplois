@@ -290,7 +290,8 @@ class Suspension(models.Model):
     without intervention of a prescriber or a posteriori control.
 
     When a suspension is saved/edited/deleted, the end date of its approval is
-    automatically pushed back or forth.
+    automatically pushed back or forth with a PostgreSQL trigger:
+    `trigger_update_approval_end_at`.
     """
 
     # Min duration: none.
@@ -363,29 +364,19 @@ class Suspension(models.Model):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
 
     def save(self, *args, **kwargs):
+        """
+        The related Approval's end date is automatically pushed back/forth
+        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
+        """
         self.clean()
-        already_exists = bool(self.pk)
-        # `prev_instance` must be fetched before `super().save()`.
-        prev_instance = Suspension.objects.get(pk=self.pk) if already_exists else None
         super().save(*args, **kwargs)
-        # At save time, the approval's end date is pushed forward.
-        # At edit time, the approval's end date is first reset before being
-        # pushed forward, e.g.:
-        #     - step 1 "create new 90 days suspension":
-        #         - extend approval: approval.end_date + 90 days
-        #     - step 2 "edit 60 days instead of 90 days":
-        #         - reset approval: approval.end_date - 90 days
-        #         - extend approval: approval.end_date + 60 days
-        if prev_instance:
-            self.approval.end_at -= prev_instance.duration
-        self.approval.end_at += self.duration
-        self.approval.save()
 
     def delete(self, *args, **kwargs):
+        """
+        The related Approval's end date is automatically pushed back
+        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
+        """
         super().delete(*args, **kwargs)
-        # At delete time, the approval's end date is pushed back.
-        self.approval.end_at -= self.duration
-        self.approval.save()
 
     def clean(self):
         super().clean()
