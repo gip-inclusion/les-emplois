@@ -408,6 +408,21 @@ class Suspension(models.Model):
                 }
             )
 
+        # A suspension cannot overlap another one for the same SIAE.
+        # This check is enforced by a constraint at the database level but
+        # still required here to avoid a 500 server error "IntegrityError"
+        # during form validation.
+        if self.get_overlaps().exists():
+            overlap = self.get_overlaps().first()
+            raise ValidationError(
+                {
+                    "start_at": _(
+                        f"La période chevauche une suspension déjà existante pour cette SIAE "
+                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
     @property
     def duration(self):
         return self.end_at - self.start_at
@@ -415,6 +430,14 @@ class Suspension(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
+
+    def get_overlaps(self):
+        args = {
+            "end_at__gte": self.start_at,
+            "start_at__lte": self.end_at,
+            "siae": self.siae,
+        }
+        return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
     @staticmethod
     def is_in_future(start_at):

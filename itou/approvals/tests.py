@@ -680,8 +680,32 @@ class SuspensionModelTest(TestCase):
 
     def test_is_in_progress(self):
         start_at = datetime.date.today() - relativedelta(days=10)
-        suspension = SuspensionFactory.build(start_at=start_at)
+        suspension = SuspensionFactory.build(start_at=start_at)  # Build provides a local object.
         self.assertTrue(suspension.is_in_progress)
+
+    def test_get_overlaps(self):
+        start_at = datetime.date.today() - relativedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at)
+        suspension1 = SuspensionFactory(approval=approval, start_at=start_at)
+
+        # Start same day as suspension1.
+        suspension2 = SuspensionFactory.build(approval=approval, start_at=start_at)  # Build provides a local object.
+        self.assertTrue(suspension2.get_overlaps().exists())
+
+        # Start at suspension1.end_at.
+        suspension2.start_at = suspension1.end_at
+        suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
+        self.assertTrue(suspension2.get_overlaps().exists())
+
+        # Cover suspension1.
+        suspension2.start_at = suspension1.start_at - relativedelta(days=1)
+        suspension2.end_at = suspension1.end_at + relativedelta(days=1)
+        self.assertTrue(suspension2.get_overlaps().exists())
+
+        # End before suspension1.
+        suspension2.start_at = suspension1.start_at - relativedelta(years=2)
+        suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
+        self.assertFalse(suspension2.get_overlaps().exists())
 
     def test_save(self):
         """
