@@ -492,7 +492,6 @@ class ApprovalsWrapperTest(TestCase):
     def test_status_with_suspended_approval(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user)
-        # TODO: approval.suspend()
         SuspensionFactory(approval=approval)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.SUSPENDED)
@@ -657,30 +656,40 @@ class SuspensionModelTest(TestCase):
 
     def test_is_in_future(self):
         start_at = datetime.date.today() + relativedelta(days=10)
-        self.assertTrue(Suspension.is_in_future(start_at))
+        # Build provides a local object without saving it to the database.
+        suspension = SuspensionFactory.build(start_at=start_at)
+        self.assertTrue(suspension.is_in_future)
 
     def test_start_in_approval_boundaries(self):
         start_at = datetime.date.today()
         end_at = start_at + relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        # Build provides a local object without saving it to the database.
+        suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
+
         # Equal to lower boundary.
-        self.assertTrue(Suspension.start_in_approval_boundaries(start_at, approval))
+        self.assertTrue(suspension.start_in_approval_boundaries)
+
         # In boundaries.
-        start_at = approval.start_at + relativedelta(days=5)
-        self.assertTrue(Suspension.start_in_approval_boundaries(start_at, approval))
+        suspension.start_at = approval.start_at + relativedelta(days=5)
+        self.assertTrue(suspension.start_in_approval_boundaries)
+
         # Equal to upper boundary.
-        start_at = approval.end_at
-        self.assertTrue(Suspension.start_in_approval_boundaries(start_at, approval))
+        suspension.start_at = approval.end_at
+        self.assertTrue(suspension.start_in_approval_boundaries)
+
         # Before lower boundary.
-        start_at = approval.start_at - relativedelta(days=1)
-        self.assertFalse(Suspension.start_in_approval_boundaries(start_at, approval))
+        suspension.start_at = approval.start_at - relativedelta(days=1)
+        self.assertFalse(suspension.start_in_approval_boundaries)
+
         # After upper boundary.
-        start_at = approval.end_at + relativedelta(days=1)
-        self.assertFalse(Suspension.start_in_approval_boundaries(start_at, approval))
+        suspension.start_at = approval.end_at + relativedelta(days=1)
+        self.assertFalse(suspension.start_in_approval_boundaries)
 
     def test_is_in_progress(self):
         start_at = datetime.date.today() - relativedelta(days=10)
-        suspension = SuspensionFactory.build(start_at=start_at)  # Build provides a local object.
+        # Build provides a local object without saving it to the database.
+        suspension = SuspensionFactory.build(start_at=start_at)
         self.assertTrue(suspension.is_in_progress)
 
     def test_get_overlaps(self):
@@ -689,7 +698,8 @@ class SuspensionModelTest(TestCase):
         suspension1 = SuspensionFactory(approval=approval, start_at=start_at)
 
         # Start same day as suspension1.
-        suspension2 = SuspensionFactory.build(approval=approval, start_at=start_at)  # Build provides a local object.
+        # Build provides a local object without saving it to the database.
+        suspension2 = SuspensionFactory.build(approval=approval, start_at=start_at)
         self.assertTrue(suspension2.get_overlaps().exists())
 
         # Start at suspension1.end_at.

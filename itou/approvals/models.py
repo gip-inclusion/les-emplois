@@ -382,11 +382,11 @@ class Suspension(models.Model):
         super().clean()
 
         # A suspension cannot be in the future.
-        if self.is_in_future(self.start_at):
+        if self.is_in_future:
             raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
 
         # The start of a suspension must be contained in its approval boundaries.
-        if not self.start_in_approval_boundaries(self.start_at, self.approval):
+        if not self.start_in_approval_boundaries:
             raise ValidationError(
                 {
                     "start_at": _(
@@ -431,6 +431,14 @@ class Suspension(models.Model):
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
 
+    @property
+    def is_in_future(self):
+        return self.start_at > timezone.now().date()
+
+    @property
+    def start_in_approval_boundaries(self):
+        return self.approval.start_at <= self.start_at <= self.approval.end_at
+
     def get_overlaps(self):
         args = {
             "end_at__gte": self.start_at,
@@ -438,14 +446,6 @@ class Suspension(models.Model):
             "siae": self.siae,
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
-
-    @staticmethod
-    def is_in_future(start_at):
-        return start_at > timezone.now().date()
-
-    @staticmethod
-    def start_in_approval_boundaries(start_at, approval):
-        return approval.start_at <= start_at <= approval.end_at
 
     @staticmethod
     def get_max_end_at(start_at):
