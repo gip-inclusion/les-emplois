@@ -593,9 +593,28 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
 class ApprovalsWrapper:
     """
-    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models.
+    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models
+    for a given user.
 
     This should be the only way to access approvals for a given job seeker.
+
+    Pôle emploi is the historical issuing authority for approvals.
+    At the end of 2019, Itou began to issue approvals (called PASS IAE) in
+    parallel.
+    During 2021, Itou should become the new sole issuing authority.
+    But for the time being, 2 systems coexist.
+
+    When a candidate applies for a job, it is necessary to:
+        - check if Itou has already issued a PASS IAE
+        - or check if Pôle emploi has already issued an approval
+
+    Moreover, the status must be checked to be able to block applications
+    in case of waiting period, suspension etc.
+
+    This wrapper encapsulates all this logic for use in views and templates
+    without having to manually search in two different tables.
+
+    (Maybe a Manager would've been a better place for this logic)
     """
 
     # Status codes.
