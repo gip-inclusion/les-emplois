@@ -125,7 +125,7 @@ class Approval(CommonApprovalMixin):
     A number starting with `ASP_ITOU_PREFIX` means it has been created by Itou.
 
     Otherwise, it was previously created by Pôle emploi (and initially found
-    in `PoleEmploiApproval`) and re-issued by Itou.
+    in `PoleEmploiApproval`) and re-issued by Itou as a PASS IAE.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -238,7 +238,7 @@ class Approval(CommonApprovalMixin):
             if Approval.ASP_ITOU_PREFIX.isdigit():
                 next_number = int(last_itou_approval.number) + 1
             else:
-                # For some environment, the prefix is a string (ie. XXXXX or YYYYY)
+                # For some environment, the prefix is a string (ie. XXXXX or YYYYY).
                 numeric_part = int(last_itou_approval.number.replace(Approval.ASP_ITOU_PREFIX, "")) + 1
                 next_number = Approval.ASP_ITOU_PREFIX + str(numeric_part)
             return str(next_number)
@@ -521,7 +521,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     at the time of issuance.
     """
 
-    # Matches prescriber_organisation.code_safir_pole_emploi
+    # Matches prescriber_organisation.code_safir_pole_emploi.
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
 
     # The normal length of a number is 12 chars.
@@ -693,8 +693,21 @@ class ApprovalsWrapper:
 
     @property
     def is_pass_iae(self):
+        """
+        Returns True if the approval has been issued by Itou as a PASS IAE,
+        False otherwise.
+        """
         return isinstance(self.latest_approval, Approval)
 
     @property
     def can_be_suspended(self):
         return self.is_pass_iae and self.has_valid
+
+    def can_be_suspended_by_siae(self, siae):
+        """
+        Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
+        """
+        if not self.can_be_suspended:
+            return False
+        user_last_accepted_job_application = self.latest_approval.user.job_applications.accepted().latest("created_at")
+        return siae == user_last_accepted_job_application.to_siae

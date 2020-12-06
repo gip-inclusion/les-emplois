@@ -13,6 +13,7 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory,
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
@@ -554,6 +555,18 @@ class ApprovalsWrapperTest(TestCase):
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
+
+    def test_can_be_suspended_by_siae(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user)
+        job_app = JobApplicationWithApprovalFactory(
+            job_seeker=user, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        approvals_wrapper = ApprovalsWrapper(user)
+        siae = job_app.to_siae
+        self.assertTrue(approvals_wrapper.can_be_suspended_by_siae(siae))
+        siae2 = SiaeFactory()
+        self.assertFalse(approvals_wrapper.can_be_suspended_by_siae(siae2))
 
 
 class CustomAdminViewsTest(TestCase):
