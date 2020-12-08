@@ -53,6 +53,14 @@ class User(AbstractUser, AddressMixin):
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
     )
+    email = models.EmailField(
+        _("email address"),
+        blank=True,
+        # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
+        # This avoids unique constraint violations when saving multiple objects with blank values.
+        null=True,
+        unique=True,
+    )
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
 
     is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)
