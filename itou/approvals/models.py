@@ -443,7 +443,7 @@ class Suspension(models.Model):
         args = {
             "end_at__gte": self.start_at,
             "start_at__lte": self.end_at,
-            "siae": self.siae,
+            "approval": self.approval,
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
