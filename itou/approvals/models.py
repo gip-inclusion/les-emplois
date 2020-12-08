@@ -416,7 +416,7 @@ class Suspension(models.Model):
             raise ValidationError(
                 {
                     "start_at": _(
-                        f"La période chevauche une suspension déjà existante pour cette SIAE "
+                        f"La période chevauche une suspension déjà existante pour ce PASS IAE "
                         f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
                     )
                 }
