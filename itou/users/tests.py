@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 
 
 class ModelTest(TestCase):
@@ -72,21 +72,16 @@ class ModelTest(TestCase):
         """
         Ensure `email` is unique when using the save() method for creating or updating a User instance.
         """
-        User = get_user_model()
 
-        unique_email = "foo@foo.com"
+        email = "juste@leblanc.com"
+        UserFactory(email=email)
 
-        User.objects.create(username="foo", email=unique_email)
-
+        # Creating a user with an existing email should raise an error.
         with self.assertRaises(ValidationError):
-            # Creating a user with an existing email should raise an error.
-            User.objects.create(username="foo2", email=unique_email)
+            UserFactory(email=email)
 
-        bar = User.objects.create(username="bar", email="bar@bar.com")
-        # Update email.
-        bar.email = "baz@baz.com"
-        bar.save()
+        # Updating a user with an existing email should raise an error.
+        user = UserFactory(email="francois@pignon.com")
+        user.email = email
         with self.assertRaises(ValidationError):
-            # Updating a user with an existing email should raise an error.
-            bar.email = unique_email
-            bar.save()
+            user.save()
