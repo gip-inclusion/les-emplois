@@ -111,22 +111,10 @@ class User(AbstractUser, AddressMixin):
         return self.email
 
     def save(self, *args, **kwargs):
-        self.clean_email()
         # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
+        self.validate_unique()
         super().save(*args, **kwargs)
-
-    def clean(self, *args, **kwargs):
-        super().clean()
-        self.clean_email()
-
-    def clean_email(self):
-        # There is no unicity constraint on `email` at the DB level.
-        # It's in anticipation of other authentication methods to
-        # authenticate against something else, e.g. username/password.
-        has_email = hasattr(self, "email") and self.email
-        if has_email and User.email_already_exists(self.email, exclude_pk=self.pk):
-            raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
     @cached_property
     def approvals_wrapper(self):
