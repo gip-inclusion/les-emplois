@@ -1,8 +1,9 @@
 from allauth.utils import generate_unique_username
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
-from django.db import models
+from django.db import IntegrityError, models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
@@ -53,7 +54,7 @@ class User(AbstractUser, AddressMixin):
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
     )
-    email = models.EmailField(
+    email = CIEmailField(
         _("email address"),
         blank=True,
         # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
@@ -112,7 +113,11 @@ class User(AbstractUser, AddressMixin):
         self.clean_email()
         # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
-        super().save(*args, **kwargs)
+        try:
+            with transaction.atomic():
+                super().save(*args, **kwargs)
+        except IntegrityError as error:
+            raise ValidationError(error)
 
     def clean(self, *args, **kwargs):
         super().clean()
