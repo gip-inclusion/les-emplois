@@ -54,7 +54,11 @@
                             {{ prescriber_org.name }}
                         </a>
                     </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ prescriber_org.address_on_one_line }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">{{ prescriber_org.get_kind_display }}</h6>
+                    <hr>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ prescriber_org.address_on_one_line }}
+                    </h6>
                     <p class="card-text">
                         {% blocktranslate with distance=prescriber_org.distance.km|floatformat:1 %}
                             <span class="badge badge-dark">{{ distance }} Km</span>
