@@ -85,3 +85,8 @@ class ModelTest(TestCase):
         user.email = email
         with self.assertRaises(ValidationError):
             user.save()
+
+        # Make sure it's case insensitive.
+        email = email.title()
+        with self.assertRaises(ValidationError):
+            UserFactory(email=email)
