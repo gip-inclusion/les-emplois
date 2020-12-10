@@ -413,8 +413,8 @@ class Suspension(models.Model):
         # This check is enforced by a constraint at the database level but
         # still required here to avoid a 500 server error "IntegrityError"
         # during form validation.
-        if self.get_overlaps().exists():
-            overlap = self.get_overlaps().first()
+        if self.get_overlapping_suspensions().exists():
+            overlap = self.get_overlapping_suspensions().first()
             raise ValidationError(
                 {
                     "start_at": _(
@@ -440,7 +440,7 @@ class Suspension(models.Model):
     def start_in_approval_boundaries(self):
         return self.approval.start_at <= self.start_at <= self.approval.end_at
 
-    def get_overlaps(self):
+    def get_overlapping_suspensions(self):
         args = {
             "end_at__gte": self.start_at,
             "start_at__lte": self.end_at,

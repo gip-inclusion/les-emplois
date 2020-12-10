@@ -716,7 +716,7 @@ class SuspensionModelTest(TestCase):
         suspension = SuspensionFactory.build(start_at=start_at)
         self.assertTrue(suspension.is_in_progress)
 
-    def test_get_overlaps(self):
+    def test_get_overlapping_suspensions(self):
         start_at = datetime.date.today() - relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at)
         suspension1 = SuspensionFactory(approval=approval, start_at=start_at)
@@ -724,22 +724,22 @@ class SuspensionModelTest(TestCase):
         # Start same day as suspension1.
         # Build provides a local object without saving it to the database.
         suspension2 = SuspensionFactory.build(approval=approval, siae=suspension1.siae, start_at=start_at)
-        self.assertTrue(suspension2.get_overlaps().exists())
+        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
 
         # Start at suspension1.end_at.
         suspension2.start_at = suspension1.end_at
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
-        self.assertTrue(suspension2.get_overlaps().exists())
+        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
 
         # Cover suspension1.
         suspension2.start_at = suspension1.start_at - relativedelta(days=1)
         suspension2.end_at = suspension1.end_at + relativedelta(days=1)
-        self.assertTrue(suspension2.get_overlaps().exists())
+        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
 
         # End before suspension1.
         suspension2.start_at = suspension1.start_at - relativedelta(years=2)
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
-        self.assertFalse(suspension2.get_overlaps().exists())
+        self.assertFalse(suspension2.get_overlapping_suspensions().exists())
 
     def test_save(self):
         """
