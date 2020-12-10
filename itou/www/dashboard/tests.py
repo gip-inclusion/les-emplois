@@ -1,4 +1,6 @@
+from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from django.contrib.auth import get_user_model
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
@@ -10,6 +12,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
+from itou.www.dashboard.forms import EditUserEmailForm
 
 
 class DashboardViewTest(TestCase):
@@ -50,10 +53,8 @@ class DashboardViewTest(TestCase):
 
 class EditUserInfoViewTest(TestCase):
     def test_edit(self):
-
         user = JobSeekerFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
@@ -69,6 +70,100 @@ class EditUserInfoViewTest(TestCase):
         user = get_user_model().objects.get(id=user.id)
         self.assertEqual(user.phone, post_data["phone"])
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+
+
+class ChangeEmailViewTest(TestCase):
+    def test_update_email(self):
+        user = JobSeekerFactory()
+        old_email = user.email
+        new_email = "jean@gabin.fr"
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_user_email")
+        response = self.client.get(url)
+
+        email_address = EmailAddress(email=old_email, verified=True, primary=True)
+        email_address.user = user
+        email_address.save()
+
+        post_data = {"email": new_email, "email_confirmation": new_email}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        # User is logged out
+        user.refresh_from_db()
+        self.assertEqual(response.request.get("user"), None)
+        self.assertEqual(user.email, new_email)
+        self.assertEqual(user.emailaddress_set.count(), 0)
+
+        # User cannot log in with his old address
+        post_data = {"login": old_email, "password": DEFAULT_PASSWORD}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context_data["form"].is_valid())
+
+        # User cannot log in until confirmation
+        post_data = {"login": new_email, "password": DEFAULT_PASSWORD}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_email_verification_sent"))
+
+        # User receives an email to confirm his new address.
+        email = mail.outbox[0]
+        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
+        self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
+        self.assertEqual(email.to[0], new_email)
+
+        # Confirm email + auto login.
+        confirmation_token = EmailConfirmationHMAC(user.emailaddress_set.first()).key
+        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
+        response = self.client.post(confirm_email_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("account_login"))
+
+        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
+        url = reverse("account_login")
+        response = self.client.post(url, data=post_data)
+        self.assertTrue(response.context.get("user").is_authenticated)
+
+        user.refresh_from_db()
+        self.assertEqual(user.email, new_email)
+        self.assertEqual(user.emailaddress_set.count(), 1)
+        new_address = user.emailaddress_set.first()
+        self.assertEqual(new_address.email, new_email)
+        self.assertTrue(new_address.verified)
+
+
+class EditUserEmailFormTest(TestCase):
+    def test_invalid_form(self):
+        old_email = "bernard@blier.fr"
+
+        # Email and confirmation email do not match
+        email = "jean@gabin.fr"
+        email_confirmation = "oscar@gabin.fr"
+        data = {"email": email, "email_confirmation": email_confirmation}
+        form = EditUserEmailForm(data=data, user_email=old_email)
+        self.assertFalse(form.is_valid())
+
+        # Email already taken by another user. Bad luck!
+        user = JobSeekerFactory()
+        data = {"email": user.email, "email_confirmation": user.email}
+        form = EditUserEmailForm(data=data, user_email=old_email)
+        self.assertFalse(form.is_valid())
+
+        # New address is the same as the old one.
+        data = {"email": old_email, "email_confirmation": old_email}
+        form = EditUserEmailForm(data=data, user_email=old_email)
+        self.assertFalse(form.is_valid())
+
+    def test_valid_form(self):
+        old_email = "bernard@blier.fr"
+        new_email = "jean@gabin.fr"
+        data = {"email": new_email, "email_confirmation": new_email}
+        form = EditUserEmailForm(data=data, user_email=old_email)
+        self.assertTrue(form.is_valid())
 
 
 class SwitchSiaeTest(TestCase):
