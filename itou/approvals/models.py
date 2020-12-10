@@ -296,7 +296,7 @@ class Suspension(models.Model):
 
     # Min duration: none.
     # Max duration: 6 months (could be adjusted according to user feedback).
-    # It's possible to have succesive 6-month suspensions: no limit.
+    # 6-months suspensions can be consecutive and there can be any number of them.
     MAX_DURATION_MONTHS = 6
 
     class Reason(models.TextChoices):
