@@ -368,6 +368,8 @@ class Suspension(models.Model):
         The related Approval's end date is automatically pushed back/forth
         with a PostgreSQL trigger: `trigger_update_approval_end_at`.
         """
+        if self.pk:
+            self.updated_at = timezone.now()
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
