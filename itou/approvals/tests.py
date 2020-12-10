@@ -678,11 +678,11 @@ class SuspensionModelTest(TestCase):
         suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
         self.assertEqual(suspension.duration, expected_duration)
 
-    def test_is_in_future(self):
+    def test_start_in_future(self):
         start_at = datetime.date.today() + relativedelta(days=10)
         # Build provides a local object without saving it to the database.
         suspension = SuspensionFactory.build(start_at=start_at)
-        self.assertTrue(suspension.is_in_future)
+        self.assertTrue(suspension.start_in_future)
 
     def test_start_in_approval_boundaries(self):
         start_at = datetime.date.today()

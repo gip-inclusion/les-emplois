@@ -383,7 +383,7 @@ class Suspension(models.Model):
         super().clean()
 
         # A suspension cannot be in the future.
-        if self.is_in_future:
+        if self.start_in_future:
             raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
 
         # The start of a suspension must be contained in its approval boundaries.
@@ -433,7 +433,7 @@ class Suspension(models.Model):
         return self.start_at <= timezone.now().date() <= self.end_at
 
     @property
-    def is_in_future(self):
+    def start_in_future(self):
         return self.start_at > timezone.now().date()
 
     @property
