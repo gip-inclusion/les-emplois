@@ -767,6 +767,9 @@ class SuspensionModelTest(TestCase):
         initial_duration = approval.duration
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + suspension.duration)
+
         suspension.delete()
 
         approval.refresh_from_db()
