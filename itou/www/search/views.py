@@ -1,4 +1,3 @@
-from django.contrib.auth.decorators import login_required
 from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.shortcuts import render
 
@@ -67,7 +66,6 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
     return render(request, template_name, context)
 
 
-@login_required
 def search_prescribers_home(request, template_name="search/prescribers_search_home.html"):
     """
     The search home page has a different design from the results page.
@@ -77,7 +75,6 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
     return render(request, template_name, context)
 
 
-@login_required
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
 
     form = PrescriberSearchForm(data=request.GET or None)

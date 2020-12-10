@@ -1,5 +1,6 @@
 from allauth.utils import generate_unique_username
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -53,6 +54,15 @@ class User(AbstractUser, AddressMixin):
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
     )
+    email = CIEmailField(
+        _("email address"),
+        blank=True,
+        db_index=True,
+        # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
+        # This avoids unique constraint violations when saving multiple objects with blank values.
+        null=True,
+        unique=True,
+    )
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
 
     is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)
@@ -101,22 +111,10 @@ class User(AbstractUser, AddressMixin):
         return self.email
 
     def save(self, *args, **kwargs):
-        self.clean_email()
         # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
+        self.validate_unique()
         super().save(*args, **kwargs)
-
-    def clean(self, *args, **kwargs):
-        super().clean()
-        self.clean_email()
-
-    def clean_email(self):
-        # There is no unicity constraint on `email` at the DB level.
-        # It's in anticipation of other authentication methods to
-        # authenticate against something else, e.g. username/password.
-        has_email = hasattr(self, "email") and self.email
-        if has_email and User.email_already_exists(self.email, exclude_pk=self.pk):
-            raise ValidationError(self.ERROR_EMAIL_ALREADY_EXISTS)
 
     @cached_property
     def approvals_wrapper(self):

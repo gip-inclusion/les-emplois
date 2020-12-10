@@ -76,15 +76,18 @@
                                         </a>
 
                                         <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
+                                            {% translate "Modifier mon profil" %}
+                                        </a>
 
                                         {% if not user.is_peamu %}
                                             <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
                                                 {% translate "Modifier mon mot de passe" %}
                                             </a>
+                                            <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">
+                                                {% translate "Modifier mon adresse e-mail" %}
+                                            </a>
                                         {% endif %}
-                                        <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                                            {% translate "Modifier mon profil" %}
-                                        </a>
 
                                         <div class="dropdown-divider"></div>
 
@@ -171,11 +174,7 @@
 
                 <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">{% translate "Rechercher des employeurs" %}</a>
 
-                {% if user.is_authenticated %}
-                    {# Do not confuse unlogged users with a prescriber search, especially jobseekers  #}
-                    {# who may be unfamiliar with the prescriber concept. #}
-                    <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% translate "Rechercher des prescripteurs" %}</a>
-                {% endif %}
+                <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% translate "Rechercher des prescripteurs" %}</a>
 
                 <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="{% translate "Accéder au Forum de l'inclusion (nouvel onglet)" %}">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
 

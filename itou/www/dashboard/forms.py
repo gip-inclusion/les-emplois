@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 
 from itou.utils.address.forms import AddressFormMixin
@@ -57,3 +58,29 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             self._meta.model.clean_pole_emploi_fields(
                 self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
             )
+
+
+class EditUserEmailForm(forms.Form):
+
+    email = forms.EmailField(label=gettext_lazy("Nouvelle adresse e-mail"), required=True,)
+    email_confirmation = forms.EmailField(label=gettext_lazy("Confirmation"), required=True,)
+
+    def __init__(self, *args, **kwargs):
+        self.user_email = kwargs.pop("user_email")
+        super().__init__(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+        email = self.cleaned_data.get("email")
+        email_confirmation = self.cleaned_data.get("email_confirmation")
+        if email != email_confirmation:
+            raise ValidationError(gettext_lazy("Les deux adresses sont différentes."))
+        return self.cleaned_data
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        if email == self.user_email:
+            raise ValidationError(gettext_lazy("Veuillez indiquer une adresse différente de l'actuelle."))
+        if get_user_model().objects.filter(email=email):
+            raise ValidationError(gettext_lazy("Cette adresse est déjà utilisée par un autre utilisateur."))
+        return email

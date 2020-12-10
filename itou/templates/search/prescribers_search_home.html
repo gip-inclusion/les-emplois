@@ -22,3 +22,7 @@
     </section>
 
 {% endblock %}
+
+{# The "content" block is empty here, so we hide it to avoid a gap in UI. #}
+{% block content_container_css_classes %}{{ block.super }} d-none{% endblock %}
+{% block content %}{% endblock %}

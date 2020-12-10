@@ -29,34 +29,28 @@
         <div>{{ prescriber_org.description|linebreaks }}</div>
     {% endif %}
 
-    {% if prescriber_org.email or prescriber_org.phone or prescriber_org.website %}
+    {% if user.is_authenticated and prescriber_org.email %}
+        <p>
+            {% translate "E-mail" as email_label %}
+            {% include "includes/icon.html" with icon="mail" title=email_label %}
+            <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
+        </p>
+    {% endif %}
 
-        <hr>
+    {% if user.is_authenticated and prescriber_org.phone %}
+        <p>
+            {% translate "Téléphone" as phone_label %}
+            {% include "includes/icon.html" with icon="phone" title=phone_label %}
+            <a href="tel:{{ prescriber_org.phone }}">{{ prescriber_org.phone|format_phone }}</a>
+        </p>
+    {% endif %}
 
-        {% if prescriber_org.email %}
-            <p>
-                {% translate "E-mail" as email_label %}
-                {% include "includes/icon.html" with icon="mail" title=email_label %}
-                <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
-            </p>
-        {% endif %}
-
-        {% if prescriber_org.phone %}
-            <p>
-                {% translate "Téléphone" as phone_label %}
-                {% include "includes/icon.html" with icon="phone" title=phone_label %}
-                <a href="tel:{{ prescriber_org.phone }}">{{ prescriber_org.phone|format_phone }}</a>
-            </p>
-        {% endif %}
-
-        {% if prescriber_org.website %}
-            <p>
-                {% translate "Site Internet" as website_label %}
-                {% include "includes/icon.html" with icon="external-link" title=website_label %}
-                <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank">{{ prescriber_org.website }}</a>
-            </p>
-        {% endif %}
-
+    {% if prescriber_org.website %}
+        <p>
+            {% translate "Site Internet" as website_label %}
+            {% include "includes/icon.html" with icon="external-link" title=website_label %}
+            <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank">{{ prescriber_org.website }}</a>
+        </p>
     {% endif %}
 
     {% if back_url %}
