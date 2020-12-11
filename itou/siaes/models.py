@@ -405,6 +405,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         in other words siaes during or after their grace period,
         to figure out the exact end date of their grace period.
         """
+        # This should never happen but let's be defensive in this case.
+        if self.is_active:
+            return timezone.now() + timezone.timedelta(days=365)
+
         if self.source == self.SOURCE_USER_CREATED and not self.convention:
             # All user created siaes should have a convention but a small
             # number of them (58 as of November 2020) don't because they
