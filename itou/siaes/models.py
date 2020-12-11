@@ -19,8 +19,9 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 
 
 class SiaeQuerySet(models.QuerySet):
-    def active(self):
-        return self.select_related("convention").filter(
+    @property
+    def active_lookup(self):
+        return (
             # GEIQ, EA... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
@@ -32,19 +33,14 @@ class SiaeQuerySet(models.QuerySet):
             | Q(convention__is_active=True)
         )
 
+    def active(self):
+        return self.select_related("convention").filter(self.active_lookup)
+
     def active_or_in_grace_period(self):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
-            # GEIQ, EA... have no convention logic and thus are always active.
-            # `~` means NOT, similarly to dataframes.
-            ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
-            # Staff created siaes are always active until eventually
-            # converted to ASP source siaes by import_siae script.
-            | Q(source=Siae.SOURCE_STAFF_CREATED)
-            # ASP source siaes and user created siaes are active if and only
-            # if they have an active convention.
-            | Q(convention__is_active=True)
+            self.active_lookup
             # All user created siaes should have a convention but a small
             # number of them (58 as of November 2020) don't because they
             # were created before convention assignment was automated.
