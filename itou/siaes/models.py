@@ -27,6 +27,8 @@ class SiaeQuerySet(models.QuerySet):
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
             # Staff created siaes are always active until eventually
             # converted to ASP source siaes by import_siae script.
+            # Such siaes are created by our staff when ASP data is lacking
+            # the most recent data about them.
             | Q(source=Siae.SOURCE_STAFF_CREATED)
             # ASP source siaes and user created siaes are active if and only
             # if they have an active convention.
@@ -233,6 +235,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if self.source == Siae.SOURCE_STAFF_CREATED:
             # Staff created siaes are always active until eventually
             # converted to ASP source siaes by import_siae script.
+            # Such siaes are created by our staff when ASP data is lacking
+            # the most recent data about them.
             return True
         # ASP source siaes and user created siaes are active if and only
         # if they have an active convention.
