@@ -73,6 +73,13 @@ class CommonApprovalMixin(models.Model):
         return self.number.startswith(Approval.ASP_ITOU_PREFIX)
 
     @property
+    def is_pass_iae(self):
+        """
+        Returns True if the approval has been issued by Itou, False otherwise.
+        """
+        return isinstance(self, Approval)
+
+    @property
     def duration(self):
         return self.end_at - self.start_at
 
@@ -649,7 +656,7 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if self.is_pass_iae and self.latest_approval.is_suspended:
+            if self.latest_approval.is_pass_iae and self.latest_approval.is_suspended:
                 self.status = self.SUSPENDED
             elif self.latest_approval.is_valid:
                 self.status = self.VALID
@@ -693,16 +700,8 @@ class ApprovalsWrapper:
         return self.has_valid and not self.latest_approval.originates_from_itou
 
     @property
-    def is_pass_iae(self):
-        """
-        Returns True if the approval has been issued by Itou as a PASS IAE,
-        False otherwise.
-        """
-        return isinstance(self.latest_approval, Approval)
-
-    @property
     def can_be_suspended(self):
-        return self.is_pass_iae and self.has_valid
+        return self.latest_approval.is_pass_iae and self.has_valid
 
     def can_be_suspended_by_siae(self, siae):
         """
