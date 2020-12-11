@@ -432,7 +432,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         Note that the convention itself does not necessarily exist yet
         e.g. in the case of old user created siaes without convention yet.
         """
-        if not user.is_siae_staff or not self.has_admin(user):
+        if not self.has_admin(user):
             return False
         if not self.is_subject_to_eligibility_rules:
             # AF interfaces only makes sense for SIAE, not for GEIQ EA etc.
