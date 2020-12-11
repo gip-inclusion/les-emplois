@@ -1,10 +1,14 @@
 """
 
-Various helpers for the import_siae.py script.
+Various helpers shared by the import_siae, import_geiq and import_ea_eatt scripts.
 
 """
 from functools import wraps
 from time import time
+
+from itou.siaes.models import Siae
+from itou.utils.address.models import AddressMixin
+from itou.utils.apis.geocoding import get_geocoding_data
 
 
 SHOW_IMPORT_SIAE_METHOD_TIMER = False
@@ -33,6 +37,16 @@ def timeit(f):
     return wrap
 
 
+def clean_string(s):
+    """
+    Drop trailing whitespace and merge consecutive spaces.
+    """
+    if s is None:
+        return None
+    s = s.strip()
+    return " ".join(s.split())
+
+
 def remap_columns(df, column_mapping):
     """
     Rename columns according to mapping and delete all other columns.
@@ -49,3 +63,71 @@ def remap_columns(df, column_mapping):
     df = df[column_mapping.values()]
 
     return df
+
+
+def could_siae_be_deleted(siae):
+    return siae.members.count() == 0 and siae.job_applications_received.count() == 0
+
+
+def geocode_siae(siae):
+    assert siae.geocoding_address
+
+    geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
+
+    if geocoding_data:
+        siae.geocoding_score = geocoding_data["score"]
+        # If the score is greater than API_BAN_RELIABLE_MIN_SCORE, coords are reliable:
+        # use data returned by the BAN API because it's better written using accents etc.
+        # while the source data is in all caps etc.
+        # Otherwise keep the old address (which is probably wrong or incomplete).
+        if siae.geocoding_score >= AddressMixin.API_BAN_RELIABLE_MIN_SCORE:
+            siae.address_line_1 = geocoding_data["address_line_1"]
+        # City is always good due to `postcode` passed in query.
+        # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens
+        siae.city = geocoding_data["city"]
+
+        siae.coords = geocoding_data["coords"]
+
+    return siae
+
+
+def sync_structures(df, name, kinds, build_structure, dry_run):
+    """
+    Sync structures between db and export.
+
+    The same logic here is shared between import_geiq and import_ea_eatt.
+
+    - df: dataframe of structures, one row per structure
+    - name: user friendly name ("GEIQ" or "EA and EATT")
+    - kinds: possible kinds of the structures
+    - build_structure: a method building a structure from a dataframe row
+    """
+    print(f"Loaded {len(df)} {name} from export.")
+
+    db_sirets = set([siae.siret for siae in Siae.objects.filter(kind__in=kinds)])
+    df_sirets = set(df.siret.tolist())
+
+    # Create structures which do not exist in database yet.
+    creatable_sirets = df_sirets - db_sirets
+    print(f"{len(creatable_sirets)} {name} will be created.")
+    siret_to_row = {row.siret: row for _, row in df.iterrows()}
+    for siret in creatable_sirets:
+        row = siret_to_row[siret]
+        siae = build_structure(row)
+        if not dry_run:
+            siae.save()
+            print(f"siae.id={siae.id} has been created.")
+
+    # Delete structures which no longer exist in the latest export.
+    deletable_sirets = db_sirets - df_sirets
+    print(f"{len(deletable_sirets)} {name} will be deleted.")
+    for siret in deletable_sirets:
+        siae = Siae.objects.get(siret=siret, kind__in=kinds)
+        if could_siae_be_deleted(siae):
+            print(f"siae.id={siae.id} will be deleted.")
+            if not dry_run:
+                siae.delete()
+        else:
+            # As of 2020/10/16, 5 GEIQ are undeletable.
+            # As of 2020/12/11, 5 EA and EATT are undeletable.
+            print(f"siae.id={siae.id} cannot be deleted as it has data.")

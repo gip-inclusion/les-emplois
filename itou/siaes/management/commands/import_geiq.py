@@ -5,8 +5,13 @@ import numpy as np
 import pandas as pd
 from django.core.management.base import BaseCommand
 
-from itou.siaes.management.commands._import_siae.siae import could_siae_be_deleted, geocode_siae
-from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
+from itou.siaes.management.commands._import_siae.utils import (
+    clean_string,
+    geocode_siae,
+    remap_columns,
+    sync_structures,
+    timeit,
+)
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.validators import validate_siret
@@ -15,16 +20,6 @@ from itou.utils.validators import validate_siret
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 GEIQ_DATASET_FILENAME = f"{CURRENT_DIR}/data/Geiq_-_liste_02-10-2020.xls"
-
-
-def clean_string(s):
-    """
-    Drop trailing whitespace and merge consecutive spaces.
-    """
-    if s is None:
-        return None
-    s = s.strip()
-    return " ".join(s.split())
 
 
 @timeit
@@ -73,7 +68,7 @@ def get_geiq_df(filename=GEIQ_DATASET_FILENAME):
     return df
 
 
-def build_siae(row):
+def build_geiq(row):
     siae = Siae()
     siae.siret = row.siret
     siae.kind = Siae.KIND_GEIQ
@@ -138,34 +133,7 @@ class Command(BaseCommand):
         self.set_logger(options.get("verbosity"))
 
         geiq_df = get_geiq_df()
-        self.log(f"Loaded {len(geiq_df)} GEIQ from export.")
-
-        db_sirets = set([siae.siret for siae in Siae.objects.filter(kind=Siae.KIND_GEIQ)])
-        df_sirets = set(geiq_df.siret.tolist())
-
-        # Create GEIQ which do not exist in database yet.
-        creatable_sirets = df_sirets - db_sirets
-        self.log(f"{len(creatable_sirets)} GEIQ will be created.")
-        siret_to_row = {row.siret: row for _, row in geiq_df.iterrows()}
-        for siret in creatable_sirets:
-            row = siret_to_row[siret]
-            siae = build_siae(row)
-            if not dry_run:
-                siae.save()
-                self.log(f"siae.id={siae.id} has been created.")
-
-        # Delete GEIQ which no longer exist in the latest export.
-        deletable_sirets = db_sirets - df_sirets
-        self.log(f"{len(deletable_sirets)} GEIQ will be deleted.")
-        for siret in deletable_sirets:
-            siae = Siae.objects.get(siret=siret, kind=Siae.KIND_GEIQ)
-            if could_siae_be_deleted(siae):
-                self.log(f"siae.id={siae.id} will be deleted.")
-                if not dry_run:
-                    siae.delete()
-            else:
-                # As of 2020/10/16 five GEIQ are undeletable.
-                self.log(f"siae.id={siae.id} cannot be deleted as it has data.")
+        sync_structures(df=geiq_df, name="GEIQ", kinds=[Siae.KIND_GEIQ], build_structure=build_geiq, dry_run=dry_run)
 
         self.log("-" * 80)
         self.log("Done.")
