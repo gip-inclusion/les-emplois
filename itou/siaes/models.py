@@ -429,7 +429,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         """
         Decides whether the user can show the siae convention or not.
         In other words, whether the user can access the "My AFs" interface.
-        Note that the convention itself does not necesserarily exist yet
+        Note that the convention itself does not necessarily exist yet
         e.g. in the case of old user created siaes without convention yet.
         """
         if not user.is_siae_staff or not self.has_admin(user):
