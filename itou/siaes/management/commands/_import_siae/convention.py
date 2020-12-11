@@ -95,8 +95,13 @@ def get_deletable_conventions():
     return SiaeConvention.objects.filter(siaes__isnull=True)
 
 
-def check_each_convention_has_exactly_one_asp_siae(dry_run):
+def check_convention_data_consistency(dry_run):
+    """
+    Check data consistency of conventions, not only versus siaes of ASP source,
+    but also vs user created siaes.
+    """
     for convention in SiaeConvention.objects.prefetch_related("siaes").all():
+        # Check that each convention has exactly one siae of ASP source.
         asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Siae.SOURCE_ASP]
         if dry_run:
             # During a dry run we might have some zero-siae conventions
@@ -104,3 +109,23 @@ def check_each_convention_has_exactly_one_asp_siae(dry_run):
             assert len(asp_siaes) in [0, 1]
         else:
             assert len(asp_siaes) == 1
+
+        # Additional data consistency checks.
+        for siae in convention.siaes.all():
+            if siae.kind != convention.kind:
+                # ONE TIME FIX - can be removed later.
+                assert siae.source == Siae.SOURCE_USER_CREATED
+                print(
+                    f"convention.id={convention.id} kind mismatch: "
+                    f"convention={convention.kind} vs siae={siae.kind} (will be fixed)"
+                )
+                if not dry_run:
+                    siae.convention = None
+                    siae.save()
+                # end of ONE TIME FIX
+            assert siae.siren == convention.siren_signature
+
+    user_created_siaes_without_convention = Siae.objects.filter(
+        kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS, source=Siae.SOURCE_USER_CREATED, convention__isnull=True
+    ).count()
+    print(f"{user_created_siaes_without_convention} user created siaes still have no convention (technical debt)")

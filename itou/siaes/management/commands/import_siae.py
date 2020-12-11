@@ -20,7 +20,7 @@ from django.core.management.base import BaseCommand
 from django.db.models import Q
 
 from itou.siaes.management.commands._import_siae.convention import (
-    check_each_convention_has_exactly_one_asp_siae,
+    check_convention_data_consistency,
     get_creatable_conventions,
     get_deletable_conventions,
     update_existing_conventions,
@@ -279,7 +279,8 @@ class Command(BaseCommand):
             # Otherwise some convention might have 2 asp siaes,
             # but one of them would be deleted by the next script run.
             self.update_siret_and_auth_email_of_existing_siaes()
-        check_each_convention_has_exactly_one_asp_siae(dry_run=self.dry_run)
+
+        check_convention_data_consistency(dry_run=self.dry_run)
 
     @timeit
     def manage_financial_annexes(self):
