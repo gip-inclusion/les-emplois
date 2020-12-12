@@ -137,6 +137,11 @@ class CommonApprovalMixinTest(TestCase):
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
 
+    def test_is_in_progress(self):
+        start_at = datetime.date.today() - relativedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at)
+        self.assertTrue(approval.is_in_progress)
+
     def test_waiting_period(self):
 
         # End is tomorrow.
@@ -310,6 +315,17 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(number="999990000001")
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
+
+    def test_can_be_suspended_by_siae(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user)
+        job_app = JobApplicationWithApprovalFactory(
+            job_seeker=user, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        siae = job_app.to_siae
+        self.assertTrue(approval.can_be_suspended_by_siae(siae))
+        siae2 = SiaeFactory()
+        self.assertFalse(approval.can_be_suspended_by_siae(siae2))
 
     def test_get_or_create_from_valid(self):
 
@@ -553,18 +569,6 @@ class ApprovalsWrapperTest(TestCase):
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
-
-    def test_can_be_suspended_by_siae(self):
-        user = JobSeekerFactory()
-        approval = ApprovalFactory(user=user)
-        job_app = JobApplicationWithApprovalFactory(
-            job_seeker=user, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED
-        )
-        approvals_wrapper = ApprovalsWrapper(user)
-        siae = job_app.to_siae
-        self.assertTrue(approvals_wrapper.can_be_suspended_by_siae(siae))
-        siae2 = SiaeFactory()
-        self.assertFalse(approvals_wrapper.can_be_suspended_by_siae(siae2))
 
 
 class CustomAdminViewsTest(TestCase):

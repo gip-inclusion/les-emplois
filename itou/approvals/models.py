@@ -55,6 +55,10 @@ class CommonApprovalMixin(models.Model):
         return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
 
     @property
+    def is_in_progress(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    @property
     def waiting_period_end(self):
         return self.end_at + relativedelta(years=self.WAITING_PERIOD_YEARS)
 
@@ -222,6 +226,17 @@ class Approval(CommonApprovalMixin):
     @property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
+
+    @property
+    def can_be_suspended(self):
+        return self.is_in_progress and not self.is_suspended
+
+    def can_be_suspended_by_siae(self, siae):
+        """
+        Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
+        """
+        user_last_accepted_job_application = self.user.job_applications.accepted().latest("created_at")
+        return self.can_be_suspended and siae == user_last_accepted_job_application.to_siae
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -698,16 +713,3 @@ class ApprovalsWrapper:
         has been made outside of Itou.
         """
         return self.has_valid and not self.latest_approval.originates_from_itou
-
-    @property
-    def can_be_suspended(self):
-        return self.latest_approval.is_pass_iae and self.has_valid
-
-    def can_be_suspended_by_siae(self, siae):
-        """
-        Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
-        """
-        if not self.can_be_suspended:
-            return False
-        user_last_accepted_job_application = self.latest_approval.user.job_applications.accepted().latest("created_at")
-        return siae == user_last_accepted_job_application.to_siae
