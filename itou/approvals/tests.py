@@ -319,10 +319,17 @@ class ApprovalModelTest(TestCase):
     def test_can_be_suspended_by_siae(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user)
-        job_app = JobApplicationWithApprovalFactory(
-            job_seeker=user, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED
+        job_application = JobApplicationWithApprovalFactory(
+            job_seeker=user,
+            approval=approval,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=datetime.date.today()
+            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+            - relativedelta(days=1),
         )
-        siae = job_app.to_siae
+        self.assertFalse(job_application.can_be_cancelled)
+        siae = job_application.to_siae
         self.assertTrue(approval.can_be_suspended_by_siae(siae))
         siae2 = SiaeFactory()
         self.assertFalse(approval.can_be_suspended_by_siae(siae2))

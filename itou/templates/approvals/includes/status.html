@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 {% comment %}
 
     Usage:
@@ -6,34 +7,47 @@
 
 {% endcomment %}
 
+<img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE" class="mx-auto d-block mb-4">
+
+<p class="m-0">
+    {% if approval.is_pass_iae %}
+        {% translate "Numéro de PASS IAE (agrément) :" %}
+        <b>{{ approval.number_with_spaces }}</b>
+    {% else %}
+        {% translate "Agrément existant" %}
+    {% endif %}
+</p>
+
 {% if approval.is_valid %}
 
-    <span class="text-success">
-
-        {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
-            <b>Valide</b> du {{ start }} au {{ end }}
-        {% endblocktranslate %}
-
-        {% with approval.time_until_waiting_period as still %}
-            {% if still == "0" %}
-                {% translate "(expire aujourd'hui)" %}
-            {% elif still == "in_future" %}
-                {% translate "(dans le futur)" %}
-            {% else %}
-                {% blocktranslate %}(encore {{ still }}){% endblocktranslate %}
-            {% endif %}
-        {% endwith %}
-
-    </span>
+    <ul class="list-unstyled pl-3">
+         <li>
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
+                Délivré le {{ start }}
+            {% endblocktranslate %}
+         </li>
+         <li class="text-success">
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
+                Valide du {{ start }} au {{ end }}
+            {% endblocktranslate %}
+            {% with approval.time_until_waiting_period as still %}
+                {% if still == "0" %}
+                    {% translate "(expire aujourd'hui)" %}
+                {% elif still == "in_future" %}
+                    {% translate "(dans le futur)" %}
+                {% else %}
+                    {% blocktranslate %}(encore {{ still }}){% endblocktranslate %}
+                {% endif %}
+            {% endwith %}
+         </li>
+    </ul>
 
 {% elif approval.is_in_waiting_period %}
 
-    <span class="text-danger">
-
+    <p class="m-0 text-danger">
         {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
             <b>Expiré</b> le {{ end }} (depuis {{ since }})
         {% endblocktranslate %}
-
-    </span>
+    </p>
 
 {% endif %}

@@ -12,6 +12,7 @@ from django.db import models
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
@@ -214,7 +215,7 @@ class Approval(CommonApprovalMixin):
         """
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
-    @property
+    @cached_property
     def can_be_deleted(self):
         state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
 
@@ -223,11 +224,11 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
-    @property
+    @cached_property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
 
-    @property
+    @cached_property
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
 
@@ -236,7 +237,11 @@ class Approval(CommonApprovalMixin):
         Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
         """
         user_last_accepted_job_application = self.user.job_applications.accepted().latest("created_at")
-        return self.can_be_suspended and siae == user_last_accepted_job_application.to_siae
+        return (
+            self.can_be_suspended
+            and siae == user_last_accepted_job_application.to_siae
+            and not user_last_accepted_job_application.can_be_cancelled
+        )
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -637,7 +642,7 @@ class ApprovalsWrapper:
     This wrapper encapsulates all this logic for use in views and templates
     without having to manually search in two different tables.
 
-    (Maybe a Manager would've been a better place for this logic)
+    (Maybe a Manager would've been a better place for this logic).
     """
 
     # Status codes.
@@ -713,3 +718,11 @@ class ApprovalsWrapper:
         has been made outside of Itou.
         """
         return self.has_valid and not self.latest_approval.originates_from_itou
+
+    def can_be_suspended_by_siae(self, siae):
+        """
+        The suspension process applies only to a valid PASS IAE.
+        """
+        return (
+            self.has_valid and self.latest_approval.is_pass_iae and self.latest_approval.can_be_suspended_by_siae(siae)
+        )

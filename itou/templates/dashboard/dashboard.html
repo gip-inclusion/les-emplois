@@ -120,11 +120,10 @@
                     <div class="card">
                         <h5 class="card-header">{% translate "Numéro d'agrément" %}</h5>
                         <div class="card-body">
-                            <p class="card-text">
-                                {% include "includes/icon.html" with icon="award" %}
-                                <b>{{ approvals_wrapper.latest_approval.number_with_spaces }}</b>
+                            {# Approval status. #}
+                            <div class="card-text">
                                 {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
-                            </p>
+                            </div>
                             {% if approvals_wrapper.has_in_waiting_period %}
                                 <p class="card-text">
                                     <small>
