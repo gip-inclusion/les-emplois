@@ -648,7 +648,6 @@ class ApprovalsWrapper:
     # Status codes.
     NONE_FOUND = "NONE_FOUND"
     VALID = "VALID"
-    SUSPENDED = "SUSPENDED"
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
 
     # Error messages.
@@ -675,9 +674,7 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if self.latest_approval.is_pass_iae and self.latest_approval.is_suspended:
-                self.status = self.SUSPENDED
-            elif self.latest_approval.is_valid:
+            if self.latest_approval.is_valid:
                 self.status = self.VALID
             elif self.latest_approval.waiting_period_has_elapsed:
                 # The `Période de carence` is over. A job seeker can get a new Approval.
@@ -688,7 +685,6 @@ class ApprovalsWrapper:
 
         # Only one of the following attributes can be True at a time.
         self.has_valid = self.status == self.VALID
-        self.has_suspended = self.status == self.SUSPENDED
         self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):
@@ -720,10 +716,13 @@ class ApprovalsWrapper:
         """
         return self.has_valid and not self.latest_approval.originates_from_itou
 
-    def can_be_suspended_by_siae(self, siae):
-        """
-        The suspension process applies only to a valid PASS IAE.
-        """
+    # The suspension process applies only to a valid PASS IAE.
+
+    @property
+    def latest_is_suspended(self):
+        return self.has_valid and self.latest_approval.is_pass_iae and self.latest_approval.is_suspended
+
+    def latest_can_be_suspended_by_siae(self, siae):
         return (
             self.has_valid and self.latest_approval.is_pass_iae and self.latest_approval.can_be_suspended_by_siae(siae)
         )
