@@ -116,7 +116,7 @@
             </div>
 
             {% with user.approvals_wrapper as approvals_wrapper %}
-                {% if approvals_wrapper.has_valid or approvals_wrapper.has_in_waiting_period %}
+                {% if approvals_wrapper.latest_approval %}
                     <div class="card">
                         <h5 class="card-header">{% translate "Numéro d'agrément" %}</h5>
                         <div class="card-body">

@@ -650,7 +650,6 @@ class ApprovalsWrapper:
     VALID = "VALID"
     SUSPENDED = "SUSPENDED"
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
-    WAITING_PERIOD_HAS_ELAPSED = "WAITING_PERIOD_HAS_ELAPSED"
 
     # Error messages.
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
@@ -681,7 +680,9 @@ class ApprovalsWrapper:
             elif self.latest_approval.is_valid:
                 self.status = self.VALID
             elif self.latest_approval.waiting_period_has_elapsed:
-                self.status = self.WAITING_PERIOD_HAS_ELAPSED
+                # The `Période de carence` is over. A job seeker can get a new Approval.
+                self.latest_approval = None
+                self.status = self.NONE_FOUND
             else:
                 self.status = self.IN_WAITING_PERIOD
 

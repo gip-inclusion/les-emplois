@@ -149,7 +149,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
-        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is today.
@@ -157,7 +156,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
-        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is yesterday.
@@ -165,7 +163,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid)
-        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertTrue(approval.is_in_waiting_period)
 
         # Ended since more than WAITING_PERIOD_YEARS.
@@ -173,7 +170,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid)
-        self.assertTrue(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
     def test_originates_from_itou(self):
@@ -561,11 +557,11 @@ class ApprovalsWrapperTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
         self.assertFalse(approvals_wrapper.has_suspended)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
-        self.assertEqual(approvals_wrapper.latest_approval, approval)
+        self.assertEqual(approvals_wrapper.latest_approval, None)
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory()
