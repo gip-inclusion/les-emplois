@@ -43,8 +43,11 @@
                     {# Approval actions. #}
                     {% if job_application.approval %}
                         {% if approval_can_be_suspended_by_siae %}
-                            {# TODO: new suspension view #}
-                            <a href="#" class="btn btn btn-link">{% translate "Suspendre" %}</a>
+                            <a
+                                href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                class="btn btn btn-link">
+                                    {% translate "Suspendre" %}
+                            </a>
                         {% endif %}
                         {% if job_application.can_download_approval_as_pdf %}
                             <a

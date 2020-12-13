@@ -1,0 +1,109 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% translate "Suspendre le PASS IAE" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% blocktranslate with full_name=approval.user.get_full_name|title %}
+            Suspendre le PASS IAE
+            <br>
+            <span class="text-muted">pour {{ full_name }}</span>
+        {% endblocktranslate %}
+    </h1>
+
+    {# Approval status. #}
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text">
+                {% include "approvals/includes/status.html" with approval=approval %}
+            </div>
+        </div>
+    </div>
+
+    {% if not preview %}{# Edit mode. #}
+
+        <form method="post" action="" class="js-prevent-multiple-submit">
+
+            {% csrf_token %}
+
+            {% bootstrap_form_errors form %}
+
+            {% for field in form %}
+                {# Display a warning message before the "reason" field. #}
+                {% if field.name == "reason" %}
+                    <div class="alert alert-warning pb-0" role="alert">
+                        <p>
+                            {% translate "Un abandon de poste, une fin de contrat de travail, ou tout autre motif ne figurant pas dans la liste officielle des motifs de suspension, ne peuvent donner lieu à une suspension." %}
+                        </p>
+                    </div>
+                {% endif %}
+                {% bootstrap_field field %}
+            {% endfor %}
+
+            {% buttons %}
+                <a class="btn btn-secondary" href="{{ back_url }}">
+                    {% translate "Retour" %}
+                </a>
+                {# Enable preview mode: preview=1. #}
+                <button type="submit" name="preview" value="1" class="btn btn-primary">
+                    {% translate "Valider la suspension" %}
+                </button>
+            {% endbuttons %}
+
+        </form>
+
+    {% else %}{# Preview mode: ask for confirmation before committing to DB. #}
+
+        <form method="post" action="" class="js-prevent-multiple-submit">
+
+            {% csrf_token %}
+
+            {# Hide all form fields. #}
+            {% for field in form %}
+                <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
+            {% endfor %}
+
+            {# Show the user a summary of the info. #}
+            <div class="card my-3 text-center">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {% translate "Vous êtes sur le point de suspendre ce PASS IAE" %}
+                        <br>
+                        {% translate "pour la raison suivante :" %}
+                    </h5>
+                    <p class="card-text">
+                        {{ form.instance.get_reason_display }}
+                    </p>
+                    <p class="card-text text-success">
+                        {% blocktranslate with start=form.instance.start_at|date:"d/m/Y" end=form.instance.end_at|date:"d/m/Y" %}
+                            À partir du {{ start }} jusqu'au {{ end }}
+                        {% endblocktranslate %}
+                    </p>
+                </div>
+            </div>
+
+            {% buttons %}
+                {# Allow the user to modify the suspension: edit=1. #}
+                <button type="submit" name="edit" value="1" class="btn btn-secondary">
+                    {% translate "Annuler" %}
+                </button>
+                {# Create a suspension: save=1. #}
+                <button type="submit" name="save" value="1" class="btn btn-primary">
+                    {% translate "Confirmer la suspension" %}
+                </button>
+            {% endbuttons %}
+
+        </form>
+
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ form.media }}
+{% endblock %}

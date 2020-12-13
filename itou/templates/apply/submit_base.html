@@ -26,9 +26,9 @@
     {% endif %}
 
     {% if approvals_wrapper.latest_approval %}
+        {# Approval status. #}
         <div class="card my-3">
             <div class="card-body">
-                {# Approval status. #}
                 <div class="card-text">
                     {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
                 </div>

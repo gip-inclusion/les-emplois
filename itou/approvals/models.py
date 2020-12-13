@@ -225,8 +225,34 @@ class Approval(CommonApprovalMixin):
         return self.jobapplication_set.get().state == state_accepted
 
     @cached_property
+    def user_last_accepted_job_application(self):
+        return self.user.job_applications.accepted().latest("created_at")
+
+    @cached_property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
+
+    @cached_property
+    def suspensions_by_start_date_asc(self):
+        return self.suspension_set.all().order_by("start_at")
+
+    @cached_property
+    def last_old_suspension(self):
+        return self.suspensions_by_start_date_asc.old().last()
+
+    @cached_property
+    def next_suspension_min_date(self):
+        """
+        A suspension is backdatable: the starting date is the date of the
+        beginning of hiring.
+        If suspensions exist in the past, the starting date becomes the end
+        date of the most recent suspension.
+        It makes it possible to stick a new suspension to the previous one:
+        |---S1---|--S2---| => similar to an extension.
+        """
+        if self.last_old_suspension:
+            return self.last_old_suspension.end_at + relativedelta(days=1)
+        return self.user_last_accepted_job_application.hiring_start_at
 
     @cached_property
     def can_be_suspended(self):
@@ -236,11 +262,10 @@ class Approval(CommonApprovalMixin):
         """
         Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
         """
-        user_last_accepted_job_application = self.user.job_applications.accepted().latest("created_at")
         return (
             self.can_be_suspended
-            and siae == user_last_accepted_job_application.to_siae
-            and not user_last_accepted_job_application.can_be_cancelled
+            and siae == self.user_last_accepted_job_application.to_siae
+            and not self.user_last_accepted_job_application.can_be_cancelled
         )
 
     @staticmethod
@@ -309,6 +334,10 @@ class SuspensionQuerySet(models.QuerySet):
 
     def not_in_progress(self):
         return self.exclude(self.in_progress_lookup)
+
+    def old(self):
+        now = timezone.now().date()
+        return self.filter(end_at__lt=now)
 
 
 class Suspension(models.Model):
@@ -408,6 +437,13 @@ class Suspension(models.Model):
 
     def clean(self):
         super().clean()
+
+        if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
+            raise ValidationError({"reason_explanation": _("En cas de force majeure, veuillez préciser le motif.")})
+
+        # No min duration: a suspension may last only 1 day.
+        if self.end_at < self.start_at:
+            raise ValidationError({"end_at": _("La date de fin doit être postérieure à la date de début.")})
 
         # A suspension cannot be in the future.
         if self.start_in_future:
@@ -715,14 +751,3 @@ class ApprovalsWrapper:
         has been made outside of Itou.
         """
         return self.has_valid and not self.latest_approval.originates_from_itou
-
-    # The suspension process applies only to a valid PASS IAE.
-
-    @property
-    def latest_is_suspended(self):
-        return self.has_valid and self.latest_approval.is_pass_iae and self.latest_approval.is_suspended
-
-    def latest_can_be_suspended_by_siae(self, siae):
-        return (
-            self.has_valid and self.latest_approval.is_pass_iae and self.latest_approval.can_be_suspended_by_siae(siae)
-        )

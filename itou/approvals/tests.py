@@ -541,7 +541,7 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
         self.assertFalse(approvals_wrapper.has_valid)
@@ -653,6 +653,18 @@ class SuspensionQuerySetTest(TestCase):
         end_at = Suspension.get_max_end_at(start_at)
         Suspension.objects.all().update(start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
+
+    def test_old(self):
+        # Starting today.
+        start_at = datetime.date.today()
+        SuspensionFactory.create_batch(2, start_at=start_at)
+        self.assertEqual(0, Suspension.objects.old().count())
+        # Old.
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = Suspension.get_max_end_at(start_at)
+        expected_num = 3
+        SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
+        self.assertEqual(expected_num, Suspension.objects.old().count())
 
 
 class SuspensionModelTest(TestCase):
