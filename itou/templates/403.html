@@ -5,12 +5,14 @@
 
 {% block content %}
 
-    <h1>{% translate "Accès refusé" %}</h1>
+    <h1>{% translate "Vous ne pouvez pas continuer" %}</h1>
 
     {% if exception %}
         <div class="lead alert alert-warning" role="alert">
             <p class="mb-0">{{ exception }}</p>
         </div>
+    {% else %}
+        <h2>{% translate "Accès refusé" %}</h2>
     {% endif %}
 
 {% endblock %}

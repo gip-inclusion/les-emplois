@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
+from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -17,6 +18,7 @@ from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.tokens import resume_signer
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
+
 
 
 def valid_session_required(function=None):
@@ -43,6 +45,16 @@ def get_approvals_wrapper(request, job_seeker):
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         if user_info.user == job_seeker:
             error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
+        raise PermissionDenied(error)
+    # Ensure that an existing approval is not suspended.
+    if (
+        approvals_wrapper.has_valid
+        and approvals_wrapper.latest_approval.is_pass_iae
+        and approvals_wrapper.latest_approval.is_suspended
+    ):
+        error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
+        if user_info.user == job_seeker:
+            error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
         raise PermissionDenied(error)
     return approvals_wrapper
 

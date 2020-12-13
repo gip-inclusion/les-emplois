@@ -143,6 +143,15 @@ class Approval(CommonApprovalMixin):
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
+    # Error messages.
+    ERROR_PASS_IAE_SUSPENDED_FOR_USER = _(
+        "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
+    )
+    ERROR_PASS_IAE_SUSPENDED_FOR_PROXY = _(
+        "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler "
+        "pour lui pendant la période de suspension."
+    )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
