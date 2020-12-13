@@ -20,7 +20,6 @@ from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, Su
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
-
 def valid_session_required(function=None):
     def decorated(request, *args, **kwargs):
         session_data = request.session.get(settings.ITOU_SESSION_JOB_APPLICATION_KEY)

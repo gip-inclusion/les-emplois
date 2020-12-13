@@ -28,7 +28,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
+        "approval", "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae__convention"
     ).prefetch_related("selected_jobs__appellation")
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
@@ -62,7 +62,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
+        "approval", "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae__convention"
     ).prefetch_related("selected_jobs__appellation")
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
@@ -87,7 +87,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         filters = filters_form.humanize_filters()
 
     job_applications = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
+        "approval", "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae__convention"
     ).prefetch_related("selected_jobs__appellation")
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
