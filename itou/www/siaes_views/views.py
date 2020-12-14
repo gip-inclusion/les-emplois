@@ -160,6 +160,12 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
         .order_by("-number")
     )
 
+    # Show only one AF for each AF number prefix to significantly reduce
+    # the length of the dropdown when there are many AFs in the same SIREN.
+    prefix_to_af = {af.number_prefix: af for af in financial_annexes.all()}
+    # The form expects a queryset and not a list.
+    financial_annexes = financial_annexes.filter(pk__in=[af.pk for af in prefix_to_af.values()])
+
     select_form = FinancialAnnexSelectForm(data=request.POST or None, financial_annexes=financial_annexes)
 
     if request.method == "POST" and select_form.is_valid():

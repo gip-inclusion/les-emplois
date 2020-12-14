@@ -752,9 +752,6 @@ class SiaeFinancialAnnex(models.Model):
         verbose_name = _("Annexe financière")
         verbose_name_plural = _("Annexes financières")
 
-    def __str__(self):
-        return f"{self.number}"
-
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()

@@ -219,9 +219,20 @@ class FinancialAnnexSelectForm(forms.Form):
         self.financial_annexes = kwargs.pop("financial_annexes")
         super().__init__(*args, **kwargs)
         self.fields["financial_annexes"].queryset = self.financial_annexes
+        self.fields["financial_annexes"].label_from_instance = self.label_from_instance
+
+    @staticmethod
+    def label_from_instance(self):
+        """
+        Display a custom value for the AF in the dropdown instead
+        of the default af.__str__.
+
+        From https://stackoverflow.com/questions/41969899/display-field-other-than-str
+        """
+        return self.number_prefix
 
     financial_annexes = forms.ModelChoiceField(
-        label=gettext_lazy("Numéro d'annexe financière de votre structure"),
+        label=gettext_lazy("Numéro d'annexe financière sans son suffixe de type 'A1M1'"),
         queryset=None,
         widget=forms.Select,
         help_text=gettext_lazy("Veuillez sélectionner un numéro existant."),
