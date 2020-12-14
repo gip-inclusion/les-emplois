@@ -151,7 +151,7 @@ class IsInProgressFilter(admin.SimpleListFilter):
 
 @admin.register(models.Suspension)
 class SuspensionAdmin(admin.ModelAdmin):
-    list_display = ("pk", "approval", "start_at", "end_at", "reason", "created_at", "is_in_progress")
+    list_display = ("pk", "approval", "start_at", "end_at", "created_at", "is_in_progress")
     list_display_links = ("pk", "approval")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
     list_filter = (
