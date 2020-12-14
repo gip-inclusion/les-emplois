@@ -14,16 +14,16 @@
         {% endblocktranslate %}
     </h1>
 
-    {# Approval status. #}
-    <div class="card my-3">
-        <div class="card-body">
-            <div class="card-text">
-                {% include "approvals/includes/status.html" with approval=approval %}
+    {% if not preview %}{# Edit mode. #}
+
+        {# Approval status. #}
+        <div class="card my-3">
+            <div class="card-body">
+                <div class="card-text">
+                    {% include "approvals/includes/status.html" with approval=approval %}
+                </div>
             </div>
         </div>
-    </div>
-
-    {% if not preview %}{# Edit mode. #}
 
         <form method="post" action="" class="js-prevent-multiple-submit">
 
@@ -93,16 +93,21 @@
                 </div>
             </div>
 
-            {% buttons %}
-                {# Allow the user to modify the suspension: edit=1. #}
-                <button type="submit" name="edit" value="1" class="btn btn-secondary">
-                    {% translate "Annuler" %}
-                </button>
-                {# Create a suspension: save=1. #}
-                <button type="submit" name="save" value="1" class="btn btn-primary">
-                    {% translate "Confirmer la suspension" %}
-                </button>
-            {% endbuttons %}
+            <div class="alert alert-warning" role="alert">
+                <p>
+                    {% translate "En validant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié." %}
+                </p>
+                {% buttons %}
+                    {# Allow the user to modify the suspension: edit=1. #}
+                    <button type="submit" name="edit" value="1" class="btn btn-secondary">
+                        {% translate "Annuler" %}
+                    </button>
+                    {# Create a suspension: save=1. #}
+                    <button type="submit" name="save" value="1" class="btn btn-primary">
+                        {% translate "Confirmer la suspension" %}
+                    </button>
+                {% endbuttons %}
+            </div>
 
         </form>
 
