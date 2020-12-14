@@ -9,8 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
-from itou.siae.models import FinancialAnnex
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import User
 from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
 from itou.utils.validators import validate_siret
@@ -48,7 +47,7 @@ class INSEECommune(PeriodMixin):
     reference file is currently not up-to-date (2018)
     """
 
-    code = models.Charfield(max_length=5, verbose_name=_("Code commune INSEE"))
+    code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
     def __str__(self):
@@ -141,7 +140,6 @@ class LaneType(Enum):
     ESPA = "Espace"
     ESP = "Esplanade"
     FG = "Faubourg"
-    FG = "Faubourg"
     FRM = "Ferme"
     FON = "Fontaine"
     GAL = "Galerie"
@@ -225,7 +223,7 @@ class ASPFormatAddress:
 
     @classmethod
     def from_address(cls, obj, update_coords=False):
-        if type(obj) not in [Siae, PrescriberOrganization, settings.AUTH_USER_MODEL]:
+        if type(obj) not in [Siae, PrescriberOrganization, User]:
             raise ValidationError(_("Ce type ne contient pas d'adresse exploitable"))
 
         # first we use geo API to get a 'lane' and a number
@@ -237,29 +235,33 @@ class ASPFormatAddress:
             obj.geocoding_score = address["score"]
             obj.save()
 
+        print(address)
         result = {}
 
         # Get street extension (bis, ter ...)
         # It's included in the resulting streetnumber geo API field
-        number, extension = address.get("number", "").split()
+        number, *extension = address.get("number", "").split()
 
         if number:
             result["number"] = number
 
         if extension:
+            extension = extension[0]
             if extension not in cls.street_extensions.values():
                 raise ValidationError(_("Ce type d'extension de voie n'est pas reconnu"))
             else:
                 result["extension"] = cls.street_extensions.get(extension)
 
-        lane_type, lane_name = result.get("lane", "").lower().split(maxsplit=1)
-        lane_codes = [k.lower() for k in LaneType.keys()]
-        lane_names = [v.lower() for v in LaneType.values()]
+        lane_type, lane_name = address.get("lane", "").split(maxsplit=1)
+        lane_codes = [k.name.lower() for k in LaneType]
+        lane_names = [v.value.lower() for v in LaneType]
+        print(lane_codes)
+        print(lane_names)
+        print(lane_type)
+        if lane_type.lower() in lane_codes or lane_type.lower() in lane_names:
+            result["lane_type"] = lane_type
 
-        if lane_type in lane_codes or lane_type in lane_names:
-            result["lane_type"] = lane_type.upper()
-
-        if result:
+        if lane_name:
             result["lane"] = lane_name
         else:
             raise ValidationError(_("Impossible de déterminer le nom de la rue"))
@@ -364,7 +366,7 @@ class EmployeeRecord(models.Model):
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
 
     # Link to financial annex, mainlu for its number
-    financial_annex = models.ForeignKey(FinancialAnnex, on_delete=models.CASCADE)
+    financial_annex = models.ForeignKey(SiaeFinancialAnnex, on_delete=models.CASCADE)
 
     # Some information in the eligibility diagnosis can be used in the ER
     eligibility_diagnosis = models.ForeignKey(EligibilityDiagnosis, on_delete=models.CASCADE)
@@ -391,9 +393,11 @@ class EmployeeRecord(models.Model):
     # - personnePhysique.codeComInsee.codeComInsee
     # - personnePhysique.codeComInsee.codeDpt
     employee = models.ForeignKey(User, verbose_name=_("Employé"), on_delete=models.CASCADE)
-    educational_leval = models.ForeignKey(EducationalLevel, verbose_name=("Niveau de formation"))
-    birth_place = models.ForeignKey(INSEECommune, verbose_name=_("Commune de naissance"))
-    birth_country = models.ForeignKey(INSEECountry, verbose_name=_("Pays de naissance"))
+    educational_leval = models.ForeignKey(
+        EducationalLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL
+    )
+    birth_place = models.ForeignKey(INSEECommune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL)
+    birth_country = models.ForeignKey(INSEECountry, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL)
 
     # birth_place = models.ForeignKey(INSEECode, verbose_name=_("Lieu de naissance"))
 
