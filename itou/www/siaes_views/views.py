@@ -110,36 +110,6 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
     if not current_siae.convention_can_be_accessed_by(request.user):
         raise PermissionDenied
 
-    if current_siae.is_active:
-        messages.success(
-            request,
-            _(
-                "Votre structure est active car elle est associée à au moins une "
-                "annexe financière valide listée ci-dessous ou bien elle a été "
-                "manuellement activée par notre support. Vous n'avez rien à faire."
-            ),
-        )
-    elif current_siae.source == Siae.SOURCE_ASP:
-        # Inactive siaes of ASP source cannot be fixed by user.
-        messages.error(
-            request,
-            _(
-                f"Votre structure est inactive car n'est associée à aucune annexe "
-                f"financière valide. Contactez nous : {settings.ITOU_EMAIL_ASSISTANCE}"
-            ),
-        )
-    elif current_siae.source == Siae.SOURCE_USER_CREATED:
-        # Inactive user created siaes can be fixed by the user.
-        messages.error(
-            request,
-            _(
-                "Votre structure sera prochainement désactivée car n'est "
-                "associée à aucune annexe financière valide. "
-                "Veuillez dès que possible procéder à la sélection d'une "
-                "annexe financière valide ci-dessous."
-            ),
-        )
-
     financial_annexes = []
     if current_siae.convention:
         financial_annexes = current_siae.convention.financial_annexes.all()
@@ -167,6 +137,8 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
         "convention": current_siae.convention,
         "financial_annexes": financial_annexes,
         "can_select_af": current_siae.convention_can_be_changed_by(request.user),
+        "current_siae_is_asp": current_siae.source == Siae.SOURCE_ASP,
+        "current_siae_is_user_created": current_siae.source == Siae.SOURCE_USER_CREATED,
     }
     return render(request, template_name, context)
 
