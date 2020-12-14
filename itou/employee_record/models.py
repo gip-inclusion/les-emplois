@@ -1,3 +1,6 @@
+from enum import Enum
+
+from django.conf import settings
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
@@ -5,9 +8,11 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.prescribers.models import PrescriberOrganization
 from itou.siae.models import FinancialAnnex
 from itou.siaes.models import Siae
 from itou.users.models import User
+from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
 from itou.utils.validators import validate_siret
 
 
@@ -101,6 +106,165 @@ class INSEECountry(models.Model):
 
     def __repr__(self):
         return f"INSEECountry:code={self.code}, name={self.name}"
+
+
+class LaneType(Enum):
+    AER = "Aérodrome"
+    AGL = "Agglomération"
+    AIRE = "Aire"
+    ALL = "Allee"
+    ACH = "Ancien chemin"
+    ART = "Ancienne route"
+    AV = "Avenue"
+    BEGI = "Beguinage"
+    BD = "Boulevard"
+    BRG = "Bourg"
+    CPG = "Camping"
+    CAR = "Carrefour"
+    CTRE = "Centre"
+    CCAL = "Centre commercial"
+    CHT = "Chateau"
+    CHS = "Chaussee"
+    CHEM = "Chemin"
+    CHV = "Chemin vicinal"
+    CITE = "Cité"
+    CLOS = "Clos"
+    CTR = "Contour"
+    COR = "Corniche"
+    COTE = "Coteaux"
+    COUR = "Cour"
+    CRS = "Cours"
+    DSC = "Descente"
+    DOM = "Domaine"
+    ECL = "Ecluse"
+    ESC = "Escalier"
+    ESPA = "Espace"
+    ESP = "Esplanade"
+    FG = "Faubourg"
+    FG = "Faubourg"
+    FRM = "Ferme"
+    FON = "Fontaine"
+    GAL = "Galerie"
+    GARE = "Gare"
+    GBD = "Grand boulevard"
+    GPL = "Grande place"
+    GR = "Grande rue"
+    GRI = "Grille"
+    HAM = "Hameau"
+    IMM = "Immeuble(s)"
+    IMP = "Impasse"
+    JARD = "Jardin"
+    LD = "Lieu-dit"
+    LOT = "Lotissement"
+    MAIL = "Mail"
+    MAIS = "Maison"
+    MAS = "Mas"
+    MTE = "Montee"
+    PARC = "Parc"
+    PRV = "Parvis"
+    PAS = "Passage"
+    PLE = "Passerelle"
+    PCH = "Petit chemin"
+    PRT = "Petite route"
+    PTR = "Petite rue"
+    PL = "Place"
+    PTTE = "Placette"
+    PLN = "Plaine"
+    PLAN = "Plan"
+    PLT = "Plateau"
+    PONT = "Pont"
+    PORT = "Port"
+    PROM = "Promenade"
+    QUAI = "Quai"
+    QUAR = "Quartier"
+    RPE = "Rampe"
+    REMP = "Rempart"
+    RES = "Residence"
+    ROC = "Rocade"
+    RPT = "Rond-point"
+    RTD = "Rotonde"
+    RTE = "Route"
+    RUE = "Rue"
+    RLE = "Ruelle"
+    SEN = "Sente"
+    SENT = "Sentier"
+    SQ = "Square"
+    TPL = "Terre plein"
+    TRAV = "Traverse"
+    VEN = "Venelle"
+    VTE = "Vieille route"
+    VCHE = "Vieux chemin"
+    VILL = "Villa"
+    VLGE = "Village"
+    VOIE = "Voie"
+    ZONE = "Zone"
+    ZA = "Zone d'activite"
+    ZAC = "Zone d'amenagement concerte"
+    ZAD = "Zone d'amenagement differe"
+    ZI = "Zone industrielle"
+    ZUP = "Zone urbanisation prio"
+
+
+class ASPFormatAddress:
+    """
+    ASP formatted address
+
+    ASP expects an address to have the following fields:
+    - number
+    - number extension (Bis, Ter ...)
+    - type (street, avenue, road ...)
+    - address complement (optionnal)
+    - a postal code and the matching INSEE commune code
+    - department code
+    - city name
+    - country INSEE code and country group (within EU or not, and France itself)
+    """
+
+    # These are the extensions defined in ASP ref file: ref_extension_voie_v1.csv
+    street_extensions = {"bis": "B", "ter": "T", "quater": "Q", "quinqies": "C"}
+
+    @classmethod
+    def from_address(cls, obj, update_coords=False):
+        if type(obj) not in [Siae, PrescriberOrganization, settings.AUTH_USER_MODEL]:
+            raise ValidationError(_("Ce type ne contient pas d'adresse exploitable"))
+
+        # first we use geo API to get a 'lane' and a number
+        address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code, fmt=detailed_geocoding_data)
+
+        if update_coords and address.get("coords", None) and address.get("score", -1) > obj.get("geocoding_score", 0):
+            # User, Siae and PrescribersOrganisation all have score and coords
+            obj.coords = address["coords"]
+            obj.geocoding_score = address["score"]
+            obj.save()
+
+        result = {}
+
+        # Get street extension (bis, ter ...)
+        # It's included in the resulting streetnumber geo API field
+        number, extension = address.get("number", "").split()
+
+        if number:
+            result["number"] = number
+
+        if extension:
+            if extension not in cls.street_extensions.values():
+                raise ValidationError(_("Ce type d'extension de voie n'est pas reconnu"))
+            else:
+                result["extension"] = cls.street_extensions.get(extension)
+
+        lane_type, lane_name = result.get("lane", "").lower().split(maxsplit=1)
+        lane_codes = [k.lower() for k in LaneType.keys()]
+        lane_names = [v.lower() for v in LaneType.values()]
+
+        if lane_type in lane_codes or lane_type in lane_names:
+            result["lane_type"] = lane_type.upper()
+
+        if result:
+            result["lane"] = lane_name
+        else:
+            raise ValidationError(_("Impossible de déterminer le nom de la rue"))
+
+        return result
 
 
 class EducationalLevel(PeriodMixin):
@@ -270,8 +434,8 @@ class EmployeeRecord(models.Model):
     @staticmethod
     def convert_kind_to_asp_id(kind):
         """
-        Conversion of Siae.kind field value to ASP employer type  
-        i.e. field `rte_code_type_employeur` of ASP reference file: ref_type_employeur_v3.csv 
+        Conversion of Siae.kind field value to ASP employer type
+        i.e. field `rte_code_type_employeur` of ASP reference file: ref_type_employeur_v3.csv
 
         Employer code is coded in one char.
 
