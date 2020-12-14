@@ -7,14 +7,14 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-import itou.approvals.models
+import itou.utils.models
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("siaes", "0041_auto_20201120_1421"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("siaes", "0041_auto_20201120_1421"),
         ("approvals", "0009_auto_20200222_1128"),
     ]
 
@@ -98,14 +98,14 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Suspension", "verbose_name_plural": "Suspensions", "ordering": ["-created_at"]},
+            options={"verbose_name": "Suspension", "verbose_name_plural": "Suspensions", "ordering": ["-start_at"],},
         ),
         migrations.AddConstraint(
             model_name="suspension",
             constraint=django.contrib.postgres.constraints.ExclusionConstraint(
                 expressions=(
                     (
-                        itou.approvals.models.DateRange(
+                        itou.utils.models.DateRange(
                             "start_at",
                             "end_at",
                             django.contrib.postgres.fields.ranges.RangeBoundary(

@@ -364,7 +364,7 @@ class Suspension(models.Model):
     class Meta:
         verbose_name = _("Suspension")
         verbose_name_plural = _("Suspensions")
-        ordering = ["-created_at"]
+        ordering = ["-start_at"]
         # Use an exclusion constraint to prevent overlapping date ranges.
         # This requires the btree_gist extension on PostgreSQL.
         # See "Tip of the Week" https://postgresweekly.com/issues/289
