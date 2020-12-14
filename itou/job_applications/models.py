@@ -91,6 +91,9 @@ class JobApplicationQuerySet(models.QuerySet):
             ]
         )
 
+    def accepted(self):
+        return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
+
     def get_unique_fk_objects(self, fk_field):
         """
         Get unique foreign key objects in a single query.

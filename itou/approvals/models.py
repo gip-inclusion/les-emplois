@@ -4,6 +4,8 @@ import time
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.postgres.constraints import ExclusionConstraint
+from django.contrib.postgres.fields import RangeBoundary, RangeOperators
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
@@ -14,6 +16,7 @@ from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
+from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
 
@@ -52,6 +55,10 @@ class CommonApprovalMixin(models.Model):
         return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
 
     @property
+    def is_in_progress(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    @property
     def waiting_period_end(self):
         return self.end_at + relativedelta(years=self.WAITING_PERIOD_YEARS)
 
@@ -68,6 +75,17 @@ class CommonApprovalMixin(models.Model):
     @property
     def originates_from_itou(self):
         return self.number.startswith(Approval.ASP_ITOU_PREFIX)
+
+    @property
+    def is_pass_iae(self):
+        """
+        Returns True if the approval has been issued by Itou, False otherwise.
+        """
+        return isinstance(self, Approval)
+
+    @property
+    def duration(self):
+        return self.end_at - self.start_at
 
     @property
     def overlaps_covid_lockdown(self):
@@ -112,15 +130,13 @@ class CommonApprovalQuerySet(models.QuerySet):
 
 class Approval(CommonApprovalMixin):
     """
-    Store approvals (`agréments` in French). Another name is `PASS IAE`.
+    Store "PASS IAE" whose former name was "approval" ("agréments" in French)
+    issued by Itou.
 
-    A number starting with `ASP_ITOU_PREFIX` means it has been delivered
-    through ITOU. Otherwise, it was delivered by Pôle emploi and initially
-    found in `PoleEmploiApproval`.
+    A number starting with `ASP_ITOU_PREFIX` means it has been created by Itou.
 
-    If an approval exists in this table it means that:
-    - it has been delivered through Itou
-    - but was created by either Itou or Pôle emploi
+    Otherwise, it was previously created by Pôle emploi (and initially found
+    in `PoleEmploiApproval`) and re-issued by Itou as a PASS IAE.
     """
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
@@ -198,6 +214,30 @@ class Approval(CommonApprovalMixin):
         """
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
+    @property
+    def can_be_deleted(self):
+        state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
+
+        job_applications = self.jobapplication_set
+        if job_applications.count() != 1:
+            return False
+        return self.jobapplication_set.get().state == state_accepted
+
+    @property
+    def is_suspended(self):
+        return self.suspension_set.in_progress().exists()
+
+    @property
+    def can_be_suspended(self):
+        return self.is_in_progress and not self.is_suspended
+
+    def can_be_suspended_by_siae(self, siae):
+        """
+        Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
+        """
+        user_last_accepted_job_application = self.user.job_applications.accepted().latest("created_at")
+        return self.can_be_suspended and siae == user_last_accepted_job_application.to_siae
+
     @staticmethod
     def get_next_number(hiring_start_at=None):
         """
@@ -220,7 +260,7 @@ class Approval(CommonApprovalMixin):
             if Approval.ASP_ITOU_PREFIX.isdigit():
                 next_number = int(last_itou_approval.number) + 1
             else:
-                # For some environment, the prefix is a string (ie. XXXXX or YYYYY)
+                # For some environment, the prefix is a string (ie. XXXXX or YYYYY).
                 numeric_part = int(last_itou_approval.number.replace(Approval.ASP_ITOU_PREFIX, "")) + 1
                 next_number = Approval.ASP_ITOU_PREFIX + str(numeric_part)
             return str(next_number)
@@ -252,14 +292,187 @@ class Approval(CommonApprovalMixin):
         approval_from_pe.save()
         return approval_from_pe
 
-    @property
-    def can_be_deleted(self):
-        state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
 
-        job_applications = self.jobapplication_set
-        if job_applications.count() != 1:
-            return False
-        return self.jobapplication_set.get().state == state_accepted
+class SuspensionQuerySet(models.QuerySet):
+    @property
+    def in_progress_lookup(self):
+        now = timezone.now().date()
+        return models.Q(start_at__lte=now, end_at__gte=now)
+
+    def in_progress(self):
+        return self.filter(self.in_progress_lookup)
+
+    def not_in_progress(self):
+        return self.exclude(self.in_progress_lookup)
+
+
+class Suspension(models.Model):
+    """
+    A PASS IAE (or approval) issued by Itou can be directly suspended by an SIAE,
+    without intervention of a prescriber or a posteriori control.
+
+    When a suspension is saved/edited/deleted, the end date of its approval is
+    automatically pushed back or forth with a PostgreSQL trigger:
+    `trigger_update_approval_end_at`.
+    """
+
+    # Min duration: none.
+    # Max duration: 6 months (could be adjusted according to user feedback).
+    # 6-months suspensions can be consecutive and there can be any number of them.
+    MAX_DURATION_MONTHS = 6
+
+    class Reason(models.TextChoices):
+        SICKNESS = "SICKNESS", _("Arrêt pour longue maladie")
+        MATERNITY = "MATERNITY", _("Congé de maternité")
+        INCARCERATION = "INCARCERATION", _("Incarcération")
+        TRIAL_OUTSIDE_IAE = (
+            "TRIAL_OUTSIDE_IAE",
+            _("Période d'essai auprès d'un employeur ne relevant pas de l'insertion par l'activité économique"),
+        )
+        DETOXIFICATION = "DETOXIFICATION", _("Période de cure pour désintoxication")
+        FORCE_MAJEURE = (
+            "FORCE_MAJEURE",
+            _(
+                "Raison de force majeure conduisant le salarié à quitter son emploi ou toute autre "
+                "situation faisant l'objet d'un accord entre les acteurs membres du CTA"
+            ),
+        )
+
+    approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    siae = models.ForeignKey(
+        "siaes.Siae", verbose_name=_("SIAE"), null=True, on_delete=models.SET_NULL, related_name="approvals_suspended",
+    )
+    reason = models.CharField(verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.SICKNESS)
+    reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_suspended_set",
+    )
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, verbose_name=_("Mis à jour par"), null=True, blank=True, on_delete=models.SET_NULL,
+    )
+
+    objects = models.Manager.from_queryset(SuspensionQuerySet)()
+
+    class Meta:
+        verbose_name = _("Suspension")
+        verbose_name_plural = _("Suspensions")
+        ordering = ["-start_at"]
+        # Use an exclusion constraint to prevent overlapping date ranges.
+        # This requires the btree_gist extension on PostgreSQL.
+        # See "Tip of the Week" https://postgresweekly.com/issues/289
+        # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
+        constraints = [
+            ExclusionConstraint(
+                name="exclude_overlapping_suspensions",
+                expressions=(
+                    (
+                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=True)),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    ("approval", RangeOperators.EQUAL),
+                ),
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
+
+    def save(self, *args, **kwargs):
+        """
+        The related Approval's end date is automatically pushed back/forth
+        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
+        """
+        if self.pk:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """
+        The related Approval's end date is automatically pushed back
+        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
+        """
+        super().delete(*args, **kwargs)
+
+    def clean(self):
+        super().clean()
+
+        # A suspension cannot be in the future.
+        if self.start_in_future:
+            raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
+
+        # The start of a suspension must be contained in its approval boundaries.
+        if not self.start_in_approval_boundaries:
+            raise ValidationError(
+                {
+                    "start_at": _(
+                        f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                        f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
+        # A suspension cannot exceed max duration.
+        max_end_at = self.get_max_end_at(self.start_at)
+        if self.end_at > max_end_at:
+            raise ValidationError(
+                {
+                    "end_at": _(
+                        f"La durée totale ne peut excéder {self.MAX_DURATION_MONTHS} mois. "
+                        f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
+        # A suspension cannot overlap another one for the same SIAE.
+        # This check is enforced by a constraint at the database level but
+        # still required here to avoid a 500 server error "IntegrityError"
+        # during form validation.
+        if self.get_overlapping_suspensions().exists():
+            overlap = self.get_overlapping_suspensions().first()
+            raise ValidationError(
+                {
+                    "start_at": _(
+                        f"La période chevauche une suspension déjà existante pour ce PASS IAE "
+                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
+    @property
+    def duration(self):
+        return self.end_at - self.start_at
+
+    @property
+    def is_in_progress(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    @property
+    def start_in_future(self):
+        return self.start_at > timezone.now().date()
+
+    @property
+    def start_in_approval_boundaries(self):
+        return self.approval.start_at <= self.start_at <= self.approval.end_at
+
+    def get_overlapping_suspensions(self):
+        args = {
+            "end_at__gte": self.start_at,
+            "start_at__lte": self.end_at,
+            "approval": self.approval,
+        }
+        return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
+
+    @staticmethod
+    def get_max_end_at(start_at):
+        return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):
@@ -328,10 +541,10 @@ class PoleEmploiApproval(CommonApprovalMixin):
     admin command on a regular basis with data shared by Pôle emploi.
 
     If a valid Pôle emploi's approval is found, it's copied in the `Approval`
-    model when it is attached to a JobApplication.
+    at the time of issuance.
     """
 
-    # Matches prescriber_organisation.code_safir_pole_emploi
+    # Matches prescriber_organisation.code_safir_pole_emploi.
     pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
 
     # The normal length of a number is 12 chars.
@@ -348,8 +561,21 @@ class PoleEmploiApproval(CommonApprovalMixin):
         # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
         S = "suspension", _("Suspension")
 
-    # The last two digits refer to the act number (e.g. E02 = second extension).
-    # Suffixes are not taken into account in Itou yet but that might change.
+    # Parts of an Approval number:
+    #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
+    #     - next 2 digits = 2-digit year of delivery
+    #     - next 5 digits = decision number with autonomous increment per PE agency, e.g.: 75631 14 10001
+    #         - decisions are starting with 1
+    #         - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
+    #     - next 3 chars (optional suffix) = status change, e.g.: 75631 14 10001 E01
+    #         - first char = kind of amendment:
+    #             - E for "Extension"
+    #             - S for "Suspension"
+    #             - P for "Prolongation"
+    #             - A for "Interruption"
+    #         - next 2 digits = refer to the act number (e.g. E02 = second extension)
+    # An Approval number is not modifiable, there is a new entry for each new status change.
+    # Suffixes are not taken into account in Itou.
     number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
     pole_emploi_id = models.CharField(_("Identifiant Pôle emploi"), max_length=8)
     first_name = models.CharField(_("Prénom"), max_length=150)
@@ -390,14 +616,34 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
 class ApprovalsWrapper:
     """
-    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models.
+    Wrapper that manipulates both `Approval` and `PoleEmploiApproval` models
+    for a given user.
 
     This should be the only way to access approvals for a given job seeker.
+
+    Pôle emploi is the historical issuing authority for approvals.
+    At the end of 2019, Itou began to issue approvals (called PASS IAE) in
+    parallel.
+    During 2021, Itou should become the new sole issuing authority.
+    But for the time being, 2 systems coexist.
+
+    When a candidate applies for a job, it is necessary to:
+        - check if Itou has already issued a PASS IAE
+        - or check if Pôle emploi has already issued an approval
+
+    Moreover, the status must be checked to be able to block applications
+    in case of waiting period, suspension etc.
+
+    This wrapper encapsulates all this logic for use in views and templates
+    without having to manually search in two different tables.
+
+    (Maybe a Manager would've been a better place for this logic)
     """
 
     # Status codes.
     NONE_FOUND = "NONE_FOUND"
     VALID = "VALID"
+    SUSPENDED = "SUSPENDED"
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
     WAITING_PERIOD_HAS_ELAPSED = "WAITING_PERIOD_HAS_ELAPSED"
 
@@ -425,7 +671,9 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if self.latest_approval.is_valid:
+            if self.latest_approval.is_pass_iae and self.latest_approval.is_suspended:
+                self.status = self.SUSPENDED
+            elif self.latest_approval.is_valid:
                 self.status = self.VALID
             elif self.latest_approval.waiting_period_has_elapsed:
                 self.status = self.WAITING_PERIOD_HAS_ELAPSED
@@ -434,6 +682,7 @@ class ApprovalsWrapper:
 
         # Only one of the following attributes can be True at a time.
         self.has_valid = self.status == self.VALID
+        self.has_suspended = self.status == self.SUSPENDED
         self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):

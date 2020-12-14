@@ -9,10 +9,11 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
@@ -136,6 +137,11 @@ class CommonApprovalMixinTest(TestCase):
         approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
 
+    def test_is_in_progress(self):
+        start_at = datetime.date.today() - relativedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at)
+        self.assertTrue(approval.is_in_progress)
+
     def test_waiting_period(self):
 
         # End is tomorrow.
@@ -175,6 +181,15 @@ class CommonApprovalMixinTest(TestCase):
         self.assertTrue(approval.originates_from_itou)
         approval = PoleEmploiApprovalFactory(number="625741810182")
         self.assertFalse(approval.originates_from_itou)
+
+    def test_is_pass_iae(self):
+        # PoleEmploiApproval.
+        user = JobSeekerFactory()
+        approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        self.assertFalse(approval.is_pass_iae)
+        # Approval.
+        approval = ApprovalFactory(user=user)
+        self.assertTrue(approval.is_pass_iae)
 
     def overlaps_covid_lockdown(self):
 
@@ -300,6 +315,17 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(number="999990000001")
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
+
+    def test_can_be_suspended_by_siae(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user)
+        job_app = JobApplicationWithApprovalFactory(
+            job_seeker=user, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        siae = job_app.to_siae
+        self.assertTrue(approval.can_be_suspended_by_siae(siae))
+        siae2 = SiaeFactory()
+        self.assertFalse(approval.can_be_suspended_by_siae(siae2))
 
     def test_get_or_create_from_valid(self):
 
@@ -484,15 +510,28 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
+        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, None)
+
+    def test_status_with_suspended_approval(self):
+        user = JobSeekerFactory()
+        approval = ApprovalFactory(user=user)
+        SuspensionFactory(approval=approval)
+        approvals_wrapper = ApprovalsWrapper(user)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.SUSPENDED)
+        self.assertTrue(approvals_wrapper.has_suspended)
+        self.assertFalse(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.has_in_waiting_period)
+        self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user, start_at=datetime.date.today() - relativedelta(days=1))
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
+        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
@@ -504,6 +543,7 @@ class ApprovalsWrapperTest(TestCase):
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
+        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertTrue(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
@@ -515,6 +555,7 @@ class ApprovalsWrapperTest(TestCase):
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED)
+        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
@@ -524,8 +565,9 @@ class ApprovalsWrapperTest(TestCase):
         approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
-        self.assertFalse(approvals_wrapper.has_in_waiting_period)
+        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertTrue(approvals_wrapper.has_valid)
+        self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 
@@ -597,3 +639,171 @@ class CustomAdminViewsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn(approval.number_with_spaces, email.body)
+
+
+class SuspensionQuerySetTest(TestCase):
+    """
+    Test SuspensionQuerySet.
+    """
+
+    def test_in_progress(self):
+        # In progress: started today.
+        start_at = datetime.date.today()
+        expected_num = 5
+        SuspensionFactory.create_batch(expected_num, start_at=start_at)
+        self.assertEqual(expected_num, Suspension.objects.in_progress().count())
+
+    def test_not_in_progress(self):
+        # Create "in progress" suspensions because Factory.create_batch() with
+        # a `start_at` in the past will trigger Suspension.save(), then
+        # Suspension.clean() and fail the validation.
+        start_at = datetime.date.today()
+        expected_num = 3
+        SuspensionFactory.create_batch(expected_num, start_at=start_at)
+        # Then make suspensions go back in time using a batch update() that
+        # won't trigger Suspension.save() nor Suspension.clean().
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = Suspension.get_max_end_at(start_at)
+        Suspension.objects.all().update(start_at=start_at, end_at=end_at)
+        self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
+
+
+class SuspensionModelTest(TestCase):
+    """
+    Test Suspension model.
+    """
+
+    def test_duration(self):
+        expected_duration = datetime.timedelta(days=2)
+        start_at = datetime.date.today()
+        end_at = start_at + expected_duration
+        suspension = SuspensionFactory(start_at=start_at, end_at=end_at)
+        self.assertEqual(suspension.duration, expected_duration)
+
+    def test_start_in_future(self):
+        start_at = datetime.date.today() + relativedelta(days=10)
+        # Build provides a local object without saving it to the database.
+        suspension = SuspensionFactory.build(start_at=start_at)
+        self.assertTrue(suspension.start_in_future)
+
+    def test_start_in_approval_boundaries(self):
+        start_at = datetime.date.today()
+        end_at = start_at + relativedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        # Build provides a local object without saving it to the database.
+        suspension = SuspensionFactory.build(approval=approval, start_at=start_at)
+
+        # Equal to lower boundary.
+        self.assertTrue(suspension.start_in_approval_boundaries)
+
+        # In boundaries.
+        suspension.start_at = approval.start_at + relativedelta(days=5)
+        self.assertTrue(suspension.start_in_approval_boundaries)
+
+        # Equal to upper boundary.
+        suspension.start_at = approval.end_at
+        self.assertTrue(suspension.start_in_approval_boundaries)
+
+        # Before lower boundary.
+        suspension.start_at = approval.start_at - relativedelta(days=1)
+        self.assertFalse(suspension.start_in_approval_boundaries)
+
+        # After upper boundary.
+        suspension.start_at = approval.end_at + relativedelta(days=1)
+        self.assertFalse(suspension.start_in_approval_boundaries)
+
+    def test_is_in_progress(self):
+        start_at = datetime.date.today() - relativedelta(days=10)
+        # Build provides a local object without saving it to the database.
+        suspension = SuspensionFactory.build(start_at=start_at)
+        self.assertTrue(suspension.is_in_progress)
+
+    def test_get_overlapping_suspensions(self):
+        start_at = datetime.date.today() - relativedelta(days=10)
+        approval = ApprovalFactory(start_at=start_at)
+        suspension1 = SuspensionFactory(approval=approval, start_at=start_at)
+
+        # Start same day as suspension1.
+        # Build provides a local object without saving it to the database.
+        suspension2 = SuspensionFactory.build(approval=approval, siae=suspension1.siae, start_at=start_at)
+        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
+
+        # Start at suspension1.end_at.
+        suspension2.start_at = suspension1.end_at
+        suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
+        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
+
+        # Cover suspension1.
+        suspension2.start_at = suspension1.start_at - relativedelta(days=1)
+        suspension2.end_at = suspension1.end_at + relativedelta(days=1)
+        self.assertTrue(suspension2.get_overlapping_suspensions().exists())
+
+        # End before suspension1.
+        suspension2.start_at = suspension1.start_at - relativedelta(years=2)
+        suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
+        self.assertFalse(suspension2.get_overlapping_suspensions().exists())
+
+    def test_save(self):
+        """
+        Test `trigger_update_approval_end_at` with SQL INSERT.
+        An approval's `end_at` is automatically pushed forward when it's suspended.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        suspension = SuspensionFactory(approval=approval, start_at=start_at)
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + suspension.duration)
+
+    def test_delete(self):
+        """
+        Test `trigger_update_approval_end_at` with SQL DELETE.
+        An approval's `end_at` is automatically pushed back when it's suspended.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        suspension = SuspensionFactory(approval=approval, start_at=start_at)
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + suspension.duration)
+
+        suspension.delete()
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
+    def test_save_and_edit(self):
+        """
+        Test `trigger_update_approval_end_at` with SQL UPDATE.
+        An approval's `end_at` is automatically pushed back and forth when
+        one of its suspension is saved, then edited to be shorter.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        # New suspension.
+        suspension = SuspensionFactory(approval=approval, start_at=start_at)
+        suspension_duration_1 = suspension.duration
+        approval.refresh_from_db()
+        approval_duration_2 = approval.duration
+
+        # Edit suspension to be shorter.
+        suspension.end_at -= relativedelta(months=2)
+        suspension.save()
+        suspension_duration_2 = suspension.duration
+        approval.refresh_from_db()
+        approval_duration_3 = approval.duration
+
+        # Check suspension duration.
+        self.assertNotEqual(suspension_duration_1, suspension_duration_2)
+        # Check approval duration.
+        self.assertNotEqual(initial_duration, approval_duration_2)
+        self.assertNotEqual(approval_duration_2, approval_duration_3)
+        self.assertEqual(approval_duration_3, initial_duration + suspension_duration_2)

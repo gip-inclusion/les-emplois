@@ -112,17 +112,7 @@ def check_convention_data_consistency(dry_run):
 
         # Additional data consistency checks.
         for siae in convention.siaes.all():
-            if siae.kind != convention.kind:
-                # ONE TIME FIX - can be removed later.
-                assert siae.source == Siae.SOURCE_USER_CREATED
-                print(
-                    f"convention.id={convention.id} kind mismatch: "
-                    f"convention={convention.kind} vs siae={siae.kind} (will be fixed)"
-                )
-                if not dry_run:
-                    siae.convention = None
-                    siae.save()
-                # end of ONE TIME FIX
+            assert siae.kind == convention.kind
             assert siae.siren == convention.siren_signature
 
     user_created_siaes_without_convention = Siae.objects.filter(
