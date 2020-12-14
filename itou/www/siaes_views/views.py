@@ -130,7 +130,8 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
             prefix_to_af[prefix] = af
             continue
 
-    financial_annexes = prefix_to_af.values()
+    financial_annexes = list(prefix_to_af.values())
+    financial_annexes.sort(key=lambda af: af.number, reverse=True)
 
     context = {
         "siae": current_siae,
@@ -153,8 +154,10 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
         raise PermissionDenied
 
     # We only allow the user to select an AF under the same SIREN as the current siae.
-    financial_annexes = SiaeFinancialAnnex.objects.select_related("convention").filter(
-        convention__kind=current_siae.kind, convention__siret_signature__startswith=current_siae.siren
+    financial_annexes = (
+        SiaeFinancialAnnex.objects.select_related("convention")
+        .filter(convention__kind=current_siae.kind, convention__siret_signature__startswith=current_siae.siren)
+        .order_by("-number")
     )
 
     select_form = FinancialAnnexSelectForm(data=request.POST or None, financial_annexes=financial_annexes)
