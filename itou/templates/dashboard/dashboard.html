@@ -36,9 +36,8 @@
                 <a href="{% url 'siaes_views:show_financial_annexes' %}">{% translate "en sélectionnant une annexe financière valide" %}</a>.
             {% else %}
                 {% with current_siae.active_admin_members.first as admin %}
-                    {# For security, display only the first char of the last name. #}
-                    {% blocktranslate with first_name=admin.first_name|title last_name_first_char=admin.last_name|slice:1 %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ first_name }} {{ last_name_first_char }}) pour qu'il ou elle régularise la situation de votre structure.
+                    {% blocktranslate with first_name=admin.first_name|title last_name=admin.last_name|title %}
+                        Veuillez contacter un de vos administrateurs (par exemple {{ first_name }} {{ last_name }}) pour qu'il ou elle régularise la situation de votre structure.
                     {% endblocktranslate %}
                 {% endwith %}
             {% endif %}
