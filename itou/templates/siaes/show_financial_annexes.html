@@ -37,6 +37,8 @@
         <thead>
             <tr>
                 <th scope="col">{% translate "Numéro d'annexe financière" %}</th>
+                <th scope="col">{% translate "Date de début d'effet" %}</th>
+                <th scope="col">{% translate "Date de fin d'effet" %}</th>
                 <th scope="col">{% translate "Validité à ce jour" %}</th>
             </tr>
         </thead>
@@ -45,6 +47,8 @@
                 {% for financial_annex in financial_annexes %}
                     <tr>
                         <td>{{ financial_annex.number }}</td>
+                        <td>{{ financial_annex.start_at|date:"d/m/Y" }}</td>
+                        <td>{{ financial_annex.end_at|date:"d/m/Y" }}</td>
                         {% if financial_annex.is_active %}
                             <td><span class="badge badge-success">Valide</span></td>
                         {% else %}
