@@ -42,14 +42,28 @@
 # ```
 # -----------------------------------------------------------------
 
-echo "Loading cities"
-PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD psql -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER -d $DEMO_APP_DB_NAME -f $APP_HOME/itou/fixtures/postgres/cities.sql
+# Delete everything
+django-admin flush
 
-# `ls $APP_HOME` does not work as the current user
-# does not have execution rights on the $APP_HOME directory.
-echo "Loading fixtures"
-ls -d $APP_HOME/itou/fixtures/django/* | xargs django-admin loaddata
+# Restore cities
+# First, delete all references to an "itou" role from the SQL dump.
+# Then, load data
+# /!\ The database is not the standard one! Use the $DEMO_APP_DB_NAME variable.
+cat itou/fixtures/postgres/cities.sql | awk '!/itou/' | psql -d $DEMO_APP_DB_NAME -h $POSTGRESQL_ADDON_DIRECT_HOST -p $POSTGRESQL_ADDON_DIRECT_PORT -U $POSTGRESQL_ADDON_USER
 
+# Now load fixtures while taking a break. 
+# It can last a few minutes without any sign of life coming from the shell, just wait.
+ls -d itou/fixtures/django/* | xargs django-admin loaddata
+
+# Import administrative criteria
+# As data have been deleted after running migrations,
+# administrative criteria are no longer in the database
+# whereas the migration generating them has been completed.
+# Go back to the initial migration and run them another time.
+django-admin migrate eligibility 0001_initial
+django-admin migrate eligibility
+
+# Change admin password
 echo "Updating super admin password"
 django-admin shell <<EOF
 import os
