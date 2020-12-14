@@ -13,7 +13,6 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.timesince import timeuntil
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
