@@ -44,15 +44,6 @@
             {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
                 Valide du {{ start }} au {{ end }}
             {% endblocktranslate %}
-            {% with approval.time_until_waiting_period as still %}
-                {% if still == "0" %}
-                    {% translate "(expire aujourd'hui)" %}
-                {% elif still == "in_future" %}
-                    {% translate "(dans le futur)" %}
-                {% else %}
-                    {% blocktranslate %}(encore {{ still }}){% endblocktranslate %}
-                {% endif %}
-            {% endwith %}
         </li>
 
         {# Suspensions history. #}

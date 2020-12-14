@@ -94,23 +94,6 @@ class CommonApprovalMixin(models.Model):
         starts_after_lockdown = self.start_at > self.LOCKDOWN_END_AT
         return not (ends_before_lockdown or starts_after_lockdown)
 
-    @property
-    def time_until_waiting_period(self):
-        """
-        Helper primarily used within templates whose sole purpose is to catch
-        and display a custom message for the localized "0 minutes" otherwise
-        returned by the built-in `timeuntil` template filter:
-        https://docs.djangoproject.com/en/dev/ref/templates/builtins/#timeuntil
-        """
-        if not self.is_valid:
-            return "0"
-        now = timezone.now().date()
-        if self.start_at > now:
-            return "in_future"
-        if self.end_at == now:
-            return "0"
-        return timeuntil(self.end_at, now)
-
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
