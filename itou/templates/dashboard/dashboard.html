@@ -244,6 +244,7 @@
                             <a href="{% url 'siaes_views:show_financial_annexes' %}">
                                 {% translate "Gérer mes annexes financières" %}
                             </a>
+                            <span class="badge badge-info">{% translate "Nouveau" %}</span>
                             {% if not current_siae.is_active %}
                                 <span class="badge badge-danger">
                                     {% translate "Action requise" %}
