@@ -51,12 +51,11 @@
             {% if suspensions %}{% translate "Suspendu :" %}{% endif %}
             <ul>
                 {% for s in suspensions %}
-                    <li{% if s.is_in_progress %} class="text-warning"{% endif %}>
+                    <li{% if s.is_in_progress %} class="font-weight-bold"{% endif %}>
                         {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
                             du {{ start }} au {{ end }}
                         {% endblocktranslate %}
                         <small>({{ s.get_reason_display }})</small>
-                        {% if s.is_in_progress %}<b>{% translate "En cours" %}</b>{% endif %}
                     </li>
                 {% endfor %}
             </ul>
