@@ -98,7 +98,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name": "Suspension", "verbose_name_plural": "Suspensions", "ordering": ["-start_at"],},
+            options={"verbose_name": "Suspension", "verbose_name_plural": "Suspensions", "ordering": ["-start_at"]},
         ),
         migrations.AddConstraint(
             model_name="suspension",
