@@ -70,7 +70,8 @@ def could_siae_be_deleted(siae):
 
 
 def geocode_siae(siae):
-    assert siae.geocoding_address
+    if siae.geocoding_address is None:
+        return siae
 
     geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
 
