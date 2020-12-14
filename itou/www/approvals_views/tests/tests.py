@@ -157,12 +157,3 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertRedirects(response, back_url)
 
         self.assertEqual(1, approval.suspension_set.count())
-
-        suspension = approval.suspension_set.first()
-        self.assertEqual(suspension.approval, approval)
-        self.assertEqual(suspension.start_at, start_at)
-        self.assertEqual(suspension.end_at, end_at)
-        self.assertEqual(suspension.siae, job_application.to_siae)
-        self.assertEqual(suspension.reason, post_data["reason"])
-        self.assertEqual(suspension.reason_explanation, post_data["reason_explanation"])
-        self.assertEqual(suspension.created_by, siae_user)

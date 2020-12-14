@@ -108,9 +108,14 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            suspension = form.save(commit=False)
-            suspension.created_by = request.user
-            suspension.save()
+            approval.suspend(
+                start_at=form.cleaned_data["start_at"],
+                end_at=form.cleaned_data["end_at"],
+                siae=form.cleaned_data["siae"],
+                reason=form.cleaned_data["reason"],
+                reason_explanation=form.cleaned_data["reason_explanation"],
+                created_by=request.user,
+            )
             messages.success(request, _("Suspension effectuée."))
             return HttpResponseRedirect(back_url)
 

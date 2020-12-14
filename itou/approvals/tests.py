@@ -313,11 +313,7 @@ class ApprovalModelTest(TestCase):
         self.assertEqual(approval.number_with_spaces, expected)
 
     def test_can_be_suspended_by_siae(self):
-        user = JobSeekerFactory()
-        approval = ApprovalFactory(user=user)
         job_application = JobApplicationWithApprovalFactory(
-            job_seeker=user,
-            approval=approval,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=datetime.date.today()
@@ -326,9 +322,53 @@ class ApprovalModelTest(TestCase):
         )
         self.assertFalse(job_application.can_be_cancelled)
         siae = job_application.to_siae
-        self.assertTrue(approval.can_be_suspended_by_siae(siae))
+        self.assertTrue(job_application.approval.can_be_suspended_by_siae(siae))
         siae2 = SiaeFactory()
-        self.assertFalse(approval.can_be_suspended_by_siae(siae2))
+        self.assertFalse(job_application.approval.can_be_suspended_by_siae(siae2))
+
+    def test_suspend(self):
+
+        today = datetime.date.today()
+
+        # Create a job application with an approval.
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=today
+            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+            - relativedelta(days=1),
+        )
+
+        # Prepare suspension data.
+        approval = job_application.approval
+        data = {
+            "start_at": today,
+            "end_at": today + relativedelta(months=3),
+            "siae": job_application.to_siae,
+            "reason": Suspension.Reason.MATERNITY,
+            "reason_explanation": "",
+            "created_by": job_application.to_siae.members.first(),
+        }
+
+        # Suspend approval.
+        suspension = approval.suspend(
+            start_at=data["start_at"],
+            end_at=data["end_at"],
+            siae=data["siae"],
+            reason=data["reason"],
+            reason_explanation=data["reason_explanation"],
+            created_by=data["created_by"],
+        )
+
+        # Check suspension data.
+        suspension = approval.suspension_set.first()
+        self.assertEqual(suspension.approval, approval)
+        self.assertEqual(suspension.start_at, data["start_at"])
+        self.assertEqual(suspension.end_at, data["end_at"])
+        self.assertEqual(suspension.siae, data["siae"])
+        self.assertEqual(suspension.reason, data["reason"])
+        self.assertEqual(suspension.reason_explanation, data["reason_explanation"])
+        self.assertEqual(suspension.created_by, data["created_by"])
 
     def test_get_or_create_from_valid(self):
 

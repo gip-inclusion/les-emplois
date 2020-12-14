@@ -277,6 +277,24 @@ class Approval(CommonApprovalMixin):
             and not self.user_last_accepted_job_application.can_be_cancelled
         )
 
+    def suspend(self, start_at, end_at, siae, reason, reason_explanation, created_by):
+        """
+        Suspend current Approval.
+        """
+        if not self.can_be_suspended_by_siae(siae):
+            raise RuntimeError(_("Approval cannot be suspended by this SIAE."))
+        suspension = Suspension(
+            approval=self,
+            start_at=start_at,
+            end_at=end_at,
+            siae=siae,
+            reason=reason,
+            reason_explanation=reason_explanation,
+            created_by=created_by,
+        )
+        suspension.save()
+        return suspension
+
     @staticmethod
     def get_next_number(hiring_start_at=None):
         """
