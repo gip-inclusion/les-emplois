@@ -1,14 +1,15 @@
 """
 
-Siae object logic used by the import_siae.py script is gathered here.
+SIAE object logic used by the import_siae.py script is gathered here.
+
+All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 """
+from itou.siaes.management.commands._import_siae.utils import geocode_siae
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
 from itou.siaes.management.commands._import_siae.vue_structure import SIRET_TO_ASP_ID
 from itou.siaes.models import Siae
 from itou.utils.address.departments import department_from_postcode
-from itou.utils.address.models import AddressMixin
-from itou.utils.apis.geocoding import get_geocoding_data
 
 
 def does_siae_have_an_active_convention(siae):
@@ -21,33 +22,12 @@ def should_siae_be_created(siae):
     return does_siae_have_an_active_convention(siae)
 
 
-def could_siae_be_deleted(siae):
-    return siae.members.count() == 0 and siae.job_applications_received.count() == 0
-
-
-def geocode_siae(siae):
-    assert siae.geocoding_address
-
-    geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
-
-    if geocoding_data:
-        siae.geocoding_score = geocoding_data["score"]
-        # If the score is greater than API_BAN_RELIABLE_MIN_SCORE, coords are reliable:
-        # use data returned by the BAN API because it's better written using accents etc.
-        # while the source data is in all caps etc.
-        # Otherwise keep the old address (which is probably wrong or incomplete).
-        if siae.geocoding_score >= AddressMixin.API_BAN_RELIABLE_MIN_SCORE:
-            siae.address_line_1 = geocoding_data["address_line_1"]
-        # City is always good due to `postcode` passed in query.
-        # ST MAURICE DE REMENS => Saint-Maurice-de-Rémens
-        siae.city = geocoding_data["city"]
-
-        siae.coords = geocoding_data["coords"]
-
-    return siae
-
-
 def build_siae(row, kind):
+    """
+    Build a siae object from a dataframe row.
+
+    Only for SIAE, not for GEIQ nor EA nor EATT.
+    """
     siae = Siae()
     siae.siret = row.siret
     siae.kind = kind

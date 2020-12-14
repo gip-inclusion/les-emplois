@@ -126,12 +126,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     SOURCE_ASP = "ASP"
     SOURCE_GEIQ = "GEIQ"
+    SOURCE_EA_EATT = "EA_EATT"
     SOURCE_USER_CREATED = "USER_CREATED"
     SOURCE_STAFF_CREATED = "STAFF_CREATED"
 
     SOURCE_CHOICES = (
         (SOURCE_ASP, _("Export ASP")),
         (SOURCE_GEIQ, _("Export GEIQ")),
+        (SOURCE_EA_EATT, _("Export EA+EATT")),
         (SOURCE_USER_CREATED, _("Utilisateur (Antenne)")),
         (SOURCE_STAFF_CREATED, _("Staff Itou")),
     )

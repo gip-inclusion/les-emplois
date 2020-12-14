@@ -19,68 +19,101 @@ from itou.utils.validators import validate_siret
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-GEIQ_DATASET_FILENAME = f"{CURRENT_DIR}/data/Geiq_-_liste_02-10-2020.xls"
+EA_EATT_DATASET_FILENAME = f"{CURRENT_DIR}/data/Liste_Contact_EA_20201207.xlsx"
+
+
+def convert_kind(raw_kind):
+    if raw_kind == "Entreprise adaptee":
+        return Siae.KIND_EA
+    elif raw_kind == "EA Travail Temporaire":
+        return Siae.KIND_EATT
+    raise ValueError("Unexpected raw_kind")
 
 
 @timeit
-def get_geiq_df(filename=GEIQ_DATASET_FILENAME):
-    df = pd.read_excel(filename, converters={"siret": str, "zip": str})
+def get_ea_eatt_df(filename=EA_EATT_DATASET_FILENAME):
+    df = pd.read_excel(filename, converters={"SIRET": str, "CODE_POST": str})
 
     column_mapping = {
-        "Geiq": "name",
-        "street": "address_line_1",
-        "street2": "address_line_2",
-        "zip": "post_code",
-        "city": "city",
-        "siret": "siret",
-        "email": "auth_email",
+        "RAISON_SCLE": "name",
+        "TYPE_EA": "kind",
+        "NUM_ENTREE": "address_part1",
+        "NUM_VOIE": "address_part2",
+        "CODE_VOIE": "address_part3",
+        "LIB_VOIE": "address_part4",
+        "CODE_POST": "post_code",
+        "LIB_COM": "city",
+        "SIRET": "siret",
+        "CRL_CONT": "auth_email",
+        "TEL_CONT": "phone",
     }
     df = remap_columns(df, column_mapping=column_mapping)
 
     # Replace NaN elements with None.
     df = df.replace({np.nan: None})
 
-    # Clean string fields.
-    df["name"] = df.name.apply(clean_string)
-    df["address_line_1"] = df.address_line_1.apply(clean_string)
-    df["address_line_2"] = df.address_line_2.apply(clean_string)
-    df["post_code"] = df.post_code.apply(clean_string)
-    df["city"] = df.city.apply(clean_string)
-    df["siret"] = df.siret.apply(clean_string)
-    df["auth_email"] = df.auth_email.apply(clean_string)
-
-    # "GEIQ PROVENCE" becomes "Geiq Provence".
-    df["name"] = df.name.apply(str.title)
-
-    df["department"] = df.post_code.apply(department_from_postcode)
+    df["kind"] = df.kind.apply(convert_kind)
 
     # Drop rows without siret.
     df = df[~df.siret.isnull()]
 
-    # Drop rows without auth_email.
-    df = df[~df.auth_email.isnull()]
+    df["address_line_1"] = ""
 
     for _, row in df.iterrows():
         validate_siret(row.siret)
+        address_line_1 = ""
+        if row.address_part1:
+            address_line_1 += row.address_part1
+        if row.address_part2:
+            address_line_1 += f" {int(row.address_part2)}"
+        if row.address_part3:
+            address_line_1 += f" {row.address_part3}"
+        if row.address_part4:
+            address_line_1 += f" {row.address_part4}"
+        row["address_line_1"] = address_line_1
+
+    # Clean string fields.
+    df["name"] = df.name.apply(clean_string)
+    df["kind"] = df.kind.apply(clean_string)
+    df["address_line_1"] = df.address_line_1.apply(clean_string)
+    df["post_code"] = df.post_code.apply(clean_string)
+    df["city"] = df.city.apply(clean_string)
+    df["siret"] = df.siret.apply(clean_string)
+    df["auth_email"] = df.auth_email.apply(clean_string)
+    df["phone"] = df.phone.apply(clean_string)
+
+    # "EA LOU JAS" becomes "Ea Lou Jas".
+    df["name"] = df.name.apply(str.title)
+
+    df["department"] = df.post_code.apply(department_from_postcode)
+
+    # Drop rows without auth_email.
+    df = df[~df.auth_email.isnull()]
 
     assert df.siret.is_unique
 
     return df
 
 
-def build_geiq(row):
+def build_ea_eatt(row):
     siae = Siae()
     siae.siret = row.siret
-    siae.kind = Siae.KIND_GEIQ
-    siae.source = Siae.SOURCE_GEIQ
+    siae.kind = row.kind
+    siae.source = Siae.SOURCE_EA_EATT
+
     siae.name = row["name"]  # row.name returns row index.
     assert not siae.name.isnumeric()
+
     siae.email = ""  # Do not make the authentification email public!
     siae.auth_email = row.auth_email
+
+    siae.phone = row.phone.replace(" ", "").replace(".", "") if row.phone else ""
+    phone_is_valid = siae.phone and len(siae.phone) == 10
+    if not phone_is_valid:
+        siae.phone = ""  # siae.phone cannot be null in db
+
     siae.address_line_1 = row.address_line_1
     siae.address_line_2 = ""
-    if row.address_line_2:
-        siae.address_line_2 = row.address_line_2
     siae.post_code = row.post_code
     siae.city = row.city
     siae.department = row.department
@@ -92,20 +125,21 @@ def build_geiq(row):
 
 class Command(BaseCommand):
     """
-    Import GEIQs data into the database.
+    Import EA and EATT data into the database.
     This command is meant to be used before any fixture is available.
 
-    GEIQ = "Groupement d'Employeurs pour l'Insertion et la Qualification".
+    EA = "Entreprise adaptée".
+    EATT = "Entreprise adaptée de travail temporaire".
 
     To debug:
-        django-admin import_geiq --dry-run
-        django-admin import_geiq --dry-run --verbosity=2
+        django-admin import_ea_eatt --dry-run
+        django-admin import_ea_eatt --dry-run --verbosity=2
 
     To populate the database:
-        django-admin import_geiq
+        django-admin import_ea_eatt
     """
 
-    help = "Import the content of the GEIQ csv file into the database."
+    help = "Import the content of the EA+EATT csv file into the database."
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
@@ -132,8 +166,14 @@ class Command(BaseCommand):
 
         self.set_logger(options.get("verbosity"))
 
-        geiq_df = get_geiq_df()
-        sync_structures(df=geiq_df, name="GEIQ", kinds=[Siae.KIND_GEIQ], build_structure=build_geiq, dry_run=dry_run)
+        ea_eatt_df = get_ea_eatt_df()
+        sync_structures(
+            df=ea_eatt_df,
+            name="EA and EATT",
+            kinds=[Siae.KIND_EA, Siae.KIND_EATT],
+            build_structure=build_ea_eatt,
+            dry_run=dry_run,
+        )
 
         self.log("-" * 80)
         self.log("Done.")
