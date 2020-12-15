@@ -227,6 +227,20 @@ class ASPFormatAddress:
     # These are the extensions defined in ASP ref file: ref_extension_voie_v1.csv
     street_extensions = {"bis": "B", "ter": "T", "quater": "Q", "quinqies": "C"}
 
+    revert = {strip_accents(lt.value.lower()): lt.name for lt in LaneType}
+
+    lane_type_keys = [k.name.lower() for k in LaneType]
+
+    # Sometimes the geo API does not give a correct lane type
+    # Here are some common aliases
+    lane_type_aliases = {
+        "r": LaneType.RUE,
+        "grand rue": LaneType.RUE,
+        "grande rue": LaneType.RUE,
+        "grand'rue": LaneType.RUE,
+        "voies": LaneType.VOIE,
+    }
+
     @classmethod
     def from_address(cls, obj, update_coords=False):
         if type(obj) not in [Siae, PrescriberOrganization, User]:
@@ -271,13 +285,16 @@ class ASPFormatAddress:
             lane = strip_accents(lane)
             result["lane"] = lane
 
-        lane_type, _ = lane.split(maxsplit=1)
+        # Lane type processing
+        lane_type = lane.split(maxsplit=1)[0]
         lane_type = lane_type.lower()
 
-        revert = {strip_accents(lt.value.lower()): lt.name for lt in LaneType}
-
-        if revert.get(lane_type):
-            result["lane_type"] = revert.get(lane_type)
+        if cls.revert.get(lane_type):
+            result["lane_type"] = cls.revert.get(lane_type)
+        elif cls.lane_type_aliases.get(lane_type):
+            result["lane_type"] = cls.lane_type_aliases.get(lane_type).name
+        elif lane_type in cls.lane_type_keys:
+            result["lane_type"] = lane_type.upper()
         else:
             return None, f"Can't find lane type: {lane_type}"
 
