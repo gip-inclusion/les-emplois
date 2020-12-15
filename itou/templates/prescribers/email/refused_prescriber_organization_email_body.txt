@@ -3,16 +3,20 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Nous sommes désolés, nous n'avons pas pu vérifier l'habilitation de votre organisation. Nous vous recontacterons au plus vite afin d'obtenir les renseignements qui nous manquent. Si toutefois nous tardons à revenir vers vous, n'hésitez pas à relancer notre équipe Support à l'adresse "%}{{ itou_email_contact }}
+{% blocktranslate %}Bonjour,
 
-{% translate "Merci de recontacter l'équipe support." %}
+Nous n'avons pas pu vérifier l'habilitation de votre structure, par conséquent nous vous avons attribué le statut d'orienteur. Vous pourrez envoyer des candidatures aux employeurs solidaires sans valider l'éligibilité IAE des candidats, c'est l'employeur qui se chargera de valider cette éligibilité sur la base de critères administratifs, et donc qui en portera la responsabilité juridique.
 
-{% translate "*Structure* :" %}
+Si vous êtes bien un prescripteur habilité, nous avons besoin d'une preuve de votre habilitation.
 
-- {% translate "Nom" %} : {{ organization.display_name }}
-- {% translate "SIRET" %} : {{ organization.siret }}
-- {% translate "Type" %} : {{ organization.kind }}
+- Si vous êtes une organisation habilitée par le préfet : Merci de nous communiquer par retour de mail l'arrêté préfectoral portant mention de votre habilitation à valider l'éligibilité IAE des candidats. Pensez à nous communiquer l'ID de votre organisation (ce numéro est affiché dans votre tableau de bord)
 
-{% translate "Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus." %}
+- Si votre organisation appartient à la liste des organisations habilitées au national (https://doc.inclusion.beta.gouv.fr/pourquoi-une-plateforme-de-linclusion/qui-sont-les-differents-prescripteurs/prescripteur-habilite#liste-des-prescripteurs-habilites-en-national) : merci de nous communiquer par retour de mail le type de structure et l'ID de votre organisation (ce numéro est affiché dans votre tableau de bord)
+
+- Si vous êtes une organisation conventionnée par un Conseil départemental pour le suivi des BRSA : Vous devez demander au Conseil départemental de nous adresser un mail à {{ itou_email_assistance }} afin de nous confirmer votre conventionnement (Nous n'acceptons pas les transferts de mail). Communiquez à cette personne l'ID de votre structure en lui demandant de le mentionner dans l'e-mail attestant de votre habilitation pour que nous fassions le rapprochement.
+
+- Si vous êtes une organisation conventionnée par un PLIE : Vous devez demander à l'organisme gestionnaire du PLIE de nous adresser un mail à {{ itou_email_assistance }} afin de nous confirmer votre conventionnement (Nous n'acceptons pas les transferts de mail)
+
+Nous restons à votre disposition pour tout renseignement complémentaire.{% endblocktranslate %}
 
 {% endblock body %}
