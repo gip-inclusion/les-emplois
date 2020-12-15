@@ -3,7 +3,7 @@ set -e
 
 if [ -z "$PGURI" ]
 then
-      echo "No URI specified. Using standard Postgresql environment variables."
+  echo "No URI specified. Using standard PostgreSQL environment variables."
 fi
 
 # Creating a spatial database

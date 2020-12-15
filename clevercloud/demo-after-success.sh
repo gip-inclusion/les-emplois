@@ -21,26 +21,9 @@
 # By default, it copies the standard system database named template1.
 # cf https://www.postgresql.org/docs/current/manage-ag-templatedbs.html
 
-# /!\ That is why the following instructions were added manually to the
-# configured addon.
-# If you update docker/dev/postgres/psql_init.sh, make sure to
-# reflect it on Clever Cloud.
-
-# ```
-#   \c template1;
-
-#   CREATE EXTENSION IF NOT EXISTS btree_gist;
-#   CREATE EXTENSION IF NOT EXISTS citext;
-#   CREATE EXTENSION IF NOT EXISTS pg_trgm;
-#   CREATE EXTENSION IF NOT EXISTS postgis;
-#   CREATE EXTENSION IF NOT EXISTS unaccent;
-
-#   DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
-#   CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
-#   ALTER TEXT SEARCH CONFIGURATION french_unaccent
-#   ALTER MAPPING FOR hword, hword_part, word
-#   WITH unaccent, french_stem;
-# ```
+# To add a new extension, add it to docker/dev/postgres/psql_extensions.sh
+# and execute the script manually:
+# $ PGURI=$URI_TO_PG bash docker/dev/postgres/psql_extensions.sh
 # -----------------------------------------------------------------
 
 echo "Loading cities"
