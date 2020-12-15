@@ -92,7 +92,7 @@ class INSEECountry(models.Model):
 
     COUNTRY_GROUP_CHOICES = (
         (COUNTRY_GROUP_FRANCE, _("France")),
-        (COUNTRY_GROUP_CEE, _("CEE"), (COUNTRY_GROUP_NOT_CEE, _("Hors CEE"))),
+        (COUNTRY_GROUP_CEE, _("CEE")), (COUNTRY_GROUP_NOT_CEE, _("Hors CEE")),
     )
 
     code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
@@ -394,10 +394,10 @@ class EmployeeRecord(models.Model):
     # - personnePhysique.codeComInsee.codeDpt
     employee = models.ForeignKey(User, verbose_name=_("Employé"), on_delete=models.CASCADE)
     educational_leval = models.ForeignKey(
-        EducationalLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL
+        EducationalLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL, null=True,
     )
-    birth_place = models.ForeignKey(INSEECommune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL)
-    birth_country = models.ForeignKey(INSEECountry, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL)
+    birth_place = models.ForeignKey(INSEECommune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL, null=True,)
+    birth_country = models.ForeignKey(INSEECountry, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL, null=True,)
 
     # birth_place = models.ForeignKey(INSEECode, verbose_name=_("Lieu de naissance"))
 
