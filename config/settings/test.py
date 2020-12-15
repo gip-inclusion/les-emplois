@@ -11,8 +11,6 @@ API_BAN_BASE_URL = None
 API_ENTREPRISE_BASE_URL = None
 API_ESD_KEY = None
 API_ESD_SECRET = None
-API_INSEE_KEY = None
-API_INSEE_SECRET = None
 
 # Disable logging and traceback in unit tests for readability.
 # https://docs.python.org/3/library/logging.html#logging.disable
