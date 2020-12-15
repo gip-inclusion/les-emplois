@@ -1,3 +1,4 @@
+import unicodedata
 from enum import Enum
 
 from django.db import models
@@ -12,8 +13,6 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import User
 from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
 from itou.utils.validators import validate_siret
-
-import unicodedata
 
 
 # INSEE codes
@@ -206,8 +205,8 @@ class LaneType(Enum):
 
 
 def strip_accents(s):
-    nfkd_form = unicodedata.normalize('NFKD', s)
-    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    nfkd_form = unicodedata.normalize("NFKD", s)
+    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 class ASPFormatAddress:
