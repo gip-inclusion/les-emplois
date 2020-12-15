@@ -92,7 +92,8 @@ class INSEECountry(models.Model):
 
     COUNTRY_GROUP_CHOICES = (
         (COUNTRY_GROUP_FRANCE, _("France")),
-        (COUNTRY_GROUP_CEE, _("CEE")), (COUNTRY_GROUP_NOT_CEE, _("Hors CEE")),
+        (COUNTRY_GROUP_CEE, _("CEE")),
+        (COUNTRY_GROUP_NOT_CEE, _("Hors CEE")),
     )
 
     code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
@@ -224,7 +225,7 @@ class ASPFormatAddress:
     @classmethod
     def from_address(cls, obj, update_coords=False):
         if type(obj) not in [Siae, PrescriberOrganization, User]:
-            raise ValidationError(_("Ce type ne contient pas d'adresse exploitable"))
+            raise ValidationError("This type has no address")
 
         # first we use geo API to get a 'lane' and a number
         address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code, fmt=detailed_geocoding_data)
@@ -248,23 +249,23 @@ class ASPFormatAddress:
         if extension:
             extension = extension[0]
             if extension not in cls.street_extensions.values():
-                raise ValidationError(_("Ce type d'extension de voie n'est pas reconnu"))
+                raise ValidationError(f"Unknown lane extension: {extension}")
+                pass
             else:
                 result["extension"] = cls.street_extensions.get(extension)
 
-        lane_type, lane_name = address.get("lane", "").split(maxsplit=1)
-        lane_codes = [k.name.lower() for k in LaneType]
-        lane_names = [v.value.lower() for v in LaneType]
-        print(lane_codes)
-        print(lane_names)
-        print(lane_type)
-        if lane_type.lower() in lane_codes or lane_type.lower() in lane_names:
-            result["lane_type"] = lane_type
+        if address.get("lane"):
+            result["lane"] = address["lane"]
 
-        if lane_name:
-            result["lane"] = lane_name
+        lane_type, _ = address.get("lane", "").split(maxsplit=1)
+        lane_type = lane_type.lower()
+
+        revert = {lt.value.lower(): lt.name for lt in LaneType}
+
+        if revert.get(lane_type):
+            result["lane_type"] = revert.get(lane_type)
         else:
-            raise ValidationError(_("Impossible de déterminer le nom de la rue"))
+            raise ValidationError(f"Can't find lane type: {lane_type}")
 
         return result
 
@@ -396,8 +397,12 @@ class EmployeeRecord(models.Model):
     educational_leval = models.ForeignKey(
         EducationalLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL, null=True,
     )
-    birth_place = models.ForeignKey(INSEECommune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL, null=True,)
-    birth_country = models.ForeignKey(INSEECountry, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL, null=True,)
+    birth_place = models.ForeignKey(
+        INSEECommune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL, null=True,
+    )
+    birth_country = models.ForeignKey(
+        INSEECountry, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL, null=True,
+    )
 
     # birth_place = models.ForeignKey(INSEECode, verbose_name=_("Lieu de naissance"))
 
