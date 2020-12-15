@@ -41,18 +41,8 @@ jobs:
       run: sudo apt-get update && sudo apt-get install binutils libproj-dev gdal-bin
     - name: 🧩 Add extentions to Postgres and create a database to check migrations
       run: |
+        PGDATABASE=template1 bash docker/dev/postgres/psql_extensions.sh
         psql <<SQL
-            \c template1;
-            CREATE EXTENSION IF NOT EXISTS btree_gist;
-            CREATE EXTENSION IF NOT EXISTS citext;
-            CREATE EXTENSION IF NOT EXISTS pg_trgm;
-            CREATE EXTENSION IF NOT EXISTS postgis;
-            CREATE EXTENSION IF NOT EXISTS unaccent;
-            DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
-            CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
-            ALTER TEXT SEARCH CONFIGURATION french_unaccent
-            ALTER MAPPING FOR hword, hword_part, word
-            WITH unaccent, french_stem;
             CREATE DATABASE itou;
         SQL
     - name: 💂 Install Python ${{ matrix.python-version }}
