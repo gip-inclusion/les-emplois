@@ -1,6 +1,5 @@
 from enum import Enum
 
-from django.conf import settings
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
@@ -13,6 +12,8 @@ from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.users.models import User
 from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
 from itou.utils.validators import validate_siret
+
+import unicodedata
 
 
 # INSEE codes
@@ -112,7 +113,7 @@ class LaneType(Enum):
     AER = "Aérodrome"
     AGL = "Agglomération"
     AIRE = "Aire"
-    ALL = "Allee"
+    ALL = "Allée"
     ACH = "Ancien chemin"
     ART = "Ancienne route"
     AV = "Avenue"
@@ -204,6 +205,11 @@ class LaneType(Enum):
     ZUP = "Zone urbanisation prio"
 
 
+def strip_accents(s):
+    nfkd_form = unicodedata.normalize('NFKD', s)
+    return u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+
+
 class ASPFormatAddress:
     """
     ASP formatted address
@@ -225,10 +231,56 @@ class ASPFormatAddress:
     @classmethod
     def from_address(cls, obj, update_coords=False):
         if type(obj) not in [Siae, PrescriberOrganization, User]:
-            raise ValidationError("This type has no address")
+            return None, "This type has no address"
+
+        # Do we have enough data to make an extraction?
+        if not obj.post_code or not obj.address_line_1:
+            return None, "Incomplete address data"
+
+        print(f"FMT: {obj.address_line_1}, {obj.post_code}")
 
         # first we use geo API to get a 'lane' and a number
         address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code, fmt=detailed_geocoding_data)
+        if not address:
+            return None, "Geocoding error, unable to get result"
+
+        result = {}
+
+        # Get street extension (bis, ter ...)
+        # It's included in the resulting streetnumber geo API field
+        number_plus_ext = address.get("number")
+        if number_plus_ext:
+            number, *extension = number_plus_ext.split()
+
+            if number:
+                result["number"] = number
+
+            if extension:
+                extension = extension[0]
+                if extension.lower() not in cls.street_extensions.keys():
+                    result["non_std_extension"] = extension
+                    # return None, f"Unknown lane extension: {extension}"
+                else:
+                    result["std_extension"] = cls.street_extensions.get(extension)
+
+        lane = None
+        if not address.get("lane") and not address.get("address"):
+            print(address)
+            return None, "Unable to get address lane"
+        else:
+            lane = address.get("lane") or address.get("address")
+            lane = strip_accents(lane)
+            result["lane"] = lane
+
+        lane_type, _ = lane.split(maxsplit=1)
+        lane_type = lane_type.lower()
+
+        revert = {strip_accents(lt.value.lower()): lt.name for lt in LaneType}
+
+        if revert.get(lane_type):
+            result["lane_type"] = revert.get(lane_type)
+        else:
+            return None, f"Can't find lane type: {lane_type}"
 
         if update_coords and address.get("coords", None) and address.get("score", -1) > obj.get("geocoding_score", 0):
             # User, Siae and PrescribersOrganisation all have score and coords
@@ -236,38 +288,7 @@ class ASPFormatAddress:
             obj.geocoding_score = address["score"]
             obj.save()
 
-        print(address)
-        result = {}
-
-        # Get street extension (bis, ter ...)
-        # It's included in the resulting streetnumber geo API field
-        number, *extension = address.get("number", "").split()
-
-        if number:
-            result["number"] = number
-
-        if extension:
-            extension = extension[0]
-            if extension not in cls.street_extensions.values():
-                raise ValidationError(f"Unknown lane extension: {extension}")
-                pass
-            else:
-                result["extension"] = cls.street_extensions.get(extension)
-
-        if address.get("lane"):
-            result["lane"] = address["lane"]
-
-        lane_type, _ = address.get("lane", "").split(maxsplit=1)
-        lane_type = lane_type.lower()
-
-        revert = {lt.value.lower(): lt.name for lt in LaneType}
-
-        if revert.get(lane_type):
-            result["lane_type"] = revert.get(lane_type)
-        else:
-            raise ValidationError(f"Can't find lane type: {lane_type}")
-
-        return result
+        return result, None
 
 
 class EducationalLevel(PeriodMixin):

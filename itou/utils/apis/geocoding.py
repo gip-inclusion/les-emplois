@@ -70,14 +70,16 @@ def process_geocoding_data(data):
 def detailed_geocoding_data(data):
     if not data:
         return None
+    if not data.get("properties"):
+        return None
 
     longitude = data["geometry"]["coordinates"][0]
     latitude = data["geometry"]["coordinates"][1]
 
     return {
         "score": data["properties"]["score"],
-        "number": data["properties"]["housenumber"],
-        "lane": data["properties"]["street"],
+        "number": data["properties"].get("housenumber", None),
+        "lane": data["properties"].get("street", None),
         "address": data["properties"]["name"],
         "post_code": data["properties"]["postcode"],
         "insee_code": data["properties"]["citycode"],
