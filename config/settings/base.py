@@ -50,7 +50,6 @@ THIRD_PARTY_APPS = [
     "bootstrap4",
     "bootstrap_datepicker_plus",
     "django_select2",
-    "mathfilters",
     "huey.contrib.djhuey",
 ]
 
