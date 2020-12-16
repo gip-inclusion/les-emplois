@@ -1,8 +1,6 @@
 import unicodedata
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
-from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
 
