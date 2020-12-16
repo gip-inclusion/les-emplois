@@ -1,10 +1,11 @@
-from itou.utils.apis.geocoding import get_geocoding_data, detailed_geocoding_data
 import unicodedata
+
 import Enum
 
-from itou.siaes.models import Siae
 from itou.prescribers.models import PrescriberOrganization
+from itou.siaes.models import Siae
 from itou.users.models import User
+from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
 
 
 class LaneType(Enum):
