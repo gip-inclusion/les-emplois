@@ -104,16 +104,21 @@ class LaneType(Enum):
     ZUP = "Zone urbanisation prio"
 
     @classmethod
-    def has_similar_name(cls, name, fmt=str.upper):
+    def with_similar_name(cls, name, fmt=str.upper):
         "Returns enum with similar name (fmt-fn wise)"
         assert name
-        return name if fmt(name) in [fmt(k) for k, v in cls.__members__.items()] else None
+        for elt in cls:
+            test = fmt(name)
+            if test == fmt(elt.name):
+                return elt
+
+        return None
 
     @classmethod
-    def name_for_similar_value(cls, value, fmt=str.lower):
+    def with_similar_value(cls, value, fmt=str.lower):
         "Returns enum.name if a similar value exists in enum (fmt-fn wise)"
         assert value
-        revert_map = {fmt(lt.value): lt.name for lt in cls}
+        revert_map = {fmt(lt.value): lt for lt in cls}
         return revert_map.get(fmt(value))
 
 
@@ -128,6 +133,7 @@ LANE_TYPE_ALIASES = {
     "grand'rue": LaneType.GR,
     "qu": LaneType.QUAI,
     "voies": LaneType.VOIE,
+    "domaines": LaneType.DOM,
 }
 
 
@@ -138,16 +144,16 @@ class LaneExtension(Enum):
     Import/translation of ASP ref file: ref_extension_voie_v1.csv
     """
 
-    BIS = "B"
-    TER = "T"
-    QUATER = "Q"
-    QUINQUIES = "C"
+    B = "Bis"
+    T = "Ter"
+    Q = "Qauter"
+    C = "Quinquies"
 
     @classmethod
-    def has_similar_name_or_value(cls, s, fmt=str.lower):
+    def with_similar_name_or_value(cls, s, fmt=str.lower):
         assert s
         for elt in cls:
             test = fmt(s)
             if test == fmt(elt.name) or test == fmt(elt.value):
-                return elt.name
+                return elt
         return None

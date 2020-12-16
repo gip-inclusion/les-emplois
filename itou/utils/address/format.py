@@ -47,8 +47,8 @@ def format_address(obj, update_coords=False):
 
     result = {}
 
-    # Get street extension (bis, ter ...)
-    # It's part of the resulting streetnumber geo API field
+    # Street extension processing (bis, ter ...)
+    # Extension is part of the resulting streetnumber geo API field
     number_plus_ext = address.get("number")
     if number_plus_ext:
         number, *extension = number_plus_ext.split()
@@ -58,9 +58,8 @@ def format_address(obj, update_coords=False):
 
         if extension:
             extension = extension[0]
-            if ext := LaneExtension.has_similar_name_or_value(extension):
-                result["std_extension"] = ext
-                # return None, f"Unknown lane extension: {extension}"
+            if ext := LaneExtension.with_similar_name_or_value(extension):
+                result["std_extension"] = ext.name
             else:
                 result["non_std_extension"] = extension
 
@@ -73,14 +72,21 @@ def format_address(obj, update_coords=False):
         lane = strip_accents(lane)
         result["lane"] = lane
 
-    # Lane type processing
+    # Lane type processing (Avenue, RUe, Boulevard ...)
     lane_type = lane.split(maxsplit=1)[0]
 
-    if lt := LaneType.has_similar_name(lane_type, fmt=strip_accents):
-        result["lane_type"] = lt
-    elif lt := LaneType.name_for_similar_value(lane_type):
-        result["lane_type"] = lt
-    elif lt := LANE_TYPE_ALIASES.get(lane_type):
+    if lt := LaneType.with_similar_name(lane_type):
+        # The API field is similar to know lane type,
+        # example: got "Av" for name "AV" (Avenue)
+        result["lane_type"] = lt.name
+    elif lt := LaneType.with_similar_value(lane_type, fmt=lambda x: strip_accents(x.lower())):
+        # The API field is similar to an exiting value
+        # example: got "allee" for "Allée
+        result["lane_type"] = lt.name
+    elif lt := LANE_TYPE_ALIASES.get(lane_type.lower()):
+        # Maybe the geo API mispelled the lane type (happens sometimes)
+        # so we use an aliases table as a last change to get the type
+        # example: got "R" or "r" instead of "Rue"
         result["lane_type"] = lt.name
     else:
         return None, f"Can't find lane type: {lane_type}"
@@ -89,9 +95,13 @@ def format_address(obj, update_coords=False):
     # must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")
     # TODO check with ASP data
+    result["post_code"] = address.get("post_code")
+    result["city"] = address.get("city")
 
     if update_coords and address.get("coords", None) and address.get("score", -1) > obj.get("geocoding_score", 0):
         # User, Siae and PrescribersOrganisation all have score and coords
+        # If update_coords is True AND if we get a better geo score,
+        # the existing address will be updated
         obj.coords = address["coords"]
         obj.geocoding_score = address["score"]
         obj.save()
