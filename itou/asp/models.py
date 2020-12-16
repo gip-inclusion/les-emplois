@@ -107,7 +107,6 @@ class LaneType(Enum):
     @classmethod
     def with_similar_name(cls, name, fmt=str.upper):
         "Returns enum with similar name (fmt-fn wise)"
-        assert name
         for elt in cls:
             test = fmt(name)
             if test == fmt(elt.name):
@@ -118,7 +117,6 @@ class LaneType(Enum):
     @classmethod
     def with_similar_value(cls, value, fmt=str.lower):
         "Returns enum with a similar value (fmt-fn wise)"
-        assert value
         revert_map = {fmt(lt.value): lt for lt in cls}
         return revert_map.get(fmt(value))
 
@@ -138,6 +136,7 @@ _LANE_TYPE_ALIASES = {
 
 
 def find_lane_type_aliases(alias):
+    "Alternative lookup of some lane types"
     for regx, lane_type in _LANE_TYPE_ALIASES.items():
         if re.search(regx, alias):
             return lane_type
@@ -158,7 +157,6 @@ class LaneExtension(Enum):
 
     @classmethod
     def with_similar_name_or_value(cls, s, fmt=str.lower):
-        assert s
         for elt in cls:
             test = fmt(s)
             if test == fmt(elt.name) or test == fmt(elt.value):

@@ -41,9 +41,8 @@ def format_address(obj, update_coords=False):
     - OK => (result_dict, None),
     - KO => (None, error_message)
     """
-
-    if type(obj) not in [Siae, PrescriberOrganization, User]:
-        return None, "This object has no address"
+    if not isinstance(obj, User):
+        return None, "Only valid for User objects"
 
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
