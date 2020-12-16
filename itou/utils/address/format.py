@@ -1,6 +1,6 @@
 import unicodedata
 
-from itou.asp.models import LANE_TYPE_ALIASES, LaneExtension, LaneType
+from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
@@ -23,10 +23,22 @@ def format_address(obj, update_coords=False):
 
     Employee records ("Fiches salarié") contains 2 addresses of this kind.
 
-    See validation of ASP address for expected/valid fields
+    See validation of ASP address for expected/valid fields.
+
+    Output fields:
+    - number (opt.): number in the lane
+    - std_extension (opt.): One of the ASP ref lane extension (see LaneExtension)
+    - non_std_extension (opt.): if another extension is detected
+    - lane: name of the lane
+    - lane_type: One of the ASP ref lane type (see LaneType)
+    - city: name of city
+    - post_code: postal code
+    - insee_code: INSEE code of the city (Itou)
+
+    INSEE code can be checked against ASP ref for further validation.
 
     Returns a (result,error) tuple:
-    - OK => (smth, None),
+    - OK => (result_dict, None),
     - KO => (None, error_message)
     """
 
@@ -36,8 +48,6 @@ def format_address(obj, update_coords=False):
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
         return None, "Incomplete address data"
-
-    print(f"FMT: {obj.address_line_1}, {obj.post_code}")
 
     # first we use geo API to get a 'lane' and a number
     address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code, fmt=detailed_geocoding_data)
@@ -83,7 +93,7 @@ def format_address(obj, update_coords=False):
         # The API field is similar to an exiting value
         # example: got "allee" for "Allée
         result["lane_type"] = lt.name
-    elif lt := LANE_TYPE_ALIASES.get(lane_type.lower()):
+    elif lt := find_lane_type_aliases(lane.lower()):
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
@@ -94,7 +104,6 @@ def format_address(obj, update_coords=False):
     # INSEE code:
     # must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")
-    # TODO check with ASP data
     result["post_code"] = address.get("post_code")
     result["city"] = address.get("city")
 

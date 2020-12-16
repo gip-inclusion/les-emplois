@@ -1,4 +1,5 @@
 # from django.db import models
+import re
 from enum import Enum
 
 
@@ -125,16 +126,22 @@ class LaneType(Enum):
 # Even if geo API does a great deal of a job,
 # it sometimes shows unexpected result labels for lane types
 # This a still incomplete mapping of these differences
-LANE_TYPE_ALIASES = {
+_LANE_TYPE_ALIASES = {
     "r": LaneType.RUE,
     "che": LaneType.CHEM,
-    "grand rue": LaneType.GR,
-    "grande rue": LaneType.GR,
-    "grand'rue": LaneType.GR,
+    "grand[ e\-']rue": LaneType.GR,  # noqa W605
     "qu": LaneType.QUAI,
     "voies": LaneType.VOIE,
     "domaines": LaneType.DOM,
+    "allees": LaneType.ALL,
 }
+
+
+def find_lane_type_aliases(alias):
+    for regx, lane_type in _LANE_TYPE_ALIASES.items():
+        if re.search(regx, alias):
+            return lane_type
+    return None
 
 
 class LaneExtension(Enum):
