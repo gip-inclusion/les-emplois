@@ -54,8 +54,31 @@ def process_geocoding_data(data):
     }
 
 
-def get_geocoding_data(address, post_code=None, limit=1):
+def detailed_geocoding_data(data):
+    if not data:
+        return None
+    if not data.get("properties"):
+        return None
+
+    longitude = data["geometry"]["coordinates"][0]
+    latitude = data["geometry"]["coordinates"][1]
+
+    return {
+        "score": data["properties"]["score"],
+        "number": data["properties"].get("housenumber", None),
+        "lane": data["properties"].get("street", None),
+        "address": data["properties"]["name"],
+        "post_code": data["properties"]["postcode"],
+        "insee_code": data["properties"]["citycode"],
+        "city": data["properties"]["city"],
+        "longitude": longitude,
+        "latitude": latitude,
+        "coords": GEOSGeometry(f"POINT({longitude} {latitude})"),
+    }
+
+
+def get_geocoding_data(address, post_code=None, limit=1, fmt=process_geocoding_data):
 
     geocoding_data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
-    return process_geocoding_data(geocoding_data)
+    return fmt(geocoding_data)
