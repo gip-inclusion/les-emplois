@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
 from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
@@ -30,7 +31,9 @@ class EditOrganizationTest(TestCase):
     def test_edit(self, mock_call_ban_geocoding_api):
         """Edit a prescriber organization."""
 
-        organization = PrescriberOrganizationWithMembershipFactory()
+        organization = AuthorizedPrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganization.Kind.CAP_EMPLOI
+        )
         user = organization.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
@@ -41,6 +44,7 @@ class EditOrganizationTest(TestCase):
 
         post_data = {
             "name": "foo",
+            "siret": organization.siret,
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "address_line_1": "2 Rue de Soufflenheim",
             "address_line_2": "",
@@ -58,6 +62,7 @@ class EditOrganizationTest(TestCase):
 
         organization = PrescriberOrganization.objects.get(siret=organization.siret)
 
+        self.assertEqual(organization.name, post_data["name"])
         self.assertEqual(organization.description, post_data["description"])
         self.assertEqual(organization.address_line_1, post_data["address_line_1"])
         self.assertEqual(organization.address_line_2, post_data["address_line_2"])
@@ -81,11 +86,11 @@ class EditOrganizationTest(TestCase):
         when user is member of multiple orgs with the same SIRET (and different types)
         (was a regression)
         """
-        organization = PrescriberOrganizationWithMembershipFactory(kind="ML")
+        organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.ML)
         siret = organization.siret
         user = organization.members.first()
 
-        org2 = PrescriberOrganizationWithMembershipFactory(kind="PLIE", siret=siret)
+        org2 = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.PLIE, siret=siret)
         org2.members.add(user)
         org2.save()
 

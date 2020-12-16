@@ -21,11 +21,9 @@ from itou.users.models import User
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import process_geocoding_data
-from itou.utils.apis.siret import process_siret_data
 from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
-from itou.utils.mocks.siret import API_INSEE_SIRET_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
@@ -274,20 +272,6 @@ class UtilsGeocodingTest(TestCase):
             "longitude": 2.316754,
             "latitude": 48.838411,
             "coords": GEOSGeometry("POINT(2.316754 48.838411)"),
-        }
-        self.assertEqual(result, expected)
-
-
-class UtilsSiretTest(TestCase):
-    @mock.patch("itou.utils.apis.siret.call_insee_api", return_value=API_INSEE_SIRET_RESULT_MOCK)
-    def test_process_siret_data(self, mock_call_insee_api):
-        siret_data = mock_call_insee_api()
-        result = process_siret_data(siret_data)
-        # Expected data comes from API_INSEE_SIRET_RESULT_MOCK.
-        expected = {
-            "name": "DELEGATION GENERALE A L'EMPLOI ET A LA FORMATION PROFESSIONNELLE",
-            "address": "10 PL 5 MARTYRS LYCEE BUFFON",
-            "post_code": "75015",
         }
         self.assertEqual(result, expected)
 

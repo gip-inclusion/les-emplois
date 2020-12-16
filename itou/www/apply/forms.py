@@ -209,7 +209,12 @@ class AcceptForm(forms.ModelForm):
                 "Indiquez une date dans le futur."
             )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple  %(date)s.")
+            "hiring_end_at": gettext_lazy(
+                "Au format JJ/MM/AAAA, par exemple  %(date)s. "
+                "Cette date n'est pas modifiable après validation. Elle sert uniquement "
+                "à des fins d'informations et est sans conséquence sur les déclarations "
+                "à faire dans l'extranet 2.0 de l'ASP."
+            )
             % {
                 "date": (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime(
                     "%d/%m/%Y"

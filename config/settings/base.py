@@ -50,7 +50,6 @@ THIRD_PARTY_APPS = [
     "bootstrap4",
     "bootstrap_datepicker_plus",
     "django_select2",
-    "mathfilters",
     "huey.contrib.djhuey",
 ]
 
@@ -303,15 +302,7 @@ API_BAN_BASE_URL = "https://api-adresse.data.gouv.fr"
 # https://api.gouv.fr/api/api-geo.html#doc_tech
 API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 
-# Sirene - V3
-# https://api.insee.fr/catalogue/
-# https://github.com/sne3ks/api_insee
-# > Autorise 30 requêtes par minute pour chaque application des utilisateurs.
-# > Quota par défaut pour tout nouveau compte.
-API_INSEE_KEY = os.environ.get("API_INSEE_KEY")
-API_INSEE_SECRET = os.environ.get("API_INSEE_SECRET")
-
-# API Entreprise
+# API Entreprise.
 # https://dashboard.entreprise.api.gouv.fr/login (login is done through auth.api.gouv.fr)
 # https://doc.entreprise.api.gouv.fr/
 API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
