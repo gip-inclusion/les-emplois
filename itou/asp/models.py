@@ -116,7 +116,7 @@ class LaneType(Enum):
 
     @classmethod
     def with_similar_value(cls, value, fmt=str.lower):
-        "Returns enum.name if a similar value exists in enum (fmt-fn wise)"
+        "Returns enum with a similar value (fmt-fn wise)"
         assert value
         revert_map = {fmt(lt.value): lt for lt in cls}
         return revert_map.get(fmt(value))
@@ -146,7 +146,7 @@ class LaneExtension(Enum):
 
     B = "Bis"
     T = "Ter"
-    Q = "Qauter"
+    Q = "Quater"
     C = "Quinquies"
 
     @classmethod
