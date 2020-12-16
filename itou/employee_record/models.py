@@ -226,18 +226,18 @@ class ASPFormatAddress:
 
     # These are the extensions defined in ASP ref file: ref_extension_voie_v1.csv
     street_extensions = {"bis": "B", "ter": "T", "quater": "Q", "quinqies": "C"}
-
     revert = {strip_accents(lt.value.lower()): lt.name for lt in LaneType}
-
     lane_type_keys = [k.name.lower() for k in LaneType]
 
     # Sometimes the geo API does not give a correct lane type
     # Here are some common aliases
     lane_type_aliases = {
         "r": LaneType.RUE,
+        "che": LaneType.CHEM,
         "grand rue": LaneType.RUE,
         "grande rue": LaneType.RUE,
         "grand'rue": LaneType.RUE,
+        "qu": LaneType.QUAI,
         "voies": LaneType.VOIE,
     }
 
@@ -297,6 +297,11 @@ class ASPFormatAddress:
             result["lane_type"] = lane_type.upper()
         else:
             return None, f"Can't find lane type: {lane_type}"
+
+        # INSEE code:
+        # must double check with ASP ref file
+        result["insee_code"] = address.get("insee_code")
+        # TODO check with ASP data
 
         if update_coords and address.get("coords", None) and address.get("score", -1) > obj.get("geocoding_score", 0):
             # User, Siae and PrescribersOrganisation all have score and coords
