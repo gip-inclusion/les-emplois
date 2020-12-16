@@ -93,7 +93,7 @@ def format_address(obj, update_coords=False):
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
-        or find_lane_type_aliases(lane.lower())
+        or find_lane_type_aliases(lane)
     )
 
     if lt:

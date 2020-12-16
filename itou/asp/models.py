@@ -125,20 +125,20 @@ class LaneType(Enum):
 # it sometimes shows unexpected result labels for lane types
 # This a still incomplete mapping of these differences
 _LANE_TYPE_ALIASES = {
-    "r": LaneType.RUE,
-    "che": LaneType.CHEM,
-    "grand[ e\-']rue": LaneType.GR,  # noqa W605
-    "qu": LaneType.QUAI,
-    "voies": LaneType.VOIE,
-    "domaines": LaneType.DOM,
-    "allees": LaneType.ALL,
+    "^r": LaneType.RUE,
+    "^che": LaneType.CHEM,
+    "^grande?[ \-']rue": LaneType.GR,  # noqa W605
+    "^qu": LaneType.QUAI,
+    "^voies": LaneType.VOIE,
+    "^domaines": LaneType.DOM,
+    "^allees": LaneType.ALL,
 }
 
 
 def find_lane_type_aliases(alias):
     "Alternative lookup of some lane types"
     for regx, lane_type in _LANE_TYPE_ALIASES.items():
-        if re.search(regx, alias):
+        if re.search(regx, alias.lower()):
             return lane_type
     return None
 
