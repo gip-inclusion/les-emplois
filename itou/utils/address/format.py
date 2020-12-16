@@ -85,24 +85,25 @@ def format_address(obj, update_coords=False):
     # Lane type processing (Avenue, RUe, Boulevard ...)
     lane_type = lane.split(maxsplit=1)[0]
 
-    if lt := LaneType.with_similar_name(lane_type):
+    lt = (
         # The API field is similar to know lane type,
         # example: got "Av" for name "AV" (Avenue)
-        result["lane_type"] = lt.name
-    elif lt := LaneType.with_similar_value(lane_type, fmt=lambda x: strip_accents(x.lower())):
+        LaneType.with_similar_name(lane_type)
         # The API field is similar to an exiting value
-        # example: got "allee" for "Allée
-        result["lane_type"] = lt.name
-    elif lt := find_lane_type_aliases(lane.lower()):
+        # example: got "allee" for "Allée"
+        or LaneType.with_similar_value(lane_type, fmt=lambda x: strip_accents(x.lower()))
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
+        or find_lane_type_aliases(lane.lower())
+    )
+
+    if lt:
         result["lane_type"] = lt.name
     else:
         return None, f"Can't find lane type: {lane_type}"
 
-    # INSEE code:
-    # must double check with ASP ref file
+    # INSEE code: must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")
     result["post_code"] = address.get("post_code")
     result["city"] = address.get("city")
