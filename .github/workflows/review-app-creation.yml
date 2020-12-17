@@ -72,6 +72,10 @@ jobs:
         EOSQL
         echo "Database created successfully!"
 
+    - name: 🧩 Activate Postgres extensions
+      run: |
+        PGURI=$POSTGRESQL_ADDON_URI bash docker/dev/postgres/psql_extensions.sh
+
     - name: 🗺 Add environment variables to the review app
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
