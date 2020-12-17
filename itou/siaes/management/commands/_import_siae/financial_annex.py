@@ -29,9 +29,14 @@ def get_creatable_and_deletable_afs(dry_run):
         # The AF already exists in db. Let's check if some of its fields have changed.
         row = AF_NUMBER_TO_ROW[af.number]
         assert af.number == row.number
-        assert af.start_at == row.start_date
-        assert af.end_at == row.end_date
         assert af.convention.kind == row.kind
+
+        # Sometimes an AF start date changes.
+        if af.start_at != row.start_date:
+            af.start_at = row.start_date
+            if not dry_run:
+                af.save()
+        assert af.end_at == row.end_date
 
         # Sometimes an AF state changes.
         if af.state != row.state:
