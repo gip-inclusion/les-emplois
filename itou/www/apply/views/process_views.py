@@ -48,10 +48,8 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         job_application.job_seeker, for_siae=job_application.to_siae
     )
 
-    approval_can_be_suspended_by_siae = (
-        job_application.approval.can_be_suspended_by_siae(job_application.to_siae)
-        if job_application.approval
-        else False
+    approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
+        job_application.to_siae
     )
 
     context = {
