@@ -12,7 +12,7 @@ from django.db import models
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
-from django.utils.timesince import timeuntil
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
@@ -93,23 +93,6 @@ class CommonApprovalMixin(models.Model):
         starts_after_lockdown = self.start_at > self.LOCKDOWN_END_AT
         return not (ends_before_lockdown or starts_after_lockdown)
 
-    @property
-    def time_until_waiting_period(self):
-        """
-        Helper primarily used within templates whose sole purpose is to catch
-        and display a custom message for the localized "0 minutes" otherwise
-        returned by the built-in `timeuntil` template filter:
-        https://docs.djangoproject.com/en/dev/ref/templates/builtins/#timeuntil
-        """
-        if not self.is_valid:
-            return "0"
-        now = timezone.now().date()
-        if self.start_at > now:
-            return "in_future"
-        if self.end_at == now:
-            return "0"
-        return timeuntil(self.end_at, now)
-
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
@@ -141,6 +124,15 @@ class Approval(CommonApprovalMixin):
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
+
+    # Error messages.
+    ERROR_PASS_IAE_SUSPENDED_FOR_USER = _(
+        "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
+    )
+    ERROR_PASS_IAE_SUSPENDED_FOR_PROXY = _(
+        "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler "
+        "pour lui pendant la période de suspension."
+    )
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -214,7 +206,7 @@ class Approval(CommonApprovalMixin):
         """
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
-    @property
+    @cached_property
     def can_be_deleted(self):
         state_accepted = self.jobapplication_set.model.state.STATE_ACCEPTED
 
@@ -223,11 +215,19 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
-    @property
+    @cached_property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
 
-    @property
+    @cached_property
+    def suspensions_by_start_date_asc(self):
+        return self.suspension_set.all().order_by("start_at")
+
+    @cached_property
+    def last_old_suspension(self):
+        return self.suspensions_by_start_date_asc.old().last()
+
+    @cached_property
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
 
@@ -235,8 +235,29 @@ class Approval(CommonApprovalMixin):
         """
         Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
         """
-        user_last_accepted_job_application = self.user.job_applications.accepted().latest("created_at")
-        return self.can_be_suspended and siae == user_last_accepted_job_application.to_siae
+        return (
+            self.can_be_suspended
+            and siae == self.user.last_accepted_job_application.to_siae
+            and not self.user.last_accepted_job_application.can_be_cancelled
+        )
+
+    def suspend(self, start_at, end_at, siae, reason, reason_explanation, created_by):
+        """
+        Suspend current Approval.
+        """
+        if not self.can_be_suspended_by_siae(siae):
+            raise RuntimeError(_("Approval cannot be suspended by this SIAE."))
+        suspension = Suspension(
+            approval=self,
+            start_at=start_at,
+            end_at=end_at,
+            siae=siae,
+            reason=reason,
+            reason_explanation=reason_explanation,
+            created_by=created_by,
+        )
+        suspension.save()
+        return suspension
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -304,6 +325,10 @@ class SuspensionQuerySet(models.QuerySet):
 
     def not_in_progress(self):
         return self.exclude(self.in_progress_lookup)
+
+    def old(self):
+        now = timezone.now().date()
+        return self.filter(end_at__lt=now)
 
 
 class Suspension(models.Model):
@@ -404,6 +429,13 @@ class Suspension(models.Model):
     def clean(self):
         super().clean()
 
+        if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
+            raise ValidationError({"reason_explanation": _("En cas de force majeure, veuillez préciser le motif.")})
+
+        # No min duration: a suspension may last only 1 day.
+        if self.end_at < self.start_at:
+            raise ValidationError({"end_at": _("La date de fin doit être postérieure à la date de début.")})
+
         # A suspension cannot be in the future.
         if self.start_in_future:
             raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
@@ -473,6 +505,17 @@ class Suspension(models.Model):
     @staticmethod
     def get_max_end_at(start_at):
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
+
+    @staticmethod
+    def next_min_start_at(approval):
+        """
+        Used when adding a new suspension to the given approval.
+        """
+        if approval.is_suspended:
+            raise RuntimeError(_("A suspension is already in progress."))
+        if approval.last_old_suspension:
+            return approval.last_old_suspension.end_at + relativedelta(days=1)
+        return approval.user.last_accepted_job_application.hiring_start_at
 
 
 class PoleEmploiApprovalManager(models.Manager):
@@ -637,15 +680,13 @@ class ApprovalsWrapper:
     This wrapper encapsulates all this logic for use in views and templates
     without having to manually search in two different tables.
 
-    (Maybe a Manager would've been a better place for this logic)
+    (Maybe a Manager would've been a better place for this logic).
     """
 
     # Status codes.
     NONE_FOUND = "NONE_FOUND"
     VALID = "VALID"
-    SUSPENDED = "SUSPENDED"
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
-    WAITING_PERIOD_HAS_ELAPSED = "WAITING_PERIOD_HAS_ELAPSED"
 
     # Error messages.
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
@@ -671,18 +712,17 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if self.latest_approval.is_pass_iae and self.latest_approval.is_suspended:
-                self.status = self.SUSPENDED
-            elif self.latest_approval.is_valid:
+            if self.latest_approval.is_valid:
                 self.status = self.VALID
             elif self.latest_approval.waiting_period_has_elapsed:
-                self.status = self.WAITING_PERIOD_HAS_ELAPSED
+                # The `Période de carence` is over. A job seeker can get a new Approval.
+                self.latest_approval = None
+                self.status = self.NONE_FOUND
             else:
                 self.status = self.IN_WAITING_PERIOD
 
         # Only one of the following attributes can be True at a time.
         self.has_valid = self.status == self.VALID
-        self.has_suspended = self.status == self.SUSPENDED
         self.has_in_waiting_period = self.status == self.IN_WAITING_PERIOD
 
     def _merge_approvals(self):

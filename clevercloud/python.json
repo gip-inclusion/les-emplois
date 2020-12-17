@@ -3,8 +3,8 @@
     "managetasks":
         [
             "migrate --no-input",
-            "collectstatic --no-input"
-
+            "collectstatic --no-input",
+            "sync_group_and_perms"
         ]
     }
 }

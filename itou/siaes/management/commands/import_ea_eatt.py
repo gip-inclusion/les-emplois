@@ -19,7 +19,7 @@ from itou.utils.validators import validate_siret
 
 CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
-EA_EATT_DATASET_FILENAME = f"{CURRENT_DIR}/data/Liste_Contact_EA_20201207.xlsx"
+EA_EATT_DATASET_FILENAME = f"{CURRENT_DIR}/data/Liste_Contact_EA_20201214.xlsx"
 
 
 def convert_kind(raw_kind):

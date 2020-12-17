@@ -149,7 +149,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
-        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is today.
@@ -157,7 +156,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertTrue(approval.is_valid)
-        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is yesterday.
@@ -165,7 +163,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid)
-        self.assertFalse(approval.waiting_period_has_elapsed)
         self.assertTrue(approval.is_in_waiting_period)
 
         # Ended since more than WAITING_PERIOD_YEARS.
@@ -173,7 +170,6 @@ class CommonApprovalMixinTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_valid)
-        self.assertTrue(approval.waiting_period_has_elapsed)
         self.assertFalse(approval.is_in_waiting_period)
 
     def test_originates_from_itou(self):
@@ -317,15 +313,62 @@ class ApprovalModelTest(TestCase):
         self.assertEqual(approval.number_with_spaces, expected)
 
     def test_can_be_suspended_by_siae(self):
-        user = JobSeekerFactory()
-        approval = ApprovalFactory(user=user)
-        job_app = JobApplicationWithApprovalFactory(
-            job_seeker=user, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=datetime.date.today()
+            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+            - relativedelta(days=1),
         )
-        siae = job_app.to_siae
-        self.assertTrue(approval.can_be_suspended_by_siae(siae))
+        self.assertFalse(job_application.can_be_cancelled)
+        siae = job_application.to_siae
+        self.assertTrue(job_application.approval.can_be_suspended_by_siae(siae))
         siae2 = SiaeFactory()
-        self.assertFalse(approval.can_be_suspended_by_siae(siae2))
+        self.assertFalse(job_application.approval.can_be_suspended_by_siae(siae2))
+
+    def test_suspend(self):
+
+        today = datetime.date.today()
+
+        # Create a job application with an approval.
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=today
+            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+            - relativedelta(days=1),
+        )
+
+        # Prepare suspension data.
+        approval = job_application.approval
+        data = {
+            "start_at": today,
+            "end_at": today + relativedelta(months=3),
+            "siae": job_application.to_siae,
+            "reason": Suspension.Reason.MATERNITY,
+            "reason_explanation": "",
+            "created_by": job_application.to_siae.members.first(),
+        }
+
+        # Suspend approval.
+        suspension = approval.suspend(
+            start_at=data["start_at"],
+            end_at=data["end_at"],
+            siae=data["siae"],
+            reason=data["reason"],
+            reason_explanation=data["reason_explanation"],
+            created_by=data["created_by"],
+        )
+
+        # Check suspension data.
+        suspension = approval.suspension_set.first()
+        self.assertEqual(suspension.approval, approval)
+        self.assertEqual(suspension.start_at, data["start_at"])
+        self.assertEqual(suspension.end_at, data["end_at"])
+        self.assertEqual(suspension.siae, data["siae"])
+        self.assertEqual(suspension.reason, data["reason"])
+        self.assertEqual(suspension.reason_explanation, data["reason_explanation"])
+        self.assertEqual(suspension.created_by, data["created_by"])
 
     def test_get_or_create_from_valid(self):
 
@@ -510,28 +553,15 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
-        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, None)
-
-    def test_status_with_suspended_approval(self):
-        user = JobSeekerFactory()
-        approval = ApprovalFactory(user=user)
-        SuspensionFactory(approval=approval)
-        approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.SUSPENDED)
-        self.assertTrue(approvals_wrapper.has_suspended)
-        self.assertFalse(approvals_wrapper.has_valid)
-        self.assertFalse(approvals_wrapper.has_in_waiting_period)
-        self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_with_valid_approval(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user, start_at=datetime.date.today() - relativedelta(days=1))
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
-        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
@@ -543,7 +573,6 @@ class ApprovalsWrapperTest(TestCase):
         approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
-        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertTrue(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
@@ -552,20 +581,18 @@ class ApprovalsWrapperTest(TestCase):
         user = JobSeekerFactory()
         end_at = datetime.date.today() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
         approvals_wrapper = ApprovalsWrapper(user)
-        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.WAITING_PERIOD_HAS_ELAPSED)
-        self.assertFalse(approvals_wrapper.has_suspended)
+        self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.NONE_FOUND)
         self.assertFalse(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
-        self.assertEqual(approvals_wrapper.latest_approval, approval)
+        self.assertEqual(approvals_wrapper.latest_approval, None)
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory()
         approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         approvals_wrapper = ApprovalsWrapper(user)
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.VALID)
-        self.assertFalse(approvals_wrapper.has_suspended)
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
@@ -666,6 +693,18 @@ class SuspensionQuerySetTest(TestCase):
         end_at = Suspension.get_max_end_at(start_at)
         Suspension.objects.all().update(start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
+
+    def test_old(self):
+        # Starting today.
+        start_at = datetime.date.today()
+        SuspensionFactory.create_batch(2, start_at=start_at)
+        self.assertEqual(0, Suspension.objects.old().count())
+        # Old.
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = Suspension.get_max_end_at(start_at)
+        expected_num = 3
+        SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
+        self.assertEqual(expected_num, Suspension.objects.old().count())
 
 
 class SuspensionModelTest(TestCase):

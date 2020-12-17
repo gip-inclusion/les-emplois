@@ -54,6 +54,10 @@
             <h6 class="card-subtitle text-muted">{% translate "Statut :" %}</h6>
             <p class="card-text">
                 {% include "apply/includes/state_badge.html" with job_application=job_application %}
+                {% if job_application.has_suspended_approval %}
+                    <br>
+                    <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
+                {% endif %}
             </p>
         </div>
     </div>

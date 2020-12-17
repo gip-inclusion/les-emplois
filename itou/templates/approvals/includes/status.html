@@ -1,4 +1,5 @@
 {% load i18n %}
+{% load static %}
 {% comment %}
 
     Usage:
@@ -6,34 +7,68 @@
 
 {% endcomment %}
 
+{% if approval.is_pass_iae %}
+    <p class="text-center">
+        {% if approval.is_pass_iae and approval.is_suspended %}
+            <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo PASS IAE">
+            <br>
+            <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
+        {% else %}
+            <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
+        {% endif %}
+    </p>
+{% endif %}
+
+<p>
+    {% if approval.is_pass_iae %}
+        {% translate "Numéro de PASS IAE (agrément) :" %}
+    {% else %}
+        {% translate "Agrément existant :" %}
+    {% endif %}
+    <b>{{ approval.number_with_spaces }}</b>
+</p>
+
 {% if approval.is_valid %}
 
-    <span class="text-success">
+    <ul class="list-unstyled pl-2 border-left" style="border-left-width: 3px !important;">
 
-        {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
-            <b>Valide</b> du {{ start }} au {{ end }}
-        {% endblocktranslate %}
+        {# Delivery date. #}
+        <li>
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
+                Délivré le {{ start }}
+            {% endblocktranslate %}
+        </li>
 
-        {% with approval.time_until_waiting_period as still %}
-            {% if still == "0" %}
-                {% translate "(expire aujourd'hui)" %}
-            {% elif still == "in_future" %}
-                {% translate "(dans le futur)" %}
-            {% else %}
-                {% blocktranslate %}(encore {{ still }}){% endblocktranslate %}
-            {% endif %}
+        {# Validity. #}
+        <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
+                Valide du {{ start }} au {{ end }}
+            {% endblocktranslate %}
+        </li>
+
+        {# Suspensions history. #}
+        {% with approval.suspensions_by_start_date_asc as suspensions %}
+            {% if suspensions %}{% translate "Suspendu :" %}{% endif %}
+            <ul>
+                {% for s in suspensions %}
+                    <li{% if s.is_in_progress %} class="font-weight-bold"{% endif %}>
+                        {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
+                            du {{ start }} au {{ end }}
+                        {% endblocktranslate %}
+                        <small>({{ s.get_reason_display }})</small>
+                    </li>
+                {% endfor %}
+            </ul>
         {% endwith %}
 
-    </span>
+    </ul>
 
 {% elif approval.is_in_waiting_period %}
 
-    <span class="text-danger">
-
+    <p class="text-danger">
         {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
             <b>Expiré</b> le {{ end }} (depuis {{ since }})
         {% endblocktranslate %}
-
-    </span>
+    </p>
 
 {% endif %}

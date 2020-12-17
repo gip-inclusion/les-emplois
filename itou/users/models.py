@@ -201,6 +201,12 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
+    @cached_property
+    def last_accepted_job_application(self):
+        if self.is_job_seeker:
+            return self.job_applications.accepted().latest("created_at")
+        return None
+
 
 def get_allauth_account_user_display(user):
     return user.email

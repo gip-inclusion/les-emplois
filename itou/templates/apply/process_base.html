@@ -17,44 +17,68 @@
             <div class="col-sm">
                 <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>
             </div>
-            {% if job_application.can_download_approval_as_pdf %}
-                <div class="col-sm text-sm-right">
-                    <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="details-candidature">
-                        <button type="button" class="btn btn-outline-primary">{% translate "Télécharger l'attestation" %}</button>
-                    </a>
-                </div>
-            {% endif %}
         </div>
     </h1>
 
     {% if job_application.to_siae.is_subject_to_eligibility_rules %}
 
         {% if job_application.state.is_accepted %}
-            <div class="alert border">
-                {% if job_application.approval %}
-                    {% translate "Numéro d'agrément :" %} <b>{{ job_application.approval.number_with_spaces }}</b>
-                    <br>
-                    {% include "approvals/includes/status.html" with approval=job_application.approval %}
-                {% elif job_application.hiring_without_approval %}
-                    {% translate "Vous n'avez pas demandé de PASS IAE." %}
-                {% elif job_application.approval_manually_refused_at %}
-                    {% translate "PASS IAE refusé." %}
-                {% else %}
-                    {% translate "PASS IAE en cours de délivrance." %}
-                {% endif %}
+
+            <div class="card my-3">
+                <div class="card-body">
+
+                    {# Approval status. #}
+                    <div class="card-text">
+                        {% if job_application.approval %}
+                            {% include "approvals/includes/status.html" with approval=job_application.approval %}
+                        {% elif job_application.hiring_without_approval %}
+                            {% translate "Vous n'avez pas demandé de PASS IAE (agrément)." %}
+                        {% elif job_application.approval_manually_refused_at %}
+                            {% translate "PASS IAE (agrément) refusé." %}
+                        {% else %}
+                            {% translate "PASS IAE (agrément) en cours de délivrance." %}
+                        {% endif %}
+                    </div>
+
+                    {# Approval actions. #}
+                    {% if job_application.approval %}
+                        {% if approval_can_be_suspended_by_siae %}
+                            <a
+                                href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                class="btn btn btn-link">
+                                    {% translate "Suspendre" %}
+                            </a>
+                        {% endif %}
+                        {% if job_application.can_download_approval_as_pdf %}
+                            <a
+                                href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}"
+                                class="btn btn-outline-primary float-right disable-on-click matomo-event"
+                                data-matomo-category="agrement"
+                                data-matomo-action="telechargement-pdf"
+                                data-matomo-option="details-candidature">
+                                    {% translate "Télécharger l'attestation" %}
+                            </a>
+                        {% endif %}
+                    {% endif %}
+
+                </div>
             </div>
+
         {% elif not job_application.state.is_cancelled and approvals_wrapper.latest_approval %}
-            <div class="alert border">
-                {# Employers need to know the expiration date of an approval #}
-                {# to decide whether they may accept a job application or not. #}
-                {% translate "Agrément existant" %}
-                <br>
-                {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+
+            <div class="card my-3">
+                <div class="card-body">
+                    {# Approval status. #}
+                    <div class="card-text">
+                        {# Employers need to know the expiration date of an approval #}
+                        {# to decide whether they may accept a job application or not. #}
+                        {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+                    </div>
+                </div>
             </div>
+
         {% endif %}
 
     {% endif %}
-
-    <hr>
 
 {% endblock %}

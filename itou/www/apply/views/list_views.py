@@ -27,9 +27,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
-    job_applications = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
-    ).prefetch_related("selected_jobs__appellation")
+    job_applications = job_applications.with_list_related_data()
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
     context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
@@ -61,10 +59,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
-    job_applications = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
-    ).prefetch_related("selected_jobs__appellation")
-
+    job_applications = job_applications.with_list_related_data()
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
     context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
@@ -86,9 +81,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         job_applications = job_applications.filter(*filters_form.get_qs_filters())
         filters = filters_form.humanize_filters()
 
-    job_applications = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
-    ).prefetch_related("selected_jobs__appellation")
+    job_applications = job_applications.with_list_related_data()
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
 
     context = {

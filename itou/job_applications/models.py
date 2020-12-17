@@ -6,12 +6,13 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
+from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.models import Approval
+from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -97,6 +98,7 @@ class JobApplicationQuerySet(models.QuerySet):
     def get_unique_fk_objects(self, fk_field):
         """
         Get unique foreign key objects in a single query.
+        TODO: move this method in a custom manager since it's not chainable.
         """
         if fk_field not in ["job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"]:
             raise RuntimeError("Unauthorized fk_field")
@@ -124,6 +126,17 @@ class JobApplicationQuerySet(models.QuerySet):
             approval_number_sent_by_email=False,
             approval_manually_refused_at=None,
         )
+
+    def with_list_related_data(self):
+        """
+        Stop the deluge of database queries that is caused by accessing related
+        objects in job applications's lists.
+        """
+        qs = self.select_related(
+            "approval", "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae__convention",
+        ).prefetch_related("selected_jobs__appellation")
+        has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
+        return qs.annotate(has_suspended_approval=Exists(has_suspended_approval))
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
