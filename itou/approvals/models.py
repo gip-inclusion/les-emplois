@@ -232,20 +232,6 @@ class Approval(CommonApprovalMixin):
         return self.suspensions_by_start_date_asc.old().last()
 
     @cached_property
-    def next_suspension_min_date(self):
-        """
-        A suspension is backdatable: the starting date is the date of the
-        beginning of hiring.
-        If suspensions exist in the past, the starting date becomes the end
-        date of the most recent suspension.
-        It makes it possible to stick a new suspension to the previous one:
-        |---S1---|--S2---| => similar to an extension.
-        """
-        if self.last_old_suspension:
-            return self.last_old_suspension.end_at + relativedelta(days=1)
-        return self.user_last_accepted_job_application.hiring_start_at
-
-    @cached_property
     def can_be_suspended(self):
         return self.is_in_progress and not self.is_suspended
 
@@ -523,6 +509,17 @@ class Suspension(models.Model):
     @staticmethod
     def get_max_end_at(start_at):
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
+
+    @staticmethod
+    def next_min_start_at(approval):
+        """
+        Used when adding a new suspension to the given approval.
+        """
+        if approval.is_suspended:
+            raise RuntimeError(_("A suspension is already in progress."))
+        if approval.last_old_suspension:
+            return approval.last_old_suspension.end_at + relativedelta(days=1)
+        return approval.user_last_accepted_job_application.hiring_start_at
 
 
 class PoleEmploiApprovalManager(models.Manager):
