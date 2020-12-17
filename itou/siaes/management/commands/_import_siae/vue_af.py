@@ -41,7 +41,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     - number (by merging 3 underlying columns)
     - asp_id
     - kind
-    - start_date
+    - start_at
     - end_date
     - state
     """
@@ -66,7 +66,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
         "af_numero_avenant_modification": "modification_number",
         "af_id_structure": "asp_id",
         "af_mesure_dispositif_code": "kind",
-        "af_date_debut_effet": "start_date",
+        "af_date_debut_effet": "start_at",
         "af_date_fin_effet": "end_date",
         "af_etat_annexe_financiere_code": "state",
     }
@@ -94,7 +94,7 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
         assert row.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
         validate_af_number(row.number)
 
-    df["start_date"] = df.start_date.apply(timezone.make_aware)
+    df["start_at"] = df.start_at.apply(timezone.make_aware)
     df["end_date"] = df.end_date.apply(timezone.make_aware)
 
     df["ends_in_the_future"] = df.end_date > timezone.now()
