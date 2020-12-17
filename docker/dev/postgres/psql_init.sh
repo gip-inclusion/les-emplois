@@ -4,24 +4,11 @@ set -e
 # Initialization script.
 # https://hub.docker.com/_/postgres/#initialization-scripts
 
-# Creating a spatial database
-# https://docs.djangoproject.com/en/dev/ref/contrib/gis/install/postgis/#creating-a-spatial-database
-# We activate postgis in template1: when you create a new database you get an exact copy of template1.
+export BASE_DIR=$(dirname "$BASH_SOURCE")
+
+# We activate extensions in template1: when you create a new database you get an exact copy of template1.
+PGUSER="$POSTGRES_USER" PGDATABASE="template1" bash $BASE_DIR/psql_extensions.sh
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-
-  \c template1;
-
-  CREATE EXTENSION IF NOT EXISTS btree_gist;
-  CREATE EXTENSION IF NOT EXISTS citext;
-  CREATE EXTENSION IF NOT EXISTS pg_trgm;
-  CREATE EXTENSION IF NOT EXISTS postgis;
-  CREATE EXTENSION IF NOT EXISTS unaccent;
-
-  DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent;
-  CREATE TEXT SEARCH CONFIGURATION french_unaccent ( COPY = french );
-  ALTER TEXT SEARCH CONFIGURATION french_unaccent
-    ALTER MAPPING FOR hword, hword_part, word
-    WITH unaccent, french_stem;
 
   \c postgres;
 
