@@ -216,10 +216,6 @@ class Approval(CommonApprovalMixin):
         return self.jobapplication_set.get().state == state_accepted
 
     @cached_property
-    def user_last_accepted_job_application(self):
-        return self.user.job_applications.accepted().latest("created_at")
-
-    @cached_property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
 
@@ -241,8 +237,8 @@ class Approval(CommonApprovalMixin):
         """
         return (
             self.can_be_suspended
-            and siae == self.user_last_accepted_job_application.to_siae
-            and not self.user_last_accepted_job_application.can_be_cancelled
+            and siae == self.user.last_accepted_job_application.to_siae
+            and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
     def suspend(self, start_at, end_at, siae, reason, reason_explanation, created_by):
@@ -519,7 +515,7 @@ class Suspension(models.Model):
             raise RuntimeError(_("A suspension is already in progress."))
         if approval.last_old_suspension:
             return approval.last_old_suspension.end_at + relativedelta(days=1)
-        return approval.user_last_accepted_job_application.hiring_start_at
+        return approval.user.last_accepted_job_application.hiring_start_at
 
 
 class PoleEmploiApprovalManager(models.Manager):
