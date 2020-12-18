@@ -46,7 +46,7 @@
             {% if financial_annexes %}
                 {% for financial_annex in financial_annexes %}
                     <tr>
-                        <td>{{ financial_annex.number }}</td>
+                        <td>{{ financial_annex.number_with_spaces }}</td>
                         <td>{{ financial_annex.start_at|date:"d/m/Y" }}</td>
                         <td>{{ financial_annex.end_at|date:"d/m/Y" }}</td>
                         {% if financial_annex.is_active %}

@@ -229,7 +229,7 @@ class FinancialAnnexSelectForm(forms.Form):
 
         From https://stackoverflow.com/questions/41969899/display-field-other-than-str
         """
-        return self.number_prefix
+        return self.number_prefix_with_spaces
 
     financial_annexes = forms.ModelChoiceField(
         label=gettext_lazy("Numéro d'annexe financière sans son suffixe de type 'A1M1'"),

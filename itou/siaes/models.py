@@ -762,8 +762,31 @@ class SiaeFinancialAnnex(models.Model):
         return self.number[:-4]  # all but last 4 characters
 
     @property
+    def number_prefix_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        prefix = self.number_prefix
+        return f"{prefix[:-9]} {prefix[-9:-6]} {prefix[-6:-4]} {prefix[-4:]}"
+
+    @property
     def number_suffix(self):
         return self.number[-4:]  # last 4 characters
+
+    @property
+    def number_suffix_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        suffix = self.number_suffix
+        return f"{suffix[:-2]} {suffix[-2:]}"
+
+    @property
+    def number_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        return f"{self.number_prefix_with_spaces} {self.number_suffix_with_spaces}"
 
     @property
     def is_active(self):
