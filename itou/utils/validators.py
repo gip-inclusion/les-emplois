@@ -61,11 +61,11 @@ def validate_birthdate(birthdate):
 
 
 AF_NUMBER_PREFIX_REGEXPS = [
-    r"ACI\d{2}[A-Z\d]\d{6}",
-    r"EI\d{2}[A-Z\d]\d{5}",
-    r"AI\d{2}[A-Z\d]\d{5}",
-    r"ETTI\d{2}[A-Z\d]\d{6}",
-    r"EITI\d{2}[A-Z\d]\d{6}",
+    r"^ACI\d{2}[A-Z\d]\d{6}$",
+    r"^EI\d{2}[A-Z\d]\d{6}$",
+    r"^AI\d{2}[A-Z\d]\d{6}$",
+    r"^ETTI\d{2}[A-Z\d]\d{6}$",
+    r"^EITI\d{2}[A-Z\d]\d{6}$",
 ]
 
 
@@ -77,7 +77,7 @@ def validate_af_number(af_number):
         raise ValidationError(_("Numéro d'AF vide ou trop court"))
     suffix = af_number[-4:]  # last 4 characters
     # e.g. A0M0, A0M1, A1M0.
-    if not re.match(r"A\dM\d", suffix):
+    if not re.match(r"^A\dM\d$", suffix):
         raise ValidationError(_("Suffixe de numéro d'AF incorrect."))
 
     prefix = af_number[:-4]  # all but last 4 characters
