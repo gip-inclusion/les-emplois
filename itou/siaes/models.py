@@ -660,7 +660,7 @@ class SiaeFinancialAnnex(models.Model):
     # - ACI is the "mesure" (ASP term for "type de structure").
     # - 051 is the department (sometimes two digits and one letter).
     # - 17 are the last 2 digits of the "millésime".
-    # - 0013 is the "numéro d'ordre".
+    # - 0013 is the "numéro d'ordre" (3 digits for EI/AI, 4 digits otherwise).
     # 2) Suffix part:
     # - A0, A1, A2… is the "numéro d'avenant".
     # - M0, M1, M2… is the "numéro de modification de l'avenant".
