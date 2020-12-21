@@ -11,9 +11,12 @@ from itou.jobs.models import Appellation
 from itou.siaes.factories import (
     SiaeConventionFactory,
     SiaeFactory,
+    SiaeMembershipFactory,
     SiaeWith2MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
+    StaffCreatedSiaePendingGracePeriodFactory,
+    StaffCreatedSiaePendingImmunityPeriodFactory,
 )
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
@@ -163,6 +166,8 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.has_admin(user))
         self.assertTrue(siae.is_subject_to_eligibility_rules)
         self.assertTrue(siae.source == Siae.SOURCE_ASP)
+        self.assertTrue(siae.convention_can_be_accessed_by(user))
+        self.assertFalse(siae.convention_can_be_changed_by(user))
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:index")
@@ -178,13 +183,15 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
     def test_user_created_siae_admin_can_see_and_select_af(self):
         siae = SiaeWithMembershipFactory(source=Siae.SOURCE_USER_CREATED,)
         user = siae.members.first()
-        old_convention = siae.convention
-        # Only conventions of the same SIREN can be selected.
-        new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
-
         self.assertTrue(siae.has_admin(user))
         self.assertTrue(siae.is_subject_to_eligibility_rules)
         self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
+        self.assertTrue(siae.convention_can_be_accessed_by(user))
+        self.assertTrue(siae.convention_can_be_changed_by(user))
+
+        old_convention = siae.convention
+        # Only conventions of the same SIREN can be selected.
+        new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:index")
@@ -210,12 +217,15 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertNotEqual(siae.convention, old_convention)
         self.assertEqual(siae.convention, new_convention)
 
-    def test_staff_created_siae_admin_cannot_see_nor_select_af(self):
-        siae = SiaeWithMembershipFactory(source=Siae.SOURCE_STAFF_CREATED)
-        user = siae.members.first()
+    def test_staff_created_siae_admin_cannot_see_nor_select_af_during_immunity_period(self):
+        membership = SiaeMembershipFactory(siae=StaffCreatedSiaePendingImmunityPeriodFactory())
+        siae = membership.siae
+        user = membership.user
         self.assertTrue(siae.has_admin(user))
         self.assertTrue(siae.is_subject_to_eligibility_rules)
         self.assertTrue(siae.source == Siae.SOURCE_STAFF_CREATED)
+        self.assertFalse(siae.convention_can_be_accessed_by(user))
+        self.assertFalse(siae.convention_can_be_changed_by(user))
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:index")
@@ -228,12 +238,52 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
 
+    def test_staff_created_siae_admin_can_see_and_select_af_during_grace_period(self):
+        membership = SiaeMembershipFactory(siae=StaffCreatedSiaePendingGracePeriodFactory())
+        siae = membership.siae
+        user = membership.user
+        self.assertTrue(siae.has_admin(user))
+        self.assertTrue(siae.is_subject_to_eligibility_rules)
+        self.assertTrue(siae.source == Siae.SOURCE_STAFF_CREATED)
+        self.assertTrue(siae.convention_can_be_accessed_by(user))
+        self.assertTrue(siae.convention_can_be_changed_by(user))
+
+        old_convention = siae.convention
+        # Only conventions of the same SIREN can be selected.
+        new_convention = SiaeConventionFactory(siret_signature=f"{siae.siren}12345")
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:index")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:show_financial_annexes")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        url = reverse("siaes_views:select_financial_annex")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(siae.convention, old_convention)
+        self.assertNotEqual(siae.convention, new_convention)
+
+        post_data = {
+            "financial_annexes": new_convention.financial_annexes.get().id,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        siae.refresh_from_db()
+        self.assertNotEqual(siae.convention, old_convention)
+        self.assertEqual(siae.convention, new_convention)
+
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
         siae = SiaeWithMembershipFactory(membership__is_siae_admin=False)
         user = siae.members.first()
         self.assertFalse(siae.has_admin(user))
         self.assertTrue(siae.is_subject_to_eligibility_rules)
         self.assertTrue(siae.source == Siae.SOURCE_ASP)
+        self.assertFalse(siae.convention_can_be_accessed_by(user))
+        self.assertFalse(siae.convention_can_be_changed_by(user))
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:index")
@@ -252,6 +302,8 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.has_admin(user))
         self.assertFalse(siae.is_subject_to_eligibility_rules)
         self.assertTrue(siae.source == Siae.SOURCE_GEIQ)
+        self.assertFalse(siae.convention_can_be_accessed_by(user))
+        self.assertFalse(siae.convention_can_be_changed_by(user))
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:index")
@@ -270,6 +322,8 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         self.assertTrue(siae.has_admin(user))
         self.assertFalse(siae.is_subject_to_eligibility_rules)
         self.assertTrue(siae.source == Siae.SOURCE_USER_CREATED)
+        self.assertFalse(siae.convention_can_be_accessed_by(user))
+        self.assertFalse(siae.convention_can_be_changed_by(user))
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:index")

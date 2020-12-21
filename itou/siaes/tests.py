@@ -12,6 +12,9 @@ from itou.siaes.factories import (
     SiaeWith4MembershipsFactory,
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
+    StaffCreatedSiaeAfterGracePeriodFactory,
+    StaffCreatedSiaePendingGracePeriodFactory,
+    StaffCreatedSiaePendingImmunityPeriodFactory,
 )
 from itou.siaes.models import Siae
 from itou.users.factories import SiaeStaffFactory
@@ -168,27 +171,53 @@ class ModelTest(TestCase):
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], user.email)
 
-    def test_deactivation_queryset_methods(self):
+    def test_activation_of_active_siae(self):
         siae = SiaeFactory()
+        self.assertTrue(siae.is_active)
+        self.assertFalse(siae.grace_period_has_expired)
         self.assertEqual(Siae.objects.count(), 1)
         self.assertEqual(Siae.objects.active().count(), 1)
         self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
-        siae.delete()
-        self.assertEqual(Siae.objects.count(), 0)
 
+    def test_activation_of_siae_pending_grace_period(self):
         siae = SiaePendingGracePeriodFactory()
+        self.assertFalse(siae.is_active)
+        self.assertFalse(siae.grace_period_has_expired)
         self.assertEqual(Siae.objects.count(), 1)
         self.assertEqual(Siae.objects.active().count(), 0)
         self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
-        siae.delete()
-        self.assertEqual(Siae.objects.count(), 0)
 
+    def test_activation_of_siae_after_grace_period(self):
         siae = SiaeAfterGracePeriodFactory()
+        self.assertFalse(siae.is_active)
+        self.assertTrue(siae.grace_period_has_expired)
         self.assertEqual(Siae.objects.count(), 1)
         self.assertEqual(Siae.objects.active().count(), 0)
         self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 0)
-        siae.delete()
-        self.assertEqual(Siae.objects.count(), 0)
+
+    def test_activation_of_staff_created_siae_pending_immunity(self):
+        siae = StaffCreatedSiaePendingImmunityPeriodFactory()
+        self.assertTrue(siae.is_active)
+        self.assertFalse(siae.grace_period_has_expired)
+        self.assertEqual(Siae.objects.count(), 1)
+        self.assertEqual(Siae.objects.active().count(), 1)
+        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
+
+    def test_activation_of_staff_created_siae_pending_grace_period(self):
+        siae = StaffCreatedSiaePendingGracePeriodFactory()
+        self.assertFalse(siae.is_active)
+        self.assertFalse(siae.grace_period_has_expired)
+        self.assertEqual(Siae.objects.count(), 1)
+        self.assertEqual(Siae.objects.active().count(), 0)
+        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 1)
+
+    def test_activation_of_staff_created_siae_after_grace_period(self):
+        siae = StaffCreatedSiaeAfterGracePeriodFactory()
+        self.assertFalse(siae.is_active)
+        self.assertTrue(siae.grace_period_has_expired)
+        self.assertEqual(Siae.objects.count(), 1)
+        self.assertEqual(Siae.objects.active().count(), 0)
+        self.assertEqual(Siae.objects.active_or_in_grace_period().count(), 0)
 
     def test_active_member_with_many_memberships(self):
         siae1 = SiaeWith2MembershipsFactory(membership2__is_active=False)

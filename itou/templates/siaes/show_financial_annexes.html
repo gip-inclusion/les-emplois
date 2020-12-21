@@ -10,16 +10,16 @@
         <div class="alert alert-success" role="alert">
             {% translate "Votre structure est active car elle est associée à au moins une annexe financière valide listée ci-dessous ou bien elle a été manuellement activée par notre support. Vous n'avez rien à faire." %}
         </div>
-    {% elif current_siae_is_asp %}
+    {% elif can_select_af %}
+        <div class="alert alert-danger" role="alert">
+            {# Inactive user/staff created siaes can be fixed by the user. #}
+            {% translate "Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous." %}
+        </div>
+    {% else %}
         <div class="alert alert-danger" role="alert">
             {# Inactive siaes of ASP source cannot be fixed by user. #}
             {% translate "Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez nous : " %}
             {{ ITOU_EMAIL_ASSISTANCE }}
-        </div>
-    {% elif current_siae_is_user_created %}
-        <div class="alert alert-danger" role="alert">
-            {# Inactive user created siaes can be fixed by the user. #}
-            {% translate "Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous." %}
         </div>
     {% endif %}
 

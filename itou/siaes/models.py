@@ -21,17 +21,19 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 class SiaeQuerySet(models.QuerySet):
     @property
     def active_lookup(self):
+        now = timezone.now()
+        staff_creation_immunity_period = timezone.timedelta(days=Siae.STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS)
         return (
             # GEIQ, EA... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
-            # Staff created siaes are always active until eventually
-            # converted to ASP source siaes by import_siae script.
-            # Such siaes are created by our staff when ASP data is lacking
-            # the most recent data about them.
-            | Q(source=Siae.SOURCE_STAFF_CREATED)
-            # ASP source siaes and user created siaes are active if and only
-            # if they have an active convention.
+            # Our staff manually creates siaes when ASP data is lacking the most recent data.
+            # They are considered active for a short immunity period.
+            # They are sometimes, but not always, converted to regular ASP source siaes by the import_siae script
+            # when and if their SIRET is detected in ASP data.
+            | Q(source=Siae.SOURCE_STAFF_CREATED, created_at__gte=now - staff_creation_immunity_period)
+            # ASP source siaes and user created siaes are active if and only if they have an active convention.
+            # Staff siaes might also have an active convention.
             | Q(convention__is_active=True)
         )
 
@@ -41,15 +43,16 @@ class SiaeQuerySet(models.QuerySet):
     def active_or_in_grace_period(self):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        staff_creation_immunity_period = timezone.timedelta(days=Siae.STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
             self.active_lookup
-            # All user created siaes should have a convention but a small
-            # number of them (58 as of November 2020) don't because they
-            # were created before convention assignment was automated.
-            # This number will only decrease over time as siae admin users
-            # select their convention.
+            # All user created siaes should have a convention but a small number of them (79 as of December 2020)
+            # don't because they were created before convention assignment was automated. This number will only
+            # decrease over time as siae admin users select their convention.
             # We consider them as experiencing their grace period.
             | Q(source=Siae.SOURCE_USER_CREATED, convention__isnull=True)
+            # Staff created siaes experience a regular grace period after their immunity period.
+            | Q(source=Siae.SOURCE_STAFF_CREATED, created_at__gte=now - staff_creation_immunity_period - grace_period)
             # Include siaes experiencing their grace period.
             | Q(convention__deactivated_at__gte=now - grace_period)
         )
@@ -150,6 +153,12 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (SOURCE_STAFF_CREATED, _("Staff Itou")),
     )
 
+    # When staff creates a SIAE manually, the siae is considered active for so many days, no questions asked.
+    # If its SIRET eventually appears in ASP data, `import_siae` script will convert it to a regular siae
+    # of ASP source. If it did not happen and the source is still SOURCE_STAFF_CREATED after this period,
+    # the siae is considered inactive and its grace period starts.
+    STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS = 30
+
     # https://code.travail.gouv.fr/code-du-travail/l5132-4
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
     ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
@@ -229,18 +238,20 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def is_active(self):
+        now = timezone.now()
+        staff_creation_immunity_period = timezone.timedelta(days=self.STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS)
         if not self.is_subject_to_eligibility_rules:
             # GEIQ, EA... have no convention logic and thus are always active.
             return True
-        if self.source == Siae.SOURCE_STAFF_CREATED:
-            # Staff created siaes are always active until eventually
-            # converted to ASP source siaes by import_siae script.
-            # Such siaes are created by our staff when ASP data is lacking
-            # the most recent data about them.
+        if self.source == self.SOURCE_STAFF_CREATED and self.created_at >= now - staff_creation_immunity_period:
+            # Our staff manually creates siaes when ASP data is lacking the most recent data.
+            # They are considered active for a short immunity period.
+            # They are sometimes, but not always, converted to regular ASP source siaes by the import_siae script
+            # when and if their SIRET is detected in ASP data.
             return True
-        # ASP source siaes and user created siaes are active if and only
-        # if they have an active convention.
-        return self.convention and self.convention.is_active
+        # ASP source siaes and user created siaes are active if and only if they have an active convention.
+        # Staff siaes might also have an active convention.
+        return self.convention is not None and self.convention.is_active
 
     @property
     def asp_id(self):
@@ -401,25 +412,31 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def grace_period_end_date(self):
         """
-        This method is only called for inactive siaes,
-        in other words siaes during or after their grace period,
+        This method is only called for inactive siaes, in other words siaes during or after their grace period,
         to figure out the exact end date of their grace period.
         """
+        now = timezone.now()
+        grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        staff_creation_immunity_period = timezone.timedelta(days=self.STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS)
+        one_year = timezone.timedelta(days=365)
+
         # This should never happen but let's be defensive in this case.
         if self.is_active:
-            return timezone.now() + timezone.timedelta(days=365)
+            return now + one_year
 
         if self.source == self.SOURCE_USER_CREATED and not self.convention:
-            # All user created siaes should have a convention but a small
-            # number of them (58 as of November 2020) don't because they
-            # were created before convention assignment was automated.
-            # This number will only decrease over time as siae admin users
-            # select their convention.
+            # All user created siaes should have a convention but a small number of them (79 as of December 2020)
+            # don't because they were created before convention assignment was automated. This number will only
+            # decrease over time as siae admin users select their convention.
             # We consider them as experiencing their grace period.
-            return timezone.now() + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+            return now + grace_period
+
+        if self.source == self.SOURCE_STAFF_CREATED and not self.convention:
+            # Staff created siaes experience a grace period once their immunity period ends.
+            return self.created_at + staff_creation_immunity_period + grace_period
 
         grace_period_start_date = self.convention.deactivated_at
-        return grace_period_start_date + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+        return grace_period_start_date + grace_period
 
     @property
     def grace_period_has_expired(self):
@@ -434,28 +451,34 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         """
         if not self.has_admin(user):
             return False
+
+        if self.grace_period_has_expired:
+            return False
+
         if not self.is_subject_to_eligibility_rules:
-            # AF interfaces only makes sense for SIAE, not for GEIQ EA etc.
+            # "My AFs" interface only makes sense for SIAE, not for GEIQ EA etc.
             return False
-        if self.source not in [self.SOURCE_ASP, self.SOURCE_USER_CREATED]:
-            # AF interfaces do not make sense for staff created siaes, which
-            # have no convention yet, and will eventually be converted into
-            # siaes of ASP source by `import_siae.py` script.
+
+        now = timezone.now()
+        staff_creation_immunity_period = timezone.timedelta(days=self.STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS)
+        if self.source == Siae.SOURCE_STAFF_CREATED and self.created_at >= now - staff_creation_immunity_period:
+            # During the immunity period, we do not give convention access to the user because we are waiting for
+            # ASP data about the siae. Once that period expires, we give convention access to the user so that they
+            # can select a convention by themselves.
             return False
+
         return True
 
     def convention_can_be_changed_by(self, user):
         """
-        Decides whether the user can change the siae convention or not.
-        In other words, whether the user can not only access the "My AFs" interface
-        but also use it to select a different convention for the siae.
+        Decides whether the user can change the siae convention or not. In other words, whether the user can not only
+        access the "My AFs" interface but also use it to select a different convention for the siae.
         """
         if not self.convention_can_be_accessed_by(user):
             return False
-        # The link between an ASP source siae and its convention
-        # is immutable. Only user created siaes can have their
-        # convention changed by the user.
-        return self.source == self.SOURCE_USER_CREATED
+        # The link between an ASP source siae and its convention is immutable. Only user and staff created siaes can
+        # have their convention changed by the user.
+        return self.source != self.SOURCE_ASP
 
 
 class SiaeMembership(models.Model):

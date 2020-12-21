@@ -138,8 +138,6 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
         "convention": current_siae.convention,
         "financial_annexes": financial_annexes,
         "can_select_af": current_siae.convention_can_be_changed_by(request.user),
-        "current_siae_is_asp": current_siae.source == Siae.SOURCE_ASP,
-        "current_siae_is_user_created": current_siae.source == Siae.SOURCE_USER_CREATED,
     }
     return render(request, template_name, context)
 

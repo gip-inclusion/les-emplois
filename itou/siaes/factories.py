@@ -13,6 +13,7 @@ from itou.utils.address.departments import DEPARTMENTS
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
 
 NOW = timezone.now()
+STAFF_CREATION_IMMUNITY_PERIOD = timezone.timedelta(days=models.Siae.STAFF_CREATION_IMMUNITY_PERIOD_IN_DAYS)
 GRACE_PERIOD = timezone.timedelta(days=models.SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
 ONE_DAY = timezone.timedelta(days=1)
 ONE_MONTH = timezone.timedelta(days=30)
@@ -162,3 +163,21 @@ class SiaeConventionAfterGracePeriodFactory(SiaeConventionFactory):
 
 class SiaeAfterGracePeriodFactory(SiaeFactory):
     convention = factory.SubFactory(SiaeConventionAfterGracePeriodFactory)
+
+
+class StaffCreatedSiaePendingImmunityPeriodFactory(SiaeFactory):
+    source = models.Siae.SOURCE_STAFF_CREATED
+    convention = None
+    created_at = NOW - ONE_DAY
+
+
+class StaffCreatedSiaePendingGracePeriodFactory(SiaeFactory):
+    source = models.Siae.SOURCE_STAFF_CREATED
+    convention = None
+    created_at = NOW - STAFF_CREATION_IMMUNITY_PERIOD - ONE_DAY
+
+
+class StaffCreatedSiaeAfterGracePeriodFactory(SiaeFactory):
+    source = models.Siae.SOURCE_STAFF_CREATED
+    convention = None
+    created_at = NOW - STAFF_CREATION_IMMUNITY_PERIOD - GRACE_PERIOD - ONE_DAY
