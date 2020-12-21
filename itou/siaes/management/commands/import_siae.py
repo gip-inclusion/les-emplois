@@ -18,6 +18,7 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.db.models import Q
+from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.convention import (
     check_convention_data_consistency,
@@ -26,10 +27,14 @@ from itou.siaes.management.commands._import_siae.convention import (
     update_existing_conventions,
 )
 from itou.siaes.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
-from itou.siaes.management.commands._import_siae.siae import build_siae, should_siae_be_created
+from itou.siaes.management.commands._import_siae.siae import (
+    build_siae,
+    does_siae_have_an_active_convention,
+    should_siae_be_created,
+)
 from itou.siaes.management.commands._import_siae.utils import could_siae_be_deleted, timeit
 from itou.siaes.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
-from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW
+from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_SIAE_ROW, SIRET_TO_ASP_ID
 from itou.siaes.models import Siae, SiaeConvention
 
 
@@ -90,6 +95,54 @@ class Command(BaseCommand):
                         f"siae.id={siae.id} is user created and "
                         f"has no member but has job applications thus cannot be deleted"
                     )
+
+    @timeit
+    def manage_staff_created_siaes(self):
+        """
+        Itou staff regularly creates siaes manually when ASP data lags behind
+        for some specific employers.
+
+        Normally the SIRET later appears in ASP data then the siae is
+        converted to ASP source by `create_new_siaes` method.
+
+        But sometimes a staff created siae's SIRET never appear in ASP data.
+        We wait 30 days (as decided with staff team) before converting
+        and deactivating such siae.
+
+        Note that there will be no grace period in this edge case, since
+        there is no convention and grace period logics relies on the convention.
+
+        We convert them into user created siaes rather than ASP source siaes,
+        at it makes more sense since they are not present in ASP data. They
+        thus become user created siaes with no convention.
+        If and when their SIRET eventually appears in ASP data, they will
+        be converted to ASP source.
+        """
+        one_month_ago = timezone.now() - timezone.timedelta(days=30)
+        staff_created_siaes = Siae.objects.filter(
+            kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS, source=Siae.SOURCE_STAFF_CREATED
+        )
+
+        recent_siaes = staff_created_siaes.filter(created_at__gte=one_month_ago)
+        self.log(f"{recent_siaes.count()} siaes created by staff less than one month ago (will not be converted)")
+
+        old_siaes = staff_created_siaes.filter(created_at__lt=one_month_ago)
+        self.log(
+            f"{old_siaes.count()} siaes created by staff more than one month ago (will be converted to USER_CREATED source)"
+        )
+        for siae in old_siaes:
+            self.log(f"https://inclusion.beta.gouv.fr/admin/siaes/siae/{siae.id}")
+            if siae.members.count():
+                self.log(f"siae.id={siae.id} has members!")
+            if siae.job_applications_received.count():
+                self.log(f"siae.id={siae.id} has job applications!")
+            if siae.siret in SIRET_TO_ASP_ID:
+                self.log(f"{siae.siret} found in Vue Structure!")
+            if does_siae_have_an_active_convention(siae):
+                self.log(f"siae.id={siae.id} has active convention!")
+            if not self.dry_run:
+                siae.source = Siae.SOURCE_USER_CREATED
+                siae.save()
 
     def update_siae_auth_email(self, siae, new_auth_email):
         assert siae.auth_email != new_auth_email
@@ -302,6 +355,7 @@ class Command(BaseCommand):
         self.set_logger(options.get("verbosity"))
 
         self.delete_user_created_siaes_without_members()
+        self.manage_staff_created_siaes()
         self.update_siret_and_auth_email_of_existing_siaes()
         self.create_new_siaes()
         self.manage_conventions()
