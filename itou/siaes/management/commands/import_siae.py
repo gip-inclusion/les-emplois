@@ -17,6 +17,7 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 import logging
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.convention import (
     check_convention_data_consistency,
@@ -83,6 +84,52 @@ class Command(BaseCommand):
                         f"has no member but has job applications thus cannot be deleted"
                     )
                     self.fatal_errors += 1
+
+    @timeit
+    def manage_staff_created_siaes(self):
+        """
+        Itou staff regularly creates siaes manually when ASP data lags behind for some specific employers.
+
+        Normally the SIRET later appears in ASP data then the siae is converted to ASP source by `create_new_siaes`.
+
+        But sometimes a staff created siae's SIRET never appear in ASP data. We wait 90 days (as decided with staff
+        team) before considering it invalid and attempting deleting it.
+
+        If the siae cannot be deleted because it has data, a warning will be shown to supportix.
+        """
+        # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
+        # case it should be converted to a regular user created siae so that the usual convention logic applies.
+        for siae in Siae.objects.filter(
+            kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_STAFF_CREATED, convention__isnull=False
+        ):
+            self.log(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
+            siae.source = Siae.SOURCE_USER_CREATED
+            siae.save()
+
+        three_months_ago = timezone.now() - timezone.timedelta(days=90)
+        staff_created_siaes = Siae.objects.filter(
+            kind__in=Siae.ASP_MANAGED_KINDS,
+            source=Siae.SOURCE_STAFF_CREATED,
+        )
+
+        recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
+        self.log(
+            f"{recent_unconfirmed_siaes.count()} siaes created recently by staff"
+            f" (still waiting for ASP data to be confirmed)"
+        )
+
+        old_unconfirmed_siaes = staff_created_siaes.filter(created_at__lt=three_months_ago)
+        self.log(f"{old_unconfirmed_siaes.count()} siaes created by staff should be deleted as they are unconfirmed")
+        for siae in old_unconfirmed_siaes:
+            if could_siae_be_deleted(siae):
+                self.log(f"deleted unconfirmed siae.id={siae.id} created by staff a while ago")
+                self.delete_siae(siae)
+            else:
+                self.log(
+                    f"FATAL ERROR: Please fix unconfirmed staff created siae.id={siae.id}"
+                    f" by either deleting it or attaching it to the correct convention"
+                )
+                self.fatal_errors += 1
 
     def update_siae_auth_email(self, siae, new_auth_email):
         assert siae.auth_email != new_auth_email
@@ -274,6 +321,7 @@ class Command(BaseCommand):
 
         self.delete_user_created_siaes_without_members()
         update_existing_conventions()
+        self.manage_staff_created_siaes()
         self.update_siret_and_auth_email_of_existing_siaes()
         self.create_new_siaes()
         self.create_conventions()
