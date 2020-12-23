@@ -1,4 +1,3 @@
-# from django.db import models
 import re
 from enum import Enum
 
@@ -105,11 +104,11 @@ class LaneType(Enum):
     ZUP = "Zone urbanisation prio"
 
     @classmethod
-    def with_similar_name(cls, name, fmt=str.upper):
+    def with_similar_name(cls, name):
         "Returns enum with similar name (fmt-fn wise)"
         for elt in cls:
-            test = fmt(name)
-            if test == fmt(elt.name):
+            test = name.lower()
+            if test == elt.name.lower():
                 return elt
 
         return None
