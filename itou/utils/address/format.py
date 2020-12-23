@@ -5,7 +5,7 @@ from itou.users.models import User
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-def format_address(obj, update_coords=False):
+def format_address(obj, update_coords=False, strict=True):
     """
     Formats the address contained in obj into a valid address "structure" for ASP ER exports.
 
@@ -34,7 +34,7 @@ def format_address(obj, update_coords=False):
     - OK => (result_dict, None),
     - KO => (None, error_message)
     """
-    if not isinstance(obj, User):
+    if strict and not isinstance(obj, User):
         return None, "Only valid for User objects"
 
     # Do we have enough data to make an extraction?
@@ -94,7 +94,7 @@ def format_address(obj, update_coords=False):
     if lt:
         result["lane_type"] = lt.name
     else:
-        return None, f"Can't find lane type: {lane_type}"
+        return None, f"Can't find lane type: {lane_type} for address: {address}"
 
     # INSEE code: must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")

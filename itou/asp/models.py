@@ -131,6 +131,7 @@ _LANE_TYPE_ALIASES = {
     "^voies": LaneType.VOIE,
     "^domaines": LaneType.DOM,
     "^allees": LaneType.ALL,
+    "^lieu?[ -]dit": LaneType.ALL,
 }
 
 
