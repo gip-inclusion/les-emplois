@@ -1,10 +1,11 @@
+from unittest import mock
+
 from django.test import TestCase
 
-from unittest import mock
 from itou.asp.models import LaneType, find_lane_type_aliases
-from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, random_result_mock
-from itou.utils.address.format import format_address
 from itou.users.factories import JobSeekerWithAddressFactory
+from itou.utils.address.format import format_address
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, random_result_mock
 
 
 class LaneTypeTest(TestCase):
@@ -21,7 +22,6 @@ class LaneExtensionTest(TestCase):
 
 
 class FormatASPAdresses(TestCase):
-
     def test_valid_types(self):
         result, error = format_address({})
         self.assertFalse(result)
