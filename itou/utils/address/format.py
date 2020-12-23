@@ -1,13 +1,8 @@
-import unicodedata
+from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.users.models import User
 from itou.utils.apis.geocoding import get_geocoding_data
-
-
-def strip_accents(s):
-    nfkd_form = unicodedata.normalize("NFKD", s)
-    return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
 def format_address(obj, update_coords=False):
@@ -77,7 +72,7 @@ def format_address(obj, update_coords=False):
         return None, "Unable to get address lane"
     else:
         lane = address.get("lane") or address.get("address")
-        lane = strip_accents(lane)
+        lane = unidecode(lane)
         result["lane"] = lane
 
     # Lane type processing (Avenue, RUe, Boulevard ...)
@@ -89,7 +84,7 @@ def format_address(obj, update_coords=False):
         LaneType.with_similar_name(lane_type)
         # The API field is similar to an exiting value
         # example: got "allee" for "Allée"
-        or LaneType.with_similar_value(lane_type, fmt=lambda x: strip_accents(x.lower()))
+        or LaneType.with_similar_value(lane_type, fmt=lambda x: unidecode(x.lower()))
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
