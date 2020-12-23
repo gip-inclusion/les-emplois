@@ -3,13 +3,18 @@
 Various helpers shared by the import_siae, import_geiq and import_ea_eatt scripts.
 
 """
+import os
 from functools import wraps
 from time import time
+
+from django.utils import timezone
 
 from itou.siaes.models import Siae
 from itou.utils.address.models import AddressMixin
 from itou.utils.apis.geocoding import get_geocoding_data
 
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 SHOW_IMPORT_SIAE_METHOD_TIMER = False
 
@@ -35,6 +40,30 @@ def timeit(f):
         return result
 
     return wrap
+
+
+def get_filename(filename_prefix, filename_extension, description):
+    """
+    Automatically detect the correct filename.
+    e.g. fluxIAE_Structure_14122020_075350.csv
+    e.g. fluxIAE_AnnexeFinanciere_14122020_063002.csv
+    """
+    filenames = []
+    path = f"{CURRENT_DIR}/../data"
+    for filename in os.listdir(path):
+        root, ext = os.path.splitext(filename)
+        if root.startswith(filename_prefix) and ext == filename_extension:
+            filenames.append(filename)
+
+    if len(filenames) == 0:
+        raise RuntimeError(f"No match found for {description}")
+    if len(filenames) > 1:
+        raise RuntimeError(f"Too many matches for {description}")
+    assert len(filenames) == 1
+
+    filename = filenames[0]
+    print(f"Selected file {filename} for {description}.")
+    return os.path.join(path, filename)
 
 
 def clean_string(s):
@@ -124,11 +153,18 @@ def sync_structures(df, name, kinds, build_structure, dry_run):
     print(f"{len(deletable_sirets)} {name} will be deleted.")
     for siret in deletable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
+
+        one_week_ago = timezone.now() - timezone.timedelta(days=7)
+        if siae.source == Siae.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
+            print(f"siae.id={siae.id} is staff created and too recent to be deleted.")
+            continue
+
         if could_siae_be_deleted(siae):
             print(f"siae.id={siae.id} will be deleted.")
             if not dry_run:
                 siae.delete()
-        else:
-            # As of 2020/10/16, 5 GEIQ are undeletable.
-            # As of 2020/12/11, 5 EA and EATT are undeletable.
-            print(f"siae.id={siae.id} cannot be deleted as it has data.")
+            continue
+
+        # As of 2020/10/16, 5 GEIQ are undeletable.
+        # As of 2020/12/11, 5 EA and EATT are undeletable.
+        print(f"siae.id={siae.id} cannot be deleted as it has data.")

@@ -365,6 +365,10 @@ class UtilsValidatorsTest(TestCase):
         self.assertRaises(ValidationError, validate_af_number, "ACI063170007")
         self.assertRaises(ValidationError, validate_af_number, "ACI063170007Z1Z1")
 
+        # Missing digit.
+        self.assertRaises(ValidationError, validate_af_number, "EI08018002A1M1")
+        self.assertRaises(ValidationError, validate_af_number, "AI08816001A1M1")
+
         # Correct values.
         validate_af_number("ACI063170007A0M0")
         validate_af_number("ACI063170007A0M1")

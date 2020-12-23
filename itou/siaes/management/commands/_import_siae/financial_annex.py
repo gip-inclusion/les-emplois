@@ -32,8 +32,8 @@ def get_creatable_and_deletable_afs(dry_run):
         assert af.convention.kind == row.kind
 
         # Sometimes an AF start date changes.
-        if af.start_at != row.start_date:
-            af.start_at = row.start_date
+        if af.start_at != row.start_at:
+            af.start_at = row.start_at
             if not dry_run:
                 af.save()
         assert af.end_at == row.end_date
@@ -76,7 +76,7 @@ def build_financial_annex_from_number(number):
     return SiaeFinancialAnnex(
         number=row.number,
         state=row.state,
-        start_at=row.start_date,
+        start_at=row.start_at,
         end_at=row.end_date,
         convention=convention_query.get(),
     )

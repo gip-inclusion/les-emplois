@@ -82,5 +82,61 @@
       "description": "L’agent de service assure des prestations à partir d’instructions précises, sous le contrôle de sa hiérarchie. Il effectue des travaux d’entretien courant consistant en un enchaînement de tâches simples et répétitives.\r\n• Organiser son travail en fonction des exigences de l’activité et du temps qui est imparti\r\n• Préparer le matériel, les produits nettoyants et baliser les zones glissantes\r\n• Enlever les poussières des surfaces, les détritus, trier et vider les corbeilles\r\n• Nettoyer et laver les sols, les mobiliers\r\n• Nettoyer les sanitaires, cuisines et approvisionner les distributeurs d'essuie-mains, de savon,...\r\n• Eliminer par aération, désodorisation, les pollutions de lieux\r\n• Renseigner les supports de suivi (horaire, lieu, ...) et informer l'interlocuteur concerné des anomalies constatées\r\n• Nettoyer et entretenir le matériel\r\n• Ouverture et fermeture du site",
       "ui_rank": 32767
    }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 7,
+   "fields": {
+      "appellation": "16464",
+      "siae": 3853,
+      "created_at": "2020-04-09T13:36:58Z",
+      "updated_at": "2020-04-09T14:44:59.861Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 8,
+   "fields": {
+      "appellation": "12150",
+      "siae": 3853,
+      "created_at": "2020-04-09T13:36:58Z",
+      "updated_at": "2020-04-09T14:44:59.870Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 9,
+   "fields": {
+      "appellation": "16464",
+      "siae": 3854,
+      "created_at": "2020-04-09T13:36:58Z",
+      "updated_at": "2020-04-09T14:44:59.861Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 10,
+   "fields": {
+      "appellation": "12150",
+      "siae": 3854,
+      "created_at": "2020-04-09T13:36:58Z",
+      "updated_at": "2020-04-09T14:44:59.870Z",
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
 }
 ]
