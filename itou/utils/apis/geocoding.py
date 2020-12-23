@@ -36,25 +36,14 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
 
 
 def process_geocoding_data(data):
-
-    if not data:
-        return None
-
-    longitude = data["geometry"]["coordinates"][0]
-    latitude = data["geometry"]["coordinates"][1]
-
-    return {
-        "score": data["properties"]["score"],
-        "address_line_1": data["properties"]["name"],
-        "post_code": data["properties"]["postcode"],
-        "city": data["properties"]["city"],
-        "longitude": longitude,
-        "latitude": latitude,
-        "coords": GEOSGeometry(f"POINT({longitude} {latitude})"),
-    }
-
-
-def detailed_geocoding_data(data):
+    """
+    Contains parts of an address useful for objects like User
+    but also some fields needed for ASP address formatting:
+    - insee_code
+    - number
+    - lane
+    - address (different from address_line_1)
+    """
     if not data:
         return None
     if not data.get("properties"):
@@ -65,6 +54,7 @@ def detailed_geocoding_data(data):
 
     return {
         "score": data["properties"]["score"],
+        "address_line_1": data["properties"]["name"],
         "number": data["properties"].get("housenumber", None),
         "lane": data["properties"].get("street", None),
         "address": data["properties"]["name"],
@@ -77,8 +67,8 @@ def detailed_geocoding_data(data):
     }
 
 
-def get_geocoding_data(address, post_code=None, limit=1, fmt=process_geocoding_data):
+def get_geocoding_data(address, post_code=None, limit=1):
 
     geocoding_data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
-    return fmt(geocoding_data)
+    return process_geocoding_data(geocoding_data)

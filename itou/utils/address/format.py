@@ -2,7 +2,7 @@ import unicodedata
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.users.models import User
-from itou.utils.apis.geocoding import detailed_geocoding_data, get_geocoding_data
+from itou.utils.apis.geocoding import get_geocoding_data
 
 
 def strip_accents(s):
@@ -47,7 +47,7 @@ def format_address(obj, update_coords=False):
         return None, "Incomplete address data"
 
     # first we use geo API to get a 'lane' and a number
-    address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code, fmt=detailed_geocoding_data)
+    address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
 
     if not address:
         return None, "Geocoding error, unable to get result"
