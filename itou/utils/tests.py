@@ -269,7 +269,11 @@ class UtilsGeocodingTest(TestCase):
         expected = {
             "score": 0.587663373207207,
             "address_line_1": "10 Pl des Cinq Martyrs du Lycee Buffon",
+            "number": "10",
+            "lane": "Pl des Cinq Martyrs du Lycee Buffon",
+            "address": "10 Pl des Cinq Martyrs du Lycee Buffon",
             "post_code": "75015",
+            "insee_code": "75115",
             "city": "Paris",
             "longitude": 2.316754,
             "latitude": 48.838411,
