@@ -24,7 +24,8 @@ class City(models.Model):
         verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3, db_index=True
     )
     post_codes = ArrayField(models.CharField(max_length=5), verbose_name=_("Codes postaux"), blank=True)
-    code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=5, unique=True)
+    # Most INSEE codes have 5 digits but some have 6, e.g. Sainte-Clotilde - 974454.
+    code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=6, unique=True)
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
