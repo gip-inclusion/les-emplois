@@ -17,23 +17,16 @@ For convenience we systematically call such an (asp_id, kind) identifier
 an "siae_key" throughout the import_siae.py script code.
 
 """
-import os
-
 import pandas as pd
 from django.utils import timezone
 
-from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
+from itou.siaes.management.commands._import_siae.utils import get_filename, remap_columns, timeit
 from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.utils.validators import validate_af_number
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-VUE_AF_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_AnnexeFinanciere_14122020_063002.csv"
-
-
 @timeit
-def get_vue_af_df(filename=VUE_AF_FILENAME):
+def get_vue_af_df():
     """
     "Vue AF" is short for "Vue Annexes Financières".
     This export makes us able to know which siae is or is not "conventionnée" as of today.
@@ -45,6 +38,10 @@ def get_vue_af_df(filename=VUE_AF_FILENAME):
     - end_date
     - state
     """
+    filename = get_filename(
+        filename_prefix="fluxIAE_AnnexeFinanciere_", filename_extension=".csv", description="Vue AF"
+    )
+
     df = pd.read_csv(
         filename,
         sep="|",

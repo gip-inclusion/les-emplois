@@ -11,22 +11,15 @@ It contains almost all data to build a siae from scratch with 2 exceptions:
 - it does not contain the auth_email (see "Liste Correspondants technique" instead).
 
 """
-import os
-
 import numpy as np
 import pandas as pd
 
-from itou.siaes.management.commands._import_siae.utils import remap_columns, timeit
+from itou.siaes.management.commands._import_siae.utils import get_filename, remap_columns, timeit
 from itou.utils.validators import validate_naf, validate_siret
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-VUE_STRUCTURE_FILENAME = f"{CURRENT_DIR}/../data/fluxIAE_Structure_14122020_075350.csv"
-
-
 @timeit
-def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
+def get_vue_structure_df():
     """
     The "Vue Structure" export has the following fields:
     - asp_id
@@ -40,6 +33,10 @@ def get_vue_structure_df(filename=VUE_STRUCTURE_FILENAME):
     - kind (found in the "Vue AF" export)
     - website (nowhere to be found)
     """
+    filename = get_filename(
+        filename_prefix="fluxIAE_Structure_", filename_extension=".csv", description="Vue Structure"
+    )
+
     df = pd.read_csv(
         filename,
         sep="|",

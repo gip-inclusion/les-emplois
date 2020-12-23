@@ -1,5 +1,4 @@
 import logging
-import os
 
 import numpy as np
 import pandas as pd
@@ -8,6 +7,7 @@ from django.core.management.base import BaseCommand
 from itou.siaes.management.commands._import_siae.utils import (
     clean_string,
     geocode_siae,
+    get_filename,
     remap_columns,
     sync_structures,
     timeit,
@@ -17,13 +17,10 @@ from itou.utils.address.departments import department_from_postcode
 from itou.utils.validators import validate_siret
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-GEIQ_DATASET_FILENAME = f"{CURRENT_DIR}/data/Geiq_-_liste_02-10-2020.xls"
-
-
 @timeit
-def get_geiq_df(filename=GEIQ_DATASET_FILENAME):
+def get_geiq_df():
+    filename = get_filename(filename_prefix="Geiq_-_liste_", filename_extension=".xls", description="Export GEIQ")
+
     df = pd.read_excel(filename, converters={"siret": str, "zip": str})
 
     column_mapping = {
