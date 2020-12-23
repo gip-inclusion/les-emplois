@@ -5,6 +5,7 @@ import os
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.management.base import BaseCommand
 from django.template.defaultfilters import slugify
+from tqdm import tqdm
 
 from itou.cities.models import City
 from itou.utils.address.departments import DEPARTMENTS, department_from_postcode
@@ -98,8 +99,6 @@ class Command(BaseCommand):
         with open(CITIES_JSON_FILE, "r") as raw_json_data:
 
             json_data = json.load(raw_json_data)
-            total_len = len(json_data)
-            last_progress = 0
 
             # Transform list into convenient dictionary.
             json_data = {(item["nom"], item["code"]): item for item in json_data}
@@ -118,12 +117,7 @@ class Command(BaseCommand):
             # Transform dictionary back to list.
             json_data = json_data.values()
 
-            for i, item in enumerate(json_data):
-
-                progress = int((100 * i) / total_len)
-                if progress > last_progress + 5:
-                    self.stdout.write(f"Creating cities… {progress}%")
-                    last_progress = progress
+            for item in tqdm(json_data):
 
                 name = item["nom"]
                 post_codes = item["codesPostaux"]
