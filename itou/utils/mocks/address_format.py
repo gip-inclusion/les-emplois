@@ -1,5 +1,6 @@
 import random
 
+
 BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.1515072727272727,
