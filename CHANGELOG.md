@@ -6,6 +6,21 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [9] - 2020-12-30
+
+### Ajouté
+- Gestion de la suspension de PASS IAE
+- Le moteur de recherche des prescripteurs est maintenant public
+- 700 EA et EATT ont été ajoutées à la Plateforme
+- Import des agréments PE de décembre
+- Ajout d'un texte informatif précisant que la date de fin de contrat est indicative et qu'elle n'a aucune conséquence sur les déclarations faites dans l'extranet IAE 2.0 de l'ASP
+- Les prescripteurs peuvent maintenant personnaliser le nom de leur organisation comme les employeurs
+- Les utilisateurs peuvent maintenant modifier leur email personnel
+
+### Modifié
+- La recherche est maintenant sur 5km par défaut au lieu de 25km
+- Modification du texte du mail envoyé lors d'un refus d'habilitation
+
 ## [8] - 2020-12-03
 
 ### Ajouté
