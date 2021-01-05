@@ -33,7 +33,7 @@ class FormatASPAdresses(TestCase):
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
-    def test_sanity(self, mock):
+    def test_sanity(self, _):
         """ Sanity check:
             every mock entries must be parseable and result must be valid
         """
@@ -46,7 +46,7 @@ class FormatASPAdresses(TestCase):
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
-    def test_asp_addresses(self, mock):
+    def test_asp_addresses(self, _):
         """Test some of the most common address format
            Complete if needed.
         """
@@ -144,7 +144,7 @@ class LaneExtensionTest(TestCase):
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
-    def test_standard_extension(self):
+    def test_standard_extension(self, _):
         "Check if lane extension is included in ASP ref file"
         user = _users_with_mock_address(0)
         result, error = format_address(user, strict=False)
@@ -157,7 +157,7 @@ class LaneExtensionTest(TestCase):
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
-    def test_non_standard_extension(self):
+    def test_non_standard_extension(self, _):
         "Non-standard extension, i.e. not in ASP ref file"
         user = _users_with_mock_address(17)
         result, error = format_address(user, strict=False)

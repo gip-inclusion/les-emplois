@@ -64,7 +64,7 @@ def format_address(obj, update_coords=False, strict=True):
             if ext:
                 result["std_extension"] = ext.name
             else:
-                result["non_std_extension"] = extension
+                result["non_std_extension"] = extension.upper()
 
     lane = None
     if not address.get("lane") and not address.get("address"):
