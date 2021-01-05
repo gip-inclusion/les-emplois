@@ -8,20 +8,6 @@ from itou.utils.address.format import format_address
 from itou.utils.mocks.address_format import result_at_index, result_for_address, results_by_address
 
 
-class LaneTypeTest(TestCase):
-    def test_aliases(self):
-        self.assertEquals(LaneType.GR, find_lane_type_aliases("grand rue"))
-        self.assertEquals(LaneType.GR, find_lane_type_aliases("grande-rue"))
-        self.assertEquals(LaneType.RUE, find_lane_type_aliases("R"))
-        self.assertEquals(LaneType.RUE, find_lane_type_aliases("r"))
-        self.assertEquals(LaneType.LD, find_lane_type_aliases("lieu dit"))
-        self.assertIsNone(find_lane_type_aliases("XXX"))
-
-
-class LaneExtensionTest(TestCase):
-    pass
-
-
 def _users_with_mock_address(idx):
     address = result_at_index(idx)
     return JobSeekerWithAddressFactory(
@@ -56,7 +42,6 @@ class FormatASPAdresses(TestCase):
             result, error = format_address(user, strict=False)
             self.assertIsNone(error)
             self.assertIsNotNone(result)
-            # self.assertTrue(result.get("score") > 0.4)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
@@ -70,7 +55,6 @@ class FormatASPAdresses(TestCase):
         result, error = format_address(user, strict=False)
         self.assertEquals(result.get("lane_type"), LaneType.RUE.name)
         self.assertEquals(result.get("number"), "37")
-        self.assertEquals(result.get("std_extension"), LaneExtension.B.name)
 
         user = _users_with_mock_address(1)
         result, error = format_address(user, strict=False)
@@ -143,3 +127,39 @@ class FormatASPAdresses(TestCase):
         result, error = format_address(user, strict=False)
         self.assertEquals(result.get("lane_type"), LaneType.ALL.name)
         self.assertEquals(result.get("number"), "3")
+
+
+class LaneTypeTest(TestCase):
+    def test_aliases(self):
+        "Test some variants / alternatives used by api.geo.gouv.fr for lane types"
+        self.assertEquals(LaneType.GR, find_lane_type_aliases("grand rue"))
+        self.assertEquals(LaneType.GR, find_lane_type_aliases("grande-rue"))
+        self.assertEquals(LaneType.RUE, find_lane_type_aliases("R"))
+        self.assertEquals(LaneType.RUE, find_lane_type_aliases("r"))
+        self.assertEquals(LaneType.LD, find_lane_type_aliases("lieu dit"))
+        self.assertIsNone(find_lane_type_aliases("XXX"))
+
+
+class LaneExtensionTest(TestCase):
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
+    )
+    def test_standard_extension(self):
+        "Check if lane extension is included in ASP ref file"
+        user = _users_with_mock_address(0)
+        result, error = format_address(user, strict=False)
+        self.assertEquals(result.get("std_extension"), LaneExtension.B.name)
+
+        user = _users_with_mock_address(16)
+        result, error = format_address(user, strict=False)
+        self.assertEquals(result.get("std_extension"), LaneExtension.T.name)
+
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
+    )
+    def test_non_standard_extension(self):
+        "Non-standard extension, i.e. not in ASP ref file"
+        user = _users_with_mock_address(17)
+        result, error = format_address(user, strict=False)
+        self.assertEquals(result.get("non_std_extension"), "G")
+        self.assertIsNone(result.get("std_extension"))
