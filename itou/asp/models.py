@@ -137,7 +137,7 @@ _LANE_TYPE_ALIASES = {
 
 
 def find_lane_type_aliases(alias):
-    """Alternative lookup of some lane types. 
+    """Alternative lookup of some lane types.
        Help improving overall quality of ASP address formatting"""
     for regx, lane_type in _LANE_TYPE_ALIASES.items():
         if re.search(regx, alias.lower()):
