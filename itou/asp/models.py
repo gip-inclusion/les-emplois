@@ -122,7 +122,8 @@ class LaneType(Enum):
 
 # Even if geo API does a great deal of a job,
 # it sometimes shows unexpected result labels for lane types
-# This a still incomplete mapping of these differences
+# like 'r' for 'rue', or 'Av' for 'Avenue', etc.
+# This a still incomplete mapping of these variations
 _LANE_TYPE_ALIASES = {
     "^r": LaneType.RUE,
     "^che": LaneType.CHEM,
@@ -131,12 +132,13 @@ _LANE_TYPE_ALIASES = {
     "^voies": LaneType.VOIE,
     "^domaines": LaneType.DOM,
     "^allees": LaneType.ALL,
-    "^lieu?[ -]dit": LaneType.ALL,
+    "^lieu?[ -]dit": LaneType.LD,
 }
 
 
 def find_lane_type_aliases(alias):
-    "Alternative lookup of some lane types"
+    """Alternative lookup of some lane types. 
+       Help improving overall quality of ASP address formatting"""
     for regx, lane_type in _LANE_TYPE_ALIASES.items():
         if re.search(regx, alias.lower()):
             return lane_type
