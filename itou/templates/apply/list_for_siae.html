@@ -12,12 +12,15 @@
     <h1>{% translate "Candidatures reçues" %}</h1>
     <h2 class="text-muted">{{ siae.display_name }}</h2>
 
-    <div class="alert alert-primary mt-3" role="alert">
-        {% blocktranslate %}
-            Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.<br>
-            Les demandes rétroactives ne sont pas autorisées.
-        {% endblocktranslate %}
-    </div>
+    {% if siae.is_subject_to_eligibility_rules %}
+        <div class="alert alert-primary mt-3" role="alert">
+            {% blocktranslate %}
+                Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.<br>
+                Les demandes rétroactives ne sont pas autorisées.
+            {% endblocktranslate %}
+        </div>
+    {% endif %}
+
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
