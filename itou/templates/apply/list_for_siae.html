@@ -52,6 +52,15 @@
                             </a>
                         </div>
                     {% endif %}
+                    {% if siae.is_subject_to_eligibility_rules and job_application.approval and job_application.can_be_cancelled %}
+                        <div class="col-sm-3">
+                            <span class="text-muted text-nowrap">
+                                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
+                                    PASS IAE disponible au téléchargement après le {{cancellation_date}}
+                                {% endblocktranslate %}
+                            </span>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
