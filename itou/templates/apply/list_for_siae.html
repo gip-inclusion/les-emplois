@@ -45,7 +45,7 @@
                     {% if job_application.can_download_approval_as_pdf %}
                         <div class="col-sm-3">
                             <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="liste-candidatures">
-                                {% translate "Télécharger l'attestation" %}
+                                {% translate "Télécharger le PASS IAE" %}
                             </a>
                         </div>
                     {% endif %}
