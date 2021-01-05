@@ -43,6 +43,10 @@
                 {% if job_application.sender_kind == job_application.SENDER_KIND_SIAE_STAFF %}
                     <br>
                     <b>{{ job_application.sender_siae.display_name }}</b>
+                    {% if siae == job_application.sender_siae %}
+                        <br>
+                        <span class="badge badge-info">{% translate "Auto-prescription" %}</span>
+                    {% endif %}
                 {% endif %}
 
             </p>
