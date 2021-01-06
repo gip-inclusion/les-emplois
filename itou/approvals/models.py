@@ -492,12 +492,15 @@ class Suspension(models.Model):
 
     @staticmethod
     def get_max_end_at(start_at):
+        """
+        Returns the maximum date on which a suspension can end.
+        """
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
     @staticmethod
     def next_min_start_at(approval):
         """
-        Used when adding a new suspension to the given approval.
+        Returns the minimum date on which a suspension can begin.
         """
         if approval.last_old_suspension:
             return approval.last_old_suspension.end_at + relativedelta(days=1)

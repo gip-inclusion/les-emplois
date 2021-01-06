@@ -60,11 +60,6 @@
                             <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
                                 <small>{% translate "Modifier" %}</small>
                             </a>
-                            {% comment %}
-                            <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                <small>{% translate "Annuler" %}</small>
-                            </a>
-                            {% endcomment %}
                         {% endif %}
 
                     </li>
