@@ -1,4 +1,4 @@
-_BAN_GEOCODING_API_RESULTS_MOCK = [
+BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
         "address_line_1": "37 B Rue du Général De Gaulle",
@@ -277,17 +277,4 @@ _BAN_GEOCODING_API_RESULTS_MOCK = [
     },
 ]
 
-_RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in _BAN_GEOCODING_API_RESULTS_MOCK}
-
-
-def result_for_address(address):
-    return _RESULTS_BY_ADDRESS.get(address, None)
-
-
-def results_by_address():
-    return _RESULTS_BY_ADDRESS
-
-
-def result_at_index(idx):
-    assert idx < len(_BAN_GEOCODING_API_RESULTS_MOCK)
-    return _BAN_GEOCODING_API_RESULTS_MOCK[idx]
+RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in BAN_GEOCODING_API_RESULTS_MOCK}

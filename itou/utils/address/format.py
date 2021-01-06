@@ -68,7 +68,6 @@ def format_address(obj, update_coords=False, strict=True):
 
     lane = None
     if not address.get("lane") and not address.get("address"):
-        print(address)
         return None, "Unable to get address lane"
     else:
         lane = address.get("lane") or address.get("address")

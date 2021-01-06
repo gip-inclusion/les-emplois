@@ -5,18 +5,18 @@ from django.test import TestCase
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.users.factories import JobSeekerWithAddressFactory
 from itou.utils.address.format import format_address
-from itou.utils.mocks.address_format import result_at_index, result_for_address, results_by_address
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
 
 def _users_with_mock_address(idx):
-    address = result_at_index(idx)
+    address = BAN_GEOCODING_API_RESULTS_MOCK[idx]
     return JobSeekerWithAddressFactory(
         address_line_1=address.get("address_line_1"), post_code=address.get("post_code"),
     )
 
 
 def mock_get_geocoding_data(address, post_code, limit=1):
-    return result_for_address(address)
+    return RESULTS_BY_ADDRESS.get(address)
 
 
 class FormatASPAdresses(TestCase):
@@ -37,7 +37,7 @@ class FormatASPAdresses(TestCase):
         """ Sanity check:
             every mock entries must be parseable and result must be valid
         """
-        for idx, elt in enumerate(results_by_address()):
+        for idx, elt in enumerate(RESULTS_BY_ADDRESS):
             user = _users_with_mock_address(idx)
             result, error = format_address(user, strict=False)
             self.assertIsNone(error)
