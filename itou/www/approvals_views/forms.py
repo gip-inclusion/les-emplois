@@ -7,9 +7,9 @@ from itou.approvals.models import Suspension
 from itou.utils.widgets import DatePickerField
 
 
-class SuspendApprovalForm(forms.ModelForm):
+class SuspensionForm(forms.ModelForm):
     """
-    Suspend an approval.
+    Create or edit a suspension.
     """
 
     def __init__(self, approval, *args, **kwargs):

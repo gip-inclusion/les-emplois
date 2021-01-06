@@ -9,13 +9,13 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 from django.utils.translation import gettext as _
 
-from itou.approvals.models import Approval
+from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.approvals_views.forms import SuspendApprovalForm
+from itou.www.approvals_views.forms import SuspensionForm
 
 
 @login_required
@@ -99,7 +99,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     preview = False
 
     initial = {"approval": approval, "siae": siae, "reason": None}
-    form = SuspendApprovalForm(approval=approval, initial=initial, data=request.POST or None)
+    form = SuspensionForm(approval=approval, initial=initial, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
@@ -108,14 +108,9 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            approval.suspend(
-                start_at=form.cleaned_data["start_at"],
-                end_at=form.cleaned_data["end_at"],
-                siae=form.cleaned_data["siae"],
-                reason=form.cleaned_data["reason"],
-                reason_explanation=form.cleaned_data["reason_explanation"],
-                created_by=request.user,
-            )
+            suspension = form.save(commit=False)
+            suspension.created_by = request.user
+            suspension.save()
             messages.success(request, _("Suspension effectuée."))
             return HttpResponseRedirect(back_url)
 
@@ -124,5 +119,36 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         "back_url": back_url,
         "form": form,
         "preview": preview,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def suspension_update(request, suspension_id, template_name="approvals/suspension_update.html"):
+    """
+    Edit the given suspension.
+    """
+
+    siae = get_current_siae_or_404(request)
+    suspension = get_object_or_404(Suspension, pk=suspension_id)
+
+    if not suspension.can_be_updated_by_siae(siae):
+        raise PermissionDenied()
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+
+    form = SuspensionForm(approval=suspension.approval, instance=suspension, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        suspension = form.save(commit=False)
+        suspension.updated_by = request.user
+        suspension.save()
+        messages.success(request, _("Modification de suspension effectuée."))
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "suspension": suspension,
+        "back_url": back_url,
+        "form": form,
     }
     return render(request, template_name, context)
