@@ -1,6 +1,8 @@
 import re
 from enum import Enum
 
+from unidecode import unidecode
+
 
 class LaneType(Enum):
     """
@@ -105,7 +107,7 @@ class LaneType(Enum):
 
     @classmethod
     def with_similar_name(cls, name):
-        "Returns enum with similar name (fmt-fn wise)"
+        "Returns enum with similar name"
         for elt in cls:
             test = name.lower()
             if test == elt.name.lower():
@@ -114,10 +116,10 @@ class LaneType(Enum):
         return None
 
     @classmethod
-    def with_similar_value(cls, value, fmt=str.lower):
-        "Returns enum with a similar value (fmt-fn wise)"
-        revert_map = {fmt(lt.value): lt for lt in cls}
-        return revert_map.get(fmt(value))
+    def with_similar_value(cls, value):
+        "Returns enum with a similar value"
+        revert_map = {unidecode(lt.value.lower()): lt for lt in cls}
+        return revert_map.get(value)
 
 
 # Even if geo API does a great deal of a job,

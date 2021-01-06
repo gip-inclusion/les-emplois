@@ -83,7 +83,7 @@ def format_address(obj, update_coords=False, strict=True):
         LaneType.with_similar_name(lane_type)
         # The API field is similar to an exiting value
         # example: got "allee" for "Allée"
-        or LaneType.with_similar_value(lane_type, fmt=lambda x: unidecode(x.lower()))
+        or LaneType.with_similar_value(unidecode(lane_type.lower()))
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
@@ -93,6 +93,7 @@ def format_address(obj, update_coords=False, strict=True):
     if lt:
         result["lane_type"] = lt.name
     else:
+        print(unidecode(lane_type.lower()))
         return None, f"Can't find lane type: {lane_type} for address: {address}"
 
     # INSEE code: must double check with ASP ref file
