@@ -35,7 +35,7 @@
 
             {% include "apply/includes/list_card_header.html" with job_application=job_application %}
 
-            {% include "apply/includes/list_card_body.html" with job_application=job_application siae=siae %}
+            {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
             <div class="card-footer">
                 <div class="row">
@@ -56,7 +56,7 @@
                         <div class="col-sm-3">
                             <span class="text-muted text-nowrap">
                                 {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
-                                    PASS IAE disponible au téléchargement après le {{cancellation_date}}
+                                    PASS IAE disponible au téléchargement après le {{ cancellation_date }}
                                 {% endblocktranslate %}
                             </span>
                         </div>
