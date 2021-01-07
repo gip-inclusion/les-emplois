@@ -411,6 +411,16 @@ class UtilsTemplateTagsTestCase(TestCase):
         expected = "?page=1"
         self.assertEqual(out, expected)
 
+    def test_call_method(self):
+        """Test `call_method` template tag."""
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        context = {"siae": siae, "user": user}
+        template = Template("{% load call_method %}{% call_method siae 'has_member' user %}")
+        out = template.render(Context(context))
+        expected = "True"
+        self.assertEqual(out, expected)
+
 
 class UtilsTemplateFiltersTestCase(TestCase):
     def test_format_phone(self):

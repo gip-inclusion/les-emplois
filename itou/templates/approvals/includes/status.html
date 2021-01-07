@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load call_method %}
 {% comment %}
 
     Usage:
@@ -56,12 +57,14 @@
                             du {{ start }} au {{ end }}
                         {% endblocktranslate %}
                         <small>({{ s.get_reason_display }})</small>
-                        {% if s.is_in_progress and current_siae and current_siae == approval.user.last_accepted_job_application.to_siae %}
-                            <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                <small>{% translate "Modifier" %}</small>
-                            </a>
+                        {% if current_siae %}
+                            {% call_method s "can_be_updated_by_siae" current_siae as can_be_updated %}
+                            {% if can_be_updated %}
+                                <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                    <small>{% translate "Modifier" %}</small>
+                                </a>
+                            {% endif %}
                         {% endif %}
-
                     </li>
                 {% endfor %}
             </ul>
