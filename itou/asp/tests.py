@@ -21,7 +21,7 @@ def mock_get_geocoding_data(address, post_code, limit=1):
 
 class FormatASPAdresses(TestCase):
     def test_valid_types(self):
-        "Check input validity for address parsing"
+        """Check input validity for address parsing"""
         result, error = format_address({})
         self.assertFalse(result)
         self.assertTrue(error)
@@ -34,8 +34,9 @@ class FormatASPAdresses(TestCase):
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
     def test_sanity(self, _):
-        """ Sanity check:
-            every mock entries must be parseable and result must be valid
+        """ 
+        Sanity check:
+        every mock entries must be parseable and result must be valid
         """
         for idx, elt in enumerate(RESULTS_BY_ADDRESS):
             user = _users_with_mock_address(idx)
@@ -47,8 +48,9 @@ class FormatASPAdresses(TestCase):
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
     def test_asp_addresses(self, _):
-        """Test some of the most common address format
-           Complete if needed.
+        """
+        Test some of the most common address format
+        Complete if needed.
         """
         user = _users_with_mock_address(0)
         # strict=False ensures that user factories will be accepted as input type
@@ -147,7 +149,7 @@ class FormatASPAdresses(TestCase):
 
 class LaneTypeTest(TestCase):
     def test_aliases(self):
-        "Test some variants / alternatives used by api.geo.gouv.fr for lane types"
+        """Test some variants / alternatives used by api.geo.gouv.fr for lane types"""
         self.assertEquals(LaneType.GR, find_lane_type_aliases("grand rue"))
         self.assertEquals(LaneType.GR, find_lane_type_aliases("grande-rue"))
         self.assertEquals(LaneType.RUE, find_lane_type_aliases("R"))
@@ -161,7 +163,7 @@ class LaneExtensionTest(TestCase):
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
     def test_standard_extension(self, _):
-        "Check if lane extension is included in ASP ref file"
+        """Check if lane extension is included in ASP ref file"""
         user = _users_with_mock_address(0)
         result, error = format_address(user, strict=False)
         self.assertEquals(result.get("std_extension"), LaneExtension.B.name)
@@ -174,7 +176,7 @@ class LaneExtensionTest(TestCase):
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
     def test_non_standard_extension(self, _):
-        "Non-standard extension, i.e. not in ASP ref file"
+        """Non-standard extension, i.e. not in ASP ref file"""
         user = _users_with_mock_address(17)
         result, error = format_address(user, strict=False)
         self.assertEquals(result.get("non_std_extension"), "G")
