@@ -15,6 +15,8 @@ def update_existing_conventions(dry_run):
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
     """
+    deactivations = 0
+    reactivations = 0
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
         if siae.siret not in SIRET_TO_ASP_ID:
             # This can happen in a dry run only, when a siae should have changed
@@ -60,12 +62,19 @@ def update_existing_conventions(dry_run):
 
         is_active = does_siae_have_an_active_convention(siae)
         if convention.is_active != is_active:
+            if is_active:
+                reactivations += 1
+            else:
+                deactivations += 1
             if not dry_run:
                 convention.is_active = is_active
                 if not is_active:
                     # This was a deactivation - start the grace period now.
                     convention.deactivated_at = timezone.now()
                 convention.save()
+
+    print(f"{deactivations} conventions will be deactivated")
+    print(f"{reactivations} conventions will be reactivated")
 
 
 def get_creatable_conventions():
