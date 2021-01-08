@@ -16,6 +16,13 @@ def update_existing_conventions(dry_run):
     and check data integrity on the fly.
     """
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
+        if siae.siret not in SIRET_TO_ASP_ID:
+            # This can happen in a dry run only, when a siae should have changed
+            # its SIRET during update_siret_and_auth_email_of_existing_siaes()
+            # but did not yet due to dry run.
+            assert dry_run
+            print(f"ignored unknown siret of siae.id={siae.id} due to dry run")
+            continue
         asp_id = SIRET_TO_ASP_ID[siae.siret]
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
