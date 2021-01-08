@@ -69,9 +69,9 @@ def update_existing_conventions(dry_run):
                 convention.siret_signature = siret_signature
                 convention.save()
 
-        is_active = does_siae_have_an_active_convention(siae)
-        if convention.is_active != is_active:
-            if is_active:
+        should_be_active = does_siae_have_an_active_convention(siae)
+        if convention.is_active != should_be_active:
+            if should_be_active:
                 reactivations += 1
                 if not dry_run:
                     convention.is_active = True
