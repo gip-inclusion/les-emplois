@@ -10,12 +10,30 @@ from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_
 from itou.siaes.models import Siae, SiaeConvention
 
 
+# In general we deactivate conventions which should be deactivated,
+# but some timings are tricky like the beginning of each year.
+# For example in ASP dataset of Jan 4 2021, no structure had any valid
+# AF for 2021 yet, which means we would have deactivated 4013 conventions o_O
+# In these cases we temporarily no longer deactivate any convention until
+# AF data catches up.
+DEACTIVATE_CONVENTIONS = False
+
+
 def update_existing_conventions(dry_run):
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
     """
+    deactivations = 0
+    reactivations = 0
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
+        if siae.siret not in SIRET_TO_ASP_ID:
+            # This can happen in a dry run only, when a siae should have changed
+            # its SIRET during update_siret_and_auth_email_of_existing_siaes()
+            # but did not yet due to dry run.
+            assert dry_run
+            print(f"ignored unknown siret of siae.id={siae.id} due to dry run")
+            continue
         asp_id = SIRET_TO_ASP_ID[siae.siret]
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
@@ -51,14 +69,26 @@ def update_existing_conventions(dry_run):
                 convention.siret_signature = siret_signature
                 convention.save()
 
-        is_active = does_siae_have_an_active_convention(siae)
-        if convention.is_active != is_active:
-            if not dry_run:
-                convention.is_active = is_active
-                if not is_active:
-                    # This was a deactivation - start the grace period now.
+        should_be_active = does_siae_have_an_active_convention(siae)
+        if convention.is_active != should_be_active:
+            if should_be_active:
+                reactivations += 1
+                if not dry_run:
+                    convention.is_active = True
+                    convention.save()
+            else:
+                deactivations += 1
+                if DEACTIVATE_CONVENTIONS and not dry_run:
+                    convention.is_active = False
+                    # Start the grace period now.
                     convention.deactivated_at = timezone.now()
-                convention.save()
+                    convention.save()
+
+    print(f"{reactivations} conventions will be reactivated")
+    if DEACTIVATE_CONVENTIONS:
+        print(f"{deactivations} conventions will be deactivated")
+    else:
+        print(f"{deactivations} conventions would have been deactivated but will *not* be")
 
 
 def get_creatable_conventions():
