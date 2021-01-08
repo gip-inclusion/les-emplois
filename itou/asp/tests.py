@@ -34,7 +34,7 @@ class FormatASPAdresses(TestCase):
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
     )
     def test_sanity(self, _):
-        """ 
+        """
         Sanity check:
         every mock entries must be parseable and result must be valid
         """
