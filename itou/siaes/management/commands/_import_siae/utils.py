@@ -45,14 +45,15 @@ def timeit(f):
 def get_filename(filename_prefix, filename_extension, description):
     """
     Automatically detect the correct filename.
+    File can be gzipped or not.
     e.g. fluxIAE_Structure_14122020_075350.csv
-    e.g. fluxIAE_AnnexeFinanciere_14122020_063002.csv
+    e.g. fluxIAE_AnnexeFinanciere_14122020_063002.csv.gz
     """
     filenames = []
+    extensions = (filename_extension, f"{filename_extension}.gz")
     path = f"{CURRENT_DIR}/../data"
     for filename in os.listdir(path):
-        root, ext = os.path.splitext(filename)
-        if root.startswith(filename_prefix) and ext == filename_extension:
+        if filename.startswith(filename_prefix) and filename.endswith(extensions):
             filenames.append(filename)
 
     if len(filenames) == 0:
