@@ -10,6 +10,15 @@ from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_
 from itou.siaes.models import Siae, SiaeConvention
 
 
+# In general we deactivate conventions which should be deactivated,
+# but some timings are tricky like the beginning of each year.
+# For example in ASP dataset of Jan 4 2021, no structure had any valid
+# AF for 2021 yet, which means we would have deactivated 4013 conventions o_O
+# In these cases we temporarily no longer deactivate any convention until
+# AF data catches up.
+DEACTIVATE_CONVENTIONS = False
+
+
 def update_existing_conventions(dry_run):
     """
     Update existing conventions, mainly the is_active field,
@@ -64,17 +73,22 @@ def update_existing_conventions(dry_run):
         if convention.is_active != is_active:
             if is_active:
                 reactivations += 1
+                if not dry_run:
+                    convention.is_active = True
+                    convention.save()
             else:
                 deactivations += 1
-            if not dry_run:
-                convention.is_active = is_active
-                if not is_active:
-                    # This was a deactivation - start the grace period now.
+                if DEACTIVATE_CONVENTIONS and not dry_run:
+                    convention.is_active = False
+                    # Start the grace period now.
                     convention.deactivated_at = timezone.now()
-                convention.save()
+                    convention.save()
 
-    print(f"{deactivations} conventions will be deactivated")
     print(f"{reactivations} conventions will be reactivated")
+    if DEACTIVATE_CONVENTIONS:
+        print(f"{deactivations} conventions will be deactivated")
+    else:
+        print(f"{deactivations} conventions would have been deactivated but will *not* be")
 
 
 def get_creatable_conventions():
