@@ -16,15 +16,15 @@ class SuspensionForm(forms.ModelForm):
         self.approval = approval
         super().__init__(*args, **kwargs)
 
-        today = timezone.now().date()
+        if not self.instance:
+            today = timezone.now().date()
+            min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
+            max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
+            today_str = today.strftime("%Y/%m/%d")
+            # A suspension is backdatable but cannot start in the future.
+            self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
+            self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
 
-        min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
-        max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
-        today_str = today.strftime("%Y/%m/%d")
-
-        # A suspension is backdatable but cannot start in the future.
-        self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
-        self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
         for field in ["start_at", "end_at"]:
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
 
