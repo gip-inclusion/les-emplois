@@ -56,7 +56,14 @@
                                 data-matomo-category="agrement"
                                 data-matomo-action="telechargement-pdf"
                                 data-matomo-option="details-candidature">
-                                    {% translate "Télécharger l'attestation" %}
+                                    {% translate "Télécharger le PASS IAE" %}
+                            </a>
+                        {% endif %}
+                        {% if job_application.can_be_cancelled %}
+                            <a class="btn btn-outline-secondary disabled w-100">
+                                    {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
+                                        Disponible au téléchargement après le {{ cancellation_date }}
+                                    {% endblocktranslate %}
                             </a>
                         {% endif %}
                     {% endif %}

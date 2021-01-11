@@ -140,6 +140,10 @@ def check_convention_data_consistency(dry_run):
         else:
             assert len(asp_siaes) == 1
 
+        # Check that each inactive convention has a grace period start date.
+        if not convention.is_active:
+            assert convention.deactivated_at is not None
+
         # Additional data consistency checks.
         for siae in convention.siaes.all():
             assert siae.kind == convention.kind
