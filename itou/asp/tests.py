@@ -28,9 +28,10 @@ class FormatASPAdresses(TestCase):
         result, error = format_address(None)
         self.assertFalse(result)
         self.assertTrue(error)
+        # formatting factories with strict type check must fail
         result, error = format_address(JobSeekerWithAddressFactory())
-        self.assertFalse(error)
-        self.assertTrue(result)
+        self.assertFalse(result)
+        self.assertTrue(error)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,

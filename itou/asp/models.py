@@ -108,12 +108,7 @@ class LaneType(Enum):
     @classmethod
     def with_similar_name(cls, name):
         "Returns enum with similar name"
-        for elt in cls:
-            test = name.lower()
-            if test == elt.name.lower():
-                return elt
-
-        return None
+        return cls.__members__.get(name.upper)
 
     @classmethod
     def with_similar_value(cls, value):
