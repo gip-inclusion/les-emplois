@@ -42,6 +42,8 @@ class SuspensionForm(forms.ModelForm):
             "siae": forms.HiddenInput(),
             "approval": forms.HiddenInput(),
             "reason": forms.RadioSelect(),
+            "start_at": DatePickerField(),
+            "end_at": DatePickerField(),
         }
         help_texts = {
             "start_at": mark_safe(
