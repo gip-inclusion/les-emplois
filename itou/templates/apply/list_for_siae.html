@@ -12,12 +12,15 @@
     <h1>{% translate "Candidatures reçues" %}</h1>
     <h2 class="text-muted">{{ siae.display_name }}</h2>
 
-    <div class="alert alert-primary mt-3" role="alert">
-        {% blocktranslate %}
-            Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.<br>
-            Les demandes rétroactives ne sont pas autorisées.
-        {% endblocktranslate %}
-    </div>
+    {% if siae.is_subject_to_eligibility_rules %}
+        <div class="alert alert-primary mt-3" role="alert">
+            {% blocktranslate %}
+                Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.<br>
+                Les demandes rétroactives ne sont pas autorisées.
+            {% endblocktranslate %}
+        </div>
+    {% endif %}
+
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
@@ -45,8 +48,17 @@
                     {% if job_application.can_download_approval_as_pdf %}
                         <div class="col-sm-3">
                             <a href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}" class="text-decoration-none disable-on-click matomo-event" data-matomo-category="agrement" data-matomo-action="telechargement-pdf" data-matomo-option="liste-candidatures">
-                                {% translate "Télécharger l'attestation" %}
+                                {% translate "Télécharger le PASS IAE" %}
                             </a>
+                        </div>
+                    {% endif %}
+                    {% if siae.is_subject_to_eligibility_rules and job_application.approval and job_application.can_be_cancelled %}
+                        <div class="col-sm-3">
+                            <span class="text-muted text-nowrap">
+                                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
+                                    PASS IAE disponible au téléchargement après le {{ cancellation_date }}
+                                {% endblocktranslate %}
+                            </span>
                         </div>
                     {% endif %}
                 </div>

@@ -32,7 +32,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "badge": "badge-danger",
             },
             {
-                "name": _("Candidatures acceptées et embauches prévues"),
+                "name": _("Candidatures acceptées ou mises en liste d'attente"),
                 "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED],
                 "icon": "user-check",
                 "badge": "badge-secondary",

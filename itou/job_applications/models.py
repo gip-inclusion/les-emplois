@@ -38,7 +38,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_CHOICES = (
         (STATE_NEW, _("Nouvelle candidature")),
         (STATE_PROCESSING, _("Candidature à l'étude")),
-        (STATE_POSTPONED, _("Embauche pour plus tard")),
+        (STATE_POSTPONED, _("Candidature en liste d'attente")),
         (STATE_ACCEPTED, _("Candidature acceptée")),
         (STATE_REFUSED, _("Candidature déclinée")),
         (STATE_CANCELLED, _("Embauche annulée")),
