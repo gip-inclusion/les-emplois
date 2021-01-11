@@ -53,6 +53,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements/dev.txt
+    - name: ✨ Black, isort and Flake8
+      run: |
+        black --check --line-length 119 itou
+        isort --check-only itou
+        flake8 itou --count --show-source --statistics
     - name: 🤹‍ Django tests
       run: django-admin test --noinput --failfast --parallel=2
       env:
@@ -61,8 +66,3 @@ jobs:
     # See https://trello.com/c/txewyFOm
     # - name: 🚧 Check pending migrations
     #   run: django-admin makemigrations --check --dry-run --noinput
-    - name: ✨ Black, isort and Flake8
-      run: |
-        black --check --line-length 119 itou
-        isort --check-only itou
-        flake8 itou --count --show-source --statistics

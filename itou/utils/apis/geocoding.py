@@ -36,8 +36,17 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
 
 
 def process_geocoding_data(data):
-
+    """
+    Contains parts of an address useful for objects like User
+    but also some fields needed for ASP address formatting:
+    - insee_code
+    - number
+    - lane
+    - address (different from address_line_1)
+    """
     if not data:
+        return None
+    if not data.get("properties"):
         return None
 
     longitude = data["geometry"]["coordinates"][0]
@@ -46,7 +55,11 @@ def process_geocoding_data(data):
     return {
         "score": data["properties"]["score"],
         "address_line_1": data["properties"]["name"],
+        "number": data["properties"].get("housenumber", None),
+        "lane": data["properties"].get("street", None),
+        "address": data["properties"]["name"],
         "post_code": data["properties"]["postcode"],
+        "insee_code": data["properties"]["citycode"],
         "city": data["properties"]["city"],
         "longitude": longitude,
         "latitude": latitude,

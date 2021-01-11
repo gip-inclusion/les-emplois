@@ -68,6 +68,7 @@ LOCAL_APPS = [
     "itou.invitations",
     "itou.external_data.apps.ExternalDataConfig",
     "itou.metabase",
+    "itou.asp",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
