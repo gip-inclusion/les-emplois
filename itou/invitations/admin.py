@@ -27,7 +27,7 @@ class BaseInvitationAdmin(admin.ModelAdmin):
     search_fields = ("email", "sender__email")
     # https://code.djangoproject.com/ticket/30354
     list_filter = ("accepted", IsValidFilter)
-    readonly_fields = ("is_valid", "created_at", "sent_at", "accepted_at")
+    readonly_fields = ("is_valid", "created_at", "sent_at", "accepted_at", "acceptance_link")
     raw_id_fields = ("sender",)
 
     def get_queryset(self, request):
@@ -36,8 +36,12 @@ class BaseInvitationAdmin(admin.ModelAdmin):
     def is_valid(self, obj):
         return not obj.has_expired
 
+    def acceptance_link(self, obj):
+        return obj.acceptance_link
+
     is_valid.boolean = True
     is_valid.short_description = _("En cours de validité")
+    acceptance_link.short_description = _("Lien")
 
 
 @admin.register(SiaeStaffInvitation)
