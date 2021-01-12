@@ -134,12 +134,14 @@ class ItouUserAdmin(UserAdmin):
     ordering = ("-id",)
     raw_id_fields = ("created_by",)
     search_fields = UserAdmin.search_fields + ("pk",)
+    readonly_fields = ("pk",)
 
     fieldsets = UserAdmin.fieldsets + (
         (
             _("Informations"),
             {
                 "fields": (
+                    "pk",
                     "birthdate",
                     "phone",
                     "resume_link",

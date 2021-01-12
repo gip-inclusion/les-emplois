@@ -98,7 +98,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             _("Structure"),
-            {"fields": ("siret", "kind", "name", "phone", "email", "code_safir_pole_emploi", "is_authorized")},
+            {"fields": ("pk", "siret", "kind", "name", "phone", "email", "code_safir_pole_emploi", "is_authorized")},
         ),
         (
             _("Adresse"),
@@ -142,6 +142,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     )
     raw_id_fields = ("created_by",)
     readonly_fields = (
+        "pk",
         "coords",  # Quick tip to disable GeoDjango's Openlayers map.
         "created_by",
         "created_at",
