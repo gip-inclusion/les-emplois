@@ -75,7 +75,10 @@
                     </p>
                     <p class="card-text text-success">
                         {% blocktranslate with start=form.instance.start_at|date:"d/m/Y" end=form.instance.end_at|date:"d/m/Y" %}
-                            À partir du {{ start }} jusqu'au {{ end }}
+                            À partir du
+                            <span class="badge badge-success">{{ start }}</span>
+                            jusqu'au
+                            <span class="badge badge-success">{{ end }}</span>
                         {% endblocktranslate %}
                     </p>
                 </div>
