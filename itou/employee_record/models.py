@@ -1,5 +1,3 @@
-from enum import Enum
-
 from django.db import models
 from django.forms import ValidationError
 from django.utils import timezone
@@ -84,20 +82,15 @@ class INSEECountry(models.Model):
     Imported from ASP reference file: ref_insee_pays_v4.csv
     """
 
-    COUNTRY_GROUP_FRANCE = "1"
-    # CEE = "Communauté Economique Européenne" is not used since 1993...
-    COUNTRY_GROUP_CEE = "2"
-    COUNTRY_GROUP_NOT_CEE = "3"
-
-    COUNTRY_GROUP_CHOICES = (
-        (COUNTRY_GROUP_FRANCE, _("France")),
-        (COUNTRY_GROUP_CEE, _("CEE")),
-        (COUNTRY_GROUP_NOT_CEE, _("Hors CEE")),
-    )
+    class Group(models.TextChoices):
+        FRANCE = "FRANCE", _("France")
+        # FTR CEE = "Communauté Economique Européenne" is not used since 1993...
+        CEE = "CEE", _("CEE")
+        OUTSIDE_CEE = "OUTSIDE_CEE", _("Hors CEE")
 
     code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
-    group = models.CharField(max_length=1, choices=COUNTRY_GROUP_CHOICES)
+    group = models.CharField(max_length=20, choices=Group.choices)
     # TODO DPT field ?
 
     def __str__(self):
@@ -148,13 +141,6 @@ class EmployeeRecord(models.Model):
         PROCESSED = "PROCESSED", _("Traitée ASP")
 
     # TODO Maybe too specifiic, move to ASP ?
-    class AllocationDuration(models.TextChoices):
-        NONE = "", _("Aucune")
-        LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
-        FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
-        FROM_12_TO_23_MONTHS = "FROM_12_TO_23_MONTHS", _("De 12 à 23 mois")
-        MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
-
     # ..
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret])

@@ -1,7 +1,9 @@
 import re
 from enum import Enum
 
+from django.db import models
 from unidecode import unidecode
+from django.utils.translation import gettext_lazy as _
 
 
 class LaneType(Enum):
@@ -161,3 +163,105 @@ class LaneExtension(Enum):
             if test == fmt(elt.name) or test == fmt(elt.value):
                 return elt
         return None
+
+
+class PeriodMixinQuerySet(models.QuerySet):
+    def current(self):
+        return self.filter(end_date=None)
+
+
+class PeriodMixin(models.Model):
+    start_date = models.DateField(verbose_name=_("Début de validité"))
+    end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
+
+    class Meta:
+        abstract = True
+
+
+class CodeLabelMixin(models.Model):
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return f"{type(self).__name__}: pk={self.pk}, code={self.code}"
+
+
+class AllocationDuration(models.TextChoices):
+    """
+    Translation of ASP ref file: ref_duree_allocation_emploi_v2.csv
+
+    Note: effect periods are not handled
+    """
+    NONE = "", _("Aucune")
+    LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
+    FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
+    FROM_12_TO_23_MONTHS = "FROM_12_TO_23_MONTHS", _("De 12 à 23 mois")
+    MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
+
+
+class EducationalLevel(PeriodMixin, CodeLabelMixin):
+    """
+    Education level of the employee
+
+    Translation of ASP ref file: ref_niveau_formation_v3.csv
+    """
+    code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
+    name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
+
+    # TODO rme_id ???
+
+
+class INSEECommune(PeriodMixin, CodeLabelMixin):
+    """
+    INSEE commune
+
+    Code and name of French communes.
+    Mainly used to get the commune code (different from postal code).
+
+    Imported from ASP reference file: ref_insee_com_v1.csv
+
+    Note:
+    reference file is currently not up-to-date (2018)
+    """
+
+    code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
+    name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
+
+
+class INSEEDepartment(PeriodMixin, CodeLabelMixin):
+    """
+    INSEE department code
+
+    Code and name of French departments
+
+    Imported from ASP reference file: ref_insee_dpt_v2.csv
+    """
+
+    code = models.CharField(max_length=3, verbose_name=_("Code département INSEE"))
+    name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
+
+
+class INSEECountry(CodeLabelMixin):
+    """
+    INSEE country code
+
+    Code and name of world countries
+
+    Imported from ASP reference file: ref_insee_pays_v4.csv
+    """
+
+    class Group(models.TextChoices):
+        FRANCE = "FRANCE", _("France")
+        # FTR CEE = "Communauté Economique Européenne" is not used since 1993...
+        CEE = "CEE", _("CEE")
+        OUTSIDE_CEE = "OUTSIDE_CEE", _("Hors CEE")
+
+    code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
+    name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
+    group = models.CharField(max_length=15, choices=Group.choices)
+    # TODO DPT field ?
+
