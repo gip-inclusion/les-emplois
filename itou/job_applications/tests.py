@@ -222,6 +222,9 @@ class JobApplicationEmailTest(TestCase):
         self.assertIn(job_application.sender.get_full_name(), email.body)
         self.assertIn(job_application.sender.email, email.body)
         self.assertIn(format_filters.format_phone(job_application.sender.phone), email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.to_siae.city, email.body)
+        self.assertIn(str(job_application.to_siae.pk), email.body)
 
     def test_new_for_prescriber(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(

@@ -84,4 +84,4 @@ class JobApplicationTransitionLogAdmin(admin.ModelAdmin):
     list_filter = ("transition",)
     raw_id_fields = ("job_application", "user")
     readonly_fields = ("job_application", "transition", "from_state", "to_state", "user", "timestamp")
-    search_fields = ("transition", "user__username")
+    search_fields = ("transition", "user__username", "job_application__pk")
