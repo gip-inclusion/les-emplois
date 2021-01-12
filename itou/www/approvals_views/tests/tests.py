@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.utils.http import urlencode
 from requests import exceptions as requests_exceptions
 
+from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
@@ -103,6 +104,9 @@ class TestDownloadApprovalAsPDF(TestCase):
 
 class ApprovalSuspendViewTest(TestCase):
     def test_suspend_approval(self):
+        """
+        Test the creation of a suspension.
+        """
 
         today = timezone.now().date()
 
@@ -157,3 +161,57 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertRedirects(response, back_url)
 
         self.assertEqual(1, approval.suspension_set.count())
+        suspension = approval.suspension_set.first()
+        self.assertEqual(suspension.created_by, siae_user)
+
+    def test_update_suspension(self):
+        """
+        Test the update of a suspension.
+        """
+
+        today = timezone.now().date()
+
+        job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=today
+            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
+            - relativedelta(days=1),
+        )
+
+        approval = job_application.approval
+        siae_user = job_application.to_siae.members.first()
+        start_at = today
+        end_at = today + relativedelta(days=10)
+
+        suspension = SuspensionFactory(approval=approval, start_at=start_at, end_at=end_at, created_by=siae_user)
+
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        back_url = "/"
+        params = urlencode({"back_url": back_url})
+        url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
+        url = f"{url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        new_end_at = end_at + relativedelta(days=30)
+
+        post_data = {
+            "approval": suspension.approval.pk,
+            "start_at": suspension.start_at.strftime("%d/%m/%Y"),
+            "end_at": new_end_at.strftime("%d/%m/%Y"),
+            "siae": suspension.siae.pk,
+            "reason": suspension.reason,
+            "reason_explanation": suspension.reason_explanation,
+        }
+
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, back_url)
+
+        self.assertEqual(1, approval.suspension_set.count())
+        suspension = approval.suspension_set.first()
+        self.assertEqual(suspension.updated_by, siae_user)
+        self.assertEqual(suspension.end_at, new_end_at)

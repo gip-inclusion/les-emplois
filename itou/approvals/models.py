@@ -241,24 +241,6 @@ class Approval(CommonApprovalMixin):
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
-    def suspend(self, start_at, end_at, siae, reason, reason_explanation, created_by):
-        """
-        Suspend current Approval.
-        """
-        if not self.can_be_suspended_by_siae(siae):
-            raise RuntimeError(_("Approval cannot be suspended by this SIAE."))
-        suspension = Suspension(
-            approval=self,
-            start_at=start_at,
-            end_at=end_at,
-            siae=siae,
-            reason=reason,
-            reason_explanation=reason_explanation,
-            created_by=created_by,
-        )
-        suspension.save()
-        return suspension
-
     @staticmethod
     def get_next_number(hiring_start_at=None):
         """
@@ -502,17 +484,24 @@ class Suspension(models.Model):
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
+    def can_be_updated_by_siae(self, siae):
+        """
+        Only the SIAE currently hiring the job seeker can edit a suspension.
+        """
+        return self.is_in_progress and siae == self.approval.user.last_accepted_job_application.to_siae
+
     @staticmethod
     def get_max_end_at(start_at):
+        """
+        Returns the maximum date on which a suspension can end.
+        """
         return start_at + relativedelta(months=Suspension.MAX_DURATION_MONTHS) - relativedelta(days=1)
 
     @staticmethod
     def next_min_start_at(approval):
         """
-        Used when adding a new suspension to the given approval.
+        Returns the minimum date on which a suspension can begin.
         """
-        if approval.is_suspended:
-            raise RuntimeError(_("A suspension is already in progress."))
         if approval.last_old_suspension:
             return approval.last_old_suspension.end_at + relativedelta(days=1)
         return approval.user.last_accepted_job_application.hiring_start_at

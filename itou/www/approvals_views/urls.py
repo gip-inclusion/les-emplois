@@ -9,4 +9,5 @@ app_name = "approvals"
 urlpatterns = [
     path("download/<uuid:job_application_id>", views.approval_as_pdf, name="approval_as_pdf"),
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),
+    path("suspension/<int:suspension_id>/edit", views.suspension_update, name="suspension_update"),
 ]

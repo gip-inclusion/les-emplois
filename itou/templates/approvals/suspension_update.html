@@ -1,0 +1,48 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% translate "Modifier la suspension de PASS IAE" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% blocktranslate with full_name=suspension.approval.user.get_full_name|title %}
+            Modifier la suspension de PASS IAE
+            <br>
+            <span class="text-muted">{{ full_name }}</span>
+        {% endblocktranslate %}
+    </h1>
+
+    <form method="post" action="" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form_errors form %}
+
+        {% for field in form %}
+            {# Display a warning message before the "reason" field. #}
+            {% if field.name == "reason" %}
+                {% include "approvals/includes/suspension_reason_alert.html" %}
+            {% endif %}
+            {% bootstrap_field field %}
+        {% endfor %}
+
+        {% buttons %}
+            <a class="btn btn-secondary" href="{{ back_url }}">
+                {% translate "Retour" %}
+            </a>
+            <button type="submit" class="btn btn-primary">
+                {% translate "Valider la suspension" %}
+            </button>
+        {% endbuttons %}
+
+    </form>
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ form.media }}
+{% endblock %}

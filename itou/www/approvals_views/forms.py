@@ -7,24 +7,24 @@ from itou.approvals.models import Suspension
 from itou.utils.widgets import DatePickerField
 
 
-class SuspendApprovalForm(forms.ModelForm):
+class SuspensionForm(forms.ModelForm):
     """
-    Suspend an approval.
+    Create or edit a suspension.
     """
 
     def __init__(self, approval, *args, **kwargs):
         self.approval = approval
         super().__init__(*args, **kwargs)
 
-        today = timezone.now().date()
+        if not self.instance:
+            today = timezone.now().date()
+            min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
+            max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
+            today_str = today.strftime("%Y/%m/%d")
+            # A suspension is backdatable but cannot start in the future.
+            self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
+            self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
 
-        min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
-        max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
-        today_str = today.strftime("%Y/%m/%d")
-
-        # A suspension is backdatable but cannot start in the future.
-        self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
-        self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
         for field in ["start_at", "end_at"]:
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
 
@@ -42,6 +42,8 @@ class SuspendApprovalForm(forms.ModelForm):
             "siae": forms.HiddenInput(),
             "approval": forms.HiddenInput(),
             "reason": forms.RadioSelect(),
+            "start_at": DatePickerField(),
+            "end_at": DatePickerField(),
         }
         help_texts = {
             "start_at": mark_safe(
