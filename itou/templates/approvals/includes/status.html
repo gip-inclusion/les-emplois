@@ -58,10 +58,13 @@
                         {% endblocktranslate %}
                         <small>({{ s.get_reason_display }})</small>
                         {% if current_siae %}
-                            {% call_method s "can_be_updated_by_siae" current_siae as can_be_updated %}
-                            {% if can_be_updated %}
+                            {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
+                            {% if can_be_handled %}
                                 <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
                                     <small>{% translate "Modifier" %}</small>
+                                </a>
+                                <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                    <small>{% translate "Annuler" %}</small>
                                 </a>
                             {% endif %}
                         {% endif %}

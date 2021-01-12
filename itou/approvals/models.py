@@ -484,11 +484,17 @@ class Suspension(models.Model):
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
-    def can_be_updated_by_siae(self, siae):
+    def can_be_handled_by_siae(self, siae):
         """
-        Only the SIAE currently hiring the job seeker can edit a suspension.
+        Only the SIAE currently hiring the job seeker can handle a suspension.
         """
-        return self.is_in_progress and siae == self.approval.user.last_accepted_job_application.to_siae
+        can_be_handled_by_siae_cache = getattr(self, "_can_be_handled_by_siae_cache", None)
+        if can_be_handled_by_siae_cache:
+            return can_be_handled_by_siae_cache
+        self._can_be_handled_by_siae_cache = (
+            self.is_in_progress and siae == self.approval.user.last_accepted_job_application.to_siae
+        )
+        return self._can_be_handled_by_siae_cache
 
     @staticmethod
     def get_max_end_at(start_at):
