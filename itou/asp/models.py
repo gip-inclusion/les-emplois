@@ -2,8 +2,8 @@ import re
 from enum import Enum
 
 from django.db import models
-from unidecode import unidecode
 from django.utils.translation import gettext_lazy as _
+from unidecode import unidecode
 
 
 class LaneType(Enum):
@@ -178,11 +178,7 @@ class PeriodMixin(models.Model):
         abstract = True
 
 
-class CodeLabelMixin(models.Model):
-
-    class Meta:
-        abstract = True
-
+class CodeLabelMixin:
     def __str__(self):
         return self.name
 
@@ -196,6 +192,7 @@ class AllocationDuration(models.TextChoices):
 
     Note: effect periods are not handled
     """
+
     NONE = "", _("Aucune")
     LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
     FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
@@ -203,12 +200,13 @@ class AllocationDuration(models.TextChoices):
     MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
 
 
-class EducationalLevel(PeriodMixin, CodeLabelMixin):
+class EducationLevel(PeriodMixin, CodeLabelMixin):
     """
     Education level of the employee
 
     Translation of ASP ref file: ref_niveau_formation_v3.csv
     """
+
     code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
     name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
 
@@ -264,4 +262,3 @@ class INSEECountry(CodeLabelMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
     group = models.CharField(max_length=15, choices=Group.choices)
     # TODO DPT field ?
-
