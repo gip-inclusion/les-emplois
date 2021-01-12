@@ -48,6 +48,8 @@
 
 {% endif %}
 
+{% translate "Candidature envoyée à l'entreprise" %} {{ job_application.to_siae.display_name }}, {{ job_application.to_siae.city }}. Identifiant sur la plateforme : {{ job_application.to_siae.pk }}.
+
 {% blocktranslate %}
 Toute demande de PASS IAE doit être effectuée au plus tard le jour de l'embauche. Les demandes rétroactives ne sont pas autorisées.
 {% endblocktranslate %}
