@@ -45,6 +45,11 @@
                     </div>
                     {% endfor %}
 
+                    {% if filters_form.pass_iae_suspended %}
+                        <h5 class="mt-4">{% translate "PASS IAE" %}</h5>
+                        {% bootstrap_field filters_form.pass_iae_suspended form_group_class="form_group m-3" %}
+                    {% endif %}
+
                     {% if filters_form.senders or filters_form.sender_organizations %}
                         <h5 class="mt-4">{% translate "Emetteur" %}</h5>
                     {% endif %}
