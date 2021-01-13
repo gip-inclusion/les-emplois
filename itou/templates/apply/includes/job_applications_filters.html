@@ -30,12 +30,25 @@
                     {% bootstrap_field filters_form.end_date form_group_class="form_group m-3" %}
 
                     <h5 class="mt-4">{% translate "Statut" %}</h5>
-                      {% for choice in filters_form.states %}
-                      <div class="form-check form-check-inline dropdown-item">
-                          <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
-                          <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
-                      </div>
-                      {% endfor %}
+                    {% for choice in filters_form.states %}
+                        <div class="form-check form-check-inline dropdown-item">
+                            <input
+                                id="{{ choice.id_for_label }}"
+                                class="form-check-input"
+                                name="{{ choice.data.name }}"
+                                type="checkbox"
+                                value="{{ choice.data.value }}"
+                                {% if choice.data.selected %}checked=""{% endif %}>
+                            <label for="{{ choice.id_for_label }}" class="form-check-label">
+                                {{ choice.choice_label }}
+                            </label>
+                        </div>
+                    {% endfor %}
+
+                    {% if filters_form.pass_iae_suspended %}
+                        <h5 class="mt-4">{% translate "PASS IAE" %}</h5>
+                        {% bootstrap_field filters_form.pass_iae_suspended form_group_class="form_group m-3" %}
+                    {% endif %}
 
                     {% if filters_form.senders or filters_form.sender_organizations %}
                         <h5 class="mt-4">{% translate "Emetteur" %}</h5>
