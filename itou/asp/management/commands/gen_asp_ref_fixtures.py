@@ -64,7 +64,7 @@ class Command(BaseCommand):
                 of.write(json.dumps(records))
         else:
             self.log("joking: DRY-RUN enabled")
-
+        self.log("Done!")
         self.log("-" * 80)
 
     def file_exists(self, path):
@@ -148,7 +148,6 @@ class Command(BaseCommand):
         self.write_fixture_file(export_path, records)
 
     def gen_insee_departments(self, filename="ref_insee_dpt.csv"):
-
         """
         Generates ASP INSEE department fixture.
 
@@ -187,7 +186,6 @@ class Command(BaseCommand):
         self.write_fixture_file(export_path, records)
 
     def gen_insee_countries(self, filename="ref_insee_pays.csv"):
-
         """
         Generates ASP INSEE countries fixture.
 
@@ -223,7 +221,6 @@ class Command(BaseCommand):
         self.write_fixture_file(export_path, records)
 
     def gen_measures(self, filename="ref_mesure.csv"):
-
         """
         Generates ASP INSEE mesures fixture.
         """
@@ -260,12 +257,48 @@ class Command(BaseCommand):
 
         self.write_fixture_file(export_path, records)
 
+    def gen_employer_types(self, filename="ref_type_employeur.csv"):
+        """
+        Generates ASP employer types fixture.
+        """
+        path = os.path.join(_IMPORT_DIR, filename)
+
+        self.log("Importing ASP employer types:\n")
+
+        if not self.file_exists(path):
+            return
+
+        export_path = os.path.join(_FIXTURES_DIR, "asp_employer_types.json")
+        model = "asp.EmployerType"
+        df = self.load_dataframe(path)
+        records = []
+
+        for idx, row in df.iterrows():
+            start_date = parse_asp_date(row["rte_date_debut_effet"])
+            end_date = parse_asp_date(row["rte_date_fin_effet"])
+            elt = {
+                "model": model,
+                "pk": row["rte_id"],
+                "fields": {
+                    "code": row["rte_code_type_employeur"],
+                    "name": row["rte_lib_type_employeur"],
+                    "measure_id": row["rme_id"],
+                    "start_date": start_date,
+                    "end_date": end_date,
+                },
+            }
+            records.append(elt)
+
+        self.write_fixture_file(export_path, records)
+
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
 
+        # Order matters
         self.gen_education_levels()
         self.gen_insee_communes()
         self.gen_insee_departments()
         self.gen_insee_countries()
         self.gen_measures()
+        self.gen_employer_types()

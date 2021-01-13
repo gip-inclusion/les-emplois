@@ -136,8 +136,10 @@ _LANE_TYPE_ALIASES = {
 
 
 def find_lane_type_aliases(alias):
-    """Alternative lookup of some lane types.
-       Help improving overall quality of ASP address formatting"""
+    """
+    Alternative lookup of some lane types.
+    Help improving overall quality of ASP address formatting
+    """
     for regx, lane_type in _LANE_TYPE_ALIASES.items():
         if re.search(regx, alias.lower()):
             return lane_type
@@ -305,7 +307,17 @@ class Measure(PeriodMixin, CodeLabelMixin):
     code = models.CharField(max_length=10, verbose_name=_("Code mesure ASP complet"))
     display_code = models.CharField(max_length=5, verbose_name=_("Code mesure ASP resumé"))
     help_code = models.CharField(max_length=5, verbose_name=_("Code d'aide mesure ASP"))
-    name = models.CharField(max_length=80, verbose_name=_("Libellé de la mesure ASP"))
+    name = models.CharField(max_length=80, verbose_name=_("Libellé mesure ASP"))
 
     # I don't what this ID is about yet, seems unused but kept for compatibility
     rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
+
+
+class EmployerType(PeriodMixin, CodeLabelMixin):
+    """
+    ASP employer type
+    """
+
+    code = models.CharField(max_length=3, verbose_name=_("Code employeur ASP"))
+    name = models.CharField(max_length=50, verbose_name=_("Libellé employeur ASP"))
+    measure = models.ForeignKey(Measure, verbose_name=_("Mesure ASP"), on_delete=models.SET_NULL, null=True)
