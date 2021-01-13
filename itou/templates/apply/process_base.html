@@ -12,7 +12,7 @@
 
     <h1>
         {% translate "Candidature de" %}
-        <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
+        <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
         <div class="row">
             <div class="col-sm">
                 <small>{% include "apply/includes/state_badge.html" with job_application=job_application %}</small>

@@ -132,7 +132,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     siae = get_current_siae_or_404(request)
     suspension = get_object_or_404(Suspension, pk=suspension_id)
 
-    if not suspension.can_be_updated_by_siae(siae):
+    if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
@@ -150,5 +150,31 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         "suspension": suspension,
         "back_url": back_url,
         "form": form,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def suspension_delete(request, suspension_id, template_name="approvals/suspension_delete.html"):
+    """
+    Delete the given suspension.
+    """
+
+    siae = get_current_siae_or_404(request)
+    suspension = get_object_or_404(Suspension, pk=suspension_id)
+
+    if not suspension.can_be_handled_by_siae(siae):
+        raise PermissionDenied()
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+
+    if request.method == "POST" and request.POST.get("confirm") == "true":
+        suspension.delete()
+        messages.success(request, _("Annulation de suspension effectuée."))
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "suspension": suspension,
+        "back_url": back_url,
     }
     return render(request, template_name, context)
