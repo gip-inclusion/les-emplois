@@ -165,14 +165,42 @@ class LaneExtension(Enum):
         return None
 
 
-class PeriodMixinQuerySet(models.QuerySet):
-    def current(self):
-        return self.filter(end_date=None)
+class PeriodMixinManager(models.Manager):
+    def get_queryset(self):
+        """
+        Return all currently valid objects, i.e.:
+        - currrently usable as a reference for new objects
+        - their end date must be None (active / non-historized entry)
+
+        As with all reference files from ASP, we do not alter or summarize their content
+        when importing or reshaping them.
+        Even more with elements with effective dates (start / end / history concerns).
+        """
+        print("Using custom manager")
+        return super().get_queryset().filter(end_date=None)
 
 
 class PeriodMixin(models.Model):
+    """
+    Mixin for ref files having history concerns (start_date and end_date defined)
+
+    Important:
+    when using this mixin, there is no 'type.objects' default model manager defined.
+
+    Instead:
+    - 'type.history' is a manager with ALL previous versions of a record
+    - 'type.current' is a manager returning ONLY valid records for current date / version subset
+
+    => Use 'type.current' for most use cases.
+    => Use 'type.history' when you have to deal with history or previous version of a record
+    """
+
     start_date = models.DateField(verbose_name=_("Début de validité"))
     end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
+
+    current = PeriodMixinManager()
+    # Must be manually added, if we want to access full table
+    history = models.Manager()
 
     class Meta:
         abstract = True
