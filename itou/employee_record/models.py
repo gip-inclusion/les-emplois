@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import Approval
+from itou.asp.models import Commune, Country, Department, EducationLevel
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeFinancialAnnex
@@ -16,101 +17,6 @@ from itou.utils.validators import validate_siret
 # Are needed for:
 # - the current living address of the employee
 # - the birth place of the employee
-
-
-class PeriodMixinQuerySet(models.QuerySet):
-    def current(self):
-        return self.filter(end_date=None)
-
-
-class PeriodMixin(models.Model):
-    start_date = models.DateField(verbose_name=_("Début de validité"))
-    end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
-
-    class Meta:
-        abstract = True
-
-
-class INSEECommune(PeriodMixin):
-    """
-    INSEE commune
-
-    Code and name of French communes.
-    Mainly used to get the commune code (different from postal code).
-
-    Imported from ASP reference file: ref_insee_com_v1.csv
-
-    Note:
-    reference file is currently not up-to-date (2018)
-    """
-
-    code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
-    name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
-
-    def __str__(self):
-        return f"{self.code} - {self.name}"
-
-    def __repr__(self):
-        return f"INSEE:code={self.code}, name={self.name}"
-
-
-class INSEEDepartment(PeriodMixin):
-    """
-    INSEE department code
-
-    Code and name of French departments
-
-    Imported from ASP reference file: ref_insee_dpt_v2.csv
-    """
-
-    code = models.CharField(max_length=3, verbose_name=_("Code département INSEE"))
-    name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return f"INSEEDepartementCode:code={self.code}, name={self.name}"
-
-
-class INSEECountry(models.Model):
-    """
-    INSEE country code
-
-    Code and name of world countries
-
-    Imported from ASP reference file: ref_insee_pays_v4.csv
-    """
-
-    class Group(models.TextChoices):
-        FRANCE = "FRANCE", _("France")
-        # FTR CEE = "Communauté Economique Européenne" is not used since 1993...
-        CEE = "CEE", _("CEE")
-        OUTSIDE_CEE = "OUTSIDE_CEE", _("Hors CEE")
-
-    code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
-    name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
-    group = models.CharField(max_length=20, choices=Group.choices)
-    # TODO DPT field ?
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return f"INSEECountry:code={self.code}, name={self.name}"
-
-
-class EducationalLevel(PeriodMixin):
-    """
-    Educational level of the employee
-
-    Imported from ASP reference file: ref_niveau_formation_v3.csv
-    """
-
-    code = models.CharField(max_length=2, verbose_name=_("Code niveau de formation"))
-    name = models.CharField(max_length=100, verbose_name=_("Nom du niveau de formation"))
-
-    # TODO rme_id field used ?
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
@@ -207,13 +113,13 @@ class EmployeeRecord(models.Model):
     # - personnePhysique.codeComInsee.codeDpt
     employee = models.ForeignKey(User, verbose_name=_("Employé"), on_delete=models.CASCADE)
     educational_leval = models.ForeignKey(
-        EducationalLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL, null=True,
+        EducationLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL, null=True,
     )
     birth_place = models.ForeignKey(
-        INSEECommune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL, null=True,
+        Commune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL, null=True,
     )
     birth_country = models.ForeignKey(
-        INSEECountry, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL, null=True,
+        Country, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL, null=True,
     )
 
     # birth_place = models.ForeignKey(INSEECode, verbose_name=_("Lieu de naissance"))

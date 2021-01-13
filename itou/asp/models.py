@@ -176,7 +176,6 @@ class PeriodMixinManager(models.Manager):
         when importing or reshaping them.
         Even more with elements with effective dates (start / end / history concerns).
         """
-        print("Using custom manager")
         return super().get_queryset().filter(end_date=None)
 
 
@@ -199,7 +198,6 @@ class PeriodMixin(models.Model):
     end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
 
     current = PeriodMixinManager()
-    # Must be manually added, if we want to access full table
     history = models.Manager()
 
     class Meta:
@@ -241,7 +239,7 @@ class EducationLevel(PeriodMixin, CodeLabelMixin):
     # TODO rme_id ???
 
 
-class INSEECommune(PeriodMixin, CodeLabelMixin):
+class Commune(PeriodMixin, CodeLabelMixin):
     """
     INSEE commune
 
@@ -258,7 +256,7 @@ class INSEECommune(PeriodMixin, CodeLabelMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
 
-class INSEEDepartment(PeriodMixin, CodeLabelMixin):
+class Department(PeriodMixin, CodeLabelMixin):
     """
     INSEE department code
 
@@ -271,7 +269,7 @@ class INSEEDepartment(PeriodMixin, CodeLabelMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
 
 
-class INSEECountry(CodeLabelMixin):
+class Country(models.Model, CodeLabelMixin):
     """
     INSEE country code
 
@@ -281,12 +279,33 @@ class INSEECountry(CodeLabelMixin):
     """
 
     class Group(models.TextChoices):
-        FRANCE = "FRANCE", _("France")
+        FRANCE = "1", _("France")
         # FTR CEE = "Communauté Economique Européenne" is not used since 1993...
-        CEE = "CEE", _("CEE")
-        OUTSIDE_CEE = "OUTSIDE_CEE", _("Hors CEE")
+        CEE = "2", _("CEE")
+        OUTSIDE_CEE = "3", _("Hors CEE")
 
     code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
     group = models.CharField(max_length=15, choices=Group.choices)
-    # TODO DPT field ?
+    # For compatibility, no usage yet
+    department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
+
+
+class Measure(PeriodMixin, CodeLabelMixin):
+    """
+    ASP Measure (mesure)
+
+    ASP Equivalent to Siae.Kind, but codes are different
+    """
+
+    # Field code and display code are inverted for current usage, so:
+    # - 'Measure.code' is 'Rme_code_mesure_disp'
+    # - 'Measure.display_code' is 'Rme_code_mesure'
+    # - 'help_code' is 'Rme_code_aide'
+    code = models.CharField(max_length=10, verbose_name=_("Code mesure ASP complet"))
+    display_code = models.CharField(max_length=5, verbose_name=_("Code mesure ASP resumé"))
+    help_code = models.CharField(max_length=5, verbose_name=_("Code d'aide mesure ASP"))
+    name = models.CharField(max_length=80, verbose_name=_("Libellé de la mesure ASP"))
+
+    # I don't what this ID is about yet, seems unused but kept for compatibility
+    rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
