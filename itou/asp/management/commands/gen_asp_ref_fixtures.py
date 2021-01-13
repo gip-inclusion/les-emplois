@@ -16,7 +16,14 @@ from django.core.management.base import BaseCommand
 _IMPORT_DIR = "imports"
 _FIXTURES_DIR = "itou/asp/fixtures"
 _SEP = ";"
-_DATE_FORMAT = "%d/%m/%Y"
+_ASP_DATE_FORMAT = "%d/%m/%Y"
+
+
+def parse_asp_date(dt):
+    if dt:
+        return str(datetime.strptime(dt, _ASP_DATE_FORMAT).date())
+    else:
+        return None
 
 
 class Command(BaseCommand):
@@ -56,12 +63,8 @@ class Command(BaseCommand):
 
         result = []
         for idx, row in df.iterrows():
-            start_date = datetime.strptime(row["rte_date_debut_effet"], _DATE_FORMAT).date()
-            end_date = (
-                datetime.strptime(row["rte_date_fin_effet"], _DATE_FORMAT).date()
-                if row["rte_date_fin_effet"]
-                else None
-            )
+            start_date = parse_asp_date(row["rte_date_debut_effet"])
+            end_date = parse_asp_date(row["rte_date_fin_effet"])
 
             elt = {
                 "model": model,
@@ -69,8 +72,8 @@ class Command(BaseCommand):
                 "fields": {
                     "code": row["rnf_code_form_empl"],
                     "name": row["rnf_libelle_niveau_form_empl"],
-                    "start_date": str(start_date),
-                    "end_date": str(end_date) if end_date else None,
+                    "start_date": start_date,
+                    "end_date": end_date,
                 },
             }
             result.append(elt)
@@ -79,8 +82,6 @@ class Command(BaseCommand):
         if not self.dry_run:
             with open(export_path, "w") as of:
                 of.write(json.dumps(result))
-
-        print(result)
 
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run
