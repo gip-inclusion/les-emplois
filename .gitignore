@@ -143,8 +143,8 @@ ENV/
 .clever.json
 
 # Import files
-# imports
-# !imports/*.md
+imports
+!imports/*.md
 
 # Export files
 exports
