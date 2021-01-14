@@ -6,6 +6,28 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [10] - 2010-01-14
+
+### Ajouté
+- Ajout d'un filtre sur les candidatures : "PASS IAE suspendu"
+- Les suspensions de PASS IAE peuvent être modifiées et supprimées
+- Page d'accueil : affichage des prochains webinaires
+- Page de gestion de candidature : ajout d'un message informatif
+- Django Admin : ajout du lien permettant d'accepter une invitation
+- Django Admin : affichage de certains identifiants
+- Django Admin : rubrique "log des transitions des candidatures", recherche par identifiant de candidature
+- Ajout d'informations dans l'email de candidature à destination des employeurs
+- Affichage de la date à laquelle il sera possible de télécharger un PASS IAE
+- Tableau de bord employeur : mise en avant des auto-prescriptions à travers l'ajout d'un badge
+
+### Modifié
+- Mise à jour vers Django 3.1.5
+- Le bouton "Télécharger l'attestation" devient "Télécharger le Pass IAE"
+- Le statut de candidature "Embauche pour plus tard" a été remplacé par "Candidature en liste d'attente"
+
+### Supprimé
+- Pour les GEIQ et les EA, retrait de la note informative "Pass IAE et demande rétroactive"
+
 ## [9] - 2020-12-30
 
 ### Ajouté
