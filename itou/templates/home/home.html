@@ -24,12 +24,12 @@
     </section>
 
     {% if not user.is_authenticated %}
-        <section class="layout-section bg-light py-5 text-center">
-            <div class="layout-content">
+        <section class="layout-section bg-light pt-5 text-center">
+            <div class="layout-content pb-0">
                 <h3 class="h4 font-weight-bold">{% translate "Vous découvrez l'inclusion ?" %}</h3>
                 <h3 class="h4 pt-2 font-weight-light">{% translate "Nos outils sont à votre disposition" %}</h4>
 
-                <div class="card-deck my-5 justify-content-between text-center">
+                <div class="card-deck mt-5 justify-content-between text-center">
                     <div class="card p-4" style="flex: 0 0 23%;">
                         <div class="card-body">
                             <h5 class="card-title font-weight-light mb-4">
@@ -69,4 +69,22 @@
 
     {% endif %}
 
+    <section class="layout-section bg-light py-5 text-center">
+        <div class="layout-content">
+            <iframe width="100%" height="980" id="livestorm_iframe" frameborder="0" src="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements La Plateforme de l'inclusion | Livestorm"></iframe>
+        </div>
+    </section>
+
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script type="text/javascript">
+        // Poor attempt to make the Livestorm iframe responsive.
+        const tablet_width = 750;
+        const width = document.body.clientWidth;
+        if (width > tablet_width) {
+            $("#livestorm_iframe").height("310px");
+        }
+    </script>
+{% endblock script %}
