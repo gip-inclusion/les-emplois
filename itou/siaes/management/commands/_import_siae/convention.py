@@ -85,10 +85,13 @@ def update_existing_conventions(dry_run):
                     convention.save()
 
     print(f"{reactivations} conventions will be reactivated")
+
+    total = SiaeConvention.objects.count()
     if DEACTIVATE_CONVENTIONS:
-        print(f"{deactivations} conventions will be deactivated")
+        print(f"{deactivations} of {total} conventions will be deactivated")
     else:
-        print(f"{deactivations} conventions would have been deactivated but will *not* be")
+        total = SiaeConvention.objects.count()
+        print(f"{deactivations} of {total} conventions would have been deactivated but will *not* be")
 
 
 def get_creatable_conventions():
