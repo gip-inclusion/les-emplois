@@ -1,5 +1,13 @@
 import psycopg2
 from django.conf import settings
+from sqlalchemy import create_engine
+
+
+# Required for using pandas.to_sql method in `populate_metabase_fluxiae.py`.
+PG_ENGINE = create_engine(
+    f"postgresql://{settings.METABASE_USER}:{settings.METABASE_PASSWORD}"
+    f"@{settings.METABASE_HOST}:{settings.METABASE_PORT}/{settings.METABASE_DATABASE}"
+)
 
 
 class MetabaseDatabaseCursor:

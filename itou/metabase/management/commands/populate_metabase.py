@@ -1,6 +1,10 @@
 """
 Populate metabase database with transformed data from itou database.
 
+For fluxIAE data, see the other script `populate_metabase_fluxiae.py`.
+
+This script runs every night in production via a cronjob, but can also be run from your local dev.
+
 This script reads data from the itou production database,
 transforms it for the convenience of our metabase non tech-savvy,
 french speaking only users, and injects the result into metabase.
@@ -12,8 +16,8 @@ The metabase database tables are trashed and recreated every time.
 The data is heavily denormalized among tables so that the metabase user
 has all the fields needed and thus never needs to perform joining two tables.
 
-We maintain a google sheet with extensive documentation about all tables
-and fields. Not linked here but easy to find internally.
+We maintain a google sheet with extensive documentation about all tables and fields.
+Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for safety reasons.
 """
 import gc
 import logging
