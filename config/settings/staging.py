@@ -1,7 +1,7 @@
 from .base import *
 from ._sentry import sentry_init
 
-ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr"]
+ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr", "staging.emploi.inclusion.beta.gouv.fr"]
 
 DATABASES = {
     "default": {

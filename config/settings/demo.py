@@ -1,7 +1,7 @@
 from .base import *
 from ._sentry import sentry_init
 
-ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", "demo.inclusion.beta.gouv.fr"]
+ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", "demo.inclusion.beta.gouv.fr", "demo.emploi.inclusion.beta.gouv.fr"]
 
 DATABASES = {
     "default": {
