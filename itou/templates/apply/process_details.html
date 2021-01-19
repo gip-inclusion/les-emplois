@@ -12,9 +12,7 @@
     <h3 class="font-weight-normal text-muted">{% translate "Candidat" %}</h3>
 
     <ul>
-
-        <li>{% translate "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
-
+        
         <li>{% translate "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>
 
         <li>{% translate "Nom :" %} <b>{{ job_application.job_seeker.last_name }}</b></li>
@@ -43,6 +41,25 @@
                     href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
             </li>
         {% endif %}
+    
+    </ul>
+
+    {% if job_application.can_update_job_seeker %}
+        <p>
+            <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
+               class="btn btn-outline-primary btn-block">
+                {% translate "Modifier les informations" %}
+            </a>
+        </p>
+    {% endif %}
+
+    {# Job application info ------------------------------------------------------------------------- #}
+
+    <hr>
+    <h3 class="font-weight-normal text-muted">{% translate "Candidature" %}</h3>
+
+    <ul>
+        <li>{% translate "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
 
         {% if job_application.selected_jobs.exists %}
             <li>
@@ -56,9 +73,8 @@
         {% else %}
             <li>{% translate "Candidature spontanée" %}</li>
         {% endif %}
-
     </ul>
-
+    
     <div class="alert alert-secondary">
         <p><b>{% translate "Message :" %}</b></p>
         {{ job_application.message|linebreaks }}

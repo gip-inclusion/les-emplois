@@ -401,6 +401,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and self.refusal_reason == self.REFUSAL_REASON_DEACTIVATION
         )
 
+    @property
+    def can_update_job_seeker(self):
+        return (self.state.is_processing or self.state.is_accepted) and self.job_seeker.is_handled_by_proxy
+
     # Workflow transitions.
 
     @xwf_models.transition()
