@@ -3,7 +3,6 @@
 # Werkzeug is required to use django-extensions's runserver_plus.
 Werkzeug==1.0.1  # pyup: < 2 # https://github.com/pallets/werkzeug
 ipdb==0.13.4  # https://github.com/gotcha/ipdb
-tblib  # https://github.com/ionelmc/python-tblib
 
 # Last jedi release (0.18.0) is incompatible with ipython
 # https://github.com/ipython/ipython/issues/12740
