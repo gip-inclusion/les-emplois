@@ -17,7 +17,7 @@ class Command(BaseCommand):
     help = "Export the content of the Approvals from the database into an xlsx file."
 
     def handle(self, **options):
-        self.stdout.write("Exporting approvals")
+        self.stdout.write("Exporting approvals / PASS IAE")
 
         result = export_approvals()
 
