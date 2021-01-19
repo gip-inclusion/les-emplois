@@ -4,7 +4,7 @@
 
 {% block title %}
     {% blocktranslate %}
-        Attestation de délivrance d'agrément pour {{ user_name }}.
+        Attestation de délivrance d'agrément pour {{ job_seeker.get_full_name|title }}.
     {% endblocktranslate %}
     {{ block.super }}
 {% endblock %}
@@ -39,7 +39,9 @@
         </section>
 
         <section class="mt-5">
+
             <span class="d-block font-weight-bold">{% translate "Références à rappeler :" %}</span>
+
             <span class="d-block">{% translate "PASS IAE n°" %} {{ approval.number_with_spaces }}</span>
 
             <span class="d-block">
@@ -48,7 +50,12 @@
                 {% endblocktranslate %}
             </span>
 
+            {% if job_seeker.pole_emploi_id %}
+                <span class="d-block">{% translate "Identifiant Pôle emploi :" %} {{ job_seeker.pole_emploi_id }}</span>
+            {% endif %}
+
             <span class="d-block">{% translate "délivré par la Plateforme de l'inclusion" %}</span>
+
         </section>
 
         <section class="mt-5">
@@ -75,7 +82,7 @@
 
                 {% endif %}
 
-                {% blocktranslate with user_name=user_name|title %}
+                {% blocktranslate with user_name=job_seeker.get_full_name|title %}
                     la situation sociale et professionnelle de {{ user_name }}
                     et de votre promesse d’embauche, la Plateforme de l’Inclusion vous délivre
                     un PASS IAE pour un parcours d’insertion par l’activité économique,
