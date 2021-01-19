@@ -5,6 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -60,6 +61,8 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
@@ -68,6 +71,8 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(id=user.id)
+        self.assertEqual(user.first_name, post_data["first_name"])
+        self.assertEqual(user.last_name, post_data["last_name"])
         self.assertEqual(user.phone, post_data["phone"])
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 

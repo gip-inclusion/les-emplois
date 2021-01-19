@@ -37,6 +37,8 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = [
+            "first_name",
+            "last_name",
             "birthdate",
             "phone",
             "address_line_1",
