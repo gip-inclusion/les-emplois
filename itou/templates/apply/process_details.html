@@ -34,6 +34,10 @@
             <li>{% translate "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
         {% endif %}
 
+        {% if job_application.job_seeker.pole_emploi_id %}
+            <li>{% translate "Identifiant Pôle emploi :" %} <b>{{ job_application.job_seeker.pole_emploi_id }}</b></li>
+        {% endif %}
+
         {% if job_application.job_seeker.resume_link %}
             <li>{% translate "Lien vers CV :" %} <a
                     href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
