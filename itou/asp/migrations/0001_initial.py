@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=50, verbose_name="Nom de la commune")),
             ],
             options={"abstract": False,},
-            bases=(models.Model, itou.asp.models.CodeLabelMixin),
+            bases=(models.Model, itou.asp.models.NameLabelStrMixin),
             managers=[("current", django.db.models.manager.Manager()),],
         ),
         migrations.CreateModel(
@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 ("group", models.CharField(choices=[("1", "France"), ("2", "CEE"), ("3", "Hors CEE")], max_length=15)),
                 ("department", models.CharField(default="098", max_length=3, verbose_name="Code département")),
             ],
-            bases=(models.Model, itou.asp.models.CodeLabelMixin),
+            bases=(models.Model, itou.asp.models.NameLabelStrMixin),
         ),
         migrations.CreateModel(
             name="Department",
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=50, verbose_name="Nom du département")),
             ],
             options={"abstract": False,},
-            bases=(models.Model, itou.asp.models.CodeLabelMixin),
+            bases=(models.Model, itou.asp.models.NameLabelStrMixin),
             managers=[("current", django.db.models.manager.Manager()),],
         ),
         migrations.CreateModel(
@@ -62,7 +62,7 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=80, verbose_name="Libellé niveau de formation ASP")),
             ],
             options={"abstract": False,},
-            bases=(models.Model, itou.asp.models.CodeLabelMixin),
+            bases=(models.Model, itou.asp.models.NameLabelStrMixin),
             managers=[("current", django.db.models.manager.Manager()),],
         ),
         migrations.CreateModel(
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 ("rdi_id", models.CharField(max_length=1, verbose_name="Identifiant RDI ?")),
             ],
             options={"abstract": False,},
-            bases=(models.Model, itou.asp.models.CodeLabelMixin),
+            bases=(models.Model, itou.asp.models.NameLabelStrMixin),
             managers=[("current", django.db.models.manager.Manager()),],
         ),
         migrations.CreateModel(
@@ -100,7 +100,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={"abstract": False,},
-            bases=(models.Model, itou.asp.models.CodeLabelMixin),
+            bases=(models.Model, itou.asp.models.NameLabelStrMixin),
             managers=[("current", django.db.models.manager.Manager()),],
         ),
     ]

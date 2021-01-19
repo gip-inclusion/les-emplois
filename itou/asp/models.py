@@ -206,7 +206,7 @@ class PeriodMixin(models.Model):
         abstract = True
 
 
-class CodeLabelMixin:
+class NameLabelStrMixin:
     def __str__(self):
         return self.name
 
@@ -228,7 +228,7 @@ class AllocationDuration(models.TextChoices):
     MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
 
 
-class EducationLevel(PeriodMixin, CodeLabelMixin):
+class EducationLevel(NameLabelStrMixin, PeriodMixin):
     """
     Education level of the employee
 
@@ -241,7 +241,7 @@ class EducationLevel(PeriodMixin, CodeLabelMixin):
     # TODO rme_id ???
 
 
-class Commune(PeriodMixin, CodeLabelMixin):
+class Commune(NameLabelStrMixin, PeriodMixin):
     """
     INSEE commune
 
@@ -258,7 +258,7 @@ class Commune(PeriodMixin, CodeLabelMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
 
-class Department(PeriodMixin, CodeLabelMixin):
+class Department(NameLabelStrMixin, models.Model):
     """
     INSEE department code
 
@@ -271,7 +271,7 @@ class Department(PeriodMixin, CodeLabelMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
 
 
-class Country(models.Model, CodeLabelMixin):
+class Country(NameLabelStrMixin, models.Model):
     """
     INSEE country code
 
@@ -293,7 +293,7 @@ class Country(models.Model, CodeLabelMixin):
     department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
 
 
-class Measure(PeriodMixin, CodeLabelMixin):
+class Measure(NameLabelStrMixin, PeriodMixin):
     """
     ASP Measure (mesure)
 
@@ -313,7 +313,7 @@ class Measure(PeriodMixin, CodeLabelMixin):
     rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
 
 
-class EmployerType(PeriodMixin, CodeLabelMixin):
+class EmployerType(NameLabelStrMixin, PeriodMixin):
     """
     ASP employer type
     """

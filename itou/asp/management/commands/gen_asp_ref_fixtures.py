@@ -28,6 +28,19 @@ def parse_asp_date(dt):
 
 
 class Command(BaseCommand):
+    """
+    Generation of ASP reference files fixtures
+
+    Modus operandi:
+    - put the ASP files to import in the 'imports' folder
+    - run command via: ./manage.py gen_asp_ref_fixtures --verbosity=2
+
+    Once generated, fixtures can be imported via:
+    ./manage.py loaddata asp
+
+    Check 'itou.asp.models' for details.
+    """
+
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
