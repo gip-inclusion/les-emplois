@@ -12,5 +12,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(name="prescribermembership", unique_together={("user_id", "organization_id")},),
+        migrations.AlterUniqueTogether(
+            name="prescribermembership",
+            unique_together={("user_id", "organization_id")},
+        ),
     ]

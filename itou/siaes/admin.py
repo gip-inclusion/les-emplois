@@ -196,9 +196,35 @@ class SiaeConvention(admin.ModelAdmin):
         "updated_at",
     )
     fieldsets = (
-        (_("Informations"), {"fields": ("kind", "siret_signature",)},),
-        (_("Statut"), {"fields": ("is_active", "deactivated_at", "reactivated_by", "reactivated_at",)},),
-        (_("Autres"), {"fields": ("created_at", "updated_at",)},),
+        (
+            _("Informations"),
+            {
+                "fields": (
+                    "kind",
+                    "siret_signature",
+                )
+            },
+        ),
+        (
+            _("Statut"),
+            {
+                "fields": (
+                    "is_active",
+                    "deactivated_at",
+                    "reactivated_by",
+                    "reactivated_at",
+                )
+            },
+        ),
+        (
+            _("Autres"),
+            {
+                "fields": (
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
     )
     search_fields = ("pk", "siret_signature")
     inlines = (FinancialAnnexesInline, SiaesInline)
@@ -231,8 +257,33 @@ class SiaeFinancialAnnex(admin.ModelAdmin):
         "updated_at",
     )
     fieldsets = (
-        (_("Informations"), {"fields": ("number", "convention",)},),
-        (_("Statut"), {"fields": ("state", "start_at", "end_at",)},),
-        (_("Autres"), {"fields": ("created_at", "updated_at",)},),
+        (
+            _("Informations"),
+            {
+                "fields": (
+                    "number",
+                    "convention",
+                )
+            },
+        ),
+        (
+            _("Statut"),
+            {
+                "fields": (
+                    "state",
+                    "start_at",
+                    "end_at",
+                )
+            },
+        ),
+        (
+            _("Autres"),
+            {
+                "fields": (
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
     )
     search_fields = ("pk", "number")

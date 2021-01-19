@@ -127,7 +127,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
 def edit_siae(request, template_name="siaes/edit_siae.html"):
     """
     Edit an SIAE.
-   """
+    """
     siae = get_current_siae_or_404(request)
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)
