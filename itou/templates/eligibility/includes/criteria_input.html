@@ -14,21 +14,25 @@
                 <small class="form-text text-muted">{{ field.help_text }}</small>
             {% endif %}
 
-            {% with objects_dict|get_dict_item:field.name as criteria %}
-                 {% if criteria.written_proof %}
-                     <small class="form-text text-muted">
-                         {% translate "Pièce justificative :" %}
-                         <i>{{ criteria.written_proof }}</i>
-                     </small>
-                 {% endif %}
-                 {% if criteria.written_proof_url %}
-                     <small class="form-text text-muted">
-                         <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank">
-                             {{ criteria.written_proof_url }}
-                         </a>
-                     </small>
-                 {% endif %}
-            {% endwith %}
+            {# Show written proof only to SIAE because prescribers feel they have #}
+            {# to provide them when they don't have to. #}
+            {% if request.user.is_siae_staff %}
+                {% with objects_dict|get_dict_item:field.name as criteria %}
+                     {% if criteria.written_proof %}
+                         <small class="form-text text-muted">
+                             {% translate "Pièce justificative :" %}
+                             <i>{{ criteria.written_proof }}</i>
+                         </small>
+                     {% endif %}
+                     {% if criteria.written_proof_url %}
+                         <small class="form-text text-muted">
+                             <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank">
+                                 {{ criteria.written_proof_url }}
+                             </a>
+                         </small>
+                     {% endif %}
+                {% endwith %}
+            {% endif %}
 
         </label>
 
