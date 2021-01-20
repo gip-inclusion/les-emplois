@@ -402,7 +402,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     @property
-    def can_update_job_seeker(self):
+    def has_editable_job_seeker(self):
         return (self.state.is_processing or self.state.is_accepted) and self.job_seeker.is_handled_by_proxy
 
     # Workflow transitions.

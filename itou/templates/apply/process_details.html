@@ -40,11 +40,10 @@
             <li>{% translate "Lien vers CV :" %} <a
                     href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
             </li>
-        {% endif %
-}
+        {% endif %}
     </ul>
 
-    {% if job_application.can_update_job_seeker %}
+    {% if job_application.has_editable_job_seeker %}
         <p>
             <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
                class="btn btn-outline-primary btn-block">
