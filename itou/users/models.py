@@ -51,8 +51,20 @@ class User(AbstractUser, AddressMixin):
 
     ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
 
+    TITLE_M = "M"
+    TITLE_MME = "MME"
+    TITLE_CHOICES = ((TITLE_M, _("Monsieur")), (TITLE_MME, _("Madame")))
+
+    title = models.CharField(max_length=5, verbose_name=_("Civilité"), null=True, choices=TITLE_CHOICES)
+
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
+    )
+    birth_place = models.ForeignKey(
+        "asp.Commune", verbose_name=_("Commune de naissance"), null=True, on_delete=models.SET_NULL
+    )
+    birth_country = models.ForeignKey(
+        "asp.Country", verbose_name=_("Pays de naissance"), null=True, on_delete=models.SET_NULL
     )
     email = CIEmailField(
         _("email address"),
@@ -212,6 +224,39 @@ class User(AbstractUser, AddressMixin):
         if self.is_job_seeker:
             return self.job_applications.accepted().latest("created_at")
         return None
+
+
+class JobSeekerProfile(models.Model):
+    """
+    TODO
+    """
+
+    education_level = models.ForeignKey(
+        "asp.EducationLevel", verbose_name=_("Niveau de formation (ASP)", null=True, on_delete=models.SET_NULL)
+    )
+    employer_type = models.ForeignKey(
+        "asp.EmployerType", verbose_name=_("Type d'employeur (ASP)"), null=True, on_delete=models.SET_NULL
+    )
+
+    resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
+
+    poleemploi = models.BooleanField(verbose_name=_("Inscrit Pôle emploi"), default=False)
+    poleemploi_since = models.ForeignKey(
+        "asp.AllocationDuration",
+        verbose_name=_("Inscrit à Pôle emploi depuis (ASP)"),
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    currently_employed = models.BooleanField(verbose_name=_("Actuellement employé"), default=False)
+    unemployed_since = models.ForeignKey(
+        "asp.AllocationDuration", verbose_name=_("Durée (ASP)"), null=True, on_delete=models.SET_NULL
+    )
+
+    rqth = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
+    oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
+
+    # TODO to be continued...
 
 
 def get_allauth_account_user_display(user):
