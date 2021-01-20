@@ -35,14 +35,33 @@ class Command(BaseCommand):
     - put the ASP files to import in the 'imports' folder
     - run command via: ./manage.py gen_asp_ref_fixtures --verbosity=2
 
+    OR
+
+    select one or more files to import explicitly:
+    ./manage.py gen_asp_ref_fixtures --verbosity=2 --education_levels=myfile.csv ...
+
+    Files still have to be in 'import' folder.
+
+    A 'dry-run' parameter is also available:
+    ./manage.py gen_asp_ref_fixtures --verbosity=2 --dry-run
+
+    With 'dry-run', all operations but file storage are processed.
+
     Once generated, fixtures can be imported via:
-    ./manage.py loaddata asp
+    ./manage.py loaddata --app asp
 
     Check 'itou.asp.models' for details.
     """
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
+        parser.add_argument("--all", dest="all_files", action="store_true", help="Process all files in import folder")
+        parser.add_argument("--education_levels")
+        parser.add_argument("--insee_communes")
+        parser.add_argument("--insee_departments")
+        parser.add_argument("--insee_countries")
+        parser.add_argument("--measures")
+        parser.add_argument("--employer_types")
 
     def set_logger(self, verbosity):
         """
@@ -308,10 +327,28 @@ class Command(BaseCommand):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
 
-        # Order matters
-        self.gen_education_levels()
-        self.gen_insee_communes()
-        self.gen_insee_departments()
-        self.gen_insee_countries()
-        self.gen_measures()
-        self.gen_employer_types()
+        partial = [
+            elt
+            for elt in [
+                "education_levels",
+                "insee_communes",
+                "insee_departments",
+                "insee_countries",
+                "measures",
+                "employer_types",
+            ]
+            if options.get(elt)
+        ]
+
+        if partial:
+            for gen_method in partial:
+                fn = getattr(self, f"gen_{gen_method}")
+                fn(filename=options.get(gen_method))
+        else:
+            # Order matters
+            self.gen_education_levels()
+            self.gen_insee_communes()
+            self.gen_insee_departments()
+            self.gen_insee_countries()
+            self.gen_measures()
+            self.gen_employer_types()

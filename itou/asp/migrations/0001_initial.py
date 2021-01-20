@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(itou.asp.models.NameLabelStrMixin, models.Model),
+            bases=(itou.asp.models.PrettyPrintMixin, models.Model),
             managers=[
                 ("current", django.db.models.manager.Manager()),
             ],
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
                 ("group", models.CharField(choices=[("1", "France"), ("2", "CEE"), ("3", "Hors CEE")], max_length=15)),
                 ("department", models.CharField(default="098", max_length=3, verbose_name="Code département")),
             ],
-            bases=(itou.asp.models.NameLabelStrMixin, models.Model),
+            bases=(itou.asp.models.PrettyPrintMixin, models.Model),
         ),
         migrations.CreateModel(
             name="Department",
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(itou.asp.models.NameLabelStrMixin, models.Model),
+            bases=(itou.asp.models.PrettyPrintMixin, models.Model),
             managers=[
                 ("current", django.db.models.manager.Manager()),
             ],
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(itou.asp.models.NameLabelStrMixin, models.Model),
+            bases=(itou.asp.models.PrettyPrintMixin, models.Model),
             managers=[
                 ("current", django.db.models.manager.Manager()),
             ],
@@ -92,7 +92,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(itou.asp.models.NameLabelStrMixin, models.Model),
+            bases=(itou.asp.models.PrettyPrintMixin, models.Model),
             managers=[
                 ("current", django.db.models.manager.Manager()),
             ],
@@ -118,7 +118,7 @@ class Migration(migrations.Migration):
             options={
                 "abstract": False,
             },
-            bases=(itou.asp.models.NameLabelStrMixin, models.Model),
+            bases=(itou.asp.models.PrettyPrintMixin, models.Model),
             managers=[
                 ("current", django.db.models.manager.Manager()),
             ],

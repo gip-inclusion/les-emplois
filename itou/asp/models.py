@@ -183,10 +183,10 @@ class PeriodMixinManager(models.Manager):
 
 class PeriodMixin(models.Model):
     """
-    Mixin for ref files having history concerns (start_date and end_date defined)
+    Mixin for reference files having history concerns (start_date and end_date defined)
 
     Important:
-    when using this mixin, there is no 'type.objects' default model manager defined.
+    When using this mixin, there is no 'type.objects' default model manager defined.
 
     Instead:
     - 'type.history' is a manager with ALL previous versions of a record
@@ -206,7 +206,7 @@ class PeriodMixin(models.Model):
         abstract = True
 
 
-class NameLabelStrMixin:
+class PrettyPrintMixin:
     def __str__(self):
         return self.name
 
@@ -228,7 +228,7 @@ class AllocationDuration(models.TextChoices):
     MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
 
 
-class EducationLevel(NameLabelStrMixin, PeriodMixin):
+class EducationLevel(PrettyPrintMixin, PeriodMixin):
     """
     Education level of the employee
 
@@ -238,10 +238,8 @@ class EducationLevel(NameLabelStrMixin, PeriodMixin):
     code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
     name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
 
-    # TODO rme_id ???
 
-
-class Commune(NameLabelStrMixin, PeriodMixin):
+class Commune(PrettyPrintMixin, PeriodMixin):
     """
     INSEE commune
 
@@ -258,7 +256,7 @@ class Commune(NameLabelStrMixin, PeriodMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
 
-class Department(NameLabelStrMixin, PeriodMixin):
+class Department(PrettyPrintMixin, PeriodMixin):
     """
     INSEE department code
 
@@ -271,7 +269,7 @@ class Department(NameLabelStrMixin, PeriodMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
 
 
-class Country(NameLabelStrMixin, models.Model):
+class Country(PrettyPrintMixin, models.Model):
     """
     INSEE country code
 
@@ -282,18 +280,19 @@ class Country(NameLabelStrMixin, models.Model):
 
     class Group(models.TextChoices):
         FRANCE = "1", _("France")
-        # FTR CEE = "Communauté Economique Européenne" is not used since 1993...
+        # FTR CEE = "Communauté Economique Européenne" and is not used since 1993...
         CEE = "2", _("CEE")
         OUTSIDE_CEE = "3", _("Hors CEE")
 
     code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
     group = models.CharField(max_length=15, choices=Group.choices)
+
     # For compatibility, no usage yet
     department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
 
 
-class Measure(NameLabelStrMixin, PeriodMixin):
+class Measure(PrettyPrintMixin, PeriodMixin):
     """
     ASP Measure (mesure)
 
@@ -301,7 +300,7 @@ class Measure(NameLabelStrMixin, PeriodMixin):
     """
 
     # Field code and display code are inverted for current usage, so:
-    # - 'Measure.code' is 'Rme_code_mesure_disp'
+    # - 'Measure.code' is 'Rme_code_mesure_disp' ASP field
     # - 'Measure.display_code' is 'Rme_code_mesure'
     # - 'help_code' is 'Rme_code_aide'
     code = models.CharField(max_length=10, verbose_name=_("Code mesure ASP complet"))
@@ -313,9 +312,11 @@ class Measure(NameLabelStrMixin, PeriodMixin):
     rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
 
 
-class EmployerType(NameLabelStrMixin, PeriodMixin):
+class EmployerType(PrettyPrintMixin, PeriodMixin):
     """
     ASP employer type
+
+    Imported from ASP reference file: ref_type_employeur_v3.csv
     """
 
     code = models.CharField(max_length=3, verbose_name=_("Code employeur ASP"))
