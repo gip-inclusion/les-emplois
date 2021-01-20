@@ -2,6 +2,7 @@ from allauth.account.views import LogoutView, PasswordChangeView
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -9,7 +10,7 @@ from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -135,6 +136,32 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         "form": form,
         "job_seeker_signed_pk": job_seeker_signed_pk,
         "prev_url": prev_url,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def edit_job_seeker_info(request, job_application_id, template_name="dashboard/edit_job_seeker_info.html"):
+    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+    job_application = get_object_or_404(JobApplication, pk=job_application_id)
+
+    if not current_siae_pk or current_siae_pk != job_application.to_siae.pk:
+        raise PermissionDenied
+
+    dashboard_url = reverse_lazy("dashboard:index")
+    back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
+    form = EditUserInfoForm(instance=job_application.job_seeker, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, _("Les informations du candidat ont été mises à jour."))
+        return HttpResponseRedirect(back_url)
+
+    context = {
+        "form": form,
+        "job_application": job_application,
+        "prev_url": back_url,
     }
 
     return render(request, template_name, context)

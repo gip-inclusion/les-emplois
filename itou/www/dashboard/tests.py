@@ -1,10 +1,12 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
+from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -60,6 +62,8 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
             "phone": "0610203050",
             "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
@@ -68,8 +72,54 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
 
         user = get_user_model().objects.get(id=user.id)
+        self.assertEqual(user.first_name, post_data["first_name"])
+        self.assertEqual(user.last_name, post_data["last_name"])
         self.assertEqual(user.phone, post_data["phone"])
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+
+
+class EditJobSeekerInfo(TestCase):
+    def test_edit(self):
+        job_application = JobApplicationSentByPrescriberFactory()
+        user = job_application.to_siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
+
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, back_url)
+
+        job_seeker = get_user_model().objects.get(id=job_application.job_seeker.id)
+        self.assertEqual(job_seeker.first_name, post_data["first_name"])
+        self.assertEqual(job_seeker.last_name, post_data["last_name"])
+        self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
+        self.assertEqual(job_seeker.phone, post_data["phone"])
+
+    def test_edit_not_allowed(self):
+        job_application = JobApplicationSentByPrescriberFactory()
+        user = job_application.sender
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
 
 
 class ChangeEmailViewTest(TestCase):

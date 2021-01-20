@@ -256,7 +256,6 @@
    "pk": 8,
    "fields": {
       "password": "pbkdf2_sha256$180000$CPDNpTjYqjR1$skD6ISRz3Q1/9PsgtJagpxfjWZzpWydnQwMvbXgT0yA=",
-      "last_login": "2020-04-09T14:08:07Z",
       "is_superuser": false,
       "username": "test+de-proxy@inclusion.beta.gouv.fr",
       "first_name": "Sylvie",

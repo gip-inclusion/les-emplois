@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils import timezone
 
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 
@@ -90,3 +91,15 @@ class ModelTest(TestCase):
         email = email.title()
         with self.assertRaises(ValidationError):
             UserFactory(email=email)
+
+    def test_is_handled_by_proxy(self):
+        job_seeker = JobSeekerFactory()
+        self.assertFalse(job_seeker.is_handled_by_proxy)
+
+        prescriber = PrescriberFactory()
+        job_seeker = JobSeekerFactory(created_by=prescriber)
+        self.assertTrue(job_seeker.is_handled_by_proxy)
+
+        # Job seeker activates his account. He is in control now!
+        job_seeker.last_login = timezone.now()
+        self.assertFalse(job_seeker.is_handled_by_proxy)

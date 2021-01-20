@@ -122,6 +122,12 @@ class User(AbstractUser, AddressMixin):
             return None
         return ApprovalsWrapper(self)
 
+    @property
+    def is_handled_by_proxy(self):
+        if self.is_job_seeker and self.created_by and not self.last_login:
+            return True
+        return False
+
     @cached_property
     def is_peamu(self):
         social_accounts = self.socialaccount_set.all()
