@@ -258,7 +258,7 @@ class Commune(NameLabelStrMixin, PeriodMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
 
-class Department(NameLabelStrMixin, models.Model):
+class Department(NameLabelStrMixin, PeriodMixin):
     """
     INSEE department code
 
