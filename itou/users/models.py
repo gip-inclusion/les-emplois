@@ -15,6 +15,7 @@ from itou.approvals.models import ApprovalsWrapper
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
+from itou.asp.models import Country, Commune
 
 
 class User(AbstractUser, AddressMixin):
@@ -53,9 +54,19 @@ class User(AbstractUser, AddressMixin):
 
     ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
 
+    TITLE_M = "M"
+    TITLE_MME = "MME"
+    TITLE_CHOICES = ((TITLE_M, _("Monsieur")), (TITLE_MME, _("Madame")))
+
+    title = models.CharField(max_length=5, verbose_name=_("Civilité"), null=True, choices=TITLE_CHOICES)
+
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
     )
+
+    birth_place = models.ForeignKey(Commune, verbose_name=_("Commune de naissance"), null=True, on_delete=models.SET_NULL)
+    birth_country = models.ForeignKey(Country, verbose_name=_("Pays de naissance"), null=True, on_delete=models.SET_NULL)
+
     email = CIEmailField(
         _("email address"),
         blank=True,
