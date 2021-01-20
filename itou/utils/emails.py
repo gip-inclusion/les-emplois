@@ -124,50 +124,50 @@ def _serializeEmailMessage(email_message):
 
 def _deserializeEmailMessage(serialized_email_message):
     """
-        Creates a "light" version of the original `EmailMessage` passed to the email backend.
+    Creates a "light" version of the original `EmailMessage` passed to the email backend.
 
-        In order to be serializable, we:
-        * only get the fields actually used by the app (defined in counterpart `_serializeEmailMessage`)
-        * add a reference to the "synchronous" email backend (for convenience)
+    In order to be serializable, we:
+    * only get the fields actually used by the app (defined in counterpart `_serializeEmailMessage`)
+    * add a reference to the "synchronous" email backend (for convenience)
 
-        *Tip*: use non-serializable objects only when deserialization is over... (f.i. email backends)
+    *Tip*: use non-serializable objects only when deserialization is over... (f.i. email backends)
     """
     return EmailMessage(connection=get_connection(backend=ASYNC_EMAIL_BACKEND), **serialized_email_message)
 
 
 @task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
 def _async_send_messages(serializable_email_messages):
-    """ Async email sending "delegate"
+    """Async email sending "delegate"
 
-        This function sends emails with the backend defined in `ASYNC_EMAIL_BACKEND`
-        and is triggerred by an email backend wrappper: `AsyncEmailBackend`.
+    This function sends emails with the backend defined in `ASYNC_EMAIL_BACKEND`
+    and is triggerred by an email backend wrappper: `AsyncEmailBackend`.
 
-        As it is decorated as a Huey task, all parameters must be serializable via Pickle.
+    As it is decorated as a Huey task, all parameters must be serializable via Pickle.
 
-        Huey stores some data via the broker persistance mechanism (Redis | in-memory | SQLite)
-        for RPC/async/retry purposes.
+    Huey stores some data via the broker persistance mechanism (Redis | in-memory | SQLite)
+    for RPC/async/retry purposes.
 
-        In order to send data to a remote broker and perform callback function call on the client,
-        Huey must use a serialization mechanism to send "over the wire" (Pickle here).
+    In order to send data to a remote broker and perform callback function call on the client,
+    Huey must use a serialization mechanism to send "over the wire" (Pickle here).
 
-        In this case for a `@task`, data sent by Huey are:
-        * the function name (to use as a callback)
-        * its call parameters (to make the call)
+    In this case for a `@task`, data sent by Huey are:
+    * the function name (to use as a callback)
+    * its call parameters (to make the call)
 
-        The main parameter is a list of `EmailMessage` objects to be send.
+    The main parameter is a list of `EmailMessage` objects to be send.
 
-        By design, an `EmailMessage` instance holds references to some non-serializable ressources:
-        * a connection to the email backend (if not `None`)
-        * inner locks for atomic/threadsafe operations
-        * ...
+    By design, an `EmailMessage` instance holds references to some non-serializable ressources:
+    * a connection to the email backend (if not `None`)
+    * inner locks for atomic/threadsafe operations
+    * ...
 
-        Making `EmailMessage` serializable is the purpose of `_serializeEmailMessage` and `_deserializeEmailMessage`.
+    Making `EmailMessage` serializable is the purpose of `_serializeEmailMessage` and `_deserializeEmailMessage`.
 
-        If there are many async tasks to be defined or for specific objects,
-        it may be better to use a custom serializer.
+    If there are many async tasks to be defined or for specific objects,
+    it may be better to use a custom serializer.
 
-        By design (see `BaseEmailBackend.send_messages`), this function must return
-        the number of email correctly processed.
+    By design (see `BaseEmailBackend.send_messages`), this function must return
+    the number of email correctly processed.
     """
 
     count = 0
@@ -183,18 +183,18 @@ def _async_send_messages(serializable_email_messages):
 
 
 class AsyncEmailBackend(BaseEmailBackend):
-    """ Custom async email backend wrapper
+    """Custom async email backend wrapper
 
-        Decorating a method with `@task` does not work (no static context).
-        Only functions can be Huey tasks.
+    Decorating a method with `@task` does not work (no static context).
+    Only functions can be Huey tasks.
 
-        This class:
-        * wraps an email backend defined in `settings.ASYNC_EMAIL_BACKEND`
-        * delegate the actual email sending to a function with *serializable* parameters
+    This class:
+    * wraps an email backend defined in `settings.ASYNC_EMAIL_BACKEND`
+    * delegate the actual email sending to a function with *serializable* parameters
 
-        See:
-        * `base.py` section "Huey" for details on `ASYNC_EMAIL_BACKEND`
-        * `_async_send_messages` for more on details on async/serialization concerns
+    See:
+    * `base.py` section "Huey" for details on `ASYNC_EMAIL_BACKEND`
+    * `_async_send_messages` for more on details on async/serialization concerns
     """
 
     def send_messages(self, email_messages):

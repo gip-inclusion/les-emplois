@@ -1,23 +1,31 @@
 -r ./base.txt
 
+ipdb==0.13.4  # https://github.com/gotcha/ipdb
+
+# tblib is used to avoid parallel tests to crash hard if an exception occurs.
+# https://code.djangoproject.com/ticket/25497#comment:6
+tblib==1.7.0  # https://github.com/ionelmc/python-tblib
+
 # Werkzeug is required to use django-extensions's runserver_plus.
 Werkzeug==1.0.1  # pyup: < 2 # https://github.com/pallets/werkzeug
-ipdb==0.13.3  # https://github.com/gotcha/ipdb
-tblib  # https://github.com/ionelmc/python-tblib
+
+# Last jedi release (0.18.0) is incompatible with ipython
+# https://github.com/ipython/ipython/issues/12740
+# Pin it explicitly until a fix is available.
+jedi==0.17.2
 
 # Code quality
 # ------------------------------------------------------------------------------
-flake8==3.8.3  # https://github.com/PyCQA/flake8
-coverage==5.2.1  # https://github.com/nedbat/coveragepy
-black==19.10b0  # https://github.com/ambv/black
-isort==5.3.0  # https://github.com/timothycrosley/isort
+flake8==3.8.4  # https://github.com/PyCQA/flake8
+black==20.8b1  # https://github.com/ambv/black
+isort==5.7.0  # https://github.com/timothycrosley/isort
 
 # Django
 # ------------------------------------------------------------------------------
 factory-boy==2.12.0  # https://github.com/FactoryBoy/factory_boy
 
-django-debug-toolbar==2.2  # https://github.com/jazzband/django-debug-toolbar
-django-extensions==3.0.5  # https://github.com/django-extensions/django-extensions
+django-debug-toolbar==3.2  # https://github.com/jazzband/django-debug-toolbar
+django-extensions==3.1.0  # https://github.com/django-extensions/django-extensions
 django-admin-logs==1.0.1  # https://pypi.org/project/django-admin-logs/
 
 # Test & Mock

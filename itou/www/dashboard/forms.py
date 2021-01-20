@@ -37,6 +37,8 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = [
+            "first_name",
+            "last_name",
             "birthdate",
             "phone",
             "address_line_1",
@@ -62,8 +64,14 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
 class EditUserEmailForm(forms.Form):
 
-    email = forms.EmailField(label=gettext_lazy("Nouvelle adresse e-mail"), required=True,)
-    email_confirmation = forms.EmailField(label=gettext_lazy("Confirmation"), required=True,)
+    email = forms.EmailField(
+        label=gettext_lazy("Nouvelle adresse e-mail"),
+        required=True,
+    )
+    email_confirmation = forms.EmailField(
+        label=gettext_lazy("Confirmation"),
+        required=True,
+    )
 
     def __init__(self, *args, **kwargs):
         self.user_email = kwargs.pop("user_email")

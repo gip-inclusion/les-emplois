@@ -221,7 +221,9 @@ class PrescriberChooseKindForm(forms.Form):
     )
 
     kind = forms.ChoiceField(
-        label=gettext_lazy("Pour qui travaillez-vous ?"), choices=KIND_CHOICES, widget=forms.RadioSelect,
+        label=gettext_lazy("Pour qui travaillez-vous ?"),
+        choices=KIND_CHOICES,
+        widget=forms.RadioSelect,
     )
 
 

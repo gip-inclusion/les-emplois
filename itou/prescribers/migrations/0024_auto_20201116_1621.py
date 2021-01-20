@@ -31,5 +31,8 @@ class Migration(migrations.Migration):
         # Replace old `blank` by `null` values.
         migrations.RunPython(move_data_forward, migrations.RunPython.noop),
         # Add a unique together constraint.
-        migrations.AlterUniqueTogether(name="prescriberorganization", unique_together={("siret", "kind")},),
+        migrations.AlterUniqueTogether(
+            name="prescriberorganization",
+            unique_together={("siret", "kind")},
+        ),
     ]

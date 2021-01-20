@@ -12,12 +12,30 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="siae", name="convention_end_date",),
-        migrations.RemoveField(model_name="siae", name="deactivated_at",),
-        migrations.RemoveField(model_name="siae", name="external_id",),
-        migrations.RemoveField(model_name="siae", name="is_active",),
-        migrations.RemoveField(model_name="siae", name="reactivated_at",),
-        migrations.RemoveField(model_name="siae", name="reactivated_by",),
+        migrations.RemoveField(
+            model_name="siae",
+            name="convention_end_date",
+        ),
+        migrations.RemoveField(
+            model_name="siae",
+            name="deactivated_at",
+        ),
+        migrations.RemoveField(
+            model_name="siae",
+            name="external_id",
+        ),
+        migrations.RemoveField(
+            model_name="siae",
+            name="is_active",
+        ),
+        migrations.RemoveField(
+            model_name="siae",
+            name="reactivated_at",
+        ),
+        migrations.RemoveField(
+            model_name="siae",
+            name="reactivated_by",
+        ),
         migrations.AlterField(
             model_name="siaeconvention",
             name="siret_signature",

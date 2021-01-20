@@ -11,7 +11,8 @@ from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESU
 def _users_with_mock_address(idx):
     address = BAN_GEOCODING_API_RESULTS_MOCK[idx]
     return JobSeekerWithAddressFactory(
-        address_line_1=address.get("address_line_1"), post_code=address.get("post_code"),
+        address_line_1=address.get("address_line_1"),
+        post_code=address.get("post_code"),
     )
 
 
@@ -34,7 +35,8 @@ class FormatASPAdresses(TestCase):
         self.assertTrue(error)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
     )
     def test_sanity(self, _):
         """
@@ -48,7 +50,8 @@ class FormatASPAdresses(TestCase):
             self.assertIsNotNone(result)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
     )
     def test_asp_addresses(self, _):
         """
@@ -163,7 +166,8 @@ class LaneTypeTest(TestCase):
 
 class LaneExtensionTest(TestCase):
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
     )
     def test_standard_extension(self, _):
         """Check if lane extension is included in ASP ref file"""
@@ -176,7 +180,8 @@ class LaneExtensionTest(TestCase):
         self.assertEquals(result.get("std_extension"), LaneExtension.T.name)
 
     @mock.patch(
-        "itou.utils.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data,
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
     )
     def test_non_standard_extension(self, _):
         """Non-standard extension, i.e. not in ASP ref file"""

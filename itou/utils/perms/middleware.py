@@ -30,10 +30,14 @@ class ItouCurrentOrganizationMiddleware:
                     first_active_siae = siae_set.first()
                     if first_active_siae:
                         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
-                    elif request.path not in [
-                        reverse("account_logout"),
-                        reverse("account_login"),
-                    ] and not request.path.startswith("/invitations/"):
+                    elif (
+                        request.path
+                        not in [
+                            reverse("account_logout"),
+                            reverse("account_login"),
+                        ]
+                        and not request.path.startswith("/invitations/")
+                    ):
                         # SIAE user has no active SIAE and thus must not be able to access any page,
                         # thus we force a logout with a few exceptions:
                         # - logout (to avoid infinite redirect loop)
