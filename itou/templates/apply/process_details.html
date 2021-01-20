@@ -34,6 +34,10 @@
             <li>{% translate "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
         {% endif %}
 
+        {% if job_application.job_seeker.pole_emploi_id %}
+            <li>{% translate "Identifiant Pôle emploi :" %} <b>{{ job_application.job_seeker.pole_emploi_id }}</b></li>
+        {% endif %}
+
         {% if job_application.job_seeker.resume_link %}
             <li>{% translate "Lien vers CV :" %} <a
                     href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
@@ -303,9 +307,13 @@
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
+                    {% blocktranslate %}
+                        Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
+                    {% endblocktranslate %}
+                </p>
+                <p>
                     {% blocktranslate with user_name=job_application.job_seeker.get_full_name|title %}
-                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans
-                        le futur.
+                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
                     {% endblocktranslate %}
                 </p>
             {% endif %}

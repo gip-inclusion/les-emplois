@@ -124,7 +124,11 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "convention_number",
-                    models.CharField(db_index=True, max_length=19, verbose_name="Numéro de convention",),
+                    models.CharField(
+                        db_index=True,
+                        max_length=19,
+                        verbose_name="Numéro de convention",
+                    ),
                 ),
                 (
                     "state",

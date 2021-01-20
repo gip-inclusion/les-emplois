@@ -349,7 +349,11 @@ class Suspension(models.Model):
     start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
     end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
     siae = models.ForeignKey(
-        "siaes.Siae", verbose_name=_("SIAE"), null=True, on_delete=models.SET_NULL, related_name="approvals_suspended",
+        "siaes.Siae",
+        verbose_name=_("SIAE"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_suspended",
     )
     reason = models.CharField(verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.SICKNESS)
     reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
@@ -363,7 +367,11 @@ class Suspension(models.Model):
     )
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
     updated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_("Mis à jour par"), null=True, blank=True, on_delete=models.SET_NULL,
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Mis à jour par"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
 
     objects = models.Manager.from_queryset(SuspensionQuerySet)()

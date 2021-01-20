@@ -35,9 +35,6 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
             )
         )
 
-    job_seeker = job_application.job_seeker
-    user_name = job_seeker.get_full_name()
-
     diagnosis = None
     diagnosis_author = None
     diagnosis_author_org = None
@@ -72,12 +69,13 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
         "diagnosis_author": diagnosis_author,
         "diagnosis_author_org_name": diagnosis_author_org_name,
         "siae": job_application.to_siae,
-        "user_name": user_name,
+        "job_seeker": job_application.job_seeker,
     }
 
     html = SimpleTemplateResponse(template=template_name, context=context).rendered_content
 
-    filename = f"{slugify(user_name)}-pass-iae.pdf"
+    full_name_slug = slugify(job_application.job_seeker.get_full_name())
+    filename = f"{full_name_slug}-pass-iae.pdf"
 
     with HtmlToPdf(html, autoclose=False) as transformer:
         return FileResponse(transformer.file, as_attachment=True, filename=filename)

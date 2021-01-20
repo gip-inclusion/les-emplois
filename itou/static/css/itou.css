@@ -200,10 +200,11 @@ footer a:hover {
 }
 
 footer img.footer-logo {
-    max-width: 140px;
-    max-height: 130px;
+    max-width: 170px;
+    max-height: 160px;
     background: #fff;
     margin: 0 0 20px 0;
+    padding: 20px;
 }
 
 /* Spacing.
