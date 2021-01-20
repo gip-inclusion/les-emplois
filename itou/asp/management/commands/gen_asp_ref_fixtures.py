@@ -1,8 +1,8 @@
 """
-This script exports ASP reference files into fixtures
+This script exports ASP reference files into fixtures.
 
-This could be a "one shot" but we don't know for sure if this
-reference files are likely to change
+This could be a "one shot" action but we don't know for sure
+if these reference files are likely to change.
 """
 import json
 import logging
@@ -55,7 +55,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
-        parser.add_argument("--all", dest="all_files", action="store_true", help="Process all files in import folder")
         parser.add_argument("--education_levels")
         parser.add_argument("--insee_communes")
         parser.add_argument("--insee_departments")
