@@ -24,9 +24,13 @@ class Migration(migrations.Migration):
                 ("code", models.CharField(max_length=5, verbose_name="Code commune INSEE")),
                 ("name", models.CharField(max_length=50, verbose_name="Nom de la commune")),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
             bases=(itou.asp.models.NameLabelStrMixin, models.Model),
-            managers=[("current", django.db.models.manager.Manager()),],
+            managers=[
+                ("current", django.db.models.manager.Manager()),
+            ],
         ),
         migrations.CreateModel(
             name="Country",
@@ -48,9 +52,13 @@ class Migration(migrations.Migration):
                 ("code", models.CharField(max_length=3, verbose_name="Code département INSEE")),
                 ("name", models.CharField(max_length=50, verbose_name="Nom du département")),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
             bases=(itou.asp.models.NameLabelStrMixin, models.Model),
-            managers=[("current", django.db.models.manager.Manager()),],
+            managers=[
+                ("current", django.db.models.manager.Manager()),
+            ],
         ),
         migrations.CreateModel(
             name="EducationLevel",
@@ -61,9 +69,13 @@ class Migration(migrations.Migration):
                 ("code", models.CharField(max_length=2, verbose_name="Code formation ASP")),
                 ("name", models.CharField(max_length=80, verbose_name="Libellé niveau de formation ASP")),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
             bases=(itou.asp.models.NameLabelStrMixin, models.Model),
-            managers=[("current", django.db.models.manager.Manager()),],
+            managers=[
+                ("current", django.db.models.manager.Manager()),
+            ],
         ),
         migrations.CreateModel(
             name="Measure",
@@ -77,9 +89,13 @@ class Migration(migrations.Migration):
                 ("name", models.CharField(max_length=80, verbose_name="Libellé mesure ASP")),
                 ("rdi_id", models.CharField(max_length=1, verbose_name="Identifiant RDI ?")),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
             bases=(itou.asp.models.NameLabelStrMixin, models.Model),
-            managers=[("current", django.db.models.manager.Manager()),],
+            managers=[
+                ("current", django.db.models.manager.Manager()),
+            ],
         ),
         migrations.CreateModel(
             name="EmployerType",
@@ -99,8 +115,12 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"abstract": False,},
+            options={
+                "abstract": False,
+            },
             bases=(itou.asp.models.NameLabelStrMixin, models.Model),
-            managers=[("current", django.db.models.manager.Manager()),],
+            managers=[
+                ("current", django.db.models.manager.Manager()),
+            ],
         ),
     ]
