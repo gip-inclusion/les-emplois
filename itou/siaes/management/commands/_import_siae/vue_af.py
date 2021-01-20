@@ -132,7 +132,9 @@ def get_vue_af_df():
     )
 
     df.drop_duplicates(
-        subset=["number"], keep="first", inplace=True,
+        subset=["number"],
+        keep="first",
+        inplace=True,
     )
 
     assert df.number.is_unique

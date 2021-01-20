@@ -113,13 +113,22 @@ class EmployeeRecord(models.Model):
     # - personnePhysique.codeComInsee.codeDpt
     employee = models.ForeignKey(User, verbose_name=_("Employé"), on_delete=models.CASCADE)
     educational_leval = models.ForeignKey(
-        EducationLevel, verbose_name=("Niveau de formation"), on_delete=models.SET_NULL, null=True,
+        EducationLevel,
+        verbose_name=("Niveau de formation"),
+        on_delete=models.SET_NULL,
+        null=True,
     )
     birth_place = models.ForeignKey(
-        Commune, verbose_name=_("Commune de naissance"), on_delete=models.SET_NULL, null=True,
+        Commune,
+        verbose_name=_("Commune de naissance"),
+        on_delete=models.SET_NULL,
+        null=True,
     )
     birth_country = models.ForeignKey(
-        Country, verbose_name=_("Pays de naissance"), on_delete=models.SET_NULL, null=True,
+        Country,
+        verbose_name=_("Pays de naissance"),
+        on_delete=models.SET_NULL,
+        null=True,
     )
 
     # birth_place = models.ForeignKey(INSEECode, verbose_name=_("Lieu de naissance"))

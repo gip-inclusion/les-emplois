@@ -12,10 +12,10 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
+from itou.asp.models import Commune, Country
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
-from itou.asp.models import Country, Commune
 
 
 class User(AbstractUser, AddressMixin):
@@ -64,8 +64,12 @@ class User(AbstractUser, AddressMixin):
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
     )
 
-    birth_place = models.ForeignKey(Commune, verbose_name=_("Commune de naissance"), null=True, on_delete=models.SET_NULL)
-    birth_country = models.ForeignKey(Country, verbose_name=_("Pays de naissance"), null=True, on_delete=models.SET_NULL)
+    birth_place = models.ForeignKey(
+        Commune, verbose_name=_("Commune de naissance"), null=True, on_delete=models.SET_NULL
+    )
+    birth_country = models.ForeignKey(
+        Country, verbose_name=_("Pays de naissance"), null=True, on_delete=models.SET_NULL
+    )
 
     email = CIEmailField(
         _("email address"),

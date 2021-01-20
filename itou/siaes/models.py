@@ -191,7 +191,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     # A convention can only be deleted if it is no longer linked to any siae.
     convention = models.ForeignKey(
-        "SiaeConvention", on_delete=models.RESTRICT, blank=True, null=True, related_name="siaes",
+        "SiaeConvention",
+        on_delete=models.RESTRICT,
+        blank=True,
+        null=True,
+        related_name="siaes",
     )
 
     objects = models.Manager.from_queryset(SiaeQuerySet)()
@@ -554,7 +558,10 @@ class SiaeConvention(models.Model):
     # This field is almost unique (one exception, see unique_together clause below)
     # and is almost constant over time, at least much more than the "SIRET actualisé".
     siret_signature = models.CharField(
-        verbose_name=_("Siret à la signature"), max_length=14, validators=[validate_siret], db_index=True,
+        verbose_name=_("Siret à la signature"),
+        max_length=14,
+        validators=[validate_siret],
+        db_index=True,
     )
 
     # Ideally convention.is_active would be a property and not a field.
@@ -576,7 +583,10 @@ class SiaeConvention(models.Model):
     )
     # Grace period starts from this date.
     deactivated_at = models.DateTimeField(
-        verbose_name=_("Date de  désactivation et début de délai de grâce"), blank=True, null=True, db_index=True,
+        verbose_name=_("Date de  désactivation et début de délai de grâce"),
+        blank=True,
+        null=True,
+        db_index=True,
     )
     # When itou staff manually reactivates an inactive convention, store who did it and when.
     reactivated_by = models.ForeignKey(
@@ -596,7 +606,10 @@ class SiaeConvention(models.Model):
     # In other words, if an EI and a ACI share the same SIRET, they also
     # share the same asp_id in ASP's own database.
     # In this example a single siae à la ASP corresponds to two siaes à la Itou.
-    asp_id = models.IntegerField(verbose_name=_("ID ASP de la SIAE"), db_index=True,)
+    asp_id = models.IntegerField(
+        verbose_name=_("ID ASP de la SIAE"),
+        db_index=True,
+    )
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
@@ -671,7 +684,11 @@ class SiaeFinancialAnnex(models.Model):
         unique=True,
         db_index=True,
     )
-    state = models.CharField(verbose_name=_("Etat"), max_length=20, choices=STATE_CHOICES,)
+    state = models.CharField(
+        verbose_name=_("Etat"),
+        max_length=20,
+        choices=STATE_CHOICES,
+    )
     start_at = models.DateTimeField(verbose_name=_("Date de début d'effet"))
     end_at = models.DateTimeField(verbose_name=_("Date de fin d'effet"))
 
@@ -680,7 +697,11 @@ class SiaeFinancialAnnex(models.Model):
 
     # A financial annex cannot exist without a convention, and
     # deleting a convention will delete all its financial annexes.
-    convention = models.ForeignKey("SiaeConvention", on_delete=models.CASCADE, related_name="financial_annexes",)
+    convention = models.ForeignKey(
+        "SiaeConvention",
+        on_delete=models.CASCADE,
+        related_name="financial_annexes",
+    )
 
     class Meta:
         verbose_name = _("Annexe financière")

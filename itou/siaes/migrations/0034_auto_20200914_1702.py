@@ -10,5 +10,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(model_name="siae", old_name="active_until", new_name="convention_end_date",),
+        migrations.RenameField(
+            model_name="siae",
+            old_name="active_until",
+            new_name="convention_end_date",
+        ),
     ]

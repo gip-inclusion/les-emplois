@@ -86,7 +86,8 @@ def remap_columns(df, column_mapping):
     {"ID Structure": "asp_id", "Adresse e-mail": "auth_email"}
     """
     df.rename(
-        columns=column_mapping, inplace=True,
+        columns=column_mapping,
+        inplace=True,
     )
 
     # Keep only the columns we need.

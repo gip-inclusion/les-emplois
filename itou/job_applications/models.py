@@ -133,7 +133,12 @@ class JobApplicationQuerySet(models.QuerySet):
         objects in job applications's lists.
         """
         qs = self.select_related(
-            "approval", "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae__convention",
+            "approval",
+            "job_seeker",
+            "sender",
+            "sender_siae",
+            "sender_prescriber_organization",
+            "to_siae__convention",
         ).prefetch_related("selected_jobs__appellation")
         has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
         return qs.annotate(has_suspended_approval=Exists(has_suspended_approval))
