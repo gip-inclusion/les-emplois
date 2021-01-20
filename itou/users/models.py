@@ -13,6 +13,8 @@ from itou.approvals.models import ApprovalsWrapper
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
+from django.utils.crypto import salted_hmac
+from django.conf import settings
 
 
 class User(AbstractUser, AddressMixin):
@@ -205,6 +207,15 @@ class User(AbstractUser, AddressMixin):
     def last_accepted_job_application(self):
         if self.is_job_seeker:
             return self.job_applications.accepted().latest("created_at")
+        return None
+
+    @property
+    def hash_id(self):
+        """
+        Returns a hash of user id, salted with settings.SECRET_KEY
+        """
+        if self.id:
+            return salted_hmac(key_salt="user.id", value=self.id, secret=settings.SECRET_KEY).hexdigest()[:30]
         return None
 
 
