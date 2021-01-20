@@ -12,7 +12,7 @@
     <h3 class="font-weight-normal text-muted">{% translate "Candidat" %}</h3>
 
     <ul>
-        
+
         <li>{% translate "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>
 
         <li>{% translate "Nom :" %} <b>{{ job_application.job_seeker.last_name }}</b></li>
@@ -40,8 +40,8 @@
             <li>{% translate "Lien vers CV :" %} <a
                     href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
             </li>
-        {% endif %}
-    
+        {% endif %
+}
     </ul>
 
     {% if job_application.can_update_job_seeker %}
@@ -74,7 +74,7 @@
             <li>{% translate "Candidature spontanée" %}</li>
         {% endif %}
     </ul>
-    
+
     <div class="alert alert-secondary">
         <p><b>{% translate "Message :" %}</b></p>
         {{ job_application.message|linebreaks }}
