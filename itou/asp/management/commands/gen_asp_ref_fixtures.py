@@ -48,7 +48,7 @@ class Command(BaseCommand):
     With 'dry-run', all operations but file storage are processed.
 
     Once generated, fixtures can be imported via:
-    ./manage.py loaddata --app asp
+    ./manage.py loaddata --app asp itou/asp/fixtures/*.json
 
     Check 'itou.asp.models' for details.
     """
