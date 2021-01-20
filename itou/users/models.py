@@ -1,10 +1,12 @@
 from allauth.utils import generate_unique_username
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -13,8 +15,6 @@ from itou.approvals.models import ApprovalsWrapper
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
-from django.utils.crypto import salted_hmac
-from django.conf import settings
 
 
 class User(AbstractUser, AddressMixin):
