@@ -194,8 +194,8 @@ class JobApplicationFactoriesTest(TestCase):
         self.assertTrue(sender_prescriber_organization.is_authorized)
 
 
-class JobApplicationEmailTest(TestCase):
-    """Test JobApplication emails."""
+class JobApplicationNotificationsTest(TestCase):
+    """Test JobApplication notifications."""
 
     @classmethod
     def setUpTestData(cls):

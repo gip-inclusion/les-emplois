@@ -14,7 +14,6 @@ from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
-from itou.utils.notifications.list import siaemembership_notifications_default as notifications_default
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_af_number, validate_naf, validate_siret
 
@@ -414,7 +413,7 @@ class SiaeMembership(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
     )
-    notifications = models.JSONField(verbose_name=("Notifications"), default=notifications_default)
+    notifications = models.JSONField(verbose_name=("Notifications"), default=dict)
 
     class Meta:
         unique_together = ("user_id", "siae_id")
