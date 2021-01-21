@@ -94,6 +94,13 @@ class Command(BaseCommand):
             "add_user",
             "change_user",
             "view_user",
+            # ASP
+            "view_commune",
+            "view_country",
+            "view_department",
+            "view_educationlevel",
+            "view_measure",
+            "view_employertype",
         ]
 
         perms = Permission.objects.filter(codename__in=perms_codenames)

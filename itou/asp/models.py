@@ -239,6 +239,10 @@ class EducationLevel(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
     name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
 
+    class Meta:
+        verbose_name = _("Niveau de formation")
+        verbose_name_plural = _("Niveaux de formation")
+
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
     """
@@ -256,6 +260,9 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
+    class Meta:
+        verbose_name = _("Commune")
+
 
 class Department(PrettyPrintMixin, AbstractPeriod):
     """
@@ -268,6 +275,9 @@ class Department(PrettyPrintMixin, AbstractPeriod):
 
     code = models.CharField(max_length=3, verbose_name=_("Code département INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
+
+    class Meta:
+        verbose_name = _("Département")
 
 
 class Country(PrettyPrintMixin, models.Model):
@@ -292,6 +302,10 @@ class Country(PrettyPrintMixin, models.Model):
     # For compatibility, no usage yet
     department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
 
+    class Meta:
+        verbose_name = _("Pays")
+        verbose_name_plural = _("Pays")
+
 
 class Measure(PrettyPrintMixin, AbstractPeriod):
     """
@@ -312,6 +326,9 @@ class Measure(PrettyPrintMixin, AbstractPeriod):
     # I don't know what this ID is about yet, seems unused but kept for compatibility
     rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
 
+    class Meta:
+        verbose_name = _("Mesure")
+
 
 class EmployerType(PrettyPrintMixin, AbstractPeriod):
     """
@@ -323,3 +340,7 @@ class EmployerType(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=3, verbose_name=_("Code employeur ASP"))
     name = models.CharField(max_length=50, verbose_name=_("Libellé employeur ASP"))
     measure = models.ForeignKey(Measure, verbose_name=_("Mesure ASP"), on_delete=models.SET_NULL, null=True)
+
+    class Meta:
+        verbose_name = _("Type d'employeur")
+        verbose_name = _("Types d'employeur")
