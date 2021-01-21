@@ -228,7 +228,9 @@ class User(AbstractUser, AddressMixin):
 
 class JobSeekerProfile(models.Model):
     """
-    TODO
+    This is specific information about the job seeker
+    Instead of augmenting the 'User' model, it is collected in a "profile" object.
+    It will first be used by employee record model / system to serialize data for ASP tranfers.
     """
 
     education_level = models.ForeignKey(
@@ -238,6 +240,7 @@ class JobSeekerProfile(models.Model):
         "asp.EmployerType", verbose_name=_("Type d'employeur (ASP)"), null=True, on_delete=models.SET_NULL
     )
 
+    # TODO Needed ?
     resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
 
     poleemploi = models.BooleanField(verbose_name=_("Inscrit Pôle emploi"), default=False)
@@ -255,6 +258,31 @@ class JobSeekerProfile(models.Model):
 
     rqth = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
     oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
+
+    rsa_allocation = models.BooleanField(verbose_name=_("Bénéficiaire du RSA"), default=False)
+    rsa_allocation_since = models.ForeignKey(
+        "asp.AllocationDuration", verbose_name=_("Allocataire du RSA depuis"), on_delete=models.SET_NULL
+    )
+
+    # ill-named
+    ass_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'ASS"), default=False)
+    ass_allocation_since = models.ForeignKey(
+        "asp.AllocationDuration", verbose_name=_("Allocataire de l'ASS depuis"), on_delete=models.SET_NULL
+    )
+
+    aah_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'AAH"), default=False)
+    aah_allocation_since = models.ForeignKey(
+        "asp.AllocationDuration", verbose_name=_("Allocataire de l'AAH depuis"), on_delete=models.SET_NULL
+    )
+
+    ata_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'ATA"), default=False)
+    ata_allocation_since = models.ForeignKey(
+        "asp.AllocationDuration", verbose_name=_("Allocataire de l'ATA depuis"), on_delete=models.SET_NULL
+    )
+
+    @property
+    def has_social_allowance(self):
+        return self.rsa_allocation or self.ass_allocation or self.aah_allocation or self.ata_allocation
 
     # TODO to be continued...
 
