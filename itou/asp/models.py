@@ -167,7 +167,7 @@ class LaneExtension(Enum):
         return None
 
 
-class PeriodMixinManager(models.Manager):
+class PeriodManager(models.Manager):
     def get_queryset(self):
         """
         Return all currently valid objects, i.e.:
@@ -181,7 +181,7 @@ class PeriodMixinManager(models.Manager):
         return super().get_queryset().filter(end_date=None)
 
 
-class PeriodMixin(models.Model):
+class AbstractPeriod(models.Model):
     """
     Mixin for reference files having history concerns (start_date and end_date defined)
 
@@ -199,7 +199,7 @@ class PeriodMixin(models.Model):
     start_date = models.DateField(verbose_name=_("Début de validité"))
     end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
 
-    current = PeriodMixinManager()
+    current = PeriodManager()
     history = models.Manager()
 
     class Meta:
@@ -228,7 +228,7 @@ class AllocationDuration(models.TextChoices):
     MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
 
 
-class EducationLevel(PrettyPrintMixin, PeriodMixin):
+class EducationLevel(PrettyPrintMixin, AbstractPeriod):
     """
     Education level of the employee
 
@@ -239,7 +239,7 @@ class EducationLevel(PrettyPrintMixin, PeriodMixin):
     name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
 
 
-class Commune(PrettyPrintMixin, PeriodMixin):
+class Commune(PrettyPrintMixin, AbstractPeriod):
     """
     INSEE commune
 
@@ -256,7 +256,7 @@ class Commune(PrettyPrintMixin, PeriodMixin):
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
 
-class Department(PrettyPrintMixin, PeriodMixin):
+class Department(PrettyPrintMixin, AbstractPeriod):
     """
     INSEE department code
 
@@ -292,7 +292,7 @@ class Country(PrettyPrintMixin, models.Model):
     department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
 
 
-class Measure(PrettyPrintMixin, PeriodMixin):
+class Measure(PrettyPrintMixin, AbstractPeriod):
     """
     ASP Measure (mesure)
 
@@ -308,11 +308,11 @@ class Measure(PrettyPrintMixin, PeriodMixin):
     help_code = models.CharField(max_length=5, verbose_name=_("Code d'aide mesure ASP"))
     name = models.CharField(max_length=80, verbose_name=_("Libellé mesure ASP"))
 
-    # I don't what this ID is about yet, seems unused but kept for compatibility
+    # I don't know what this ID is about yet, seems unused but kept for compatibility
     rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
 
 
-class EmployerType(PrettyPrintMixin, PeriodMixin):
+class EmployerType(PrettyPrintMixin, AbstractPeriod):
     """
     ASP employer type
 
