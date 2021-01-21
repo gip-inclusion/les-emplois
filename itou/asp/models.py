@@ -167,8 +167,8 @@ class LaneExtension(Enum):
         return None
 
 
-class PeriodManager(models.Manager):
-    def get_queryset(self):
+class PeriodQuerySet(models.QuerySet):
+    def current(self):
         """
         Return all currently valid objects, i.e.:
         - currrently usable as a reference for new objects
@@ -178,29 +178,30 @@ class PeriodManager(models.Manager):
         when importing or reshaping them.
         Even more with elements with effective dates (start / end / history concerns).
         """
-        return super().get_queryset().filter(end_date=None)
+        return self.filter(end_date=None)
+
+    def old(self):
+        """
+        Return "old" objects <=> objects with a end_date
+        """
+        return self.exclude(end_date=None)
 
 
 class AbstractPeriod(models.Model):
     """
-    Mixin for reference files having history concerns (start_date and end_date defined)
+    Abstract for reference files having history concerns (start_date and end_date defined)
 
-    Important:
-    When using this mixin, there is no 'type.objects' default model manager defined.
+    - 'type.objects.old' is a QS with ALL previous versions of a record
+    - 'type.objects.current' is a QS returning ONLY valid records for current date / version subset
 
-    Instead:
-    - 'type.history' is a manager with ALL previous versions of a record
-    - 'type.current' is a manager returning ONLY valid records for current date / version subset
-
-    => Use 'type.current' for most use cases.
-    => Use 'type.history' when you have to deal with history or previous version of a record
+    => Use 'current' for most use cases.
+    => Use 'old' when you have to deal with history or previous version of a record
     """
 
     start_date = models.DateField(verbose_name=_("Début de validité"))
     end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
 
-    current = PeriodManager()
-    history = models.Manager()
+    objects = models.Manager.from_queryset(PeriodQuerySet)()
 
     class Meta:
         abstract = True
