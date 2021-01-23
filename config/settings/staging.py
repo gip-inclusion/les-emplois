@@ -1,7 +1,7 @@
 from .base import *
 from ._sentry import sentry_init
 
-ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr"]
+ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr", "staging.emplois.inclusion.beta.gouv.fr"]
 
 DATABASES = {
     "default": {
@@ -16,7 +16,7 @@ DATABASES = {
 
 ITOU_ENVIRONMENT = "STAGING"
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "staging.inclusion.beta.gouv.fr"
+ITOU_FQDN = "staging.emplois.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact+staging@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+staging@inclusion.beta.gouv.fr"
 

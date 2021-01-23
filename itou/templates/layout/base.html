@@ -19,7 +19,7 @@
     <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
     {# https://metatags.io Twitter #}
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }/">
+    <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
     <meta property="twitter:title" content="{% translate "La plateforme de l'inclusion" %}">
     <meta property="twitter:description" content="{% translate "La plateforme de l'inclusion facilite le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
     <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
@@ -44,7 +44,7 @@
             <div class="layout-header py-2 px-0 px-sm-3">
                 <a href="/" class="text-decoration-none text-reset">
                     <div class="row pt-1 pl-3">
-                        <img src="{% static 'img/logo_header.svg' %}" alt="inclusion.beta.gouv.fr" class="layout-header-logo img-fluid">
+                        <img src="{% static 'img/logo_header.svg' %}" alt="{{ ITOU_FQDN }}" class="layout-header-logo img-fluid">
                     </div>
                 </a>
                 <div class="layout-header-content">
@@ -178,7 +178,7 @@
 
                 <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="{% translate "Accéder au Forum de l'inclusion (nouvel onglet)" %}">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
 
-                <a class="nav-link" href="https://doc.inclusion.beta.gouv.fr/" rel="noopener" target="_blank" aria-label="{% translate "Accéder à l'espace de documentation (nouvel onglet)" %}">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
+                <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="{% translate "Accéder à l'espace de documentation (nouvel onglet)" %}">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
 
             </nav>
         </div>
@@ -239,7 +239,7 @@
                         <div class="col-sm-6">
                             <ul class="list-unstyled">
                                 <li>
-                                    <a href="https://doc.inclusion.beta.gouv.fr/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
+                                    <a href="{{ ITOU_DOC_URL }}/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Besoin d'aide ?" %}
                                         {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
@@ -255,7 +255,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
+                                    <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
                                         {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
@@ -267,7 +267,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://doc.inclusion.beta.gouv.fr/mentions/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
+                                    <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Mentions légales" %}
                                         {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
@@ -313,7 +313,7 @@
             "removeCredit": true,  /* Remove credit link */
             "moreInfoLink": true,  /* Show more info link */
             "useExternalCss": false,  /* If false, the tarteaucitron.css file will be loaded */
-            "readmoreLink": "https://doc.inclusion.beta.gouv.fr/mentions/protection-des-donnees",  /* Change the default readmore link */
+            "readmoreLink": "{{ ITOU_DOC_URL }}/mentions/protection-des-donnees",  /* Change the default readmore link */
             "mandatory": false,  /* Show a message about mandatory cookies */
         });
 
@@ -335,7 +335,7 @@
         {% endif %}
     {% endblock %}
 
-    {% if "inclusion.beta.gouv.fr" in ALLOWED_HOSTS %}
+    {% if ITOU_FQDN in ALLOWED_HOSTS %}
         {# Matomo/Piwik open source web analytics #}
         <script>
             var _paq = window._paq || [];

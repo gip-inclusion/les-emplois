@@ -114,10 +114,17 @@ def get_creatable_conventions():
 
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE.get(asp_id)
 
+        if DEACTIVATE_CONVENTIONS:
+            is_active = does_siae_have_an_active_convention(siae)
+        else:
+            # At the beginning of each year, when AFs of the new year are not there yet, we temporarily
+            # consider all new conventions as active by default even though they do not have a valid AF yet.
+            is_active = True
+
         convention = SiaeConvention(
             siret_signature=siret_signature,
             kind=siae.kind,
-            is_active=does_siae_have_an_active_convention(siae),
+            is_active=is_active,
             asp_id=asp_id,
         )
         creatable_conventions.append((convention, siae))

@@ -388,13 +388,12 @@ class UtilsTemplateTagsTestCase(TestCase):
     def test_url_add_query(self):
         """Test `url_add_query` template tag."""
 
+        base_url = "https://emplois.inclusion.beta.gouv.fr"
         # Full URL.
-        context = {
-            "url": "https://inclusion.beta.gouv.fr/siae/search?distance=100&city=aubervilliers-93&page=55&page=1"
-        }
+        context = {"url": f"{base_url}/siae/search?distance=100&city=aubervilliers-93&page=55&page=1"}
         template = Template("{% load url_add_query %}{% url_add_query url page=2 %}")
         out = template.render(Context(context))
-        expected = "https://inclusion.beta.gouv.fr/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2"
+        expected = f"{base_url}/siae/search?distance=100&amp;city=aubervilliers-93&amp;page=2"
         self.assertEqual(out, expected)
 
         # Relative URL.

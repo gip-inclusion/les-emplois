@@ -171,7 +171,7 @@
                                 {% include "includes/icon.html" with icon="award" %}
                                 <span>
                                     {% blocktranslate with name=current_prescriber_organization.display_name %}
-                                        {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="https://doc.inclusion.beta.gouv.fr/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
+                                        {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                                     {% endblocktranslate %}
                                 </span>
                             </p>
@@ -271,7 +271,7 @@
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="book-open" %}
                             <a
-                                href="https://doc.inclusion.beta.gouv.fr/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
+                                href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
                                 target="_blank">
                                     {% translate "Liste des critères d'éligibilité" %}
                             </a>

@@ -307,7 +307,7 @@ API_GEO_BASE_URL = "https://geo.api.gouv.fr"
 # https://dashboard.entreprise.api.gouv.fr/login (login is done through auth.api.gouv.fr)
 # https://doc.entreprise.api.gouv.fr/
 API_ENTREPRISE_BASE_URL = "https://entreprise.api.gouv.fr/v2"
-API_ENTREPRISE_CONTEXT = "inclusion.beta.gouv.fr"
+API_ENTREPRISE_CONTEXT = "emplois.inclusion.beta.gouv.fr"
 API_ENTREPRISE_RECIPIENT = os.environ.get("API_ENTREPRISE_RECIPIENT")
 API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 
@@ -351,7 +351,7 @@ TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
 # Environment, sets the type of env of the app (DEMO, REVIEW_APP, STAGING, DEV…)
 ITOU_ENVIRONMENT = "PROD"
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "inclusion.beta.gouv.fr"
+ITOU_FQDN = "emplois.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact@inclusion.beta.gouv.fr"
 ITOU_EMAIL_ASSISTANCE = "assistance@inclusion.beta.gouv.fr"
 
@@ -369,7 +369,7 @@ ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL = "https://startupsbeta.typeform.com/to/X40
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.
 # Use the staging domain name when this case arises.
-ITOU_STAGING_DN = "staging.inclusion.beta.gouv.fr"
+ITOU_STAGING_DN = "staging.emplois.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 

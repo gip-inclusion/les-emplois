@@ -1,7 +1,7 @@
 from .base import *
 from ._sentry import sentry_init
 
-ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", "demo.inclusion.beta.gouv.fr"]
+ALLOWED_HOSTS = ["127.0.0.1", ".cleverapps.io", "demo.inclusion.beta.gouv.fr", "demo.emplois.inclusion.beta.gouv.fr"]
 
 DATABASES = {
     "default": {
@@ -16,7 +16,7 @@ DATABASES = {
 
 ITOU_ENVIRONMENT = "DEMO"
 ITOU_PROTOCOL = "https"
-ITOU_FQDN = "demo.inclusion.beta.gouv.fr"
+ITOU_FQDN = "demo.emplois.inclusion.beta.gouv.fr"
 ITOU_EMAIL_CONTACT = "contact+demo@inclusion.beta.gouv.fr"
 DEFAULT_FROM_EMAIL = "noreply+demo@inclusion.beta.gouv.fr"
 
