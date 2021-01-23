@@ -1,3 +1,0 @@
-[
-    "0 0 * * * $ROOT/clevercloud/populate_metabase.sh"
-]

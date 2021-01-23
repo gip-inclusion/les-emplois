@@ -1,7 +1,0 @@
-{% comment %}
-django-allauth template override to avoid a "dot" after {{ email }} that confuses users:
-https://itou.zammad.com/#ticket/zoom/6640
-https://github.com/pennersr/django-allauth/blob/f9e0e4/allauth/templates/account/messages/email_confirmation_sent.txt
-{% endcomment %}
-{% load i18n %}
-{% blocktrans %}E-mail de confirmation envoyé à {{ email }}{% endblocktrans %}

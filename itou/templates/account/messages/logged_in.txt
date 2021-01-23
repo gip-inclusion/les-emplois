@@ -1,1 +1,0 @@
-{# Blank template to disable logged_in message https://github.com/pennersr/django-allauth/issues/1455 #}

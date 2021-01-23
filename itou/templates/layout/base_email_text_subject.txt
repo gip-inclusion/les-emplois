@@ -1,6 +1,0 @@
-{% load i18n %}
-{% autoescape off %}
-
-{% block subject %}{% endblock %}
-
-{% endautoescape %}
