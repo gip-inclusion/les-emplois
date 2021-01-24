@@ -195,7 +195,7 @@
                     </div>
 
                     {# Temporary message during the transition to the new domains. #}
-                    {% if "https://inclusion.beta.gouv.fr" in request.META.HTTP_REFERER or "https://staging.inclusion.beta.gouv.fr" in request.META.HTTP_REFERER or "https://demo.inclusion.beta.gouv.fr" in request.META.HTTP_REFERER %}
+                    {% if not request.META.HTTP_REFERER %}
                         <div class="alert alert-warning" role="alert">
                             {% blocktranslate %}
                                 Notre nom de domaine change. Nous vous accueillons maintenant sur <b>{{ ITOU_FQDN }}</b>
