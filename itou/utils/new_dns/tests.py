@@ -1,5 +1,3 @@
-from django.contrib.messages.middleware import MessageMiddleware
-from django.contrib.sessions.middleware import SessionMiddleware
 from django.http import HttpResponse
 from django.test import RequestFactory, SimpleTestCase, override_settings
 
@@ -16,8 +14,6 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
         path = "/accounts/login/?account_type=job_seeker"
         request = self.request_factory.get(path, HTTP_HOST="inclusion.beta.gouv.fr")
 
-        SessionMiddleware().process_request(request)
-        MessageMiddleware().process_request(request)
         response = self.middleware(request)
 
         self.assertEqual(response.status_code, 301)
@@ -28,8 +24,6 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
         path = "/accounts/login/?account_type=job_seeker"
         request = self.request_factory.get(path, HTTP_HOST="staging.inclusion.beta.gouv.fr")
 
-        SessionMiddleware().process_request(request)
-        MessageMiddleware().process_request(request)
         response = self.middleware(request)
 
         self.assertEqual(response.status_code, 301)
@@ -40,8 +34,6 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
         path = "/accounts/login/?account_type=job_seeker"
         request = self.request_factory.get(path, HTTP_HOST="demo.inclusion.beta.gouv.fr")
 
-        SessionMiddleware().process_request(request)
-        MessageMiddleware().process_request(request)
         response = self.middleware(request)
 
         self.assertEqual(response.status_code, 301)
@@ -51,8 +43,6 @@ class NewDnsRedirectMiddlewareTest(SimpleTestCase):
     def test_non_redirect(self):
         request = self.request_factory.get("/", HTTP_HOST="localhost", SERVER_PORT="8080")
 
-        SessionMiddleware().process_request(request)
-        MessageMiddleware().process_request(request)
         response = self.middleware(request)
 
         self.assertEqual(response.status_code, 200)
