@@ -100,7 +100,10 @@ DJANGO_MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ITOU_MIDDLEWARE = ["itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware"]
+ITOU_MIDDLEWARE = [
+    "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
+    "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
+]
 
 MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
 
