@@ -51,8 +51,6 @@
         {% endif %}
     {% endfor %}
 
-    {% include "eligibility/includes/reference_diagnosis.html" %}
-
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
         {% bootstrap_form form_confirm_eligibility %}
     {% endif %}
