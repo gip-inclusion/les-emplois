@@ -251,9 +251,11 @@ class Command(BaseCommand):
 
             if siae:
                 # row is a copy no longer connected to initial df.
+                df.loc[index, "itou_name"] = siae.display_name
                 df.loc[index, "itou_kind"] = siae.kind
                 df.loc[index, "itou_post_code"] = siae.post_code
                 df.loc[index, "itou_city"] = siae.city
+                df.loc[index, "itou_department_code"] = siae.department
                 df.loc[index, "itou_department"] = DEPARTMENTS.get(siae.department)
                 df.loc[index, "itou_region"] = DEPARTMENT_TO_REGION.get(siae.department)
                 df.loc[index, "itou_latitude"] = siae.latitude
