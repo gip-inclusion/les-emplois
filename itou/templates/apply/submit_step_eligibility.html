@@ -5,25 +5,32 @@
 
     {{ block.super }}
 
+    {# This template is shown only to prescribers. #}
+
+    <hr>
+
     <h2>
         {% blocktranslate with full_name=job_seeker.get_full_name|title %}
-            <span class="text-muted">Valider l'éligibilité IAE de</span> <b>{{ full_name }}</b>
+            Valider l'éligibilité IAE de <b>{{ full_name }}</b>
         {% endblocktranslate %}
     </h2>
 
-    {% if request.user.is_prescriber %}
-        <p>{% translate "Pour valider l'éligibilité IAE du candidat il faut :" %}</p>
-        <ol>
-            <li>
-                {% blocktranslate %}
-                    Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
-                {% endblocktranslate %}
-            </li>
-            <li>
-                {% translate "Préciser la situation administrative du candidat (facultatif)" %}
-            </li>
-        </ol>
-    {% endif %}
+    <p>{% translate "Pour valider l'éligibilité IAE du candidat il faut :" %}</p>
+
+    <ol>
+        <li>
+            {% blocktranslate %}
+                Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
+            {% endblocktranslate %}
+        </li>
+        <li>
+            {% translate "Préciser la situation administrative du candidat (facultatif)" %}
+        </li>
+    </ol>
+
+    <hr>
+
+    <h2>{% translate "Situation administrative du candidat" %}</h2>
 
     {% include "eligibility/includes/form.html" %}
 

@@ -11,21 +11,9 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% if request.user.is_siae_staff %}
-    <div class="alert alert-warning" role="alert">
-        <i>{% translate "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
-    </div>
-{% endif %}
-
 <form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
-
-    {% if request.user.is_siae_staff %}
-        <h2>{% translate "Critères d'éligibilité" %}</h2>
-    {% elif request.user.is_prescriber %}
-        <h2>{% translate "Situation administrative du candidat" %}</h2>
-    {% endif %}
 
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
         {% bootstrap_form_errors form_confirm_eligibility %}
