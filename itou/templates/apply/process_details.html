@@ -166,7 +166,7 @@
             <li>
                 {% translate "Structure :" %}
                 <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
-                {% if job_application.sender_prescriber_organization.is_authorized %}
+                {% if job_application.is_sent_by_authorized_prescriber %}
                     <span class="badge badge-warning">{% translate "Prescripteur habilité" %}</span>
                 {% endif %}
             </li>
