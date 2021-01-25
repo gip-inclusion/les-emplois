@@ -13,6 +13,32 @@ from itou.invitations.models import InvitationAbstract, SiaeStaffInvitation
 from itou.users.factories import UserFactory
 
 
+class InvitationQuerySetTest(TestCase):
+    """
+    Test InvitationQuerySet.
+    """
+
+    def test_pending(self):
+
+        # Create some non-expired invitations.
+        invitation1 = SentInvitationFactory()
+        invitation2 = SentInvitationFactory()
+        invitation3 = SentInvitationFactory()
+
+        # Add one expired invitation.
+        invitation4 = ExpiredInvitationFactory()
+
+        pending_invitations = SiaeStaffInvitation.objects.pending()
+
+        self.assertEqual(3, pending_invitations.count())
+
+        self.assertIn(invitation1.pk, pending_invitations.values_list("pk", flat=True))
+        self.assertIn(invitation2.pk, pending_invitations.values_list("pk", flat=True))
+        self.assertIn(invitation3.pk, pending_invitations.values_list("pk", flat=True))
+
+        self.assertNotIn(invitation4.pk, pending_invitations.values_list("pk", flat=True))
+
+
 class InvitationModelTest(TestCase):
     def test_acceptance_link(self):
         invitation = SentInvitationFactory()

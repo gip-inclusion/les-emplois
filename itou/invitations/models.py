@@ -30,6 +30,9 @@ class InvitationQuerySet(models.QuerySet):
     def expired(self):
         return self.exclude(self.valid_lookup)
 
+    def pending(self):
+        return self.valid().filter(accepted=False).order_by("sent_at")
+
 
 class InvitationAbstract(models.Model):
     # String representing the account type to use when logging in.
