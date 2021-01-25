@@ -9,11 +9,7 @@
 
     <hr>
 
-    <h2>
-        {% blocktranslate with full_name=job_application.job_seeker.get_full_name|title %}
-            Valider l'éligibilité IAE de <b>{{ full_name }}</b>
-        {% endblocktranslate %}
-    </h2>
+    <h2>{% translate "Valider l'éligibilité IAE" %}</h2>
 
     <p>{% translate "Pour valider l'éligibilité IAE du candidat il faut :" %}</p>
 
