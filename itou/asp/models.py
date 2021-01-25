@@ -171,7 +171,7 @@ class PeriodQuerySet(models.QuerySet):
     def current(self):
         """
         Return all currently valid objects, i.e.:
-        - currrently usable as a reference for new objects
+        - currently usable as a reference for new objects
         - their end date must be None (active / non-historized entry)
 
         As with all reference files from ASP, we do not alter or summarize their content
@@ -182,7 +182,8 @@ class PeriodQuerySet(models.QuerySet):
 
     def old(self):
         """
-        Return "old" objects <=> objects with a end_date
+        Return "old" objects <=> objects with an end_date,
+        These objects can't be used for new employee records (hence "old" entries)
         """
         return self.exclude(end_date=None)
 
@@ -307,9 +308,9 @@ class Country(PrettyPrintMixin, models.Model):
         verbose_name_plural = _("Pays")
 
 
-class Measure(PrettyPrintMixin, AbstractPeriod):
+class SiaeKind(PrettyPrintMixin, AbstractPeriod):
     """
-    ASP Measure (mesure)
+    ASP SIAE kind (mesure)
 
     ASP Equivalent to Siae.Kind, but codes are different
     """
@@ -339,7 +340,7 @@ class EmployerType(PrettyPrintMixin, AbstractPeriod):
 
     code = models.CharField(max_length=3, verbose_name=_("Code employeur ASP"))
     name = models.CharField(max_length=50, verbose_name=_("Libellé employeur ASP"))
-    measure = models.ForeignKey(Measure, verbose_name=_("Mesure ASP"), on_delete=models.SET_NULL, null=True)
+    siae_kind = models.ForeignKey(SiaeKind, verbose_name=_("Mesure ASP"), on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name = _("Type d'employeur")

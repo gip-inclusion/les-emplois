@@ -10,10 +10,10 @@ import os
 from datetime import datetime
 
 import pandas as pd
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 
-_IMPORT_DIR = "imports"
 _FIXTURES_DIR = "itou/asp/fixtures"
 _SEP = ";"
 _ASP_DATE_FORMAT = "%d/%m/%Y"
@@ -23,8 +23,7 @@ def parse_asp_date(dt):
     # Sometimes import files have a / instead of empty string for end dates
     if dt and dt != "/":
         return str(datetime.strptime(dt, _ASP_DATE_FORMAT).date())
-    else:
-        return None
+    return None
 
 
 class Command(BaseCommand):
@@ -59,7 +58,7 @@ class Command(BaseCommand):
         parser.add_argument("--insee_communes")
         parser.add_argument("--insee_departments")
         parser.add_argument("--insee_countries")
-        parser.add_argument("--measures")
+        parser.add_argument("--siae_kinds")
         parser.add_argument("--employer_types")
 
     def set_logger(self, verbosity):
@@ -92,7 +91,7 @@ class Command(BaseCommand):
 
         if not self.dry_run:
             with open(path, "w") as of:
-                of.write(json.dumps(records))
+                of.write(json.dumps(records, indent=3))
         else:
             self.log("joking: DRY-RUN enabled")
         self.log("Done!")
@@ -110,7 +109,7 @@ class Command(BaseCommand):
         """
         Generate ASP education level fixture
         """
-        path = os.path.join(_IMPORT_DIR, filename)
+        path = os.path.join(settings.IMPORT_DIR, filename)
 
         self.log("Importing ASP education levels:\n")
 
@@ -122,7 +121,7 @@ class Command(BaseCommand):
         df = self.load_dataframe(path)
         records = []
 
-        for idx, row in df.iterrows():
+        for _, row in df.iterrows():
             start_date = parse_asp_date(row["rte_date_debut_effet"])
             end_date = parse_asp_date(row["rte_date_fin_effet"])
 
@@ -148,7 +147,7 @@ class Command(BaseCommand):
         This list of communes is not the same as the official INSEE one.
         There is a reconciliation mechanism to implement
         """
-        path = os.path.join(_IMPORT_DIR, filename)
+        path = os.path.join(settings.IMPORT_DIR, filename)
 
         self.log("Importing ASP INSEE communes:\n")
 
@@ -186,7 +185,7 @@ class Command(BaseCommand):
         This list of departments is not the same as the official INSEE one.
         There is a reconciliation mechanism to implement
         """
-        path = os.path.join(_IMPORT_DIR, filename)
+        path = os.path.join(settings.IMPORT_DIR, filename)
 
         self.log("Importing ASP INSEE departments:\n")
 
@@ -223,7 +222,7 @@ class Command(BaseCommand):
         This list of countries is not the same as the official INSEE one.
         In this specific case, we don't care. Itou is France-centric
         """
-        path = os.path.join(_IMPORT_DIR, filename)
+        path = os.path.join(settings.IMPORT_DIR, filename)
 
         self.log("Importing ASP INSEE countries:\n")
 
@@ -251,19 +250,19 @@ class Command(BaseCommand):
 
         self.write_fixture_file(export_path, records)
 
-    def gen_measures(self, filename="ref_mesure.csv"):
+    def gen_siae_kinds(self, filename="ref_mesure.csv"):
         """
-        Generates ASP INSEE mesures fixture.
+        Generates ASP SIAE kinds fixture.
         """
-        path = os.path.join(_IMPORT_DIR, filename)
+        path = os.path.join(settings.IMPORT_DIR, filename)
 
-        self.log("Importing ASP measures:\n")
+        self.log("Importing ASP SIAE kinds:\n")
 
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_measures.json")
-        model = "asp.Measure"
+        export_path = os.path.join(_FIXTURES_DIR, "asp_siae_kinds.json")
+        model = "asp.SiaeKind"
         df = self.load_dataframe(path)
         records = []
 
@@ -292,7 +291,7 @@ class Command(BaseCommand):
         """
         Generates ASP employer types fixture.
         """
-        path = os.path.join(_IMPORT_DIR, filename)
+        path = os.path.join(settings.IMPORT_DIR, filename)
 
         self.log("Importing ASP employer types:\n")
 
@@ -313,7 +312,7 @@ class Command(BaseCommand):
                 "fields": {
                     "code": row["rte_code_type_employeur"],
                     "name": row["rte_lib_type_employeur"],
-                    "measure_id": row["rme_id"],
+                    "siae_kind_id": row["rme_id"],
                     "start_date": start_date,
                     "end_date": end_date,
                 },
@@ -333,21 +332,26 @@ class Command(BaseCommand):
                 "insee_communes",
                 "insee_departments",
                 "insee_countries",
-                "measures",
+                "siae_kinds",
                 "employer_types",
             ]
             if options.get(elt)
         ]
 
+        if len(partial) > 1:
+            self.logger.error(f"ERROR: Only one file import argument is allowed, {len(partial)} provided")
+            return
+
         if partial:
-            for gen_method in partial:
-                fn = getattr(self, f"gen_{gen_method}")
-                fn(filename=options.get(gen_method))
+            import_arg = partial[0]
+            fn = getattr(self, f"gen_{import_arg}")
+            fn(filename=options.get(import_arg))
         else:
-            # Order matters
+            # Order matters (see below)
             self.gen_education_levels()
             self.gen_insee_communes()
             self.gen_insee_departments()
             self.gen_insee_countries()
-            self.gen_measures()
+            self.gen_siae_kinds()
+            # employer types depends on SIAE kinds ID
             self.gen_employer_types()

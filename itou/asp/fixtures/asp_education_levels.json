@@ -1,1 +1,992 @@
-[{"model": "asp.EducationLevel", "pk": 1, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 2, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 3, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 4, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 5, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 6, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 7, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 8, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 9, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 10, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 11, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": "2017-01-01"}}, {"model": "asp.EducationLevel", "pk": 12, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 13, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 14, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 15, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 16, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 17, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 18, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 19, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 20, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 21, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 22, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 23, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 24, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 25, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 26, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 27, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 28, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 29, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 30, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 31, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 32, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 33, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 34, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 35, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 36, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 37, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 38, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 39, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 40, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 41, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 42, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 43, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 44, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 45, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 46, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 47, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 48, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 49, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 50, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 51, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 52, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 53, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 54, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 55, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 56, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 57, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 58, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 59, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 60, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 61, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 62, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 63, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 64, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 65, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 66, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 67, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 68, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 69, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 70, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 71, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 72, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 73, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 74, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 75, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 76, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 77, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 78, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 79, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 80, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 81, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 82, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 83, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 84, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 85, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 86, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 87, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 88, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 89, "fields": {"code": 0, "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 90, "fields": {"code": 1, "name": "JAMAIS SCOLARISE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 91, "fields": {"code": 10, "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 92, "fields": {"code": 20, "name": "FORMATION DE NIVEAU LICENCE", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 93, "fields": {"code": 30, "name": "FORMATION DE NIVEAU BTS OU DUT", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 94, "fields": {"code": 40, "name": "FORMATION DE NIVEAU BAC", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 95, "fields": {"code": 41, "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 96, "fields": {"code": 50, "name": "FORMATION DE NIVEAU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 97, "fields": {"code": 51, "name": "DIPLOME OBTENU CAP OU BEP", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 98, "fields": {"code": 60, "name": "FORMATION COURTE D'UNE DUREE D'UN AN", "start_date": "2017-01-01", "end_date": null}}, {"model": "asp.EducationLevel", "pk": 99, "fields": {"code": 70, "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.", "start_date": "2017-01-01", "end_date": null}}]
+[
+   {
+      "model": "asp.EducationLevel",
+      "pk": 1,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 2,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 3,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 4,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 5,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 6,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 7,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 8,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 9,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 10,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 11,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 12,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 13,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 14,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 15,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 16,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 17,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 18,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 19,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 20,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 21,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 22,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 23,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 24,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 25,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 26,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 27,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 28,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 29,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 30,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 31,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 32,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 33,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 34,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 35,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 36,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 37,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 38,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 39,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 40,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 41,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 42,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 43,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 44,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 45,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 46,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 47,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 48,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 49,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 50,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 51,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 52,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 53,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 54,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 55,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 56,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 57,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 58,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 59,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 60,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 61,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 62,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 63,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 64,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 65,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 66,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 67,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 68,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 69,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 70,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 71,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 72,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 73,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 74,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 75,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 76,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 77,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 78,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 79,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 80,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 81,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 82,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 83,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 84,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 85,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 86,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 87,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 88,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 89,
+      "fields": {
+         "code": 0,
+         "name": "PERSONNES AVEC QUALIFICATIONS NON CERTIFIANTES",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 90,
+      "fields": {
+         "code": 1,
+         "name": "JAMAIS SCOLARISE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 91,
+      "fields": {
+         "code": 10,
+         "name": "TROISIEME CYCLE OU ECOLE D'INGENIEUR",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 92,
+      "fields": {
+         "code": 20,
+         "name": "FORMATION DE NIVEAU LICENCE",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 93,
+      "fields": {
+         "code": 30,
+         "name": "FORMATION DE NIVEAU BTS OU DUT",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 94,
+      "fields": {
+         "code": 40,
+         "name": "FORMATION DE NIVEAU BAC",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 95,
+      "fields": {
+         "code": 41,
+         "name": "BREVET DE TECHNICIEN OU BACCALAUREAT PROFESSIONNEL",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 96,
+      "fields": {
+         "code": 50,
+         "name": "FORMATION DE NIVEAU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 97,
+      "fields": {
+         "code": 51,
+         "name": "DIPLOME OBTENU CAP OU BEP",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 98,
+      "fields": {
+         "code": 60,
+         "name": "FORMATION COURTE D'UNE DUREE D'UN AN",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EducationLevel",
+      "pk": 99,
+      "fields": {
+         "code": 70,
+         "name": "PAS DE FORMATION AU DELA DE LA SCOLARITE OBLIG.",
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   }
+]
