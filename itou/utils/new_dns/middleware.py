@@ -14,7 +14,7 @@ class NewDnsRedirectMiddleware:
         host = request.get_host().partition(":")[0]
         new_host = None
 
-        if host == "inclusion.beta.gouv.fr":
+        if host == "inclusion.beta.gouv.fr" or host == "emploi.inclusion.beta.gouv.fr":
             new_host = "emplois.inclusion.beta.gouv.fr"
 
         elif host == "demo.inclusion.beta.gouv.fr":
