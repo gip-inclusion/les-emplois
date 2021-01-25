@@ -43,7 +43,7 @@ class DepartmentAdmin(ASPModelAdmin):
 
 
 @admin.register(models.SiaeKind)
-class MeasureAdmin(ASPModelAdmin):
+class SiaeKindAdmin(ASPModelAdmin):
     pass
 
 
