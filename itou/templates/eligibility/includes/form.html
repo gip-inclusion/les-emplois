@@ -21,7 +21,11 @@
 
     {% csrf_token %}
 
-    <h2>{% translate "Critères d'éligibilité" %}</h2>
+    {% if request.user.is_siae_staff %}
+        <h2>{% translate "Critères d'éligibilité" %}</h2>
+    {% elif request.user.is_prescriber %}
+        <h2>{% translate "Situation administrative du candidat" %}</h2>
+    {% endif %}
 
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
         {% bootstrap_form_errors form_confirm_eligibility %}
@@ -29,13 +33,11 @@
 
     {% bootstrap_form_errors form_administrative_criteria %}
 
-    <h2 id="criteres_administratifs">
-        <span class="badge badge-secondary">{% translate "Critères administratifs" %}</span>
-    </h2>
-
-    <h3>
-        {% translate "Critères administratifs de niveau 1" %}
-    </h3>
+    {% if request.user.is_siae_staff %}
+        <h3>
+            {% translate "Critères administratifs de niveau 1" %}
+        </h3>
+    {% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
@@ -43,9 +45,11 @@
         {% endif %}
     {% endfor %}
 
-    <h3>
-        {% translate "Critères administratifs de niveau 2" %}
-    </h3>
+    {% if request.user.is_siae_staff %}
+        <h3>
+            {% translate "Critères administratifs de niveau 2" %}
+        </h3>
+    {% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
