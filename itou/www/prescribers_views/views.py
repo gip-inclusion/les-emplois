@@ -54,7 +54,7 @@ def members(request, template_name="prescribers/members.html"):
         .all()
         .order_by("-is_admin", "joined_at")
     )
-    pending_invitations = organization.invitations.filter(accepted=False).all().order_by("sent_at")
+    pending_invitations = organization.invitations.pending()
 
     context = {
         "organization": organization,

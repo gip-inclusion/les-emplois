@@ -14,7 +14,7 @@ SENDER_KIND_CHOICES = (
 
 def get_job_application_origin(ja):
     if ja.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
-        if ja.sender_prescriber_organization and ja.sender_prescriber_organization.is_authorized:
+        if ja.is_sent_by_authorized_prescriber:
             return "Prescripteur habilité"
         return "Orienteur"
     return get_choice(choices=SENDER_KIND_CHOICES, key=ja.sender_kind)

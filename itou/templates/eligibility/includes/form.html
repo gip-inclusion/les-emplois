@@ -11,15 +11,9 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-<div class="alert alert-warning" role="alert">
-    <i>{% translate "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
-</div>
-
 <form method="post" action="" role="form" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
-
-    <h2>{% translate "Critères d'éligibilité" %}</h2>
 
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
         {% bootstrap_form_errors form_confirm_eligibility %}
@@ -27,13 +21,11 @@
 
     {% bootstrap_form_errors form_administrative_criteria %}
 
-    <h2 id="criteres_administratifs">
-        <span class="badge badge-secondary">{% translate "Critères administratifs" %}</span>
-    </h2>
-
-    <h3>
-        {% translate "Critères administratifs de niveau 1" %}
-    </h3>
+    {% if request.user.is_siae_staff %}
+        <h3>
+            {% translate "Critères administratifs de niveau 1" %}
+        </h3>
+    {% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_1_PREFIX in field.name %}
@@ -41,17 +33,17 @@
         {% endif %}
     {% endfor %}
 
-    <h3>
-        {% translate "Critères administratifs de niveau 2" %}
-    </h3>
+    {% if request.user.is_siae_staff %}
+        <h3>
+            {% translate "Critères administratifs de niveau 2" %}
+        </h3>
+    {% endif %}
 
     {% for field in form_administrative_criteria %}
         {% if form_administrative_criteria.LEVEL_2_PREFIX in field.name %}
             {% include "eligibility/includes/criteria_input.html" with field=field objects_dict=form_administrative_criteria.OBJECTS %}
         {% endif %}
     {% endfor %}
-
-    {% include "eligibility/includes/reference_diagnosis.html" %}
 
     {% if form_confirm_eligibility and request.user.is_siae_staff %}
         {% bootstrap_form form_confirm_eligibility %}

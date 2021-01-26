@@ -5,6 +5,7 @@
 
     Usage:
         {% include "approvals/includes/status.html" with approval=approval %}
+        {% include "approvals/includes/status.html" with approval=approval job_application=job_application %}
 
 {% endcomment %}
 
@@ -77,10 +78,18 @@
 
 {% elif approval.is_in_waiting_period %}
 
-    <p class="text-danger">
-        {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
-            <b>Expiré</b> le {{ end }} (depuis {{ since }})
-        {% endblocktranslate %}
-    </p>
+    {% comment %}
+    Hide the "expired" status when a job application is sent by an authorized prescriber
+    for a job seeker with an approval in waiting period. The "expired" status suggests to
+    employers that they cannot hire the job seeker. But authorized prescribers can bypass
+    approvals in waiting period.
+    {% endcomment %}
+    {% if not job_application.is_sent_by_authorized_prescriber %}
+        <p class="text-danger">
+            {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
+                <b>Expiré</b> le {{ end }} (depuis {{ since }})
+            {% endblocktranslate %}
+        </p>
+    {% endif %}
 
 {% endif %}

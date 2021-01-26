@@ -79,7 +79,7 @@
                     <div class="card-text">
                         {# Employers need to know the expiration date of an approval #}
                         {# to decide whether they may accept a job application or not. #}
-                        {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval %}
+                        {% include "approvals/includes/status.html" with approval=approvals_wrapper.latest_approval job_application=job_application %}
                     </div>
                 </div>
             </div>

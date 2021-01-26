@@ -5,26 +5,45 @@
 
     {{ block.super }}
 
+    {# This template is shown only to SIAEs (*auto-prescription*). #}
+
+    <hr>
+
+    <h2>{% translate "Valider l'éligibilité IAE" %}</h2>
+
+    <p>{% translate "Pour valider l'éligibilité IAE du candidat il faut :" %}</p>
+
+    <ol>
+        <li>
+            {% blocktranslate %}
+                Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
+            {% endblocktranslate %}
+        </li>
+        <li>
+            {% translate "Sélectionner le ou les critères administratifs" %}
+            <ul>
+                <li>
+                    {% translate "un critère administratif de niveau 1" %}
+                </li>
+                <li>
+                    {% translate "trois critères de niveau 2 (seulement deux critères de niveau 2 pour les ETTI)" %}
+                </li>
+        </li>
+    </ol>
+
+    <p>
+        {% blocktranslate %}
+            Si le candidat ne remplit pas les conditions administratives, <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite/derogation-criteres" target="_blank" rel="noreferrer noopener">orientez-le vers un prescripteur habilité</a>.
+        {% endblocktranslate %}
+    </p>
+
     <div class="alert alert-warning" role="alert">
-        <p>{% translate "Pour valider une éligibilité la personne doit relever :" %}</p>
-        <ul>
-            <li>{% translate "d'au moins un besoin d'accompagnement" %}</li>
-            <li><b>{% translate "et" %}</b></li>
-            <li>
-                {% translate "de critères administratifs :" %}
-                <ul>
-                    <li>{% translate "au moins un critère administratif de niveau 1" %}</li>
-                    <li><b>{% translate "ou" %}</b></li>
-                    <li>{% translate "le cumul d'au moins trois critères de niveau 2 - seulement deux critères de niveau 2 pour les ETTI" %}</li>
-                </ul>
-            </li>
-        </ul>
-        <p class="mb-0">
-            {% translate "Les personnes, qui ne répondraient pas aux critères d'éligibilité administratifs requis, pourront être orientées vers un prescripteur habilité (exemples des personnes sans ressource ou sans emploi de longue durée) qui pourra passer outre ces critères pour prescrire un parcours IAE." %}
-        </p>
+        <i>{% translate "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
     </div>
 
     <hr>
+
+    <h2>{% translate "Critères d'éligibilité" %}</h2>
 
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}

@@ -1,25 +1,27 @@
 {% load i18n %}
 
-<h1 class="mt-5 mb-3">{% translate "Invitations en attente" %}</h1>
-<div class="table-responsive">
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">{% translate "Nom" %}</th>
-                <th scope="col">{% translate "Email" %}</th>
-                <th scope="col">{% translate "Envoyée le" %}</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for invitation in pending_invitations %}
-            <tr>
-                <th scope="row">{{ forloop.counter }}</th>
-                <td>{{ invitation.first_name }} {{ invitation.last_name }}</td>
-                <td><a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a></td>
-                <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
+{% if pending_invitations %}
+    <h1 class="mt-5 mb-3">{% translate "Invitations en attente" %}</h1>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">{% translate "Nom" %}</th>
+                    <th scope="col">{% translate "Email" %}</th>
+                    <th scope="col">{% translate "Envoyée le" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for invitation in pending_invitations %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{ invitation.first_name }} {{ invitation.last_name }}</td>
+                    <td><a href="mailto:{{ invitation.email }}">{{ invitation.email }}</a></td>
+                    <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
