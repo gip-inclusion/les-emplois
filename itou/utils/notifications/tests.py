@@ -69,7 +69,7 @@ class NotificationsBaseClassTest(TestCase):
 
     def test_get_recipients_default_dont_send_to_all(self):
         # Unset recipients are not present in get_recipients if SEND_TO_ALL_DEFAULT = False
-        self.notification.SEND_TO_ALL_DEFAULT = False
+        self.notification.SEND_TO_UNSET_RECIPIENTS = False
         recipients = self.notification.get_recipients()
         self.assertEqual(len(recipients), 0)
 

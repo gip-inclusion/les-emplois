@@ -3,6 +3,10 @@ from itou.utils.notifications.base_class import NotificationBase
 
 
 class NewJobApplicationSiaeEmailNotification(NotificationBase):
+    """
+    Notification sent to employers after a job seeker applied.
+    """
+
     def __init__(self, job_application):
         active_memberships = job_application.to_siae.siaemembership_set.filter(is_active=True, user__is_active=True)
         super().__init__(recipients_qs=active_memberships)
@@ -19,9 +23,6 @@ class NewJobApplicationSiaeEmailNotification(NotificationBase):
 
     @property
     def name(self):
-        """
-        Key used to store notification subscription preference.
-        """
         return "new_job_application_siae_email"
 
     @property
