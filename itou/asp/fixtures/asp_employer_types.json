@@ -1,0 +1,695 @@
+[
+   {
+      "model": "asp.EmployerType",
+      "pk": 1,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 2,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 3,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 4,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 5,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 6,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 7,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": null,
+         "start_date": "2017-01-01",
+         "end_date": "2017-01-01"
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 8,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 9,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 10,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 11,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 12,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 13,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 14,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 1.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 15,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 16,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 17,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 18,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 19,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 20,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 21,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 2.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 22,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 23,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 24,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 25,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 26,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 27,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 28,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 3.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 29,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 30,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 31,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 32,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 33,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 34,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 35,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 4.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 36,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 37,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 38,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 39,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 40,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 41,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 42,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 5.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 43,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 44,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 45,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 46,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 47,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 48,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 49,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 6.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 50,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 51,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 52,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 53,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 54,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 55,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 56,
+      "fields": {
+         "code": 7,
+         "name": "AUTRES",
+         "siae_kind_id": 7.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 57,
+      "fields": {
+         "code": 1,
+         "name": "EI",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 58,
+      "fields": {
+         "code": 2,
+         "name": "ETTI",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 59,
+      "fields": {
+         "code": 3,
+         "name": "AI",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 60,
+      "fields": {
+         "code": 4,
+         "name": "ACI",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 61,
+      "fields": {
+         "code": 5,
+         "name": "ESAT",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 62,
+      "fields": {
+         "code": 6,
+         "name": "ENTREPRISE ADAPTEE",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.EmployerType",
+      "pk": 63,
+      "fields": {
+         "code": 7,
+         "name": "AUTRE",
+         "siae_kind_id": 8.0,
+         "start_date": "2017-01-01",
+         "end_date": null
+      }
+   }
+]
