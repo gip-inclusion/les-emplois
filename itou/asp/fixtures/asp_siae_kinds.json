@@ -1,0 +1,106 @@
+[
+   {
+      "model": "asp.SiaeKind",
+      "pk": 1,
+      "fields": {
+         "code": "AI_DC",
+         "display_code": "AI",
+         "help_code": "AI",
+         "name": "Droit Commun - Association Interm\u00e9diaire",
+         "rdi_id": 1,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 2,
+      "fields": {
+         "code": "ACI_DC",
+         "display_code": "ACI",
+         "help_code": "ACI",
+         "name": "Droit Commun - Atelier et Chantier d'Insertion",
+         "rdi_id": 1,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 3,
+      "fields": {
+         "code": "EI_DC",
+         "display_code": "EI",
+         "help_code": "EI",
+         "name": "Droit Commun -  Entreprise d'Insertion",
+         "rdi_id": 1,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 4,
+      "fields": {
+         "code": "ETTI_DC",
+         "display_code": "ETTI",
+         "help_code": "ETTI",
+         "name": "Droit Commun -  Entreprise de Travail Temporaire d'Insertion",
+         "rdi_id": 1,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 5,
+      "fields": {
+         "code": "FDI_DC",
+         "display_code": "FDI",
+         "help_code": "FDI",
+         "name": "Droit Commun -  Fonds D\u00e9partemental pour l'Insertion",
+         "rdi_id": 1,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 6,
+      "fields": {
+         "code": "EI_MP",
+         "display_code": "EI",
+         "help_code": "EI",
+         "name": "Milieu P\u00e9nitentiaire - Entreprise d'Insertion",
+         "rdi_id": 2,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 7,
+      "fields": {
+         "code": "ACI_MP",
+         "display_code": "ACI",
+         "help_code": "ACI",
+         "name": "Milieu P\u00e9nitentiaire - Atelier et Chantier d'Insertion",
+         "rdi_id": 2,
+         "start_date": "2016-01-01",
+         "end_date": null
+      }
+   },
+   {
+      "model": "asp.SiaeKind",
+      "pk": 8,
+      "fields": {
+         "code": "EITI_DC",
+         "display_code": "EITI",
+         "help_code": "EITI",
+         "name": "Entreprise d'Insertion par le Travail Ind\u00e9pendant",
+         "rdi_id": 1,
+         "start_date": "2019-12-01",
+         "end_date": null
+      }
+   }
+]

@@ -16,6 +16,8 @@ APPS_DIR = os.path.abspath(os.path.join(ROOT_DIR, "itou"))
 
 EXPORT_DIR = f"{ROOT_DIR}/exports"
 
+IMPORT_DIR = f"{ROOT_DIR}/imports"
+
 # General.
 # ------------------------------------------------------------------------------
 
@@ -472,3 +474,4 @@ SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
 
 # Le marché de l'inclusion
 LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
+

@@ -141,3 +141,11 @@ ENV/
 
 # Clever Cloud
 .clever.json
+
+# Import files
+imports
+!imports/*.md
+
+# Export files
+exports
+!exports/*.md
