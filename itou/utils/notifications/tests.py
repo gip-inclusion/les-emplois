@@ -1,3 +1,4 @@
+from django.core import mail
 from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
@@ -63,16 +64,18 @@ class NotificationsBaseClassTest(TestCase):
         )
 
     def test_get_recipients_default_send_to_all(self):
-        # Unset recipients are present in get_recipients if SEND_TO_ALL_DEFAULT = True
+        # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
         recipients = self.notification.get_recipients()
         self.assertEqual(self.siaemembership_set.count(), len(recipients))
 
     def test_get_recipients_default_dont_send_to_all(self):
-        # Unset recipients are not present in get_recipients if SEND_TO_ALL_DEFAULT = False
+        # Unset recipients are not present in get_recipients if SEND_TO_UNSET_RECIPIENTS = False
         self.notification.SEND_TO_UNSET_RECIPIENTS = False
         recipients = self.notification.get_recipients()
         self.assertEqual(len(recipients), 0)
 
     def test_send(self):
-        # send email
-        pass
+        self.notification.send()
+
+        receivers = [receiver for message in mail.outbox for receiver in message.to]
+        self.assertEqual(self.notification.email.to, receivers)
