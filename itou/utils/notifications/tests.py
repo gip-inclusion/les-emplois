@@ -19,33 +19,21 @@ class NotificationsBaseClassTest(TestCase):
         self.membership = self.siaemembership_set.first()
         self.assertFalse(self.membership.notifications)
 
-    # Subscribe
     def test_subscribe(self):
         self.notification.subscribe(recipient=self.membership)
-
-        # Dict is not empty
-        self.assertTrue(self.membership.notifications)
-
-        # Key exists
-        key = self.notification.name
-        self.assertTrue(self.membership.notifications.get(key))
-
-        # Test method
+        self.assertTrue(self.membership.notifications)  # Dict is not empty
         self.assertTrue(self.notification.is_subscribed(recipient=self.membership))
 
-    # Unsubscribe
+        key = self.notification.name
+        self.assertTrue(self.membership.notifications.get(key))  # Key exists
+
     def test_unsubscribe(self):
         self.notification.unsubscribe(recipient=self.membership)
-
-        # Dict is not empty
-        self.assertTrue(self.membership.notifications)
-
-        # Key exists
-        key = self.notification.name
-        self.assertTrue(self.membership.notifications.get(key))
-
-        # Test method
+        self.assertTrue(self.membership.notifications)  # Dict is not empty
         self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
+
+        key = self.notification.name
+        self.assertTrue(self.membership.notifications.get(key))  # Key exists
 
     def test_subscribe_unset_recipients(self):
         """
@@ -63,12 +51,12 @@ class NotificationsBaseClassTest(TestCase):
             self.siaemembership_set.filter(user__email__in=recipients_emails).count(), len(recipients_emails)
         )
 
-    def test_get_recipients_default_send_to_all(self):
+    def test_get_recipients_default_send_to_unset_recipients(self):
         # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
         recipients = self.notification.get_recipients()
         self.assertEqual(self.siaemembership_set.count(), len(recipients))
 
-    def test_get_recipients_default_dont_send_to_all(self):
+    def test_get_recipients_default_dont_send_to_unset_recipients(self):
         # Unset recipients are not present in get_recipients if SEND_TO_UNSET_RECIPIENTS = False
         self.notification.SEND_TO_UNSET_RECIPIENTS = False
         recipients = self.notification.get_recipients()

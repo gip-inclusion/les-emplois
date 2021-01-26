@@ -6,9 +6,9 @@ class NotificationBase:
     Base class used in the notifications system.
     - A **notification** represents any transactional email sent to recipients.
     - A **recipient** is a user that can whether accept or refuse to receive a notification.
-    More precisely, it represents the place where this preference is stored.
+    More precisely, it represents the place (Model) where this preference is stored.
 
-    Notifications preferences are stored as a JSON like this:
+    Notifications preferences are stored as a JSON dictionary like this one:
     ```
     {notification.name: {"subscribed": True}}
     ```
@@ -22,11 +22,10 @@ class NotificationBase:
 
     Live example:
     - Model: itou/siaes/models.py > SiaeMembership
-    - Notifications : itou/job_applications/notifications.py
+    - Notifications: itou/job_applications/notifications.py
     """
 
-    # If recipients didn't express any preference,
-    # do we send it anyway?
+    # If recipients didn't express any preference, do we send it anyway?
     SEND_TO_UNSET_RECIPIENTS = True
 
     def __init__(self, recipients_qs):
@@ -61,7 +60,7 @@ class NotificationBase:
     @property
     def recipients_emails(self):
         """
-        List of recipients email address where self.email is sent.
+        List of recipients' email addresses to send `self.email`.
         Type: list of strings
         """
         raise NotImplementedError
