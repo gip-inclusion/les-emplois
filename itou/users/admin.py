@@ -211,3 +211,8 @@ class ItouUserAdmin(UserAdmin):
         if not request.user.is_superuser:
             rof += ("is_staff", "is_superuser", "groups", "user_permissions")
         return rof
+
+
+@admin.register(models.JobSeekerProfile)
+class JobSeekerProfileAdmin(admin.ModelAdmin):
+    pass

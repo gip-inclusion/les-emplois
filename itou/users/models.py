@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
+from itou.asp.models import AllocationDuration
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
@@ -234,51 +235,58 @@ class JobSeekerProfile(models.Model):
     """
 
     education_level = models.ForeignKey(
-        "asp.EducationLevel", verbose_name=_("Niveau de formation (ASP)", null=True, on_delete=models.SET_NULL)
+        "asp.EducationLevel",
+        on_delete=models.SET_NULL,
+        verbose_name=_("Niveau de formation (ASP)"),
+        null=True,
     )
     employer_type = models.ForeignKey(
-        "asp.EmployerType", verbose_name=_("Type d'employeur (ASP)"), null=True, on_delete=models.SET_NULL
+        "asp.EmployerType",
+        on_delete=models.SET_NULL,
+        verbose_name=_("Type d'employeur (ASP)"),
+        null=True,
     )
 
     # TODO Needed ?
     resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
 
     poleemploi = models.BooleanField(verbose_name=_("Inscrit Pôle emploi"), default=False)
-    poleemploi_since = models.ForeignKey(
-        "asp.AllocationDuration",
-        verbose_name=_("Inscrit à Pôle emploi depuis (ASP)"),
-        null=True,
-        on_delete=models.SET_NULL,
+    poleemploi_since = models.CharField(
+        max_length=20, verbose_name=_("Inscrit à Pôle emploi depuis (ASP)"), null=True, choices=AllocationDuration.choices
     )
 
     currently_employed = models.BooleanField(verbose_name=_("Actuellement employé"), default=False)
-    unemployed_since = models.ForeignKey(
-        "asp.AllocationDuration", verbose_name=_("Durée (ASP)"), null=True, on_delete=models.SET_NULL
+    unemployed_since = models.CharField(
+        max_length=20, verbose_name=_("Durée (ASP)"), null=True, choices=AllocationDuration.choices
     )
 
     rqth = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
     oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
 
     rsa_allocation = models.BooleanField(verbose_name=_("Bénéficiaire du RSA"), default=False)
-    rsa_allocation_since = models.ForeignKey(
-        "asp.AllocationDuration", verbose_name=_("Allocataire du RSA depuis"), on_delete=models.SET_NULL
+    rsa_allocation_since = models.CharField(
+        max_length=20, verbose_name=_("Allocataire du RSA depuis"), null=True, choices=AllocationDuration.choices
     )
 
     # ill-named
     ass_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'ASS"), default=False)
-    ass_allocation_since = models.ForeignKey(
-        "asp.AllocationDuration", verbose_name=_("Allocataire de l'ASS depuis"), on_delete=models.SET_NULL
+    ass_allocation_since = models.CharField(
+        max_length=20, verbose_name=_("Allocataire de l'ASS depuis"), null=True, choices=AllocationDuration.choices
     )
 
     aah_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'AAH"), default=False)
-    aah_allocation_since = models.ForeignKey(
-        "asp.AllocationDuration", verbose_name=_("Allocataire de l'AAH depuis"), on_delete=models.SET_NULL
+    aah_allocation_since = models.CharField(
+        max_length=20, verbose_name=_("Allocataire de l'AAH depuis"), null=True, choices=AllocationDuration.choices
     )
 
     ata_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'ATA"), default=False)
-    ata_allocation_since = models.ForeignKey(
-        "asp.AllocationDuration", verbose_name=_("Allocataire de l'ATA depuis"), on_delete=models.SET_NULL
+    ata_allocation_since = models.CharField(
+        max_length=20, verbose_name=_("Allocataire de l'ATA depuis"), null=True, choices=AllocationDuration.choices
     )
+
+    class Meta:
+        verbose_name = _("Profil demandeur d'emploi")
+        verbose_name_plural = _("Profils demandeurs d'emploi")
 
     @property
     def has_social_allowance(self):
