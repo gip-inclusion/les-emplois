@@ -8,7 +8,7 @@ class NewJobApplicationSiaeEmailNotification(NotificationBase):
     """
 
     def __init__(self, job_application):
-        active_memberships = job_application.to_siae.siaemembership_set.filter(is_active=True, user__is_active=True)
+        active_memberships = job_application.to_siae.siaemembership_set.active()
         super().__init__(recipients_qs=active_memberships)
         self.job_application = job_application
         self.siae = job_application.to_siae

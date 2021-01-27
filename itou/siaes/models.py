@@ -396,6 +396,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         return not self.is_active and timezone.now() > self.grace_period_end_date
 
 
+class SiaeMembershipQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True, user__is_active=True)
+
+
 class SiaeMembership(models.Model):
     """Intermediary model between `User` and `Siae`."""
 
@@ -414,6 +419,8 @@ class SiaeMembership(models.Model):
         verbose_name=_("Mis à jour par"),
     )
     notifications = models.JSONField(verbose_name=("Notifications"), default=dict)
+
+    objects = models.Manager.from_queryset(SiaeMembershipQuerySet)()
 
     class Meta:
         unique_together = ("user_id", "siae_id")

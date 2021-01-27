@@ -28,8 +28,9 @@ def get_current_organization_and_perms(request):
             user_siae_set_pks = request.user.siae_set.active_or_in_grace_period().values_list("pk", flat=True)
             # SIAE members can be deactivated, hence filtering on `membership.is_active`
             memberships = (
-                request.user.siaemembership_set.select_related("siae")
-                .filter(siae__pk__in=user_siae_set_pks, is_active=True)
+                request.user.siaemembership_set.active()
+                .select_related("siae")
+                .filter(siae__pk__in=user_siae_set_pks)
                 .order_by("created_at")
                 .all()
             )
