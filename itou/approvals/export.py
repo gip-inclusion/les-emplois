@@ -13,7 +13,7 @@ from itou.job_applications.models import JobApplication
 # XLS export of currently valid approvals
 # Currently used by admin site and admin command (export_approvals)
 
-LOG = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 FIELDS = [
     "id_pole_emploi",
@@ -57,7 +57,7 @@ def export_approvals(export_format="file"):
     current_dt = datetime.datetime.now()
     ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
 
-    LOG.info("Loading data...")
+    logger.info("Loading data...")
     data = [FIELDS]
 
     st = time.clock()
@@ -89,13 +89,13 @@ def export_approvals(export_format="file"):
         ]
         data.append(line)
 
-    LOG.info(f"Took: {time.clock() - st} sec.")
+    logger.info(f"Took: {time.clock() - st} sec.")
 
     # These values were formerly computed dynamically in the rendering loop
     # It is *way* faster to use static values to change the width of columns once
     max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
 
-    LOG.info("Writing data...")
+    logger.info("Writing data...")
     st = time.clock()
     for i, row in enumerate(data, 1):
         for j, cell_value in enumerate(row, 1):
@@ -105,8 +105,8 @@ def export_approvals(export_format="file"):
     for idx, width in enumerate(max_widths, 1):
         ws.column_dimensions[get_column_letter(idx)].width = width
 
-    LOG.info(f"Exported {export_count} records")
-    LOG.info(f"Took: {time.clock() - st} sec.")
+    logger.info(f"Exported {export_count} records")
+    logger.info(f"Took: {time.clock() - st} sec.")
 
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
