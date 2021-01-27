@@ -4,7 +4,10 @@ pytz==2020.1  # https://github.com/stub42/pytz
 requests==2.24.0  # https://github.com/psf/requests
 python-dateutil==2.8.1  # https://pypi.org/project/python-dateutil/
 openpyxl==3.0.3  # https://openpyxl.readthedocs.io/en/stable/
+
+# lxml improves performance of Excel file generation with openpyxl
 lxml==4.6.2  # https://lxml.de/
+
 Unidecode==1.1.1  # https://github.com/avian2/unidecode
 
 # Django
