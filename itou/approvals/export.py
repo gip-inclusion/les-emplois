@@ -1,6 +1,7 @@
 import datetime
 import time
 from tempfile import NamedTemporaryFile
+import logging
 
 from django.conf import settings
 from openpyxl import Workbook
@@ -11,6 +12,8 @@ from itou.job_applications.models import JobApplication
 
 # XLS export of currently valid approvals
 # Currently used by admin site and admin command (export_approvals)
+
+LOG = logging.getLogger(__name__)
 
 FIELDS = [
     "id_pole_emploi",
@@ -26,6 +29,8 @@ FIELDS = [
     "numero_siret",
     "raison_sociale",
     "type_siae",
+    "date_debut_embauche",
+    "date_fin_embauche",
 ]
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -52,7 +57,7 @@ def export_approvals(export_format="file"):
     current_dt = datetime.datetime.now()
     ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
 
-    print("Loading data...")
+    LOG.info("Loading data...")
     data = [FIELDS]
 
     st = time.clock()
@@ -61,6 +66,8 @@ def export_approvals(export_format="file"):
     job_applications = JobApplication.objects.exclude(approval=None).select_related(
         "job_seeker", "approval", "to_siae"
     )
+
+    export_count = job_applications.count()
 
     for ja in job_applications:
         line = [
@@ -77,16 +84,18 @@ def export_approvals(export_format="file"):
             ja.to_siae.siret,
             ja.to_siae.name,
             ja.to_siae.kind,
+            ja.hiring_start_at.strftime(DATE_FMT) if ja.hiring_start_at else "",
+            ja.hiring_end_at.strftime(DATE_FMT) if ja.hiring_end_at else "",
         ]
         data.append(line)
 
-    print(f"Took: {time.clock() - st} sec.")
+    LOG.info(f"Took: {time.clock() - st} sec.")
 
     # These values were formerly computed dynamically in the rendering loop
     # It is *way* faster to use static values to change the width of columns once
-    max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9]
+    max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
 
-    print("Writing data...")
+    LOG.info("Writing data...")
     st = time.clock()
     for i, row in enumerate(data, 1):
         for j, cell_value in enumerate(row, 1):
@@ -96,7 +105,8 @@ def export_approvals(export_format="file"):
     for idx, width in enumerate(max_widths, 1):
         ws.column_dimensions[get_column_letter(idx)].width = width
 
-    print(f"Took: {time.clock() - st} sec.")
+    LOG.info(f"Exported {export_count} records")
+    LOG.info(f"Took: {time.clock() - st} sec.")
 
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
