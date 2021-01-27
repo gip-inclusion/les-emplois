@@ -75,7 +75,7 @@ def export_approvals(export_format="file"):
         ws.cell(1, idx).value = cell_value
 
     # Write data rows
-    for row_idx, ja in enumerate(job_applications.iterator(), 1):
+    for row_idx, ja in enumerate(job_applications.iterator(), 2):
         line = [
             ja.job_seeker.pole_emploi_id,
             ja.job_seeker.first_name,
