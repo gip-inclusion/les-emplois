@@ -54,22 +54,28 @@ def export_approvals(export_format="file"):
     wb = Workbook()
     ws = wb.active
 
+    # These values were formerly computed dynamically in the rendering loop
+    # It is *way* faster to use static values to change the width of columns once
+    max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
     current_dt = datetime.datetime.now()
     ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
 
     logger.info("Loading data...")
-    data = [FIELDS]
-
     st = time.clock()
 
-    # Let try
+    # Fetch data
     job_applications = JobApplication.objects.exclude(approval=None).select_related(
         "job_seeker", "approval", "to_siae"
     )
 
     export_count = job_applications.count()
 
-    for ja in job_applications:
+    # Write header line
+    for idx, cell_value in enumerate(FIELDS, 1):
+        ws.cell(1, idx).value = cell_value
+
+    # Write data rows
+    for row_idx, ja in enumerate(job_applications.iterator(), 1):
         line = [
             ja.job_seeker.pole_emploi_id,
             ja.job_seeker.first_name,
@@ -87,19 +93,10 @@ def export_approvals(export_format="file"):
             ja.hiring_start_at.strftime(DATE_FMT) if ja.hiring_start_at else "",
             ja.hiring_end_at.strftime(DATE_FMT) if ja.hiring_end_at else "",
         ]
-        data.append(line)
-
-    logger.info(f"Took: {time.clock() - st} sec.")
-
-    # These values were formerly computed dynamically in the rendering loop
-    # It is *way* faster to use static values to change the width of columns once
-    max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
-
-    logger.info("Writing data...")
-    st = time.clock()
-    for i, row in enumerate(data, 1):
-        for j, cell_value in enumerate(row, 1):
-            ws.cell(i, j).value = cell_value
+        # Instead of using a temp array to store lines,
+        # write rows one by one
+        for col_idx, cell_value in enumerate(line, 1):
+            ws.cell(row_idx, col_idx).value = cell_value
 
     # Formating columns once (not in the loop)
     for idx, width in enumerate(max_widths, 1):
