@@ -1,7 +1,7 @@
 import datetime
+import logging
 import time
 from tempfile import NamedTemporaryFile
-import logging
 
 from django.conf import settings
 from openpyxl import Workbook
