@@ -35,6 +35,19 @@ class NotificationsBaseClassTest(TestCase):
         key = self.notification.name
         self.assertTrue(self.membership.notifications.get(key))  # Key exists
 
+    def test_unsubscribe_and_subscribe(self):
+        """
+        Make sure it's possible to toggle preferences.
+        """
+        self.notification.unsubscribe(recipient=self.membership)
+        self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
+
+        self.notification.subscribe(recipient=self.membership)
+        self.assertTrue(self.notification.is_subscribed(recipient=self.membership))
+
+        self.notification.unsubscribe(recipient=self.membership)
+        self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
+
     def test_subscribe_unset_recipients(self):
         """
         By default, notification preferences are not stored.

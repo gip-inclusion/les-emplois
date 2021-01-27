@@ -86,26 +86,18 @@ class NotificationBase:
         filters = {f"notifications__{self.name}__isnull": True}
         return Q(**filters)
 
-    def add_notification_key(self, recipient):
-        if not recipient.notifications.get(self.name):
-            recipient.notifications[self.name] = {}
-
     def is_subscribed(self, recipient):
-        if recipient.notifications.get(self.name):
-            return recipient.notifications[self.name]["subscribed"]
-        return False
+        return recipient.notifications.get(self.name) and recipient.notifications[self.name]["subscribed"]
 
     def send(self):
         self.email.send()
 
     def subscribe(self, recipient):
-        self.add_notification_key(recipient=recipient)
-        recipient.notifications[self.name]["subscribed"] = True
+        recipient.notifications.setdefault(self.name, {})["subscribed"] = True
         recipient.save()
 
     def unsubscribe(self, recipient):
-        self.add_notification_key(recipient=recipient)
-        recipient.notifications[self.name]["subscribed"] = False
+        recipient.notifications.setdefault(self.name, {})["subscribed"] = False
         recipient.save()
 
     def get_recipients(self):
