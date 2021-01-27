@@ -1,15 +1,19 @@
 import datetime
+import logging
+import time
+from tempfile import NamedTemporaryFile
 
 from django.conf import settings
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-from openpyxl.writer.excel import save_virtual_workbook
 
-from itou.approvals.models import Approval
+from itou.job_applications.models import JobApplication
 
 
 # XLS export of currently valid approvals
 # Currently used by admin site and admin command (export_approvals)
+
+logger = logging.getLogger(__name__)
 
 FIELDS = [
     "id_pole_emploi",
@@ -25,6 +29,8 @@ FIELDS = [
     "numero_siret",
     "raison_sociale",
     "type_siae",
+    "date_debut_embauche",
+    "date_fin_embauche",
 ]
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -51,37 +57,56 @@ def export_approvals(export_format="file"):
     current_dt = datetime.datetime.now()
     ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
 
+    logger.info("Loading data...")
     data = [FIELDS]
-    approvals = Approval.objects.all().select_related("user").prefetch_related("jobapplication_set__to_siae")
 
-    for approval in approvals:
-        # The same approval can be used for multiple job applications.
-        for job_application in approval.jobapplication_set.all():
-            line = [
-                approval.user.pole_emploi_id,
-                approval.user.first_name,
-                approval.user.last_name,
-                approval.user.birthdate.strftime(DATE_FMT),
-                approval.number,
-                approval.start_at.strftime(DATE_FMT),
-                approval.end_at.strftime(DATE_FMT),
-                approval.user.post_code,
-                approval.user.city,
-                job_application.to_siae.post_code,
-                job_application.to_siae.siret,
-                job_application.to_siae.name,
-                job_application.to_siae.kind,
-            ]
-            data.append(line)
+    st = time.clock()
 
-    # Getting the column to auto-adjust to max field size
-    max_width = [0] * (len(FIELDS) + 1)
+    # Let try
+    job_applications = JobApplication.objects.exclude(approval=None).select_related(
+        "job_seeker", "approval", "to_siae"
+    )
 
+    export_count = job_applications.count()
+
+    for ja in job_applications:
+        line = [
+            ja.job_seeker.pole_emploi_id,
+            ja.job_seeker.first_name,
+            ja.job_seeker.last_name,
+            ja.job_seeker.birthdate.strftime(DATE_FMT),
+            ja.approval.number,
+            ja.approval.start_at.strftime(DATE_FMT),
+            ja.approval.end_at.strftime(DATE_FMT),
+            ja.job_seeker.post_code,
+            ja.job_seeker.city,
+            ja.to_siae.post_code,
+            ja.to_siae.siret,
+            ja.to_siae.name,
+            ja.to_siae.kind,
+            ja.hiring_start_at.strftime(DATE_FMT) if ja.hiring_start_at else "",
+            ja.hiring_end_at.strftime(DATE_FMT) if ja.hiring_end_at else "",
+        ]
+        data.append(line)
+
+    logger.info(f"Took: {time.clock() - st} sec.")
+
+    # These values were formerly computed dynamically in the rendering loop
+    # It is *way* faster to use static values to change the width of columns once
+    max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
+
+    logger.info("Writing data...")
+    st = time.clock()
     for i, row in enumerate(data, 1):
         for j, cell_value in enumerate(row, 1):
-            max_width[j] = max(max_width[j], len(cell_value))
             ws.cell(i, j).value = cell_value
-            ws.column_dimensions[get_column_letter(j)].width = max_width[j]
+
+    # Formating columns once (not in the loop)
+    for idx, width in enumerate(max_widths, 1):
+        ws.column_dimensions[get_column_letter(idx)].width = width
+
+    logger.info(f"Exported {export_count} records")
+    logger.info(f"Took: {time.clock() - st} sec.")
 
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
@@ -91,4 +116,8 @@ def export_approvals(export_format="file"):
         wb.save(path)
         return path
     elif export_format == "stream":
-        return filename, save_virtual_workbook(wb)
+        # save_virtual_workbook is deprecated
+        with NamedTemporaryFile() as tmp_file:
+            wb.save(tmp_file.name)
+            tmp_file.seek(0)
+            return filename, tmp_file.read()
