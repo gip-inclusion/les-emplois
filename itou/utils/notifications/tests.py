@@ -48,6 +48,12 @@ class NotificationsBaseClassTest(TestCase):
         self.notification.unsubscribe(recipient=self.membership)
         self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
 
+    def test_subscribe_bulk(self):
+        self.notification.subscribe_bulk(recipients=self.siaemembership_set)
+
+        for membership in self.siaemembership_set.all():
+            self.assertTrue(self.notification.is_subscribed(recipient=membership))
+
     def test_subscribe_unset_recipients(self):
         """
         By default, notification preferences are not stored.

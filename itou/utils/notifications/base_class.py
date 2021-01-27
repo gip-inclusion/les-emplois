@@ -92,13 +92,22 @@ class NotificationBase:
     def send(self):
         self.email.send()
 
-    def subscribe(self, recipient):
+    def subscribe(self, recipient, save=True):
         recipient.notifications.setdefault(self.name, {})["subscribed"] = True
-        recipient.save()
+        if save:
+            recipient.save()
+        return recipient
 
     def unsubscribe(self, recipient):
         recipient.notifications.setdefault(self.name, {})["subscribed"] = False
         recipient.save()
+
+    def subscribe_bulk(self, recipients):
+        subscribed_recipients = []
+        for recipient in recipients.all():
+            recipient = self.subscribe(recipient=recipient, save=False)
+            subscribed_recipients.append(recipient)
+        recipients.model.objects.bulk_update(subscribed_recipients, ["notifications"])
 
     def get_recipients(self):
         if self.SEND_TO_UNSET_RECIPIENTS:
@@ -109,5 +118,4 @@ class NotificationBase:
     def _subscribe_unset_recipients(self):
         unset_recipients = self.recipients_qs.filter(self.unset_lookup)
         if unset_recipients:
-            for recipient in unset_recipients:
-                self.subscribe(recipient=recipient)
+            self.subscribe_bulk(unset_recipients)
