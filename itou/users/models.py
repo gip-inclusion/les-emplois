@@ -247,39 +247,33 @@ class JobSeekerProfile(models.Model):
         null=True,
     )
 
-    # TODO Needed ?
-    resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
-
-    poleemploi = models.BooleanField(verbose_name=_("Inscrit Pôle emploi"), default=False)
-    poleemploi_since = models.CharField(
-        max_length=20, verbose_name=_("Inscrit à Pôle emploi depuis (ASP)"), null=True, choices=AllocationDuration.choices
-    )
-
     currently_employed = models.BooleanField(verbose_name=_("Actuellement employé"), default=False)
-    unemployed_since = models.CharField(
-        max_length=20, verbose_name=_("Durée (ASP)"), null=True, choices=AllocationDuration.choices
-    )
+    resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
 
     rqth = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
     oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
 
-    rsa_allocation = models.BooleanField(verbose_name=_("Bénéficiaire du RSA"), default=False)
+    poleemploi = models.BooleanField(verbose_name=_("Inscrit Pôle emploi"), default=False)
+    poleemploi_since = models.CharField(
+        max_length=20, verbose_name=_("Inscrit à Pôle emploi depuis"), null=True, choices=AllocationDuration.choices
+    )
+
+    unemployed_since = models.CharField(
+        max_length=20, verbose_name=_("Sans emploi depuis"), null=True, choices=AllocationDuration.choices
+    )
+
     rsa_allocation_since = models.CharField(
         max_length=20, verbose_name=_("Allocataire du RSA depuis"), null=True, choices=AllocationDuration.choices
     )
 
-    # ill-named
-    ass_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'ASS"), default=False)
     ass_allocation_since = models.CharField(
         max_length=20, verbose_name=_("Allocataire de l'ASS depuis"), null=True, choices=AllocationDuration.choices
     )
 
-    aah_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'AAH"), default=False)
     aah_allocation_since = models.CharField(
         max_length=20, verbose_name=_("Allocataire de l'AAH depuis"), null=True, choices=AllocationDuration.choices
     )
 
-    ata_allocation = models.BooleanField(verbose_name=_("Bénéficiaire de l'ATA"), default=False)
     ata_allocation_since = models.CharField(
         max_length=20, verbose_name=_("Allocataire de l'ATA depuis"), null=True, choices=AllocationDuration.choices
     )
@@ -289,8 +283,28 @@ class JobSeekerProfile(models.Model):
         verbose_name_plural = _("Profils demandeurs d'emploi")
 
     @property
+    def is_unemployed(self):
+        return self.unemployed_since != AllocationDuration.NONE
+
+    @property
+    def has_rsa_allocation(self):
+        return self.rsa_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_ass_allocation(self):
+        return self.ass_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_aah_allocation(self):
+        return self.aah_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_ata_allocation(self):
+        return self.ata_allocation_since != AllocationDuration.NONE
+
+    @property
     def has_social_allowance(self):
-        return self.rsa_allocation or self.ass_allocation or self.aah_allocation or self.ata_allocation
+        return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
 
     # TODO to be continued...
 
