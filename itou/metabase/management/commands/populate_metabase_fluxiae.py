@@ -16,7 +16,6 @@ Refactoring it for low memory use would make it even longer and is actually not 
 - aka = also known as
 - sme = suivi mensuel
 - dsm = détail suivi mensuel
-- esm = FIXME
 - emi = état mensuel individuel (AFAIU same as `dsm`)
 - mei = mission état (mensuel) individuel
 - ctr = contrat
