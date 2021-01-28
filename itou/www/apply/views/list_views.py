@@ -48,7 +48,8 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         # current user for backward compatibility (in the past, a user could
         # create his prescriber's organization later on).
         job_applications = JobApplication.objects.filter(
-            Q(sender=request.user) | Q(sender_prescriber_organization=prescriber_organization)
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=prescriber_organization)
         )
     else:
         job_applications = request.user.job_applications_sent
