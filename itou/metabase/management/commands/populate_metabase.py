@@ -1,6 +1,10 @@
 """
 Populate metabase database with transformed data from itou database.
 
+For fluxIAE data, see the other script `populate_metabase_fluxiae.py`.
+
+This script runs every night in production via a cronjob, but can also be run from your local dev.
+
 This script reads data from the itou production database,
 transforms it for the convenience of our metabase non tech-savvy,
 french speaking only users, and injects the result into metabase.
@@ -12,8 +16,8 @@ The metabase database tables are trashed and recreated every time.
 The data is heavily denormalized among tables so that the metabase user
 has all the fields needed and thus never needs to perform joining two tables.
 
-We maintain a google sheet with extensive documentation about all tables
-and fields. Not linked here but easy to find internally.
+We maintain a google sheet with extensive documentation about all tables and fields.
+Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for safety reasons.
 """
 import gc
 import logging
@@ -27,6 +31,7 @@ from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.job_applications.models import JobApplication
+from itou.jobs.models import Rome
 from itou.metabase.management.commands import _approvals, _job_applications, _job_seekers, _organizations, _siaes
 from itou.metabase.management.commands._database import MetabaseDatabaseCursor
 from itou.metabase.management.commands._utils import chunked_queryset, compose, convert_boolean_to_int
@@ -283,6 +288,29 @@ class Command(BaseCommand):
 
         self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, queryset=queryset)
 
+    def populate_job_romes(self):
+        """
+        Populate rome codes.
+        """
+        queryset = Rome.objects.all()
+
+        table_columns = [
+            {
+                "name": "code_rome",
+                "type": "varchar",
+                "comment": "Code ROME",
+                "lambda": lambda o: o.code,
+            },
+            {
+                "name": "description_code_rome",
+                "type": "varchar",
+                "comment": "Description du code ROME",
+                "lambda": lambda o: o.name,
+            },
+        ]
+
+        self.populate_table(table_name="codes_rome", table_columns=table_columns, queryset=queryset)
+
     def populate_metabase(self):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
@@ -295,6 +323,7 @@ class Command(BaseCommand):
             self.populate_job_seekers()
             self.populate_job_applications()
             self.populate_approvals()
+            self.populate_job_romes()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
