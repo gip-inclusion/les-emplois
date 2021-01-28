@@ -39,7 +39,7 @@ def get_vue_af_df():
     - state
     """
     filename = get_filename(
-        filename_prefix="fluxIAE_AnnexeFinanciere_", filename_extension=".csv", description="Vue AF"
+        filename_prefix="fluxIAE_AnnexeFinanciere", filename_extension=".csv", description="Vue AF"
     )
 
     df = pd.read_csv(

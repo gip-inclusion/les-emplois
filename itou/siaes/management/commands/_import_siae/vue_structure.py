@@ -34,7 +34,7 @@ def get_vue_structure_df():
     - website (nowhere to be found)
     """
     filename = get_filename(
-        filename_prefix="fluxIAE_Structure_", filename_extension=".csv", description="Vue Structure"
+        filename_prefix="fluxIAE_Structure", filename_extension=".csv", description="Vue Structure"
     )
 
     df = pd.read_csv(
