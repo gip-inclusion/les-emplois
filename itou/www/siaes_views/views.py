@@ -150,7 +150,7 @@ def members(request, template_name="siaes/members.html"):
     if not siae.is_active:
         raise PermissionDenied
 
-    members = siae.siaemembership_set.filter(is_active=True).select_related("user").all().order_by("joined_at")
+    members = siae.siaemembership_set.active().select_related("user").all().order_by("joined_at")
     pending_invitations = siae.invitations.pending()
 
     context = {
