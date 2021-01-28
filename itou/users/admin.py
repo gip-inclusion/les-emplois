@@ -215,4 +215,4 @@ class ItouUserAdmin(UserAdmin):
 
 @admin.register(models.JobSeekerProfile)
 class JobSeekerProfileAdmin(admin.ModelAdmin):
-    pass
+    raw_id_fields = ("user",)

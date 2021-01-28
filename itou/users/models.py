@@ -262,27 +262,45 @@ class JobSeekerProfile(models.Model):
     oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
 
     poleemploi_since = models.CharField(
-        max_length=20, verbose_name=_("Inscrit à Pôle emploi depuis"), choices=AllocationDuration.choices
+        max_length=20,
+        verbose_name=_("Inscrit à Pôle emploi depuis"),
+        default=AllocationDuration.NONE,
+        choices=AllocationDuration.choices,
     )
 
     unemployed_since = models.CharField(
-        max_length=20, verbose_name=_("Sans emploi depuis"), choices=AllocationDuration.choices
+        max_length=20,
+        verbose_name=_("Sans emploi depuis"),
+        default=AllocationDuration.NONE,
+        choices=AllocationDuration.choices,
     )
 
     rsa_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire du RSA depuis"), choices=AllocationDuration.choices
+        max_length=20,
+        verbose_name=_("Allocataire du RSA depuis"),
+        default=AllocationDuration.NONE,
+        choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire de l'ASS depuis"), choices=AllocationDuration.choices
+        max_length=20,
+        verbose_name=_("Allocataire de l'ASS depuis"),
+        default=AllocationDuration.NONE,
+        choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire de l'AAH depuis"), choices=AllocationDuration.choices
+        max_length=20,
+        verbose_name=_("Allocataire de l'AAH depuis"),
+        default=AllocationDuration.NONE,
+        choices=AllocationDuration.choices,
     )
 
     ata_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire de l'ATA depuis"), choices=AllocationDuration.choices
+        max_length=20,
+        verbose_name=_("Allocataire de l'ATA depuis"),
+        default=AllocationDuration.NONE,
+        choices=AllocationDuration.choices,
     )
 
     class Meta:
@@ -294,7 +312,11 @@ class JobSeekerProfile(models.Model):
                 check=Q(employer_type__isnull=False, unemployed_since=AllocationDuration.NONE)
                 | (Q(employer_type__isnull=True) & ~Q(unemployed_since=AllocationDuration.NONE)),
             ),
+            # models.CheckConstraint(name="jobseekerprofile_user_is_jobseeker"check=Q(user__is_job_seeker=True))
         ]
+
+    def __str__(self):
+        return f"Jobseeker profile: {self.user.name}"
 
     @property
     def is_employed(self):
