@@ -1,12 +1,14 @@
 from django.db.models import Q
 
+from itou.siaes.models import SiaeMembershipQuerySet
+
 
 class NotificationBase:
     """
     Base class used in the notifications system.
     - A **notification** represents any transactional email sent to recipients.
-    - A **recipient** is a user that can whether accept or refuse to receive a notification.
-    More precisely, it represents the place (Model) where this preference is stored.
+    - A **recipient** is, in the real world, an end user that can whether accept or refuse
+    to receive a notification. In our code, a recipient represents the model used to store this preference.
 
     Notifications preferences are stored as a JSON dictionary like this one:
     ```
@@ -28,7 +30,12 @@ class NotificationBase:
     # If recipients didn't express any preference, do we send it anyway?
     SEND_TO_UNSET_RECIPIENTS = True
 
-    def __init__(self, recipients_qs):
+    def __init__(
+        self,
+        recipients_qs: [
+            SiaeMembershipQuerySet,
+        ],
+    ):
         """
         `recipients_qs`: Django QuerySet leading to this notification recipients.
         We should be able to perform a `filter()` with it.
