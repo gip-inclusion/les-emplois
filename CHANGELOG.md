@@ -6,7 +6,44 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
-## [10] - 2010-01-14
+## [11] - 2021-01-28
+
+### Ajouté
+
+- Import et traitement des fichiers de référence ASP pour les fiches salarié
+- Les employeurs peuvent modifier les informations des candidatures :
+    - pour les candidats considérés comme "autonomes"
+    - si la candidature est en attente ou acceptée
+- Affichage de l'identifiant Pôle emploi :
+    - dans le détail d'une candidature
+    - dans le PDF du PASS IAE
+- Nouveau logo "Ministère du travail, de l'emploi et de l'insertion" dans le pied de page
+
+### Modifié
+
+- Changement des noms de domaine :
+    - `inclusion.beta.gouv.fr` **devient** `emplois.inclusion.beta.gouv.fr`
+    - `staging.inclusion.beta.gouv.fr` **devient** `staging.emplois.inclusion.beta.gouv.fr`
+    - `demo.inclusion.beta.gouv.fr` **devient** `demo.emplois.inclusion.beta.gouv.fr`
+- Correctif d'un problème de performance de l'export des PASS IAE via l'admin
+- Dans "Gérer des collaborateurs" on affiche uniquement les invitations **non expirées**
+- Simplification des étapes de diagnostic :
+    - le critère "Primo arrivant" devient "Primo arrivant (personne récemment arrivée en France avec un contrat d'intégration républicaine de moins de 24 mois)"
+    - simplification du texte du préambule et ajout d'explications différentes pour les prescripteurs habilités et les SIAE
+- Correctif pour la requête qui affiche la liste des candidatures des prescripteurs, on n'affiche plus que :
+    - celles éventuellement émises par l'utilisateur connecté en tant qu'orienteur (avant d'avoir rejoint une organisation)
+    - celles de l'organisation active
+
+### Supprimé
+
+- Suppression de la mention "Agrément expiré" dans les candidatures envoyées aux SIAE par des prescripteurs habilités pour des candidats en période de carence
+- Suppression des mentions "pièces justificatives" dans l'écran de validation des critères d'éligibilité des prescripteurs
+- Simplification des étapes de diagnostic :
+    - suppression de la partie "Diagnostic socio-professionnel de référence" (le gros tableau)
+    - suppression du bloc jaune "Vous postulez pour X" dans le tunnel de candidature, le nom complet est déplacé dans le titre "Postuler pour X chez Y" à la place
+    - suppression des mentions "Critères administratifs" dans le diagnostic pour les prescripteurs habilités
+
+## [10] - 2021-01-14
 
 ### Ajouté
 - Ajout d'un filtre sur les candidatures : "PASS IAE suspendu"
