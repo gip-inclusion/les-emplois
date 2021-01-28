@@ -4,6 +4,7 @@ from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
@@ -227,12 +228,20 @@ class User(AbstractUser, AddressMixin):
         return None
 
 
+def get_allauth_account_user_display(user):
+    return user.email
+
+
 class JobSeekerProfile(models.Model):
     """
-    This is specific information about the job seeker
-    Instead of augmenting the 'User' model, it is collected in a "profile" object.
+    Specific information about the job seeker
+    Instead of augmenting the 'User' model, additional data is collected in a "profile" object.
     It will first be used by employee record model / system to serialize data for ASP tranfers.
     """
+
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, primary_key=True, verbose_name=_("Profil du demandeur d'emploi")
+    )
 
     education_level = models.ForeignKey(
         "asp.EducationLevel",
@@ -247,44 +256,49 @@ class JobSeekerProfile(models.Model):
         null=True,
     )
 
-    currently_employed = models.BooleanField(verbose_name=_("Actuellement employé"), default=False)
     resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
 
     rqth = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
     oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
 
-    poleemploi = models.BooleanField(verbose_name=_("Inscrit Pôle emploi"), default=False)
     poleemploi_since = models.CharField(
-        max_length=20, verbose_name=_("Inscrit à Pôle emploi depuis"), null=True, choices=AllocationDuration.choices
+        max_length=20, verbose_name=_("Inscrit à Pôle emploi depuis"), choices=AllocationDuration.choices
     )
 
     unemployed_since = models.CharField(
-        max_length=20, verbose_name=_("Sans emploi depuis"), null=True, choices=AllocationDuration.choices
+        max_length=20, verbose_name=_("Sans emploi depuis"), choices=AllocationDuration.choices
     )
 
     rsa_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire du RSA depuis"), null=True, choices=AllocationDuration.choices
+        max_length=20, verbose_name=_("Allocataire du RSA depuis"), choices=AllocationDuration.choices
     )
 
     ass_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire de l'ASS depuis"), null=True, choices=AllocationDuration.choices
+        max_length=20, verbose_name=_("Allocataire de l'ASS depuis"), choices=AllocationDuration.choices
     )
 
     aah_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire de l'AAH depuis"), null=True, choices=AllocationDuration.choices
+        max_length=20, verbose_name=_("Allocataire de l'AAH depuis"), choices=AllocationDuration.choices
     )
 
     ata_allocation_since = models.CharField(
-        max_length=20, verbose_name=_("Allocataire de l'ATA depuis"), null=True, choices=AllocationDuration.choices
+        max_length=20, verbose_name=_("Allocataire de l'ATA depuis"), choices=AllocationDuration.choices
     )
 
     class Meta:
         verbose_name = _("Profil demandeur d'emploi")
         verbose_name_plural = _("Profils demandeurs d'emploi")
+        constraints = [
+            models.CheckConstraint(
+                name="jobseekerprofile_employed",
+                check=Q(employer_type__isnull=False, unemployed_since=AllocationDuration.NONE)
+                | (Q(employer_type__isnull=True) & ~Q(unemployed_since=AllocationDuration.NONE)),
+            ),
+        ]
 
     @property
-    def is_unemployed(self):
-        return self.unemployed_since != AllocationDuration.NONE
+    def is_employed(self):
+        return self.employer_type is not None
 
     @property
     def has_rsa_allocation(self):
@@ -305,9 +319,3 @@ class JobSeekerProfile(models.Model):
     @property
     def has_social_allowance(self):
         return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
-
-    # TODO to be continued...
-
-
-def get_allauth_account_user_display(user):
-    return user.email
