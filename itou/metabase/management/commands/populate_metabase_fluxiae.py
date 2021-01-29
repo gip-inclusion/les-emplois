@@ -66,7 +66,8 @@ import pandas as pd
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from itou.metabase.management.commands._database import PG_ENGINE, MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_sqlalchemy import PG_ENGINE
 from itou.metabase.management.commands._missions_ai_ehpad import MISSIONS_AI_EPHAD_SQL_REQUEST
 from itou.siaes.management.commands._import_siae.utils import get_filename, timeit
 from itou.siaes.models import Siae

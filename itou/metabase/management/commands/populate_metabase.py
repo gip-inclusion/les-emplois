@@ -33,7 +33,7 @@ from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.management.commands import _approvals, _job_applications, _job_seekers, _organizations, _siaes
-from itou.metabase.management.commands._database import MetabaseDatabaseCursor
+from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
