@@ -53,6 +53,8 @@ THIRD_PARTY_APPS = [
     "bootstrap_datepicker_plus",
     "django_select2",
     "huey.contrib.djhuey",
+    "rest_framework", # DRF (Django Rest Framework).
+    "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
 ]
 
 
@@ -475,3 +477,10 @@ SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
 # Le marché de l'inclusion
 LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
 
+
+# DRF (Django Rest Framework)
+# ------------------------------------------------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}

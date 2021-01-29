@@ -8,9 +8,7 @@ from itou.www.dashboard import views as dashboard_views
 from itou.www.signup import views as signup_views
 from itou.www.login import views as login_views
 
-
 register_converter(SiretConverter, "siret")
-
 
 urlpatterns = [
 
@@ -55,6 +53,9 @@ urlpatterns = [
     # PEAMU URLs.
     path("accounts/", include("itou.allauth.peamu.urls")),
     # --------------------------------------------------------------------------------------
+
+    # API.
+    path("api/", include("itou.api.urls")),
 
     # www.
     path("", include("itou.www.home.urls")),

@@ -23,6 +23,9 @@ django-anymail==8.0  # https://github.com/anymail/django-anymail
 # Django-XWorkflows
 django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
 
+# DRF (Django Rest Framework)
+djangorestframework==3.12.2  # https://www.django-rest-framework.org/
+
 # Front-end
 # ------------------------------------------------------------------------------
 
