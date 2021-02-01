@@ -76,7 +76,9 @@ class JobSeekerExternalData(models.Model):
 
     data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
-    user = models.OneToOneField(get_user_model(), on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(
+        get_user_model(), verbose_name=_("Demandeur d'emploi"), on_delete=models.CASCADE, primary_key=True
+    )
 
     # Is the user a job seeker ? (from PE perspective)
     # --
