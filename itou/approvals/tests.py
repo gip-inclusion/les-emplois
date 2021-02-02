@@ -9,8 +9,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Prolongation, Suspension
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory
@@ -832,3 +832,111 @@ class SuspensionModelTest(TestCase):
         self.assertNotEqual(initial_duration, approval_duration_2)
         self.assertNotEqual(approval_duration_2, approval_duration_3)
         self.assertEqual(approval_duration_3, initial_duration + suspension_duration_2)
+
+
+class ProlongationModelTest(TestCase):
+    """
+    Test Prolongation model.
+    """
+
+    def test_get_max_end_at(self):
+
+        start_at = datetime.date(2021, 2, 1)
+
+        reason = Prolongation.Reason.COMPLETE_TRAINING.value
+        expected_max_end_at = datetime.date(2021, 7, 31)  # 6 months.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.RQTH.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.SENIOR.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+    def test_save(self):
+        """
+        Test `trigger_update_approval_end_at_for_prolongation` with SQL INSERT.
+        An approval's `end_at` is automatically pushed forward when it's prolongation
+        is validated.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        # When `is_valid=False`, the approval duration stays the same.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_valid=False)
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
+        # When `is_valid=True`, the approval duration is prolongated.
+        prolongation.is_valid = True
+        prolongation.save()
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + prolongation.duration)
+
+    def test_delete(self):
+        """
+        Test `trigger_update_approval_end_at_for_prolongation` with SQL DELETE.
+        An approval's `end_at` is automatically pushed back when it's prolongation
+        is deleted.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        # When `is_valid=True`, the approval duration is prolongated.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_valid=True)
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + prolongation.duration)
+
+        prolongation.delete()
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
+    def test_save_and_edit(self):
+        """
+        Test `trigger_update_approval_end_at_for_prolongation` with SQL UPDATE.
+        An approval's `end_at` is automatically pushed back and forth when
+        one of its valid prolongation is saved, then edited to be shorter.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_approval_duration = approval.duration
+
+        # New prolongation. When `is_valid=True`, the approval duration is prolongated.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_valid=True)
+        prolongation_duration_1 = prolongation.duration
+        approval.refresh_from_db()
+        approval_duration_2 = approval.duration
+
+        # Edit prolongation to be shorter.
+        prolongation.end_at -= relativedelta(months=2)
+        prolongation.save()
+        prolongation_duration_2 = prolongation.duration
+        approval.refresh_from_db()
+        approval_duration_3 = approval.duration
+
+        # Prolongation durations must be different.
+        self.assertNotEqual(prolongation_duration_1, prolongation_duration_2)
+
+        # Approval durations must be different.
+        self.assertNotEqual(initial_approval_duration, approval_duration_2)
+        self.assertNotEqual(approval_duration_2, approval_duration_3)
+
+        self.assertEqual(approval_duration_3, initial_approval_duration + prolongation_duration_2)
