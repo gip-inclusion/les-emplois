@@ -428,13 +428,6 @@ class Suspension(models.Model):
             self.updated_at = timezone.now()
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        """
-        The related Approval's end date is automatically pushed back
-        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
-        """
-        super().delete(*args, **kwargs)
-
     def clean(self):
         super().clean()
 
@@ -538,6 +531,142 @@ class Suspension(models.Model):
         if approval.last_old_suspension:
             return approval.last_old_suspension.end_at + relativedelta(days=1)
         return approval.user.last_accepted_job_application.hiring_start_at
+
+
+class ProlongationQuerySet(models.QuerySet):
+    @property
+    def in_progress_lookup(self):
+        now = timezone.now().date()
+        return models.Q(start_at__lte=now, end_at__gte=now)
+
+    def in_progress(self):
+        return self.filter(self.in_progress_lookup)
+
+    def not_in_progress(self):
+        return self.exclude(self.in_progress_lookup)
+
+    def old(self):
+        now = timezone.now().date()
+        return self.filter(end_at__lt=now)
+
+    def valid(self):
+        return self.filter(is_valid=True)
+
+
+class Prolongation(models.Model):
+    """
+    A prolongation demand can be issued by an SIAE for a PASS IAE.
+    The demand must then be accepted by a Pôle emploi agent.
+
+    When a prolongation is saved/edited/deleted, the end date of its approval is
+    automatically pushed back or forth with a PostgreSQL trigger:
+    `trigger_update_approval_end_at_for_prolongation`.
+    """
+
+    class Reason(models.TextChoices):
+        COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Achever une formation (6 mois maximum)")
+        RQTH = "RQTH", _("RQTH (reconnaissance de la qualité de travailleur handicapé)")
+        SENIOR = "SENIOR", _("Senior (+50 ans)")
+        PARTICULAR_DIFFICULTIES = (
+            "PARTICULAR_DIFFICULTIES",
+            _("Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi"),
+        )
+
+    approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    siae = models.ForeignKey(
+        "siaes.Siae",
+        verbose_name=_("SIAE"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongated",
+    )
+    reason = models.CharField(
+        verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
+    )
+    reason_explanation = models.TextField(verbose_name=_("Motivez la demande"), blank=True)
+
+    is_valid = models.BooleanField(
+        verbose_name=_("Validée"),
+        default=False,
+        help_text=_("Précise si la prolongation est validée."),
+    )
+    validated_at = models.DateTimeField(verbose_name=_("Date de la validation"), null=True)
+    validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Validé par"),
+        related_name="approvals_prolongations_validated",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongated_set",
+    )
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Mis à jour par"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    objects = models.Manager.from_queryset(ProlongationQuerySet)()
+
+    class Meta:
+        verbose_name = _("Prolongation")
+        verbose_name_plural = _("Prolongations")
+        ordering = ["-start_at"]
+        # Use an exclusion constraint to prevent overlapping date ranges.
+        # This requires the btree_gist extension on PostgreSQL.
+        # See "Tip of the Week" https://postgresweekly.com/issues/289
+        # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
+        constraints = [
+            ExclusionConstraint(
+                name="exclude_overlapping_prolongations",
+                expressions=(
+                    (
+                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=True)),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    ("approval", RangeOperators.EQUAL),
+                ),
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
+
+    def save(self, *args, **kwargs):
+        """
+        The related Approval's end date is automatically pushed back/forth with
+        a PostgreSQL trigger: `trigger_update_approval_end_at_for_prolongation`.
+        """
+        if self.pk:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    @property
+    def duration(self):
+        return self.end_at - self.start_at
+
+    @staticmethod
+    def get_max_end_at(start_at, reason):
+        """
+        Returns the maximum date on which a prolongation can end.
+        """
+        MAX_DURATION_MONTHS = 12
+        if reason == Prolongation.Reason.COMPLETE_TRAINING.value:
+            MAX_DURATION_MONTHS = 6
+        return start_at + relativedelta(months=MAX_DURATION_MONTHS) - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):
