@@ -418,7 +418,7 @@ class SiaeMembership(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
     )
-    notifications = models.JSONField(verbose_name=("Notifications"), default=dict)
+    notifications = models.JSONField(verbose_name=("Notifications"), default=dict, blank=True)
 
     objects = models.Manager.from_queryset(SiaeMembershipQuerySet)()
 
