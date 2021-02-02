@@ -6,7 +6,7 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 
-from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
+from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory
 
@@ -35,6 +35,19 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
     approval = factory.SubFactory(ApprovalFactory)
     start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
+    siae = factory.SubFactory(SiaeFactory)
+
+
+class ProlongationFactory(factory.django.DjangoModelFactory):
+    """Generate a Prolongation() object for unit tests."""
+
+    class Meta:
+        model = Prolongation
+
+    approval = factory.SubFactory(ApprovalFactory)
+    start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
+    end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, obj.reason))
+    reason = Prolongation.Reason.COMPLETE_TRAINING.value
     siae = factory.SubFactory(SiaeFactory)
 
 
