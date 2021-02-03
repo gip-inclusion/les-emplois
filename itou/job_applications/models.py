@@ -354,6 +354,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         )
 
     @property
+    def is_spontaneous(self):
+        return self.selected_jobs.exists()
+
+    @property
     def eligibility_diagnosis_by_siae_required(self):
         """
         Returns True if an eligibility diagnosis must be made by an SIAE
