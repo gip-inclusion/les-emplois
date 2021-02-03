@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [("approvals", "0012_auto_20210202_1449")]
+    dependencies = [("approvals", "0012_auto_20210203_0951")]
 
     operations = [
         migrations.RunSQL(
@@ -28,20 +28,20 @@ class Migration(migrations.Migration):
                             UPDATE approvals_approval
                             SET end_at = end_at - (OLD.end_at - OLD.start_at)
                             WHERE id = OLD.approval_id;
-                        ELSIF (TG_OP = 'INSERT' AND NEW.is_valid) THEN
+                        ELSIF (TG_OP = 'INSERT' AND NEW.is_validated) THEN
                             -- At insert time, the approval's end date is pushed forward if the prolongation
                             -- is validated.
                             UPDATE approvals_approval
                             SET end_at = end_at + (NEW.end_at - NEW.start_at)
                             WHERE id = NEW.approval_id;
                         ELSIF (TG_OP = 'UPDATE') THEN
-                            IF (NOT OLD.is_valid AND NEW.is_valid) THEN
+                            IF (NOT OLD.is_validated AND NEW.is_validated) THEN
                                 -- At update time, the approval's end date is pushed forward if the prolongation
                                 -- is being validated.
                                 UPDATE approvals_approval
                                 SET end_at = end_at + (NEW.end_at - NEW.start_at)
                                 WHERE id = NEW.approval_id;
-                            ELSIF (OLD.is_valid AND NEW.is_valid) THEN
+                            ELSIF (OLD.is_validated AND NEW.is_validated) THEN
                                 -- At update time, the approval's end date is first reset before
                                 -- being pushed forward if the prolongation was already validated.
                                 UPDATE approvals_approval

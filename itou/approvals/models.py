@@ -537,7 +537,7 @@ class ProlongationQuerySet(models.QuerySet):
 class Prolongation(models.Model):
     """
     A prolongation demand can be issued by an SIAE for a PASS IAE.
-    The demand must then be accepted by a Pôle emploi agent.
+    The demand must then be validated by a Pôle emploi agent.
 
     When a prolongation is saved/edited/deleted, the end date of its approval is
     automatically pushed back or forth with a PostgreSQL trigger:
@@ -568,7 +568,7 @@ class Prolongation(models.Model):
     )
     reason_explanation = models.TextField(verbose_name=_("Motivez la demande"), blank=True)
 
-    is_valid = models.BooleanField(
+    is_validated = models.BooleanField(
         verbose_name=_("Validée"),
         default=False,
         help_text=_("Précise si la prolongation est validée."),
