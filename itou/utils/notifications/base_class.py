@@ -35,6 +35,8 @@ class NotificationBase:
         recipients_qs: [
             SiaeMembershipQuerySet,
         ],
+        *args,
+        **kwargs,
     ):
         """
         `recipients_qs`: Django QuerySet leading to this notification recipients.
