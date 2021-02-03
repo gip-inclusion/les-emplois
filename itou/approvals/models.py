@@ -637,6 +637,30 @@ class Prolongation(models.Model):
             self.updated_at = timezone.now()
         super().save(*args, **kwargs)
 
+    def clean(self):
+        super().clean()
+
+        # No min duration: a prolongation may last only 1 day.
+        if self.end_at < self.start_at:
+            raise ValidationError({"end_at": _("La date de fin doit être postérieure à la date de début.")})
+
+        # A prolongation cannot exceed max duration.
+        max_end_at = self.get_max_end_at(self.start_at, self.reason)
+        if self.end_at > max_end_at:
+            raise ValidationError(
+                {
+                    "end_at": _(
+                        f'La durée totale est trop longue pour le motif "{self.get_reason_display()}". '
+                        f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
+        if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
+            if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
+                raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
+            # TODO: Up to 5 years.
+
     @property
     def duration(self):
         return self.end_at - self.start_at
