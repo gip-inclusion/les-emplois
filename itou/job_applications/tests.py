@@ -23,7 +23,7 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.job_applications.notifications import NewJobApplicationSiaeEmailNotification
+from itou.job_applications.notifications import NewQualifiedJobApplicationSiaeEmailNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeFactory
@@ -206,7 +206,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             selected_jobs=Appellation.objects.all()
         )
-        email = NewJobApplicationSiaeEmailNotification(job_application).email
+        email = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application).email
         # To.
         self.assertIn(job_application.to_siae.members.first().email, email.to)
         self.assertEqual(len(email.to), 1)
