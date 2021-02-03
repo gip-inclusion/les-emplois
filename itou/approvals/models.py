@@ -639,6 +639,10 @@ class Prolongation(models.Model):
     def duration(self):
         return self.end_at - self.start_at
 
+    @property
+    def is_in_progress(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
     @staticmethod
     def get_max_end_at(start_at, reason):
         """
