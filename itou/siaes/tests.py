@@ -26,7 +26,7 @@ class FactoriesTest(TestCase):
 
     def test_siae_with_membership_and_jobs_factory(self):
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-        self.assertEqual(siae.jobs.count(), 4)
+        self.assertEqual(siae.jobs.count(), 2)
 
     def test_siae_with_2_memberships_factory(self):
         siae = SiaeWith2MembershipsFactory()

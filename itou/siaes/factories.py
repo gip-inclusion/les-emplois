@@ -118,8 +118,8 @@ class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
 
         romes = extracted or ("N1101", "N1105", "N1103", "N4105")
         create_test_romes_and_appellations(romes)
-        # Pick 4 random results.
-        appellations = Appellation.objects.order_by("?")[:4]
+        # Pick random results.
+        appellations = Appellation.objects.order_by("?")[: len(romes)]
         self.jobs.add(*appellations)
 
 
