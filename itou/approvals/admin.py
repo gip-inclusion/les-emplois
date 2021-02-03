@@ -37,13 +37,28 @@ class JobApplicationInline(admin.StackedInline):
         return False
 
 
-class SuspensionInline(admin.StackedInline):
+class SuspensionInline(admin.TabularInline):
     model = models.Suspension
     extra = 0
     show_change_link = True
     can_delete = False
     fields = ("start_at", "end_at", "reason", "created_by", "siae")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+class ProlongationInline(admin.TabularInline):
+    model = models.Prolongation
+    extra = 0
+    show_change_link = True
+    can_delete = False
+    fields = ("start_at", "end_at", "reason", "created_by", "siae", "is_validated", "validated_by")
+    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "validated_by")
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -79,6 +94,7 @@ class ApprovalAdmin(admin.ModelAdmin):
     date_hierarchy = "start_at"
     inlines = (
         SuspensionInline,
+        ProlongationInline,
         JobApplicationInline,
     )
     actions = ["export_approvals"]
@@ -166,6 +182,31 @@ class SuspensionAdmin(admin.ModelAdmin):
         "reason",
     )
     readonly_fields = ("created_at", "created_by", "updated_at", "updated_by")
+    date_hierarchy = "start_at"
+
+    def is_in_progress(self, obj):
+        return obj.is_in_progress
+
+    is_in_progress.boolean = True
+    is_in_progress.short_description = _("En cours")
+
+    def save_model(self, request, obj, form, change):
+        if not change:
+            obj.created_by = request.user
+        super().save_model(request, obj, form, change)
+
+
+@admin.register(models.Prolongation)
+class ProlongationAdmin(admin.ModelAdmin):
+    list_display = ("pk", "approval", "start_at", "end_at", "created_at", "is_validated", "is_in_progress")
+    list_display_links = ("pk", "approval")
+    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "validated_by")
+    list_filter = (
+        IsInProgressFilter,
+        "is_validated",
+        "reason",
+    )
+    readonly_fields = ("validated_at", "created_at", "created_by", "updated_at", "updated_by")
     date_hierarchy = "start_at"
 
     def is_in_progress(self, obj):
