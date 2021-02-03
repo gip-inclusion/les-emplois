@@ -834,6 +834,25 @@ class SuspensionModelTest(TestCase):
         self.assertEqual(approval_duration_3, initial_duration + suspension_duration_2)
 
 
+class ProlongationQuerySetTest(TestCase):
+    """
+    Test ProlongationQuerySet.
+    """
+
+    def test_in_progress(self):
+        start_at = datetime.date.today()  # Starts today so it's in progress.
+        expected_num = 5
+        ProlongationFactory.create_batch(expected_num, start_at=start_at)
+        self.assertEqual(expected_num, Prolongation.objects.in_progress().count())
+
+    def test_not_in_progress(self):
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = start_at + relativedelta(months=6)
+        expected_num = 3
+        ProlongationFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
+        self.assertEqual(expected_num, Prolongation.objects.not_in_progress().count())
+
+
 class ProlongationModelTest(TestCase):
     """
     Test Prolongation model.
@@ -876,14 +895,12 @@ class ProlongationModelTest(TestCase):
 
         # When the status is NOT validated, the approval duration stays the same.
         prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.REFUSED)
-
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration)
 
         # When the status is validated, the approval duration is prolongated.
         prolongation.status = Prolongation.Status.VALIDATED
         prolongation.save()
-
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration + prolongation.duration)
 
