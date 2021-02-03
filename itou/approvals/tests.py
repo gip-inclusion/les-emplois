@@ -874,14 +874,14 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
 
-        # When `is_validated=False`, the approval duration stays the same.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_validated=False)
+        # When the status is NOT validated, the approval duration stays the same.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.REFUSED)
 
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration)
 
-        # When `is_validated=True`, the approval duration is prolongated.
-        prolongation.is_validated = True
+        # When the status is validated, the approval duration is prolongated.
+        prolongation.status = Prolongation.Status.VALIDATED
         prolongation.save()
 
         approval.refresh_from_db()
@@ -898,8 +898,8 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
 
-        # When `is_validated=True`, the approval duration is prolongated.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_validated=True)
+        # When the status is validated, the approval duration is prolongated.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.VALIDATED)
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration + prolongation.duration)
 
@@ -919,8 +919,8 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_approval_duration = approval.duration
 
-        # New prolongation. When `is_validated=True`, the approval duration is prolongated.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_validated=True)
+        # New prolongation. When the status is validated, the approval duration is prolongated.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.VALIDATED)
         prolongation_duration_1 = prolongation.duration
         approval.refresh_from_db()
         approval_duration_2 = approval.duration
@@ -940,3 +940,9 @@ class ProlongationModelTest(TestCase):
         self.assertNotEqual(approval_duration_2, approval_duration_3)
 
         self.assertEqual(approval_duration_3, initial_approval_duration + prolongation_duration_2)
+
+        # Remove the validated status, the approval duration must be reset.
+        prolongation.status = Prolongation.Status.REFUSED
+        prolongation.save()
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_approval_duration)

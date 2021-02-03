@@ -57,8 +57,8 @@ class ProlongationInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     can_delete = False
-    fields = ("start_at", "end_at", "reason", "created_by", "siae", "is_validated", "validated_by")
-    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "validated_by")
+    fields = ("start_at", "end_at", "reason", "created_by", "siae", "status", "status_updated_by")
+    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "status_updated_by")
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -198,15 +198,15 @@ class SuspensionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Prolongation)
 class ProlongationAdmin(admin.ModelAdmin):
-    list_display = ("pk", "approval", "start_at", "end_at", "created_at", "is_validated", "is_in_progress")
+    list_display = ("pk", "approval", "start_at", "end_at", "created_at", "status", "is_in_progress")
     list_display_links = ("pk", "approval")
-    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "validated_by")
+    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "status_updated_by")
     list_filter = (
+        "status",
         IsInProgressFilter,
-        "is_validated",
         "reason",
     )
-    readonly_fields = ("validated_at", "created_at", "created_by", "updated_at", "updated_by")
+    readonly_fields = ("status_updated_at", "created_at", "created_by", "updated_at", "updated_by")
     date_hierarchy = "start_at"
 
     def is_in_progress(self, obj):
