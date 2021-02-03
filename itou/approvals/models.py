@@ -529,11 +529,14 @@ class ProlongationQuerySet(models.QuerySet):
 
 class Prolongation(models.Model):
     """
-    A prolongation demand can be issued by an SIAE for a PASS IAE.
-    The demand must then be validated by a Pôle emploi agent.
+    A prolongation can be issued by an SIAE for a PASS IAE.
 
-    When a prolongation is saved/edited/deleted, the end date of its approval is
-    automatically pushed back or forth with a PostgreSQL trigger:
+    It must then be validated by a Pôle emploi agent bacause a self-validated
+    prolongation made by an SIAE would increase the risk of staying on
+    insertion for a candidate.
+
+    When a prolongation is saved/edited/deleted, the end date of its approval
+    is automatically pushed back or forth with a PostgreSQL trigger:
     `trigger_update_approval_end_at_for_prolongation`.
     """
 
@@ -659,7 +662,12 @@ class Prolongation(models.Model):
         if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
             if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
                 raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
-            # TODO: Up to 5 years.
+
+        # TODO: needs business clarification:
+        # - limit successive COMPLETE_TRAINING prolongations up to 6 months?
+        # - limit successive PARTICULAR_DIFFICULTIES prolongations up to 5 years?
+        # - limit successive kinds of reasons?
+        # - take suspensions into account in the duration?
 
     @property
     def duration(self):
