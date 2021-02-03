@@ -545,13 +545,6 @@ class ProlongationQuerySet(models.QuerySet):
     def not_in_progress(self):
         return self.exclude(self.in_progress_lookup)
 
-    def old(self):
-        now = timezone.now().date()
-        return self.filter(end_at__lt=now)
-
-    def valid(self):
-        return self.filter(is_valid=True)
-
 
 class Prolongation(models.Model):
     """
@@ -565,12 +558,20 @@ class Prolongation(models.Model):
 
     class Reason(models.TextChoices):
         COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Achever une formation (6 mois maximum)")
-        RQTH = "RQTH", _("RQTH (reconnaissance de la qualité de travailleur handicapé)")
-        SENIOR = "SENIOR", _("Senior (+50 ans)")
+        RQTH = "RQTH", _("RQTH (12 mois maximum)")
+        SENIOR = "SENIOR", _("50 ans et plus (12 mois maximum)")
         PARTICULAR_DIFFICULTIES = (
             "PARTICULAR_DIFFICULTIES",
-            _("Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi"),
+            _(
+                "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi "
+                "(12 mois maximum dans la limite de 5 ans)"
+            ),
         )
+
+    class Status(models.TextChoices):
+        NOT_SET = "NOT_SET", _("À traiter")
+        VALIDATED = "VALIDATED", _("Validée")
+        REFUSED = "REFUSED", _("Refusée")
 
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
@@ -587,16 +588,17 @@ class Prolongation(models.Model):
     )
     reason_explanation = models.TextField(verbose_name=_("Motivez la demande"), blank=True)
 
-    is_validated = models.BooleanField(
-        verbose_name=_("Validée"),
-        default=False,
-        help_text=_("Précise si la prolongation est validée."),
+    status = models.CharField(
+        verbose_name=_("Statut"),
+        max_length=30,
+        choices=Status.choices,
+        default=Status.NOT_SET,
     )
-    validated_at = models.DateTimeField(verbose_name=_("Date de la validation"), null=True)
-    validated_by = models.ForeignKey(
+    status_updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour du statut"), null=True)
+    status_updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Validé par"),
-        related_name="approvals_prolongations_validated",
+        verbose_name=_("Statut mis à jour par"),
+        related_name="approvals_prolongations_status_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
