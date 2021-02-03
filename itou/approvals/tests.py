@@ -874,14 +874,14 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
 
-        # When `is_valid=False`, the approval duration stays the same.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_valid=False)
+        # When `is_validated=False`, the approval duration stays the same.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_validated=False)
 
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration)
 
-        # When `is_valid=True`, the approval duration is prolongated.
-        prolongation.is_valid = True
+        # When `is_validated=True`, the approval duration is prolongated.
+        prolongation.is_validated = True
         prolongation.save()
 
         approval.refresh_from_db()
@@ -898,8 +898,8 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_duration = approval.duration
 
-        # When `is_valid=True`, the approval duration is prolongated.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_valid=True)
+        # When `is_validated=True`, the approval duration is prolongated.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_validated=True)
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration + prolongation.duration)
 
@@ -919,8 +919,8 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at)
         initial_approval_duration = approval.duration
 
-        # New prolongation. When `is_valid=True`, the approval duration is prolongated.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_valid=True)
+        # New prolongation. When `is_validated=True`, the approval duration is prolongated.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, is_validated=True)
         prolongation_duration_1 = prolongation.duration
         approval.refresh_from_db()
         approval_duration_2 = approval.duration
