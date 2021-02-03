@@ -31,5 +31,12 @@
                 </div>
             {% endif %}
         {% endif %}
+
+        {% if job_application.state.is_postponed and job_application.answer %}
+            <p>
+                <b>{% translate "Motif de la mise en liste d'attente :" %}</b>
+            </p>
+            <p>{{ job_application.answer|linebreaks }}</p>
+        {% endif %}
     </div>
 </div>
