@@ -660,24 +660,16 @@ class SuspensionQuerySetTest(TestCase):
     """
 
     def test_in_progress(self):
-        # In progress: started today.
-        start_at = datetime.date.today()
+        start_at = datetime.date.today()  # Starts today so it's in progress.
         expected_num = 5
         SuspensionFactory.create_batch(expected_num, start_at=start_at)
         self.assertEqual(expected_num, Suspension.objects.in_progress().count())
 
     def test_not_in_progress(self):
-        # Create "in progress" suspensions because Factory.create_batch() with
-        # a `start_at` in the past will trigger Suspension.save(), then
-        # Suspension.clean() and fail the validation.
-        start_at = datetime.date.today()
-        expected_num = 3
-        SuspensionFactory.create_batch(expected_num, start_at=start_at)
-        # Then make suspensions go back in time using a batch update() that
-        # won't trigger Suspension.save() nor Suspension.clean().
         start_at = datetime.date.today() - relativedelta(years=1)
-        end_at = Suspension.get_max_end_at(start_at)
-        Suspension.objects.all().update(start_at=start_at, end_at=end_at)
+        end_at = start_at + relativedelta(months=6)
+        expected_num = 3
+        SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
 
     def test_old(self):
