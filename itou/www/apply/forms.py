@@ -147,7 +147,18 @@ class SubmitJobApplicationForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = ["selected_jobs", "message"]
-        widgets = {"selected_jobs": forms.CheckboxSelectMultiple()}
+        widgets = {
+            "selected_jobs": forms.CheckboxSelectMultiple(),
+            "message": forms.Textarea(
+                attrs={
+                    "placeholder": gettext_lazy(
+                        "Message à destination de l’employeur (avec copie transmise au candidat)"
+                        " et non modifiable après l’envoi : motivations du candidat, motifs d’orientation, "
+                        "éléments du diagnostic socio-professionnel, ..."
+                    )
+                }
+            ),
+        }
         labels = {"selected_jobs": gettext_lazy("Métiers recherchés (optionnel)")}
 
 
@@ -184,7 +195,14 @@ class AnswerForm(forms.Form):
     Allow an SIAE to add an answer message when postponing or accepting.
     """
 
-    answer = forms.CharField(label=gettext_lazy("Réponse"), widget=forms.Textarea(), required=False, strip=True)
+    answer = forms.CharField(
+        label=gettext_lazy("Réponse"),
+        widget=forms.Textarea(
+            attrs={"placeholder": gettext_lazy("Votre réponse sera visible par le candidat et le prescripteur")}
+        ),
+        required=False,
+        strip=True,
+    )
 
 
 class AcceptForm(forms.ModelForm):
