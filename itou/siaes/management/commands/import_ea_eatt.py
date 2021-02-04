@@ -28,7 +28,7 @@ def convert_kind(raw_kind):
 @timeit
 def get_ea_eatt_df():
     filename = get_filename(
-        filename_prefix="Liste_Contact_EA_", filename_extension=".xlsx", description="Export EA/EATT"
+        filename_prefix="Liste_Contact_EA", filename_extension=".xlsx", description="Export EA/EATT"
     )
 
     df = pd.read_excel(filename, converters={"SIRET": str, "CODE_POST": str})
@@ -90,6 +90,7 @@ def get_ea_eatt_df():
     df = df[~df.auth_email.isnull()]
 
     assert df.siret.is_unique
+    assert len(df) >= 600  # Export usually has 700+ ea/eatt structures.
 
     return df
 

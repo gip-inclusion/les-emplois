@@ -89,6 +89,7 @@ def update_existing_conventions(dry_run):
     total = SiaeConvention.objects.count()
     if DEACTIVATE_CONVENTIONS:
         print(f"{deactivations} of {total} conventions will be deactivated")
+        assert deactivations <= 400  # Break if too many deactivations would occur.
     else:
         total = SiaeConvention.objects.count()
         print(f"{deactivations} of {total} conventions would have been deactivated but will *not* be")
