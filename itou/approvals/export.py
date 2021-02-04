@@ -43,12 +43,11 @@ FIELDS_WS2 = [
     "date_debut_suspension",
     "date_fin_suspension",
     "raison",
-    "suspendu_par",
     "numero_siret",
     "raison_sociale",
 ]
 # Columns widths for worksheet 2
-WIDTHS_WS2 = [16, 20, 20, 50, 40, 20, 80]
+WIDTHS_WS2 = [16, 20, 20, 50, 20, 80]
 
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -137,7 +136,6 @@ def _format_suspended_pass_worksheet(wb):
             _format_date(s.start_at),
             _format_date(s.end_at),
             s.get_reason_display(),
-            s.created_by.email,
             s.siae.siret,
             s.siae.name,
         ]
