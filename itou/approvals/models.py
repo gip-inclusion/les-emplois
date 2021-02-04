@@ -682,10 +682,10 @@ class Prolongation(models.Model):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        MAX_DURATION_MONTHS = 12
+        max_duration_months = 12
         if reason == Prolongation.Reason.COMPLETE_TRAINING.value:
-            MAX_DURATION_MONTHS = 6
-        return start_at + relativedelta(months=MAX_DURATION_MONTHS) - relativedelta(days=1)
+            max_duration_months = 6
+        return start_at + relativedelta(months=max_duration_months) - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):
