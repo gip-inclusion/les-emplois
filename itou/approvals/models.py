@@ -550,7 +550,7 @@ class Prolongation(models.Model):
     """
     A prolongation can be issued by an SIAE for a PASS IAE.
 
-    It must then be validated by a Pôle emploi agent bacause a self-validated
+    It must then be validated by a Pôle emploi agent because a self-validated
     prolongation made by an SIAE would increase the risk of staying on
     insertion for a candidate.
 
