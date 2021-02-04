@@ -61,6 +61,7 @@ def get_geiq_df():
         validate_siret(row.siret)
 
     assert df.siret.is_unique
+    assert len(df) >= 150  # Export usually has 180+ geiq structures.
 
     return df
 
