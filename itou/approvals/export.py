@@ -1,7 +1,6 @@
 import datetime
 import logging
 import time
-from tempfile import NamedTemporaryFile
 
 from django.conf import settings
 from openpyxl import Workbook
@@ -153,21 +152,17 @@ def _format_suspended_pass_worksheet(wb):
     logger.info(f"Exported {export_count} suspensions in {time.clock() - st} sec.")
 
 
-def export_approvals(export_format="file"):
+def export_approvals(tmp_file=None):
     """
     Main entry point. Currently used by admin site and an admin command:
         $ itou/approvals/management/commands/export_approvals.py
 
-    `export_format` can be either:
-        * `file` : for the admin command, export result as a file
-        * `stream` : for the admin site (to be bundled in a HTTP response object)
+    `tmp_file` can be either:
+        * 'None':     management command usage => save result as a file
+        * valid file: admin site usage => file will be bundled in a HTTP response object
 
-    Returns:
-        * a path for `file`
-        * a pair with filename and object for `stream`
+    Returns:  a valid filename for HTTP streaming (inline attachment) or storage
     """
-    assert export_format in EXPORT_FORMATS, f"Unknown export format '{export_format}'"
-
     wb = Workbook()
     _format_pass_worksheet(wb)
     _format_suspended_pass_worksheet(wb)
@@ -176,13 +171,12 @@ def export_approvals(export_format="file"):
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
 
-    if export_format == "file":
+    # No streaming: management comand usage
+    if not tmp_file:
         path = f"{settings.EXPORT_DIR}/{filename}"
         wb.save(path)
         return path
-    elif export_format == "stream":
-        # save_virtual_workbook is deprecated
-        with NamedTemporaryFile() as tmp_file:
-            wb.save(tmp_file.name)
-            tmp_file.seek(0)
-            return filename, tmp_file.read()
+
+    # Admin usage: Save tmp file for stream purposes
+    wb.save(tmp_file.name)
+    return filename
