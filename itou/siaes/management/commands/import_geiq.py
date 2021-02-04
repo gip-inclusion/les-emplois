@@ -19,7 +19,7 @@ from itou.utils.validators import validate_siret
 
 @timeit
 def get_geiq_df():
-    filename = get_filename(filename_prefix="Geiq_-_liste_", filename_extension=".xls", description="Export GEIQ")
+    filename = get_filename(filename_prefix="Liste_Geiq", filename_extension=".xls", description="Export GEIQ")
 
     df = pd.read_excel(filename, converters={"siret": str, "zip": str})
 
