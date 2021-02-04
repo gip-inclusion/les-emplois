@@ -10,11 +10,12 @@ from openpyxl.utils import get_column_letter
 from itou.job_applications.models import JobApplication, Suspension
 
 
-# XLS export of currently valid approvals
+# XLS export of approvals
 # Currently used by admin site and admin command (export_approvals)
 
 logger = logging.getLogger(__name__)
 
+# Field names for worksheet 1 (full export of approvals)
 FIELDS_WS1 = [
     "id_pole_emploi",
     "nom",
@@ -32,6 +33,12 @@ FIELDS_WS1 = [
     "date_debut_embauche",
     "date_fin_embauche",
 ]
+
+# These values were formerly computed dynamically in the rendering loop
+# It is *way* faster to use static values to change the width of columns once
+WIDTHS_WS1 = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
+
+# Field names for worksheet 2 (approvals suspensions)
 FIELDS_WS2 = [
     "numero_pass_iae",
     "date_debut_suspension",
@@ -41,20 +48,29 @@ FIELDS_WS2 = [
     "numero_siret",
     "raison_sociale",
 ]
+# Columns widths for worksheet 2
+WIDTHS_WS2 = [16, 20, 20, 50, 40, 20, 80]
+
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
 
 
+def _format_date(dt):
+    return dt.strftime(DATE_FMT) if dt else ""
+
+
 def _format_pass_worksheet(wb):
     """
-    Format 1st sheet of workbook:
-
     Export of all approvals
     """
+    logger.info("Loading approvals data...")
+
     ws = wb.active
     current_dt = datetime.datetime.now()
     ws.title = "Export PASS IAE " + current_dt.strftime(DATE_FMT)
-    max_widths_ws1 = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
+
+    # Start timer
+    st = time.clock()
 
     job_applications = JobApplication.objects.exclude(approval=None).select_related(
         "job_seeker", "approval", "to_siae"
@@ -70,37 +86,71 @@ def _format_pass_worksheet(wb):
             ja.job_seeker.pole_emploi_id,
             ja.job_seeker.first_name,
             ja.job_seeker.last_name,
-            ja.job_seeker.birthdate.strftime(DATE_FMT),
+            _format_date(ja.job_seeker.birthdate),
             ja.approval.number,
-            ja.approval.start_at.strftime(DATE_FMT),
-            ja.approval.end_at.strftime(DATE_FMT),
+            _format_date(ja.approval.start_at),
+            _format_date(ja.approval.end_at),
             ja.job_seeker.post_code,
             ja.job_seeker.city,
             ja.to_siae.post_code,
             ja.to_siae.siret,
             ja.to_siae.name,
             ja.to_siae.kind,
-            ja.hiring_start_at.strftime(DATE_FMT) if ja.hiring_start_at else "",
-            ja.hiring_end_at.strftime(DATE_FMT) if ja.hiring_end_at else "",
+            _format_date(ja.hiring_start_at),
+            _format_date(ja.hiring_end_at),
         ]
         # Instead of using a temp array to store lines,
-        # write rows one by one
+        # writing rows one by one will avoid memory issues
         for col_idx, cell_value in enumerate(line, 1):
             ws.cell(row_idx, col_idx).value = cell_value
 
     # Formating columns once (not in the loop)
-    for idx, width in enumerate(max_widths_ws1, 1):
+    for idx, width in enumerate(WIDTHS_WS1, 1):
         ws.column_dimensions[get_column_letter(idx)].width = width
 
+    export_count = job_applications.count()
 
-def _format_suspended_pass_worksheet():
+    logger.info(f"Exported {export_count} approvals in {time.clock() - st} sec.")
+
+
+def _format_suspended_pass_worksheet(wb):
     """
-    Format 2nd sheet of workbook:
-
     Suspended approvals
     """
-    suspended_approvals = Suspension.objects.all().select_related("approval")
-    suspended_count = suspended_approvals.count()
+    # suspended_approvals = Suspension.objects.all().select_related("approval")
+    # suspended_count = suspended_approvals.count()
+    logger.info("Loading suspension data...")
+
+    ws = wb.create_sheet("Suspensions PASS IAE")
+
+    # Start timer
+    st = time.clock()
+
+    suspensions = Suspension.objects.all().select_related("approval", "created_by")
+
+    # Write header line
+    for idx, cell_value in enumerate(FIELDS_WS2, 1):
+        ws.cell(1, idx).value = cell_value
+
+    for idx, s in enumerate(suspensions.iterator(), 2):
+        line = [
+            s.approval.number,
+            _format_date(s.start_at),
+            _format_date(s.end_at),
+            s.get_reason_display(),
+            s.created_by.email,
+            s.siae.siret,
+            s.siae.name,
+        ]
+        for col_idx, cell_value in enumerate(line, 1):
+            ws.cell(idx, col_idx).value = cell_value
+
+    # Formating columns once (not in the loop)
+    for idx, width in enumerate(WIDTHS_WS2, 1):
+        ws.column_dimensions[get_column_letter(idx)].width = width
+
+    export_count = suspensions.count()
+    logger.info(f"Exported {export_count} suspensions in {time.clock() - st} sec.")
 
 
 def export_approvals(export_format="file"):
@@ -119,59 +169,10 @@ def export_approvals(export_format="file"):
     assert export_format in EXPORT_FORMATS, f"Unknown export format '{export_format}'"
 
     wb = Workbook()
-    ws = wb.active
+    _format_pass_worksheet(wb)
+    _format_suspended_pass_worksheet(wb)
 
-    # These values were formerly computed dynamically in the rendering loop
-    # It is *way* faster to use static values to change the width of columns once
-    max_widths_ws1 = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
     current_dt = datetime.datetime.now()
-    ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
-
-    logger.info("Loading data...")
-    st = time.clock()
-
-    # Fetch data
-    job_applications = JobApplication.objects.exclude(approval=None).select_related(
-        "job_seeker", "approval", "to_siae"
-    )
-
-    export_count = job_applications.count()
-
-    # Write header line
-    for idx, cell_value in enumerate(FIELDS_WS1, 1):
-        ws.cell(1, idx).value = cell_value
-
-    # Write data rows
-    for row_idx, ja in enumerate(job_applications.iterator(), 2):
-        line = [
-            ja.job_seeker.pole_emploi_id,
-            ja.job_seeker.first_name,
-            ja.job_seeker.last_name,
-            ja.job_seeker.birthdate.strftime(DATE_FMT),
-            ja.approval.number,
-            ja.approval.start_at.strftime(DATE_FMT),
-            ja.approval.end_at.strftime(DATE_FMT),
-            ja.job_seeker.post_code,
-            ja.job_seeker.city,
-            ja.to_siae.post_code,
-            ja.to_siae.siret,
-            ja.to_siae.name,
-            ja.to_siae.kind,
-            ja.hiring_start_at.strftime(DATE_FMT) if ja.hiring_start_at else "",
-            ja.hiring_end_at.strftime(DATE_FMT) if ja.hiring_end_at else "",
-        ]
-        # Instead of using a temp array to store lines,
-        # write rows one by one
-        for col_idx, cell_value in enumerate(line, 1):
-            ws.cell(row_idx, col_idx).value = cell_value
-
-    # Formating columns once (not in the loop)
-    for idx, width in enumerate(max_widths_ws1, 1):
-        ws.column_dimensions[get_column_letter(idx)].width = width
-
-    logger.info(f"Exported {export_count} records")
-    logger.info(f"Took: {time.clock() - st} sec.")
-
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
 

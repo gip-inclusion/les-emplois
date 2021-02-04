@@ -19,4 +19,5 @@ class Command(BaseCommand):
     def handle(self, **options):
         self.stdout.write("Exporting approvals / PASS IAE")
         result = export_approvals()
-        self.stdout.write(f"Approvals / PASS IAE export file written to: '{result}'")
+        self.stdout.write("Approvals / PASS IAE export file written to:")
+        self.stdout.write(result)
