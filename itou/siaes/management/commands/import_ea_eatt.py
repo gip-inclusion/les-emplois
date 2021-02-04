@@ -90,6 +90,7 @@ def get_ea_eatt_df():
     df = df[~df.auth_email.isnull()]
 
     assert df.siret.is_unique
+    assert len(df) >= 600  # Export usually has 700+ ea/eatt structures.
 
     return df
 
