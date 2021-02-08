@@ -26,9 +26,9 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.job_applications.notifications import NewQualifiedJobApplicationSiaeEmailNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
-from itou.users.factories import JobSeekerFactory, UserFactory
+from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
 from itou.utils.templatetags import format_filters
 
 
@@ -195,7 +195,9 @@ class JobApplicationFactoriesTest(TestCase):
 
 
 class JobApplicationNotificationsTest(TestCase):
-    """Test JobApplication notifications."""
+    """
+    Test JobApplication notifications: emails content and receivers.
+    """
 
     @classmethod
     def setUpTestData(cls):
@@ -468,6 +470,93 @@ class JobApplicationNotificationsTest(TestCase):
         email = job_application.email_cancel(cancelled_by=cancellation_user)
         # To.
         self.assertFalse(email.bcc)
+
+
+class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
+    def test_one_selected_job(self):
+        siae = SiaeWithMembershipAndJobsFactory()
+        job_application = JobApplicationFactory(to_siae=siae)
+
+        # Add a selected job description to the application
+        job_descriptions = siae.job_description_through.all()
+        selected_job = job_descriptions[0]
+        job_application.selected_jobs.add(selected_job)
+        job_application.save()
+
+        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+
+        membership = siae.siaemembership_set.first()
+        self.assertFalse(membership.notifications)
+        notification.subscribe(recipient=membership)
+        self.assertTrue(notification.is_subscribed(recipient=membership))
+
+        # Receiver is now subscribed to one kind of notification
+        self.assertEqual(len(notification._get_recipient_subscribed_pks(recipient=membership)), 1)
+
+        # A job application is sent concerning another job_description.
+        # He should then be subscribed to two different notifications.
+        job_application = JobApplicationFactory(to_siae=siae)
+        selected_job = job_descriptions[1]
+        job_application.selected_jobs.add(selected_job)
+        job_application.save()
+
+        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification.subscribe(recipient=membership)
+        self.assertTrue(notification.is_subscribed(recipient=membership))
+
+        self.assertEqual(len(notification._get_recipient_subscribed_pks(recipient=membership)), 2)
+        self.assertEqual(len(membership.notifications), 1)
+
+        recipients = notification.recipients_emails
+        self.assertEqual(len(recipients), 1)
+
+    def test_multiple_selected_jobs_multiple_recipients(self):
+        siae = SiaeWithMembershipAndJobsFactory()
+        job_descriptions = siae.job_description_through.all()
+
+        user = SiaeStaffFactory(siae=siae)
+        siae.members.add(user)
+        membership = siae.siaemembership_set.get(user=user)
+        notification = NewQualifiedJobApplicationSiaeEmailNotification(selected_jobs_pks=[job_descriptions[0].pk])
+        notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
+        notification.subscribe(membership)
+
+        user = SiaeStaffFactory(siae=siae)
+        siae.members.add(user)
+        membership = siae.siaemembership_set.get(user=user)
+        notification = NewQualifiedJobApplicationSiaeEmailNotification(selected_jobs_pks=[job_descriptions[1].pk])
+        notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
+        notification.subscribe(membership)
+
+        # Two selected jobs. Each user subscribed to one of them. We should have two recipients.
+        job_application = JobApplicationFactory(to_siae=siae)
+        job_application.selected_jobs.add(job_descriptions[0])
+        job_application.selected_jobs.add(job_descriptions[1])
+        job_application.save()
+
+        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
+        self.assertEqual(len(notification.recipients_emails), 2)
+
+    def test_default_subscription(self):
+        """
+        Unset recipients should receive new job application notifications.
+        """
+        siae = SiaeWithMembershipAndJobsFactory()
+        user = SiaeStaffFactory(siae=siae)
+        siae.members.add(user)
+
+        job_application = JobApplicationFactory(to_siae=siae)
+
+        # Add a job description to the application
+        selected_job = siae.job_description_through.first()
+        job_application.selected_jobs.add(selected_job)
+        job_application.save()
+
+        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+
+        recipients = notification.recipients_emails
+        self.assertEqual(len(recipients), siae.members.count())
 
 
 class JobApplicationWorkflowTest(TestCase):
