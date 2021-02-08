@@ -850,28 +850,38 @@ class ProlongationModelTest(TestCase):
     Test Prolongation model.
     """
 
+    def test_get_start_at(self):
+
+        end_at = datetime.date(2021, 2, 1)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        prolongation_start_at = Prolongation.get_start_at(approval)
+        expected_start_at = datetime.date(2021, 2, 2)  # One day after `approval.end_at`.
+        self.assertEqual(prolongation_start_at, expected_start_at)
+
     def test_get_max_end_at(self):
 
         start_at = datetime.date(2021, 2, 1)
 
         reason = Prolongation.Reason.COMPLETE_TRAINING.value
         expected_max_end_at = datetime.date(2021, 7, 31)  # 6 months.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
         reason = Prolongation.Reason.RQTH.value
         expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
         reason = Prolongation.Reason.SENIOR.value
         expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
         reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
         expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason)
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
         self.assertEqual(max_end_at, expected_max_end_at)
 
     def test_save(self):
