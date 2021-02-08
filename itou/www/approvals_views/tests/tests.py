@@ -147,10 +147,8 @@ class ApprovalSuspendViewTest(TestCase):
         end_at = today + relativedelta(days=10)
 
         post_data = {
-            "approval": approval.pk,
             "start_at": start_at.strftime("%d/%m/%Y"),
             "end_at": end_at.strftime("%d/%m/%Y"),
-            "siae": job_application.to_siae.pk,
             "reason": Suspension.Reason.SICKNESS,
             "reason_explanation": "",
             # Preview.
@@ -209,10 +207,8 @@ class ApprovalSuspendViewTest(TestCase):
         new_end_at = end_at + relativedelta(days=30)
 
         post_data = {
-            "approval": suspension.approval.pk,
             "start_at": suspension.start_at.strftime("%d/%m/%Y"),
             "end_at": new_end_at.strftime("%d/%m/%Y"),
-            "siae": suspension.siae.pk,
             "reason": suspension.reason,
             "reason_explanation": suspension.reason_explanation,
         }
