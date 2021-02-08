@@ -134,8 +134,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
     preview = False
 
-    initial = {"approval": approval, "siae": siae, "reason": None}
-    form = SuspensionForm(approval=approval, initial=initial, data=request.POST or None)
+    form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
@@ -173,7 +172,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
 
-    form = SuspensionForm(approval=suspension.approval, instance=suspension, data=request.POST or None)
+    form = SuspensionForm(approval=suspension.approval, siae=siae, instance=suspension, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)

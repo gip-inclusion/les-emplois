@@ -20,10 +20,11 @@ class ProlongationForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
-            # `start_at` is implicit and should begin just after the approval. It cannot be set by the user.
+            # `start_at` should begin just after the approval. It cannot be set by the user.
             self.instance.start_at = Prolongation.get_start_at(self.approval)
             self.instance.siae = self.siae
             self.instance.approval = self.approval
+            self.fields["reason"].initial = None  # Uncheck radio buttons.
 
         # `PARTICULAR_DIFFICULTIES` is allowed only for AI and ACI.
         if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
@@ -43,7 +44,7 @@ class ProlongationForm(forms.ModelForm):
     class Meta:
         model = Prolongation
         fields = [
-            # Order of other fields is important for the template.
+            # Order is important for the template.
             "reason",
             "reason_explanation",
             "end_at",
@@ -72,16 +73,21 @@ class SuspensionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
+        self.siae = kwargs.pop("siae")
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
-            today = timezone.now().date()
-            min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
-            max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
-            today_str = today.strftime("%Y/%m/%d")
-            # A suspension is backdatable but cannot start in the future.
-            self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
-            self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
+            self.instance.siae = self.siae
+            self.instance.approval = self.approval
+            self.fields["reason"].initial = None  # Uncheck radio buttons.
+
+        today = timezone.now().date()
+        min_start_at_str = Suspension.next_min_start_at(self.approval).strftime("%Y/%m/%d")
+        max_end_at_str = Suspension.get_max_end_at(today).strftime("%Y/%m/%d")
+        today_str = today.strftime("%Y/%m/%d")
+        # A suspension is backdatable but cannot start in the future.
+        self.fields["start_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": today_str})
+        self.fields["end_at"].widget = DatePickerField({"minDate": min_start_at_str, "maxDate": max_end_at_str})
 
         for field in ["start_at", "end_at"]:
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
@@ -89,16 +95,13 @@ class SuspensionForm(forms.ModelForm):
     class Meta:
         model = Suspension
         fields = [
-            "approval",
+            # Order is important for the template.
             "start_at",
             "end_at",
-            "siae",
             "reason",
             "reason_explanation",
         ]
         widgets = {
-            "siae": forms.HiddenInput(),
-            "approval": forms.HiddenInput(),
             "reason": forms.RadioSelect(),
             "start_at": DatePickerField(),
             "end_at": DatePickerField(),
