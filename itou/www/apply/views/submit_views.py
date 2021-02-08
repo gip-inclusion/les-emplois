@@ -11,7 +11,10 @@ from django.utils.translation import gettext as _
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.notifications import NewJobApplicationSiaeEmailNotification
+from itou.job_applications.notifications import (
+    NewQualifiedJobAppSiaeNotification,
+    NewSpontaneousJobAppSiaeNotification,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.user import get_user_info
@@ -367,7 +370,10 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         for job in form.cleaned_data["selected_jobs"]:
             job_application.selected_jobs.add(job)
 
-        notification = NewJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
+        if job_application.is_spontaneous:
+            notification = NewSpontaneousJobAppSiaeNotification(job_application=job_application)
+
         notification.send()
         base_url = request.build_absolute_uri("/")[:-1]
         job_application.email_new_for_job_seeker(base_url=base_url).send()
