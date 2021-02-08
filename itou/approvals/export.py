@@ -1,21 +1,21 @@
 import datetime
 import logging
 import time
-from tempfile import NamedTemporaryFile
 
 from django.conf import settings
 from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
 
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, Suspension
 
 
-# XLS export of currently valid approvals
+# XLS export of approvals
 # Currently used by admin site and admin command (export_approvals)
 
 logger = logging.getLogger(__name__)
 
-FIELDS = [
+# Field names for worksheet 1 (full export of approvals)
+FIELDS_WS1 = [
     "id_pole_emploi",
     "nom",
     "prenom",
@@ -32,92 +32,145 @@ FIELDS = [
     "date_debut_embauche",
     "date_fin_embauche",
 ]
+
+# Field names for worksheet 2 (approvals suspensions)
+FIELDS_WS2 = [
+    "numero_pass_iae",
+    "date_debut_suspension",
+    "date_fin_suspension",
+    "raison",
+    "numero_siret",
+    "raison_sociale",
+]
+
+# Default cell width (no more dynamic computation)
+CELL_WIDTH = 50
+
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
 
 
-def export_approvals(export_format="file"):
+def _format_date(dt):
+    return dt.strftime(DATE_FMT) if dt else ""
+
+
+def _format_pass_worksheet(wb):
     """
-    Main entry point. Currently used by admin site and an admin command:
-        $ itou/approvals/management/commands/export_approvals.py
-
-    `export_format` can be either:
-        * `file` : for the admin command, export result as a file
-        * `stream` : for the admin site (to be bundled in a HTTP response object)
-
-    Returns:
-        * a path for `file`
-        * a pair with filename and object for `stream`
+    Export of all approvals
     """
-    assert export_format in EXPORT_FORMATS, f"Unknown export format '{export_format}'"
+    logger.info("Loading approvals data...")
 
-    wb = Workbook()
     ws = wb.active
-
     current_dt = datetime.datetime.now()
-    ws.title = "Export PASS SIAE " + current_dt.strftime(DATE_FMT)
+    ws.title = "Export PASS IAE " + current_dt.strftime(DATE_FMT)
 
-    logger.info("Loading data...")
-    data = [FIELDS]
-
+    # Start timer
     st = time.clock()
 
-    # Let try
     job_applications = JobApplication.objects.exclude(approval=None).select_related(
         "job_seeker", "approval", "to_siae"
     )
 
-    export_count = job_applications.count()
+    # Write header row
+    for idx, cell_value in enumerate(FIELDS_WS1, 1):
+        ws.cell(1, idx).value = cell_value
 
-    for ja in job_applications:
-        line = [
+    # Write data rows
+    for row_idx, ja in enumerate(job_applications.iterator(), 2):
+        row = [
             ja.job_seeker.pole_emploi_id,
             ja.job_seeker.first_name,
             ja.job_seeker.last_name,
-            ja.job_seeker.birthdate.strftime(DATE_FMT),
+            _format_date(ja.job_seeker.birthdate),
             ja.approval.number,
-            ja.approval.start_at.strftime(DATE_FMT),
-            ja.approval.end_at.strftime(DATE_FMT),
+            _format_date(ja.approval.start_at),
+            _format_date(ja.approval.end_at),
             ja.job_seeker.post_code,
             ja.job_seeker.city,
             ja.to_siae.post_code,
             ja.to_siae.siret,
             ja.to_siae.name,
             ja.to_siae.kind,
-            ja.hiring_start_at.strftime(DATE_FMT) if ja.hiring_start_at else "",
-            ja.hiring_end_at.strftime(DATE_FMT) if ja.hiring_end_at else "",
+            _format_date(ja.hiring_start_at),
+            _format_date(ja.hiring_end_at),
         ]
-        data.append(line)
-
-    logger.info(f"Took: {time.clock() - st} sec.")
-
-    # These values were formerly computed dynamically in the rendering loop
-    # It is *way* faster to use static values to change the width of columns once
-    max_widths = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
-
-    logger.info("Writing data...")
-    st = time.clock()
-    for i, row in enumerate(data, 1):
-        for j, cell_value in enumerate(row, 1):
-            ws.cell(i, j).value = cell_value
+        # Instead of using a temp array to store rows,
+        # writing rows one by one will avoid memory issues
+        for col_idx, cell_value in enumerate(row, 1):
+            ws.cell(row_idx, col_idx).value = cell_value
 
     # Formating columns once (not in the loop)
-    for idx, width in enumerate(max_widths, 1):
-        ws.column_dimensions[get_column_letter(idx)].width = width
+    for idx in range(len(FIELDS_WS1)):
+        ws.column_dimensions[get_column_letter(idx + 1)].width = CELL_WIDTH
 
-    logger.info(f"Exported {export_count} records")
-    logger.info(f"Took: {time.clock() - st} sec.")
+    export_count = job_applications.count()
 
+    logger.info(f"Exported {export_count} approvals in {time.clock() - st} sec.")
+
+
+def _format_suspended_pass_worksheet(wb):
+    """
+    Suspended approvals
+    """
+    logger.info("Loading suspension data...")
+    ws = wb.create_sheet("Suspensions PASS IAE")
+
+    # Start timer
+    st = time.clock()
+
+    suspensions = Suspension.objects.all().select_related("approval", "created_by")
+
+    # Write header row
+    for idx, cell_value in enumerate(FIELDS_WS2, 1):
+        ws.cell(1, idx).value = cell_value
+
+    for idx, s in enumerate(suspensions.iterator(), 2):
+        row = [
+            s.approval.number,
+            _format_date(s.start_at),
+            _format_date(s.end_at),
+            s.get_reason_display(),
+            s.siae.siret,
+            s.siae.name,
+        ]
+        for col_idx, cell_value in enumerate(row, 1):
+            ws.cell(idx, col_idx).value = cell_value
+
+    # Formating columns once (not in the loop)
+    # Was dynamic, but fixed width also does the job and
+    # makes code simpler
+    for idx in range(len(FIELDS_WS2)):
+        ws.column_dimensions[get_column_letter(idx + 1)].width = CELL_WIDTH
+
+    export_count = suspensions.count()
+    logger.info(f"Exported {export_count} suspensions in {time.clock() - st} sec.")
+
+
+def export_approvals(tmp_file=None):
+    """
+    Main entry point. Currently used by admin site and an admin command:
+        $ itou/approvals/management/commands/export_approvals.py
+
+    `tmp_file` can be either:
+        * 'None':     management command usage => save result as a file
+        * valid file: admin site usage => file will be bundled in a HTTP response object
+
+    Returns:  a valid filename for HTTP streaming (inline attachment) or storage
+    """
+    wb = Workbook()
+    _format_pass_worksheet(wb)
+    _format_suspended_pass_worksheet(wb)
+
+    current_dt = datetime.datetime.now()
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
 
-    if export_format == "file":
+    # No streaming: management command usage
+    if not tmp_file:
         path = f"{settings.EXPORT_DIR}/{filename}"
         wb.save(path)
         return path
-    elif export_format == "stream":
-        # save_virtual_workbook is deprecated
-        with NamedTemporaryFile() as tmp_file:
-            wb.save(tmp_file.name)
-            tmp_file.seek(0)
-            return filename, tmp_file.read()
+
+    # Admin usage: Save tmp file for stream purposes
+    wb.save(tmp_file.name)
+    return filename

@@ -1,5 +1,8 @@
+import os
+from tempfile import NamedTemporaryFile
+
 from django.contrib import admin
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
@@ -107,10 +110,14 @@ class ApprovalAdmin(admin.ModelAdmin):
         """
         Custom admin view to export all approvals as an XLSX file.
         """
-        filename, file_content = export_approvals(export_format="stream")
-        response = HttpResponse(content=file_content, content_type="application/ms-excel")
-        response["Content-Disposition"] = f"attachment; filename={filename}"
-        return response
+        try:
+            tmp_file = NamedTemporaryFile(delete=False)
+            filename = export_approvals(tmp_file=tmp_file)
+            response = FileResponse(open(tmp_file.name, "rb"))
+            response["Content-Disposition"] = f'attachment; filename="{filename}"'
+            return response
+        finally:
+            os.remove(tmp_file.name)
 
     def get_urls(self):
         additional_urls = [
