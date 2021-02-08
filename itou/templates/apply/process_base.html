@@ -49,6 +49,14 @@
                                     {% translate "Suspendre" %}
                             </a>
                         {% endif %}
+
+                        {# TODO: access control. #}
+                        <a
+                            href="{% url 'approvals:prolong' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                            class="btn btn btn-link">
+                                {% translate "Prolonger" %}
+                        </a>
+
                         {% if job_application.can_download_approval_as_pdf %}
                             <a
                                 href="{% url 'approvals:approval_as_pdf' job_application_id=job_application.id %}"

@@ -540,6 +540,10 @@ class Prolongation(models.Model):
     `trigger_update_approval_end_at_for_prolongation`.
     """
 
+    # Min duration: none.
+    # Max duration: 12 months (but it depends on the `reason` field).
+    MAX_DURATION_MONTHS = 12
+
     class Reason(models.TextChoices):
         COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Achever une formation (6 mois maximum)")
         RQTH = "RQTH", _("RQTH (12 mois maximum)")
@@ -678,11 +682,18 @@ class Prolongation(models.Model):
         return self.start_at <= timezone.now().date() <= self.end_at
 
     @staticmethod
-    def get_max_end_at(start_at, reason):
+    def get_start_at(approval):
+        """
+        Returns the start date of the prolongation.
+        """
+        return approval.end_at + relativedelta(days=1)
+
+    @staticmethod
+    def get_max_end_at(start_at, reason=None):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        max_duration_months = 12
+        max_duration_months = Prolongation.MAX_DURATION_MONTHS
         if reason == Prolongation.Reason.COMPLETE_TRAINING.value:
             max_duration_months = 6
         return start_at + relativedelta(months=max_duration_months) - relativedelta(days=1)
