@@ -33,10 +33,6 @@ FIELDS_WS1 = [
     "date_fin_embauche",
 ]
 
-# These values were formerly computed dynamically in the rendering loop
-# It is *way* faster to use static values to change the width of columns once
-WIDTHS_WS1 = [14, 39, 33, 14, 15, 19, 17, 11, 37, 21, 14, 73, 9, 19, 19]
-
 # Field names for worksheet 2 (approvals suspensions)
 FIELDS_WS2 = [
     "numero_pass_iae",
@@ -46,8 +42,9 @@ FIELDS_WS2 = [
     "numero_siret",
     "raison_sociale",
 ]
-# Columns widths for worksheet 2
-WIDTHS_WS2 = [16, 20, 20, 50, 20, 80]
+
+# Default cell width (no more dynamic computation)
+CELL_WIDTH = 50
 
 DATE_FMT = "%d-%m-%Y"
 EXPORT_FORMATS = ["stream", "file"]
@@ -74,13 +71,13 @@ def _format_pass_worksheet(wb):
         "job_seeker", "approval", "to_siae"
     )
 
-    # Write header line
+    # Write header row
     for idx, cell_value in enumerate(FIELDS_WS1, 1):
         ws.cell(1, idx).value = cell_value
 
     # Write data rows
     for row_idx, ja in enumerate(job_applications.iterator(), 2):
-        line = [
+        row = [
             ja.job_seeker.pole_emploi_id,
             ja.job_seeker.first_name,
             ja.job_seeker.last_name,
@@ -97,14 +94,14 @@ def _format_pass_worksheet(wb):
             _format_date(ja.hiring_start_at),
             _format_date(ja.hiring_end_at),
         ]
-        # Instead of using a temp array to store lines,
+        # Instead of using a temp array to store rows,
         # writing rows one by one will avoid memory issues
-        for col_idx, cell_value in enumerate(line, 1):
+        for col_idx, cell_value in enumerate(row, 1):
             ws.cell(row_idx, col_idx).value = cell_value
 
     # Formating columns once (not in the loop)
-    for idx, width in enumerate(WIDTHS_WS1, 1):
-        ws.column_dimensions[get_column_letter(idx)].width = width
+    for idx in range(len(FIELDS_WS1)):
+        ws.column_dimensions[get_column_letter(idx + 1)].width = CELL_WIDTH
 
     export_count = job_applications.count()
 
@@ -115,10 +112,7 @@ def _format_suspended_pass_worksheet(wb):
     """
     Suspended approvals
     """
-    # suspended_approvals = Suspension.objects.all().select_related("approval")
-    # suspended_count = suspended_approvals.count()
     logger.info("Loading suspension data...")
-
     ws = wb.create_sheet("Suspensions PASS IAE")
 
     # Start timer
@@ -126,12 +120,12 @@ def _format_suspended_pass_worksheet(wb):
 
     suspensions = Suspension.objects.all().select_related("approval", "created_by")
 
-    # Write header line
+    # Write header row
     for idx, cell_value in enumerate(FIELDS_WS2, 1):
         ws.cell(1, idx).value = cell_value
 
     for idx, s in enumerate(suspensions.iterator(), 2):
-        line = [
+        row = [
             s.approval.number,
             _format_date(s.start_at),
             _format_date(s.end_at),
@@ -139,12 +133,14 @@ def _format_suspended_pass_worksheet(wb):
             s.siae.siret,
             s.siae.name,
         ]
-        for col_idx, cell_value in enumerate(line, 1):
+        for col_idx, cell_value in enumerate(row, 1):
             ws.cell(idx, col_idx).value = cell_value
 
     # Formating columns once (not in the loop)
-    for idx, width in enumerate(WIDTHS_WS2, 1):
-        ws.column_dimensions[get_column_letter(idx)].width = width
+    # Was dynamic, but fixed width also does the job and
+    # makes code simpler
+    for idx in range(len(FIELDS_WS2)):
+        ws.column_dimensions[get_column_letter(idx + 1)].width = CELL_WIDTH
 
     export_count = suspensions.count()
     logger.info(f"Exported {export_count} suspensions in {time.clock() - st} sec.")
@@ -169,7 +165,7 @@ def export_approvals(tmp_file=None):
     suffix = current_dt.strftime("%d%m%Y_%H%M%S")
     filename = f"export_pass_iae_{suffix}.xlsx"
 
-    # No streaming: management comand usage
+    # No streaming: management command usage
     if not tmp_file:
         path = f"{settings.EXPORT_DIR}/{filename}"
         wb.save(path)
