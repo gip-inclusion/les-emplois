@@ -23,7 +23,7 @@ from itou.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.job_applications.notifications import NewQualifiedJobApplicationSiaeEmailNotification
+from itou.job_applications.notifications import NewQualifiedJobAppSiaeNotification
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
@@ -208,7 +208,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             selected_jobs=Appellation.objects.all()
         )
-        email = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application).email
+        email = NewQualifiedJobAppSiaeNotification(job_application=job_application).email
         # To.
         self.assertIn(job_application.to_siae.members.first().email, email.to)
         self.assertEqual(len(email.to), 1)
@@ -472,7 +472,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertFalse(email.bcc)
 
 
-class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
+class NewQualifiedJobAppSiaeNotificationTest(TestCase):
     def test_one_selected_job(self):
         siae = SiaeWithMembershipAndJobsFactory()
         job_application = JobApplicationFactory(to_siae=siae)
@@ -483,7 +483,7 @@ class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
         job_application.selected_jobs.add(selected_job)
         job_application.save()
 
-        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
 
         membership = siae.siaemembership_set.first()
         self.assertFalse(membership.notifications)
@@ -500,7 +500,7 @@ class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
         job_application.selected_jobs.add(selected_job)
         job_application.save()
 
-        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
         notification.subscribe(recipient=membership)
         self.assertTrue(notification.is_subscribed(recipient=membership))
 
@@ -517,14 +517,14 @@ class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
         user = SiaeStaffFactory(siae=siae)
         siae.members.add(user)
         membership = siae.siaemembership_set.get(user=user)
-        notification = NewQualifiedJobApplicationSiaeEmailNotification(selected_jobs_pks=[job_descriptions[0].pk])
+        notification = NewQualifiedJobAppSiaeNotification(selected_jobs_pks=[job_descriptions[0].pk])
         notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
         notification.subscribe(membership)
 
         user = SiaeStaffFactory(siae=siae)
         siae.members.add(user)
         membership = siae.siaemembership_set.get(user=user)
-        notification = NewQualifiedJobApplicationSiaeEmailNotification(selected_jobs_pks=[job_descriptions[1].pk])
+        notification = NewQualifiedJobAppSiaeNotification(selected_jobs_pks=[job_descriptions[1].pk])
         notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
         notification.subscribe(membership)
 
@@ -534,7 +534,7 @@ class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
         job_application.selected_jobs.add(job_descriptions[1])
         job_application.save()
 
-        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
         notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
         self.assertEqual(len(notification.recipients_emails), 2)
 
@@ -553,7 +553,7 @@ class NewQualifiedJobApplicationSiaeEmailNotificationTest(TestCase):
         job_application.selected_jobs.add(selected_job)
         job_application.save()
 
-        notification = NewQualifiedJobApplicationSiaeEmailNotification(job_application=job_application)
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
 
         recipients = notification.recipients_emails
         self.assertEqual(len(recipients), siae.members.count())

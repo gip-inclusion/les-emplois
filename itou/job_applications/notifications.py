@@ -10,20 +10,16 @@ class NewJobApplicationSiaeEmailNotification(NotificationBase):
         if not job_application:
             raise ValueError
 
-        obj = super(NewJobApplicationSiaeEmailNotification, cls).__new__(
-            NewQualifiedJobApplicationSiaeEmailNotification
-        )
+        obj = super(NewJobApplicationSiaeEmailNotification, cls).__new__(NewQualifiedJobAppSiaeNotification)
 
         if job_application.is_spontaneous:
-            obj = super(NewJobApplicationSiaeEmailNotification, cls).__new__(
-                NewSpontaneousJobApplicationSiaeEmailNotification
-            )
+            obj = super(NewJobApplicationSiaeEmailNotification, cls).__new__(NewSpontaneousJobAppSiaeNotification)
 
         obj.__init__(*args, **kwargs)
         return obj
 
 
-class NewSpontaneousJobApplicationSiaeEmailNotification(NotificationBase):
+class NewSpontaneousJobAppSiaeNotification(NotificationBase):
     def __init__(self, job_application=None):
         active_memberships = None
         if job_application:
@@ -48,7 +44,7 @@ class NewSpontaneousJobApplicationSiaeEmailNotification(NotificationBase):
         return self.get_recipients().values_list("user__email", flat=True)
 
 
-class NewQualifiedJobApplicationSiaeEmailNotification(NotificationBase):
+class NewQualifiedJobAppSiaeNotification(NotificationBase):
     """
     Subscribe a recipient to a job description and send notifications.
     A job description represents an SiaeJobDescription object also known as

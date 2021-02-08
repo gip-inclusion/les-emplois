@@ -3,8 +3,8 @@ from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.notifications import (
-    NewQualifiedJobApplicationSiaeEmailNotification,
-    NewSpontaneousJobApplicationSiaeEmailNotification,
+    NewQualifiedJobAppSiaeNotification,
+    NewSpontaneousJobAppSiaeNotification,
 )
 from itou.siaes.factories import SiaeWith2MembershipsFactory, SiaeWithMembershipAndJobsFactory
 from itou.users.factories import SiaeStaffFactory
@@ -16,7 +16,7 @@ class NotificationsBaseClassTest(TestCase):
     def setUp(self):
         self.siae = SiaeWith2MembershipsFactory()
         self.job_application = JobApplicationFactory(to_siae=self.siae)
-        self.notification = NewSpontaneousJobApplicationSiaeEmailNotification(job_application=self.job_application)
+        self.notification = NewSpontaneousJobAppSiaeNotification(job_application=self.job_application)
 
         # Make sure notifications are empty
         self.siaemembership_set = self.siae.siaemembership_set
