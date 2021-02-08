@@ -4,6 +4,25 @@ from itou.utils.emails import get_email_message
 from itou.utils.notifications.base_class import NotificationBase
 
 
+class NewJobApplicationSiaeEmailNotification(NotificationBase):
+    def __new__(cls, *args, **kwargs):
+        job_application = kwargs.get("job_application")
+        if not job_application:
+            raise ValueError
+
+        obj = super(NewJobApplicationSiaeEmailNotification, cls).__new__(
+            NewQualifiedJobApplicationSiaeEmailNotification
+        )
+
+        if job_application.is_spontaneous:
+            obj = super(NewJobApplicationSiaeEmailNotification, cls).__new__(
+                NewSpontaneousJobApplicationSiaeEmailNotification
+            )
+
+        obj.__init__(*args, **kwargs)
+        return obj
+
+
 class NewSpontaneousJobApplicationSiaeEmailNotification(NotificationBase):
     def __init__(self, job_application=None):
         active_memberships = None
