@@ -6,13 +6,16 @@ from itou.job_applications.notifications import NewSpontaneousJobAppSiaeNotifica
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 
 
+NotificationBase = NewSpontaneousJobAppSiaeNotification
+
+
 class NotificationsBaseClassTest(TestCase):
     # Use a child class to test parent class. Maybe refactor that later.
 
     def setUp(self):
         self.siae = SiaeWith2MembershipsFactory()
         self.job_application = JobApplicationFactory(to_siae=self.siae)
-        self.notification = NewSpontaneousJobAppSiaeNotification(job_application=self.job_application)
+        self.notification = NotificationBase(job_application=self.job_application)
 
         # Make sure notifications are empty
         self.siaemembership_set = self.siae.siaemembership_set
@@ -20,39 +23,39 @@ class NotificationsBaseClassTest(TestCase):
         self.assertFalse(self.membership.notifications)
 
     def test_subscribe(self):
-        self.notification.subscribe(recipient=self.membership)
+        NotificationBase.subscribe(recipient=self.membership)
         self.assertTrue(self.membership.notifications)  # Dict is not empty
-        self.assertTrue(self.notification.is_subscribed(recipient=self.membership))
+        self.assertTrue(NotificationBase.is_subscribed(recipient=self.membership))
 
-        key = self.notification.name
+        key = self.notification.NAME
         self.assertTrue(self.membership.notifications.get(key))  # Key exists
 
     def test_unsubscribe(self):
         self.notification.unsubscribe(recipient=self.membership)
         self.assertTrue(self.membership.notifications)  # Dict is not empty
-        self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
+        self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
 
-        key = self.notification.name
+        key = self.notification.NAME
         self.assertTrue(self.membership.notifications.get(key))  # Key exists
 
     def test_unsubscribe_and_subscribe(self):
         """
         Make sure it's possible to toggle preferences.
         """
-        self.notification.unsubscribe(recipient=self.membership)
-        self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
+        NotificationBase.unsubscribe(recipient=self.membership)
+        self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
 
-        self.notification.subscribe(recipient=self.membership)
-        self.assertTrue(self.notification.is_subscribed(recipient=self.membership))
+        NotificationBase.subscribe(recipient=self.membership)
+        self.assertTrue(NotificationBase.is_subscribed(recipient=self.membership))
 
-        self.notification.unsubscribe(recipient=self.membership)
-        self.assertFalse(self.notification.is_subscribed(recipient=self.membership))
+        NotificationBase.unsubscribe(recipient=self.membership)
+        self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
 
     def test_subscribe_bulk(self):
         self.notification.subscribe_bulk(recipients=self.siaemembership_set)
 
         for membership in self.siaemembership_set.all():
-            self.assertTrue(self.notification.is_subscribed(recipient=membership))
+            self.assertTrue(NotificationBase.is_subscribed(recipient=membership))
 
     def test_subscribe_unset_recipients(self):
         """
@@ -62,7 +65,7 @@ class NotificationsBaseClassTest(TestCase):
         self.notification._subscribe_unset_recipients()
 
         for membership in self.siaemembership_set.all():
-            self.assertTrue(self.notification.is_subscribed(recipient=membership))
+            self.assertTrue(NotificationBase.is_subscribed(recipient=membership))
 
     def test_recipients_email(self):
         recipients_emails = self.notification.recipients_emails
