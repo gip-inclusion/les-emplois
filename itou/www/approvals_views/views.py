@@ -102,7 +102,8 @@ def prolong(request, approval_id, template_name="approvals/prolong.html"):
     siae = get_current_siae_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 
-    # TODO: access control.
+    if not approval.can_be_prolonged_by_siae(siae):
+        raise PermissionDenied()
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
     preview = False

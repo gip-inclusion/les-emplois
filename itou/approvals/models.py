@@ -125,6 +125,9 @@ class Approval(CommonApprovalMixin):
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
+    # The period of time during which it is possible to prolong a PASS IAE before it ends.
+    TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS = 3
+
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = _(
         "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
@@ -215,6 +218,11 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
+    def job_seeker_is_currently_hired_by_siae(self, siae):
+        return siae == self.user.last_accepted_job_application.to_siae
+
+    # Suspension.
+
     @cached_property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
@@ -232,12 +240,9 @@ class Approval(CommonApprovalMixin):
         return self.is_in_progress and not self.is_suspended
 
     def can_be_suspended_by_siae(self, siae):
-        """
-        Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
-        """
         return (
             self.can_be_suspended
-            and siae == self.user.last_accepted_job_application.to_siae
+            and self.job_seeker_is_currently_hired_by_siae(siae)
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
@@ -259,6 +264,21 @@ class Approval(CommonApprovalMixin):
             self.save()
             return True
         return False
+
+    # Prolongation.
+
+    @property
+    def is_open_to_prolongation(self):
+        now = timezone.now().date()
+        prolongation_threshold = self.end_at - relativedelta(months=self.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS)
+        return prolongation_threshold <= now <= self.end_at
+
+    @cached_property
+    def can_be_prolonged(self):
+        return self.is_open_to_prolongation and not self.is_suspended and not self.prolongation_set.not_set().exists()
+
+    def can_be_prolonged_by_siae(self, siae):
+        return self.job_seeker_is_currently_hired_by_siae(siae) and self.can_be_prolonged
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -508,11 +528,11 @@ class Suspension(models.Model):
         """
         Only the SIAE currently hiring the job seeker can handle a suspension.
         """
-        can_be_handled_by_siae_cache = getattr(self, "_can_be_handled_by_siae_cache", None)
-        if can_be_handled_by_siae_cache:
-            return can_be_handled_by_siae_cache
+        cached_result = getattr(self, "_can_be_handled_by_siae_cache", None)
+        if cached_result:
+            return cached_result
         self._can_be_handled_by_siae_cache = (
-            self.is_in_progress and siae == self.approval.user.last_accepted_job_application.to_siae
+            self.is_in_progress and self.approval.job_seeker_is_currently_hired_by_siae(siae)
         )
         return self._can_be_handled_by_siae_cache
 
@@ -544,6 +564,9 @@ class ProlongationQuerySet(models.QuerySet):
 
     def not_in_progress(self):
         return self.exclude(self.in_progress_lookup)
+
+    def not_set(self):
+        return self.filter(status=self.model.Status.NOT_SET)
 
 
 class Prolongation(models.Model):
