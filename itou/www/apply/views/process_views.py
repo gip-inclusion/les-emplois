@@ -51,10 +51,14 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
         job_application.to_siae
     )
+    approval_can_be_prolonged_by_siae = job_application.approval and job_application.approval.can_be_prolonged_by_siae(
+        job_application.to_siae
+    )
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
+        "approval_can_be_prolonged_by_siae": approval_can_be_prolonged_by_siae,
         "cancellation_days": cancellation_days,
         "eligibility_diagnosis": eligibility_diagnosis,
         "job_application": job_application,

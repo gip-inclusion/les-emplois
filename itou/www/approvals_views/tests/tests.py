@@ -9,7 +9,7 @@ from django.utils.http import urlencode
 from requests import exceptions as requests_exceptions
 
 from itou.approvals.factories import SuspensionFactory
-from itou.approvals.models import Prolongation, Suspension
+from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -261,12 +261,17 @@ class ApprovalProlongViewTest(TestCase):
 
         today = timezone.now().date()
 
+        # Set "now" to be "after" the day approval is open to prolongation.
+        approval_end_at = (
+            today + relativedelta(months=Approval.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS) - relativedelta(days=1)
+        )
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today
             - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
             - relativedelta(days=1),
+            approval__end_at=approval_end_at,
         )
 
         approval = job_application.approval
