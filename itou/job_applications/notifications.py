@@ -4,7 +4,7 @@ from itou.utils.emails import get_email_message
 from itou.utils.notifications.base_class import NotificationBase
 
 
-class NewSpontaneousJobAppSiaeNotification(NotificationBase):
+class NewSpontaneousJobAppEmployersNotification(NotificationBase):
     NAME = "new_spontaneous_job_application_siae_email"
 
     def __init__(self, job_application=None):
@@ -27,7 +27,7 @@ class NewSpontaneousJobAppSiaeNotification(NotificationBase):
         return self.get_recipients().values_list("user__email", flat=True)
 
 
-class NewQualifiedJobAppSiaeNotification(NotificationBase):
+class NewQualifiedJobAppEmployersNotification(NotificationBase):
     """
     Subscribe a recipient to job descriptions or send notifications.
     A job description represents an SiaeJobDescription object also known as
@@ -92,9 +92,9 @@ class NewQualifiedJobAppSiaeNotification(NotificationBase):
 
         return q_sub_query
 
-    @staticmethod
-    def is_subscribed(recipient, subscribed_pk):
-        return subscribed_pk in NewQualifiedJobAppSiaeNotification._get_recipient_subscribed_pks(recipient)
+    @classmethod
+    def is_subscribed(cls, recipient, subscribed_pk):
+        return subscribed_pk in cls._get_recipient_subscribed_pks(recipient)
 
     @classmethod
     def subscribe(cls, recipient, subscribed_pks, save=True):

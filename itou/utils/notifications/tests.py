@@ -2,11 +2,11 @@ from django.core import mail
 from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
-from itou.job_applications.notifications import NewSpontaneousJobAppSiaeNotification
+from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 
 
-NotificationBase = NewSpontaneousJobAppSiaeNotification
+NotificationBase = NewSpontaneousJobAppEmployersNotification
 
 
 class NotificationsBaseClassTest(TestCase):

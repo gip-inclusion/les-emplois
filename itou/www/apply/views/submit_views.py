@@ -12,8 +12,8 @@ from django.utils.translation import gettext as _
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.notifications import (
-    NewQualifiedJobAppSiaeNotification,
-    NewSpontaneousJobAppSiaeNotification,
+    NewQualifiedJobAppEmployersNotification,
+    NewSpontaneousJobAppEmployersNotification,
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
@@ -371,9 +371,9 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
             job_application.selected_jobs.add(job)
 
         if job_application.is_spontaneous:
-            notification = NewSpontaneousJobAppSiaeNotification(job_application=job_application)
+            notification = NewSpontaneousJobAppEmployersNotification(job_application=job_application)
         else:
-            notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
+            notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
 
         notification.send()
         base_url = request.build_absolute_uri("/")[:-1]
