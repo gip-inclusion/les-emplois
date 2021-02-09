@@ -382,6 +382,14 @@
               <img src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis" title="Je donne mon avis sur cette démarche" style="width: 150px;">
             </a>
         </div>
+    {% else %}
+        {# Sticky FAQ link is not displayed on HP and on small devices #}
+        <div class="rounded-pill bg-white shadow fixed-sm-bottom d-none d-sm-block m-4 py-2 px-3 text-center text-sm-right">
+            <a href="{{ ITOU_DOC_URL }}/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
+                {% translate "Besoin d'aide ?" %}
+                {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+            </a>
+        </div>
     {% endif %}
 
 </body>
