@@ -312,7 +312,7 @@ class ApprovalModelTest(TestCase):
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
 
-    def test_can_be_suspended_by_siae(self):
+    def test_job_seeker_is_currently_hired_by_siae(self):
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
@@ -321,10 +321,33 @@ class ApprovalModelTest(TestCase):
             - relativedelta(days=1),
         )
         self.assertFalse(job_application.can_be_cancelled)
+        approval = job_application.approval
         siae = job_application.to_siae
-        self.assertTrue(job_application.approval.can_be_suspended_by_siae(siae))
+        self.assertTrue(approval.job_seeker_is_currently_hired_by_siae(siae))
         siae2 = SiaeFactory()
-        self.assertFalse(job_application.approval.can_be_suspended_by_siae(siae2))
+        self.assertFalse(approval.job_seeker_is_currently_hired_by_siae(siae2))
+
+    def test_is_open_to_prolongation(self):
+
+        # Set "now" to be "before" the day approval is open to prolongation.
+        end_at = (
+            datetime.date.today()
+            + relativedelta(months=Approval.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS)
+            + relativedelta(days=1)
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_open_to_prolongation)
+
+        # Set "now" to be "after" the day approval is open to prolongation.
+        end_at = (
+            datetime.date.today()
+            + relativedelta(months=Approval.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS)
+            - relativedelta(days=1)
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.is_open_to_prolongation)
 
     def test_get_or_create_from_valid(self):
 
@@ -843,6 +866,15 @@ class ProlongationQuerySetTest(TestCase):
         expected_num = 3
         ProlongationFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Prolongation.objects.not_in_progress().count())
+
+    def test_not_set(self):
+        expected_num = 2
+        ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.NOT_SET)
+        ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.VALIDATED)
+        ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.REFUSED)
+        self.assertEqual(expected_num, Prolongation.objects.not_set().count())
+        for prolongation in Prolongation.objects.not_set():
+            self.assertEqual(prolongation.status, Prolongation.Status.NOT_SET)
 
 
 class ProlongationModelTest(TestCase):
