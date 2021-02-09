@@ -720,7 +720,7 @@ class Prolongation(models.Model):
         """
         Returns the start date of the prolongation.
         """
-        return approval.end_at + relativedelta(days=1)
+        return approval.end_at
 
     @staticmethod
     def get_max_end_at(start_at, reason=None):
