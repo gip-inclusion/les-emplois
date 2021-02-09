@@ -5,16 +5,14 @@ from itou.utils.notifications.base_class import NotificationBase
 
 
 class NewSpontaneousJobAppSiaeNotification(NotificationBase):
+    NAME = "new_spontaneous_job_application_siae_email"
+
     def __init__(self, job_application=None):
         active_memberships = None
         if job_application:
             active_memberships = job_application.to_siae.siaemembership_set.active()
         super().__init__(recipients_qs=active_memberships)
         self.job_application = job_application
-
-    @property
-    def name(self):
-        return "new_spontaneous_job_application_siae_email"
 
     @property
     def email(self):
@@ -31,7 +29,7 @@ class NewSpontaneousJobAppSiaeNotification(NotificationBase):
 
 class NewQualifiedJobAppSiaeNotification(NotificationBase):
     """
-    Subscribe a recipient to a job description and send notifications.
+    Subscribe a recipient to job descriptions or send notifications.
     A job description represents an SiaeJobDescription object also known as
       a `job_application.selected_jobs` relation.
 
@@ -46,38 +44,31 @@ class NewQualifiedJobAppSiaeNotification(NotificationBase):
 
     ## Opt in or opt out a recipient to a list of job descriptions
     ```
-    selected_jobs_pks = JobDescription.objects.filter().values_list("pk", flat=True)
-    notification = cls(selected_jobs_pks=selected_jobs_pks)
-    notification.subscribe(recipient)
+    selected_jobs_pks = [JobDescription.objects.get()]
+    cls.subscribe(recipient=recipient, subscribed_pks=selected_jobs_pks)
 
     # unsubscribe the same way:
-    notification.unsubscribe(recipient)
+    cls.unsubscribe(recipient=recipient, subscribed_pks=selected_jobs_pks)
     ```
 
     ## Know if a recipient opted out to a specific job description notifications
     ```
-    selected_jobs_pks = [JobDescription.objects.get()]
-    notification = cls(selected_jobs_pks=selected_jobs_pks)
-    notification.is_subscribed(recipient)
+    job_description = JobDescription.objects.get()
+    cls.is_subscribed(recipient=recipient, subscribed_pk=job_description.pk)
     ```
     """
 
-    def __init__(self, selected_jobs_pks=None, job_application=None):
-        """
-        Arguments:
-        - selected_jobs_pk: list of integers. It represents an SiaeJobDescription object
-        (also known as a job_application.selected_jobs relation). If empty, job_application is mandatory.
-        - job_application: a JobApplication object. If empty, selected_jobs_pks is mandatory.
-        """
-        active_memberships = None
+    NAME = "new_qualified_job_application_siae_email"
+    SUB_NAME = "subscribed_job_descriptions"
+
+    def __init__(self, job_application):
         self.job_application = job_application
-        self.subscribed_pks = selected_jobs_pks
-        if job_application:
-            active_memberships = job_application.to_siae.siaemembership_set.active()
-            self.subscribed_pks = job_application.selected_jobs.values_list("pk", flat=True)
-        if not selected_jobs_pks and not job_application:
-            raise ValueError
+        self.subscribed_pks = self.job_application.selected_jobs.values_list("pk", flat=True)
+        active_memberships = job_application.to_siae.siaemembership_set.active()
         super().__init__(recipients_qs=active_memberships)
+
+    def get_recipients(self):
+        return super().get_recipients(subscribed_pks=self.subscribed_pks)
 
     @property
     def email(self):
@@ -88,20 +79,12 @@ class NewQualifiedJobAppSiaeNotification(NotificationBase):
         return get_email_message(to, context, subject, body)
 
     @property
-    def name(self):
-        return "new_qualified_job_application_siae_email"
-
-    @property
-    def sub_name(self):
-        return "subscribed_job_descriptions"
-
-    @property
     def recipients_emails(self):
         return self.get_recipients().values_list("user__email", flat=True)
 
     @property
     def subscribed_lookup(self):
-        dicts = [{f"notifications__{self.name}__{self.sub_name}__contains": pk} for pk in self.subscribed_pks]
+        dicts = [{f"notifications__{self.NAME}__{self.SUB_NAME}__contains": pk} for pk in self.subscribed_pks]
 
         q_sub_query = Q()
         for query in dicts:
@@ -109,39 +92,32 @@ class NewQualifiedJobAppSiaeNotification(NotificationBase):
 
         return q_sub_query
 
-    def is_subscribed(self, recipient):
-        """
-        Return a boolean to know if a recipient has subscribed to a job description notification.
-        Quite logically, only one job description is possible.
-        Usage :
-        ```
-        notification = cls(selected_jobs_pk=[2])
-        notification.is_subscribed(my_recipient)
-        ```
-        """
-        if len(self.subscribed_pks) > 1:
-            raise AttributeError
-        return self.subscribed_pks[0] in self._get_recipient_subscribed_pks(recipient)
+    @staticmethod
+    def is_subscribed(recipient, subscribed_pk):
+        return subscribed_pk in NewQualifiedJobAppSiaeNotification._get_recipient_subscribed_pks(recipient)
 
-    def subscribe(self, recipient, save=True):
-        pks_set = self._get_recipient_subscribed_pks(recipient)
-        pks_set.update(self.subscribed_pks)
-        recipient.notifications[self.name][self.sub_name] = list(pks_set)
+    @classmethod
+    def subscribe(cls, recipient, subscribed_pks, save=True):
+        pks_set = cls._get_recipient_subscribed_pks(recipient)
+        pks_set.update(subscribed_pks)
+        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(pks_set)
         if save:
             recipient.save()
         return recipient
 
-    def unsubscribe(self, recipient):
-        pks_set = self._get_recipient_subscribed_pks(recipient)
-        pks_set.difference_update(self.subscribed_pks)
-        recipient.notifications[self.name][self.sub_name] = list(pks_set)
+    @classmethod
+    def unsubscribe(cls, recipient, subscribed_pks):
+        pks_set = cls._get_recipient_subscribed_pks(recipient)
+        pks_set.difference_update(subscribed_pks)
+        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(pks_set)
         recipient.save()
 
-    def _get_recipient_subscribed_pks(self, recipient):
+    @classmethod
+    def _get_recipient_subscribed_pks(cls, recipient):
         """
         Returns job descriptions' pk a recipient subscribed to.
         To make sure pk are unique, we use a `set` data type.
         => return set(pks)
         """
-        subscribed_pks = recipient.notifications.setdefault(self.name, {}).setdefault(self.sub_name, set())
+        subscribed_pks = recipient.notifications.setdefault(cls.NAME, {}).setdefault(cls.SUB_NAME, set())
         return set(subscribed_pks)

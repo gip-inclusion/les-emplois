@@ -483,15 +483,17 @@ class NewQualifiedJobAppSiaeNotificationTest(TestCase):
         job_application.selected_jobs.add(selected_job)
         job_application.save()
 
-        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
-
         membership = siae.siaemembership_set.first()
         self.assertFalse(membership.notifications)
-        notification.subscribe(recipient=membership)
-        self.assertTrue(notification.is_subscribed(recipient=membership))
+        NewQualifiedJobAppSiaeNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
+        self.assertTrue(
+            NewQualifiedJobAppSiaeNotification.is_subscribed(recipient=membership, subscribed_pk=selected_job.pk)
+        )
 
         # Receiver is now subscribed to one kind of notification
-        self.assertEqual(len(notification._get_recipient_subscribed_pks(recipient=membership)), 1)
+        self.assertEqual(
+            len(NewQualifiedJobAppSiaeNotification._get_recipient_subscribed_pks(recipient=membership)), 1
+        )
 
         # A job application is sent concerning another job_description.
         # He should then be subscribed to two different notifications.
@@ -500,13 +502,17 @@ class NewQualifiedJobAppSiaeNotificationTest(TestCase):
         job_application.selected_jobs.add(selected_job)
         job_application.save()
 
-        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
-        notification.subscribe(recipient=membership)
-        self.assertTrue(notification.is_subscribed(recipient=membership))
+        NewQualifiedJobAppSiaeNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
+        self.assertTrue(
+            NewQualifiedJobAppSiaeNotification.is_subscribed(recipient=membership, subscribed_pk=selected_job.pk)
+        )
 
-        self.assertEqual(len(notification._get_recipient_subscribed_pks(recipient=membership)), 2)
+        self.assertEqual(
+            len(NewQualifiedJobAppSiaeNotification._get_recipient_subscribed_pks(recipient=membership)), 2
+        )
         self.assertEqual(len(membership.notifications), 1)
 
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
         recipients = notification.recipients_emails
         self.assertEqual(len(recipients), 1)
 
@@ -517,16 +523,12 @@ class NewQualifiedJobAppSiaeNotificationTest(TestCase):
         user = SiaeStaffFactory(siae=siae)
         siae.members.add(user)
         membership = siae.siaemembership_set.get(user=user)
-        notification = NewQualifiedJobAppSiaeNotification(selected_jobs_pks=[job_descriptions[0].pk])
-        notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
-        notification.subscribe(membership)
+        NewQualifiedJobAppSiaeNotification.subscribe(recipient=membership, subscribed_pks=[job_descriptions[0].pk])
 
         user = SiaeStaffFactory(siae=siae)
         siae.members.add(user)
         membership = siae.siaemembership_set.get(user=user)
-        notification = NewQualifiedJobAppSiaeNotification(selected_jobs_pks=[job_descriptions[1].pk])
-        notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
-        notification.subscribe(membership)
+        NewQualifiedJobAppSiaeNotification.subscribe(recipient=membership, subscribed_pks=[job_descriptions[1].pk])
 
         # Two selected jobs. Each user subscribed to one of them. We should have two recipients.
         job_application = JobApplicationFactory(to_siae=siae)
@@ -557,6 +559,33 @@ class NewQualifiedJobAppSiaeNotificationTest(TestCase):
 
         recipients = notification.recipients_emails
         self.assertEqual(len(recipients), siae.members.count())
+
+    def test_unsubscribe(self):
+        siae = SiaeWithMembershipAndJobsFactory()
+        job_application = JobApplicationFactory(to_siae=siae)
+        self.assertEqual(siae.members.count(), 1)
+
+        # Add a job description to the application
+        selected_job = siae.job_description_through.first()
+        job_application.selected_jobs.add(selected_job)
+        job_application.save()
+        recipient = siae.siaemembership_set.first()
+
+        NewQualifiedJobAppSiaeNotification.subscribe(recipient=recipient, subscribed_pks=[selected_job.pk])
+        self.assertTrue(
+            NewQualifiedJobAppSiaeNotification.is_subscribed(recipient=recipient, subscribed_pk=selected_job.pk)
+        )
+
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
+        self.assertEqual(len(notification.recipients_emails), 1)
+
+        NewQualifiedJobAppSiaeNotification.unsubscribe(recipient=recipient, subscribed_pks=[selected_job.pk])
+        self.assertFalse(
+            NewQualifiedJobAppSiaeNotification.is_subscribed(recipient=recipient, subscribed_pk=selected_job.pk)
+        )
+
+        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
+        self.assertEqual(len(notification.recipients_emails), 0)
 
 
 class JobApplicationWorkflowTest(TestCase):
