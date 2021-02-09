@@ -5,14 +5,12 @@ from itou.utils.notifications.base_class import NotificationBase
 
 
 class NewSpontaneousJobAppEmployersNotification(NotificationBase):
-    NAME = "new_spontaneous_job_application_siae_email"
+    NAME = "new_spontaneous_job_application_employers_email"
 
-    def __init__(self, job_application=None):
-        active_memberships = None
-        if job_application:
-            active_memberships = job_application.to_siae.siaemembership_set.active()
-        super().__init__(recipients_qs=active_memberships)
+    def __init__(self, job_application):
         self.job_application = job_application
+        active_memberships = job_application.to_siae.siaemembership_set.active()
+        super().__init__(recipients_qs=active_memberships)
 
     @property
     def email(self):
@@ -58,7 +56,7 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
     ```
     """
 
-    NAME = "new_qualified_job_application_siae_email"
+    NAME = "new_qualified_job_application_employers_email"
     SUB_NAME = "subscribed_job_descriptions"
 
     def __init__(self, job_application):
