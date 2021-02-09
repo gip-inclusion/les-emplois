@@ -889,8 +889,7 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
 
         prolongation_start_at = Prolongation.get_start_at(approval)
-        expected_start_at = datetime.date(2021, 2, 2)  # One day after `approval.end_at`.
-        self.assertEqual(prolongation_start_at, expected_start_at)
+        self.assertEqual(prolongation_start_at, end_at)
 
     def test_get_max_end_at(self):
 
