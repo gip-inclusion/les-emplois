@@ -248,6 +248,14 @@ class Approval(CommonApprovalMixin):
 
     # Prolongation.
 
+    @cached_property
+    def has_not_set_prolongation(self):
+        return self.prolongation_set.not_set().exists()
+
+    @cached_property
+    def prolongations_by_start_date_asc(self):
+        return self.prolongation_set.validated().order_by("start_at")
+
     @property
     def is_open_to_prolongation(self):
         now = timezone.now().date()
@@ -256,7 +264,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_prolonged(self):
-        return self.is_open_to_prolongation and not self.is_suspended and not self.prolongation_set.not_set().exists()
+        return self.is_open_to_prolongation and not self.is_suspended and not self.has_not_set_prolongation
 
     def can_be_prolonged_by_siae(self, siae):
         return self.job_seeker_is_currently_hired_by_siae(siae) and self.can_be_prolonged
@@ -548,6 +556,9 @@ class ProlongationQuerySet(models.QuerySet):
 
     def not_set(self):
         return self.filter(status=self.model.Status.NOT_SET)
+
+    def validated(self):
+        return self.filter(status=self.model.Status.VALIDATED)
 
 
 class Prolongation(models.Model):
