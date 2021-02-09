@@ -23,8 +23,9 @@ class Migration(migrations.Migration):
                         -- https://www.postgresql.org/docs/12/triggers.html
                         -- https://www.postgresql.org/docs/12/plpgsql-trigger.html#PLPGSQL-TRIGGER-AUDIT-EXAMPLE
                         --
-                        IF (TG_OP = 'DELETE') THEN
-                            -- At delete time, the approval's end date is pushed back.
+                        IF (TG_OP = 'DELETE' AND OLD.status = 'VALIDATED') THEN
+                            -- At delete time, the approval's end date is pushed back if the prolongation
+                            -- was validated.
                             UPDATE approvals_approval
                             SET end_at = end_at - (OLD.end_at - OLD.start_at)
                             WHERE id = OLD.approval_id;
