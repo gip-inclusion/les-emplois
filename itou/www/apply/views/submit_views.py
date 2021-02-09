@@ -370,9 +370,10 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         for job in form.cleaned_data["selected_jobs"]:
             job_application.selected_jobs.add(job)
 
-        notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
         if job_application.is_spontaneous:
             notification = NewSpontaneousJobAppSiaeNotification(job_application=job_application)
+        else:
+            notification = NewQualifiedJobAppSiaeNotification(job_application=job_application)
 
         notification.send()
         base_url = request.build_absolute_uri("/")[:-1]
