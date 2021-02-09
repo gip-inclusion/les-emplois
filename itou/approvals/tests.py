@@ -917,6 +917,17 @@ class ProlongationModelTest(TestCase):
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration)
 
+        # When the status is not validated, the approval duration stays the same.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.NOT_SET)
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
+        prolongation.delete()
+
+        # The approval duration must stay the same.
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
     def test_save_and_edit(self):
         """
         Test `trigger_update_approval_end_at_for_prolongation` with SQL UPDATE.
