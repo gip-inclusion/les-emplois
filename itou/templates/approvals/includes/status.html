@@ -15,6 +15,10 @@
             <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo PASS IAE">
             <br>
             <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
+        {% elif approval.is_pass_iae and approval.has_not_set_prolongation %}
+            <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
+            <br>
+            <span class="badge badge-warning">{% translate "Demande de prolongation à l'étude" %}</span>
         {% else %}
             <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
         {% endif %}
@@ -50,28 +54,48 @@
 
         {# Suspensions history. #}
         {% with approval.suspensions_by_start_date_asc as suspensions %}
-            {% if suspensions %}{% translate "Suspendu :" %}{% endif %}
-            <ul>
-                {% for s in suspensions %}
-                    <li{% if s.is_in_progress %} class="font-weight-bold"{% endif %}>
-                        {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
-                            du {{ start }} au {{ end }}
-                        {% endblocktranslate %}
-                        <small>({{ s.get_reason_display }})</small>
-                        {% if current_siae %}
-                            {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
-                            {% if can_be_handled %}
-                                <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                    <small>{% translate "Modifier" %}</small>
-                                </a>
-                                <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                    <small>{% translate "Annuler" %}</small>
-                                </a>
+            {% if suspensions %}
+                {% translate "Suspendu :" %}
+                <ul>
+                    {% for s in suspensions %}
+                        <li{% if s.is_in_progress %} class="font-weight-bold"{% endif %}>
+                            {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
+                                du {{ start }} au {{ end }}
+                            {% endblocktranslate %}
+                            <small>{{ s.get_reason_display }}</small>
+                            -
+                            {% if current_siae %}
+                                {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
+                                {% if can_be_handled %}
+                                    <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                        <small>{% translate "Modifier" %}</small>
+                                    </a>
+                                    <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
+                                        <small>{% translate "Annuler" %}</small>
+                                    </a>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% with approval.prolongations_by_start_date_asc as prolongations %}
+            {% if prolongations %}
+                {% translate "Prolongé :" %}
+                <ul>
+                    {% for p in prolongations %}
+                        <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
+                            {% blocktranslate with start=p.start_at|date:"d/m/Y" end=p.end_at|date:"d/m/Y" %}
+                                du {{ start }} au {{ end }}
+                            {% endblocktranslate %}
+                            -
+                            <small>{{ p.get_reason_display }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endwith %}
 
     </ul>
