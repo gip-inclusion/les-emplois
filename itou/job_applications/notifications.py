@@ -120,7 +120,7 @@ class NewQualifiedJobAppSiaeNotification(NotificationBase):
         ```
         """
         if len(self.subscribed_pks) > 1:
-            return AttributeError
+            raise AttributeError
         return self.subscribed_pks[0] in self._get_recipient_subscribed_pks(recipient)
 
     def subscribe(self, recipient, save=True):
