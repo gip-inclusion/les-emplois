@@ -209,9 +209,14 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def last_accepted_job_application(self):
-        if self.is_job_seeker:
-            return self.job_applications.accepted().latest("created_at")
-        return None
+        if not self.is_job_seeker:
+            return None
+        return self.job_applications.accepted().latest("created_at")
+
+    def is_currently_hired_by_siae(self, siae):
+        if not self.is_job_seeker:
+            return False
+        return self.last_accepted_job_application.to_siae == siae
 
 
 def get_allauth_account_user_display(user):

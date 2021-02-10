@@ -3,6 +3,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
+from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
+from itou.job_applications.models import JobApplicationWorkflow
+from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 
 
@@ -103,3 +106,11 @@ class ModelTest(TestCase):
         # Job seeker activates his account. He is in control now!
         job_seeker.last_login = timezone.now()
         self.assertFalse(job_seeker.is_handled_by_proxy)
+
+    def test_is_currently_hired_by_siae(self):
+        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        user = job_application.job_seeker
+        siae = job_application.to_siae
+        self.assertTrue(user.is_currently_hired_by_siae(siae))
+        siae2 = SiaeFactory()
+        self.assertFalse(user.is_currently_hired_by_siae(siae2))
