@@ -1007,3 +1007,57 @@ class ProlongationModelTest(TestCase):
         prolongation.save()
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_approval_duration)
+
+    def test_time_boundaries(self):
+        """
+        Test that the upper bound of preceding time interval is the lower bound of the next.
+        E.g.:
+                  Approval: 02/03/2019 -> 01/03/2021
+            Prolongation 1: 01/03/2021 -> 31/03/2021
+            Prolongation 2: 31/03/2021 -> 30/04/2021
+        """
+
+        # Approval.
+
+        start_at = datetime.date(2019, 3, 2)
+        end_at = datetime.date(2021, 3, 1)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        initial_approval_duration = approval.duration
+
+        # Prolongation 1.
+
+        expected_end_at = datetime.date(2021, 3, 31)
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=expected_end_at,
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        approval.refresh_from_db()
+        self.assertEqual(prolongation1.end_at, expected_end_at)
+        self.assertEqual(approval.end_at, expected_end_at)
+
+        # Prolongation 2.
+
+        expected_end_at = datetime.date(2021, 4, 30)
+
+        prolongation2 = ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=expected_end_at,
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        approval.refresh_from_db()
+        self.assertEqual(prolongation2.end_at, expected_end_at)
+        self.assertEqual(approval.end_at, expected_end_at)
+
+        # Check duration.
+
+        self.assertEqual(
+            approval.duration, initial_approval_duration + prolongation1.duration + prolongation2.duration
+        )

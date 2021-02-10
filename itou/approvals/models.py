@@ -677,7 +677,9 @@ class Prolongation(models.Model):
                 name="exclude_overlapping_prolongations",
                 expressions=(
                     (
-                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=True)),
+                        # [start_at, end_at) (inclusive start, exclusive end).
+                        # For prolongations: upper bound of preceding interval is the lower bound of the next.
+                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=False)),
                         RangeOperators.OVERLAPS,
                     ),
                     ("approval", RangeOperators.EQUAL),

@@ -128,7 +128,7 @@ class Migration(migrations.Migration):
                             "start_at",
                             "end_at",
                             django.contrib.postgres.fields.ranges.RangeBoundary(
-                                inclusive_lower=True, inclusive_upper=True
+                                inclusive_lower=True, inclusive_upper=False
                             ),
                         ),
                         "&&",
