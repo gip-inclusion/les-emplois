@@ -10,6 +10,7 @@ urlpatterns = [
     path("", views.dashboard, name="index"),
     path("edit_user_email", views.edit_user_email, name="edit_user_email"),
     path("edit_user_info", views.edit_user_info, name="edit_user_info"),
+    path("edit_user_preferences", views.edit_user_preferences, name="edit_user_preferences"),
     path("edit_job_seeker_info/<uuid:job_application_id>", views.edit_job_seeker_info, name="edit_job_seeker_info"),
     path("switch_siae", views.switch_siae, name="switch_siae"),
     path(
