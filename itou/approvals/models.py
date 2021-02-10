@@ -722,6 +722,21 @@ class Prolongation(models.Model):
             if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
                 raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
 
+        # A prolongation cannot overlap another one for the same SIAE.
+        # This check is enforced by a constraint at the database level but
+        # still required here to avoid a 500 server error "IntegrityError"
+        # during form validation.
+        if self.get_overlapping_prolongations().exists():
+            overlap = self.get_overlapping_prolongations().first()
+            raise ValidationError(
+                {
+                    "start_at": _(
+                        f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
+                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
         # TODO: needs business clarification:
         # - limit successive COMPLETE_TRAINING prolongations up to 6 months?
         # - limit successive PARTICULAR_DIFFICULTIES prolongations up to 5 years?
@@ -735,6 +750,14 @@ class Prolongation(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
+
+    def get_overlapping_prolongations(self):
+        args = {
+            "start_at__lte": self.end_at,  # Inclusive start.
+            "end_at__gt": self.start_at,  # Exclusive end.
+            "approval": self.approval,
+        }
+        return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
     @staticmethod
     def get_start_at(approval):
