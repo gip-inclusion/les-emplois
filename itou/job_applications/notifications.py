@@ -66,7 +66,7 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
         super().__init__(recipients_qs=active_memberships)
 
     def get_recipients(self):
-        return super().get_recipients(subscribed_pks=self.subscribed_pks)
+        return super().get_recipients()
 
     @property
     def email(self):
@@ -88,11 +88,22 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
         for query in dicts:
             q_sub_query |= Q(**query)
 
+        if self.SEND_TO_UNSET_RECIPIENTS:
+            q_sub_query |= self.unset_lookup
+
         return q_sub_query
 
     @classmethod
     def is_subscribed(cls, recipient, subscribed_pk):
+        if cls.SEND_TO_UNSET_RECIPIENTS and not recipient.notifications.get(cls.NAME):
+            return True
         return subscribed_pk in cls._get_recipient_subscribed_pks(recipient)
+
+    @classmethod
+    def recipient_subscribed_pks(cls, recipient, default_pks=None):
+        if cls.SEND_TO_UNSET_RECIPIENTS and not recipient.notifications.get(cls.NAME):
+            return list(default_pks)
+        return list(cls._get_recipient_subscribed_pks(recipient))
 
     @classmethod
     def subscribe(cls, recipient, subscribed_pks, save=True):
@@ -108,6 +119,12 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
         pks_set = cls._get_recipient_subscribed_pks(recipient)
         pks_set.difference_update(subscribed_pks)
         recipient.notifications[cls.NAME][cls.SUB_NAME] = list(pks_set)
+        recipient.save()
+
+    @classmethod
+    def subscribe_hard(cls, recipient, subscribed_pks):
+        cls._get_recipient_subscribed_pks(recipient)
+        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(subscribed_pks)
         recipient.save()
 
     @classmethod
