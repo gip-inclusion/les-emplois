@@ -241,6 +241,17 @@ class Approval(CommonApprovalMixin):
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
+    def can_be_postponed_by_siae(self, siae):
+        """
+        The given SIAE can postpone start date of the approval provided that:
+        - target approval was created by this SIAE
+        - for a specific job application
+        - the new start date is in the future
+        - there is no job application bound to this approval
+        """
+        # FIXME temporary
+        return True
+
     @staticmethod
     def get_next_number(hiring_start_at=None):
         """

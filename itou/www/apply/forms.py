@@ -267,6 +267,44 @@ class AcceptForm(forms.ModelForm):
         return cleaned_data
 
 
+class ContractDateForm(forms.ModelForm):
+    """
+    Allows a SIAE to change contract date (in the future)
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in ["hiring_start_at", "hiring_end_at"]:
+            self.fields[field].required = True
+            self.fields[field].widget = DatePickerField()
+            self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
+
+    class Meta:
+        model = JobApplication
+        fields = ["hiring_start_at", "hiring_end_at"]
+        # help_texts = {}
+
+    def clean_hiring_start_at(self):
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
+        if hiring_start_at and hiring_start_at < datetime.date.today():
+            raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
+        return hiring_start_at
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if self.errors:
+            return cleaned_data
+
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
+        hiring_end_at = self.cleaned_data["hiring_end_at"]
+
+        if hiring_end_at < hiring_start_at:
+            raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
+
+        return cleaned_data
+
+
 class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     """
     Info that will be used to find an existing Pôle emploi approval.

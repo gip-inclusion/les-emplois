@@ -12,7 +12,14 @@ from django.views.decorators.http import require_http_methods
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
-from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
+from itou.www.apply.forms import (
+    AcceptForm,
+    AnswerForm,
+    ContractDateForm,
+    JobSeekerPoleEmploiStatusForm,
+    RefusalForm,
+    UserAddressForm,
+)
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
 
@@ -31,9 +38,10 @@ def check_waiting_period(approvals_wrapper, job_application):
 @login_required
 def details_for_siae(request, job_application_id, template_name="apply/process_details.html"):
     """
-    Detail of an application for an SIAE with the ability to give an answer.
+    Detail of an application for an SIAE with the ability:
+    - to update start date of a contract (provided given date is in the future),
+    - to give an answer.
     """
-
     queryset = (
         JobApplication.objects.siae_member_required(request.user)
         .select_related("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
@@ -52,9 +60,14 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         job_application.to_siae
     )
 
+    approval_can_be_postponed_by_siae = job_application.approval and job_application.approval.can_be_postponed_by_siae(
+        job_application.to_siae
+    )
+
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
         "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
+        "approval_can_be_postponed_by_siae": approval_can_be_postponed_by_siae,
         "cancellation_days": cancellation_days,
         "eligibility_diagnosis": eligibility_diagnosis,
         "job_application": job_application,
@@ -294,7 +307,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     return render(request, template_name, context)
 
 
-@login_required()
+@login_required
 def accept_without_approval(request, job_application_id):
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
