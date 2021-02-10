@@ -13,7 +13,6 @@ from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory,
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Prolongation, Suspension
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
@@ -311,21 +310,6 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(number="999990000001")
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
-
-    def test_job_seeker_is_currently_hired_by_siae(self):
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            # Ensure that the job_application cannot be canceled.
-            hiring_start_at=datetime.date.today()
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
-        )
-        self.assertFalse(job_application.can_be_cancelled)
-        approval = job_application.approval
-        siae = job_application.to_siae
-        self.assertTrue(approval.job_seeker_is_currently_hired_by_siae(siae))
-        siae2 = SiaeFactory()
-        self.assertFalse(approval.job_seeker_is_currently_hired_by_siae(siae2))
 
     def test_is_open_to_prolongation(self):
 
