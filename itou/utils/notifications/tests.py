@@ -57,16 +57,6 @@ class NotificationsBaseClassTest(TestCase):
         for membership in self.siaemembership_set.all():
             self.assertTrue(NotificationBase.is_subscribed(recipient=membership))
 
-    def test_subscribe_unset_recipients(self):
-        """
-        By default, notification preferences are not stored.
-        We may want to retrieve unset members and subscribe them.
-        """
-        self.notification._subscribe_unset_recipients()
-
-        for membership in self.siaemembership_set.all():
-            self.assertTrue(NotificationBase.is_subscribed(recipient=membership))
-
     def test_recipients_email(self):
         recipients_emails = self.notification.recipients_emails
         self.assertEqual(

@@ -45,16 +45,8 @@ class NotificationBase:
     def send(self):
         self.email.send()
 
-    def get_recipients(self, *args, **kwargs):
-        if self.SEND_TO_UNSET_RECIPIENTS:
-            self._subscribe_unset_recipients(*args, **kwargs)
-
+    def get_recipients(self):
         return self.recipients_qs.filter(self.subscribed_lookup)
-
-    def _subscribe_unset_recipients(self, *args, **kwargs):
-        unset_recipients = self.recipients_qs.filter(self.unset_lookup)
-        if unset_recipients:
-            self.subscribe_bulk(recipients=unset_recipients, *args, **kwargs)
 
     @property
     def email(self):
@@ -86,7 +78,11 @@ class NotificationBase:
           Cls.objects.filter(self.subscribed_lookup)
         """
         filters = {f"notifications__{self.NAME}__subscribed": True}
-        return Q(**filters)
+        query = Q(**filters)
+        if self.SEND_TO_UNSET_RECIPIENTS:
+            query = Q(query | self.unset_lookup)
+
+        return query
 
     @property
     def unset_lookup(self):
@@ -102,6 +98,8 @@ class NotificationBase:
     @classmethod
     def is_subscribed(cls, recipient):
         name = cls.NAME
+        if cls.SEND_TO_UNSET_RECIPIENTS and not recipient.notifications.get(name):
+            return True
         return recipient.notifications.get(name) and recipient.notifications[name]["subscribed"]
 
     @classmethod
