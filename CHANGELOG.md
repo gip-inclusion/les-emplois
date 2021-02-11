@@ -10,7 +10,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 ### Ajouté
 
-- Ajout d'informations pour le prescripteur lors de la saisie du message de candidature
+- A la saisie du message de candidature par une SIAE, il est précisé que ce message sera visible par le prescripteur et le demandeur d'emploi
 - Affichage pour le prescripteur et le demandeur d'emploi de la raison de la mise en file d'attente d'une candidature 
 - Ajout d'un bouton non-contextuel vers la FAQ en bas de page (absent sur mobile et page d'accueil)  
 - La liste des suspensions de PASS IAE est disponible dans l'export Excel
@@ -19,7 +19,6 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 ### Modifié
 
 - Améliorations mineures des scripts d'import GEIQ/SIAE/EA
-- Modifications du modèle du système de notifications
 - Mise à jour vers Django 3.1.6
 - Amélioration du traçage des erreurs lors d'un problème d'import de données PE Connect
 - Django Admin : correction de l'export Excel des PASS IAE
