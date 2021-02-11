@@ -229,8 +229,7 @@ class AcceptForm(forms.ModelForm):
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
             "hiring_end_at": gettext_lazy(
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. "
-                "Cette date n'est pas modifiable après validation. Elle sert uniquement "
-                "à des fins d'informations et est sans conséquence sur les déclarations "
+                "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
                 "à faire dans l'extranet 2.0 de l'ASP."
             )
             % {
@@ -282,12 +281,28 @@ class ContractDateForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at"]
-        # help_texts = {}
+        help_texts = {
+            "hiring_start_at": gettext_lazy(
+                "Il n'est pas possible d'antidater un contrat. "
+                "Indiquez une date dans le futur. "
+                "Cette date peut-être repoussée de 30 jours au plus, "
+                "et avant la fin du PASS IAE éventuellement émis pour cette candidature."
+            ),
+            "hiring_end_at": gettext_lazy(
+                "Cette date sert uniquement à des fins d'informations et est sans conséquence"
+                " sur les déclarations à faire dans l'extranet 2.0 de l'ASP."
+            ),
+        }
 
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
-        if hiring_start_at and hiring_start_at < datetime.date.today():
+
+        if hiring_start_at < datetime.date.today():
             raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
+
+        if hiring_start_at > datetime.date.today() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS):
+            raise forms.ValidationError(JobApplication.ERROR_POSTPONE_TOO_FAR)
+
         return hiring_start_at
 
     def clean(self):
@@ -296,8 +311,8 @@ class ContractDateForm(forms.ModelForm):
         if self.errors:
             return cleaned_data
 
-        hiring_start_at = self.cleaned_data["hiring_start_at"]
         hiring_end_at = self.cleaned_data["hiring_end_at"]
+        hiring_start_at = self.cleaned_data["hiring_start_at"]
 
         if hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
