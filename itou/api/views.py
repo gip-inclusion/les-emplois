@@ -3,7 +3,6 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from itou.api.serializers import SiaeSerializer
-from itou.siaes.models import Siae
 
 
 class SiaeList(generics.ListAPIView):
@@ -15,6 +14,5 @@ class SiaeList(generics.ListAPIView):
         """
         This view returns the list of all the siaes the currently authenticated user is a member of.
         """
-        user = self.request.user
         # Order by pk to solve pagination warning.
-        return Siae.objects.filter(members=user).order_by("pk")
+        return self.request.user.siae_set.active().filter(members__is_active=True).order_by("pk")
