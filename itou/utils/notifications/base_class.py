@@ -103,14 +103,6 @@ class NotificationBase:
         return recipient.notifications.get(name) and recipient.notifications[name]["subscribed"]
 
     @classmethod
-    def subscribe_bulk(cls, recipients, *args, **kwargs):
-        subscribed_recipients = []
-        for recipient in recipients.all():
-            recipient = cls.subscribe(recipient=recipient, save=False, *args, **kwargs)
-            subscribed_recipients.append(recipient)
-        recipients.model.objects.bulk_update(subscribed_recipients, ["notifications"])
-
-    @classmethod
     def subscribe(cls, recipient, save=True):
         recipient.notifications.setdefault(cls.NAME, {})["subscribed"] = True
         if save:

@@ -65,9 +65,6 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
         active_memberships = job_application.to_siae.siaemembership_set.active()
         super().__init__(recipients_qs=active_memberships)
 
-    def get_recipients(self):
-        return super().get_recipients()
-
     @property
     def email(self):
         to = self.recipients_emails
@@ -115,16 +112,16 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
         return recipient
 
     @classmethod
+    def subscribe_hard(cls, recipient, subscribed_pks):
+        cls._get_recipient_subscribed_pks(recipient)
+        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(subscribed_pks)
+        recipient.save()
+
+    @classmethod
     def unsubscribe(cls, recipient, subscribed_pks):
         pks_set = cls._get_recipient_subscribed_pks(recipient)
         pks_set.difference_update(subscribed_pks)
         recipient.notifications[cls.NAME][cls.SUB_NAME] = list(pks_set)
-        recipient.save()
-
-    @classmethod
-    def subscribe_hard(cls, recipient, subscribed_pks):
-        cls._get_recipient_subscribed_pks(recipient)
-        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(subscribed_pks)
         recipient.save()
 
     @classmethod
