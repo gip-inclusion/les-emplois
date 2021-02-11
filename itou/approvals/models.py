@@ -265,8 +265,8 @@ class Approval(CommonApprovalMixin):
     # Prolongation.
 
     @cached_property
-    def has_not_set_prolongation(self):
-        return self.prolongation_set.not_set().exists()
+    def has_pending_prolongation(self):
+        return self.prolongation_set.pending().exists()
 
     @cached_property
     def prolongations_by_start_date_asc(self):
@@ -280,7 +280,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_prolonged(self):
-        return self.is_open_to_prolongation and not self.is_suspended and not self.has_not_set_prolongation
+        return self.is_open_to_prolongation and not self.is_suspended and not self.has_pending_prolongation
 
     def can_be_prolonged_by_siae(self, siae):
         return self.user.is_currently_hired_by_siae(siae) and self.can_be_prolonged
@@ -570,8 +570,8 @@ class ProlongationQuerySet(models.QuerySet):
     def not_in_progress(self):
         return self.exclude(self.in_progress_lookup)
 
-    def not_set(self):
-        return self.filter(status=self.model.Status.NOT_SET)
+    def pending(self):
+        return self.filter(status=self.model.Status.PENDING)
 
     def validated(self):
         return self.filter(status=self.model.Status.VALIDATED)
@@ -607,7 +607,7 @@ class Prolongation(models.Model):
         )
 
     class Status(models.TextChoices):
-        NOT_SET = "NOT_SET", _("À traiter")
+        PENDING = "PENDING", _("À traiter")
         VALIDATED = "VALIDATED", _("Validée")
         REFUSED = "REFUSED", _("Refusée")
 
@@ -630,7 +630,7 @@ class Prolongation(models.Model):
         verbose_name=_("Statut"),
         max_length=30,
         choices=Status.choices,
-        default=Status.NOT_SET,
+        default=Status.PENDING,
     )
     status_updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour du statut"), null=True)
     status_updated_by = models.ForeignKey(
