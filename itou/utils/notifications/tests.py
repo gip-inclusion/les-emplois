@@ -51,12 +51,6 @@ class NotificationsBaseClassTest(TestCase):
         NotificationBase.unsubscribe(recipient=self.membership)
         self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
 
-    def test_subscribe_bulk(self):
-        self.notification.subscribe_bulk(recipients=self.siaemembership_set)
-
-        for membership in self.siaemembership_set.all():
-            self.assertTrue(NotificationBase.is_subscribed(recipient=membership))
-
     def test_recipients_email(self):
         recipients_emails = self.notification.recipients_emails
         self.assertEqual(
