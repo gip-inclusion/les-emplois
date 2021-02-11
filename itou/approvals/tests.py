@@ -851,14 +851,14 @@ class ProlongationQuerySetTest(TestCase):
         ProlongationFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Prolongation.objects.not_in_progress().count())
 
-    def test_not_set(self):
+    def test_pending(self):
         expected_num = 2
-        ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.NOT_SET)
+        ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.PENDING)
         ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.VALIDATED)
         ProlongationFactory.create_batch(expected_num, status=Prolongation.Status.REFUSED)
-        self.assertEqual(expected_num, Prolongation.objects.not_set().count())
-        for prolongation in Prolongation.objects.not_set():
-            self.assertEqual(prolongation.status, Prolongation.Status.NOT_SET)
+        self.assertEqual(expected_num, Prolongation.objects.pending().count())
+        for prolongation in Prolongation.objects.pending():
+            self.assertEqual(prolongation.status, Prolongation.Status.PENDING)
 
 
 class ProlongationModelTest(TestCase):
@@ -943,7 +943,7 @@ class ProlongationModelTest(TestCase):
         self.assertEqual(approval.duration, initial_duration)
 
         # When the status is not validated, the approval duration stays the same.
-        prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.NOT_SET)
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at, status=Prolongation.Status.PENDING)
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_duration)
 
