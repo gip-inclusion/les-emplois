@@ -6,6 +6,25 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [12] - 2021-02-12
+
+### Ajouté
+
+- A la saisie du message de candidature par une SIAE, il est précisé que ce message sera visible par le prescripteur et le demandeur d'emploi
+- Affichage pour le prescripteur et le demandeur d'emploi de la raison de la mise en file d'attente d'une candidature 
+- Ajout d'un bouton non-contextuel vers la FAQ en bas de page (absent sur mobile et page d'accueil)  
+- La liste des suspensions de PASS IAE est disponible dans l'export Excel
+- Mise en place d'alertes en cas de problème du système d'envoi d'e-mails (suite à incident) 
+
+### Modifié
+
+- Améliorations mineures des scripts d'import GEIQ/SIAE/EA
+- Mise à jour vers Django 3.1.6
+- Amélioration du traçage des erreurs lors d'un problème d'import de données PE Connect
+- Django Admin : correction de l'export Excel des PASS IAE
+- Django Admin : correction d'un problème de performance dans la gestion des données externes PE Connect
+- Django Admin : correction de la gestion des notifications des employeurs 
+
 ## [11] - 2021-01-28
 
 ### Ajouté
