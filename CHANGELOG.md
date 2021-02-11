@@ -24,7 +24,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Amélioration du traçage des erreurs lors d'un problème d'import de données PE Connect
 - Django Admin : correction de l'export Excel des PASS IAE
 - Django Admin : correction d'un problème de performance dans la gestion des données externes PE Connect
-- Django Admin : Correction de la gestion des notifications des employeurs 
+- Django Admin : correction de la gestion des notifications des employeurs 
 
 ## [11] - 2021-01-28
 
