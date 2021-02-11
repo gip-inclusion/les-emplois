@@ -15,7 +15,7 @@
             <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo PASS IAE">
             <br>
             <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
-        {% elif approval.is_pass_iae and approval.has_not_set_prolongation %}
+        {% elif approval.is_pass_iae and approval.has_pending_prolongation %}
             <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
             <br>
             <span class="badge badge-warning">{% translate "Demande de prolongation à l'étude" %}</span>

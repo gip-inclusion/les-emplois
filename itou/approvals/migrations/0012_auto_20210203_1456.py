@@ -53,8 +53,8 @@ class Migration(migrations.Migration):
                 (
                     "status",
                     models.CharField(
-                        choices=[("NOT_SET", "À traiter"), ("VALIDATED", "Validée"), ("REFUSED", "Refusée")],
-                        default="NOT_SET",
+                        choices=[("PENDING", "À traiter"), ("VALIDATED", "Validée"), ("REFUSED", "Refusée")],
+                        default="PENDING",
                         max_length=30,
                         verbose_name="Statut",
                     ),
