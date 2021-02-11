@@ -42,6 +42,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.gis",
     "django.contrib.postgres",
+    "django.forms",
 ]
 
 THIRD_PARTY_APPS = [
@@ -110,6 +111,9 @@ ITOU_MIDDLEWARE = [
 ]
 
 MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
+
+# https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # URLs.
 # ------------------------------------------------------------------------------

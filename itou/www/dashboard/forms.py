@@ -9,7 +9,7 @@ from itou.job_applications.notifications import (
 )
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
-from itou.utils.widgets import DatePickerField
+from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
 class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
@@ -99,7 +99,9 @@ class EditUserEmailForm(forms.Form):
 
 
 class EditNewJobAppEmployersNotificationForm(forms.Form):
-    spontaneous = forms.BooleanField(label=gettext_lazy("Candidatures spontanées"), required=False)
+    spontaneous = forms.BooleanField(
+        label=gettext_lazy("Candidatures spontanées"), required=False, widget=SwitchCheckboxWidget()
+    )
 
     def __init__(self, *args, **kwargs):
         self.recipient = kwargs.pop("recipient")
@@ -119,7 +121,7 @@ class EditNewJobAppEmployersNotificationForm(forms.Form):
             self.fields["qualified"] = forms.MultipleChoiceField(
                 label=gettext_lazy("Fiches de poste"),
                 required=False,
-                widget=forms.CheckboxSelectMultiple(),
+                widget=MultipleSwitchCheckboxWidget(),
                 choices=choices,
                 initial=self.subscribed_pks,
             )
@@ -132,6 +134,6 @@ class EditNewJobAppEmployersNotificationForm(forms.Form):
 
         if self.siae.job_description_through.exists():
             to_subscribe_pks = self.cleaned_data.get("qualified")
-            NewQualifiedJobAppEmployersNotification.subscribe_hard(
+            NewQualifiedJobAppEmployersNotification.replace_subscriptions(
                 recipient=self.recipient, subscribed_pks=to_subscribe_pks
             )
