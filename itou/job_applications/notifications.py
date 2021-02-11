@@ -106,22 +106,20 @@ class NewQualifiedJobAppEmployersNotification(NotificationBase):
     def subscribe(cls, recipient, subscribed_pks, save=True):
         pks_set = cls._get_recipient_subscribed_pks(recipient)
         pks_set.update(subscribed_pks)
-        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(pks_set)
-        if save:
-            recipient.save()
-        return recipient
-
-    @classmethod
-    def subscribe_hard(cls, recipient, subscribed_pks):
-        cls._get_recipient_subscribed_pks(recipient)
-        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(subscribed_pks)
-        recipient.save()
+        cls.replace_subscriptions(recipient, subscribed_pks=pks_set)
 
     @classmethod
     def unsubscribe(cls, recipient, subscribed_pks):
         pks_set = cls._get_recipient_subscribed_pks(recipient)
         pks_set.difference_update(subscribed_pks)
-        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(pks_set)
+        cls.replace_subscriptions(recipient, subscribed_pks=pks_set)
+
+    @classmethod
+    def replace_subscriptions(cls, recipient, subscribed_pks):
+        if not recipient.notifications.get(cls.NAME):
+            cls._get_recipient_subscribed_pks(recipient)
+        subscribed_pks = [int(pk) for pk in subscribed_pks]  # make sure we store integers
+        recipient.notifications[cls.NAME][cls.SUB_NAME] = list(subscribed_pks)
         recipient.save()
 
     @classmethod
