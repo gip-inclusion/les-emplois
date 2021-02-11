@@ -2,7 +2,7 @@
 
 ## Get a token for a user from its login/password.
 
-Warning: this may fail if you use an email with special characters (e.g. `+`).
+Warning: you need to _URL escape_ any special character in the email and password (e.g. `+` becomes `%2B`).
 
 ```
 curl -H 'Accept: application/json; indent=4' -d "username=me@me.com&password=password" http://127.0.0.1:8080/api/token-auth/
