@@ -579,6 +579,21 @@ class ProlongationQuerySet(models.QuerySet):
         return self.filter(status=self.model.Status.VALIDATED)
 
 
+class ProlongationManager(models.Manager):
+    def get_cumulative_duration_for(self, approval, reason=None):
+        """
+        Returns the total duration of all prolongations of the given approval
+        for the given reason (if any).
+        """
+        kwargs = {"approval": approval}
+        if reason:
+            kwargs["reason"] = reason
+        duration = datetime.timedelta(0)
+        for prolongation in self.validated().filter(**kwargs):
+            duration += prolongation.duration
+        return duration
+
+
 class Prolongation(models.Model):
     """
     A prolongation can be issued by an SIAE for a PASS IAE.
@@ -596,6 +611,11 @@ class Prolongation(models.Model):
     # Max duration: 12 months (but it depends on the `reason` field).
     MAX_DURATION_MONTHS = 12
 
+    class Status(models.TextChoices):
+        PENDING = "PENDING", _("À traiter")
+        VALIDATED = "VALIDATED", _("Validée")
+        REFUSED = "REFUSED", _("Refusée")
+
     class Reason(models.TextChoices):
         COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Achever une formation (6 mois maximum)")
         RQTH = "RQTH", _("RQTH (12 mois maximum)")
@@ -608,10 +628,16 @@ class Prolongation(models.Model):
             ),
         )
 
-    class Status(models.TextChoices):
-        PENDING = "PENDING", _("À traiter")
-        VALIDATED = "VALIDATED", _("Validée")
-        REFUSED = "REFUSED", _("Refusée")
+    MAX_CUMULATIVE_DURATION = {
+        Reason.COMPLETE_TRAINING.value: {
+            "duration": datetime.timedelta(days=365 * 0.5),
+            "label": _("6 mois"),
+        },
+        Reason.PARTICULAR_DIFFICULTIES.value: {
+            "duration": datetime.timedelta(days=365 * 5),
+            "label": _("5 ans"),
+        },
+    }
 
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
@@ -661,7 +687,7 @@ class Prolongation(models.Model):
         on_delete=models.SET_NULL,
     )
 
-    objects = models.Manager.from_queryset(ProlongationQuerySet)()
+    objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
 
     class Meta:
         verbose_name = _("Prolongation")
@@ -736,11 +762,14 @@ class Prolongation(models.Model):
                 }
             )
 
-        # TODO: needs business clarification:
-        # - limit successive COMPLETE_TRAINING prolongations up to 6 months?
-        # - limit successive PARTICULAR_DIFFICULTIES prolongations up to 5 years?
-        # - limit successive kinds of reasons?
-        # - take suspensions into account in the duration?
+        if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
+            raise ValidationError(
+                _(
+                    f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
+                    f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
+                    f'pour le motif "{self.get_reason_display()}".'
+                )
+            )
 
     @property
     def duration(self):
@@ -749,6 +778,16 @@ class Prolongation(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
+
+    def has_reached_max_cumulative_duration(self, additional_duration=None):
+        if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
+            return False
+
+        cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, reason=self.reason)
+        if additional_duration:
+            cumulative_duration += additional_duration
+
+        return cumulative_duration > self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
     def get_overlapping_prolongations(self):
         args = {
