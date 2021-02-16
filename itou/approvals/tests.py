@@ -861,6 +861,86 @@ class ProlongationQuerySetTest(TestCase):
             self.assertEqual(prolongation.status, Prolongation.Status.PENDING)
 
 
+class ProlongationManagerTest(TestCase):
+    """
+    Test ProlongationManager.
+    """
+
+    def test_get_cumulative_duration_for_any_reasons(self):
+        """
+        It should return the cumulative duration of all prolongations of the given approval.
+        """
+
+        approval = ApprovalFactory()
+
+        prolongation1_days = 30
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + relativedelta(days=prolongation1_days),
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        prolongation2_days = 14
+
+        ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
+            reason=Prolongation.Reason.RQTH.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days)
+        self.assertEqual(expected_duration, Prolongation.objects.get_cumulative_duration_for(approval))
+
+    def test_get_cumulative_duration_for_rqth(self):
+        """
+        It should return the cumulative duration of all prolongations of the given approval
+        only for the RQTH reason.
+        """
+
+        approval = ApprovalFactory()
+
+        prolongation1_days = 30
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + relativedelta(days=prolongation1_days),
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        prolongation2_days = 14
+
+        prolongation2 = ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
+            reason=Prolongation.Reason.RQTH.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        prolongation3_days = 60
+
+        ProlongationFactory(
+            approval=approval,
+            start_at=prolongation2.end_at,
+            end_at=prolongation2.end_at + relativedelta(days=prolongation3_days),
+            reason=Prolongation.Reason.RQTH.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
+        self.assertEqual(
+            expected_duration,
+            Prolongation.objects.get_cumulative_duration_for(approval, reason=Prolongation.Reason.RQTH.value),
+        )
+
+
 class ProlongationModelTest(TestCase):
     """
     Test Prolongation model.
@@ -1044,4 +1124,50 @@ class ProlongationModelTest(TestCase):
 
         self.assertEqual(
             approval.duration, initial_approval_duration + prolongation1.duration + prolongation2.duration
+        )
+
+    def test_has_reached_max_cumulative_duration_for_complete_training(self):
+
+        approval = ApprovalFactory()
+
+        duration = Prolongation.MAX_CUMULATIVE_DURATION[Prolongation.Reason.COMPLETE_TRAINING.value]["duration"]
+
+        prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + duration,
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        self.assertFalse(prolongation.has_reached_max_cumulative_duration())
+        self.assertTrue(
+            prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
+        )
+
+    def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
+
+        approval = ApprovalFactory()
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + datetime.timedelta(days=365 * 4),  # 4 years
+            reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        self.assertFalse(prolongation1.has_reached_max_cumulative_duration())
+
+        prolongation2 = ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=prolongation1.end_at + datetime.timedelta(days=365),  # 1 year,
+            reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        self.assertFalse(prolongation2.has_reached_max_cumulative_duration())
+        self.assertTrue(
+            prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
         )
