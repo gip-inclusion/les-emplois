@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                     "reason",
                     models.CharField(
                         choices=[
-                            ("COMPLETE_TRAINING", "Achever une formation (6 mois maximum)"),
+                            ("COMPLETE_TRAINING", "Fin d'une formation (6 mois maximum)"),
                             ("RQTH", "RQTH (12 mois maximum)"),
                             ("SENIOR", "50 ans et plus (12 mois maximum)"),
                             (

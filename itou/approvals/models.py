@@ -617,7 +617,7 @@ class Prolongation(models.Model):
         REFUSED = "REFUSED", _("Refusée")
 
     class Reason(models.TextChoices):
-        COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Achever une formation (6 mois maximum)")
+        COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Fin d'une formation (6 mois maximum)")
         RQTH = "RQTH", _("RQTH (12 mois maximum)")
         SENIOR = "SENIOR", _("50 ans et plus (12 mois maximum)")
         PARTICULAR_DIFFICULTIES = (
