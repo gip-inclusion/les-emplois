@@ -10,6 +10,10 @@ from itou.users.factories import DEFAULT_PASSWORD
 
 
 class EditContractTest(TestCase):
+    """
+    Checks updating a job application hiring start date when it starts in the future
+    """
+
     def setUp(self):
         siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Boss")
         boss = siae.members.get(first_name="Boss")
@@ -95,7 +99,8 @@ class EditContractTest(TestCase):
 
     def test_postpone_approval(self):
         """
-        If hiring date is postponed, approval start date must be updated accordingly
+        If hiring date is postponed,
+        approval start date must be updated accordingly (if there is an approval)
         """
         self.client.login(username=self.boss.username, password=DEFAULT_PASSWORD)
 

@@ -413,6 +413,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def has_editable_job_seeker(self):
         return (self.state.is_processing or self.state.is_accepted) and self.job_seeker.is_handled_by_proxy
 
+    @property
+    def hiring_starts_in_future(self):
+        if self.hiring_start_at:
+            return datetime.date.today() < self.hiring_start_at
+        return False
+
     # Workflow transitions.
 
     @xwf_models.transition()

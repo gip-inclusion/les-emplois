@@ -310,11 +310,11 @@
         </ul>
         </p>
 
-        {% if approval_can_be_postponed_by_siae %}
+        {% if job_application.hiring_starts_in_future %}
             <p>
                 <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
                    class="btn btn-outline-primary btn-block">
-                    {% translate "Modifier la date de départ du contrat" %}
+                    {% translate "Modifier la période du contrat de travail" %}
                 </a>
             </p>
         {% endif %}

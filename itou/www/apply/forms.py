@@ -266,9 +266,9 @@ class AcceptForm(forms.ModelForm):
         return cleaned_data
 
 
-class ContractDateForm(forms.ModelForm):
+class EditHiringDateForm(forms.ModelForm):
     """
-    Allows a SIAE to change contract date (in the future)
+    Allows a SIAE to change contract date (if current one is in the future)
     """
 
     def __init__(self, *args, **kwargs):

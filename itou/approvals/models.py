@@ -241,16 +241,19 @@ class Approval(CommonApprovalMixin):
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
-    def can_be_postponed_by_siae(self, siae):
+    def update_start_date(self, new_start_date):
         """
-        The given SIAE can postpone start date of the approval provided that:
-        - target approval was created by this SIAE
-        - for a specific job application
+        A SIAE can postpone start date of the approval provided that:
+        - target approval was created by this SIAE for this job application
         - the new start date is in the future
-        - there is no job application bound to this approval
+
+        In this case, the approval start date must be updated with the hiring date
         """
-        # FIXME temporary
-        return True
+        if self.jobapplication_set.count() == 1:
+            delay = relativedelta(new_start_date, self.start_at)
+            self.start_at = new_start_date
+            self.end_at = self.end_at + delay
+            self.save()
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
