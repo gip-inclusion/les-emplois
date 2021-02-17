@@ -337,7 +337,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return str(self.id)
 
     def clean(self):
-        if self.hiring_end_at < self.hiring_start_at:
+        if (
+            self.state in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED]
+            and self.hiring_end_at < self.hiring_start_at
+        ):
             raise ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
         # Check if hiring date is before end of a possible "old" approval
