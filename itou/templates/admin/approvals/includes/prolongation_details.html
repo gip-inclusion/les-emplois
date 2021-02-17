@@ -1,0 +1,131 @@
+{% load i18n %}
+{% load format_filters %}
+
+<h2>
+    <a href="{% url "admin:approvals_prolongation_change" prolongation.id %}" target="_blank">
+        {% translate "Prolongation" %}
+    </a>
+</h2>
+
+<ul>
+    <li>
+        <b>{% translate "Date de début : " %}</b>
+        {{ prolongation.start_at|date:"d/m/Y" }}
+    </li>
+    <li>
+        <b>{% translate "Date de fin : " %}</b>
+        {{ prolongation.end_at|date:"d/m/Y" }}
+    </li>
+    <li>
+        <b>{% translate "Demande par : " %}</b>
+        {{ prolongation.created_by.get_full_name|title }} - {{ prolongation.created_by.email }}
+    </li>
+    <li>
+        <b>{% translate "Motif : " %}</b>
+        {{ prolongation.get_reason_display }}
+    </li>
+    <li>
+        <b>{% translate "Motivation de la demande : " %}</b>
+        {{ prolongation.reason_explanation|linebreaks }}
+    </li>
+</ul>
+
+{% with prolongation.approval as approval %}
+
+    <h2>
+        <a href="{% url "admin:approvals_approval_change" approval.id %}" target="_blank">
+            {% translate "PASS IAE" %}
+        </a>
+    </h2>
+
+    <ul>
+        <li>
+            <b>{% translate "Numéro : " %}</b>
+            {{ approval.number_with_spaces }}
+        </li>
+        <li>
+            <b>{% translate "Date de début : " %}</b>
+            {{ approval.start_at|date:"d/m/Y" }}
+        </li>
+        <li>
+            <b>{% translate "Date de fin : " %}</b>
+            {{ approval.end_at|date:"d/m/Y" }}
+        </li>
+    </ul>
+
+{% endwith %}
+
+{% with prolongation.approval.user as user %}
+
+    <h2>
+        <a href="{% url "admin:users_user_change" user.id %}" target="_blank">
+            {% translate "Bénéficiaire" %}
+        </a>
+    </h2>
+
+    <ul>
+        <li>
+            <b>{% translate "Nom : " %}</b>
+            {{ user.last_name|title }}
+        </li>
+        <li>
+            <b>{% translate "Prénom : " %}</b>
+            {{ user.first_name|title }}</li>
+        <li>
+            <b>{% translate "Date de naissance : " %}</b>
+            {{ user.birthdate|date:"d/m/Y" }}
+        </li>
+        <li>
+            <b>{% translate "Email : " %}</b>
+            {{ user.email }}
+        </li>
+        {% if user.phone %}
+            <li>
+                <b>{% translate "Téléphone : " %}</b>
+                {{ user.phone|format_phone }}
+            </li>
+        {% endif %}
+        {% if user.pole_emploi_id %}
+            <li>
+                <b>{% translate "Identifiant Pôle emploi : " %}</b>
+                {{ user.pole_emploi_id }}
+            </li>
+        {% endif %}
+        {% if user.lack_of_pole_emploi_id_reason %}
+            <li>
+                <b>{% translate "Raison de l'absence d'identifiant Pôle emploi : " %}</b>
+                {{ user.get_lack_of_pole_emploi_id_reason_display }}
+            </li>
+        {% endif %}
+    </ul>
+
+{% endwith %}
+
+{% with prolongation.siae as siae %}
+
+    <h2>
+        <a href="{% url "admin:siaes_siae_change" siae.id %}" target="_blank">
+            {% translate "Employeur solidaire" %}
+        </a>
+    </h2>
+
+    <ul>
+        <li>
+            <b>{% translate "Siret : " %}</b>
+            {{ siae.siret }}
+        </li>
+        <li>
+            <b>{% translate "Nom : " %}</b>
+            {{ siae.display_name }}
+        </li>
+        <li>
+            <b>{% translate "Type : " %}</b>
+            {{ siae.kind }} ({{ siae.get_kind_display }})
+        </li>
+        <li>
+            <b>{% translate "Département : " %}</b>
+            {{ siae.get_department_display }}
+        </li>
+    </ul>
+
+{% endwith %}

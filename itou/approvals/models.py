@@ -793,10 +793,10 @@ class Prolongation(models.Model):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "prolongation": self,
-            "admin_url": reverse("admin:approvals_prolongation_change", args=[self.pk]),
+            "admin_url": reverse("admin:admin:approvals_prolongation_validate", args=[self.pk]),
         }
-        subject = "approvals/email/new_prolongation_for_admin_subject.txt"
-        body = "approvals/email/new_prolongation_for_admin_body.txt"
+        subject = "approvals/email/prolongation_new_for_admin_subject.txt"
+        body = "approvals/email/prolongation_new_for_admin_body.txt"
         return get_email_message(to, context, subject, body)
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):

@@ -6,6 +6,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.template.defaultfilters import title
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -1199,7 +1200,7 @@ class ProlongationModelTest(TestCase):
         self.assertIn(prolongation.end_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn(prolongation.get_reason_display(), email.body)
         self.assertIn(prolongation.reason_explanation, email.body)
-        self.assertIn(prolongation.created_by.get_full_name(), email.body)
+        self.assertIn(title(prolongation.created_by.get_full_name()), email.body)
         self.assertIn(prolongation.created_by.email, email.body)
 
         self.assertIn(prolongation.siae.siret, email.body)
@@ -1207,7 +1208,7 @@ class ProlongationModelTest(TestCase):
         self.assertIn(prolongation.siae.get_kind_display(), email.body)
         self.assertIn(prolongation.siae.get_department_display(), email.body)
 
-        self.assertIn(prolongation.approval.user.last_name, email.body)
-        self.assertIn(prolongation.approval.user.first_name, email.body)
+        self.assertIn(title(prolongation.approval.user.last_name), email.body)
+        self.assertIn(title(prolongation.approval.user.first_name), email.body)
         self.assertIn(prolongation.approval.user.email, email.body)
         self.assertIn(prolongation.approval.user.birthdate.strftime("%d/%m/%Y"), email.body)

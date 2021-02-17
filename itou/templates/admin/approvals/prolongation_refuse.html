@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
+
+{% block content %}
+
+<h2>{% trans "En confirmant le refus de prolongation, cet email sera envoyé à la personne ayant fait la demande :" %}</h2>
+
+<pre>
+{{ email_subject_template }}<br>
+{{ email_body_template }}
+</pre>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    <div>
+        <input type="hidden" name="confirm" value="yes">
+        <input type="submit" value="{% trans "Oui, je confirme le refus" %}">
+        <a href="{% url "admin:approvals_prolongation_validate" prolongation.id %}" class="button cancel-link">{% trans "Non, revenir à la page précédente" %}</a>
+    </div>
+
+</form>
+
+{% include "admin/approvals/includes/prolongation_details.html" %}
+
+{% endblock %}

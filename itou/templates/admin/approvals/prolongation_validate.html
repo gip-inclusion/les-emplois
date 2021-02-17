@@ -1,0 +1,51 @@
+{% extends "admin/change_form.html" %}
+{% load i18n %}
+
+{% block content %}
+<form action="" method="post" id="{{ opts.model_name }}_form" novalidate>
+
+    {% if errors %}
+        <p class="errornote">
+            {% if errors|length == 1 %}
+                {% translate "Please correct the error below." %}
+            {% else %}
+                {% translate "Please correct the errors below." %}
+            {% endif %}
+        </p>
+        {{ adminform.form.non_field_errors }}
+    {% endif %}
+
+    {% csrf_token %}
+
+    <div>
+
+        {% block field_sets %}
+            {% for fieldset in adminform %}
+                {% include "admin/includes/fieldset.html" %}
+            {% endfor %}
+        {% endblock %}
+
+        <h2>{% trans "En validant la demande de prolongation, cet email sera envoyé à la personne ayant fait la demande :" %}</h2>
+
+        <pre>{{ email_subject_template }}<br>
+{{ email_body_template }}</pre>
+
+        <div class="submit-row">
+
+            <p class="deletelink-box">
+                <a class="deletelink" href="{% url "admin:approvals_prolongation_refuse" prolongation.id %}">
+                    {% translate "Refuser" %}
+                </a>
+            </p>
+
+            <input type="submit" value="{% translate 'Valider' %}" class="default">
+
+        </div>
+
+    </div>
+
+</form>
+
+{% include "admin/approvals/includes/prolongation_details.html" %}
+
+{% endblock %}
