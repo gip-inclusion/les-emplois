@@ -695,6 +695,13 @@ class Prolongation(models.Model):
             ),
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Add `status` attributes, e.g.: `self.is_pending`.
+        for status in self.Status:
+            setattr(self, f"is_{status.lower()}", status == self.status)
+
     def __str__(self):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
 

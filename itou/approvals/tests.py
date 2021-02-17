@@ -947,6 +947,12 @@ class ProlongationModelTest(TestCase):
     Test Prolongation model.
     """
 
+    def test_status_attributes_set_in_init(self):
+        prolongation = ProlongationFactory(status=Prolongation.Status.REFUSED)
+        self.assertTrue(prolongation.is_refused)
+        self.assertFalse(prolongation.is_validated)
+        self.assertFalse(prolongation.is_pending)
+
     def test_get_start_at(self):
 
         end_at = datetime.date(2021, 2, 1)
