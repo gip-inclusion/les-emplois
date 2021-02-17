@@ -1,0 +1,5 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% load i18n %}
+{% block subject %}
+{% blocktranslate with job_seeker_full_name=prolongation.approval.user.get_full_name|title %}Prolongation de PASS IAE refusée pour {{ job_seeker_full_name }}{% endblocktranslate %}
+{% endblock %}
