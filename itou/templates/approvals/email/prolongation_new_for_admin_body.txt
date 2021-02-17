@@ -9,7 +9,7 @@ Nouvelle demande de prolongation sur Itou.
 
 - Date de début : {{ prolongation.start_at|date:"d/m/Y" }}
 - Date de fin : {{ prolongation.end_at|date:"d/m/Y" }}
-- Demande par : {{ prolongation.created_by.get_full_name }} - {{ prolongation.created_by.email }}
+- Demande par : {{ prolongation.created_by.get_full_name|title }} - {{ prolongation.created_by.email }}
 - Motif : {{ prolongation.get_reason_display }}
 
 {% translate "*Motivation de la demande* :" %}
@@ -25,8 +25,8 @@ Nouvelle demande de prolongation sur Itou.
 
 {% translate "*Bénéficiaire* :" %}
 
-- Nom : {{ prolongation.approval.user.last_name }}
-- Prénom : {{ prolongation.approval.user.first_name }}{% if prolongation.approval.user.email %}
+- Nom : {{ prolongation.approval.user.last_name|title }}
+- Prénom : {{ prolongation.approval.user.first_name|title }}{% if prolongation.approval.user.email %}
 - Email : {{ prolongation.approval.user.email }}{% endif %}
 - Date de naissance : {{ prolongation.approval.user.birthdate|date:"d/m/Y" }}
 

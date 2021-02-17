@@ -1,6 +1,6 @@
 from django import forms
 
-from itou.approvals.models import Approval
+from itou.approvals.models import Approval, Prolongation
 
 
 class ManuallyAddApprovalForm(forms.ModelForm):
@@ -13,3 +13,9 @@ class ManuallyAddApprovalForm(forms.ModelForm):
         model = Approval
         fields = ["user", "start_at", "end_at", "number", "created_by"]
         widgets = {"user": forms.HiddenInput(), "created_by": forms.HiddenInput()}
+
+
+class ProlongationForm(forms.ModelForm):
+    class Meta:
+        model = Prolongation
+        fields = ["start_at", "end_at"]

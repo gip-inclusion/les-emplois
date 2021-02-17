@@ -7,7 +7,12 @@ from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
-from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
+from itou.approvals.admin_views import (
+    manually_add_approval,
+    manually_refuse_approval,
+    refuse_prolongation,
+    validate_prolongation,
+)
 from itou.approvals.export import export_approvals
 from itou.job_applications.models import JobApplication
 
@@ -219,6 +224,33 @@ class ProlongationAdmin(admin.ModelAdmin):
         if not change:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+    def validate_prolongation(self, request, prolongation_id):
+        """
+        Custom admin view to manually validate a prolongation.
+        """
+        return validate_prolongation(request, self, prolongation_id)
+
+    def refuse_prolongation(self, request, prolongation_id):
+        """
+        Custom admin view to manually refuse a prolongation.
+        """
+        return refuse_prolongation(request, self, prolongation_id)
+
+    def get_urls(self):
+        additional_urls = [
+            path(
+                "<int:prolongation_id>/validate",
+                self.admin_site.admin_view(self.validate_prolongation),
+                name="approvals_prolongation_validate",
+            ),
+            path(
+                "<int:prolongation_id>/refuse",
+                self.admin_site.admin_view(self.refuse_prolongation),
+                name="approvals_prolongation_refuse",
+            ),
+        ]
+        return additional_urls + super().get_urls()
 
 
 @admin.register(models.PoleEmploiApproval)
