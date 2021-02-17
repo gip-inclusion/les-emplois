@@ -305,20 +305,6 @@ class EditHiringDateForm(forms.ModelForm):
 
         return hiring_start_at
 
-    def clean(self):
-        cleaned_data = super().clean()
-
-        if self.errors:
-            return cleaned_data
-
-        hiring_end_at = self.cleaned_data["hiring_end_at"]
-        hiring_start_at = self.cleaned_data["hiring_start_at"]
-
-        if hiring_end_at < hiring_start_at:
-            raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
-
-        return cleaned_data
-
 
 class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     """

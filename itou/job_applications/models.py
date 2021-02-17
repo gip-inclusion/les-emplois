@@ -5,6 +5,7 @@ import uuid
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef
 from django.urls import reverse
@@ -198,10 +199,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     ERROR_START_IN_PAST = _("Il n'est pas possible d'antidater un contrat. Indiquez une date dans le futur.")
     ERROR_END_IS_BEFORE_START = _("La date de fin du contrat doit être postérieure à la date de début.")
     ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
+    ERROR_START_AFTER_APPROVAL_END = _("La date de début contrat commence après la date de fin du PASS IAE.")
 
-    # SIAE have the possibility to update the start contract date provided that the new date is:
-    # - before the end date of an approval created for this job application
-    # - in the future, max. MAX_CONTRACT_POSTPONE_IN_DAYS days from today.
+    # SIAE have the possibility to update the hiring date if:
+    # - it is before the end date of an approval created for this job application
+    # - it is in the future, max. MAX_CONTRACT_POSTPONE_IN_DAYS days from today.
     MAX_CONTRACT_POSTPONE_IN_DAYS = 30
     ERROR_POSTPONE_TOO_FAR = _(
         f"La date de début du contrat ne peut être repoussée de plus de {MAX_CONTRACT_POSTPONE_IN_DAYS} jours."
@@ -333,6 +335,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def __str__(self):
         return str(self.id)
+
+    def clean(self):
+        if self.hiring_end_at < self.hiring_start_at:
+            raise ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
+
+        # Check if hiring date is before end of a possible "old" approval
+        if self.approval and not self.approval.can_postpone_start_date:
+            if self.hiring_start_at >= self.approval.start_at:
+                raise ValidationError(JobApplication.ERROR_START_AFTER_APPROVAL_END)
 
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
