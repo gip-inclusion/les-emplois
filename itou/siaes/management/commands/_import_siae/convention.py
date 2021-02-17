@@ -3,6 +3,8 @@
 SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
+from collections import defaultdict
+
 from django.utils import timezone
 
 from itou.siaes.management.commands._import_siae.siae import does_siae_have_an_active_convention
@@ -25,6 +27,7 @@ def update_existing_conventions(dry_run):
     and check data integrity on the fly.
     """
     deactivations = 0
+    deactivations_by_kind = defaultdict(int)  # 0 by default
     reactivations = 0
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
         if siae.siret not in SIRET_TO_ASP_ID:
@@ -78,6 +81,7 @@ def update_existing_conventions(dry_run):
                     convention.save()
             else:
                 deactivations += 1
+                deactivations_by_kind[convention.kind] += 1
                 if DEACTIVATE_CONVENTIONS and not dry_run:
                     convention.is_active = False
                     # Start the grace period now.
@@ -91,8 +95,18 @@ def update_existing_conventions(dry_run):
         print(f"{deactivations} of {total} conventions will be deactivated")
         assert deactivations <= 400  # Break if too many deactivations would occur.
     else:
-        total = SiaeConvention.objects.count()
         print(f"{deactivations} of {total} conventions would have been deactivated but will *not* be")
+
+    # Text in french ready to be copy/pasted to the DGEFP/ASP.
+    print("=== BEGINNING OF FRENCH TEXT FOR DGEFP/ASP ===")
+    pct_value = round(100 * deactivations / total, 1)
+    print(f"{deactivations} des {total} SIAE ({pct_value}%) n'ont pas d'AF 2021 à ce jour")
+    for kind, _ in Siae.KIND_CHOICES:
+        total = SiaeConvention.objects.filter(kind=kind).count()
+        if total >= 1:  # Skip GEIQ etc and avoid division by zero.
+            pct_value = round(100 * deactivations_by_kind[kind] / total, 1)
+            print(f"{deactivations_by_kind[kind]} des {total} {kind} ({pct_value}%) n'ont pas d'AF 2021 à ce jour")
+    print("=== END OF FRENCH TEXT FOR DGEFP/ASP ===")
 
 
 def get_creatable_conventions():
