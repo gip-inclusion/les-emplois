@@ -120,6 +120,7 @@ def prolong(request, approval_id, template_name="approvals/prolong.html"):
             prolongation = form.save(commit=False)
             prolongation.created_by = request.user
             prolongation.save()
+            prolongation.email_new_prolongation_for_admin.send()
             messages.success(request, _("Demande de prolongation envoyée."))
             return HttpResponseRedirect(back_url)
 
