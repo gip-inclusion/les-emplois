@@ -26,11 +26,13 @@ class EditContractTest(TestCase):
         old_approval.end_at -= delta
 
         self.siae = siae
-        self.job_application = job_application
         self.boss = boss
-        self.old_approval = old_approval
+        self.job_application = job_application
         self.job_application_with_old_approval = job_application_with_old_approval
-        self.url = reverse("apply:edit_contract_start_date", kwargs={"job_application_id": self.job_application.id})
+        self.url = reverse("apply:edit_contract_start_date", kwargs={"job_application_id": job_application.id})
+        self.old_url = reverse(
+            "apply:edit_contract_start_date", kwargs={"job_application_id": job_application_with_old_approval.id}
+        )
 
     def test_future_contract_date(self):
         """
@@ -135,14 +137,10 @@ class EditContractTest(TestCase):
     def test_start_date_with_previous_approval(self):
         """
         When the job application is linked to a previous approval,
-        check that:
-        - approval dates are not updated if the hiring date change
-        - it is not possible to postpone hiring date further than approval end date
+        check that approval dates are not updated if the hiring date change
         """
         self.client.login(username=self.boss.username, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.url)
-
-        self.job_application.approval = self.old_approval
+        response = self.client.get(self.old_url)
 
         future_start_date = (timezone.now() + relativedelta(days=5)).date()
         future_end_date = (timezone.now() + relativedelta(days=60)).date()
@@ -155,17 +153,21 @@ class EditContractTest(TestCase):
         response = self.client.post(self.url, data=post_data)
 
         self.assertEqual(response.status_code, 302)
-        self.assertIsNotNone(self.job_application.approval)
-        self.assertNotEqual(self.job_application.hiring_start_at, self.job_application.approval.start_at)
+        self.assertTrue(
+            self.job_application_with_old_approval.hiring_start_at
+            > self.job_application_with_old_approval.approval.start_at
+        )
 
     def test_do_not_update_previous_approval(self):
         """
         Previous approvals start date must not be updated when postponing contract dates
         """
         self.client.login(username=self.boss.username, password=DEFAULT_PASSWORD)
-        response = self.client.get(self.url)
+        response = self.client.get(self.old_url)
 
-        future_start_date = self.old_approval.start_at + relativedelta(days=10)
+        approval = self.job_application_with_old_approval.approval
+
+        future_start_date = approval.start_at + relativedelta(days=10)
         future_end_date = future_start_date + relativedelta(days=60)
 
         post_data = {
