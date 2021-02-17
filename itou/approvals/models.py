@@ -11,11 +11,13 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
+from itou.utils.emails import get_email_message
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
@@ -759,6 +761,17 @@ class Prolongation(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
+
+    @property
+    def email_new_prolongation_for_admin(self):
+        to = [settings.ITOU_EMAIL_CONTACT]
+        context = {
+            "prolongation": self,
+            "admin_url": reverse("admin:approvals_prolongation_change", args=[self.pk]),
+        }
+        subject = "approvals/email/new_prolongation_for_admin_subject.txt"
+        body = "approvals/email/new_prolongation_for_admin_body.txt"
+        return get_email_message(to, context, subject, body)
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):
         if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
