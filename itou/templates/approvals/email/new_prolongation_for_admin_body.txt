@@ -1,0 +1,36 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load i18n %}
+{% block body %}
+Nouvelle demande de prolongation sur Itou.
+
+{% translate "Informations pour la validation d'une prolongation de PASS IAE :" %}
+
+{% translate "*Prolongation* :" %}
+
+- Date de début : {{ prolongation.start_at|date:"d/m/Y" }}
+- Date de fin : {{ prolongation.end_at|date:"d/m/Y" }}
+- Demande par : {{ prolongation.created_by.get_full_name }} - {{ prolongation.created_by.email }}
+- Motif : {{ prolongation.get_reason_display }}
+
+{% translate "*Motivation de la demande* :" %}
+
+{{ prolongation.reason_explanation }}
+
+{% translate "*Employeur solidaire* :" %}
+
+- Siret : {{ prolongation.siae.siret }}
+- Nom : {{ prolongation.siae.display_name }}
+- Type : {{ prolongation.siae.kind }} ({{ prolongation.siae.get_kind_display }})
+- Département : {{ prolongation.siae.get_department_display }}
+
+{% translate "*Bénéficiaire* :" %}
+
+- Nom : {{ prolongation.approval.user.last_name }}
+- Prénom : {{ prolongation.approval.user.first_name }}{% if prolongation.approval.user.email %}
+- Email : {{ prolongation.approval.user.email }}{% endif %}
+- Date de naissance : {{ prolongation.approval.user.birthdate|date:"d/m/Y" }}
+
+{% translate "Valider dans l'admin :"%}
+{{ itou_protocol }}://{{ itou_fqdn }}{{ admin_url }}
+
+{% endblock body %}
