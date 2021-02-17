@@ -7,8 +7,8 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.approvals.admin_forms import ManuallyAddApprovalForm
-from itou.approvals.models import Approval
+from itou.approvals.admin_forms import ManuallyAddApprovalForm, ProlongationForm
+from itou.approvals.models import Approval, Prolongation
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
 
@@ -133,6 +133,101 @@ def manually_refuse_approval(
         "job_application": job_application,
         "opts": opts,
         "title": _("Confirmer le refus manuel d'un numéro d'agrément"),
+        **admin_site.each_context(request),
+    }
+    return render(request, template_name, context)
+
+
+@transaction.atomic
+def validate_prolongation(
+    request, model_admin, prolongation_id, template_name="admin/approvals/prolongation_validate.html"
+):
+    """
+    Custom admin view to validate a prolongation.
+
+    https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
+    https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
+    """
+
+    admin_site = model_admin.admin_site
+    opts = model_admin.model._meta
+    app_label = opts.app_label
+    codename = get_permission_codename("add", opts)
+    has_perm = request.user.has_perm(f"{app_label}.{codename}")
+
+    if not has_perm:
+        raise PermissionDenied
+
+    queryset = Prolongation.objects.pending().select_related("approval__user", "siae")
+    prolongation = get_object_or_404(queryset, pk=prolongation_id)
+
+    form = ProlongationForm(instance=prolongation, data=request.POST or None)
+    fieldsets = [(None, {"fields": list(form.base_fields)})]
+    adminForm = admin.helpers.AdminForm(form, fieldsets, {})
+
+    # TODO: handle form submit.
+
+    # Display a preview of the email that will be send.
+    context = {"prolongation": prolongation}
+    email_subject_template = get_email_text_template("approvals/email/prolongation_validate_subject.txt", context)
+    email_body_template = get_email_text_template("approvals/email/prolongation_validate_body.txt", context)
+
+    context = {
+        "add": True,
+        "adminform": adminForm,
+        "admin_site": admin_site.name,
+        "app_label": app_label,
+        "email_body_template": email_body_template,
+        "email_subject_template": email_subject_template,
+        "errors": admin.helpers.AdminErrorList(form, {}),
+        "form": form,
+        "prolongation": prolongation,
+        "opts": opts,
+        "title": _("Validation d'une prolongation"),
+        **admin_site.each_context(request),
+    }
+    return render(request, template_name, context)
+
+
+@transaction.atomic
+def refuse_prolongation(
+    request, model_admin, prolongation_id, template_name="admin/approvals/prolongation_refuse.html"
+):
+    """
+    Custom admin view to refuse a prolongation.
+
+    https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
+    https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
+    """
+
+    admin_site = model_admin.admin_site
+    opts = model_admin.model._meta
+    app_label = opts.app_label
+    codename = get_permission_codename("add", opts)
+    has_perm = request.user.has_perm(f"{app_label}.{codename}")
+
+    if not has_perm:
+        raise PermissionDenied
+
+    queryset = Prolongation.objects.pending().select_related("approval__user", "siae")
+    prolongation = get_object_or_404(queryset, pk=prolongation_id)
+
+    # TODO: handle form submit.
+
+    # Display a preview of the email that will be send.
+    context = {"prolongation": prolongation}
+    email_subject_template = get_email_text_template("approvals/email/prolongation_refuse_subject.txt", context)
+    email_body_template = get_email_text_template("approvals/email/prolongation_refuse_body.txt", context)
+
+    context = {
+        "add": True,
+        "admin_site": admin_site.name,
+        "app_label": app_label,
+        "email_body_template": email_body_template,
+        "email_subject_template": email_subject_template,
+        "prolongation": prolongation,
+        "opts": opts,
+        "title": _("Validation d'une prolongation"),
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
