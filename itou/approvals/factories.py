@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
 
 
@@ -48,7 +48,8 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
     reason = Prolongation.Reason.COMPLETE_TRAINING.value
-    siae = factory.SubFactory(SiaeFactory)
+    siae = factory.SubFactory(SiaeWithMembershipFactory)
+    created_by = factory.LazyAttribute(lambda obj: obj.siae.members.first())
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
