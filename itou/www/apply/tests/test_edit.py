@@ -3,7 +3,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
