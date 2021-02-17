@@ -793,7 +793,7 @@ class Prolongation(models.Model):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "prolongation": self,
-            "admin_url": reverse("admin:admin:approvals_prolongation_validate", args=[self.pk]),
+            "admin_url": reverse("admin:approvals_prolongation_validate", args=[self.pk]),
         }
         subject = "approvals/email/prolongation_new_for_admin_subject.txt"
         body = "approvals/email/prolongation_new_for_admin_body.txt"
