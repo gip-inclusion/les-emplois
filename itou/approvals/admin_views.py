@@ -152,13 +152,13 @@ def validate_prolongation(
     admin_site = model_admin.admin_site
     opts = model_admin.model._meta
     app_label = opts.app_label
-    codename = get_permission_codename("add", opts)
+    codename = get_permission_codename("change", opts)
     has_perm = request.user.has_perm(f"{app_label}.{codename}")
 
     if not has_perm:
         raise PermissionDenied
 
-    queryset = Prolongation.objects.pending().select_related("approval__user", "siae")
+    queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
     prolongation = get_object_or_404(queryset, pk=prolongation_id)
 
     form = ProlongationForm(instance=prolongation, data=request.POST or None)
@@ -209,16 +209,21 @@ def refuse_prolongation(
     admin_site = model_admin.admin_site
     opts = model_admin.model._meta
     app_label = opts.app_label
-    codename = get_permission_codename("add", opts)
+    codename = get_permission_codename("change", opts)
     has_perm = request.user.has_perm(f"{app_label}.{codename}")
 
     if not has_perm:
         raise PermissionDenied
 
-    queryset = Prolongation.objects.pending().select_related("approval__user", "siae")
+    queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
     prolongation = get_object_or_404(queryset, pk=prolongation_id)
 
-    # TODO: handle form submit.
+    if request.method == "POST" and request.POST.get("confirm") == "yes":
+        prolongation.refuse(refused_by=request.user)
+        messages.success(
+            request, _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été refusée.")
+        )
+        return HttpResponseRedirect(reverse("admin:approvals_prolongation_changelist"))
 
     # Display a preview of the email that will be send.
     context = {"prolongation": prolongation}
