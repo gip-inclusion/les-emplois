@@ -1197,7 +1197,7 @@ class ProlongationModelTest(TestCase):
         prolongation.refresh_from_db()
         self.assertEqual(prolongation.status, Prolongation.Status.PENDING)
         self.assertEqual(prolongation.requested_by, user)
-        self.assertEqual(prolongation.created_by, user)
+        self.assertEqual(prolongation.updated_by, user)
 
         # An email should have been sent.
         self.assertEqual(len(mail.outbox), 1)

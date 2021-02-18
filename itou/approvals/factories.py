@@ -51,6 +51,7 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     siae = factory.SubFactory(SiaeWithMembershipFactory)
     requested_by = factory.LazyAttribute(lambda obj: obj.siae.members.first())
+    created_by = factory.LazyAttribute(lambda obj: obj.requested_by)
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):
