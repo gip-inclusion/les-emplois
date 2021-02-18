@@ -1200,8 +1200,8 @@ class ProlongationModelTest(TestCase):
         self.assertIn(prolongation.end_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn(prolongation.get_reason_display(), email.body)
         self.assertIn(prolongation.reason_explanation, email.body)
-        self.assertIn(title(prolongation.created_by.get_full_name()), email.body)
-        self.assertIn(prolongation.created_by.email, email.body)
+        self.assertIn(title(prolongation.requested_by.get_full_name()), email.body)
+        self.assertIn(prolongation.requested_by.email, email.body)
 
         self.assertIn(prolongation.siae.siret, email.body)
         self.assertIn(prolongation.siae.kind, email.body)
