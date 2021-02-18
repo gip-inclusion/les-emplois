@@ -1186,9 +1186,26 @@ class ProlongationModelTest(TestCase):
             prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
         )
 
+    def test_request(self):
+        user = UserFactory()
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.PENDING,
+        )
+        prolongation.request(user)
+
+        prolongation.refresh_from_db()
+        self.assertEqual(prolongation.status, Prolongation.Status.PENDING)
+        self.assertEqual(prolongation.requested_by, user)
+        self.assertEqual(prolongation.created_by, user)
+
+        # An email should have been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Demande de prolongation de PASS IAE sur Itou", email.subject)
+
     def test_validate(self):
         user = UserFactory()
-
         prolongation = ProlongationFactory(
             reason=Prolongation.Reason.COMPLETE_TRAINING.value,
             status=Prolongation.Status.PENDING,
@@ -1207,7 +1224,6 @@ class ProlongationModelTest(TestCase):
 
     def test_refuse(self):
         user = UserFactory()
-
         prolongation = ProlongationFactory(
             reason=Prolongation.Reason.COMPLETE_TRAINING.value,
             status=Prolongation.Status.PENDING,
