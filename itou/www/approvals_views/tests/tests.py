@@ -328,6 +328,7 @@ class ApprovalProlongViewTest(TestCase):
 
         self.assertEqual(1, approval.prolongation_set.count())
         prolongation = approval.prolongation_set.first()
+        self.assertEqual(prolongation.requested_by, siae_user)
         self.assertEqual(prolongation.created_by, siae_user)
 
         # Itou staff should receive an email.
