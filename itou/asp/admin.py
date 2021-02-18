@@ -42,11 +42,6 @@ class SiaeKindAdmin(ASPModelAdmin):
     pass
 
 
-@admin.register(models.EmployerType)
-class EmployerTypeAdmin(ASPModelAdmin):
-    pass
-
-
 @admin.register(models.Country)
 class CountryAdmin(admin.ModelAdmin):
     list_display = ("pk", "code", "name")

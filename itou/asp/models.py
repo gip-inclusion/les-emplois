@@ -235,13 +235,15 @@ class EducationLevel(models.TextChoices):
     Education level of the employee
 
     In ASP reference file, education levels are linked with a "mesure" (ASP counterpart for SIAE kind)
-    For a valid employee record, we only need to send the code (2 char.)
+    For a valid employee record, we only need to send the code.
+
+    FTR: import file has incorrect field length for the code value (must be exactly 2 char.)
 
     Translation of ASP ref file: ref_niveau_formation_v3.csv
     """
 
-    NON_CERTIFIING_QUALICATIONS = "0", _("Personne avec qualifications non-certifiantes")
-    NO_SCHOOLING = "1", _("Jamais scolarisé")
+    NON_CERTIFIING_QUALICATIONS = "00", _("Personne avec qualifications non-certifiantes")
+    NO_SCHOOLING = "01", _("Jamais scolarisé")
     THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou écolde d'ingénieur")
     LICENCE_LEVEL = "20", _("Formation de niveau licence")
     BTS_OR_DUT_LEVEL = "30", _("Formation de niveau BTS ou DUT")
@@ -337,19 +339,3 @@ class SiaeKind(PrettyPrintMixin, AbstractPeriod):
 
     class Meta:
         verbose_name = _("Mesure")
-
-
-class EmployerType(PrettyPrintMixin, AbstractPeriod):
-    """
-    ASP employer type
-
-    Imported from ASP reference file: ref_type_employeur_v3.csv
-    """
-
-    code = models.CharField(max_length=3, verbose_name=_("Code employeur ASP"))
-    name = models.CharField(max_length=50, verbose_name=_("Libellé employeur ASP"))
-    siae_kind = models.ForeignKey(SiaeKind, verbose_name=_("Mesure ASP"), on_delete=models.SET_NULL, null=True)
-
-    class Meta:
-        verbose_name = _("Type d'employeur")
-        verbose_name = _("Types d'employeur")

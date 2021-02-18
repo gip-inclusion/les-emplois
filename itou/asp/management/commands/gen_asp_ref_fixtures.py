@@ -58,7 +58,6 @@ class Command(BaseCommand):
         parser.add_argument("--insee_departments")
         parser.add_argument("--insee_countries")
         parser.add_argument("--siae_kinds")
-        parser.add_argument("--employer_types")
 
     def set_logger(self, verbosity):
         """
@@ -124,7 +123,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "01_asp_INSEE_communes.json")
+        export_path = os.path.join(_FIXTURES_DIR, "asp_INSEE_communes.json")
         model = "asp.Commune"
         df = self.load_dataframe(path)
         records = []
@@ -162,7 +161,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "03_asp_INSEE_departments.json")
+        export_path = os.path.join(_FIXTURES_DIR, "asp_INSEE_departments.json")
         model = "asp.Department"
         df = self.load_dataframe(path)
         records = []
@@ -199,7 +198,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "02_asp_INSEE_countries.json")
+        export_path = os.path.join(_FIXTURES_DIR, "asp_INSEE_countries.json")
         model = "asp.Country"
         df = self.load_dataframe(path)
         records = []
@@ -234,7 +233,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "04_asp_siae_kinds.json")
+        export_path = os.path.join(_FIXTURES_DIR, "asp_siae_kinds.json")
         model = "asp.SiaeKind"
         df = self.load_dataframe(path)
         records = []
@@ -260,40 +259,6 @@ class Command(BaseCommand):
 
         self.write_fixture_file(export_path, records)
 
-    def gen_employer_types(self, filename="ref_type_employeur.csv"):
-        """
-        Generates ASP employer types fixture.
-        """
-        path = os.path.join(settings.IMPORT_DIR, filename)
-
-        self.log("Importing ASP employer types:\n")
-
-        if not self.file_exists(path):
-            return
-
-        export_path = os.path.join(_FIXTURES_DIR, "06_asp_employer_types.json")
-        model = "asp.EmployerType"
-        df = self.load_dataframe(path)
-        records = []
-
-        for idx, row in df.iterrows():
-            start_date = parse_asp_date(row["rte_date_debut_effet"])
-            end_date = parse_asp_date(row["rte_date_fin_effet"])
-            elt = {
-                "model": model,
-                "pk": row["rte_id"],
-                "fields": {
-                    "code": row["rte_code_type_employeur"],
-                    "name": row["rte_lib_type_employeur"],
-                    "siae_kind_id": row["rme_id"],
-                    "start_date": start_date,
-                    "end_date": end_date,
-                },
-            }
-            records.append(elt)
-
-        self.write_fixture_file(export_path, records)
-
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
@@ -305,7 +270,6 @@ class Command(BaseCommand):
                 "insee_departments",
                 "insee_countries",
                 "siae_kinds",
-                "employer_types",
             ]
             if options.get(elt)
         ]
@@ -319,10 +283,7 @@ class Command(BaseCommand):
             fn = getattr(self, f"gen_{import_arg}")
             fn(filename=options.get(import_arg))
         else:
-            # Order matters (see below)
             self.gen_insee_communes()
             self.gen_insee_departments()
             self.gen_insee_countries()
             self.gen_siae_kinds()
-            # employer types and education levels depends on SIAE kinds ID
-            self.gen_employer_types()

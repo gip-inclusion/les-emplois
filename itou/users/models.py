@@ -254,13 +254,6 @@ class JobSeekerProfile(models.Model):
         default=EducationLevel.NO_SCHOOLING,
     )
 
-    employer_type = models.ForeignKey(
-        "asp.EmployerType",
-        on_delete=models.SET_NULL,
-        verbose_name=_("Type d'employeur (ASP)"),
-        null=True,
-    )
-
     resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
 
     rqth_employee = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
@@ -311,14 +304,6 @@ class JobSeekerProfile(models.Model):
     class Meta:
         verbose_name = _("Profil demandeur d'emploi")
         verbose_name_plural = _("Profils demandeur d'emploi")
-        constraints = [
-            models.CheckConstraint(
-                name="jobseekerprofile_employed",
-                check=Q(employer_type__isnull=False, unemployed_since=AllocationDuration.NONE)
-                | (Q(employer_type__isnull=True) & ~Q(unemployed_since=AllocationDuration.NONE)),
-            ),
-            # models.CheckConstraint(name="jobseekerprofile_user_is_jobseeker"check=Q(user__is_job_seeker=True))
-        ]
 
     def __str__(self):
         return f"Jobseeker profile: {self.user.name}"
