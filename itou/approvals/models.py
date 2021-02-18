@@ -779,14 +779,14 @@ class Prolongation(models.Model):
         return self.start_at <= timezone.now().date() <= self.end_at
 
     @property
-    def email_new_prolongation_for_admin(self):
+    def email_prolongation_request(self):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
             "prolongation": self,
             "admin_url": reverse("admin:approvals_prolongation_validate", args=[self.pk]),
         }
-        subject = "approvals/email/prolongation_new_for_admin_subject.txt"
-        body = "approvals/email/prolongation_new_for_admin_body.txt"
+        subject = "approvals/email/prolongation_request_subject.txt"
+        body = "approvals/email/prolongation_request_body.txt"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -795,6 +795,14 @@ class Prolongation(models.Model):
         context = {"prolongation": self}
         subject = "approvals/email/prolongation_validated_subject.txt"
         body = "approvals/email/prolongation_validated_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_prolongation_refused(self):
+        to = [self.requested_by.email]
+        context = {"prolongation": self}
+        subject = "approvals/email/prolongation_refused_subject.txt"
+        body = "approvals/email/prolongation_refused_body.txt"
         return get_email_message(to, context, subject, body)
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):
@@ -822,6 +830,14 @@ class Prolongation(models.Model):
         self.updated_by = validated_by
         self.save()
         self.email_prolongation_validated.send()
+
+    def refuse(self, refused_by):
+        self.status = self.Status.REFUSED.value
+        self.status_updated_at = timezone.now()
+        self.status_updated_by = refused_by
+        self.updated_by = refused_by
+        self.save()
+        self.email_prolongation_refused.send()
 
     @staticmethod
     def get_start_at(approval):

@@ -943,49 +943,10 @@ class ProlongationManagerTest(TestCase):
         )
 
 
-class ProlongationModelTest(TestCase):
+class ProlongationModelTestTrigger(TestCase):
     """
-    Test Prolongation model.
+    Test `trigger_update_approval_end_at_for_prolongation`.
     """
-
-    def test_status_attributes_set_in_init(self):
-        prolongation = ProlongationFactory(status=Prolongation.Status.REFUSED)
-        self.assertTrue(prolongation.is_refused)
-        self.assertFalse(prolongation.is_validated)
-        self.assertFalse(prolongation.is_pending)
-
-    def test_get_start_at(self):
-
-        end_at = datetime.date(2021, 2, 1)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-
-        prolongation_start_at = Prolongation.get_start_at(approval)
-        self.assertEqual(prolongation_start_at, end_at)
-
-    def test_get_max_end_at(self):
-
-        start_at = datetime.date(2021, 2, 1)
-
-        reason = Prolongation.Reason.COMPLETE_TRAINING.value
-        expected_max_end_at = datetime.date(2021, 7, 31)  # 6 months.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
-
-        reason = Prolongation.Reason.RQTH.value
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
-
-        reason = Prolongation.Reason.SENIOR.value
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
-
-        reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
-        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
-        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
-        self.assertEqual(max_end_at, expected_max_end_at)
 
     def test_save(self):
         """
@@ -1079,6 +1040,51 @@ class ProlongationModelTest(TestCase):
         prolongation.save()
         approval.refresh_from_db()
         self.assertEqual(approval.duration, initial_approval_duration)
+
+
+class ProlongationModelTest(TestCase):
+    """
+    Test Prolongation model.
+    """
+
+    def test_status_attributes_set_in_init(self):
+        prolongation = ProlongationFactory(status=Prolongation.Status.REFUSED)
+        self.assertTrue(prolongation.is_refused)
+        self.assertFalse(prolongation.is_validated)
+        self.assertFalse(prolongation.is_pending)
+
+    def test_get_start_at(self):
+
+        end_at = datetime.date(2021, 2, 1)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        prolongation_start_at = Prolongation.get_start_at(approval)
+        self.assertEqual(prolongation_start_at, end_at)
+
+    def test_get_max_end_at(self):
+
+        start_at = datetime.date(2021, 2, 1)
+
+        reason = Prolongation.Reason.COMPLETE_TRAINING.value
+        expected_max_end_at = datetime.date(2021, 7, 31)  # 6 months.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.RQTH.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.SENIOR.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
 
     def test_time_boundaries(self):
         """
@@ -1199,20 +1205,39 @@ class ProlongationModelTest(TestCase):
         email = mail.outbox[0]
         self.assertIn("Prolongation de PASS IAE validée", email.subject)
 
+    def test_refuse(self):
+        user = UserFactory()
+
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.PENDING,
+        )
+        prolongation.refuse(user)
+
+        prolongation.refresh_from_db()
+        self.assertEqual(prolongation.status, Prolongation.Status.REFUSED)
+        self.assertEqual(prolongation.status_updated_by, user)
+        self.assertEqual(prolongation.updated_by, user)
+
+        # An email should have been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Prolongation de PASS IAE refusée", email.subject)
+
 
 class ProlongationEmailTest(TestCase):
     """
     Test Prolongation emails.
     """
 
-    def test_email_new_prolongation_for_admin(self):
+    def test_email_prolongation_request(self):
 
         prolongation = ProlongationFactory(
             reason=Prolongation.Reason.COMPLETE_TRAINING.value,
             status=Prolongation.Status.PENDING,
         )
 
-        email = prolongation.email_new_prolongation_for_admin
+        email = prolongation.email_prolongation_request
 
         # To.
         self.assertIn(settings.ITOU_EMAIL_CONTACT, email.to)
@@ -1259,13 +1284,35 @@ class ProlongationEmailTest(TestCase):
         # Body.
         self.assertIn(title(prolongation.approval.user.get_full_name()), email.body)
 
+    def test_email_prolongation_refused(self):
+
+        user = UserFactory()
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.REFUSED,
+            status_updated_by=user,
+            updated_by=user,
+        )
+
+        email = prolongation.email_prolongation_refused
+
+        # To.
+        self.assertEqual(len(email.to), 1)
+        self.assertIn(prolongation.requested_by.email, email.to)
+
+        # Subject.
+        self.assertIn(title(prolongation.approval.user.get_full_name()), email.subject)
+
+        # Body.
+        self.assertIn(title(prolongation.approval.user.get_full_name()), email.body)
+
 
 class CustomProlongationAdminViewsTest(TestCase):
     """
     Test custom Prolongation admin views.
     """
 
-    def test_validate_prolongation(self):
+    def test_custom_admin_validate_prolongation(self):
         user = UserFactory()
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
@@ -1283,7 +1330,7 @@ class CustomProlongationAdminViewsTest(TestCase):
         user.is_staff = True
         user.save()
         content_type = ContentType.objects.get_for_model(Prolongation)
-        permission = Permission.objects.get(content_type=content_type, codename="add_prolongation")
+        permission = Permission.objects.get(content_type=content_type, codename="change_prolongation")
         user.user_permissions.add(permission)
 
         # With good perms.
@@ -1307,3 +1354,43 @@ class CustomProlongationAdminViewsTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("Prolongation de PASS IAE validée", email.subject)
+
+    def test_custom_admin_refuse_prolongation(self):
+        user = UserFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.PENDING,
+        )
+
+        url = reverse("admin:approvals_prolongation_refuse", args=[prolongation.pk])
+
+        # Not enough perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        user.is_staff = True
+        user.save()
+        content_type = ContentType.objects.get_for_model(Prolongation)
+        permission = Permission.objects.get(content_type=content_type, codename="change_prolongation")
+        user.user_permissions.add(permission)
+
+        # With good perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Refuse a prolongation.
+        post_data = {"confirm": "yes"}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        prolongation.refresh_from_db()
+
+        # The prolongation should have been validated.
+        self.assertEqual(prolongation.status, Prolongation.Status.REFUSED)
+
+        # An email should have been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Prolongation de PASS IAE refusée", email.subject)
