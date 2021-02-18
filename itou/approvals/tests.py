@@ -593,9 +593,9 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 
-class CustomAdminViewsTest(TestCase):
+class CustomApprovalAdminViewsTest(TestCase):
     """
-    Test custom admin views.
+    Test custom Approval admin views.
     """
 
     def test_manually_add_approval(self):
@@ -1180,12 +1180,36 @@ class ProlongationModelTest(TestCase):
             prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
         )
 
+    def test_validate(self):
+        user = UserFactory()
+
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.PENDING,
+        )
+        prolongation.validate(user)
+
+        prolongation.refresh_from_db()
+        self.assertEqual(prolongation.status, Prolongation.Status.VALIDATED)
+        self.assertEqual(prolongation.status_updated_by, user)
+        self.assertEqual(prolongation.updated_by, user)
+
+        # An email should have been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Prolongation de PASS IAE validée", email.subject)
+
+
+class ProlongationEmailTest(TestCase):
+    """
+    Test Prolongation emails.
+    """
+
     def test_email_new_prolongation_for_admin(self):
 
         prolongation = ProlongationFactory(
             reason=Prolongation.Reason.COMPLETE_TRAINING.value,
             status=Prolongation.Status.PENDING,
-            reason_explanation="Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         )
 
         email = prolongation.email_new_prolongation_for_admin
@@ -1212,3 +1236,74 @@ class ProlongationModelTest(TestCase):
         self.assertIn(title(prolongation.approval.user.first_name), email.body)
         self.assertIn(prolongation.approval.user.email, email.body)
         self.assertIn(prolongation.approval.user.birthdate.strftime("%d/%m/%Y"), email.body)
+
+    def test_email_prolongation_validated(self):
+
+        user = UserFactory()
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.VALIDATED,
+            status_updated_by=user,
+            updated_by=user,
+        )
+
+        email = prolongation.email_prolongation_validated
+
+        # To.
+        self.assertEqual(len(email.to), 1)
+        self.assertIn(prolongation.requested_by.email, email.to)
+
+        # Subject.
+        self.assertIn(title(prolongation.approval.user.get_full_name()), email.subject)
+
+        # Body.
+        self.assertIn(title(prolongation.approval.user.get_full_name()), email.body)
+
+
+class CustomProlongationAdminViewsTest(TestCase):
+    """
+    Test custom Prolongation admin views.
+    """
+
+    def test_validate_prolongation(self):
+        user = UserFactory()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        prolongation = ProlongationFactory(
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+            status=Prolongation.Status.PENDING,
+        )
+
+        url = reverse("admin:approvals_prolongation_validate", args=[prolongation.pk])
+
+        # Not enough perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        user.is_staff = True
+        user.save()
+        content_type = ContentType.objects.get_for_model(Prolongation)
+        permission = Permission.objects.get(content_type=content_type, codename="add_prolongation")
+        user.user_permissions.add(permission)
+
+        # With good perms.
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Validate a prolongation.
+        post_data = {
+            "start_at": prolongation.start_at.strftime("%d/%m/%Y"),
+            "end_at": prolongation.end_at.strftime("%d/%m/%Y"),
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        prolongation.refresh_from_db()
+
+        # The prolongation should have been validated.
+        self.assertEqual(prolongation.status, Prolongation.Status.VALIDATED)
+
+        # An email should have been sent.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertIn("Prolongation de PASS IAE validée", email.subject)

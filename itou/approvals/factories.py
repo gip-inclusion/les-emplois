@@ -48,6 +48,7 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
     reason = Prolongation.Reason.COMPLETE_TRAINING.value
+    reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
     siae = factory.SubFactory(SiaeWithMembershipFactory)
     requested_by = factory.LazyAttribute(lambda obj: obj.siae.members.first())
 

@@ -789,6 +789,14 @@ class Prolongation(models.Model):
         body = "approvals/email/prolongation_new_for_admin_body.txt"
         return get_email_message(to, context, subject, body)
 
+    @property
+    def email_prolongation_validated(self):
+        to = [self.requested_by.email]
+        context = {"prolongation": self}
+        subject = "approvals/email/prolongation_validated_subject.txt"
+        body = "approvals/email/prolongation_validated_body.txt"
+        return get_email_message(to, context, subject, body)
+
     def has_reached_max_cumulative_duration(self, additional_duration=None):
         if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
             return False
@@ -806,6 +814,14 @@ class Prolongation(models.Model):
             "approval": self.approval,
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
+
+    def validate(self, validated_by):
+        self.status = self.Status.VALIDATED.value
+        self.status_updated_at = timezone.now()
+        self.status_updated_by = validated_by
+        self.updated_by = validated_by
+        self.save()
+        self.email_prolongation_validated.send()
 
     @staticmethod
     def get_start_at(approval):
