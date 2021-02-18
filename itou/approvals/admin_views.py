@@ -165,12 +165,18 @@ def validate_prolongation(
     fieldsets = [(None, {"fields": list(form.base_fields)})]
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
-    # TODO: handle form submit.
+    if request.method == "POST" and form.is_valid():
+        prolongation = form.save(commit=False)
+        prolongation.validate(validated_by=request.user)
+        messages.success(
+            request, _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été validée.")
+        )
+        return HttpResponseRedirect(reverse("admin:approvals_prolongation_changelist"))
 
     # Display a preview of the email that will be send.
     context = {"prolongation": prolongation}
-    email_subject_template = get_email_text_template("approvals/email/prolongation_validate_subject.txt", context)
-    email_body_template = get_email_text_template("approvals/email/prolongation_validate_body.txt", context)
+    email_subject_template = get_email_text_template("approvals/email/prolongation_validated_subject.txt", context)
+    email_body_template = get_email_text_template("approvals/email/prolongation_validated_body.txt", context)
 
     context = {
         "add": True,
@@ -216,8 +222,8 @@ def refuse_prolongation(
 
     # Display a preview of the email that will be send.
     context = {"prolongation": prolongation}
-    email_subject_template = get_email_text_template("approvals/email/prolongation_refuse_subject.txt", context)
-    email_body_template = get_email_text_template("approvals/email/prolongation_refuse_body.txt", context)
+    email_subject_template = get_email_text_template("approvals/email/prolongation_refused_subject.txt", context)
+    email_body_template = get_email_text_template("approvals/email/prolongation_refused_body.txt", context)
 
     context = {
         "add": True,
