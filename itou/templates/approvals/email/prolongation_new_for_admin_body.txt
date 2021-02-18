@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load i18n %}
 {% block body %}
-Nouvelle demande de prolongation sur Itou.
+Nouvelle demande de prolongation de PASS IAE sur Itou.
 
 {% translate "Informations pour la validation d'une prolongation de PASS IAE :" %}
 
