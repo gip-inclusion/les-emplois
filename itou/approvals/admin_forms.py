@@ -15,7 +15,7 @@ class ManuallyAddApprovalForm(forms.ModelForm):
         widgets = {"user": forms.HiddenInput(), "created_by": forms.HiddenInput()}
 
 
-class ProlongationForm(forms.ModelForm):
+class ValidateProlongationForm(forms.ModelForm):
     class Meta:
         model = Prolongation
         fields = ["start_at", "end_at"]
