@@ -333,5 +333,5 @@ class ApprovalProlongViewTest(TestCase):
         # Itou staff should receive an email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("Demande de prolongation sur Itou", email.subject)
-        self.assertIn("Nouvelle demande de prolongation sur Itou", email.body)
+        self.assertIn("Demande de prolongation de PASS IAE sur Itou", email.subject)
+        self.assertIn("Nouvelle demande de prolongation de PASS IAE sur Itou", email.body)
