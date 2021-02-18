@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
-from itou.asp.models import AllocationDuration
+from itou.asp.models import AllocationDuration, EducationLevel
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
@@ -247,12 +247,13 @@ class JobSeekerProfile(models.Model):
         related_name="jobseeker_profile",
     )
 
-    education_level = models.ForeignKey(
-        "asp.EducationLevel",
-        on_delete=models.SET_NULL,
+    education_level = models.CharField(
+        max_length=2,
         verbose_name=_("Niveau de formation (ASP)"),
-        null=True,
+        choices=EducationLevel.choices,
+        default=EducationLevel.NO_SCHOOLING
     )
+
     employer_type = models.ForeignKey(
         "asp.EmployerType",
         on_delete=models.SET_NULL,

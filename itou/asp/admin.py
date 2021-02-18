@@ -32,11 +32,6 @@ class CommuneAdmin(ASPModelAdmin):
     pass
 
 
-@admin.register(models.EducationLevel)
-class EducationLevelAdmin(ASPModelAdmin):
-    pass
-
-
 @admin.register(models.Department)
 class DepartmentAdmin(ASPModelAdmin):
     pass

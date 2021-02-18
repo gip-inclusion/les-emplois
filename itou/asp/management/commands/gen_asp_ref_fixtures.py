@@ -54,7 +54,6 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
-        parser.add_argument("--education_levels")
         parser.add_argument("--insee_communes")
         parser.add_argument("--insee_departments")
         parser.add_argument("--insee_countries")
@@ -109,41 +108,6 @@ class Command(BaseCommand):
         self.log("No import file found. Skipping.")
         self.log("-" * 80)
         return False
-
-    def gen_education_levels(self, filename="ref_niveau_formation.csv"):
-        """
-        Generate ASP education level fixture
-        """
-        path = os.path.join(settings.IMPORT_DIR, filename)
-
-        self.log("Importing ASP education levels:\n")
-
-        if not self.file_exists(path):
-            return
-
-        export_path = os.path.join(_FIXTURES_DIR, "05_asp_education_levels.json")
-        model = "asp.EducationLevel"
-        df = self.load_dataframe(path)
-        records = []
-
-        for _, row in df.iterrows():
-            start_date = parse_asp_date(row["rte_date_debut_effet"])
-            end_date = parse_asp_date(row["rte_date_fin_effet"])
-
-            elt = {
-                "model": model,
-                "pk": row["rnf_id"],
-                "fields": {
-                    "code": row["rnf_code_form_empl"],
-                    "name": row["rnf_libelle_niveau_form_empl"],
-                    "start_date": start_date,
-                    "end_date": end_date,
-                    "siae_kind_id": int(row["rme_id"]) if row["rme_id"] else None,
-                },
-            }
-            records.append(elt)
-
-        self.write_fixture_file(export_path, records)
 
     def gen_insee_communes(self, filename="ref_insee_com.csv"):
         """
@@ -337,7 +301,6 @@ class Command(BaseCommand):
         partial = [
             elt
             for elt in [
-                "education_levels",
                 "insee_communes",
                 "insee_departments",
                 "insee_countries",
@@ -363,4 +326,3 @@ class Command(BaseCommand):
             self.gen_siae_kinds()
             # employer types and education levels depends on SIAE kinds ID
             self.gen_employer_types()
-            self.gen_education_levels()

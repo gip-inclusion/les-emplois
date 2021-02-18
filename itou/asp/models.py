@@ -230,26 +230,27 @@ class AllocationDuration(models.TextChoices):
     MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
 
 
-class EducationLevel(PrettyPrintMixin, AbstractPeriod):
+class EducationLevel(models.TextChoices):
     """
     Education level of the employee
+
+    In ASP reference file, education levels are linked with a "mesure" (ASP counterpart for SIAE kind)
+    For a valid employee record, we only need to send the code (2 char.)
 
     Translation of ASP ref file: ref_niveau_formation_v3.csv
     """
 
-    code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
-    name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
-    siae_kind = models.ForeignKey(
-        "asp.SiaeKind",
-        verbose_name=_("Mesure ASP"),
-        null=True,
-        on_delete=models.CASCADE,
-        related_name="education_levels",
-    )
-
-    class Meta:
-        verbose_name = _("Niveau de formation")
-        verbose_name_plural = _("Niveaux de formation")
+    NON_CERTIFIING_QUALICATIONS = "0", _("Personne avec qualifications non-certifiantes")
+    NO_SCHOOLING = "1", _("Jamais scolarisé")
+    THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou écolde d'ingénieur")
+    LICENCE_LEVEL = "20", _("Formation de niveau licence")
+    BTS_OR_DUT_LEVEL = "30", _("Formation de niveau BTS ou DUT")
+    BAC_LEVEL = "40", _("Formation de niveau BAC")
+    BT_OR_BACPRO_LEVEL = "41", _("Brevet de technicien ou baccalauréat professionnel")
+    BEP_OR_CAP_LEVEL = "50", _("Formation de niveau BEP ou CAP")
+    BEP_OR_CAP_DIPLOMA = "51", _("Diplôme obtenu CAP ou BEP")
+    TRAINING_1_YEAR = "60", _("Formation courte d'une durée d'un an")
+    NO_SHOOLING_BEYOND_MANDATORY = "70", _("Pas de formation au-delà de la scolarité obligatoire")
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
