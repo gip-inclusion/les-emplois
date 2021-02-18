@@ -251,7 +251,7 @@ class JobSeekerProfile(models.Model):
         max_length=2,
         verbose_name=_("Niveau de formation (ASP)"),
         choices=EducationLevel.choices,
-        default=EducationLevel.NO_SCHOOLING
+        default=EducationLevel.NO_SCHOOLING,
     )
 
     employer_type = models.ForeignKey(

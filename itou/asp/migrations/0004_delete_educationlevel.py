@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0018_auto_20210218_1728'),
-        ('asp', '0003_auto_20210218_1203'),
+        ("users", "0018_auto_20210218_1728"),
+        ("asp", "0003_auto_20210218_1203"),
     ]
 
     operations = [
         migrations.DeleteModel(
-            name='EducationLevel',
+            name="EducationLevel",
         ),
     ]
