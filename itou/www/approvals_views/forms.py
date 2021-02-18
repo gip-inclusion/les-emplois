@@ -1,7 +1,7 @@
 from django import forms
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.approvals.models import Prolongation, Suspension
 from itou.utils.widgets import DatePickerField
@@ -40,6 +40,7 @@ class RequestProlongationForm(forms.ModelForm):
         max_end_at_str = Prolongation.get_max_end_at(self.instance.start_at).strftime("%Y/%m/%d")
         self.fields["end_at"].widget = DatePickerField({"minDate": min_end_at_str, "maxDate": max_end_at_str})
         self.fields["end_at"].input_formats = [DatePickerField.DATE_FORMAT]
+        self.fields["end_at"].label = _(f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au')
 
     class Meta:
         model = Prolongation
