@@ -39,6 +39,7 @@ def get_approvals_wrapper(request, job_seeker):
     """
     user_info = get_user_info(request)
     approvals_wrapper = job_seeker.approvals_wrapper
+
     # Ensure that an existing approval is not in waiting period.
     # Only "authorized prescribers" can bypass an approval in waiting period.
     if approvals_wrapper.has_in_waiting_period and not user_info.is_authorized_prescriber:
@@ -46,16 +47,23 @@ def get_approvals_wrapper(request, job_seeker):
         if user_info.user == job_seeker:
             error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
         raise PermissionDenied(error)
-    # Ensure that an existing approval is not suspended.
-    if (
-        approvals_wrapper.has_valid
-        and approvals_wrapper.latest_approval.is_pass_iae
-        and approvals_wrapper.latest_approval.is_suspended
-    ):
-        error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
-        if user_info.user == job_seeker:
-            error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
-        raise PermissionDenied(error)
+
+    if approvals_wrapper.has_valid and approvals_wrapper.latest_approval.is_pass_iae:
+
+        # Ensure that an existing approval is not suspended.
+        if approvals_wrapper.latest_approval.is_suspended:
+            error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_PROXY
+            if user_info.user == job_seeker:
+                error = Approval.ERROR_PASS_IAE_SUSPENDED_FOR_USER
+            raise PermissionDenied(error)
+
+        # Ensure that an existing approval has not a pending prolongation.
+        if approvals_wrapper.latest_approval.has_pending_prolongation:
+            error = Approval.ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_PROXY
+            if user_info.user == job_seeker:
+                error = Approval.ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_USER
+            raise PermissionDenied(error)
+
     return approvals_wrapper
 
 
