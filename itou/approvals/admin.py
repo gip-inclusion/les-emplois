@@ -3,7 +3,8 @@ from tempfile import NamedTemporaryFile
 
 from django.contrib import admin
 from django.http import FileResponse
-from django.urls import path
+from django.urls import path, reverse
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
@@ -211,7 +212,6 @@ class ProlongationAdmin(admin.ModelAdmin):
         IsInProgressFilter,
         "reason",
     )
-    readonly_fields = ("status_updated_at", "created_at", "created_by", "updated_at", "updated_by")
     date_hierarchy = "start_at"
 
     def is_in_progress(self, obj):
@@ -224,6 +224,36 @@ class ProlongationAdmin(admin.ModelAdmin):
         if not change:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+    def get_readonly_fields(self, request, obj=None):
+        """
+        Staff (not superusers) should not change some fields.
+        """
+        rof = super().get_readonly_fields(request, obj)
+        rof += (
+            "status",
+            "status_updated_by",
+            "status_updated_at",
+            "created_at",
+            "created_by",
+            "updated_at",
+            "updated_by",
+        )
+        if not request.user.is_superuser:
+            # Only superusers can change the status without using the custom admin views.
+            rof += ("status",)
+        return rof
+
+    def get_form(self, request, obj=None, **kwargs):
+        """
+        Override the `status` field's `help_text` to display a link to the validation interface.
+        """
+        if obj and obj.is_pending:
+            url = reverse("admin:approvals_prolongation_validate", args=[obj.pk])
+            text = _("Valider la prolongation dans l'admin")
+            help_texts = {"status": mark_safe(f'<a href="{url}">{text}</a>')}
+            kwargs.update({"help_texts": help_texts})
+        return super().get_form(request, obj, **kwargs)
 
     def validate_prolongation(self, request, prolongation_id):
         """
