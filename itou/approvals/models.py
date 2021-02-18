@@ -826,6 +826,14 @@ class Prolongation(models.Model):
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
 
+    def request(self, requested_by):
+        self.status = self.Status.PENDING.value
+        self.requested_by = requested_by
+        if not self.created_by:
+            self.created_by = requested_by
+        self.save()
+        self.email_prolongation_request.send()
+
     def validate(self, validated_by):
         self.status = self.Status.VALIDATED.value
         self.status_updated_at = timezone.now()

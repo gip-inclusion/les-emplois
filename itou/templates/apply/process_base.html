@@ -51,7 +51,7 @@
                         {% endif %}
                         {% if approval_can_be_prolonged_by_siae %}
                             <a
-                                href="{% url 'approvals:prolong' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                href="{% url 'approvals:request_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                 class="btn btn btn-link">
                                     {% translate "Prolonger" %}
                             </a>
