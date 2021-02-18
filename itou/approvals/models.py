@@ -470,17 +470,6 @@ class Suspension(models.Model):
         if self.start_in_future:
             raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
 
-        # The start of a suspension must be contained in its approval boundaries.
-        if not self.start_in_approval_boundaries:
-            raise ValidationError(
-                {
-                    "start_at": _(
-                        f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
-                        f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
-                    )
-                }
-            )
-
         # A suspension cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at)
         if self.end_at > max_end_at:
@@ -493,20 +482,34 @@ class Suspension(models.Model):
                 }
             )
 
-        # A suspension cannot overlap another one for the same SIAE.
-        # This check is enforced by a constraint at the database level but
-        # still required here to avoid a 500 server error "IntegrityError"
-        # during form validation.
-        if self.get_overlapping_suspensions().exists():
-            overlap = self.get_overlapping_suspensions().first()
-            raise ValidationError(
-                {
-                    "start_at": _(
-                        f"La période chevauche une suspension déjà existante pour ce PASS IAE "
-                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                    )
-                }
-            )
+        if hasattr(self, "approval"):
+
+            # The start of a suspension must be contained in its approval boundaries.
+            if not self.start_in_approval_boundaries:
+                raise ValidationError(
+                    {
+                        "start_at": _(
+                            f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                            f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
+                            f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
+                )
+
+            # A suspension cannot overlap another one for the same SIAE.
+            # This check is enforced by a constraint at the database level but
+            # still required here to avoid a 500 server error "IntegrityError"
+            # during form validation.
+            if self.get_overlapping_suspensions().exists():
+                overlap = self.get_overlapping_suspensions().first()
+                raise ValidationError(
+                    {
+                        "start_at": _(
+                            f"La période chevauche une suspension déjà existante pour ce PASS IAE "
+                            f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
+                )
 
     @property
     def duration(self):
@@ -763,29 +766,31 @@ class Prolongation(models.Model):
             if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
                 raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
 
-        # A prolongation cannot overlap another one for the same SIAE.
-        # This check is enforced by a constraint at the database level but
-        # still required here to avoid a 500 server error "IntegrityError"
-        # during form validation.
-        if self.get_overlapping_prolongations().exists():
-            overlap = self.get_overlapping_prolongations().first()
-            raise ValidationError(
-                {
-                    "start_at": _(
-                        f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
-                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                    )
-                }
-            )
+        if hasattr(self, "approval"):
 
-        if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
-            raise ValidationError(
-                _(
-                    f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
-                    f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
-                    f'pour le motif "{self.get_reason_display()}".'
+            # A prolongation cannot overlap another one for the same SIAE.
+            # This check is enforced by a constraint at the database level but
+            # still required here to avoid a 500 server error "IntegrityError"
+            # during form validation.
+            if self.get_overlapping_prolongations().exists():
+                overlap = self.get_overlapping_prolongations().first()
+                raise ValidationError(
+                    {
+                        "start_at": _(
+                            f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
+                            f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
                 )
-            )
+
+            if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
+                raise ValidationError(
+                    _(
+                        f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
+                        f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
+                        f'pour le motif "{self.get_reason_display()}".'
+                    )
+                )
 
     @property
     def duration(self):
