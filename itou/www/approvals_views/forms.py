@@ -7,9 +7,9 @@ from itou.approvals.models import Prolongation, Suspension
 from itou.utils.widgets import DatePickerField
 
 
-class ProlongationForm(forms.ModelForm):
+class RequestProlongationForm(forms.ModelForm):
     """
-    Create a prolongation.
+    Request a prolongation.
 
     Prolongation.clean() will handle the validation.
     """

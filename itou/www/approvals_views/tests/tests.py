@@ -295,7 +295,7 @@ class ApprovalProlongViewTest(TestCase):
 
         back_url = "/"
         params = urlencode({"back_url": back_url})
-        url = reverse("approvals:prolong", kwargs={"approval_id": approval.pk})
+        url = reverse("approvals:request_prolongation", kwargs={"approval_id": approval.pk})
         url = f"{url}?{params}"
 
         response = self.client.get(url)
