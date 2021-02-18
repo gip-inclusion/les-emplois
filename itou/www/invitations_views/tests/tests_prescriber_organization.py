@@ -1,4 +1,5 @@
 from allauth.account.models import EmailAddress
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core import mail
@@ -65,7 +66,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.org = PrescriberPoleEmploiFactory()
         self.org.members.add(PrescriberFactory())
         self.sender = self.org.members.first()
-        self.guest = UserFactory.build(email="sabine.lagrange@pole-emploi.fr")
+        self.guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
         self.post_data["form-0-first_name"] = self.guest.first_name
         self.post_data["form-0-last_name"] = self.guest.last_name
         self.post_data["form-0-email"] = self.guest.email
