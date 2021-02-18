@@ -344,10 +344,14 @@ SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_ADAPTER = "itou.allauth.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # PDFShift
+# ------------------------------------------------------------------------------
+
 PDFSHIFT_API_KEY = os.environ.get("PDFSHIFT_API_KEY")
 PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 
 # Typeform
+# ------------------------------------------------------------------------------
+
 TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
 
 # Itou.
@@ -378,12 +382,20 @@ ITOU_STAGING_DN = "staging.emplois.inclusion.beta.gouv.fr"
 
 SHOW_TEST_ACCOUNTS_BANNER = False
 
+# Le marché de l'inclusion
+LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
+
+POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
+
 # Documentation links
+# ------------------------------------------------------------------------------
+
 ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
 ITOU_DOC_PASS_VERIFICATION_URL = f"{ITOU_DOC_URL}/pourquoi-une-plateforme-de-linclusion/pass-iae-agrement-plus-simple-cest-a-dire#verification-des-demandes-de-pass-iae"
 
 # Approvals
 # ------------------------------------------------------------------------------
+
 # Approval numbering prefix can be different for non-production envs
 ASP_ITOU_PREFIX = "99999"
 
@@ -461,7 +473,9 @@ ANYMAIL = {
 
 MAILJET_API_URL = "https://api.mailjet.com/v3.1"
 
-# Asynchronous email backend
+# Asynchronous email backend.
+# ------------------------------------------------------------------------------
+
 # EMAIL_BACKEND points to an async wrapper of a "real" email backend
 # The real backend is hardcoded in the wrapper to avoid multiple and
 # confusing parameters in Django settings.
@@ -471,7 +485,3 @@ EMAIL_BACKEND = "itou.utils.emails.AsyncEmailBackend"
 # Number of retries & retry delay parameters for emails (for async process)
 SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS = 5 * 60
 SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
-
-# Le marché de l'inclusion
-LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
-
