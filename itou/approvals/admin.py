@@ -205,7 +205,7 @@ class SuspensionAdmin(admin.ModelAdmin):
 class ProlongationAdmin(admin.ModelAdmin):
     list_display = ("pk", "approval", "start_at", "end_at", "created_at", "status", "is_in_progress")
     list_display_links = ("pk", "approval")
-    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "status_updated_by")
+    raw_id_fields = ("approval", "requested_by", "siae", "created_by", "updated_by", "status_updated_by")
     list_filter = (
         "status",
         IsInProgressFilter,

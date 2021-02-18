@@ -118,6 +118,7 @@ def prolong(request, approval_id, template_name="approvals/prolong.html"):
             preview = True
         elif request.POST.get("save"):
             prolongation = form.save(commit=False)
+            prolongation.requested_by = request.user
             prolongation.created_by = request.user
             prolongation.save()
             prolongation.email_new_prolongation_for_admin.send()

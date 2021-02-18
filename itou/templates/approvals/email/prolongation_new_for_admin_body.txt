@@ -9,7 +9,7 @@ Nouvelle demande de prolongation de PASS IAE sur Itou.
 
 - Date de début : {{ prolongation.start_at|date:"d/m/Y" }}
 - Date de fin : {{ prolongation.end_at|date:"d/m/Y" }}
-- Demande par : {{ prolongation.created_by.get_full_name|title }} - {{ prolongation.created_by.email }}
+- Demande par : {{ prolongation.requested_by.get_full_name|title }} - {{ prolongation.requested_by.email }}
 - Motif : {{ prolongation.get_reason_display }}
 
 {% translate "*Motivation de la demande* :" %}
