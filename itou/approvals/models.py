@@ -44,8 +44,8 @@ class CommonApprovalMixin(models.Model):
     LOCKDOWN_END_AT = datetime.date(2020, 6, 16)
     LOCKDOWN_EXTENSION_DELAY_MONTHS = 3
 
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
 
     class Meta:
@@ -394,8 +394,8 @@ class Suspension(models.Model):
         )
 
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name=_("SIAE"),
@@ -641,8 +641,8 @@ class Prolongation(models.Model):
     }
 
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
     requested_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandée par"),
@@ -980,7 +980,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     first_name = models.CharField(_("Prénom"), max_length=150)
     last_name = models.CharField(_("Nom"), max_length=150)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150)
-    birthdate = models.DateField(verbose_name=_("Date de naissance"), default=timezone.now)
+    birthdate = models.DateField(verbose_name=_("Date de naissance"), default=timezone.localdate)
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
