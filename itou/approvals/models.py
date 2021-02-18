@@ -439,7 +439,6 @@ class Suspension(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
-        super().clean()
 
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
             raise ValidationError({"reason_explanation": _("En cas de force majeure, veuillez préciser le motif.")})
@@ -724,7 +723,6 @@ class Prolongation(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
-        super().clean()
 
         # No min duration: a prolongation may last only 1 day.
         if self.end_at < self.start_at:
