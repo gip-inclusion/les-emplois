@@ -1,3 +1,12 @@
+"""
+Custom admin views.
+
+We should keep those to a minimum to avoid a future maintenance nightmare.
+
+https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
+https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
+"""
+
 from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
@@ -19,9 +28,6 @@ def manually_add_approval(
 ):
     """
     Custom admin view to manually add an approval.
-
-    https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
-    https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
     """
 
     admin_site = model_admin.admin_site
@@ -144,9 +150,6 @@ def validate_prolongation(
 ):
     """
     Custom admin view to validate a prolongation.
-
-    https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
-    https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
     """
 
     admin_site = model_admin.admin_site
@@ -201,9 +204,6 @@ def refuse_prolongation(
 ):
     """
     Custom admin view to refuse a prolongation.
-
-    https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
-    https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
     """
 
     admin_site = model_admin.admin_site
