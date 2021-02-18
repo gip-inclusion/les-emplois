@@ -11,7 +11,9 @@ Votre demande de prolongation du PASS IAE de {{ job_seeker_full_name }} a été
 {% endblocktranslate %}
 
 {% with prolongation.approval.user.last_accepted_job_application as job_application %}
+{% if job_application %}
 {{ itou_protocol }}://{{ itou_fqdn }}{% url 'apply:details_for_siae' job_application.pk %}
+{% endif %}
 {% endwith %}
 
 {% endblock body %}
