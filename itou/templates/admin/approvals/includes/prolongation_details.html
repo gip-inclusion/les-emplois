@@ -2,7 +2,7 @@
 {% load format_filters %}
 
 <h2>
-    <a href="{% url "admin:approvals_prolongation_change" prolongation.id %}" target="_blank">
+    <a href="{% url "admin:approvals_prolongation_change" prolongation.id %}">
         {% translate "Prolongation" %}
     </a>
 </h2>
@@ -33,8 +33,8 @@
 {% with prolongation.approval as approval %}
 
     <h2>
-        <a href="{% url "admin:approvals_approval_change" approval.id %}" target="_blank">
-            {% translate "PASS IAE" %}
+        <a href="{% url "admin:approvals_approval_change" approval.id %}" rel="noopener" target="_blank">
+            {% blocktranslate %}PASS IAE <small>(dans une nouvelle fenêtre)</small>{% endblocktranslate %}
         </a>
     </h2>
 
@@ -58,8 +58,8 @@
 {% with prolongation.approval.user as user %}
 
     <h2>
-        <a href="{% url "admin:users_user_change" user.id %}" target="_blank">
-            {% translate "Bénéficiaire" %}
+        <a href="{% url "admin:users_user_change" user.id %}" rel="noopener" target="_blank">
+            {% blocktranslate %}Bénéficiaire <small>(dans une nouvelle fenêtre)</small>{% endblocktranslate %}
         </a>
     </h2>
 
@@ -104,8 +104,8 @@
 {% with prolongation.siae as siae %}
 
     <h2>
-        <a href="{% url "admin:siaes_siae_change" siae.id %}" target="_blank">
-            {% translate "Employeur solidaire" %}
+        <a href="{% url "admin:siaes_siae_change" siae.id %}" rel="noopener" target="_blank">
+            {% blocktranslate %}Employeur solidaire <small>(dans une nouvelle fenêtre)</small>{% endblocktranslate %}
         </a>
     </h2>
 
