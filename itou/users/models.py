@@ -4,7 +4,6 @@ from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Q
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
@@ -250,8 +249,8 @@ class JobSeekerProfile(models.Model):
     education_level = models.CharField(
         max_length=2,
         verbose_name=_("Niveau de formation (ASP)"),
+        blank=True,
         choices=EducationLevel.choices,
-        default=EducationLevel.NO_SCHOOLING,
     )
 
     resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
@@ -262,42 +261,42 @@ class JobSeekerProfile(models.Model):
     poleemploi_since = models.CharField(
         max_length=20,
         verbose_name=_("Inscrit à Pôle emploi depuis"),
-        default=AllocationDuration.NONE,
+        blank=True,
         choices=AllocationDuration.choices,
     )
 
     unemployed_since = models.CharField(
         max_length=20,
         verbose_name=_("Sans emploi depuis"),
-        default=AllocationDuration.NONE,
+        blank=True,
         choices=AllocationDuration.choices,
     )
 
     rsa_allocation_since = models.CharField(
         max_length=20,
         verbose_name=_("Allocataire du RSA depuis"),
-        default=AllocationDuration.NONE,
+        blank=True,
         choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
         max_length=20,
         verbose_name=_("Allocataire de l'ASS depuis"),
-        default=AllocationDuration.NONE,
+        blank=True,
         choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
         max_length=20,
         verbose_name=_("Allocataire de l'AAH depuis"),
-        default=AllocationDuration.NONE,
+        blank=True,
         choices=AllocationDuration.choices,
     )
 
     ata_allocation_since = models.CharField(
         max_length=20,
         verbose_name=_("Allocataire de l'ATA depuis"),
-        default=AllocationDuration.NONE,
+        blank=True,
         choices=AllocationDuration.choices,
     )
 
@@ -306,7 +305,7 @@ class JobSeekerProfile(models.Model):
         verbose_name_plural = _("Profils demandeur d'emploi")
 
     def __str__(self):
-        return f"Jobseeker profile: {self.user.name}"
+        return str(self.user)
 
     def clean(self):
         if self.resourceless and any([self.rqth_employee, self.oeth_employee]):

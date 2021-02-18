@@ -223,7 +223,6 @@ class AllocationDuration(models.TextChoices):
     Note: effect periods are not handled
     """
 
-    NONE = "", _("Sans effet")
     LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
     FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
     FROM_12_TO_23_MONTHS = "FROM_12_TO_23_MONTHS", _("De 12 à 23 mois")
