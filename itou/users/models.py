@@ -53,11 +53,11 @@ class User(AbstractUser, AddressMixin):
 
     ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
 
-    TITLE_M = "M"
-    TITLE_MME = "MME"
-    TITLE_CHOICES = ((TITLE_M, _("Monsieur")), (TITLE_MME, _("Madame")))
+    class Title(models.TextChoices):
+        M = "M", _("Monsieur")
+        MME = "MME", _("Madame")
 
-    title = models.CharField(max_length=5, verbose_name=_("Civilité"), null=True, choices=TITLE_CHOICES)
+    title = models.CharField(max_length=3, verbose_name=_("Civilité"), null=True, choices=Title.choices)
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
@@ -240,7 +240,11 @@ class JobSeekerProfile(models.Model):
     """
 
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, primary_key=True, verbose_name=_("Profil du demandeur d'emploi")
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        verbose_name=_("Profil du demandeur d'emploi"),
+        related_name="jobseeker_profile",
     )
 
     education_level = models.ForeignKey(
@@ -258,8 +262,8 @@ class JobSeekerProfile(models.Model):
 
     resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
 
-    rqth = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
-    oeth = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
+    rqth_employee = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
+    oeth_employee = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
 
     poleemploi_since = models.CharField(
         max_length=20,
@@ -305,7 +309,7 @@ class JobSeekerProfile(models.Model):
 
     class Meta:
         verbose_name = _("Profil demandeur d'emploi")
-        verbose_name_plural = _("Profils demandeurs d'emploi")
+        verbose_name_plural = _("Profils demandeur d'emploi")
         constraints = [
             models.CheckConstraint(
                 name="jobseekerprofile_employed",
@@ -317,6 +321,10 @@ class JobSeekerProfile(models.Model):
 
     def __str__(self):
         return f"Jobseeker profile: {self.user.name}"
+
+    def clean(self):
+        if self.resourceless and any([self.rqth_employee, self.oeth_employee]):
+            raise ValidationError(_("La personne n'est pas considérée comme sans ressources si OETH ou RQTH"))
 
     @property
     def is_employed(self):

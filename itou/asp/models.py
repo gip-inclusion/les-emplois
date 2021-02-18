@@ -239,6 +239,7 @@ class EducationLevel(PrettyPrintMixin, AbstractPeriod):
 
     code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
     name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
+    siae_kind = models.ForeignKey("asp.SiaeKind", verbose_name=_("Mesure ASP"), null=True, on_delete=models.CASCADE, related_name="education_levels")
 
     class Meta:
         verbose_name = _("Niveau de formation")

@@ -86,6 +86,11 @@ class Command(BaseCommand):
         return df
 
     def write_fixture_file(self, path, records):
+        """
+        Write fixture file
+        filename_prefix add a prefix to the filename for ordering concerns
+        if any (i.e. for SiaeKind objects references)
+        """
         self.log(f"Formatted {len(records)} element(s)")
         self.log(f"Writing JSON fixture to: {path}")
 
@@ -116,7 +121,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_education_levels.json")
+        export_path = os.path.join(_FIXTURES_DIR, "05_asp_education_levels.json")
         model = "asp.EducationLevel"
         df = self.load_dataframe(path)
         records = []
@@ -133,6 +138,7 @@ class Command(BaseCommand):
                     "name": row["rnf_libelle_niveau_form_empl"],
                     "start_date": start_date,
                     "end_date": end_date,
+                    "siae_kind_id": int(row["rme_id"]) if row["rme_id"] else None,
                 },
             }
             records.append(elt)
@@ -154,7 +160,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_INSEE_communes.json")
+        export_path = os.path.join(_FIXTURES_DIR, "01_asp_INSEE_communes.json")
         model = "asp.Commune"
         df = self.load_dataframe(path)
         records = []
@@ -192,7 +198,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_INSEE_departments.json")
+        export_path = os.path.join(_FIXTURES_DIR, "03_asp_INSEE_departments.json")
         model = "asp.Department"
         df = self.load_dataframe(path)
         records = []
@@ -229,7 +235,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_INSEE_countries.json")
+        export_path = os.path.join(_FIXTURES_DIR, "02_asp_INSEE_countries.json")
         model = "asp.Country"
         df = self.load_dataframe(path)
         records = []
@@ -253,6 +259,9 @@ class Command(BaseCommand):
     def gen_siae_kinds(self, filename="ref_mesure.csv"):
         """
         Generates ASP SIAE kinds fixture.
+
+        Fixture prefix is important for this case, because SiaeKind must be
+        imported before EducationLevel and EmployerType entries
         """
         path = os.path.join(settings.IMPORT_DIR, filename)
 
@@ -261,7 +270,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_siae_kinds.json")
+        export_path = os.path.join(_FIXTURES_DIR, "04_asp_siae_kinds.json")
         model = "asp.SiaeKind"
         df = self.load_dataframe(path)
         records = []
@@ -298,7 +307,7 @@ class Command(BaseCommand):
         if not self.file_exists(path):
             return
 
-        export_path = os.path.join(_FIXTURES_DIR, "asp_employer_types.json")
+        export_path = os.path.join(_FIXTURES_DIR, "06_asp_employer_types.json")
         model = "asp.EmployerType"
         df = self.load_dataframe(path)
         records = []
@@ -348,10 +357,10 @@ class Command(BaseCommand):
             fn(filename=options.get(import_arg))
         else:
             # Order matters (see below)
-            self.gen_education_levels()
             self.gen_insee_communes()
             self.gen_insee_departments()
             self.gen_insee_countries()
             self.gen_siae_kinds()
-            # employer types depends on SIAE kinds ID
+            # employer types and education levels depends on SIAE kinds ID
             self.gen_employer_types()
+            self.gen_education_levels()
