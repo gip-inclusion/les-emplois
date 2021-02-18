@@ -1,6 +1,7 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.forms.models import modelformset_factory
 from django.utils.translation import gettext as _, gettext_lazy
@@ -99,7 +100,9 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
 
     def clean_email(self):
         email = super().clean_email()
-        if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith("@pole-emploi.fr"):
+        if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith(
+            settings.POLE_EMPLOI_EMAIL_SUFFIX
+        ):
             error = forms.ValidationError(_("L'adresse e-mail doit être une adresse Pôle emploi"))
             self.add_error("email", error)
         return email

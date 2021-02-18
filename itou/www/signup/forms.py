@@ -1,5 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
@@ -41,7 +42,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 
     def clean_email(self):
         email = super().clean_email()
-        if email.endswith("@pole-emploi.fr"):
+        if email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError(gettext_lazy("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat."))
         return email
 
@@ -350,11 +351,11 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         self.pole_emploi_org = kwargs.pop("pole_emploi_org")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = _("Exemple : nom.prenom@pole-emploi.fr")
+        self.fields["email"].help_text = _(f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
 
     def clean_email(self):
         email = super().clean_email()
-        if not email.endswith("@pole-emploi.fr"):
+        if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi."))
         return email
 
