@@ -719,6 +719,8 @@ class Prolongation(models.Model):
         """
         if self.pk:
             self.updated_at = timezone.now()
+        else:
+            self.created_at = timezone.now()
         super().save(*args, **kwargs)
 
     def clean(self):
