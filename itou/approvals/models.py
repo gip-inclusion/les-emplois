@@ -625,6 +625,13 @@ class Prolongation(models.Model):
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
     end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Demandée par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongation_requests_set",
+    )
     siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name=_("SIAE"),
