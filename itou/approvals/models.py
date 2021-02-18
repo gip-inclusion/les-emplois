@@ -139,6 +139,15 @@ class Approval(CommonApprovalMixin):
         "pour lui pendant la période de suspension."
     )
 
+    ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_USER = _(
+        "La prolongation de votre PASS IAE est en attente de validation. "
+        "Vous ne pouvez pas postuler pendant cette période."
+    )
+    ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_PROXY = _(
+        "La prolongation du PASS IAE du candidat  en attente de validation. "
+        "Vous ne pouvez pas postuler pour lui pendant cette période."
+    )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
