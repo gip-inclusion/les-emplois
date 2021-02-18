@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.approvals.admin_forms import ManuallyAddApprovalForm, ProlongationForm
+from itou.approvals.admin_forms import ManuallyAddApprovalForm, ValidateProlongationForm
 from itou.approvals.models import Approval, Prolongation
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
@@ -164,7 +164,7 @@ def validate_prolongation(
     queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
     prolongation = get_object_or_404(queryset, pk=prolongation_id)
 
-    form = ProlongationForm(instance=prolongation, data=request.POST or None)
+    form = ValidateProlongationForm(instance=prolongation, data=request.POST or None)
     fieldsets = [(None, {"fields": list(form.base_fields)})]
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
