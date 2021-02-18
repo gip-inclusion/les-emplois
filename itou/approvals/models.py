@@ -831,6 +831,8 @@ class Prolongation(models.Model):
         self.requested_by = requested_by
         if not self.created_by:
             self.created_by = requested_by
+        else:
+            self.updated_by = requested_by
         self.save()
         self.email_prolongation_request.send()
 
