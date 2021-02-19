@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.utils import timezone
 
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
@@ -56,15 +55,14 @@ def get_org_accepted_job_applications_count(org):
     return len([ja for ja in job_applications if ja.state == JobApplicationWorkflow.STATE_ACCEPTED])
 
 
-def get_timedelta_since_org_last_job_application(org):
+def get_org_last_job_application_creation_date(org):
     if org != ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         job_applications = list(org.jobapplication_set.all())
         # We have to do all this in python to benefit from prefetch_related.
         if len(job_applications) >= 1:
             job_applications.sort(key=lambda o: o.created_at, reverse=True)
             last_job_application = job_applications[0]
-            now = timezone.now()
-            return now - last_job_application.created_at
+            return last_job_application.created_at
     # This field makes no sense for prescribers without org.
     return None
 
@@ -133,10 +131,10 @@ TABLE_COLUMNS = (
             "lambda": get_org_accepted_job_applications_count,
         },
         {
-            "name": "temps_écoulé_depuis_dernière_candidature",
-            "type": "interval",
-            "comment": "Temps écoulé depuis la dernière création de candidature",
-            "lambda": get_timedelta_since_org_last_job_application,
+            "name": "date_dernière_candidature",
+            "type": "date",
+            "comment": "Date de la dernière création de candidature",
+            "lambda": get_org_last_job_application_creation_date,
         },
     ]
     + get_establishment_last_login_date_column()
