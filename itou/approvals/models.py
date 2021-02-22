@@ -144,7 +144,7 @@ class Approval(CommonApprovalMixin):
         "Vous ne pouvez pas postuler pendant cette période."
     )
     ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_PROXY = _(
-        "La prolongation du PASS IAE du candidat  en attente de validation. "
+        "La prolongation du PASS IAE du candidat en attente de validation. "
         "Vous ne pouvez pas postuler pour lui pendant cette période."
     )
 
