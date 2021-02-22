@@ -107,10 +107,10 @@ class ModelTest(TestCase):
         job_seeker.last_login = timezone.now()
         self.assertFalse(job_seeker.is_handled_by_proxy)
 
-    def test_is_currently_hired_by_siae(self):
+    def test_last_hire_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         user = job_application.job_seeker
         siae = job_application.to_siae
-        self.assertTrue(user.is_currently_hired_by_siae(siae))
+        self.assertTrue(user.last_hire_made_by_siae(siae))
         siae2 = SiaeFactory()
-        self.assertFalse(user.is_currently_hired_by_siae(siae2))
+        self.assertFalse(user.last_hire_made_by_siae(siae2))

@@ -239,7 +239,7 @@ class Approval(CommonApprovalMixin):
     def can_be_suspended_by_siae(self, siae):
         return (
             self.can_be_suspended
-            and self.user.is_currently_hired_by_siae(siae)
+            and self.user.last_hire_made_by_siae(siae)
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
@@ -266,7 +266,7 @@ class Approval(CommonApprovalMixin):
         return self.is_open_to_prolongation and not self.is_suspended and not self.has_pending_prolongation
 
     def can_be_prolonged_by_siae(self, siae):
-        return self.user.is_currently_hired_by_siae(siae) and self.can_be_prolonged
+        return self.user.last_hire_made_by_siae(siae) and self.can_be_prolonged
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -519,9 +519,7 @@ class Suspension(models.Model):
         cached_result = getattr(self, "_can_be_handled_by_siae_cache", None)
         if cached_result:
             return cached_result
-        self._can_be_handled_by_siae_cache = self.is_in_progress and self.approval.user.is_currently_hired_by_siae(
-            siae
-        )
+        self._can_be_handled_by_siae_cache = self.is_in_progress and self.approval.user.last_hire_made_by_siae(siae)
         return self._can_be_handled_by_siae_cache
 
     @staticmethod

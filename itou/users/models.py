@@ -213,7 +213,7 @@ class User(AbstractUser, AddressMixin):
             return None
         return self.job_applications.accepted().latest("created_at")
 
-    def is_currently_hired_by_siae(self, siae):
+    def last_hire_made_by_siae(self, siae):
         if not self.is_job_seeker:
             return False
         return self.last_accepted_job_application.to_siae == siae
