@@ -733,6 +733,12 @@ class ApprovalsWrapper:
         Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
         """
         approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
+
+        # If an ongoing PASS IAE exists, consider it's the latest valid approval
+        # even if a PoleEmploiApproval is more recent.
+        if any(approval.is_valid for approval in approvals):
+            return approvals
+
         approvals_numbers = [approval.number for approval in approvals]
         pe_approvals = [
             pe_approval
@@ -745,22 +751,9 @@ class ApprovalsWrapper:
         # This allows to always choose the longest and most recent approval.
         # Dates are converted to timestamp so that the subtraction operator
         # can be used in the lambda.
-        merged_approvals = sorted(
+        return sorted(
             merged_approvals, key=lambda x: (-time.mktime(x.end_at.timetuple()), time.mktime(x.start_at.timetuple()))
         )
-
-        # If an ongoing PASS IAE exists, consider it's the latest valid approval
-        # even if a PoleEmploiApproval is more recent.
-        for i, approval in enumerate(merged_approvals[1:], start=1):
-            if (
-                approval.originates_from_itou
-                and not merged_approvals[i - 1].originates_from_itou
-                and approval.is_valid
-            ):
-                merged_approvals.insert(0, merged_approvals.pop(i))
-                break
-
-        return merged_approvals
 
     @property
     def has_valid_pole_emploi_eligibility_diagnosis(self):

@@ -518,14 +518,14 @@ class ApprovalsWrapperTest(TestCase):
         )
 
         # PoleEmploiApproval
-        oldest_pe_approval = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=start_at,
             end_at=end_at + relativedelta(days=1),
         )
 
-        latest_pe_approval = PoleEmploiApprovalFactory(
+        PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=start_at,
@@ -534,25 +534,6 @@ class ApprovalsWrapperTest(TestCase):
 
         approvals_wrapper = ApprovalsWrapper(user=user)
         self.assertEqual(pass_iae, approvals_wrapper.latest_approval)
-
-        # Preserve original order
-        self.assertEqual(latest_pe_approval, approvals_wrapper.merged_approvals[1])
-        self.assertEqual(oldest_pe_approval, approvals_wrapper.merged_approvals[-1])
-        self.assertEqual(3, len(approvals_wrapper.merged_approvals))
-
-    def test_merge_one_valid_approval(self):
-        user = JobSeekerFactory()
-        start_at = timezone.now() - relativedelta(months=2)
-        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
-
-        ApprovalFactory(
-            user=user,
-            start_at=start_at,
-            end_at=end_at,
-        )
-
-        approvals_wrapper = ApprovalsWrapper(user=user)
-        self.assertEqual(len(approvals_wrapper.merged_approvals), 1)
 
     def test_status_without_approval(self):
         user = JobSeekerFactory()
