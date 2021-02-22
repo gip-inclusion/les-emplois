@@ -238,7 +238,7 @@ def refuse_prolongation(
         "email_subject_template": email_subject_template,
         "prolongation": prolongation,
         "opts": opts,
-        "title": _("Validation d'une prolongation"),
+        "title": _("Refus d'une prolongation"),
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
