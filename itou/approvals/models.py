@@ -126,7 +126,7 @@ class Approval(CommonApprovalMixin):
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
 
     # The period of time during which it is possible to prolong a PASS IAE before it ends.
-    TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS = 3
+    PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS = 3
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = _(
@@ -275,7 +275,9 @@ class Approval(CommonApprovalMixin):
     @property
     def is_open_to_prolongation(self):
         now = timezone.now().date()
-        prolongation_threshold = self.end_at - relativedelta(months=self.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS)
+        prolongation_threshold = self.end_at - relativedelta(
+            months=self.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS
+        )
         return prolongation_threshold <= now <= self.end_at
 
     @cached_property

@@ -316,7 +316,7 @@ class ApprovalModelTest(TestCase):
         # Set "now" to be "before" the day approval is open to prolongation.
         end_at = (
             datetime.date.today()
-            + relativedelta(months=Approval.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS)
+            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
             + relativedelta(days=1)
         )
         start_at = end_at - relativedelta(years=2)
@@ -326,7 +326,7 @@ class ApprovalModelTest(TestCase):
         # Set "now" to be "after" the day approval is open to prolongation.
         end_at = (
             datetime.date.today()
-            + relativedelta(months=Approval.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS)
+            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
             - relativedelta(days=1)
         )
         start_at = end_at - relativedelta(years=2)

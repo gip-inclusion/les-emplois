@@ -273,7 +273,9 @@ class ApprovalProlongViewTest(TestCase):
 
         # Set "now" to be "after" the day approval is open to prolongation.
         approval_end_at = (
-            today + relativedelta(months=Approval.TIME_OPEN_TO_PROLONGATION_BEFORE_END_MONTHS) - relativedelta(days=1)
+            today
+            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
+            - relativedelta(days=1)
         )
         job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
