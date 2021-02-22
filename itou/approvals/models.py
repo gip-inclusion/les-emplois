@@ -733,6 +733,12 @@ class ApprovalsWrapper:
         Returns a list of merged unique `Approval` and `PoleEmploiApproval` objects.
         """
         approvals = list(Approval.objects.filter(user=self.user).order_by("-start_at"))
+
+        # If an ongoing PASS IAE exists, consider it's the latest valid approval
+        # even if a PoleEmploiApproval is more recent.
+        if any(approval.is_valid for approval in approvals):
+            return approvals
+
         approvals_numbers = [approval.number for approval in approvals]
         pe_approvals = [
             pe_approval
