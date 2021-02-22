@@ -138,5 +138,19 @@
       "description": "",
       "ui_rank": 32767
    }
+},
+{
+   "model": "siaes.siaejobdescription",
+   "pk": 11,
+   "fields": {
+      "appellation": "11745",
+      "siae": 3855,
+      "created_at": "2021-02-22T14:54:17Z",
+      "updated_at": null,
+      "is_active": true,
+      "custom_name": "",
+      "description": "",
+      "ui_rank": 32767
+   }
 }
 ]

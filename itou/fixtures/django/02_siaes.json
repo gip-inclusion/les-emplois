@@ -1373,7 +1373,7 @@
       "source": "ASP",
       "created_by": null,
       "created_at": "2019-12-05T14:37:56.609Z",
-      "updated_at": "2020-12-18T10:40:09.000Z",
+      "updated_at": "2020-12-18T10:40:09Z",
       "block_job_applications": false,
       "job_applications_blocked_at": null,
       "convention": 16516
@@ -51113,7 +51113,7 @@
       "source": "ASP",
       "created_by": null,
       "created_at": "2019-12-05T14:37:56.609Z",
-      "updated_at": "2020-12-18T10:39:06.000Z",
+      "updated_at": "2020-12-18T10:39:06Z",
       "block_job_applications": false,
       "job_applications_blocked_at": null,
       "convention": 14613
@@ -52433,7 +52433,7 @@
       "source": "ASP",
       "created_by": null,
       "created_at": "2019-12-05T14:37:56.609Z",
-      "updated_at": "2020-12-18T10:40:12.000Z",
+      "updated_at": "2020-12-18T10:40:12Z",
       "block_job_applications": false,
       "job_applications_blocked_at": null,
       "convention": 16606
@@ -65303,7 +65303,7 @@
       "source": "ASP",
       "created_by": null,
       "created_at": "2019-12-05T14:37:56.609Z",
-      "updated_at": "2020-12-18T10:39:21.000Z",
+      "updated_at": "2020-12-18T10:39:21Z",
       "block_job_applications": false,
       "job_applications_blocked_at": null,
       "convention": 15052
@@ -115557,6 +115557,36 @@
       "block_job_applications": false,
       "job_applications_blocked_at": null,
       "convention": 16506
+   }
+},
+{
+   "model": "siaes.siae",
+   "pk": 3855,
+   "fields": {
+      "address_line_1": "Avenue des moulins",
+      "address_line_2": "",
+      "post_code": "13990",
+      "city": "Fontvieille",
+      "department": "13",
+      "coords": "SRID=4326;POINT (4.708605 43.72501)",
+      "geocoding_score": 0.9542181818181816,
+      "siret": "12457836900001",
+      "naf": "",
+      "kind": "EA",
+      "name": "Les moulins de l'immobilier",
+      "brand": "",
+      "phone": "",
+      "email": "",
+      "auth_email": "",
+      "website": "",
+      "description": "",
+      "source": "STAFF_CREATED",
+      "created_by": 1,
+      "created_at": "2021-02-22T14:54:17.182Z",
+      "updated_at": "2021-02-23T08:25:00.205Z",
+      "block_job_applications": false,
+      "job_applications_blocked_at": null,
+      "convention": null
    }
 }
 ]
