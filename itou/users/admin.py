@@ -117,7 +117,10 @@ class CreatedByProxyFilter(admin.SimpleListFilter):
 @admin.register(models.User)
 class ItouUserAdmin(UserAdmin):
 
-    inlines = UserAdmin.inlines + [SiaeMembershipInline, PrescriberMembershipInline]
+    inlines = UserAdmin.inlines + [
+        SiaeMembershipInline,
+        PrescriberMembershipInline,
+    ]
     list_display = (
         "pk",
         "email",
@@ -215,19 +218,14 @@ class ItouUserAdmin(UserAdmin):
 
 @admin.register(models.JobSeekerProfile)
 class JobSeekerProfileAdmin(admin.ModelAdmin):
+    """
+    Inlines would only be possible the other way around
+    """
+
     raw_id_fields = ("user",)
-    list_display = (
-        "pk",
-        "user_email",
-        "user_first_name",
-        "user_last_name",
-    )
+    list_display = ("pk", "user", "username")
 
-    def user_email(self, obj):
-        return obj.user.email
+    def username(self, obj):
+        return f"{obj.user.first_name} {obj.user.last_name}"
 
-    def user_first_name(self, obj):
-        return obj.user.first_name
-
-    def user_last_name(self, obj):
-        return obj.user.last_name
+    username.short_description = _("Nom complet")

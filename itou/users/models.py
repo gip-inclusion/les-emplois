@@ -56,7 +56,7 @@ class User(AbstractUser, AddressMixin):
         M = "M", _("Monsieur")
         MME = "MME", _("Madame")
 
-    title = models.CharField(max_length=3, verbose_name=_("Civilité"), null=True, choices=Title.choices)
+    title = models.CharField(max_length=3, verbose_name=_("Civilité"), null=True, blank=True, choices=Title.choices)
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
@@ -242,7 +242,7 @@ class JobSeekerProfile(models.Model):
         User,
         on_delete=models.CASCADE,
         primary_key=True,
-        verbose_name=_("Profil du demandeur d'emploi"),
+        verbose_name=_("Demandeur d'emploi"),
         related_name="jobseeker_profile",
     )
 
@@ -305,15 +305,21 @@ class JobSeekerProfile(models.Model):
         verbose_name_plural = _("Profils demandeur d'emploi")
 
     def __str__(self):
-        return str(self.user)
+        return f"JobSeekerProfile: {self.user}"
 
     def clean(self):
-        if self.resourceless and any([self.rqth_employee, self.oeth_employee]):
+        if self.resourceless and self.is_employed:
             raise ValidationError(_("La personne n'est pas considérée comme sans ressources si OETH ou RQTH"))
+
+        if self.is_employed and self.unemployed_since:
+            raise ValidationError(_("La personne ne peut avoir de période sans emploi si actuellement employée"))
+
+        if self.unemployed_since and self.is_employed:
+            raise ValidationError(_("La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"))
 
     @property
     def is_employed(self):
-        return self.employer_type is not None
+        return self.rqth_employee or self.oeth_employee
 
     @property
     def has_rsa_allocation(self):
