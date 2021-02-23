@@ -728,6 +728,9 @@ class Prolongation(models.Model):
                     ),
                     ("approval", RangeOperators.EQUAL),
                 ),
+                # Exclude the REFUSED status in order to be able to make a new request
+                # for prolongation with dates that overlap with those of another.
+                condition=(~Q(status="REFUSED")),
             ),
         ]
 
@@ -846,12 +849,15 @@ class Prolongation(models.Model):
         return cumulative_duration > self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
 
     def get_overlapping_prolongations(self):
-        args = {
+        filter_args = {
             "start_at__lte": self.end_at,  # Inclusive start.
             "end_at__gt": self.start_at,  # Exclusive end.
             "approval": self.approval,
+            # Exclude the REFUSED status in order to be able to make a new request
+            # for prolongation with dates that overlap with those of another.
+            "status__in": [self.Status.PENDING, self.Status.VALIDATED],
         }
-        return self._meta.model.objects.exclude(pk=self.pk).filter(**args)
+        return self._meta.model.objects.exclude(pk=self.pk).filter(**filter_args)
 
     def request(self, requested_by):
         self.status = self.Status.PENDING.value
