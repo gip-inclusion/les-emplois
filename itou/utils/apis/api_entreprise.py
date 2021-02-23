@@ -18,7 +18,7 @@ class EtablissementAPI:
 
     ERROR_IS_CLOSED = gettext_lazy("La base Sirene indique que l'état administratif de l'établissement est fermé.")
 
-    def __init__(self, siret, object="Inscription à la Plateforme de l'inclusion"):
+    def __init__(self, siret, object="Inscription aux emplois de l'inclusion"):
         self.data, self.error = self.get(siret, object)
 
     def get(self, siret, object):

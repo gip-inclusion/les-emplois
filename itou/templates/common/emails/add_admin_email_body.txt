@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Vous êtes administrateur d'une structure sur la Plateforme de l'inclusion" %}
+{% translate "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" %}
 
 {% blocktranslate %}
 Un administrateur peut ajouter ou retirer :
@@ -17,6 +17,6 @@ Un administrateur peut ajouter ou retirer :
 - {% translate "Type" %} : {{ structure.kind }}
 - {% translate "Email de contact" %} : {{ structure.email }}
 
-{% translate "Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs de cette structure sur la Plateforme de l'inclusion." %}
+{% translate "Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs de cette structure sur les emplois de l'inclusion." %}
 
 {% endblock body %}

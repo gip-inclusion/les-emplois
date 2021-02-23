@@ -5,7 +5,7 @@
 {% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst org_name=org.display_name %}
 Bonjour {{ first_name }} {{ last_name }} !
 
-Vous avez été invité(e) à vous rattacher au compte de la structure {{ org_name }} sur la Plateforme de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur la Plateforme !
+Vous avez été invité(e) à vous rattacher au compte de la structure {{ org_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur la Plateforme !
 {% endblocktranslate %}
 
 {{ acceptance_link }}
