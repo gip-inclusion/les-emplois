@@ -38,7 +38,7 @@ Réponse :
 
 Notes :
 
-- Vous dévez échapper tout caractère spécial dans l'email et le mot de passe. Par exemple `+` devient `%2B`.
+- [Vous devez encoder tout caractère spécial](https://fr.wikipedia.org/wiki/Encodage-pourcent) dans l'email et le mot de passe. Par exemple `+` devient `%2B`.
 - Pour les développeurs itou qui souhaitent utiliser l'API en local dev, remplacer `https://emplois.inclusion.beta.gouv.fr` par `http://127.0.0.1:8080`.
 
 
@@ -190,6 +190,7 @@ Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont disponib
     }
 }
 ```
+
 
 
 
