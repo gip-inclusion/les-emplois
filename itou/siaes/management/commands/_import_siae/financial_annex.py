@@ -44,9 +44,9 @@ def get_creatable_and_deletable_afs(dry_run):
             if not dry_run:
                 af.save()
 
-        # Sometimes an AF migrates from one structure to another.
+        # Sometimes an AF migrates from one convention to another.
         if af.convention.asp_id != row.asp_id:
-            convention_query = SiaeConvention.objects.filter(asp_id=row.asp_id)
+            convention_query = SiaeConvention.objects.filter(asp_id=row.asp_id, kind=row.kind)
             if convention_query.exists():
                 convention = convention_query.get()
                 af.convention = convention

@@ -141,7 +141,7 @@
       "user": 16,
       "siae": 3855,
       "joined_at": "2021-02-22T14:54:17Z",
-      "is_siae_admin": false,
+      "is_siae_admin": true,
       "is_active": true,
       "created_at": "2021-02-22T15:06:22.049Z",
       "updated_at": null,
