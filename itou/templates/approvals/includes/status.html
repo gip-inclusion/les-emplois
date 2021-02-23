@@ -90,7 +90,16 @@
                             {% blocktranslate with start=p.start_at|date:"d/m/Y" end=p.end_at|date:"d/m/Y" %}
                                 du {{ start }} au {{ end }}
                             {% endblocktranslate %}
-                            -
+                            <small>
+                                <b>
+                                    {% if p.status == p.Status.PENDING %}
+                                        {% translate "À l'étude" %}
+                                    {% else %}
+                                        {{ p.get_status_display }}
+                                    {% endif %}
+                                </b>
+                            </small>
+                            <br>
                             <small>{{ p.get_reason_display }}</small>
                         </li>
                     {% endfor %}
