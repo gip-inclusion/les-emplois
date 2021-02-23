@@ -2,11 +2,13 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktranslate with job_seeker_full_name=prolongation.approval.user.get_full_name|title %}
+{% blocktranslate with job_seeker_full_name=prolongation.approval.user.get_full_name|title approval_end_at=prolongation.approval.end_at|date:"d/m/Y" %}
 
 Bonjour,
 
 Votre demande de prolongation du PASS IAE de {{ job_seeker_full_name }} a été refusée.
+
+Le PASS IAE ne sera plus valable après le {{ approval_end_at }}.
 
 {% endblocktranslate %}
 
