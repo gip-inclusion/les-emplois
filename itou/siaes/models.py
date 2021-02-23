@@ -235,6 +235,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             return self.convention.asp_id
         return None
 
+    @property
     def has_members(self):
         return self.active_members.exists()
 
