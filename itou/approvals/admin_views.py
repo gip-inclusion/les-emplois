@@ -7,6 +7,7 @@ https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-s
 https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
 """
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
@@ -161,6 +162,14 @@ def validate_prolongation(
     if not has_perm:
         raise PermissionDenied
 
+    # A validation in production must be done by a Pôle emploi agent.
+    # This should be temporary while in waiting for a system to delegate those actions to other
+    # authorized prescribers outside of the Itou staff.
+    if settings.ITOU_ENVIRONMENT == "PROD" and not request.user.has_pole_emploi_email:
+        message = _(f"Action réservée aux utilisateurs avec un email en `{settings.POLE_EMPLOI_EMAIL_SUFFIX}`.")
+        messages.error(request, message)
+        raise PermissionDenied
+
     queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
     prolongation = get_object_or_404(queryset, pk=prolongation_id)
 
@@ -171,9 +180,8 @@ def validate_prolongation(
     if request.method == "POST" and form.is_valid():
         prolongation = form.save(commit=False)
         prolongation.validate(validated_by=request.user)
-        messages.success(
-            request, _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été validée.")
-        )
+        message = _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été validée.")
+        messages.success(request, message)
         return HttpResponseRedirect(reverse("admin:approvals_prolongation_changelist"))
 
     # Display a preview of the email that will be send.
@@ -215,14 +223,21 @@ def refuse_prolongation(
     if not has_perm:
         raise PermissionDenied
 
+    # A refusal in production must be done by a Pôle emploi agent.
+    # This should be temporary while in waiting for a system to delegate those actions to other
+    # authorized prescribers outside of the Itou staff.
+    if settings.ITOU_ENVIRONMENT == "PROD" and not request.user.has_pole_emploi_email:
+        message = _(f"Action réservée aux utilisateurs avec un email en `{settings.POLE_EMPLOI_EMAIL_SUFFIX}`.")
+        messages.error(request, message)
+        raise PermissionDenied
+
     queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
     prolongation = get_object_or_404(queryset, pk=prolongation_id)
 
     if request.method == "POST" and request.POST.get("confirm") == "yes":
         prolongation.refuse(refused_by=request.user)
-        messages.success(
-            request, _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été refusée.")
-        )
+        message = _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été refusée.")
+        messages.success(request, message)
         return HttpResponseRedirect(reverse("admin:approvals_prolongation_changelist"))
 
     # Display a preview of the email that will be send.
