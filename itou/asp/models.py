@@ -243,7 +243,7 @@ class EducationLevel(models.TextChoices):
 
     NON_CERTIFIING_QUALICATIONS = "00", _("Personne avec qualifications non-certifiantes")
     NO_SCHOOLING = "01", _("Jamais scolarisé")
-    THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou écolde d'ingénieur")
+    THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou école d'ingénieur")
     LICENCE_LEVEL = "20", _("Formation de niveau licence")
     BTS_OR_DUT_LEVEL = "30", _("Formation de niveau BTS ou DUT")
     BAC_LEVEL = "40", _("Formation de niveau BAC")
@@ -252,6 +252,48 @@ class EducationLevel(models.TextChoices):
     BEP_OR_CAP_DIPLOMA = "51", _("Diplôme obtenu CAP ou BEP")
     TRAINING_1_YEAR = "60", _("Formation courte d'une durée d'un an")
     NO_SHOOLING_BEYOND_MANDATORY = "70", _("Pas de formation au-delà de la scolarité obligatoire")
+
+
+class EmployerType(models.TextChoices):
+    """
+    Employer type
+
+    Employer type codes aren't likely to change and ref file also have incorrect
+    field length for 'code' (must be 2 char. and 0 left-padded)
+
+    Translation of ASP ref file: ref_type_employeur_v3.csv
+    """
+
+    EI = "01", _("Entreprise d'insertion")
+    ETTI = "02", _("Entreprise de travail temporaire d'insertion")
+    AI = "03", _("Association intermédiaire")
+    ACI = "04", _("Atelier chantier d'insertion")
+    ESAT = "05", _("Etablissement et service d'aide par le travail")
+    EA = "06", _("Entreprise adaptée")
+    OTHER = "07", _("Autre")
+
+    @classmethod
+    def from_itou_siae_kind(cls, siae_kind):
+        """
+        Mapping for ITOU employer type
+
+        Mapping with litteral ITOU value (unlikely to change)
+        to avoid unnecessary import of Siae.
+
+        No mapping yet for ESAT
+        """
+        if siae_kind == "EI":
+            return cls.EI
+        elif siae_kind == "ETTI":
+            return cls.ETTI
+        elif siae_kind == "AI":
+            return cls.AI
+        elif siae_kind == "ACI":
+            return cls.ACI
+        elif siae_kind == "EA":
+            return cls.EA
+        else:
+            return cls.OTHER
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):

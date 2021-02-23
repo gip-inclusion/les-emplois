@@ -235,27 +235,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
             return self.convention.asp_id
         return None
 
-    @property
-    def asp_employer_type(self):
-        """
-        Mapping for ASP employer type
-
-        No mapping yet for ESAT
-        """
-        if self.kind == Siae.KIND_EI:
-            return "01"
-        elif self.kind == Siae.KIND_ETTI:
-            return "02"
-        elif self.kind == Siae.KIND_AI:
-            return "03"
-        elif self.kind == Siae.KIND_ACI:
-            return "04"
-        elif self.kind == Siae.KIND_EA:
-            return "06"
-        else:
-            return "07"  # Other type
-
-    @property
     def has_members(self):
         return self.active_members.exists()
 
