@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Un nouvel utilisateur vient de rejoindre votre structure sur la Plateforme de l'inclusion ! Si vous ne connaissez pas cette personne, n'hésitez pas à nous prévenir par e-mail :" %} {{ itou_email_contact }}
+{% translate "Un nouvel utilisateur vient de rejoindre votre structure sur les emplois de l'inclusion ! Si vous ne connaissez pas cette personne, n'hésitez pas à nous prévenir par e-mail :" %} {{ itou_email_contact }}
 
 {% translate "*Nouvel utilisateur* :" %}
 
