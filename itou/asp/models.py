@@ -241,7 +241,7 @@ class EducationLevel(models.TextChoices):
     Translation of ASP ref file: ref_niveau_formation_v3.csv
     """
 
-    NON_CERTIFIING_QUALICATIONS = "00", _("Personne avec qualifications non-certifiantes")
+    NON_CERTIFYING_QUALICATIONS = "00", _("Personne avec qualifications non-certifiantes")
     NO_SCHOOLING = "01", _("Jamais scolarisé")
     THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou école d'ingénieur")
     LICENCE_LEVEL = "20", _("Formation de niveau licence")
@@ -251,7 +251,7 @@ class EducationLevel(models.TextChoices):
     BEP_OR_CAP_LEVEL = "50", _("Formation de niveau BEP ou CAP")
     BEP_OR_CAP_DIPLOMA = "51", _("Diplôme obtenu CAP ou BEP")
     TRAINING_1_YEAR = "60", _("Formation courte d'une durée d'un an")
-    NO_SHOOLING_BEYOND_MANDATORY = "70", _("Pas de formation au-delà de la scolarité obligatoire")
+    NO_SCHOOLING_BEYOND_MANDATORY = "70", _("Pas de formation au-delà de la scolarité obligatoire")
 
 
 class EmployerType(models.TextChoices):
