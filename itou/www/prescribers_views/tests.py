@@ -179,7 +179,7 @@ class UserMembershipDeactivationTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
         self.assertIn("[Désactivation] Vous n'êtes plus membre de", email.subject)
-        self.assertIn("Un administrateur vous a retiré d'une structure sur la Plateforme de l'inclusion", email.body)
+        self.assertIn("Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion", email.body)
         self.assertEqual(email.to[0], guest.email)
 
     def test_deactivate_with_no_perms(self):
