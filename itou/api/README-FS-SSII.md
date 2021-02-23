@@ -1,16 +1,16 @@
-# Envoi des fiches salarié (FS) de la plateforme vers les logiciels
+# Envoi des fiches salarié (FS) des emplois de l'inclusion vers les logiciels
 
-Ceci est une documentation publique à destination des logiciels SSII pour la récupération de fiches salarié depuis la plateforme de l'inclusion via une API dédiée.
+Ceci est une documentation publique à destination des logiciels SSII pour la récupération de fiches salarié depuis les emplois de l'inclusion via une API dédiée.
 
 ## Principe
 
-- Le logiciel commence par appeler l'endpoint API `api/v1/token-auth` de la plateforme en fournissant le login/mdp de l'utilisateur employeur de la plateforme et obtient ainsi un token qu'il pourra utiliser pour les autres endpoints.
+- Le logiciel commence par appeler l'endpoint API `api/v1/token-auth` des emplois de l'inclusion en fournissant le login/mdp de l'utilisateur employeur des emplois de l'inclusion et obtient ainsi un token qu'il pourra utiliser pour les autres endpoints.
 
 - Le logiciel appelle ensuite l'endpoint `api/v1/employee-records` avec ce token et récupère ainsi la totalité des FS de toutes les structures de cet utilisateur et les dédoublonne si besoin en se basant sur l'unicité du couple (SIRET, PassIAE).
 
 - L'endpoint `api/v1/employee-records` n'est pas encore disponible mais en attendant vous pouvez déjà utiliser l'endpoint similaire `api/v1/dummy-employee-records` pour faire vos premiers tests.
 
-- L'endpoint `api/v1/dummy-employee-records` renvoit systématiquement 25 fiches salarié sur 2 pages avec des données factices mais réalistes. Peu importe l'utilisateur plateforme utilisé, donc vous pouvez simplement créer un compte candidat factice sur la plateforme [ici](https://emplois.inclusion.beta.gouv.fr/signup/job_seeker) et l'utiliser.
+- L'endpoint `api/v1/dummy-employee-records` renvoit systématiquement 25 fiches salarié sur 2 pages avec des données factices mais réalistes. Peu importe l'utilisateur des emplois de l'inclusion utilisé, donc vous pouvez simplement créer un compte candidat factice sur les emplois de l'inclusion [ici](https://emplois.inclusion.beta.gouv.fr/signup/job_seeker) et l'utiliser.
 
 ## Points importants
 
@@ -102,7 +102,7 @@ Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont disponib
         "passIae": "999992006615",
         # Toujours vide.
         "sufPassIae": null,
-        # Identifiant quasi-unique du candidat sur la plateforme.
+        # Identifiant quasi-unique du candidat sur les emplois de l'inclusion.
         # 30 caractères.
         "idItou": "70a6d71e4265a5768ad3b3f293ffd7",
         "civilite": "M",
