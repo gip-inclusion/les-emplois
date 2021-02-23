@@ -1330,7 +1330,7 @@ class CustomProlongationAdminViewsTest(TestCase):
     """
 
     def test_custom_admin_validate_prolongation(self):
-        user = UserFactory()
+        user = UserFactory(email=f"foo{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
         prolongation = ProlongationFactory(
@@ -1373,7 +1373,7 @@ class CustomProlongationAdminViewsTest(TestCase):
         self.assertIn("Prolongation de PASS IAE validée", email.subject)
 
     def test_custom_admin_refuse_prolongation(self):
-        user = UserFactory()
+        user = UserFactory(email=f"foo{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
         prolongation = ProlongationFactory(
