@@ -620,7 +620,6 @@ class Prolongation(models.Model):
     `trigger_update_approval_end_at_for_prolongation`.
     """
 
-    # Min duration: none.
     # Max duration: 12 months (but it depends on the `reason` field).
     MAX_DURATION_MONTHS = 12
 
@@ -755,9 +754,9 @@ class Prolongation(models.Model):
 
     def clean(self):
 
-        # No min duration: a prolongation may last only 1 day.
-        if self.end_at < self.start_at:
-            raise ValidationError({"end_at": _("La date de fin doit être postérieure à la date de début.")})
+        # Min duration == 1 day.
+        if self.end_at <= self.start_at:
+            raise ValidationError({"end_at": _("La durée minimale doit être d'au moins un jour.")})
 
         # A prolongation cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at, self.reason)
