@@ -1,4 +1,5 @@
 from allauth.utils import generate_unique_username
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
@@ -164,6 +165,12 @@ class User(AbstractUser, AddressMixin):
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined
         return time_since_date_joined.days < 7
+
+    @property
+    def has_pole_emploi_email(self):
+        if self.email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
+            return True
+        return False
 
     @property
     def is_siae_staff_with_siae(self):
