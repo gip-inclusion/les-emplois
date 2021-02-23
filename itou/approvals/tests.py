@@ -1321,6 +1321,7 @@ class ProlongationEmailTest(TestCase):
 
         # Body.
         self.assertIn(title(prolongation.approval.user.get_full_name()), email.body)
+        self.assertIn(title(prolongation.approval.end_at.strftime("%d/%m/%Y")), email.body)
 
 
 class CustomProlongationAdminViewsTest(TestCase):
