@@ -10,7 +10,7 @@ Ceci est une documentation publique à destination des logiciels SSII pour la r�
 
 - L'endpoint `api/v1/employee-records` n'est pas encore disponible mais en attendant vous pouvez déjà utiliser l'endpoint similaire `api/v1/dummy-employee-records` pour faire vos premiers tests.
 
-- L'endpoint `api/v1/dummy-employee-records` renvoit systématiquement 25 fiches salarié sur 2 pages avec des données factices mais réalistes. Peu importe l'utilisateur des emplois de l'inclusion utilisé, donc vous pouvez simplement créer un compte candidat factice sur les emplois de l'inclusion [ici](https://emplois.inclusion.beta.gouv.fr/signup/job_seeker) et l'utiliser.
+- L'endpoint `api/v1/dummy-employee-records` renvoit systématiquement 25 fiches salarié sur 2 pages avec des données factices mais réalistes, peu importe le compte employeur utilisé. Si vous ne disposez pas d'un compte employeur en production, nous vous invitons à utiliser le compte employeur `test+etti@inclusion.beta.gouv.fr` (mot de passe `password`) pour faire vos tests sur la démo (https://demo.emplois.inclusion.beta.gouv.fr/) au lieu de la production (https://emplois.inclusion.beta.gouv.fr/). Merci de ne pas créer de compte factice en production.
 
 ## Points importants
 
@@ -190,5 +190,6 @@ Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont disponib
     }
 }
 ```
+
 
 
