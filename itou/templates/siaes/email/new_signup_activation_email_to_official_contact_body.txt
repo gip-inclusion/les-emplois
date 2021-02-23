@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Un nouvel utilisateur souhaite rejoindre votre structure sur la Plateforme de l'inclusion !" %}
+{% translate "Un nouvel utilisateur souhaite rejoindre votre structure sur les emplois de l'inclusion !" %}
 
 {% translate "Structure :" %}
 
