@@ -148,5 +148,15 @@
       "verified": true,
       "primary": true
    }
+},
+{
+   "model": "account.emailaddress",
+   "pk": 16,
+   "fields": {
+      "user": 16,
+      "email": "test+ea@inclusion.beta.gouv.fr",
+      "verified": true,
+      "primary": true
+   }
 }
 ]
