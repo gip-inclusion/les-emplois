@@ -32,7 +32,7 @@ def employers_accounts_tag():
             "email": "test+ea@inclusion.beta.gouv.fr",
             "description": "1 poste ouvert au recrutement",
             "image": "ea.svg",
-            "location": "Tarascon (13)",
+            "location": "Fontvieille (13)",
             "title": "Entreprise Adaptée (E.A.)",
         },
     ]
