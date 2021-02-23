@@ -140,6 +140,33 @@ class User(AbstractUser, AddressMixin):
             return None
         return self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
 
+    @property
+    def is_prescriber_with_org(self):
+        return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
+
+    @property
+    def has_external_data(self):
+        return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
+
+    def joined_recently(self):
+        time_since_date_joined = timezone.now() - self.date_joined
+        return time_since_date_joined.days < 7
+
+    @property
+    def is_siae_staff_with_siae(self):
+        """
+        Useful to identify users deactivated as member of a SIAE
+        and without any membership left.
+        They are in a "dangling" status: still active (membership-wise) but unable to login
+        because not member of any SIAE.
+        """
+        return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
+
+    def last_hire_was_made_by_siae(self, siae):
+        if not self.is_job_seeker:
+            return False
+        return self.last_accepted_job_application.to_siae == siae
+
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):
         """
@@ -184,39 +211,6 @@ class User(AbstractUser, AddressMixin):
             not pole_emploi_id and not lack_of_pole_emploi_id_reason
         ):
             raise ValidationError(_("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."))
-
-    @property
-    def is_prescriber_with_org(self):
-        return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
-
-    @property
-    def has_external_data(self):
-        return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
-
-    def joined_recently(self):
-        time_since_date_joined = timezone.now() - self.date_joined
-        return time_since_date_joined.days < 7
-
-    @property
-    def is_siae_staff_with_siae(self):
-        """
-        Useful to identify users deactivated as member of a SIAE
-        and without any membership left.
-        They are in a "dangling" status: still active (membership-wise) but unable to login
-        because not member of any SIAE.
-        """
-        return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
-
-    @cached_property
-    def last_accepted_job_application(self):
-        if not self.is_job_seeker:
-            return None
-        return self.job_applications.accepted().latest("created_at")
-
-    def last_hire_was_made_by_siae(self, siae):
-        if not self.is_job_seeker:
-            return False
-        return self.last_accepted_job_application.to_siae == siae
 
 
 def get_allauth_account_user_display(user):
