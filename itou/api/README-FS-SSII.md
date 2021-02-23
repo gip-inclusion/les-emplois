@@ -6,7 +6,7 @@ Ceci est une documentation publique à destination des logiciels SSII pour la r�
 
 - Le logiciel commence par appeler l'endpoint API `api/v1/token-auth` des emplois de l'inclusion en fournissant le login/mdp de l'utilisateur employeur des emplois de l'inclusion et obtient ainsi un token qu'il pourra utiliser pour les autres endpoints.
 
-- Le logiciel appelle ensuite l'endpoint `api/v1/employee-records` avec ce token et récupère ainsi la totalité des FS de toutes les structures de cet utilisateur et les dédoublonne si besoin en se basant sur l'unicité du couple (SIRET, PassIAE).
+- Le logiciel appelle ensuite l'endpoint `api/v1/employee-records` avec ce token et récupère ainsi la totalité des FS de toutes les structures de cet utilisateur et les dédoublonne si besoin en se basant sur l'unicité du couple (SIRET, PASS IAE).
 
 - L'endpoint `api/v1/employee-records` n'est pas encore disponible mais en attendant vous pouvez déjà utiliser l'endpoint similaire `api/v1/dummy-employee-records` pour faire vos premiers tests.
 
@@ -14,7 +14,7 @@ Ceci est une documentation publique à destination des logiciels SSII pour la r�
 
 ## Points importants
 
-- Il y a au plus une FS par couple (SIRET, PassIAE). Autrement dit, si une même personne est recrutée pour la seconde fois (avec à chaque fois le même PassIAE) dans la même SIAE (ou deux structures ayant le même SIRET), cela ne donnera pas lieu à une nouvelle FS.
+- Il y a au plus une FS par couple (SIRET, PASS IAE). Autrement dit, si une même personne est recrutée pour la seconde fois (avec à chaque fois le même PASS IAE) dans la même SIAE (ou deux structures ayant le même SIRET), cela ne donnera pas lieu à une nouvelle FS.
 
 - Les seules mesures concernées ici sont ACI, EI, ETTI et normalement les AI. Donc pas les EITI, GEIQ, EA, EATT.
 
