@@ -24,7 +24,7 @@ def cities_autocomplete(request):
             .filter(similarity__gt=0.1)
             .order_by("-similarity")
         )
-        cities = cities[:10]
+        cities = cities[:12]
 
         cities = [{"value": city.display_name, "slug": city.slug} for city in cities]
 
