@@ -83,7 +83,7 @@ curl -H 'Accept: application/json; indent=4' -H 'Authorization: Token 123abc123a
 
 ## Référentiels utiles
 
-Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont disponibles en CSV [ici](https://github.com/betagouv/itou/tree/vgrange/fiche_salarie/itou/fiche_salarie/management/commands/data).
+Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont [disponibles en CSV](https://github.com/betagouv/itou/tree/vgrange/fiche_salarie/itou/fiche_salarie/management/commands/data).
 
 ## Documentation du détail d'une FS sur un exemple
 
