@@ -767,12 +767,10 @@ class Prolongation(models.Model):
             if self.get_overlapping_prolongations().exists():
                 overlap = self.get_overlapping_prolongations().first()
                 raise ValidationError(
-                    {
-                        "start_at": _(
-                            f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
-                            f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                        )
-                    }
+                    _(
+                        f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
+                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                    )
                 )
 
             if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
