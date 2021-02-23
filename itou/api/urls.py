@@ -10,6 +10,5 @@ app_name = "api"
 urlpatterns = [
     # TokenAuthentication endpoint to get token from login/password.
     path("token-auth/", auth_views.obtain_auth_token, name="token-auth"),
-    path("siaes/", views.SiaeList.as_view(), name="siaes"),
     path("dummy-employee-records/", views.DummyEmployeeRecordList.as_view(), name="dummy-employee-records"),
 ]
