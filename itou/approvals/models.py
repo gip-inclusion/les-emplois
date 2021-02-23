@@ -281,7 +281,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def prolongations_by_start_date_asc(self):
-        return self.prolongation_set.validated().order_by("start_at")
+        return self.prolongation_set.all().order_by("start_at")
 
     @property
     def is_open_to_prolongation(self):
