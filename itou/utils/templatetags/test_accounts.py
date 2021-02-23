@@ -28,6 +28,13 @@ def employers_accounts_tag():
             "location": "Tarascon (13)",
             "title": "Groupement d'Employeurs pour l'Insertion et la Qualification (G.E.I.Q.)",
         },
+        {
+            "email": "test+ea@inclusion.beta.gouv.fr",
+            "description": "1 poste ouvert au recrutement",
+            "image": "ea.svg",
+            "location": "Fontvieille (13)",
+            "title": "Entreprise Adaptée (E.A.)",
+        },
     ]
 
 
