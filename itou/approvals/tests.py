@@ -6,6 +6,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 from django.template.defaultfilters import title
 from django.test import TestCase
 from django.urls import reverse
@@ -1042,6 +1043,68 @@ class ProlongationModelTestTrigger(TestCase):
         self.assertEqual(approval.duration, initial_approval_duration)
 
 
+class ProlongationModelTestConstraint(TestCase):
+    def test_constraint_for_validated(self):
+
+        approval = ApprovalFactory()
+
+        # A validated prolongation.
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        with self.assertRaises(IntegrityError):
+            # A valid prolongation that starts the same day as initial_prolongation.
+            ProlongationFactory(
+                approval=approval,
+                siae=initial_prolongation.siae,
+                start_at=approval.end_at,
+                status=Prolongation.Status.VALIDATED,
+            )
+
+    def test_constraint_for_pending(self):
+
+        approval = ApprovalFactory()
+
+        # A pending prolongation.
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            status=Prolongation.Status.PENDING,
+        )
+
+        with self.assertRaises(IntegrityError):
+            # A validated prolongation that starts the same day as initial_prolongation.
+            ProlongationFactory(
+                approval=approval,
+                siae=initial_prolongation.siae,
+                start_at=approval.end_at,
+                status=Prolongation.Status.VALIDATED,
+            )
+
+    def test_constraint_for_refused(self):
+
+        approval = ApprovalFactory()
+
+        # A refused prolongation.
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            status=Prolongation.Status.REFUSED,
+        )
+
+        # A pending prolongation that starts the same day as initial_prolongation.
+        # There should be no error from the DB at save time.
+        ProlongationFactory(
+            approval=approval,
+            siae=initial_prolongation.siae,
+            start_at=approval.end_at,
+            status=Prolongation.Status.PENDING,
+        )
+
+
 class ProlongationModelTest(TestCase):
     """
     Test Prolongation model.
@@ -1139,6 +1202,59 @@ class ProlongationModelTest(TestCase):
         self.assertEqual(
             approval.duration, initial_approval_duration + prolongation1.duration + prolongation2.duration
         )
+
+    def test_get_overlapping_prolongations_when_it_should_overlap(self):
+
+        approval = ApprovalFactory()
+
+        # A validated prolongation.
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            status=Prolongation.Status.VALIDATED,
+        )
+
+        # A valid prolongation that starts the same day as initial_prolongation.
+        # Build provides a local object without saving it to the database.
+        valid_prolongation = ProlongationFactory.build(
+            approval=approval,
+            siae=initial_prolongation.siae,
+            start_at=approval.end_at,
+            status=Prolongation.Status.VALIDATED,
+        )
+        self.assertTrue(valid_prolongation.get_overlapping_prolongations().exists())
+        self.assertTrue(initial_prolongation, valid_prolongation.get_overlapping_prolongations().exists())
+
+        # A pending prolongation that starts the same day as initial_prolongation.
+        # Build provides a local object without saving it to the database.
+        pending_prolongation = ProlongationFactory.build(
+            approval=approval,
+            siae=initial_prolongation.siae,
+            start_at=approval.end_at,
+            status=Prolongation.Status.PENDING,
+        )
+        self.assertTrue(initial_prolongation, pending_prolongation.get_overlapping_prolongations().exists())
+
+    def test_get_overlapping_prolongations_when_it_should_not_overlap(self):
+
+        approval = ApprovalFactory()
+
+        # A refused prolongation.
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            status=Prolongation.Status.REFUSED,
+        )
+
+        # A valid prolongation that starts the same day as initial_prolongation.
+        # Build provides a local object without saving it to the database.
+        valid_prolongation = ProlongationFactory.build(
+            approval=approval,
+            siae=initial_prolongation.siae,
+            start_at=approval.end_at,
+            status=Prolongation.Status.VALIDATED,
+        )
+        self.assertFalse(valid_prolongation.get_overlapping_prolongations().exists())
 
     def test_has_reached_max_cumulative_duration_for_complete_training(self):
 
