@@ -82,7 +82,7 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
 
 
 @login_required
-def request_prolongation(request, approval_id, template_name="approvals/prolong.html"):
+def request_prolongation(request, approval_id, template_name="approvals/request_prolongation.html"):
     """
     Request a prolongation for the given approval.
     """
