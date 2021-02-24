@@ -162,10 +162,7 @@ def validate_prolongation(
     if not has_perm:
         raise PermissionDenied
 
-    # A validation in production must be done by a Pôle emploi agent.
-    # This should be temporary while in waiting for a system to delegate those actions to other
-    # authorized prescribers outside of the Itou staff.
-    if settings.ITOU_ENVIRONMENT == "PROD" and not request.user.has_pole_emploi_email:
+    if request.user.is_not_allowed_to_operate_on_prolongations:
         message = _(f"Action réservée aux utilisateurs avec un email en `{settings.POLE_EMPLOI_EMAIL_SUFFIX}`.")
         messages.error(request, message)
         raise PermissionDenied
@@ -223,10 +220,7 @@ def refuse_prolongation(
     if not has_perm:
         raise PermissionDenied
 
-    # A refusal in production must be done by a Pôle emploi agent.
-    # This should be temporary while in waiting for a system to delegate those actions to other
-    # authorized prescribers outside of the Itou staff.
-    if settings.ITOU_ENVIRONMENT == "PROD" and not request.user.has_pole_emploi_email:
+    if request.user.is_not_allowed_to_operate_on_prolongations:
         message = _(f"Action réservée aux utilisateurs avec un email en `{settings.POLE_EMPLOI_EMAIL_SUFFIX}`.")
         messages.error(request, message)
         raise PermissionDenied

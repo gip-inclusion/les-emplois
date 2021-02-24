@@ -173,6 +173,15 @@ class User(AbstractUser, AddressMixin):
         return False
 
     @property
+    def is_not_allowed_to_operate_on_prolongations(self):
+        """
+        Operating on prolongations must be done by a Pôle emploi agent in production.
+        This should be temporary while in waiting for a system to delegate those actions
+        to other authorized prescribers outside of the Itou staff.
+        """
+        return settings.ITOU_ENVIRONMENT == "PROD" and not self.has_pole_emploi_email
+
+    @property
     def is_siae_staff_with_siae(self):
         """
         Useful to identify users deactivated as member of a SIAE
