@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
+from itou.asp.models import AllocationDuration, EducationLevel
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
@@ -51,8 +52,20 @@ class User(AbstractUser, AddressMixin):
 
     ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
 
+    class Title(models.TextChoices):
+        M = "M", _("Monsieur")
+        MME = "MME", _("Madame")
+
+    title = models.CharField(max_length=3, verbose_name=_("Civilité"), null=True, blank=True, choices=Title.choices)
+
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
+    )
+    birth_place = models.ForeignKey(
+        "asp.Commune", verbose_name=_("Commune de naissance"), null=True, on_delete=models.SET_NULL
+    )
+    birth_country = models.ForeignKey(
+        "asp.Country", verbose_name=_("Pays de naissance"), null=True, on_delete=models.SET_NULL
     )
     email = CIEmailField(
         _("email address"),
@@ -216,3 +229,114 @@ class User(AbstractUser, AddressMixin):
 
 def get_allauth_account_user_display(user):
     return user.email
+
+
+class JobSeekerProfile(models.Model):
+    """
+    Specific information about the job seeker
+    Instead of augmenting the 'User' model, additional data is collected in a "profile" object.
+    It will first be used by employee record model / system to serialize data for ASP tranfers.
+    """
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        primary_key=True,
+        verbose_name=_("Demandeur d'emploi"),
+        related_name="jobseeker_profile",
+    )
+
+    education_level = models.CharField(
+        max_length=2,
+        verbose_name=_("Niveau de formation (ASP)"),
+        blank=True,
+        choices=EducationLevel.choices,
+    )
+
+    resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
+
+    rqth_employee = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
+    oeth_employee = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
+
+    pole_emploi_since = models.CharField(
+        max_length=20,
+        verbose_name=_("Inscrit à Pôle emploi depuis"),
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    unemployed_since = models.CharField(
+        max_length=20,
+        verbose_name=_("Sans emploi depuis"),
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    rsa_allocation_since = models.CharField(
+        max_length=20,
+        verbose_name=_("Allocataire du RSA depuis"),
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    ass_allocation_since = models.CharField(
+        max_length=20,
+        verbose_name=_("Allocataire de l'ASS depuis"),
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    aah_allocation_since = models.CharField(
+        max_length=20,
+        verbose_name=_("Allocataire de l'AAH depuis"),
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    ata_allocation_since = models.CharField(
+        max_length=20,
+        verbose_name=_("Allocataire de l'ATA depuis"),
+        blank=True,
+        choices=AllocationDuration.choices,
+    )
+
+    class Meta:
+        verbose_name = _("Profil demandeur d'emploi")
+        verbose_name_plural = _("Profils demandeur d'emploi")
+
+    def __str__(self):
+        return f"JobSeekerProfile: {self.user}"
+
+    def clean(self):
+        if self.resourceless and self.is_employed:
+            raise ValidationError(_("La personne n'est pas considérée comme sans ressources si OETH ou RQTH"))
+
+        if self.is_employed and self.unemployed_since:
+            raise ValidationError(_("La personne ne peut avoir de période sans emploi si actuellement employée"))
+
+        if self.unemployed_since and self.is_employed:
+            raise ValidationError(_("La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"))
+
+    @property
+    def is_employed(self):
+        return self.rqth_employee or self.oeth_employee
+
+    @property
+    def has_rsa_allocation(self):
+        return self.rsa_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_ass_allocation(self):
+        return self.ass_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_aah_allocation(self):
+        return self.aah_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_ata_allocation(self):
+        return self.ata_allocation_since != AllocationDuration.NONE
+
+    @property
+    def has_social_allowance(self):
+        return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation

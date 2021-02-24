@@ -54,12 +54,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
-        parser.add_argument("--education_levels")
         parser.add_argument("--insee_communes")
         parser.add_argument("--insee_departments")
         parser.add_argument("--insee_countries")
         parser.add_argument("--siae_kinds")
-        parser.add_argument("--employer_types")
 
     def set_logger(self, verbosity):
         """
@@ -86,6 +84,11 @@ class Command(BaseCommand):
         return df
 
     def write_fixture_file(self, path, records):
+        """
+        Write fixture file
+        filename_prefix add a prefix to the filename for ordering concerns
+        if any (i.e. for SiaeKind objects references)
+        """
         self.log(f"Formatted {len(records)} element(s)")
         self.log(f"Writing JSON fixture to: {path}")
 
@@ -104,40 +107,6 @@ class Command(BaseCommand):
         self.log("No import file found. Skipping.")
         self.log("-" * 80)
         return False
-
-    def gen_education_levels(self, filename="ref_niveau_formation.csv"):
-        """
-        Generate ASP education level fixture
-        """
-        path = os.path.join(settings.IMPORT_DIR, filename)
-
-        self.log("Importing ASP education levels:\n")
-
-        if not self.file_exists(path):
-            return
-
-        export_path = os.path.join(_FIXTURES_DIR, "asp_education_levels.json")
-        model = "asp.EducationLevel"
-        df = self.load_dataframe(path)
-        records = []
-
-        for _, row in df.iterrows():
-            start_date = parse_asp_date(row["rte_date_debut_effet"])
-            end_date = parse_asp_date(row["rte_date_fin_effet"])
-
-            elt = {
-                "model": model,
-                "pk": row["rnf_id"],
-                "fields": {
-                    "code": row["rnf_code_form_empl"],
-                    "name": row["rnf_libelle_niveau_form_empl"],
-                    "start_date": start_date,
-                    "end_date": end_date,
-                },
-            }
-            records.append(elt)
-
-        self.write_fixture_file(export_path, records)
 
     def gen_insee_communes(self, filename="ref_insee_com.csv"):
         """
@@ -253,6 +222,9 @@ class Command(BaseCommand):
     def gen_siae_kinds(self, filename="ref_mesure.csv"):
         """
         Generates ASP SIAE kinds fixture.
+
+        Fixture prefix is important for this case, because SiaeKind must be
+        imported before EducationLevel and EmployerType entries
         """
         path = os.path.join(settings.IMPORT_DIR, filename)
 
@@ -287,40 +259,6 @@ class Command(BaseCommand):
 
         self.write_fixture_file(export_path, records)
 
-    def gen_employer_types(self, filename="ref_type_employeur.csv"):
-        """
-        Generates ASP employer types fixture.
-        """
-        path = os.path.join(settings.IMPORT_DIR, filename)
-
-        self.log("Importing ASP employer types:\n")
-
-        if not self.file_exists(path):
-            return
-
-        export_path = os.path.join(_FIXTURES_DIR, "asp_employer_types.json")
-        model = "asp.EmployerType"
-        df = self.load_dataframe(path)
-        records = []
-
-        for idx, row in df.iterrows():
-            start_date = parse_asp_date(row["rte_date_debut_effet"])
-            end_date = parse_asp_date(row["rte_date_fin_effet"])
-            elt = {
-                "model": model,
-                "pk": row["rte_id"],
-                "fields": {
-                    "code": row["rte_code_type_employeur"],
-                    "name": row["rte_lib_type_employeur"],
-                    "siae_kind_id": row["rme_id"],
-                    "start_date": start_date,
-                    "end_date": end_date,
-                },
-            }
-            records.append(elt)
-
-        self.write_fixture_file(export_path, records)
-
     def handle(self, dry_run=False, **options):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
@@ -328,12 +266,10 @@ class Command(BaseCommand):
         partial = [
             elt
             for elt in [
-                "education_levels",
                 "insee_communes",
                 "insee_departments",
                 "insee_countries",
                 "siae_kinds",
-                "employer_types",
             ]
             if options.get(elt)
         ]
@@ -347,11 +283,7 @@ class Command(BaseCommand):
             fn = getattr(self, f"gen_{import_arg}")
             fn(filename=options.get(import_arg))
         else:
-            # Order matters (see below)
-            self.gen_education_levels()
             self.gen_insee_communes()
             self.gen_insee_departments()
             self.gen_insee_countries()
             self.gen_siae_kinds()
-            # employer types depends on SIAE kinds ID
-            self.gen_employer_types()

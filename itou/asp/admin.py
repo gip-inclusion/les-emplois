@@ -32,11 +32,6 @@ class CommuneAdmin(ASPModelAdmin):
     pass
 
 
-@admin.register(models.EducationLevel)
-class EducationLevelAdmin(ASPModelAdmin):
-    pass
-
-
 @admin.register(models.Department)
 class DepartmentAdmin(ASPModelAdmin):
     pass
@@ -44,11 +39,6 @@ class DepartmentAdmin(ASPModelAdmin):
 
 @admin.register(models.SiaeKind)
 class SiaeKindAdmin(ASPModelAdmin):
-    pass
-
-
-@admin.register(models.EmployerType)
-class EmployerTypeAdmin(ASPModelAdmin):
     pass
 
 
