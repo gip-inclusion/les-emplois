@@ -44,6 +44,18 @@ def get_job_application_detailed_origin(ja):
     return detailed_origin
 
 
+def get_ja_sender_organization_name(ja):
+    if ja.sender_prescriber_organization:
+        return ja.sender_prescriber_organization.display_name
+    return None
+
+
+def get_ja_sender_organization_safir(ja):
+    if ja.sender_prescriber_organization:
+        return ja.sender_prescriber_organization.code_safir_pole_emploi
+    return None
+
+
 def _get_ja_time_spent_in_transition(ja, logs):
     # Some job applications have duplicate transitions.
     # E.g. job application id:4db81292-ff51-4950-a8dc-cf7c9f94c67e
@@ -168,6 +180,18 @@ TABLE_COLUMNS = (
             "type": "varchar",
             "comment": "Nom de la structure destinaire de la candidature",
             "lambda": lambda o: o.to_siae.display_name,
+        },
+        {
+            "name": "nom_org_prescripteur",
+            "type": "varchar",
+            "comment": "Nom de l''organisation prescriptrice",
+            "lambda": get_ja_sender_organization_name,
+        },
+        {
+            "name": "safir_org_prescripteur",
+            "type": "varchar",
+            "comment": "SAFIR de l''organisation prescriptrice",
+            "lambda": get_ja_sender_organization_safir,
         },
     ]
     + get_department_and_region_columns(

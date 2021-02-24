@@ -270,7 +270,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     hiring_start_at = models.DateField(verbose_name=_("Date de début du contrat"), blank=True, null=True)
-    hiring_end_at = models.DateField(verbose_name=_("Date de fin du contrat"), blank=True, null=True)
+    hiring_end_at = models.DateField(verbose_name=_("Date prévisionnelle de fin du contrat"), blank=True, null=True)
 
     hiring_without_approval = models.BooleanField(
         default=False, verbose_name=_("L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche")

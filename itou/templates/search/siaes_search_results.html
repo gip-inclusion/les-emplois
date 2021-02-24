@@ -62,12 +62,11 @@
                         {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
                     </h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
-                    <p class="card-text">
-                        {% blocktranslate with distance=siae.distance.km|floatformat:1 %}
-                            <span class="badge badge-dark">{{ distance }} Km</span>
-                            de votre lieu de recherche
-                        {% endblocktranslate %}
-                    </p>
+                    {% if siae.is_kind_ea %}
+                        <p class="card-text">
+                            <span class="badge badge-dark">{% translate "Priorité aux bénéficiaires de RQTH" %}</span>
+                        </p>
+                    {% endif %}
                     {% if siae.job_description_through.exists and not siae.block_job_applications %}
                         <h6 class="border-bottom border-gray pb-2">{% translate "Métiers proposés" %}</h6>
                         <ul class="mb-0">

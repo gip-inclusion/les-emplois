@@ -136,6 +136,8 @@ TABLE_COLUMNS = (
             "comment": "Date de la dernière création de candidature",
             "lambda": get_org_last_job_application_creation_date,
         },
+        {"name": "longitude", "type": "float", "comment": "Longitude", "lambda": lambda o: o.longitude},
+        {"name": "latitude", "type": "float", "comment": "Latitude", "lambda": lambda o: o.latitude},
     ]
     + get_establishment_last_login_date_column()
     + get_establishment_is_active_column()
