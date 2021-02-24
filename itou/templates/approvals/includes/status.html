@@ -59,9 +59,11 @@
                 <ul>
                     {% for s in suspensions %}
                         <li>
-                            {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
-                                du {{ start }} au {{ end }}
-                            {% endblocktranslate %}
+                            <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
+                                {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
+                                    du {{ start }} au {{ end }}
+                                {% endblocktranslate %}
+                            </span>
                             {% if s.is_in_progress %}
                                 <small>
                                     <b>{% translate "En cours" %}</b>
