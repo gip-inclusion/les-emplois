@@ -223,26 +223,77 @@ class AllocationDuration(models.TextChoices):
     Note: effect periods are not handled
     """
 
-    NONE = "", _("Aucune")
     LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
     FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
     FROM_12_TO_23_MONTHS = "FROM_12_TO_23_MONTHS", _("De 12 à 23 mois")
     MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
 
 
-class EducationLevel(PrettyPrintMixin, AbstractPeriod):
+class EducationLevel(models.TextChoices):
     """
     Education level of the employee
+
+    In ASP reference file, education levels are linked with a "mesure" (ASP counterpart for SIAE kind)
+    For a valid employee record, we only need to send the code.
+
+    FTR: import file has incorrect field length for the code value (must be exactly 2 char.)
 
     Translation of ASP ref file: ref_niveau_formation_v3.csv
     """
 
-    code = models.CharField(verbose_name=_("Code formation ASP"), max_length=2)
-    name = models.CharField(verbose_name=_("Libellé niveau de formation ASP"), max_length=80)
+    NON_CERTIFYING_QUALICATIONS = "00", _("Personne avec qualifications non-certifiantes")
+    NO_SCHOOLING = "01", _("Jamais scolarisé")
+    THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou école d'ingénieur")
+    LICENCE_LEVEL = "20", _("Formation de niveau licence")
+    BTS_OR_DUT_LEVEL = "30", _("Formation de niveau BTS ou DUT")
+    BAC_LEVEL = "40", _("Formation de niveau BAC")
+    BT_OR_BACPRO_LEVEL = "41", _("Brevet de technicien ou baccalauréat professionnel")
+    BEP_OR_CAP_LEVEL = "50", _("Formation de niveau BEP ou CAP")
+    BEP_OR_CAP_DIPLOMA = "51", _("Diplôme obtenu CAP ou BEP")
+    TRAINING_1_YEAR = "60", _("Formation courte d'une durée d'un an")
+    NO_SCHOOLING_BEYOND_MANDATORY = "70", _("Pas de formation au-delà de la scolarité obligatoire")
 
-    class Meta:
-        verbose_name = _("Niveau de formation")
-        verbose_name_plural = _("Niveaux de formation")
+
+class EmployerType(models.TextChoices):
+    """
+    Employer type
+
+    Employer type codes aren't likely to change and ref file also have incorrect
+    field length for 'code' (must be 2 char. and 0 left-padded)
+
+    Translation of ASP ref file: ref_type_employeur_v3.csv
+    """
+
+    EI = "01", _("Entreprise d'insertion")
+    ETTI = "02", _("Entreprise de travail temporaire d'insertion")
+    AI = "03", _("Association intermédiaire")
+    ACI = "04", _("Atelier chantier d'insertion")
+    ESAT = "05", _("Etablissement et service d'aide par le travail")
+    EA = "06", _("Entreprise adaptée")
+    OTHER = "07", _("Autre")
+
+    @classmethod
+    def from_itou_siae_kind(cls, siae_kind):
+        """
+        Mapping for ITOU employer type
+
+        Mapping with litteral ITOU value (unlikely to change)
+        to avoid unnecessary import of Siae.
+
+        No mapping yet for ESAT
+        """
+        if siae_kind == "EI":
+            return cls.EI
+        elif siae_kind == "ETTI":
+            return cls.ETTI
+        elif siae_kind == "AI":
+            return cls.AI
+        elif siae_kind == "ACI":
+            return cls.ACI
+        elif siae_kind == "EA":
+            return cls.EA
+        else:
+            return cls.OTHER
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
@@ -329,19 +380,3 @@ class SiaeKind(PrettyPrintMixin, AbstractPeriod):
 
     class Meta:
         verbose_name = _("Mesure")
-
-
-class EmployerType(PrettyPrintMixin, AbstractPeriod):
-    """
-    ASP employer type
-
-    Imported from ASP reference file: ref_type_employeur_v3.csv
-    """
-
-    code = models.CharField(max_length=3, verbose_name=_("Code employeur ASP"))
-    name = models.CharField(max_length=50, verbose_name=_("Libellé employeur ASP"))
-    siae_kind = models.ForeignKey(SiaeKind, verbose_name=_("Mesure ASP"), on_delete=models.SET_NULL, null=True)
-
-    class Meta:
-        verbose_name = _("Type d'employeur")
-        verbose_name = _("Types d'employeur")
