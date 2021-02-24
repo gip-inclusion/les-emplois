@@ -243,11 +243,11 @@ class Approval(CommonApprovalMixin):
 
     @property
     def can_postpone_start_date(self):
-        return self.jobapplication_set.count() == 1
+        return self.jobapplication_set.count() == 1 and self.start_at > datetime.date.today()
 
     def update_start_date(self, new_start_date):
         """
-        A SIAE can postpone the start date of a job application if the contract has not began yet.
+        An SIAE can postpone the start date of a job application if the contract has not begun yet.
         In this case, the approval start date must be updated with the start date of the hiring.
 
         Returns True if date has been updated, False otherwise
