@@ -252,6 +252,7 @@ class Approval(CommonApprovalMixin):
             self.can_be_suspended
             and self.user.last_hire_was_made_by_siae(siae)
             and not self.user.last_accepted_job_application.can_be_cancelled
+            and not self.has_pending_prolongation
         )
 
     @property
