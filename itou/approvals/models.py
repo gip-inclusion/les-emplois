@@ -243,7 +243,7 @@ class Approval(CommonApprovalMixin):
 
     @property
     def can_postpone_start_date(self):
-        return self.jobapplication_set.count() == 1 and self.start_at > datetime.date.today()
+        return self.jobapplication_set.count() == 1 and self.start_at >= timezone.now().date()
 
     def update_start_date(self, new_start_date):
         """
