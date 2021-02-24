@@ -258,7 +258,7 @@ class JobSeekerProfile(models.Model):
     rqth_employee = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
     oeth_employee = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
 
-    poleemploi_since = models.CharField(
+    pole_emploi_since = models.CharField(
         max_length=20,
         verbose_name=_("Inscrit à Pôle emploi depuis"),
         blank=True,
