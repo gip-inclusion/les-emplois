@@ -221,7 +221,9 @@ class ProlongationAdmin(admin.ModelAdmin):
     is_in_progress.short_description = _("En cours")
 
     def save_model(self, request, obj, form, change):
-        if not change:
+        if change:
+            obj.updated_by = request.user
+        else:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
@@ -231,11 +233,10 @@ class ProlongationAdmin(admin.ModelAdmin):
         """
         rof = super().get_readonly_fields(request, obj)
         rof += (
-            "status",
-            "status_updated_by",
-            "status_updated_at",
             "created_at",
             "created_by",
+            "status_updated_at",
+            "status_updated_by",
             "updated_at",
             "updated_by",
         )
@@ -248,11 +249,16 @@ class ProlongationAdmin(admin.ModelAdmin):
         """
         Override the `status` field's `help_text` to display a link to the validation interface.
         """
+
+        if request.user.is_not_allowed_to_operate_on_prolongations:
+            return super().get_form(request, obj, **kwargs)
+
         if obj and obj.is_pending:
             url = reverse("admin:approvals_prolongation_validate", args=[obj.pk])
             text = _("Valider la prolongation dans l'admin")
             help_texts = {"status": mark_safe(f'<a href="{url}">{text}</a>')}
             kwargs.update({"help_texts": help_texts})
+
         return super().get_form(request, obj, **kwargs)
 
     def validate_prolongation(self, request, prolongation_id):
