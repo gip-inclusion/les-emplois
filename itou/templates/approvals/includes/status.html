@@ -58,23 +58,26 @@
                 {% translate "Suspendu :" %}
                 <ul>
                     {% for s in suspensions %}
-                        <li{% if s.is_in_progress %} class="font-weight-bold"{% endif %}>
+                        <li>
                             {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
                                 du {{ start }} au {{ end }}
                             {% endblocktranslate %}
-                            <small>{{ s.get_reason_display }}</small>
-                            -
+                            {% if s.is_in_progress %}
+                                <small>
+                                    <b>{% translate "En cours" %}</b>
+                                </small>
+                            {% endif %}
                             {% if current_siae %}
                                 {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
                                 {% if can_be_handled %}
-                                    <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                        <small>{% translate "Modifier" %}</small>
-                                    </a>
-                                    <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                        <small>{% translate "Annuler" %}</small>
-                                    </a>
+                                    <small>
+                                        <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Modifier" %}</a>
+                                        <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Annuler" %}</a>
+                                    </small>
                                 {% endif %}
                             {% endif %}
+                            <br>
+                            <small>{{ s.get_reason_display }}</small>
                         </li>
                     {% endfor %}
                 </ul>
