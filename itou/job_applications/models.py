@@ -5,7 +5,6 @@ import uuid
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Exists, OuterRef
 from django.urls import reverse
@@ -338,18 +337,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def __str__(self):
         return str(self.id)
 
-    def clean(self):
-        if (
-            self.state in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED]
-            and self.hiring_end_at < self.hiring_start_at
-        ):
-            raise ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
-
-        # Check if hiring date is before end of a possible "old" approval
-        if self.approval and not self.approval.can_postpone_start_date:
-            if self.hiring_start_at >= self.approval.start_at:
-                raise ValidationError(JobApplication.ERROR_START_AFTER_APPROVAL_END)
-
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
@@ -434,6 +421,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if self.hiring_start_at:
             return datetime.date.today() < self.hiring_start_at
         return False
+
+    @property
+    def can_update_hiring_start(self):
+        return self.hiring_starts_in_future and self.state in [
+            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationWorkflow.STATE_POSTPONED,
+        ]
 
     # Workflow transitions.
 

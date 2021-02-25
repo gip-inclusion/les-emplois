@@ -310,9 +310,9 @@
         </ul>
         </p>
 
-        {% if job_application.hiring_starts_in_future %}
+        {% if job_application.can_update_hiring_start %}
             <p>
-                <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
+                <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}" 
                    class="btn btn-outline-primary btn-block">
                     {% translate "Modifier la période du contrat de travail" %}
                 </a>
