@@ -1,6 +1,6 @@
 from django.urls import path
 
-from itou.www.apply.views import list_views, process_views, submit_views
+from itou.www.apply.views import edit_views, list_views, process_views, submit_views
 
 
 # https://docs.djangoproject.com/en/dev/topics/http/urls/#url-namespaces-and-included-urlconfs
@@ -42,5 +42,10 @@ urlpatterns = [
         "<uuid:job_application_id>/siae/accept_without_approval",
         process_views.accept_without_approval,
         name="accept_without_approval",
+    ),
+    path(
+        "<uuid:job_application_id>/siae/edit_contract_start_date",
+        edit_views.edit_contract_start_date,
+        name="edit_contract_start_date",
     ),
 ]

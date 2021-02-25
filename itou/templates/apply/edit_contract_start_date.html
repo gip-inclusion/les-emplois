@@ -1,0 +1,32 @@
+{% extends "layout/content_small.html" %}
+{% load i18n %}
+{% load bootstrap4 %}
+
+{% block title %}{% translate "Modification de la date de contrat" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>{% translate "Candidature de" %} <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
+
+<h2>{% translate "Modification de la date de contrat" %}</h2>
+
+<form method="post" action="" class="js-prevent-multiple-submit">
+
+    {% csrf_token %}
+
+    {% bootstrap_form_errors form %}
+
+    {% bootstrap_form form %}
+
+    {% buttons %}
+        <a class="btn btn-secondary" href="{{ prev_url }}">{% translate "Annuler" %}</a>
+        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
+    {% endbuttons %}
+
+</form>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use the Datepicker JS widget. -->
+    {{ form.media }}
+{% endblock %}

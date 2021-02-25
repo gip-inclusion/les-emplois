@@ -31,9 +31,10 @@ def check_waiting_period(approvals_wrapper, job_application):
 @login_required
 def details_for_siae(request, job_application_id, template_name="apply/process_details.html"):
     """
-    Detail of an application for an SIAE with the ability to give an answer.
+    Detail of an application for an SIAE with the ability:
+    - to update start date of a contract (provided given date is in the future),
+    - to give an answer.
     """
-
     queryset = (
         JobApplication.objects.siae_member_required(request.user)
         .select_related("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
@@ -294,7 +295,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     return render(request, template_name, context)
 
 
-@login_required()
+@login_required
 def accept_without_approval(request, job_application_id):
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
