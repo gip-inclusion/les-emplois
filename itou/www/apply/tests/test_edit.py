@@ -40,9 +40,6 @@ class EditContractTest(TestCase):
             job_seeker=old_job_application.job_seeker,
             approval=approval,
         )
-        # old_approval = old_job_application.approval
-        # old_approval.start_at -= delta
-        # old_approval.end_at -= delta
 
         self.url = reverse("apply:edit_contract_start_date", kwargs={"job_application_id": self.job_application_1.id})
         self.old_url = reverse(
