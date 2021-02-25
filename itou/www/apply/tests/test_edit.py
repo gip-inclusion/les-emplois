@@ -24,7 +24,10 @@ class EditContractTest(TestCase):
         self.user2 = siae2.members.get(first_name="Roscoe")
 
         # JA with creation of a new approval
-        self.job_application_1 = JobApplicationWithApprovalFactory(to_siae=siae1)
+        tomorrow = (timezone.now() + relativedelta(days=1)).date()
+        self.job_application_1 = JobApplicationWithApprovalFactory(
+            to_siae=siae1, hiring_start_at=tomorrow, approval__start_at=tomorrow
+        )
 
         # JA with an old approval
         delta = relativedelta(months=23)
@@ -45,6 +48,10 @@ class EditContractTest(TestCase):
         self.old_url = reverse(
             "apply:edit_contract_start_date", kwargs={"job_application_id": self.job_application_2.id}
         )
+
+    def test_approval_can_be_postponed(self):
+        self.assertTrue(self.job_application_1.approval.can_postpone_start_date)
+        self.assertFalse(self.job_application_2.approval.can_postpone_start_date)
 
     def test_future_contract_date(self):
         """
