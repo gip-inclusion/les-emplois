@@ -6,6 +6,33 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [13] - 2021-02-25
+
+### Ajouté
+
+- Un nouveau compte de démonstration est disponible pour les E.A. (Entreprise Adaptée) avec connexion automatique
+- Résultats de recherche employeurs : ajout d'une étiquette "Priorité aux bénéficiaires de RQTH" aux entreprises adaptées
+- Metabase : ajout de trois colonnes à la table Organisations (date_dernière_candidature, latitude et longitude) et transformation de la colonne temps_écoulé_depuis_dernière_candidature en date_dernière_candidature
+- Metabase : ajout de deux colonnes à la table Candidatures (nom_org_prescripteur et safir_org_prescripteur)
+- Création d'un sous-domaine assistance.inclusion.beta.gouv.fr pour le support
+- Les employeurs peuvent modifier la date de début de leurs embauches qui n'ont pas encore démarré. Cela entraîne la modification du début du PASS IAE le cas échéant
+- Point d'accès API permettant aux éditeurs de logiciel de récupérer des fiches salarié de test. [Ce point d'accès a une documentation](https://github.com/betagouv/itou/blob/master/itou/api/README-FS-SSII.md)
+- Fiches salarié: ajout d'un profil utilisateur pour compléter les données personnnelles du salarié
+
+
+### Modifié
+
+- Autocomplétion de la recherche par ville : affichage des 12 derniers résultats (au lieu de 10)
+- Formulaire d'acceptation d'une candidature : "Date de fin de contrat" remplacé par "Date prévisionnelle de fin de contrat"
+- Résolution d'un bug qui rompait la communication entre Typeform et notre service, entrainant une mauvaise sauvegarde des CV depuis le 22 janvier. Les CV en question ont pu être reliés à leurs candidats a posteriori
+- Montée en version de Django (3.1.7)
+- Modification de la méthode qui renvoie les agréments disponibles pour un candidat (Pôle emploi / PASS IAE) pour favoriser les PASS IAE valides le cas échéant
+- Fiches salarié: simplification des référentiels de données ASP
+
+
+### Supprimé
+- Résultats de recherche employeurs : suppression de la distance entre une structure et la ville recherchée
+
 ## [12] - 2021-02-12
 
 ### Ajouté
