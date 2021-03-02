@@ -19,7 +19,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.www.dashboard.forms import EditUserEmailForm
 
 
@@ -434,3 +434,20 @@ class EditUserPreferencesTest(TestCase):
             self.assertFalse(
                 NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
             )
+
+
+class EditUserPreferencesExceptionsTest(TestCase):
+    def test_not_allowed_user(self):
+        # Only employers can currently access the Preferences page.
+
+        prescriber = PrescriberFactory()
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        job_seeker = JobSeekerFactory()
+        self.client.login(username=job_seeker.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
