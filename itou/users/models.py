@@ -176,7 +176,7 @@ class User(AbstractUser, AddressMixin):
     def is_not_allowed_to_operate_on_prolongations(self):
         """
         Operating on prolongations must be done by a Pôle emploi agent in production.
-        This should be temporary while in waiting for a system to delegate those actions
+        This should be temporary while waiting for a system to delegate those actions
         to other authorized prescribers outside of the Itou staff.
         """
         return settings.ITOU_ENVIRONMENT == "PROD" and not self.has_pole_emploi_email
