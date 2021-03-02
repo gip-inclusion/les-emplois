@@ -36,6 +36,9 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def archived(self):
         return self.processed().exclude(archived_json=None)
 
+    def with_job_seeker_and_siae(self, job_seeker, siae):
+        return self.filter(job_application__to_siae=siae, job_application__job_seeker=job_seeker)
+
 
 class EmployeeRecord(models.Model):
     """
@@ -49,15 +52,18 @@ class EmployeeRecord(models.Model):
     status = models.CharField(max_length=10, verbose_name=_("Statut"), choices=Status.choices, default=Status.NEW)
 
     # Itou part
-    approval = models.ForeignKey(
-        "approvals.approval", null=True, on_delete=models.SET_NULL, verbose_name=_("PASS IAE")
-    )
+
+    # Job application has references on many mandatory parts of the E.R.:
+    # - SIAE
+    # - Employee
+    # - Approval
     job_application = models.ForeignKey(
         "job_applications.jobapplication",
         on_delete=models.SET_NULL,
         null=True,
         verbose_name=_("Candidature / embauche"),
     )
+
     # TODO: This point must be discussed: SIRET might change over time
     siret = models.CharField(max_length=14, verbose_name=_("SIRET"), validators=[validators.validate_siret])
 
@@ -141,3 +147,24 @@ class EmployeeRecord(models.Model):
             return self.job_application.job_seeker
 
         return None
+
+    @property
+    def approval(self):
+        if self.job_application and self.job_application.approval:
+            return self.job_application.approval
+
+        return None
+
+    @classmethod
+    def from_job_application(cls, job_application):
+        assert job_application
+
+        if (
+            job_application.can_be_cancelled
+            or not job_application.is_accepted
+            or not job_application.approval
+            or cls.objects.with_job_seeker_and_siae(job_application.job_seeker, job_application.to_siae)
+        ):
+            return None
+
+        return cls(job_application=job_application, siret=job_application.to_siae.siret)
