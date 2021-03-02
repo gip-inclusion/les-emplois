@@ -53,7 +53,7 @@ class EmployeeRecord(models.Model):
         "approvals.approval", null=True, on_delete=models.SET_NULL, verbose_name=_("PASS IAE")
     )
     job_application = models.ForeignKey(
-        "job_applications.job_application",
+        "job_applications.jobapplication",
         on_delete=models.SET_NULL,
         null=True,
         verbose_name=_("Candidature / embauche"),
@@ -85,7 +85,8 @@ class EmployeeRecord(models.Model):
     # Business methods
 
     def clean(self):
-        # TODO
+        # TODO check
+        # job_application.can_be_cancelled
         pass
 
     @property
@@ -131,5 +132,12 @@ class EmployeeRecord(models.Model):
     def siae(self):
         if self.job_application:
             return self.job_application.to_siae
+
+        return None
+
+    @property
+    def job_seeker(self):
+        if self.job_application:
+            return self.job_application.job_seeker
 
         return None
