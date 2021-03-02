@@ -49,8 +49,11 @@ class EmployeeRecord(models.Model):
     Holds information needed for JSON exports and processing by ASP
     """
 
-    created_at = models.DateTimeField(verbose_name=("Date de création"))
-    updated_at = models.DateTimeField(verbose_name=("Date de modification"))
+    ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED = _("La candidature doit être acceptée")
+    ERROR_RECENT_JOB_APPLICATION = _("L'embauche a été validé trop récemment")
+
+    created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
     status = models.CharField(max_length=10, verbose_name=_("Statut"), choices=Status.choices, default=Status.NEW)
 
     # Itou part
@@ -79,7 +82,7 @@ class EmployeeRecord(models.Model):
     # The API will not use JSON serializers on a regular basis,
     # except for the archive serialization, which occurs once.
     # It will only return a list of this JSON field for archived employee records.
-    archived_json = models.JSONField(verbose_name=_("Fiche salarié au format JSON (archive)"))
+    archived_json = models.JSONField(verbose_name=_("Fiche salarié au format JSON (archive)"), null=True)
 
     objects = models.Manager.from_queryset(EmployeeRecordQuerySet)()
 
@@ -88,16 +91,19 @@ class EmployeeRecord(models.Model):
         verbose_name_plural = _("Fiches salarié")
 
     def __str__(self):
-        return "["
+        return f"{self.siae} - {self.job_seeker} - {self.approval}"
 
     def clean(self):
         ja = self.job_application
 
-        if ja.state != ja.is_state_accepted:
-            raise ValidationError(_("La candidature doit être acceptée"))
+        if not ja.is_state_accepted:
+            raise ValidationError(self.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED)
 
         if ja.can_be_cancelled:
-            raise ValidationError(_("L'embauche a été validé trop récemment"))
+            raise ValidationError(self.ERROR_RECENT_JOB_APPLICATION)
+
+        if ja and ja.to_siae:
+            self.siret = ja.to_siae.siret
 
     def save(self, *args, **kwargs):
         if self.pk:
