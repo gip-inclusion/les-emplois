@@ -137,11 +137,7 @@ header.layout-section {
 
 .layout-header-logo {
     margin-right: 10px;
-}
-
-.layout-header-logo {
-    max-width: 400px;
-    min-width: 200px;
+    width: 280px;
 }
 
 .layout-header-logo:focus,
