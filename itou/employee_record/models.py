@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 import itou.utils.validators as validators
@@ -88,12 +90,21 @@ class EmployeeRecord(models.Model):
     def __str__(self):
         return "["
 
-    # Business methods
-
     def clean(self):
-        # TODO check
-        # job_application.can_be_cancelled
-        pass
+        ja = self.job_application
+
+        if ja.state != ja.is_state_accepted:
+            raise ValidationError(_("La candidature doit être acceptée"))
+
+        if ja.can_be_cancelled:
+            raise ValidationError(_("L'embauche a été validé trop récemment"))
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    # Business methods
 
     @property
     def is_archived(self):
@@ -163,7 +174,7 @@ class EmployeeRecord(models.Model):
             job_application.can_be_cancelled
             or not job_application.is_accepted
             or not job_application.approval
-            or cls.objects.with_job_seeker_and_siae(job_application.job_seeker, job_application.to_siae)
+            or cls.objects.with_job_seeker_and_siae(job_application.job_seeker, job_application.to_siae).exists()
         ):
             return None
 
