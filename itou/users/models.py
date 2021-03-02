@@ -176,6 +176,12 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
+    @cached_property
+    def last_accepted_job_application(self):
+        if not self.is_job_seeker:
+            return None
+        return self.job_applications.accepted().latest("created_at")
+
     def last_hire_was_made_by_siae(self, siae):
         if not self.is_job_seeker:
             return False
