@@ -5,7 +5,12 @@ import itou.employee_record.models as models
 
 @admin.register(models.EmployeeRecord)
 class EmployeeRecordAdmin(admin.ModelAdmin):
-    list_display = ("pk", "__str__", "created_at", "status",)
+    list_display = (
+        "pk",
+        "__str__",
+        "created_at",
+        "status",
+    )
     list_filter = ("status",)
 
     raw_id_fields = ("job_application",)
