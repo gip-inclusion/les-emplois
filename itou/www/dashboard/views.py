@@ -203,13 +203,15 @@ def switch_prescriber_organization(request):
 def edit_user_preferences(request, template_name="dashboard/edit_user_preferences.html"):
     new_job_app_notification_form = None
 
-    if request.user.is_siae_staff:
-        current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-        siae = get_object_or_404(Siae, pk=current_siae_pk)
-        membership = request.user.siaemembership_set.get(siae=siae)
-        new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(
-            recipient=membership, siae=siae, data=request.POST or None
-        )
+    if not request.user.is_siae_staff:
+        raise PermissionDenied
+
+    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+    siae = get_object_or_404(Siae, pk=current_siae_pk)
+    membership = request.user.siaemembership_set.get(siae=siae)
+    new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(
+        recipient=membership, siae=siae, data=request.POST or None
+    )
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
