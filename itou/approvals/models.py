@@ -623,7 +623,7 @@ class Prolongation(models.Model):
 
     MAX_CUMULATIVE_DURATION = {
         Reason.COMPLETE_TRAINING.value: {
-            "duration": datetime.timedelta(days=365 * 0.5),
+            "duration": datetime.timedelta(days=183),  # A leap year can contain 183 days in 6 months.
             "label": _("6 mois"),
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
