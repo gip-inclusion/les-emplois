@@ -155,9 +155,7 @@ class User(AbstractUser, AddressMixin):
 
     @property
     def has_pole_emploi_email(self):
-        if self.email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
-            return True
-        return False
+        return self.email and self.email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX)
 
     @property
     def is_not_allowed_to_operate_on_prolongations(self):
