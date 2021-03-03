@@ -417,7 +417,7 @@ class EditUserPreferencesTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        # Recipients are subscribed to spontaneous notifications by default,
+        # Recipients are subscribed to qualified notifications by default,
         # the form should reflect that.
         self.assertEqual(response.context[form_name].fields["qualified"].initial, job_descriptions_pks)
 

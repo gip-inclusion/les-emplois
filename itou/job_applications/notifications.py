@@ -27,9 +27,18 @@ class NewSpontaneousJobAppEmployersNotification(BaseNotification):
 
 class NewQualifiedJobAppEmployersNotification(BaseNotification):
     """
-    Subscribe a recipient to job descriptions or send notifications.
+    Job descriptions notifications: sending and subscription.
     A job description represents an SiaeJobDescription object also known as
       a `job_application.selected_jobs` relation.
+
+    Notifications preferences are stored as a JSON dictionary like this one:
+    ```
+    {
+        notification.name: {
+            notification.sub_name: [3, 5, 10] # primary keys of objects a recipient subscribed to.
+        }
+    }
+    ```
 
     ----
 
