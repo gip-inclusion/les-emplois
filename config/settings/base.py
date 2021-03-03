@@ -112,9 +112,6 @@ ITOU_MIDDLEWARE = [
 
 MIDDLEWARE = DJANGO_MIDDLEWARE + ITOU_MIDDLEWARE
 
-# https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
-
 # URLs.
 # ------------------------------------------------------------------------------
 
@@ -153,6 +150,13 @@ TEMPLATES = [
         },
     }
 ]
+
+# Forms.
+# ------------------------------------------------------------------------------
+
+# Override default Django forms widgets templates
+# https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # Database.
 # ------------------------------------------------------------------------------

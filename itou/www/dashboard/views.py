@@ -201,8 +201,6 @@ def switch_prescriber_organization(request):
 
 @login_required
 def edit_user_preferences(request, template_name="dashboard/edit_user_preferences.html"):
-    new_job_app_notification_form = None
-
     if not request.user.is_siae_staff:
         raise PermissionDenied
 
