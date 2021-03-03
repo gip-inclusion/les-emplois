@@ -37,9 +37,6 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
     def by_author_kind_prescriber(self):
         return self.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER)
 
-    def by_created_at_asc(self):
-        return self.order_by("created_at")
-
     def for_job_seeker(self, job_seeker):
         return self.filter(job_seeker=job_seeker).select_related(
             "author", "author_siae", "author_prescriber_organization"
@@ -77,7 +74,7 @@ class EligibilityDiagnosisManager(models.Manager):
         """
 
         last = None
-        query = self.for_job_seeker(job_seeker).by_created_at_asc()
+        query = self.for_job_seeker(job_seeker).order_by("created_at")
 
         # A diagnosis is considered valid for the duration of an approval,
         # we just retrieve the last one no matter if it's valid or not.
@@ -111,7 +108,7 @@ class EligibilityDiagnosisManager(models.Manager):
         """
 
         last = None
-        query = self.for_job_seeker(job_seeker).before(before).by_created_at_asc()
+        query = self.for_job_seeker(job_seeker).before(before).order_by("created_at")
 
         last = query.by_author_kind_prescriber().last()
         if not last and for_siae:
