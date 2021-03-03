@@ -42,7 +42,7 @@ django_select2==7.4.2  # https://github.com/codingjoe/django-select2
 # ------------------------------------------------------------------------------
 
 # Manipulate ASP CSV exports having 30+ (!) columns easily
-pandas==1.0.3  # https://github.com/pandas-dev/pandas
+pandas==1.2.3  # https://github.com/pandas-dev/pandas
 
 # Eye candy progress bar
 tqdm==4.46.1  # https://github.com/tqdm/tqdm
