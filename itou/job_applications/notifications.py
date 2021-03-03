@@ -1,10 +1,10 @@
 from django.db.models import Q
 
 from itou.utils.emails import get_email_message
-from itou.utils.notifications.base_class import NotificationBase
+from itou.utils.notifications.base_class import BaseNotification
 
 
-class NewSpontaneousJobAppEmployersNotification(NotificationBase):
+class NewSpontaneousJobAppEmployersNotification(BaseNotification):
     NAME = "new_spontaneous_job_application_employers_email"
 
     def __init__(self, job_application):
@@ -25,7 +25,7 @@ class NewSpontaneousJobAppEmployersNotification(NotificationBase):
         return self.get_recipients().values_list("user__email", flat=True)
 
 
-class NewQualifiedJobAppEmployersNotification(NotificationBase):
+class NewQualifiedJobAppEmployersNotification(BaseNotification):
     """
     Subscribe a recipient to job descriptions or send notifications.
     A job description represents an SiaeJobDescription object also known as

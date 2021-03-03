@@ -6,7 +6,7 @@ from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNot
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 
 
-NotificationBase = NewSpontaneousJobAppEmployersNotification
+BaseNotification = NewSpontaneousJobAppEmployersNotification
 
 
 class NotificationsBaseClassTest(TestCase):
@@ -15,7 +15,7 @@ class NotificationsBaseClassTest(TestCase):
     def setUp(self):
         self.siae = SiaeWith2MembershipsFactory()
         self.job_application = JobApplicationFactory(to_siae=self.siae)
-        self.notification = NotificationBase(job_application=self.job_application)
+        self.notification = BaseNotification(job_application=self.job_application)
 
         # Make sure notifications are empty
         self.siaemembership_set = self.siae.siaemembership_set
@@ -23,9 +23,9 @@ class NotificationsBaseClassTest(TestCase):
         self.assertFalse(self.membership.notifications)
 
     def test_subscribe(self):
-        NotificationBase.subscribe(recipient=self.membership)
+        BaseNotification.subscribe(recipient=self.membership)
         self.assertTrue(self.membership.notifications)  # Dict is not empty
-        self.assertTrue(NotificationBase.is_subscribed(recipient=self.membership))
+        self.assertTrue(BaseNotification.is_subscribed(recipient=self.membership))
 
         key = self.notification.NAME
         self.assertTrue(self.membership.notifications.get(key))  # Key exists
@@ -33,7 +33,7 @@ class NotificationsBaseClassTest(TestCase):
     def test_unsubscribe(self):
         self.notification.unsubscribe(recipient=self.membership)
         self.assertTrue(self.membership.notifications)  # Dict is not empty
-        self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
+        self.assertFalse(BaseNotification.is_subscribed(recipient=self.membership))
 
         key = self.notification.NAME
         self.assertTrue(self.membership.notifications.get(key))  # Key exists
@@ -42,14 +42,14 @@ class NotificationsBaseClassTest(TestCase):
         """
         Make sure it's possible to toggle preferences.
         """
-        NotificationBase.unsubscribe(recipient=self.membership)
-        self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
+        BaseNotification.unsubscribe(recipient=self.membership)
+        self.assertFalse(BaseNotification.is_subscribed(recipient=self.membership))
 
-        NotificationBase.subscribe(recipient=self.membership)
-        self.assertTrue(NotificationBase.is_subscribed(recipient=self.membership))
+        BaseNotification.subscribe(recipient=self.membership)
+        self.assertTrue(BaseNotification.is_subscribed(recipient=self.membership))
 
-        NotificationBase.unsubscribe(recipient=self.membership)
-        self.assertFalse(NotificationBase.is_subscribed(recipient=self.membership))
+        BaseNotification.unsubscribe(recipient=self.membership)
+        self.assertFalse(BaseNotification.is_subscribed(recipient=self.membership))
 
     def test_recipients_email(self):
         recipients_emails = self.notification.recipients_emails
