@@ -43,6 +43,7 @@ class User(AbstractUser, AddressMixin):
 
     More details in `itou.external_data.models` module
     """
+
     # Used for validation of birth country / place
     INSEE_CODE_FRANCE = "100"
 
@@ -54,7 +55,9 @@ class User(AbstractUser, AddressMixin):
     )
 
     ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
-    ERROR_MUST_PROVIDE_BIRTH_PLACE = _("Si le pays de naissance est la France, la commune de naissance est obligatoire")
+    ERROR_MUST_PROVIDE_BIRTH_PLACE = _(
+        "Si le pays de naissance est la France, la commune de naissance est obligatoire"
+    )
 
     class Title(models.TextChoices):
         M = "M", _("Monsieur")
