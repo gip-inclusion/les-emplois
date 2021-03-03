@@ -1,8 +1,8 @@
 from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
-
 from django.core import mail
+
 # from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse

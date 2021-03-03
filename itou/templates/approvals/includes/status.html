@@ -38,13 +38,6 @@
 
     <ul class="list-unstyled pl-2 border-left" style="border-left-width: 3px !important;">
 
-        {# Delivery date. #}
-        <li>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
-                Délivré le {{ start }}
-            {% endblocktranslate %}
-        </li>
-
         {# Validity. #}
         <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
             {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
@@ -52,10 +45,17 @@
             {% endblocktranslate %}
         </li>
 
+        {# Delivery date. #}
+        <li>
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
+                Délivrance : le {{ start }}
+            {% endblocktranslate %}
+        </li>
+
         {# Suspensions history. #}
         {% with approval.suspensions_by_start_date_asc as suspensions %}
             {% if suspensions %}
-                {% translate "Suspendu :" %}
+                {% translate "Suspensions :" %}
                 <ul>
                     {% for s in suspensions %}
                         <li>
@@ -86,9 +86,10 @@
             {% endif %}
         {% endwith %}
 
+        {# Prolongations history. #}
         {% with approval.prolongations_by_start_date_asc as prolongations %}
             {% if prolongations %}
-                {% translate "Prolongé :" %}
+                {% translate "Prolongations :" %}
                 <ul>
                     {% for p in prolongations %}
                         <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
