@@ -110,8 +110,7 @@ class JobApplicationModelTest(TestCase):
         """
         # Approval has ended
         start = datetime.date.today() - relativedelta(years=2)
-        end = start + relativedelta(years=1) - relativedelta(days=1)
-        ended_approval = ApprovalFactory(start_at=start, end_at=end)
+        ended_approval = ApprovalFactory(start_at=start)
 
         job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
         self.assertTrue(job_application.can_download_approval_as_pdf)
