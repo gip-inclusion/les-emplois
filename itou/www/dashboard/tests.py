@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.http import urlencode
 from django.utils.translation import gettext as _
 
 from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
