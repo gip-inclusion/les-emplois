@@ -3,7 +3,7 @@ from django.db.models import Q
 from itou.siaes.models import SiaeMembershipQuerySet
 
 
-class NotificationBase:
+class BaseNotification:
     """
     Base class used in the notifications system.
     - A **notification** represents any transactional email sent to recipients.
@@ -19,7 +19,7 @@ class NotificationBase:
     - In the model saving recipients preferences, add a new `JSONField` `notifications`
     and generate a migration
     - Add a `notifications.py` in the app folder
-    - In `notifications.py`, create a class for each notification and inherit from NotificationBase
+    - In `notifications.py`, create a class for each notification and inherit from BaseNotification
     - Override the `__init__` method as well as `email` and `recipients_email` properties. Provide a Notification.NAME.
 
     Live example:
