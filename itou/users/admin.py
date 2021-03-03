@@ -135,7 +135,7 @@ class ItouUserAdmin(UserAdmin):
     list_display_links = ("pk", "email")
     list_filter = UserAdmin.list_filter + (KindFilter, CreatedByProxyFilter)
     ordering = ("-id",)
-    raw_id_fields = ("created_by",)
+    raw_id_fields = ("created_by", "birth_place", "birth_country",)
     search_fields = UserAdmin.search_fields + ("pk",)
     readonly_fields = ("pk",)
 
@@ -145,7 +145,10 @@ class ItouUserAdmin(UserAdmin):
             {
                 "fields": (
                     "pk",
+                    "title",
                     "birthdate",
+                    "birth_place",
+                    "birth_country",
                     "phone",
                     "resume_link",
                     "address_line_1",

@@ -43,6 +43,8 @@ class User(AbstractUser, AddressMixin):
 
     More details in `itou.external_data.models` module
     """
+    # Used for validation of birth country / place
+    INSEE_CODE_FRANCE = "100"
 
     REASON_FORGOTTEN = "FORGOTTEN"
     REASON_NOT_REGISTERED = "NOT_REGISTERED"
@@ -52,6 +54,7 @@ class User(AbstractUser, AddressMixin):
     )
 
     ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
+    ERROR_MUST_PROVIDE_BIRTH_PLACE = _("Si le pays de naissance est la France, la commune de naissance est obligatoire")
 
     class Title(models.TextChoices):
         M = "M", _("Monsieur")
@@ -63,10 +66,10 @@ class User(AbstractUser, AddressMixin):
         verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
     )
     birth_place = models.ForeignKey(
-        "asp.Commune", verbose_name=_("Commune de naissance"), null=True, on_delete=models.SET_NULL
+        "asp.Commune", verbose_name=_("Commune de naissance"), null=True, blank=True, on_delete=models.SET_NULL
     )
     birth_country = models.ForeignKey(
-        "asp.Country", verbose_name=_("Pays de naissance"), null=True, on_delete=models.SET_NULL
+        "asp.Country", verbose_name=_("Pays de naissance"), null=True, blank=True, on_delete=models.SET_NULL
     )
     email = CIEmailField(
         _("email address"),
@@ -123,6 +126,10 @@ class User(AbstractUser, AddressMixin):
 
     def __str__(self):
         return self.email
+
+    def clean(self):
+        if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
+            raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
 
     def save(self, *args, **kwargs):
         # Update department from postal code (if possible).
