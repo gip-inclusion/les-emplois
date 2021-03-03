@@ -390,7 +390,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             and not self.can_be_cancelled
             and self.to_siae.is_subject_to_eligibility_rules
             and self.approval
-            and self.approval.is_valid
         )
 
     @property

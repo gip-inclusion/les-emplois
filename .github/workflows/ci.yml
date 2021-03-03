@@ -55,7 +55,7 @@ jobs:
         pip install -r requirements/dev.txt
     - name: ✨ Black, isort and Flake8
       run: |
-        black --check --line-length 119 itou
+        black --check itou
         isort --check-only itou
         flake8 itou --count --show-source --statistics
     - name: 🤹‍ Django tests

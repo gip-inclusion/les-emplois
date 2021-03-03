@@ -35,6 +35,8 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
             )
         )
 
+    approval = job_application.approval
+
     diagnosis = None
     diagnosis_author = None
     diagnosis_author_org = None
@@ -43,10 +45,17 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     # If an approval has been delivered by Pole Emploi, a diagnosis might
     # exist in the real world but not in our database.
     # Raise an error only if the diagnosis does not exist for an Itou approval.
-    if job_application.approval.originates_from_itou:
-        diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_siae
-        )
+    if approval.originates_from_itou:
+        if approval.is_valid:
+            diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                job_application.job_seeker, for_siae=job_application.to_siae
+            )
+        else:
+            # The PDF should be downloadable even when the PASS IAE has expired.
+            # In this case, we have to find a diagnosis made before the pass expires.
+            diagnosis = EligibilityDiagnosis.objects.last_before(
+                job_application.job_seeker, before_date=approval.end_at, for_siae=job_application.to_siae
+            )
         if not diagnosis:
             raise ObjectDoesNotExist
         diagnosis_author = diagnosis.author.get_full_name()
