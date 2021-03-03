@@ -36,9 +36,15 @@ class EmployeeRecordQuerySet(models.QuerySet):
         return self.filter(status=Status.PROCESSED).order_by("-created_at")
 
     def archived(self):
+        """
+        Archived employee records (completed and having a JSON archive)
+        """
         return self.processed().exclude(archived_json=None)
 
     def with_job_seeker_and_siae(self, job_seeker, siae):
+        """
+        Only one employee record is stored for a given job_seeker / SIAE pair
+        """
         return self.filter(job_application__to_siae=siae, job_application__job_seeker=job_seeker)
 
 
@@ -78,7 +84,7 @@ class EmployeeRecord(models.Model):
     asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), null=True)
     asp_process_response = models.JSONField(verbose_name=_("Réponse du traitement ASP"), null=True)
 
-    # Once correctly processed by ASP, the Employee Record is archived:
+    # Once correctly processed by ASP, the employee record is archived:
     # - it can't be changed anymore
     # - a serialized version of the employee record is stored (as proof, and for API concerns)
     # The API will not use JSON serializers on a regular basis,
@@ -98,6 +104,7 @@ class EmployeeRecord(models.Model):
     def clean(self):
         self._clean_job_application()
         self._clean_job_seeker()
+        self._clean_job_seeker_address()
 
     def save(self, *args, **kwargs):
         if self.pk:
@@ -131,6 +138,11 @@ class EmployeeRecord(models.Model):
 
         if not job_seeker.birth_country:
             raise ValidationError(self.ERROR_JOB_SEEKER_BIRTH_COUNTRY)
+
+    def _clean_job_seeker_address(self):
+        """
+        Check the correct format (Hexaposte) for the address
+        """
 
     # Business methods
 
@@ -207,3 +219,39 @@ class EmployeeRecord(models.Model):
             return None
 
         return cls(job_application=job_application, siret=job_application.to_siae.siret)
+
+
+class HexaAddress(models.Model):
+    """
+    HEXA address format:
+
+    The SNA (Service National de l'Adresse) has several certification / validation
+    norms to verify french addresses:
+    - Hexacle: house number level
+    - Hexaposte: zip code level
+    - Hexavia: street level
+    + others
+
+    For the employee record domain, this means that the job seeker address has to be
+    formatted in a very specific way to be accepted as valid by ASP backend.
+
+    These conversions and formatting processes are almost automatic,
+    but absolutely not 100% error proof.
+
+    Formatted addresses are stored in this model, avoiding multiple call to the
+    reverse geocoding API
+
+    Note that despite the name, addresses of this model are not fully compliant
+    with Hexa norms (but compliant enough to be accepted by ASP backend).
+
+
+    Output fields:
+    - number (opt.): number in the lane
+    - std_extension (opt.): One of the ASP ref lane extension (see LaneExtension)
+    - non_std_extension (opt.): if another extension is detected
+    - lane: name of the lane
+    - lane_type: One of the ASP ref lane type (see LaneType)
+    - city: name of city
+    - post_code: postal code
+    - insee_code: INSEE code of the city (Itou)
+    """

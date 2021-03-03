@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
-from itou.asp.models import AllocationDuration, EducationLevel
+from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
@@ -261,8 +261,40 @@ def get_allauth_account_user_display(user):
 class JobSeekerProfile(models.Model):
     """
     Specific information about the job seeker
+
     Instead of augmenting the 'User' model, additional data is collected in a "profile" object.
-    It will first be used by employee record model / system to serialize data for ASP tranfers.
+
+    This user profile has 2 main parts:
+
+    1 - Job seeker "administrative" situation
+
+    These fields are part of the requires fields for EmployeeRecord processing:
+    - education level
+    - various social allowances flags and duration
+
+    2- Job seeker address in HEXA address format:
+
+    The SNA (Service National de l'Adresse) has several certification / validation
+    norms to verify french addresses:
+    - Hexacle: house number level
+    - Hexaposte: zip code level
+    - Hexavia: street level
+    + others
+
+    For the employee record domain, this means that the job seeker address has to be
+    formatted in a very specific way to be accepted as valid by ASP backend.
+
+    These conversions and formatting processes are almost automatic,
+    but absolutely not 100% error-proof.
+
+    Formatted addresses are stored in this model, avoiding multiple call to the
+    reverse geocoding API at processing time.
+
+    These kind of addresses are at the moment only used by the employee_record app,
+    but their usage could be extended to other domain should the need arise.
+
+    Note that despite the name, addresses of this model are not fully compliant
+    with Hexa norms (but compliant enough to be accepted by ASP backend).
     """
 
     user = models.OneToOneField(
@@ -326,6 +358,22 @@ class JobSeekerProfile(models.Model):
         blank=True,
         choices=AllocationDuration.choices,
     )
+
+    # Jobseeker address in Hexa format
+
+    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), null=True, blank=True)
+    hexa_std_extension = models.CharField(
+        max_length=1, verbose_nam=_("Extension de voie"), null=True, blank=True, choices=LaneExtension.choices
+    )
+    non_std_extension = models.CharField(
+        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), black=True, null=True
+    )
+    hexa_lane_type = models.CharField(
+        max_length=4, verbose_name=_("Type de voie"), null=True, blank=True, choices=LaneType.choices
+    )
+    hexa_lane_name = models.CharField(max_length=120, verbose_name=_("Nom de la voie"), null=True, blank=True)
+    hexa_post_code = models.CharField(max_length=6, verbose_name=_("Code postal"), null=True, blank=True)
+    hexa_commune = models.ForeignKey(Commune, verbose_name=_("Commune (ref. ASP)"))
 
     class Meta:
         verbose_name = _("Profil demandeur d'emploi")
