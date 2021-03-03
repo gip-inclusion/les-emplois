@@ -13,7 +13,7 @@
         <h3 class="card-header font-weight-bold h4">{% translate "Notifications e-mail" %}</h3>
         <div class="card-body">
                 <h4 class="font-weight-bold h5">{% translate "Nouvelles candidatures" %}</h4>
-                <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
+                <form method="post" action="" class="js-prevent-multiple-submit">
                     {% csrf_token %}
 
                     {% bootstrap_form_errors new_job_app_notification_form %}
