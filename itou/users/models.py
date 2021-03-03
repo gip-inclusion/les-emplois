@@ -363,17 +363,19 @@ class JobSeekerProfile(models.Model):
 
     hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), null=True, blank=True)
     hexa_std_extension = models.CharField(
-        max_length=1, verbose_nam=_("Extension de voie"), null=True, blank=True, choices=LaneExtension.choices
+        max_length=1, verbose_name=_("Extension de voie"), null=True, blank=True, choices=LaneExtension.choices
     )
     non_std_extension = models.CharField(
-        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), black=True, null=True
+        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True, null=True
     )
     hexa_lane_type = models.CharField(
         max_length=4, verbose_name=_("Type de voie"), null=True, blank=True, choices=LaneType.choices
     )
     hexa_lane_name = models.CharField(max_length=120, verbose_name=_("Nom de la voie"), null=True, blank=True)
     hexa_post_code = models.CharField(max_length=6, verbose_name=_("Code postal"), null=True, blank=True)
-    hexa_commune = models.ForeignKey(Commune, verbose_name=_("Commune (ref. ASP)"))
+    hexa_commune = models.ForeignKey(
+        Commune, verbose_name=_("Commune (ref. ASP)"), null=True, on_delete=models.SET_NULL
+    )
 
     class Meta:
         verbose_name = _("Profil demandeur d'emploi")
