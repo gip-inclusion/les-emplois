@@ -50,7 +50,9 @@ class EmployeeRecord(models.Model):
     """
 
     ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED = _("La candidature doit être acceptée")
-    ERROR_RECENT_JOB_APPLICATION = _("L'embauche a été validé trop récemment")
+    ERROR_JOB_APPLICATION_TOO_RECENT = _("L'embauche a été validé trop récemment")
+    ERROR_JOB_SEEKER_TITLE = _("La civilité du salarié est obligatoire")
+    ERROR_JOB_SEEKER_BIRTH_COUNTRY = _("Le pays de naissance est obligatoire")
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -94,21 +96,41 @@ class EmployeeRecord(models.Model):
         return f"{self.siae} - {self.job_seeker} - {self.approval}"
 
     def clean(self):
+        self._clean_job_application()
+        self._clean_job_seeker()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            self.updated_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    def _clean_job_application(self):
+        """
+        Check if job application is valid for E.R.
+        """
         ja = self.job_application
 
         if not ja.is_state_accepted:
             raise ValidationError(self.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED)
 
         if ja.can_be_cancelled:
-            raise ValidationError(self.ERROR_RECENT_JOB_APPLICATION)
+            raise ValidationError(self.ERROR_JOB_APPLICATION_TOO_RECENT)
 
         if ja and ja.to_siae:
             self.siret = ja.to_siae.siret
 
-    def save(self, *args, **kwargs):
-        if self.pk:
-            self.updated_at = timezone.now()
-        super().save(*args, **kwargs)
+    def _clean_job_seeker(self):
+        """
+        Check if data provided for the job seeker part of the E.R. is complete / valid
+        """
+        job_seeker = self.job_application.job_seeker
+        job_seeker.clean()
+
+        if not job_seeker.title:
+            raise ValidationError(self.ERROR_JOB_SEEKER_TITLE)
+
+        if not job_seeker.birth_country:
+            raise ValidationError(self.ERROR_JOB_SEEKER_BIRTH_COUNTRY)
 
     # Business methods
 
