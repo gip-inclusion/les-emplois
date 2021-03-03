@@ -134,6 +134,7 @@ ENV/
 
 # Editors
 .tm_properties
+/.vscode/
 
 # Jetbrains / Pycharm
 *.iml
