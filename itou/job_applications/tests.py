@@ -112,6 +112,8 @@ class JobApplicationModelTest(TestCase):
         start = datetime.date.today() - relativedelta(years=2)
         ended_approval = ApprovalFactory(start_at=start)
 
+        # `hiring_start_at` must be set in order to pass the `can_be_cancelled` condition
+        # called by `can_download_approval_as_pdf`.
         job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
         self.assertTrue(job_application.can_download_approval_as_pdf)
 
