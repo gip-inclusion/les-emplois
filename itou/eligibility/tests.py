@@ -151,6 +151,18 @@ class EligibilityDiagnosisManagerTest(TestCase):
         # A diagnosis made by a prescriber takes precedence.
         self.assertEqual(last_considered_valid, prescriber_diagnosis)
 
+    def test_last_before(self):
+        """
+        Test the `last_before()` method.
+        """
+
+        job_seeker = JobSeekerFactory()
+        EligibilityDiagnosisMadeBySiaeFactory(job_seeker=job_seeker)
+        expired_diagnosis = ExpiredEligibilityDiagnosisFactory(job_seeker=job_seeker)
+
+        last_before = EligibilityDiagnosis.objects.last_before(job_seeker, datetime.date.today())
+        self.assertEqual(last_before, expired_diagnosis)
+
 
 class EligibilityDiagnosisModelTest(TestCase):
     def test_create_diagnosis(self):

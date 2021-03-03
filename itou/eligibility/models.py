@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 from dateutil.relativedelta import relativedelta
@@ -24,6 +25,25 @@ class EligibilityDiagnosisQuerySet(models.QuerySet):
 
     def expired(self):
         return self.exclude(self.valid_lookup)
+
+    def authored_by_siae(self, for_siae):
+        return self.filter(author_siae=for_siae)
+
+    def before(self, before):
+        if isinstance(before, datetime.date):
+            return self.filter(created_at__date__lt=before)
+        return self.filter(created_at__lt=before)
+
+    def by_author_kind_prescriber(self):
+        return self.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER)
+
+    def by_created_at_asc(self):
+        return self.order_by("created_at")
+
+    def for_job_seeker(self, job_seeker):
+        return self.filter(job_seeker=job_seeker).select_related(
+            "author", "author_siae", "author_prescriber_organization"
+        )
 
     def has_approval(self):
         """
@@ -57,27 +77,45 @@ class EligibilityDiagnosisManager(models.Manager):
         """
 
         last = None
-        query = (
-            self.filter(job_seeker=job_seeker)
-            .select_related("author", "author_siae", "author_prescriber_organization")
-            .order_by("created_at")
-        )
+        query = self.for_job_seeker(job_seeker).by_created_at_asc()
 
         # A diagnosis is considered valid for the duration of an approval,
         # we just retrieve the last one no matter if it's valid or not.
         if job_seeker.approvals_wrapper.has_valid:
-            last = query.filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
+            last = query.by_author_kind_prescriber().last()
             if not last and for_siae:
-                last = query.filter(author_siae=for_siae).last()
+                last = query.authored_by_siae(for_siae).last()
             if not last:
                 # Deals with cases from the past (when there was no restriction).
                 last = query.last()
 
         # Otherwise, search only in "non expired" diagnosis.
         else:
-            last = query.valid().filter(author_kind=self.model.AUTHOR_KIND_PRESCRIBER).last()
+            last = query.valid().by_author_kind_prescriber().last()
             if not last and for_siae:
-                last = query.valid().filter(author_siae=for_siae).last()
+                last = query.valid().authored_by_siae(for_siae).last()
+
+        return last
+
+    def last_before(self, job_seeker, before, for_siae=None):
+        """
+        Retrieves the given job seeker's last diagnosis (valid or expired)
+        before the given date or None.
+
+        If the `for_siae` argument is passed, it means that we are looking for
+        a diagnosis from an employer perspective. The scope is restricted to
+        avoid showing diagnoses made by other employers.
+
+        A diagnosis made by a prescriber takes precedence even when an employer
+        diagnosis already exists.
+        """
+
+        last = None
+        query = self.for_job_seeker(job_seeker).before(before).by_created_at_asc()
+
+        last = query.by_author_kind_prescriber().last()
+        if not last and for_siae:
+            last = query.authored_by_siae(for_siae).last()
 
         return last
 
