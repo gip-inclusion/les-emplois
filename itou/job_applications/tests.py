@@ -83,7 +83,6 @@ class JobApplicationModelTest(TestCase):
         are met:
         - the job_application.to_siae is subject to eligibility rules,
         - an approval exists (ie is not in the process of being delivered),
-        - this approval is valid,
         - the job_application has been accepted.
         """
         job_application = JobApplicationWithApprovalFactory()
@@ -105,13 +104,17 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         self.assertFalse(job_application.can_download_approval_as_pdf)
 
+    def test_can_download_expired_approval_as_pdf(self):
+        """
+        A user can download an expired approval PDF.
+        """
         # Approval has ended
         start = datetime.date.today() - relativedelta(years=2)
         end = start + relativedelta(years=1) - relativedelta(days=1)
         ended_approval = ApprovalFactory(start_at=start, end_at=end)
 
-        job_application = JobApplicationWithApprovalFactory(approval=ended_approval)
-        self.assertFalse(job_application.can_download_approval_as_pdf)
+        job_application = JobApplicationWithApprovalFactory(approval=ended_approval, hiring_start_at=start)
+        self.assertTrue(job_application.can_download_approval_as_pdf)
 
     def test_can_be_cancelled(self):
         today = datetime.date.today()
