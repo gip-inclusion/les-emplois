@@ -17,9 +17,9 @@
         <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not siae.job_description_through.exists %} d-none{% endif %}">
             <thead>
                 <tr>
-                    <th scope="col">{% translate "Publier la<br>fiche de poste" %}</th>
-                    <th scope="col" class="text-left">{% translate "Poste" %}</th>
                     <th scope="col">{% translate "ROME" %}</th>
+                    <th scope="col" class="text-left">{% translate "Poste" %}</th>
+                    <th scope="col">{% translate "Publier la<br>fiche de poste" %}</th>
                     <th scope="col">{% include "includes/icon.html" with icon="trash-2" %}</th>
                 </tr>
             </thead>
@@ -27,13 +27,7 @@
                 {% for job in siae.job_description_through.all %}
                 {# Important: keep the JavaScript template in sync if you edit the row markup. #}
                 <tr>
-                    <td scope="row">
-                        <input type="hidden" name="code" value="{{ job.appellation.code }}">
-                        <input
-                            type="checkbox"
-                            name="is_active-{{ job.appellation.code }}"
-                            {% if job.is_active %}checked{% endif %}>
-                    </td>
+                    <td>{{ job.appellation.rome.code }}</td>
                     <td class="text-left">
                         <p class="job-appellation-name">
                             <i>{{ job.appellation.name }}</i>
@@ -63,7 +57,13 @@
                                 rows="3">{{ job.description }}</textarea>
                         </div>
                     </td>
-                    <td>{{ job.appellation.rome.code }}</td>
+                    <td scope="row">
+                        <input type="hidden" name="code" value="{{ job.appellation.code }}">
+                        <input
+                            type="checkbox"
+                            name="is_active-{{ job.appellation.code }}"
+                            {% if job.is_active %}checked{% endif %}>
+                    </td>
                     <td><a href="#" role="button" class="js-job-delete">{% translate "Supprimer" %}</a></td>
                 </tr>
                 {% endfor %}
