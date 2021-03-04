@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.approvals.models import Approval
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
 from itou.eligibility.factories import EligibilityDiagnosisFactory
@@ -204,6 +205,101 @@ class ProcessViewsTest(TestCase):
             }
             with self.assertRaises(KeyError):
                 response = self.client.post(url, data=post_data)
+
+    def test_accept_and_update_hiring_start_date_of_two_job_applications(self):
+        create_test_cities(["54", "57"], num_per_department=2)
+        city = City.objects.first()
+        job_seeker = JobSeekerWithAddressFactory()
+        base_for_post_data = {
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.post_code,
+            "city_name": city.name,
+            "city": city.slug,
+            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "answer": "",
+        }
+        hiring_start_at = datetime.date.today() + relativedelta(months=2)
+        hiring_end_at = hiring_start_at + relativedelta(months=2)
+        approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
+
+        # Send 3 job applications to 3 different structures
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_app_starting_earlier = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+        job_app_starting_later = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+        )
+
+        # SIAE 1 logs in and accepts the first job application.
+        # The delivered approval should start at the same time as the contract.
+        user = job_application.to_siae.members.first()
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            **base_for_post_data,
+        }
+        response = self.client.post(url_accept, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        job_application.refresh_from_db()
+        self.assertTrue(job_application.state.is_accepted)
+        self.assertEqual(job_application.approval.start_at, job_application.hiring_start_at)
+        self.assertEqual(job_application.approval.end_at, approval_default_ending)
+        self.client.logout()
+
+        # SIAE 2 accepts the second job application
+        # but its contract starts earlier than the approval delivered the first time.
+        # Approval's starting date should be postponed.
+        user = job_app_starting_earlier.to_siae.members.first()
+        hiring_start_at = hiring_start_at - relativedelta(months=1)
+        hiring_end_at = hiring_start_at + relativedelta(months=2)
+        approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
+        job_app_starting_earlier.refresh_from_db()
+        self.assertTrue(job_app_starting_earlier.state.is_obsolete)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_app_starting_earlier.pk})
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            **base_for_post_data,
+        }
+        response = self.client.post(url_accept, data=post_data)
+        job_app_starting_earlier.refresh_from_db()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(job_app_starting_earlier.state.is_accepted)
+        self.assertEqual(job_app_starting_earlier.approval.start_at, job_app_starting_earlier.hiring_start_at)
+        self.assertEqual(job_app_starting_earlier.approval.end_at, approval_default_ending)
+        self.client.logout()
+
+        # SIAE 3 accepts the third job application.
+        # Its contract starts later than the corresponding approval.
+        # Approval's starting date should not be updated.
+        user = job_app_starting_later.to_siae.members.first()
+        hiring_start_at = hiring_start_at + relativedelta(months=6)
+        hiring_end_at = hiring_start_at + relativedelta(months=2)
+        job_app_starting_later.refresh_from_db()
+        self.assertTrue(job_app_starting_later.state.is_obsolete)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_app_starting_later.pk})
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            **base_for_post_data,
+        }
+        response = self.client.post(url_accept, data=post_data)
+        job_app_starting_later.refresh_from_db()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(job_app_starting_later.state.is_accepted)
+        self.assertEqual(job_app_starting_later.approval.start_at, job_app_starting_earlier.hiring_start_at)
 
     def test_eligibility(self):
         """Test eligibility."""
