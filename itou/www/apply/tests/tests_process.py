@@ -116,92 +116,94 @@ class ProcessViewsTest(TestCase):
             "city_name": city.name,
             "city": city.slug,
         }
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING, job_seeker=job_seeker
-        )
-        self.assertTrue(job_application.state.is_processing)
-        siae_user = job_application.to_siae.members.first()
-        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        for state in [JobApplicationWorkflow.STATE_PROCESSING, JobApplicationWorkflow.STATE_OBSOLETE]:
+            job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+                state=state, job_seeker=job_seeker
+            )
 
-        # Wrong dates: force `hiring_start_at` in past.
-        hiring_start_at = datetime.date.today() - relativedelta(days=1)
-        hiring_end_at = hiring_start_at + relativedelta(years=2)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-            "answer": "",
-            **address,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+            siae_user = job_application.to_siae.members.first()
+            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
-        # Wrong dates: end < start.
-        hiring_start_at = datetime.date.today()
-        hiring_end_at = hiring_start_at - relativedelta(days=1)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-            "answer": "",
-            **address,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
+            url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
 
-        # Duration too long.
-        hiring_start_at = datetime.date.today()
-        hiring_end_at = hiring_start_at + relativedelta(years=2, days=1)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-            "answer": "",
-            **address,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG)
-
-        # Good duration.
-        hiring_start_at = datetime.date.today()
-        hiring_end_at = hiring_start_at + relativedelta(years=2)
-        post_data = {
-            # Data for `JobSeekerPoleEmploiStatusForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-            "answer": "",
-            **address,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
-        self.assertEqual(response.url, next_url)
-
-        job_application = JobApplication.objects.get(pk=job_application.pk)
-        self.assertEqual(job_application.hiring_start_at, hiring_start_at)
-        self.assertEqual(job_application.hiring_end_at, hiring_end_at)
-        self.assertTrue(job_application.state.is_accepted)
-
-        # No address provided
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        hiring_start_at = datetime.date.today()
-        hiring_end_at = hiring_start_at + relativedelta(years=2)
-        post_data = {
-            # Data for `JobSeekerPoleEmploiStatusForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-            "answer": "",
-        }
-        with self.assertRaises(KeyError):
+            # Wrong dates: force `hiring_start_at` in past.
+            hiring_start_at = datetime.date.today() - relativedelta(days=1)
+            hiring_end_at = hiring_start_at + relativedelta(years=2)
+            post_data = {
+                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+                "answer": "",
+                **address,
+            }
             response = self.client.post(url, data=post_data)
+            self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+
+            # Wrong dates: end < start.
+            hiring_start_at = datetime.date.today()
+            hiring_end_at = hiring_start_at - relativedelta(days=1)
+            post_data = {
+                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+                "answer": "",
+                **address,
+            }
+            response = self.client.post(url, data=post_data)
+            self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
+
+            # Duration too long.
+            hiring_start_at = datetime.date.today()
+            hiring_end_at = hiring_start_at + relativedelta(years=2, days=1)
+            post_data = {
+                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+                "answer": "",
+                **address,
+            }
+            response = self.client.post(url, data=post_data)
+            self.assertFormError(response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG)
+
+            # Good duration.
+            hiring_start_at = datetime.date.today()
+            hiring_end_at = hiring_start_at + relativedelta(years=2)
+            post_data = {
+                # Data for `JobSeekerPoleEmploiStatusForm`.
+                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                # Data for `AcceptForm`.
+                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+                "answer": "",
+                **address,
+            }
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 302)
+
+            next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+            self.assertEqual(response.url, next_url)
+
+            job_application = JobApplication.objects.get(pk=job_application.pk)
+            self.assertEqual(job_application.hiring_start_at, hiring_start_at)
+            self.assertEqual(job_application.hiring_end_at, hiring_end_at)
+            self.assertTrue(job_application.state.is_accepted)
+
+            # No address provided
+            job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+                state=JobApplicationWorkflow.STATE_PROCESSING
+            )
+            hiring_start_at = datetime.date.today()
+            hiring_end_at = hiring_start_at + relativedelta(years=2)
+            post_data = {
+                # Data for `JobSeekerPoleEmploiStatusForm`.
+                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                # Data for `AcceptForm`.
+                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+                "answer": "",
+            }
+            with self.assertRaises(KeyError):
+                response = self.client.post(url, data=post_data)
 
     def test_eligibility(self):
         """Test eligibility."""
@@ -405,13 +407,26 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_postpone)
         self.assertContains(response, self.url_accept)
 
+    def test_details_template_for_state_obsolete(self):
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_OBSOLETE
+        self.job_application.save()
+
+        response = self.client.get(self.url_details)
+
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+
     def test_details_template_for_other_states(self):
         """Test actions available for other states."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
         for state in [
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
         ]:
             self.job_application.state = state
             self.job_application.save()

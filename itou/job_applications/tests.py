@@ -772,6 +772,33 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
 
+    def test_accept_obsolete(self):
+        job_seeker = JobSeekerFactory()
+
+        kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER}
+        for state in [
+            JobApplicationWorkflow.STATE_NEW,
+            JobApplicationWorkflow.STATE_PROCESSING,
+            JobApplicationWorkflow.STATE_POSTPONED,
+            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]:
+            JobApplicationFactory(state=state, **kwargs)
+
+        self.assertEqual(job_seeker.job_applications.count(), 6)
+
+        job_application = job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).first()
+        job_application.accept(user=job_application.to_siae.members.first())
+
+        self.assertEqual(job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count(), 2)
+        self.assertEqual(job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count(), 4)
+
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 2)
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+
     def test_refuse(self):
         user = JobSeekerFactory()
         kwargs = {"job_seeker": user, "sender": user, "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER}
