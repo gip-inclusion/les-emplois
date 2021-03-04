@@ -85,12 +85,36 @@ def get_latest_diagnosis_criteria(job_seeker, criteria_id):
     """
     Check if given criteria_id is actually present in latest diagnosis
     of given job seeker.
+
+    Return 1 if present, 0 if absent and None if there is no diagnosis.
     """
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
         # We have to do all this in python to benefit from prefetch_related.
-        return len([ac for ac in latest_diagnosis.administrative_criteria.all() if ac.id == criteria_id])
+        result = len([ac for ac in latest_diagnosis.administrative_criteria.all() if ac.id == criteria_id])
+        assert result in [0, 1]
+        return result
     return None
+
+
+def _format_criteria_name_as_column_comment(criteria):
+    column_comment = (
+        criteria.name.replace("'", " ")
+        .replace(",", "")
+        .replace("12-24", "12 à 24")
+        .replace("+", "plus de ")
+        .replace("-", "moins de ")
+        .strip()
+    )
+    # Deduplicate consecutive spaces.
+    column_comment = " ".join(column_comment.split())
+    return column_comment
+
+
+def format_criteria_name_as_column_name(criteria):
+    column_comment = _format_criteria_name_as_column_comment(criteria)
+    column_name = column_comment.replace("(", "").replace(")", "").replace(" ", "_").lower()
+    return f"critère_n{criteria.level}_{column_name}"
 
 
 TABLE_COLUMNS = (
@@ -191,25 +215,15 @@ TABLE_COLUMNS = (
     ]
 )
 
+
 # Add one column for each of the 15 criteria.
 for criteria in AdministrativeCriteria.objects.order_by("id").all():
-    # Make criteria name prettier to read.
-    column_comment = (
-        criteria.name.replace("'", " ")
-        .replace(",", "")
-        .replace("12-24", "12 à 24")
-        .replace("+", "plus de ")
-        .replace("-", "moins de ")
-        .strip()
-    )
-
-    # Deduplicate consecutive spaces.
-    column_comment = " ".join(column_comment.split())
-    column_name = column_comment.replace("(", "").replace(")", "").replace(" ", "_").lower()
+    column_comment = _format_criteria_name_as_column_comment(criteria)
+    column_name = format_criteria_name_as_column_name(criteria)
 
     TABLE_COLUMNS += [
         {
-            "name": f"critère_n{criteria.level}_{column_name}",
+            "name": column_name,
             "type": "boolean",
             "comment": f"Critère {column_comment} (niveau {criteria.level})",
             "lambda": partial(get_latest_diagnosis_criteria, criteria_id=criteria.id),
