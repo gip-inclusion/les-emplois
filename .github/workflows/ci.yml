@@ -39,9 +39,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: 🌍 Install spatial libraries
       run: sudo apt-get update && sudo apt-get install binutils libproj-dev gdal-bin
-    - name: 🧩 Add extentions to Postgres and create a database to check migrations
+    - name: 💾 Create a database to check migrations
       run: |
-        PGDATABASE=template1 bash docker/dev/postgres/psql_extensions.sh
         psql <<SQL
             CREATE DATABASE itou;
         SQL

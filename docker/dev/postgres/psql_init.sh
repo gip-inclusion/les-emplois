@@ -6,14 +6,14 @@ set -e
 
 export BASE_DIR=$(dirname "$BASH_SOURCE")
 
-# We activate extensions in template1: when you create a new database you get an exact copy of template1.
-PGUSER="$POSTGRES_USER" PGDATABASE="template1" bash $BASE_DIR/psql_extensions.sh
+# The PostgreSQL user should be able to create extensions.
+# Only the PostgreSQL superuser role provides that permission.
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
 
   \c postgres;
 
   CREATE USER $ITOU_POSTGRES_USER WITH ENCRYPTED PASSWORD '$ITOU_POSTGRES_PASSWORD';
   CREATE DATABASE $ITOU_POSTGRES_DATABASE_NAME OWNER $ITOU_POSTGRES_USER;
-  ALTER USER $ITOU_POSTGRES_USER CREATEDB;
+  ALTER USER $ITOU_POSTGRES_USER CREATEDB SUPERUSER;
 
 EOSQL
