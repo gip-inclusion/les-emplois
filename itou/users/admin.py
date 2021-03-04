@@ -229,8 +229,52 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     Inlines would only be possible the other way around
     """
 
-    raw_id_fields = ("user",)
+    raw_id_fields = ("user", "hexa_commune", )
     list_display = ("pk", "user", "username")
+
+    fieldsets = (
+        (
+            _("Informations"),
+            {
+                "fields": (
+                    "user",
+                    "education_level"
+                )
+            },
+        ),
+        (
+            _("Aides et prestations sociales"),
+            {
+                "fields": (
+                    "resourceless",
+                    "rqth_employee",
+                    "oeth_employee",
+                    "pole_emploi_since",
+                    "unemployed_since",
+                    "rsa_allocation_since",
+                    "ass_allocation_since",
+                    "aah_allocation_since",
+                    "ata_allocation_since",
+
+                )
+            },
+        ),
+        (
+            _("Adresse salarié au format Hexa"),
+            {
+                "fields": (
+                    "hexa_lane_number",
+                    "hexa_std_extension",
+                    "non_std_extension",
+                    "hexa_lane_type",
+                    "hexa_lane_name",
+                    "hexa_post_code",
+                    "hexa_commune",
+
+                )
+            },
+        ),
+    )
 
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
