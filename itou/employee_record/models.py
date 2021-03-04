@@ -219,39 +219,3 @@ class EmployeeRecord(models.Model):
             return None
 
         return cls(job_application=job_application, siret=job_application.to_siae.siret)
-
-
-class HexaAddress(models.Model):
-    """
-    HEXA address format:
-
-    The SNA (Service National de l'Adresse) has several certification / validation
-    norms to verify french addresses:
-    - Hexacle: house number level
-    - Hexaposte: zip code level
-    - Hexavia: street level
-    + others
-
-    For the employee record domain, this means that the job seeker address has to be
-    formatted in a very specific way to be accepted as valid by ASP backend.
-
-    These conversions and formatting processes are almost automatic,
-    but absolutely not 100% error proof.
-
-    Formatted addresses are stored in this model, avoiding multiple call to the
-    reverse geocoding API
-
-    Note that despite the name, addresses of this model are not fully compliant
-    with Hexa norms (but compliant enough to be accepted by ASP backend).
-
-
-    Output fields:
-    - number (opt.): number in the lane
-    - std_extension (opt.): One of the ASP ref lane extension (see LaneExtension)
-    - non_std_extension (opt.): if another extension is detected
-    - lane: name of the lane
-    - lane_type: One of the ASP ref lane type (see LaneType)
-    - city: name of city
-    - post_code: postal code
-    - insee_code: INSEE code of the city (Itou)
-    """
