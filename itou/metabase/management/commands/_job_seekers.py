@@ -91,9 +91,7 @@ def get_latest_diagnosis_criteria(job_seeker, criteria_id):
     latest_diagnosis = get_latest_diagnosis(job_seeker)
     if latest_diagnosis:
         # We have to do all this in python to benefit from prefetch_related.
-        result = len([ac for ac in latest_diagnosis.administrative_criteria.all() if ac.id == criteria_id])
-        assert result in [0, 1]
-        return result
+        return len([ac for ac in latest_diagnosis.administrative_criteria.all() if ac.id == criteria_id])
     return None
 
 
