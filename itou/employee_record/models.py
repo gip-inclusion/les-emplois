@@ -143,6 +143,7 @@ class EmployeeRecord(models.Model):
         """
         Check the correct format (Hexaposte) for the address
         """
+        # TBD / WIP
 
     # Business methods
 
