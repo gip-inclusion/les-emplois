@@ -31,13 +31,13 @@ class EditContractTest(TestCase):
 
         # JA with an old approval
         delta = relativedelta(months=23)
-        old_job_application = JobApplicationWithApprovalFactory(to_siae=siae2, created_at=timezone.now() - delta)
-        approval = old_job_application.approval
-        approval.start_at = old_job_application.created_at
+        self.old_job_application = JobApplicationWithApprovalFactory(to_siae=siae2, created_at=timezone.now() - delta)
+        approval = self.old_job_application.approval
+        approval.start_at = self.old_job_application.created_at.date()
 
         self.job_application_2 = JobApplicationWithApprovalFactory(
             to_siae=siae2,
-            job_seeker=old_job_application.job_seeker,
+            job_seeker=self.old_job_application.job_seeker,
             approval=approval,
         )
 
@@ -48,7 +48,7 @@ class EditContractTest(TestCase):
 
     def test_approval_can_be_postponed(self):
         self.assertTrue(self.job_application_1.approval.can_postpone_start_date)
-        self.assertFalse(self.job_application_2.approval.can_postpone_start_date)
+        self.assertFalse(self.old_job_application.approval.can_postpone_start_date)
 
     def test_future_contract_date(self):
         """
@@ -169,7 +169,7 @@ class EditContractTest(TestCase):
         response = self.client.post(self.old_url, data=post_data)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(self.job_application_2.hiring_start_at > self.job_application_2.approval.start_at.date())
+        self.assertTrue(self.job_application_2.hiring_start_at > self.job_application_2.approval.start_at)
 
     def test_do_not_update_approval(self):
         """

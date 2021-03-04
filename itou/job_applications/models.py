@@ -462,6 +462,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if approvals_wrapper.has_valid:
                 # Automatically reuse an existing valid Itou or PE approval.
                 self.approval = Approval.get_or_create_from_valid(approvals_wrapper)
+                if self.approval.start_at > self.hiring_start_at:
+                    self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 emails.append(self.email_deliver_approval(accepted_by))
             elif (
                 self.job_seeker.pole_emploi_id
