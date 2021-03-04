@@ -83,7 +83,7 @@ def format_address(obj, update_coords=False, strict=True):
         LaneType.with_similar_name(lane_type)
         # The API field is similar to an exiting value
         # example: got "allee" for "Allée"
-        or LaneType.with_similar_value(unidecode(lane_type.lower()))
+        or LaneType.with_similar_value(lane_type)
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"

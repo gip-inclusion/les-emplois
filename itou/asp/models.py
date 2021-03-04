@@ -1,122 +1,121 @@
 import re
-from enum import Enum
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 
-class LaneType(Enum):
+class LaneType(models.TextChoices):
     """
     Lane type
 
     Import/translation of ASP ref file: ref_type_voie_v3.csv
     """
 
-    AER = "Aérodrome"
-    AGL = "Agglomération"
-    AIRE = "Aire"
-    ALL = "Allée"
-    ACH = "Ancien chemin"
-    ART = "Ancienne route"
-    AV = "Avenue"
-    BEGI = "Beguinage"
-    BD = "Boulevard"
-    BRG = "Bourg"
-    CPG = "Camping"
-    CAR = "Carrefour"
-    CTRE = "Centre"
-    CCAL = "Centre commercial"
-    CHT = "Chateau"
-    CHS = "Chaussee"
-    CHEM = "Chemin"
-    CHV = "Chemin vicinal"
-    CITE = "Cité"
-    CLOS = "Clos"
-    CTR = "Contour"
-    COR = "Corniche"
-    COTE = "Coteaux"
-    COUR = "Cour"
-    CRS = "Cours"
-    DSC = "Descente"
-    DOM = "Domaine"
-    ECL = "Ecluse"
-    ESC = "Escalier"
-    ESPA = "Espace"
-    ESP = "Esplanade"
-    FG = "Faubourg"
-    FRM = "Ferme"
-    FON = "Fontaine"
-    GAL = "Galerie"
-    GARE = "Gare"
-    GBD = "Grand boulevard"
-    GPL = "Grande place"
-    GR = "Grande rue"
-    GRI = "Grille"
-    HAM = "Hameau"
-    IMM = "Immeuble(s)"
-    IMP = "Impasse"
-    JARD = "Jardin"
-    LD = "Lieu-dit"
-    LOT = "Lotissement"
-    MAIL = "Mail"
-    MAIS = "Maison"
-    MAS = "Mas"
-    MTE = "Montee"
-    PARC = "Parc"
-    PRV = "Parvis"
-    PAS = "Passage"
-    PLE = "Passerelle"
-    PCH = "Petit chemin"
-    PRT = "Petite route"
-    PTR = "Petite rue"
-    PL = "Place"
-    PTTE = "Placette"
-    PLN = "Plaine"
-    PLAN = "Plan"
-    PLT = "Plateau"
-    PONT = "Pont"
-    PORT = "Port"
-    PROM = "Promenade"
-    QUAI = "Quai"
-    QUAR = "Quartier"
-    RPE = "Rampe"
-    REMP = "Rempart"
-    RES = "Residence"
-    ROC = "Rocade"
-    RPT = "Rond-point"
-    RTD = "Rotonde"
-    RTE = "Route"
-    RUE = "Rue"
-    RLE = "Ruelle"
-    SEN = "Sente"
-    SENT = "Sentier"
-    SQ = "Square"
-    TPL = "Terre plein"
-    TRAV = "Traverse"
-    VEN = "Venelle"
-    VTE = "Vieille route"
-    VCHE = "Vieux chemin"
-    VILL = "Villa"
-    VLGE = "Village"
-    VOIE = "Voie"
-    ZONE = "Zone"
-    ZA = "Zone d'activite"
-    ZAC = "Zone d'amenagement concerte"
-    ZAD = "Zone d'amenagement differe"
-    ZI = "Zone industrielle"
-    ZUP = "Zone urbanisation prio"
+    AER = "AER", _("Aérodrome")
+    AGL = "AGL", _("Agglomération")
+    AIRE = "AIRE", _("Aire")
+    ALL = "ALL", _("Allée")
+    ACH = "ACH", _("Ancien chemin")
+    ART = "ART", _("Ancienne route")
+    AV = "AV", _("Avenue")
+    BEGI = "BEGI", _("Beguinage")
+    BD = "BD", _("Boulevard")
+    BRG = "BRG", _("Bourg")
+    CPG = "CPG", _("Camping")
+    CAR = "CAR", _("Carrefour")
+    CTRE = "CTRE", _("Centre")
+    CCAL = "CCAL", _("Centre commercial")
+    CHT = "CHT", _("Chateau")
+    CHS = "CHS", _("Chaussee")
+    CHEM = "CHEM", _("Chemin")
+    CHV = "CHV", _("Chemin vicinal")
+    CITE = "CITE", _("Cité")
+    CLOS = "CLOS", _("Clos")
+    CTR = "CTR", _("Contour")
+    COR = "COR", _("Corniche")
+    COTE = "COTE", _("Coteaux")
+    COUR = "COUR", _("Cour")
+    CRS = "CRS", _("Cours")
+    DSC = "DSC", _("Descente")
+    DOM = "DOM", _("Domaine")
+    ECL = "ECL", _("Ecluse")
+    ESC = "ESC", _("Escalier")
+    ESPA = "ESPA", _("Espace")
+    ESP = "ESP", _("Esplanade")
+    FG = "FG", _("Faubourg")
+    FRM = "FRM", _("Ferme")
+    FON = "FON", _("Fontaine")
+    GAL = "GAL", _("Galerie")
+    GARE = "GARE", _("Gare")
+    GBD = "GBD", _("Grand boulevard")
+    GPL = "GPL", _("Grande place")
+    GR = "GR", _("Grande rue")
+    GRI = "GRI", _("Grille")
+    HAM = "HAM", _("Hameau")
+    IMM = "IMM", _("Immeuble(s)")
+    IMP = "IMP", _("Impasse")
+    JARD = "JARD", _("Jardin")
+    LD = "LD", _("Lieu-dit")
+    LOT = "LOT", _("Lotissement")
+    MAIL = "MAIL", _("Mail")
+    MAIS = "MAIS", _("Maison")
+    MAS = "MAS", _("Mas")
+    MTE = "MTE", _("Montee")
+    PARC = "PARC", _("Parc")
+    PRV = "PRV", _("Parvis")
+    PAS = "PAS", _("Passage")
+    PLE = "PLE", _("Passerelle")
+    PCH = "PCH", _("Petit chemin")
+    PRT = "PRT", _("Petite route")
+    PTR = "PTR", _("Petite rue")
+    PL = "PL", _("Place")
+    PTTE = "PTTE", _("Placette")
+    PLN = "PLN", _("Plaine")
+    PLAN = "PLAN", _("Plan")
+    PLT = "PLT", _("Plateau")
+    PONT = "PONT", _("Pont")
+    PORT = "PORT", _("Port")
+    PROM = "PROM", _("Promenade")
+    QUAI = "QUAI", _("Quai")
+    QUAR = "QUAR", _("Quartier")
+    RPE = "RPE", _("Rampe")
+    REMP = "REMP", _("Rempart")
+    RES = "RES", _("Residence")
+    ROC = "ROC", _("Rocade")
+    RPT = "RPT", _("Rond-point")
+    RTD = "RTD", _("Rotonde")
+    RTE = "RTE", _("Route")
+    RUE = "RUE", _("Rue")
+    RLE = "RLE", _("Ruelle")
+    SEN = "SEN", _("Sente")
+    SENT = "SENT", _("Sentier")
+    SQ = "SQ", _("Square")
+    TPL = "TPL", _("Terre plein")
+    TRAV = "TRAV", _("Traverse")
+    VEN = "VEN", _("Venelle")
+    VTE = "VTE", _("Vieille route")
+    VCHE = "VCHE", _("Vieux chemin")
+    VILL = "VILL", _("Villa")
+    VLGE = "VLGE", _("Village")
+    VOIE = "VOIE", _("Voie")
+    ZONE = "ZONE", _("Zone")
+    ZA = "ZA", _("Zone d'activite")
+    ZAC = "ZAC", _("Zone d'amenagement concerte")
+    ZAD = "ZAD", _("Zone d'amenagement differe")
+    ZI = "ZI", _("Zone industrielle")
+    ZUP = "ZUP", _("Zone urbanisation prio")
 
     @classmethod
     def with_similar_name(cls, name):
         "Returns enum with similar name"
-        return cls.__members__.get(name.upper)
+        return cls.__members__.get(name.upper())
 
     @classmethod
     def with_similar_value(cls, value):
         "Returns enum with a similar value"
-        revert_map = {unidecode(lt.value.lower()): lt for lt in cls}
-        return revert_map.get(value)
+        revert_map = {unidecode(lt.label.lower()): lt for lt in cls}
+        return revert_map.get(value.lower())
 
 
 # Even if geo API does a great deal of a job,
@@ -146,17 +145,17 @@ def find_lane_type_aliases(alias):
     return None
 
 
-class LaneExtension(Enum):
+class LaneExtension(models.TextChoices):
     """
     Lane extension
 
     Import/translation of ASP ref file: ref_extension_voie_v1.csv
     """
 
-    B = "Bis"
-    T = "Ter"
-    Q = "Quater"
-    C = "Quinquies"
+    B = "B", _("Bis")
+    T = "T", _("Ter")
+    Q = "Q", _("Quater")
+    C = "C", _("Quinquies")
 
     @classmethod
     def with_similar_name_or_value(cls, s, fmt=str.lower):
