@@ -229,18 +229,16 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     Inlines would only be possible the other way around
     """
 
-    raw_id_fields = ("user", "hexa_commune", )
+    raw_id_fields = (
+        "user",
+        "hexa_commune",
+    )
     list_display = ("pk", "user", "username")
 
     fieldsets = (
         (
             _("Informations"),
-            {
-                "fields": (
-                    "user",
-                    "education_level"
-                )
-            },
+            {"fields": ("user", "education_level")},
         ),
         (
             _("Aides et prestations sociales"),
@@ -255,7 +253,6 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
                     "ass_allocation_since",
                     "aah_allocation_since",
                     "ata_allocation_since",
-
                 )
             },
         ),
@@ -270,7 +267,6 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
                     "hexa_lane_name",
                     "hexa_post_code",
                     "hexa_commune",
-
                 )
             },
         ),
