@@ -120,32 +120,6 @@ class TestPrescriberWithOrgInvitation(TestCase):
 
 
 class TestPrescriberWithOrgInvitationEmails(TestCase):
-    def test_accepted_notif_organization_members(self):
-        user = UserFactory()
-        invitation = PrescriberWithOrgSentInvitationFactory(email=user.email)
-        invitation.organization.members.add(user)
-        email = invitation.email_accepted_notif_organization_members
-
-        # Subject
-        self.assertIn(capfirst(invitation.first_name), email.subject)
-        self.assertIn(capfirst(invitation.last_name), email.subject)
-
-        # Body
-        self.assertIn(capfirst(invitation.first_name), email.body)
-        self.assertIn(capfirst(invitation.last_name), email.body)
-        self.assertIn(invitation.email, email.body)
-        self.assertIn(capfirst(invitation.sender.first_name), email.body)
-        self.assertIn(capfirst(invitation.sender.last_name), email.body)
-        self.assertIn(invitation.organization.display_name, email.body)
-
-        # To
-        members = invitation.organization.members.exclude(email__in=[invitation.sender.email, invitation.email])
-        for member in members:
-            self.assertIn(member.email, email.to)
-
-        self.assertNotIn(invitation.sender.email, email.to)
-        self.assertNotIn(invitation.email, email.to)
-
     def test_accepted_notif_sender(self):
         invitation = PrescriberWithOrgSentInvitationFactory()
         email = invitation.email_accepted_notif_sender
@@ -191,32 +165,6 @@ class TestSiaeInvitation(TestCase):
 
 
 class TestSiaeInvitationEmails(TestCase):
-    def test_accepted_notif_siae_members(self):
-        user = UserFactory()
-        invitation = SiaeSentInvitationFactory(email=user.email)
-        invitation.siae.members.add(user)
-        email = invitation.email_accepted_notif_siae_members
-
-        # Subject
-        self.assertIn(capfirst(invitation.first_name), email.subject)
-        self.assertIn(capfirst(invitation.last_name), email.subject)
-
-        # Body
-        self.assertIn(capfirst(invitation.first_name), email.body)
-        self.assertIn(capfirst(invitation.last_name), email.body)
-        self.assertIn(invitation.email, email.body)
-        self.assertIn(capfirst(invitation.sender.first_name), email.body)
-        self.assertIn(capfirst(invitation.sender.last_name), email.body)
-        self.assertIn(invitation.siae.display_name, email.body)
-
-        # To
-        members = invitation.siae.members.exclude(email__in=[invitation.sender.email, invitation.email])
-        for member in members:
-            self.assertIn(member.email, email.to)
-
-        self.assertNotIn(invitation.sender.email, email.to)
-        self.assertNotIn(invitation.email, email.to)
-
     def test_accepted_notif_sender(self):
         invitation = SiaeSentInvitationFactory()
         email = invitation.email_accepted_notif_sender

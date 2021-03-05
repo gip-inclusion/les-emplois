@@ -171,10 +171,6 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         )
         return get_absolute_url(acceptance_path)
 
-    def accept(self):
-        super().accept()
-        self.email_accepted_notif_organization_members.send()
-
     def add_invited_user_to_organization(self):
         user = get_user_model().objects.get(email=self.email)
         self.organization.members.add(user)
@@ -195,21 +191,6 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         return user
 
     # Emails
-    @property
-    def email_accepted_notif_organization_members(self):
-        members = self.organization.active_members.exclude(email__in=[self.sender.email, self.email])
-        to = [member.email for member in members]
-        context = {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "establishment_name": self.organization.display_name,
-            "sender": self.sender,
-        }
-        subject = "invitations_views/email/accepted_notif_establishment_members_subject.txt"
-        body = "invitations_views/email/accepted_notif_establishment_members_body.txt"
-        return get_email_message(to, context, subject, body)
-
     @property
     def email_accepted_notif_sender(self):
         to = [self.sender.email]
@@ -264,10 +245,6 @@ class SiaeStaffInvitation(InvitationAbstract):
         )
         return get_absolute_url(acceptance_path)
 
-    def accept(self):
-        super().accept()
-        self.email_accepted_notif_siae_members.send()
-
     def add_invited_user_to_siae(self):
         user = get_user_model().objects.get(email=self.email)
         self.siae.members.add(user)
@@ -288,21 +265,6 @@ class SiaeStaffInvitation(InvitationAbstract):
         return user
 
     # Emails
-    @property
-    def email_accepted_notif_siae_members(self):
-        members = self.siae.active_members.exclude(email__in=[self.sender.email, self.email])
-        to = [member.email for member in members]
-        context = {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "establishment_name": self.siae.display_name,
-            "sender": self.sender,
-        }
-        subject = "invitations_views/email/accepted_notif_establishment_members_subject.txt"
-        body = "invitations_views/email/accepted_notif_establishment_members_body.txt"
-        return get_email_message(to, context, subject, body)
-
     @property
     def email_accepted_notif_sender(self):
         to = [self.sender.email]
