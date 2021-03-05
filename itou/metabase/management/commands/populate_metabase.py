@@ -288,7 +288,7 @@ class Command(BaseCommand):
 
         self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, queryset=queryset)
 
-    def populate_job_romes(self):
+    def populate_rome_codes(self):
         """
         Populate rome codes.
         """
@@ -323,7 +323,7 @@ class Command(BaseCommand):
             self.populate_job_seekers()
             self.populate_job_applications()
             self.populate_approvals()
-            self.populate_job_romes()
+            self.populate_rome_codes()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
