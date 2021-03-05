@@ -294,17 +294,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def get_admins(self):
         return self.members.filter(is_active=True, prescribermembership__is_admin=True)
 
-    def new_signup_warning_email_to_existing_members(self, user):
-        """
-        Send a warning fyi-only email to all existing users of the organization
-        about a new user signup.
-        """
-        to = [u.email for u in self.active_members]
-        context = {"new_user": user, "organization": self}
-        subject = "prescribers/email/new_signup_warning_email_to_existing_members_subject.txt"
-        body = "prescribers/email/new_signup_warning_email_to_existing_members_body.txt"
-        return get_email_message(to, context, subject, body)
-
     def validated_prescriber_organization_email(self):
         """
         Send an email to the user who asked for the validation
