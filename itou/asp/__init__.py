@@ -1,1 +1,1 @@
-default_app_config = 'itou.asp.apps.AspConfig'
+default_app_config = "itou.asp.apps.AspConfig"
