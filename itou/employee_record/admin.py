@@ -35,7 +35,6 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     raw_id_fields = ("job_application",)
     readonly_fields = (
-        "siret",
         "created_at",
         "updated_at",
         "asp_processing_code",
