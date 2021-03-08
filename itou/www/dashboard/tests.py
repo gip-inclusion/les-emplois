@@ -7,13 +7,18 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
+from itou.job_applications.notifications import (
+    NewQualifiedJobAppEmployersNotification,
+    NewSpontaneousJobAppEmployersNotification,
+)
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
     SiaePendingGracePeriodFactory,
+    SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
-from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, SiaeStaffFactory
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.www.dashboard.forms import EditUserEmailForm
 
 
@@ -308,3 +313,140 @@ class SwitchSiaeTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["current_siae"], siae)
+
+
+class EditUserPreferencesTest(TestCase):
+    def test_employer_opt_in_siae_no_job_description(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        recipient = user.siaemembership_set.get(siae=siae)
+        form_name = "new_job_app_notification_form"
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Recipient's notifications are empty for the moment.
+        self.assertFalse(recipient.notifications)
+
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Recipients are subscribed to spontaneous notifications by default,
+        # the form should reflect that.
+        self.assertTrue(response.context[form_name].fields["spontaneous"].initial)
+
+        data = {"spontaneous": True}
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+
+        recipient.refresh_from_db()
+        self.assertTrue(recipient.notifications)
+        self.assertTrue(NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient))
+
+    def test_employer_opt_in_siae_with_job_descriptions(self):
+        siae = SiaeWithMembershipAndJobsFactory()
+        user = siae.members.first()
+        job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
+        recipient = user.siaemembership_set.get(siae=siae)
+        form_name = "new_job_app_notification_form"
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Recipient's notifications are empty for the moment.
+        self.assertFalse(recipient.notifications)
+
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Recipients are subscribed to spontaneous notifications by default,
+        # the form should reflect that.
+        self.assertEqual(response.context[form_name].fields["qualified"].initial, job_descriptions_pks)
+
+        data = {"qualified": job_descriptions_pks}
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        recipient.refresh_from_db()
+        self.assertTrue(recipient.notifications)
+
+        for pk in job_descriptions_pks:
+            self.assertTrue(
+                NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
+            )
+
+    def test_employer_opt_out_siae_no_job_descriptions(self):
+        siae = SiaeWithMembershipFactory()
+        user = siae.members.first()
+        recipient = user.siaemembership_set.get(siae=siae)
+        form_name = "new_job_app_notification_form"
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Recipient's notifications are empty for the moment.
+        self.assertFalse(recipient.notifications)
+
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Recipients are subscribed to spontaneous notifications by default,
+        # the form should reflect that.
+        self.assertTrue(response.context[form_name].fields["spontaneous"].initial)
+
+        data = {"spontaneous": False}
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 302)
+
+        recipient.refresh_from_db()
+        self.assertTrue(recipient.notifications)
+        self.assertFalse(NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient))
+
+    def test_employer_opt_out_siae_with_job_descriptions(self):
+        siae = SiaeWithMembershipAndJobsFactory()
+        user = siae.members.first()
+        job_descriptions_pks = list(siae.job_description_through.values_list("pk", flat=True))
+        recipient = user.siaemembership_set.get(siae=siae)
+        form_name = "new_job_app_notification_form"
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        # Recipient's notifications are empty for the moment.
+        self.assertFalse(recipient.notifications)
+
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Recipients are subscribed to qualified notifications by default,
+        # the form should reflect that.
+        self.assertEqual(response.context[form_name].fields["qualified"].initial, job_descriptions_pks)
+
+        # The recipient opted out from every notification.
+        data = {"spontaneous": False}
+        response = self.client.post(url, data=data)
+        self.assertEqual(response.status_code, 302)
+
+        recipient.refresh_from_db()
+        self.assertTrue(recipient.notifications)
+
+        for i, pk in enumerate(job_descriptions_pks):
+            self.assertFalse(
+                NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
+            )
+
+
+class EditUserPreferencesExceptionsTest(TestCase):
+    def test_not_allowed_user(self):
+        # Only employers can currently access the Preferences page.
+
+        prescriber = PrescriberFactory()
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+        job_seeker = JobSeekerFactory()
+        self.client.login(username=job_seeker.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_user_preferences")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)

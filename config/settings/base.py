@@ -42,6 +42,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.gis",
     "django.contrib.postgres",
+    "django.forms", # Required to override default Django widgets. See FORM_RENDERER
 ]
 
 THIRD_PARTY_APPS = [
@@ -149,6 +150,14 @@ TEMPLATES = [
         },
     }
 ]
+
+# Forms.
+# ------------------------------------------------------------------------------
+
+# Override default Django forms widgets templates.
+# Requires django.forms in INSTALLED_APPS
+# https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # Database.
 # ------------------------------------------------------------------------------
