@@ -338,7 +338,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for state, desc in JobApplicationWorkflow.STATE_CHOICES:
+        for state, _desc in JobApplicationWorkflow.STATE_CHOICES:
             setattr(self, f"is_state_{state.lower()}", state == self.state)
 
     def __str__(self):

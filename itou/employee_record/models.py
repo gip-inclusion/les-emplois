@@ -12,11 +12,11 @@ class Status(models.TextChoices):
 
     Self-explanatory on the meaning, however:
     - an E.R. can be modified until it is in the PROCESSED state
-    - after that, the E.R is "archived" and can't be used for further interaction
+    - after that, the FS is "archived" and can't be used for further interaction
     """
 
     NEW = "NEW", "Nouvelle fiche salarié"
-    COMPLETE = "COMPLETE", "Données complètes"
+    READY = "READY", "Données complètes, prêtes à l'envoi ASP"
     SENT = "SENT", "Envoyée ASP"
     REJECTED = "REJECTED", "Rejet ASP"
     PROCESSED = "PROCESSED", "Traitée ASP"
@@ -50,7 +50,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
 
 class EmployeeRecord(models.Model):
     """
-    EmployeeRecord - Fiche salarié
+    EmployeeRecord - Fiche salarié (FS for short)
 
     Holds information needed for JSON exports and processing by ASP
     """
@@ -76,9 +76,6 @@ class EmployeeRecord(models.Model):
         null=True,
         verbose_name=_("Candidature / embauche"),
     )
-
-    # TODO: This point must be discussed: SIRET might change over time
-    siret = models.CharField(max_length=14, verbose_name=_("SIRET"), validators=[validators.validate_siret])
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), null=True)
@@ -207,8 +204,38 @@ class EmployeeRecord(models.Model):
 
         return None
 
+    @property
+    def approval_number(self):
+        """
+        Approval number (from job_application.approval)
+
+        There is a "soft" unique contraint with the asp_convention_id, approval_number pair
+        """
+        if self.approval:
+            return self.approval.number
+
+        return None
+
+    @property
+    def asp_convention_id(self):
+        """
+        ASP convention ID (from siae.convention.asp_convention_id)
+
+        There is a "soft" unique contraint with the asp_convention_id, approval_number pair
+        """
+        if self.job_application and self.job_application.to_siae:
+            return self.job_application.to_siae.convention.asp_convention_id
+
+        return None
+
     @classmethod
     def from_job_application(cls, job_application):
+        """
+        Alternative and main FS constructor from a JobApplication object
+
+        If a job application with given criterias (approval, SIAE/ASP structure)
+        already exists, this method returns None
+        """
         assert job_application
 
         if (
@@ -219,4 +246,4 @@ class EmployeeRecord(models.Model):
         ):
             return None
 
-        return cls(job_application=job_application, siret=job_application.to_siae.siret)
+        return cls(job_application=job_application)

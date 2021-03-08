@@ -287,11 +287,11 @@ class JobSeekerProfile(models.Model):
     These conversions and formatting processes are almost automatic,
     but absolutely not 100% error-proof.
 
-    Formatted addresses are stored in this model, avoiding multiple call to the
+    Formatted addresses are stored in this model, avoiding multiple calls to the
     reverse geocoding API at processing time.
 
-    These kind of addresses are at the moment only used by the employee_record app,
-    but their usage could be extended to other domain should the need arise.
+    This kind of address are at the moment only used by the employee_record app,
+    but their usage could be extended to other domains should the need arise.
 
     Note that despite the name, addresses of this model are not fully compliant
     with Hexa norms (but compliant enough to be accepted by ASP backend).
@@ -361,18 +361,18 @@ class JobSeekerProfile(models.Model):
 
     # Jobseeker address in Hexa format
 
-    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), null=True, blank=True)
+    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), blank=True)
     hexa_std_extension = models.CharField(
         max_length=1, verbose_name=_("Extension de voie"), null=True, blank=True, choices=LaneExtension.choices
     )
     non_std_extension = models.CharField(
-        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True, null=True
+        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True
     )
     hexa_lane_type = models.CharField(
         max_length=4, verbose_name=_("Type de voie"), null=True, blank=True, choices=LaneType.choices
     )
-    hexa_lane_name = models.CharField(max_length=120, verbose_name=_("Nom de la voie"), null=True, blank=True)
-    hexa_post_code = models.CharField(max_length=6, verbose_name=_("Code postal"), null=True, blank=True)
+    hexa_lane_name = models.CharField(max_length=120, verbose_name=_("Nom de la voie"), blank=True)
+    hexa_post_code = models.CharField(max_length=6, verbose_name=_("Code postal"), blank=True)
     hexa_commune = models.ForeignKey(
         Commune, verbose_name=_("Commune (ref. ASP)"), null=True, on_delete=models.SET_NULL
     )
