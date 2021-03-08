@@ -3,7 +3,7 @@ from unittest import mock
 from django.test import TestCase
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
-from itou.users.factories import JobSeekerWithAddressFactory
+from itou.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 from itou.utils.address.format import format_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
@@ -21,18 +21,24 @@ def mock_get_geocoding_data(address, post_code, limit=1):
 
 
 class FormatASPAdresses(TestCase):
-    def test_valid_types(self):
-        """Check input validity for address parsing"""
+    def test_empty(self):
         result, error = format_address({})
         self.assertFalse(result)
-        self.assertTrue(error)
+        self.assertEqual(error, "Only valid for User objects")
+
+    def test_none(self):
         result, error = format_address(None)
         self.assertFalse(result)
-        self.assertTrue(error)
-        # formatting factories with strict type check must fail
-        result, error = format_address(JobSeekerWithAddressFactory())
+        self.assertEqual(error, "Only valid for User objects")
+
+    def test_not_existing_address(self):
+        job_seeker = JobSeekerFactory(
+            address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
+        )
+        result, error = format_address(job_seeker)
         self.assertFalse(result)
         self.assertTrue(error)
+        print(error)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
