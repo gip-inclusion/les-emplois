@@ -250,9 +250,6 @@ class ProlongationAdmin(admin.ModelAdmin):
         Override the `status` field's `help_text` to display a link to the validation interface.
         """
 
-        if request.user.is_not_allowed_to_operate_on_prolongations:
-            return super().get_form(request, obj, **kwargs)
-
         if obj and obj.is_pending:
             url = reverse("admin:approvals_prolongation_validate", args=[obj.pk])
             text = _("Valider la prolongation dans l'admin")

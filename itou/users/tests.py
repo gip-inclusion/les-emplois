@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -115,9 +114,3 @@ class ModelTest(TestCase):
         self.assertTrue(user.last_hire_was_made_by_siae(siae))
         siae2 = SiaeFactory()
         self.assertFalse(user.last_hire_was_made_by_siae(siae2))
-
-    def test_has_pole_emploi_email(self):
-        user = JobSeekerFactory(email="foo@bar.com")
-        self.assertFalse(user.has_pole_emploi_email)
-        user = JobSeekerFactory(email=f"bob{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
-        self.assertTrue(user.has_pole_emploi_email)
