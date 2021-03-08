@@ -1,7 +1,7 @@
 from allauth.account.signals import user_logged_in
 from django.dispatch import receiver
 
-from itou.allauth.peamu.provider import PEAMUProvider
+from itou.allauth_adapters.peamu.provider import PEAMUProvider
 
 from .models import ExternalDataImport
 from .tasks import import_pe_data
