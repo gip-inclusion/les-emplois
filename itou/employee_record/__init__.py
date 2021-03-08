@@ -1,1 +1,1 @@
-default_app_config = 'itou.employee_record.apps.EmployeeRecordConfig'
+default_app_config = "itou.employee_record.apps.EmployeeRecordConfig"
