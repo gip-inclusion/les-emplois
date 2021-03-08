@@ -117,9 +117,8 @@ def request_prolongation(request, approval_id, template_name="approvals/request_
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            prolongation = form.save(commit=False)
-            prolongation.request(request.user)
-            messages.success(request, _("Demande de prolongation envoyée."))
+            form.save()
+            messages.success(request, _("Déclaration de prolongation enregistrée."))
             return HttpResponseRedirect(back_url)
 
     context = {

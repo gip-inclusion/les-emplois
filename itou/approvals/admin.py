@@ -3,17 +3,11 @@ from tempfile import NamedTemporaryFile
 
 from django.contrib import admin
 from django.http import FileResponse
-from django.urls import path, reverse
-from django.utils.safestring import mark_safe
+from django.urls import path
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
-from itou.approvals.admin_views import (
-    manually_add_approval,
-    manually_refuse_approval,
-    refuse_prolongation,
-    validate_prolongation,
-)
+from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
 from itou.approvals.export import export_approvals
 from itou.job_applications.models import JobApplication
 
@@ -213,6 +207,12 @@ class ProlongationAdmin(admin.ModelAdmin):
         "reason",
     )
     date_hierarchy = "start_at"
+    readonly_fields = (
+        "created_at",
+        "created_by",
+        "updated_at",
+        "updated_by",
+    )
 
     def is_in_progress(self, obj):
         return obj.is_in_progress
@@ -226,64 +226,6 @@ class ProlongationAdmin(admin.ModelAdmin):
         else:
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
-
-    def get_readonly_fields(self, request, obj=None):
-        """
-        Staff (not superusers) should not change some fields.
-        """
-        rof = super().get_readonly_fields(request, obj)
-        rof += (
-            "created_at",
-            "created_by",
-            "status_updated_at",
-            "status_updated_by",
-            "updated_at",
-            "updated_by",
-        )
-        if not request.user.is_superuser:
-            # Only superusers can change the status without using the custom admin views.
-            rof += ("status",)
-        return rof
-
-    def get_form(self, request, obj=None, **kwargs):
-        """
-        Override the `status` field's `help_text` to display a link to the validation interface.
-        """
-
-        if obj and obj.is_pending:
-            url = reverse("admin:approvals_prolongation_validate", args=[obj.pk])
-            text = _("Valider la prolongation dans l'admin")
-            help_texts = {"status": mark_safe(f'<a href="{url}">{text}</a>')}
-            kwargs.update({"help_texts": help_texts})
-
-        return super().get_form(request, obj, **kwargs)
-
-    def validate_prolongation(self, request, prolongation_id):
-        """
-        Custom admin view to manually validate a prolongation.
-        """
-        return validate_prolongation(request, self, prolongation_id)
-
-    def refuse_prolongation(self, request, prolongation_id):
-        """
-        Custom admin view to manually refuse a prolongation.
-        """
-        return refuse_prolongation(request, self, prolongation_id)
-
-    def get_urls(self):
-        additional_urls = [
-            path(
-                "<int:prolongation_id>/validate",
-                self.admin_site.admin_view(self.validate_prolongation),
-                name="approvals_prolongation_validate",
-            ),
-            path(
-                "<int:prolongation_id>/refuse",
-                self.admin_site.admin_view(self.refuse_prolongation),
-                name="approvals_prolongation_refuse",
-            ),
-        ]
-        return additional_urls + super().get_urls()
 
 
 @admin.register(models.PoleEmploiApproval)

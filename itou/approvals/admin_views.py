@@ -16,8 +16,8 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.approvals.admin_forms import ManuallyAddApprovalForm, ValidateProlongationForm
-from itou.approvals.models import Approval, Prolongation
+from itou.approvals.admin_forms import ManuallyAddApprovalForm
+from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
 
@@ -139,104 +139,6 @@ def manually_refuse_approval(
         "job_application": job_application,
         "opts": opts,
         "title": _("Confirmer le refus manuel d'un numéro d'agrément"),
-        **admin_site.each_context(request),
-    }
-    return render(request, template_name, context)
-
-
-@transaction.atomic
-def validate_prolongation(
-    request, model_admin, prolongation_id, template_name="admin/approvals/prolongation_validate.html"
-):
-    """
-    Custom admin view to validate a prolongation.
-    """
-
-    admin_site = model_admin.admin_site
-    opts = model_admin.model._meta
-    app_label = opts.app_label
-    codename = get_permission_codename("change", opts)
-    has_perm = request.user.has_perm(f"{app_label}.{codename}")
-
-    if not has_perm:
-        raise PermissionDenied
-
-    queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
-    prolongation = get_object_or_404(queryset, pk=prolongation_id)
-
-    form = ValidateProlongationForm(instance=prolongation, data=request.POST or None)
-    fieldsets = [(None, {"fields": list(form.base_fields)})]
-    adminForm = admin.helpers.AdminForm(form, fieldsets, {})
-
-    if request.method == "POST" and form.is_valid():
-        prolongation = form.save(commit=False)
-        prolongation.validate(validated_by=request.user)
-        message = _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été validée.")
-        messages.success(request, message)
-        return HttpResponseRedirect(reverse("admin:approvals_prolongation_changelist"))
-
-    # Display a preview of the email that will be send.
-    context = {"prolongation": prolongation}
-    email_subject_template = get_email_text_template("approvals/email/prolongation_validated_subject.txt", context)
-    email_body_template = get_email_text_template("approvals/email/prolongation_validated_body.txt", context)
-
-    context = {
-        "add": True,
-        "adminform": adminForm,
-        "admin_site": admin_site.name,
-        "app_label": app_label,
-        "email_body_template": email_body_template,
-        "email_subject_template": email_subject_template,
-        "errors": admin.helpers.AdminErrorList(form, {}),
-        "form": form,
-        "prolongation": prolongation,
-        "opts": opts,
-        "title": _("Validation d'une prolongation"),
-        **admin_site.each_context(request),
-    }
-    return render(request, template_name, context)
-
-
-@transaction.atomic
-def refuse_prolongation(
-    request, model_admin, prolongation_id, template_name="admin/approvals/prolongation_refuse.html"
-):
-    """
-    Custom admin view to refuse a prolongation.
-    """
-
-    admin_site = model_admin.admin_site
-    opts = model_admin.model._meta
-    app_label = opts.app_label
-    codename = get_permission_codename("change", opts)
-    has_perm = request.user.has_perm(f"{app_label}.{codename}")
-
-    if not has_perm:
-        raise PermissionDenied
-
-    queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
-    prolongation = get_object_or_404(queryset, pk=prolongation_id)
-
-    if request.method == "POST" and request.POST.get("confirm") == "yes":
-        prolongation.refuse(refused_by=request.user)
-        message = _(f"La prolongation du PASS IAE {prolongation.approval.number_with_spaces} a été refusée.")
-        messages.success(request, message)
-        return HttpResponseRedirect(reverse("admin:approvals_prolongation_changelist"))
-
-    # Display a preview of the email that will be send.
-    context = {"prolongation": prolongation}
-    email_subject_template = get_email_text_template("approvals/email/prolongation_refused_subject.txt", context)
-    email_body_template = get_email_text_template("approvals/email/prolongation_refused_body.txt", context)
-
-    context = {
-        "add": True,
-        "admin_site": admin_site.name,
-        "app_label": app_label,
-        "email_body_template": email_body_template,
-        "email_subject_template": email_subject_template,
-        "prolongation": prolongation,
-        "opts": opts,
-        "title": _("Refus d'une prolongation"),
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
