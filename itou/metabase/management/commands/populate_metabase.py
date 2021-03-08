@@ -32,11 +32,18 @@ from tqdm import tqdm
 from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
-from itou.metabase.management.commands import _approvals, _job_applications, _job_seekers, _organizations, _siaes
+from itou.metabase.management.commands import (
+    _approvals,
+    _job_applications,
+    _job_descriptions,
+    _job_seekers,
+    _organizations,
+    _siaes,
+)
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeJobDescription
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -213,6 +220,19 @@ class Command(BaseCommand):
 
         self.populate_table(table_name="structures", table_columns=_siaes.TABLE_COLUMNS, queryset=queryset)
 
+    def populate_job_descriptions(self):
+        """
+        Populate job descriptions with various statistics.
+        """
+        queryset = SiaeJobDescription.objects.select_related(
+            "siae",
+            "appellation__rome",
+        ).all()
+
+        self.populate_table(
+            table_name="fiches_de_poste", table_columns=_job_descriptions.TABLE_COLUMNS, queryset=queryset
+        )
+
     def populate_organizations(self):
         """
         Populate prescriber organizations,
@@ -319,6 +339,7 @@ class Command(BaseCommand):
             self.cur = cur
             self.conn = conn
             self.populate_siaes()
+            self.populate_job_descriptions()
             self.populate_organizations()
             self.populate_job_seekers()
             self.populate_job_applications()
