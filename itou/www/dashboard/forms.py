@@ -3,9 +3,13 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 
+from itou.job_applications.notifications import (
+    NewQualifiedJobAppEmployersNotification,
+    NewSpontaneousJobAppEmployersNotification,
+)
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
-from itou.utils.widgets import DatePickerField
+from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
 class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
@@ -92,3 +96,44 @@ class EditUserEmailForm(forms.Form):
         if get_user_model().objects.filter(email=email):
             raise ValidationError(gettext_lazy("Cette adresse est déjà utilisée par un autre utilisateur."))
         return email
+
+
+class EditNewJobAppEmployersNotificationForm(forms.Form):
+    spontaneous = forms.BooleanField(
+        label=gettext_lazy("Candidatures spontanées"), required=False, widget=SwitchCheckboxWidget()
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.recipient = kwargs.pop("recipient")
+        self.siae = kwargs.pop("siae")
+        super().__init__(*args, **kwargs)
+        self.fields["spontaneous"].initial = NewSpontaneousJobAppEmployersNotification.is_subscribed(self.recipient)
+
+        if self.siae.job_description_through.exists():
+            default_pks = self.siae.job_description_through.values_list("pk", flat=True)
+            self.subscribed_pks = NewQualifiedJobAppEmployersNotification.recipient_subscribed_pks(
+                recipient=self.recipient, default_pks=default_pks
+            )
+            choices = [
+                (job_description.pk, job_description.display_name)
+                for job_description in self.siae.job_description_through.all()
+            ]
+            self.fields["qualified"] = forms.MultipleChoiceField(
+                label=gettext_lazy("Fiches de poste"),
+                required=False,
+                widget=MultipleSwitchCheckboxWidget(),
+                choices=choices,
+                initial=self.subscribed_pks,
+            )
+
+    def save(self):
+        if self.cleaned_data.get("spontaneous"):
+            NewSpontaneousJobAppEmployersNotification.subscribe(recipient=self.recipient)
+        else:
+            NewSpontaneousJobAppEmployersNotification.unsubscribe(recipient=self.recipient)
+
+        if self.siae.job_description_through.exists():
+            to_subscribe_pks = self.cleaned_data.get("qualified")
+            NewQualifiedJobAppEmployersNotification.replace_subscriptions(
+                recipient=self.recipient, subscribed_pks=to_subscribe_pks
+            )

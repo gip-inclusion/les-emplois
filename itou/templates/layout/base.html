@@ -75,6 +75,12 @@
                                             {% translate "Tableau de bord" %}
                                         </a>
 
+                                        {% if user.is_siae_staff %}
+                                            <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_preferences' %}">
+                                                {% translate "Préférences" %}
+                                            </a>
+                                        {% endif %}
+
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
                                             {% translate "Modifier mon profil" %}

@@ -16,7 +16,7 @@
 # By default, it copies the standard system database named template1.
 # cf https://www.postgresql.org/docs/current/manage-ag-templatedbs.html
 
-# To add a new extension, simply add it to docker/dev/postgres/psql_extensions.sh
+# To add a new extension, simply add it to a Django migration
 # -----------------------------------------------------------------
 
 echo "Loading cities"

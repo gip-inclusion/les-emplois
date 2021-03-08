@@ -14,6 +14,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("users", "0001bis_create_extensions"),
         ("siaes", "0041_auto_20201120_1421"),
         ("approvals", "0009_auto_20200222_1128"),
     ]

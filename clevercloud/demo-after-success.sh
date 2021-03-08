@@ -21,9 +21,6 @@
 # By default, it copies the standard system database named template1.
 # cf https://www.postgresql.org/docs/current/manage-ag-templatedbs.html
 
-# To add a new extension, add it to docker/dev/postgres/psql_extensions.sh
-# and execute the script manually:
-# $ PGURI=$URI_TO_PG bash docker/dev/postgres/psql_extensions.sh
 # -----------------------------------------------------------------
 
 echo "Loading cities"
