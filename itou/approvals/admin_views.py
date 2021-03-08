@@ -7,7 +7,6 @@ https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-s
 https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
 """
 
-from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
@@ -162,11 +161,6 @@ def validate_prolongation(
     if not has_perm:
         raise PermissionDenied
 
-    if request.user.is_not_allowed_to_operate_on_prolongations:
-        message = _(f"Action réservée aux utilisateurs avec un email en `{settings.POLE_EMPLOI_EMAIL_SUFFIX}`.")
-        messages.error(request, message)
-        raise PermissionDenied
-
     queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
     prolongation = get_object_or_404(queryset, pk=prolongation_id)
 
@@ -218,11 +212,6 @@ def refuse_prolongation(
     has_perm = request.user.has_perm(f"{app_label}.{codename}")
 
     if not has_perm:
-        raise PermissionDenied
-
-    if request.user.is_not_allowed_to_operate_on_prolongations:
-        message = _(f"Action réservée aux utilisateurs avec un email en `{settings.POLE_EMPLOI_EMAIL_SUFFIX}`.")
-        messages.error(request, message)
         raise PermissionDenied
 
     queryset = Prolongation.objects.pending().select_related("requested_by", "approval__user", "siae")
