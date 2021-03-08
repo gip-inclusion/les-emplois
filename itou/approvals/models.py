@@ -11,13 +11,11 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
-from itou.utils.emails import get_email_message
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
@@ -809,33 +807,6 @@ class Prolongation(models.Model):
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
 
-    @property
-    def email_prolongation_request(self):
-        to = [settings.ITOU_EMAIL_CONTACT]
-        context = {
-            "prolongation": self,
-            "admin_url": reverse("admin:approvals_prolongation_validate", args=[self.pk]),
-        }
-        subject = "approvals/email/prolongation_request_subject.txt"
-        body = "approvals/email/prolongation_request_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    @property
-    def email_prolongation_validated(self):
-        to = [self.requested_by.email]
-        context = {"prolongation": self}
-        subject = "approvals/email/prolongation_validated_subject.txt"
-        body = "approvals/email/prolongation_validated_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    @property
-    def email_prolongation_refused(self):
-        to = [self.requested_by.email]
-        context = {"prolongation": self}
-        subject = "approvals/email/prolongation_refused_subject.txt"
-        body = "approvals/email/prolongation_refused_body.txt"
-        return get_email_message(to, context, subject, body)
-
     def has_reached_max_cumulative_duration(self, additional_duration=None):
         if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
             return False
@@ -856,32 +827,6 @@ class Prolongation(models.Model):
             "status__in": [self.Status.PENDING, self.Status.VALIDATED],
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**filter_args)
-
-    def request(self, requested_by):
-        self.status = self.Status.PENDING.value
-        self.requested_by = requested_by
-        if not self.created_by:
-            self.created_by = requested_by
-        else:
-            self.updated_by = requested_by
-        self.save()
-        self.email_prolongation_request.send()
-
-    def validate(self, validated_by):
-        self.status = self.Status.VALIDATED.value
-        self.status_updated_at = timezone.now()
-        self.status_updated_by = validated_by
-        self.updated_by = validated_by
-        self.save()
-        self.email_prolongation_validated.send()
-
-    def refuse(self, refused_by):
-        self.status = self.Status.REFUSED.value
-        self.status_updated_at = timezone.now()
-        self.status_updated_by = refused_by
-        self.updated_by = refused_by
-        self.save()
-        self.email_prolongation_refused.send()
 
     @staticmethod
     def get_start_at(approval):
