@@ -1,7 +1,6 @@
 from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
-from django.core import mail
 
 # from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -327,4 +326,3 @@ class ApprovalProlongViewTest(TestCase):
         self.assertRedirects(response, back_url)
 
         self.assertEqual(1, approval.prolongation_set.count())
-        prolongation = approval.prolongation_set.first()
