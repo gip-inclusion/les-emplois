@@ -53,7 +53,6 @@ DEBUG_TOOLBAR_CONFIG = {
 # PEAMU.
 # ------------------------------------------------------------------------------
 
-
 # This trick
 # https://github.com/pennersr/django-allauth/issues/749#issuecomment-70402595
 # fixes the following issue

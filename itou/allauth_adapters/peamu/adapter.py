@@ -3,7 +3,7 @@ from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.providers.oauth2.views import OAuth2Adapter
 from django.conf import settings
 
-from itou.allauth.peamu.provider import PEAMUProvider
+from itou.allauth_adapters.peamu.provider import PEAMUProvider
 
 
 class PEAMUSocialAccountAdapter(DefaultSocialAccountAdapter):
