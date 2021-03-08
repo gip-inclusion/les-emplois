@@ -15,7 +15,7 @@ Unidecode==1.1.1  # https://github.com/avian2/unidecode
 django==3.1.7  # pyup: < 4.0  # https://www.djangoproject.com/
 
 # django-allauth
-django-allauth==0.42.0  # https://github.com/pennersr/django-allauth
+django-allauth==0.43.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
 django-anymail==8.0  # https://github.com/anymail/django-anymail
