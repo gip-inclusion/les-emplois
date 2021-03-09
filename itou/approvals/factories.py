@@ -7,6 +7,7 @@ from dateutil.relativedelta import relativedelta
 from faker import Faker
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
 
@@ -52,6 +53,15 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
     declared_by_siae = factory.SubFactory(SiaeWithMembershipFactory)
     created_by = factory.LazyAttribute(lambda obj: obj.declared_by)
+
+    @factory.post_generation
+    def set_validated_by(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        authorized_prescriber_org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        self.validated_by = authorized_prescriber_org.members.first()
+        self.save()
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):

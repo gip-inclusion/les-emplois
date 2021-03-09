@@ -1,6 +1,7 @@
 from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
+from django.core import mail
 
 # from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -336,3 +337,10 @@ class ApprovalProlongViewTest(TestCase):
         self.assertEqual(prolongation.declared_by, siae_user)
         self.assertEqual(prolongation.declared_by_siae, job_application.to_siae)
         self.assertEqual(prolongation.validated_by, prescriber)
+        self.assertEqual(prolongation.reason, post_data["reason"])
+
+        # An email should have been sent to the chosen authorized prescriber.
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(email.to[0], post_data["email"])
