@@ -119,8 +119,8 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         elif request.POST.get("save"):
             prolongation = form.save(commit=False)
             prolongation.declared_by = request.user
-            prolongation.declared_by_siae = siae
-            prolongation.validated_by = form.user
+            prolongation.declared_by_siae = form.siae
+            prolongation.validated_by = form.validated_by
             prolongation.save()
             messages.success(request, _("Déclaration de prolongation enregistrée."))
             return HttpResponseRedirect(back_url)

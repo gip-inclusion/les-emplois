@@ -92,17 +92,12 @@
                             {% blocktranslate with start=p.start_at|date:"d/m/Y" end=p.end_at|date:"d/m/Y" %}
                                 du {{ start }} au {{ end }}
                             {% endblocktranslate %}
-                            <small>
-                                <b>
-                                    {% if p.status == p.Status.PENDING %}
-                                        {% translate "À l'étude" %}
-                                    {% else %}
-                                        {{ p.get_status_display }}
-                                    {% endif %}
-                                </b>
-                            </small>
                             <br>
                             <small>{{ p.get_reason_display }}</small>
+                            <br>
+                            <small>
+                                {% blocktranslate with full_name=p.validated_by.get_full_name|title email=p.validated_by.email %}Autorisation par <i>{{ full_name }}</i> ({{ email }}){% endblocktranslate %}
+                            </small>
                         </li>
                     {% endfor %}
                 </ul>
