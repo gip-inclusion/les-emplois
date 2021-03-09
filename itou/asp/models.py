@@ -294,6 +294,16 @@ class EmployerType(models.TextChoices):
         return cls.OTHER
 
 
+class CommuneQuerySet(PeriodQuerySet):
+    def with_code(self, insee_code):
+        """
+        Lookup a Commune by INSEE code
+
+        May return several results if not used with PeriodQuerySet.current
+        """
+        return self.filter(code=insee_code)
+
+
 class Commune(PrettyPrintMixin, AbstractPeriod):
     """
     INSEE commune
@@ -310,8 +320,17 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
+    objects = models.Manager.from_queryset(CommuneQuerySet)()
+
     class Meta:
         verbose_name = _("Commune")
+
+    @staticmethod
+    def by_insee_code(insee_code):
+        """
+        Simple lookup of Commune by INSEE code
+        """
+        return Commune.objects.current().with_code(insee_code).first()
 
 
 class Department(PrettyPrintMixin, AbstractPeriod):
