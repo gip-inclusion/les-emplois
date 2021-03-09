@@ -94,7 +94,7 @@ class Migration(migrations.Migration):
                         verbose_name="Motif",
                     ),
                 ),
-                ("reason_explanation", models.TextField(blank=True, verbose_name="Motivez la demande")),
+                ("reason_explanation", models.TextField(blank=True, verbose_name="Explications supplémentaires")),
                 (
                     "created_at",
                     models.DateTimeField(default=django.utils.timezone.now, verbose_name="Date de création"),
@@ -153,7 +153,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="approvals_prolongations_validated_set",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="Validé par",
+                        verbose_name="Prescripteur habilité qui a autorisé cette prolongation",
                     ),
                 ),
             ],

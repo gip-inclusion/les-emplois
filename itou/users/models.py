@@ -159,6 +159,13 @@ class User(AbstractUser, AddressMixin):
         return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
 
     @property
+    def is_prescriber_with_authorized_org(self):
+        return (
+            self.is_prescriber
+            and self.prescriberorganization_set.filter(is_authorized=True, members__is_active=True).exists()
+        )
+
+    @property
     def has_external_data(self):
         return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
 

@@ -15,7 +15,7 @@ from itou.job_applications.models import JobApplication
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.approvals_views.forms import RequestProlongationForm, SuspensionForm
+from itou.www.approvals_views.forms import DeclareProlongationForm, SuspensionForm
 
 
 @login_required
@@ -94,9 +94,9 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
 
 
 @login_required
-def request_prolongation(request, approval_id, template_name="approvals/request_prolongation.html"):
+def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
     """
-    Request a prolongation for the given approval.
+    Declare a prolongation for the given approval.
     """
 
     siae = get_current_siae_or_404(request)
@@ -108,7 +108,7 @@ def request_prolongation(request, approval_id, template_name="approvals/request_
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
     preview = False
 
-    form = RequestProlongationForm(approval=approval, siae=siae, data=request.POST or None)
+    form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
 
@@ -117,7 +117,11 @@ def request_prolongation(request, approval_id, template_name="approvals/request_
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            form.save()
+            prolongation = form.save(commit=False)
+            prolongation.declared_by = request.user
+            prolongation.declared_by_siae = siae
+            prolongation.validated_by = form.user
+            prolongation.save()
             messages.success(request, _("Déclaration de prolongation enregistrée."))
             return HttpResponseRedirect(back_url)
 

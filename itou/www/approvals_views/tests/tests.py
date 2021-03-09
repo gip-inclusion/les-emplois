@@ -15,6 +15,7 @@ from itou.eligibility.factories import EligibilityDiagnosisFactory
 # from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
 
 from .pdfshift_mock import BITES_FILE
@@ -269,6 +270,9 @@ class ApprovalProlongViewTest(TestCase):
         Test the creation of a prolongation.
         """
 
+        prescriber_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        prescriber = prescriber_organization.members.first()
+
         today = timezone.now().date()
 
         # Set "now" to be "after" the day approval is open to prolongation.
@@ -287,14 +291,14 @@ class ApprovalProlongViewTest(TestCase):
         )
 
         approval = job_application.approval
-        self.assertEqual(0, approval.suspension_set.count())
+        self.assertEqual(0, approval.prolongation_set.count())
 
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})
-        url = reverse("approvals:request_prolongation", kwargs={"approval_id": approval.pk})
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.pk})
         url = f"{url}?{params}"
 
         response = self.client.get(url)
@@ -308,6 +312,7 @@ class ApprovalProlongViewTest(TestCase):
             "end_at": end_at.strftime("%d/%m/%Y"),
             "reason": reason,
             "reason_explanation": "Reason explanation is required.",
+            "email": prescriber.email,
             # Preview.
             "preview": "1",
         }
@@ -326,3 +331,8 @@ class ApprovalProlongViewTest(TestCase):
         self.assertRedirects(response, back_url)
 
         self.assertEqual(1, approval.prolongation_set.count())
+
+        prolongation = approval.prolongation_set.first()
+        self.assertEqual(prolongation.declared_by, siae_user)
+        self.assertEqual(prolongation.declared_by_siae, job_application.to_siae)
+        self.assertEqual(prolongation.validated_by, prescriber)
