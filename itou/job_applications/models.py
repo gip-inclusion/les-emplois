@@ -73,6 +73,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
     )
 
+    PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
     initial_state = STATE_NEW
 
     log_model = "job_applications.JobApplicationTransitionLog"
@@ -85,13 +86,7 @@ class JobApplicationQuerySet(models.QuerySet):
         return self.filter(to_siae__members=user, to_siae__members__is_active=True)
 
     def pending(self):
-        return self.filter(
-            state__in=[
-                JobApplicationWorkflow.STATE_NEW,
-                JobApplicationWorkflow.STATE_PROCESSING,
-                JobApplicationWorkflow.STATE_POSTPONED,
-            ]
-        )
+        return self.filter(state__in=JobApplicationWorkflow.PENDING_STATES)
 
     def accepted(self):
         return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
@@ -220,6 +215,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
+    WEEKS_BEFORE_CONSIDERED_OLD = 3
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -437,6 +433,33 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_POSTPONED,
         ]
+
+    # Job application freshness
+
+    @property
+    def last_answer_from_siae(self):
+        if not self.logs:
+            return None
+        return self.logs.all().order_by("timestamp").last()
+
+    @property
+    def is_old(self):
+        """
+        A job application is considered to be old when:
+        - it was sent before a certain period of time
+        - or the employer did not answer since a long time ago.
+        """
+        freshness_limit = timezone.now() - relativedelta(weeks=self.WEEKS_BEFORE_CONSIDERED_OLD)
+        if not self.last_answer_from_siae:
+            return freshness_limit > self.created_at
+        return freshness_limit > self.last_answer_from_siae.timestamp
+
+    @property
+    def is_pending(self):
+        """
+        The job application is waiting for an answer from the employer.
+        """
+        return self.state in JobApplicationWorkflow.PENDING_STATES
 
     # Workflow transitions.
 
