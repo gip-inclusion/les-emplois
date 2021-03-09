@@ -49,9 +49,9 @@ class ProlongationFactory(factory.django.DjangoModelFactory):
     end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
     reason = Prolongation.Reason.COMPLETE_TRAINING.value
     reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-    siae = factory.SubFactory(SiaeWithMembershipFactory)
-    requested_by = factory.LazyAttribute(lambda obj: obj.siae.members.first())
-    created_by = factory.LazyAttribute(lambda obj: obj.requested_by)
+    declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
+    declared_by_siae = factory.SubFactory(SiaeWithMembershipFactory)
+    created_by = factory.LazyAttribute(lambda obj: obj.declared_by)
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):

@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [("approvals", "0012_auto_20210203_1456")]
+    dependencies = [("approvals", "0012_auto_20210309_1010")]
 
     operations = [
         migrations.RunSQL(
@@ -23,35 +23,24 @@ class Migration(migrations.Migration):
                         -- https://www.postgresql.org/docs/12/triggers.html
                         -- https://www.postgresql.org/docs/12/plpgsql-trigger.html#PLPGSQL-TRIGGER-AUDIT-EXAMPLE
                         --
-                        IF (TG_OP = 'DELETE' AND OLD.status = 'VALIDATED') THEN
+                        IF (TG_OP = 'DELETE') THEN
                             -- At delete time, the approval's end date is pushed back if the prolongation
                             -- was validated.
                             UPDATE approvals_approval
                             SET end_at = end_at - (OLD.end_at - OLD.start_at)
                             WHERE id = OLD.approval_id;
-                        ELSIF (TG_OP = 'INSERT' AND NEW.status = 'VALIDATED') THEN
+                        ELSIF (TG_OP = 'INSERT') THEN
                             -- At insert time, the approval's end date is pushed forward if the prolongation
                             -- is validated.
                             UPDATE approvals_approval
                             SET end_at = end_at + (NEW.end_at - NEW.start_at)
                             WHERE id = NEW.approval_id;
                         ELSIF (TG_OP = 'UPDATE') THEN
-                            IF (NOT OLD.status = 'VALIDATED' AND NEW.status = 'VALIDATED') THEN
-                                -- Push approval's end date forward if the prolongation is being validated.
-                                UPDATE approvals_approval
-                                SET end_at = end_at + (NEW.end_at - NEW.start_at)
-                                WHERE id = NEW.approval_id;
-                            ELSIF (OLD.status = 'VALIDATED' AND NEW.status = 'VALIDATED') THEN
-                                -- Change approval's end date forward if the prolongation is being modified.
-                                UPDATE approvals_approval
-                                SET end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at)
-                                WHERE id = NEW.approval_id;
-                            ELSIF (OLD.status = 'VALIDATED' AND NOT NEW.status = 'VALIDATED') THEN
-                                -- Reset approval's end date if the prolongation is not validated anymore.
-                                UPDATE approvals_approval
-                                SET end_at = end_at - (OLD.end_at - OLD.start_at)
-                                WHERE id = NEW.approval_id;
-                            END IF;
+                            -- At update time, the approval's end date is first reset before
+                            -- being pushed forward.
+                            UPDATE approvals_approval
+                            SET end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at)
+                            WHERE id = NEW.approval_id;
                         END IF;
                         RETURN NULL;
                     END;
