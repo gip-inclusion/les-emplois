@@ -112,16 +112,18 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
 
     if request.method == "POST" and form.is_valid():
 
+        prolongation = form.save(commit=False)
+        prolongation.declared_by = request.user
+        prolongation.declared_by_siae = form.siae
+        prolongation.validated_by = form.validated_by
+
         if request.POST.get("edit"):
             preview = False
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            prolongation = form.save(commit=False)
-            prolongation.declared_by = request.user
-            prolongation.declared_by_siae = form.siae
-            prolongation.validated_by = form.validated_by
             prolongation.save()
+            prolongation.notify_authorized_prescriber_by_email()
             messages.success(request, _("Déclaration de prolongation enregistrée."))
             return HttpResponseRedirect(back_url)
 
@@ -153,13 +155,14 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
 
     if request.method == "POST" and form.is_valid():
 
+        suspension = form.save(commit=False)
+        suspension.created_by = request.user
+
         if request.POST.get("edit"):
             preview = False
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            suspension = form.save(commit=False)
-            suspension.created_by = request.user
             suspension.save()
             messages.success(request, _("Suspension effectuée."))
             return HttpResponseRedirect(back_url)

@@ -16,6 +16,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
+from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
@@ -775,6 +776,9 @@ class Prolongation(models.Model):
     @property
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
+
+    def notify_authorized_prescriber_by_email(self):
+        NewProlongationToAuthorizedPrescriberNotification(self).email.send()
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):
         if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:

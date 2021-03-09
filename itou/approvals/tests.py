@@ -6,12 +6,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.template.defaultfilters import title
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
@@ -1178,3 +1180,31 @@ class ProlongationModelTest(TestCase):
         self.assertTrue(
             prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
         )
+
+
+class ProlongationNotificationsTest(TestCase):
+    """
+    Test Prolongation notifications.
+    """
+
+    def test_new_prolongation_to_authorized_prescriber_notification(self):
+
+        prolongation = ProlongationFactory()
+
+        email = NewProlongationToAuthorizedPrescriberNotification(prolongation).email
+
+        # To.
+        self.assertIn(prolongation.validated_by.email, email.to)
+        self.assertEqual(len(email.to), 1)
+
+        # Body.
+
+        self.assertIn(prolongation.start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(prolongation.end_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(prolongation.get_reason_display(), email.body)
+        self.assertIn(title(prolongation.declared_by.get_full_name()), email.body)
+
+        self.assertIn(prolongation.declared_by_siae.display_name, email.body)
+        self.assertIn(prolongation.approval.number_with_spaces, email.body)
+        self.assertIn(title(prolongation.approval.user.first_name), email.body)
+        self.assertIn(title(prolongation.approval.user.last_name), email.body)
