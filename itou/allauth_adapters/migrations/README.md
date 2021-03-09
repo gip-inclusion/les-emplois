@@ -1,2 +1,2 @@
-This empty folder is necessary for the MIGRATION_MODULES trick.
-See dev.py.template for more information.
+This folder is necessary for the MIGRATION_MODULES trick.
+See base.py for more information.
