@@ -327,8 +327,8 @@ API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
-API_ESD_KEY = os.environ.get("API_ESD_KEY")
-API_ESD_SECRET = os.environ.get("API_ESD_SECRET")
+API_ESD_KEY = os.environ.get("API_ESD_KEY", "")
+API_ESD_SECRET = os.environ.get("API_ESD_SECRET", "")
 API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
