@@ -1,11 +1,11 @@
+from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
-from itou.users.models import User
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-def format_address(obj, update_coords=False, strict=True):
+def format_address(obj, update_coords=False):
     """
     Formats the address contained in obj into a valid address "structure" for ASP ER exports.
 
@@ -34,18 +34,18 @@ def format_address(obj, update_coords=False, strict=True):
     - OK => (result_dict, None),
     - KO => (None, error_message)
     """
-    if strict and not isinstance(obj, User):
-        return None, "Only valid for User objects"
+    # if strict and not str(type(obj)) == "itou.users.models.User":
+    #    return None, _("Uniquement valable pour les objets de type User")
 
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
-        return None, "Incomplete address data"
+        return None, _("Données d'adresse incomplètes")
 
     # first we use geo API to get a 'lane' and a number
     address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
 
     if not address:
-        return None, "Geocoding error, unable to get result"
+        return None, _("Erreur de geocoding, impossible d'obtenir un résultat")
 
     result = {}
 
