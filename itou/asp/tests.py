@@ -48,7 +48,7 @@ class FormatASPAdresses(TestCase):
         Sanity check:
         every mock entries must be parseable and result must be valid
         """
-        for idx, elt in enumerate(RESULTS_BY_ADDRESS):
+        for idx, _elt in enumerate(RESULTS_BY_ADDRESS):
             user = _users_with_mock_address(idx)
             result, error = format_address(user, strict=False)
             self.assertIsNone(error)
@@ -175,16 +175,16 @@ class LaneExtensionTest(TestCase):
     def test_standard_extension(self, _):
         """Check if lane extension is included in ASP ref file"""
         user = _users_with_mock_address(0)
-        result, error = format_address(user, strict=False)
+        result, _error = format_address(user, strict=False)
         self.assertEqual(result.get("std_extension"), LaneExtension.B.name)
 
         user = _users_with_mock_address(16)
-        result, error = format_address(user, strict=False)
+        result, _error = format_address(user, strict=False)
         self.assertEqual(result.get("std_extension"), LaneExtension.T.name)
 
     def test_non_standard_extension(self, _):
         """Non-standard extension, i.e. not in ASP ref file"""
         user = _users_with_mock_address(17)
-        result, error = format_address(user, strict=False)
+        result, _error = format_address(user, strict=False)
         self.assertEqual(result.get("non_std_extension"), "G")
         self.assertIsNone(result.get("std_extension"))

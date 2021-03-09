@@ -8,7 +8,7 @@ app_name = "prescribers_views"
 
 urlpatterns = [
     path("edit_organization", views.edit_organization, name="edit_organization"),
-    path("colleagues", views.members, name="members"),
+    path("colleagues", views.member_list, name="members"),
     path("<int:org_id>/card", views.card, name="card"),
     path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
     # Can't mix capture var syntaxes in `re_path`: all path vars expressed as RE

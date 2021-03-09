@@ -42,7 +42,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
 
 
 @login_required
-def members(request, template_name="prescribers/members.html"):
+def member_list(request, template_name="prescribers/members.html"):
     """
     List members of a prescriber organization.
     """
