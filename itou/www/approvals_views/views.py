@@ -113,6 +113,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     if request.method == "POST" and form.is_valid():
 
         prolongation = form.save(commit=False)
+        prolongation.created_by = request.user
         prolongation.declared_by = request.user
         prolongation.declared_by_siae = form.siae
         prolongation.validated_by = form.validated_by

@@ -334,6 +334,7 @@ class ApprovalProlongViewTest(TestCase):
         self.assertEqual(1, approval.prolongation_set.count())
 
         prolongation = approval.prolongation_set.first()
+        self.assertEqual(prolongation.created_by, siae_user)
         self.assertEqual(prolongation.declared_by, siae_user)
         self.assertEqual(prolongation.declared_by_siae, job_application.to_siae)
         self.assertEqual(prolongation.validated_by, prescriber)
