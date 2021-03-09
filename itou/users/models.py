@@ -336,6 +336,7 @@ class JobSeekerProfile(models.Model):
     ERROR_HEXA_LANE_NAME = _("Le nom de voie est obligatoire")
     ERROR_HEXA_POST_CODE = _("Le code postal est obligatoire")
     ERROR_HEXA_COMMUNE = _("La commune INSEE est obligatoire")
+    ERROR_HEXA_LOOKUP_COMMUNE = _("Impossible de trouver la commune à partir du code INSEE")
 
     user = models.OneToOneField(
         User,
@@ -508,7 +509,11 @@ class JobSeekerProfile(models.Model):
         self.hexa_post_code = result.get("post_code")
 
         # Special field: Commune object contains both city name and INSEE code
-        self.hexa_commune = result.get("lane_type")
+        insee_code = result.get("insee_code")
+        self.hexa_commune = Commune.by_insee_code(insee_code)
+
+        if not self.hexa_commune:
+            raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
 
     @property
     def is_employed(self):
