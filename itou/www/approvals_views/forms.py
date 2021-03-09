@@ -18,7 +18,7 @@ class DeclareProlongationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
-        self.user = None
+        self.validated_by = None
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
@@ -54,8 +54,8 @@ class DeclareProlongationForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.user = get_user_model().objects.filter(email=email).first()
-        if not self.user or not self.user.is_prescriber_with_authorized_org:
+        self.validated_by = get_user_model().objects.filter(email=email).first()
+        if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
             error = _("Cet utilisateur n'est pas un prescripteur habilité.")
             raise forms.ValidationError(error)
         return email
