@@ -362,6 +362,21 @@ TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
 # Itou.
 # ------------------------------------------------------------------------------
 
+# This trick
+# https://github.com/pennersr/django-allauth/issues/749#issuecomment-70402595
+# fixes the following issue
+# https://github.com/pennersr/django-allauth/issues/749
+# Without this trick, python manage.py makemigrations
+# would want to create a migration in django-allauth dependency
+# /usr/local/lib/python3.7/site-packages/allauth/socialaccount/migrations/0004_auto_20200415_1510.py
+# - Alter field provider on socialaccount
+# - Alter field provider on socialapp
+#
+# This setting redirects the migrations for socialaccount to our directory
+MIGRATION_MODULES = {
+    "socialaccount": "itou.allauth_adapters.migrations",
+}
+
 # Environment, sets the type of env of the app (DEMO, REVIEW_APP, STAGING, DEV…)
 ITOU_ENVIRONMENT = "PROD"
 ITOU_PROTOCOL = "https"
