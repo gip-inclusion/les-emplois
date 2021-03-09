@@ -11,7 +11,13 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType
+from itou.asp.models import (
+    AllocationDuration,
+    Commune,
+    EducationLevel,
+    LaneExtension,
+    LaneType,
+)
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.models import AddressMixin
 from itou.utils.validators import validate_birthdate, validate_pole_emploi_id
@@ -63,16 +69,33 @@ class User(AbstractUser, AddressMixin):
         M = "M", _("Monsieur")
         MME = "MME", _("Madame")
 
-    title = models.CharField(max_length=3, verbose_name=_("Civilité"), null=True, blank=True, choices=Title.choices)
+    title = models.CharField(
+        max_length=3,
+        verbose_name=_("Civilité"),
+        null=True,
+        blank=True,
+        choices=Title.choices,
+    )
 
     birthdate = models.DateField(
-        verbose_name=_("Date de naissance"), null=True, blank=True, validators=[validate_birthdate]
+        verbose_name=_("Date de naissance"),
+        null=True,
+        blank=True,
+        validators=[validate_birthdate],
     )
     birth_place = models.ForeignKey(
-        "asp.Commune", verbose_name=_("Commune de naissance"), null=True, blank=True, on_delete=models.SET_NULL
+        "asp.Commune",
+        verbose_name=_("Commune de naissance"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     birth_country = models.ForeignKey(
-        "asp.Country", verbose_name=_("Pays de naissance"), null=True, blank=True, on_delete=models.SET_NULL
+        "asp.Country",
+        verbose_name=_("Pays de naissance"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
     )
     email = CIEmailField(
         _("email address"),
@@ -85,9 +108,13 @@ class User(AbstractUser, AddressMixin):
     )
     phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
 
-    is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)
+    is_job_seeker = models.BooleanField(
+        verbose_name=_("Demandeur d'emploi"), default=False
+    )
     is_prescriber = models.BooleanField(verbose_name=_("Prescripteur"), default=False)
-    is_siae_staff = models.BooleanField(verbose_name=_("Employeur (SIAE)"), default=False)
+    is_siae_staff = models.BooleanField(
+        verbose_name=_("Employeur (SIAE)"), default=False
+    )
     is_stats_vip = models.BooleanField(verbose_name=_("Pilotage"), default=False)
 
     # The two following Pôle emploi fields are reserved for job seekers.
@@ -120,18 +147,30 @@ class User(AbstractUser, AddressMixin):
         choices=REASON_CHOICES,
         blank=True,
     )
-    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), blank=True)
-    has_completed_welcoming_tour = models.BooleanField(verbose_name=_("Parcours de bienvenue effectué"), default=False)
+    resume_link = models.URLField(
+        max_length=500, verbose_name=_("Lien vers un CV"), blank=True
+    )
+    has_completed_welcoming_tour = models.BooleanField(
+        verbose_name=_("Parcours de bienvenue effectué"), default=False
+    )
 
     created_by = models.ForeignKey(
-        "self", verbose_name=_("Créé par"), on_delete=models.SET_NULL, null=True, blank=True
+        "self",
+        verbose_name=_("Créé par"),
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
         return self.email
 
     def clean(self):
-        if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
+        if (
+            self.birth_country
+            and self.birth_country.code == self.INSEE_CODE_FRANCE
+            and not self.birth_place
+        ):
             raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
 
     def save(self, *args, **kwargs):
@@ -162,7 +201,9 @@ class User(AbstractUser, AddressMixin):
     def peamu_id_token(self):
         if not self.is_peamu:
             return None
-        return self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
+        return (
+            self.socialaccount_set.filter(provider="peamu").get().extra_data["id_token"]
+        )
 
     @property
     def is_prescriber_with_org(self):
@@ -220,11 +261,16 @@ class User(AbstractUser, AddressMixin):
                 "last_name": "Foo",
             }
         """
-        username = generate_unique_username([fields["first_name"], fields["last_name"], fields["email"]])
+        username = generate_unique_username(
+            [fields["first_name"], fields["last_name"], fields["email"]]
+        )
         fields["is_job_seeker"] = True
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(
-            username, email=fields.pop("email"), password=cls.objects.make_random_password(), **fields
+            username,
+            email=fields.pop("email"),
+            password=cls.objects.make_random_password(),
+            **fields,
         )
         return user
 
@@ -251,7 +297,11 @@ class User(AbstractUser, AddressMixin):
         if (pole_emploi_id and lack_of_pole_emploi_id_reason) or (
             not pole_emploi_id and not lack_of_pole_emploi_id_reason
         ):
-            raise ValidationError(_("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."))
+            raise ValidationError(
+                _(
+                    "Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."
+                )
+            )
 
 
 def get_allauth_account_user_display(user):
@@ -296,6 +346,21 @@ class JobSeekerProfile(models.Model):
     Note that despite the name, addresses of this model are not fully compliant
     with Hexa norms (but compliant enough to be accepted by ASP backend).
     """
+
+    ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = _(
+        "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
+    )
+    ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD = _(
+        "La personne ne peut avoir de période sans emploi si actuellement employée"
+    )
+    ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = _(
+        "La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"
+    )
+
+    ERROR_HEXA_LANE_TYPE = _("Le type de voie est obligatoire")
+    ERROR_HEXA_LANE_NAME = _("Le nom de voie est obligatoire")
+    ERROR_HEXA_POST_CODE = _("Le code postal est obligatoire")
+    ERROR_HEXA_COMMUNE = _("La commune INSEE est obligatoire")
 
     user = models.OneToOneField(
         User,
@@ -361,20 +426,37 @@ class JobSeekerProfile(models.Model):
 
     # Jobseeker address in Hexa format
 
-    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), blank=True)
-    hexa_std_extension = models.CharField(
-        max_length=1, verbose_name=_("Extension de voie"), null=True, blank=True, choices=LaneExtension.choices
+    hexa_lane_number = models.CharField(
+        max_length=10, verbose_name=_("Numéro de la voie"), blank=True
     )
-    non_std_extension = models.CharField(
+    hexa_std_extension = models.CharField(
+        max_length=1,
+        verbose_name=_("Extension de voie"),
+        null=True,
+        blank=True,
+        choices=LaneExtension.choices,
+    )
+    hexa_non_std_extension = models.CharField(
         max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True
     )
     hexa_lane_type = models.CharField(
-        max_length=4, verbose_name=_("Type de voie"), null=True, blank=True, choices=LaneType.choices
+        max_length=4,
+        verbose_name=_("Type de voie"),
+        null=True,
+        blank=True,
+        choices=LaneType.choices,
     )
-    hexa_lane_name = models.CharField(max_length=120, verbose_name=_("Nom de la voie"), blank=True)
-    hexa_post_code = models.CharField(max_length=6, verbose_name=_("Code postal"), blank=True)
+    hexa_lane_name = models.CharField(
+        max_length=120, verbose_name=_("Nom de la voie"), blank=True
+    )
+    hexa_post_code = models.CharField(
+        max_length=6, verbose_name=_("Code postal"), blank=True
+    )
     hexa_commune = models.ForeignKey(
-        Commune, verbose_name=_("Commune (ref. ASP)"), null=True, on_delete=models.SET_NULL
+        Commune,
+        verbose_name=_("Commune (ref. ASP)"),
+        null=True,
+        on_delete=models.SET_NULL,
     )
 
     class Meta:
@@ -384,15 +466,53 @@ class JobSeekerProfile(models.Model):
     def __str__(self):
         return f"JobSeekerProfile: {self.user}"
 
-    def clean(self):
+    def _clean_job_seeker_details(self):
+        # TODO
+        pass
+
+    def _clean_social_allowances(self):
         if self.resourceless and self.is_employed:
-            raise ValidationError(_("La personne n'est pas considérée comme sans ressources si OETH ou RQTH"))
+            raise ValidationError(self.ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH)
 
         if self.is_employed and self.unemployed_since:
-            raise ValidationError(_("La personne ne peut avoir de période sans emploi si actuellement employée"))
+            raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
 
         if self.unemployed_since and self.is_employed:
-            raise ValidationError(_("La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"))
+            raise ValidationError(self.ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH)
+
+    def _clean_job_seeker_hexa_address(self):
+        # Check if any fields of the hexa address is filled
+        if not any(
+            [
+                self.hexa_lane_number,
+                self.hexa_std_extension,
+                self.hexa_non_std_extension,
+                self.hexa_lane_type,
+                self.hexa_lane_name,
+                self.hexa_post_code,
+                self.hexa_commune,
+            ]
+        ):
+            return
+        
+        # if any 'hexa' field is given, then check all mandatory fields
+        # (all or nothing)
+        if not self.hexa_lane_type:
+            raise ValidationError(self.ERROR_HEXA_LANE_TYPE)
+
+        if not self.hexa_lane_name:
+            raise ValidationError(self.ERROR_HEXA_LANE_NAME)
+
+        if not self.hexa_post_code:
+            raise ValidationError(self.ERROR_HEXA_POST_CODE)
+
+        if not self.hexa_commune:
+            raise ValidationError(self.ERROR_HEXA_COMMUNE)
+
+    def clean(self):
+        self._clean_job_seeker_details()
+        self._clean_social_allowances()
+        self._clean_job_seeker_hexa_address()
 
     @property
     def is_employed(self):
@@ -416,4 +536,9 @@ class JobSeekerProfile(models.Model):
 
     @property
     def has_social_allowance(self):
-        return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
+        return (
+            self.has_rsa_allocation
+            or self.has_ass_allocation
+            or self.has_aah_allocation
+            or self.has_ata_allocation
+        )
