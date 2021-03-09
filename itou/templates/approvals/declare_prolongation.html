@@ -2,13 +2,13 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Demande de prolongation du PASS IAE" %}{{ block.super }}{% endblock %}
+{% block title %}{% translate "Déclarer une prolongation de PASS IAE" %}{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
         {% blocktranslate with full_name=approval.user.get_full_name|title %}
-            Demande de prolongation du PASS IAE
+            Déclarer une prolongation de PASS IAE
             <br>
             <span class="text-muted">{{ full_name }}</span>
         {% endblocktranslate %}
@@ -31,17 +31,7 @@
 
             {% bootstrap_form_errors form %}
 
-            {% for field in form %}
-                {# Display a warning message before the "reason_explanation" field. #}
-                {% if field.name == "reason_explanation" %}
-                    <div class="alert alert-warning pb-0" role="alert">
-                        <p>
-                            {% translate "Sur la base des éléments transmis, un prescripteur habilité autorise ou non la prolongation du parcours. Il est important de motiver votre demande." %}
-                        </p>
-                    </div>
-                {% endif %}
-                {% bootstrap_field field %}
-            {% endfor %}
+            {% bootstrap_form form %}
 
             {% buttons %}
                 <a class="btn btn-secondary" href="{{ back_url }}">
@@ -49,7 +39,7 @@
                 </a>
                 {# Enable preview mode: preview=1. #}
                 <button type="submit" name="preview" value="1" class="btn btn-primary">
-                    {% translate "Valider la demande" %}
+                    {% translate "Valider la déclaration" %}
                 </button>
             {% endbuttons %}
 
@@ -66,11 +56,11 @@
                 <input type="hidden" name="{{ field.name }}" value="{{ field.value }}">
             {% endfor %}
 
-            {# Show the user a summary of the info. #}
+            {# Show the user a preview of the prolongation. #}
             <div class="card my-3 text-center">
                 <div class="card-body">
                     <h5 class="card-title">
-                        {% translate "Vous êtes sur le point d'émettre une demande de prolongation de ce PASS IAE pour la raison suivante :" %}
+                        {% translate "Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :" %}
                     </h5>
                     <p class="card-text">
                         {{ form.instance.get_reason_display }}
@@ -83,12 +73,18 @@
                             <span class="badge badge-success">{{ end }}</span>
                         {% endblocktranslate %}
                     </p>
+                    <p class="card-text">
+                        {% blocktranslate with full_name=form.instance.validated_by.get_full_name|title email=form.instance.validated_by.email %}
+                            Un e-mail sera envoyé au prescripteur habilité ayant autorisé la prolongation :
+                            <b>{{ full_name }}</b> ({{ email }})
+                        {% endblocktranslate %}
+                    </p>
                 </div>
             </div>
 
             <div class="alert alert-warning" role="alert">
                 <p>
-                    {% translate "En confirmant cette demande je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié." %}
+                    {% translate "En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié." %}
                 </p>
                 {% buttons %}
                     {# Allow the user to modify the prolongation: edit=1. #}
@@ -97,7 +93,7 @@
                     </button>
                     {# Create a prolongation: save=1. #}
                     <button type="submit" name="save" value="1" class="btn btn-primary">
-                        {% translate "Confirmer la demande" %}
+                        {% translate "Confirmer la déclaration" %}
                     </button>
                 {% endbuttons %}
             </div>

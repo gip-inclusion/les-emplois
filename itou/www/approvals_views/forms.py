@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
@@ -7,7 +8,7 @@ from itou.approvals.models import Prolongation, Suspension
 from itou.utils.widgets import DatePickerField
 
 
-class RequestProlongationForm(forms.ModelForm):
+class DeclareProlongationForm(forms.ModelForm):
     """
     Request a prolongation.
 
@@ -17,12 +18,13 @@ class RequestProlongationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.approval = kwargs.pop("approval")
         self.siae = kwargs.pop("siae")
+        self.user = None
         super().__init__(*args, **kwargs)
 
         if not self.instance.pk:
             # `start_at` should begin just after the approval. It cannot be set by the user.
             self.instance.start_at = Prolongation.get_start_at(self.approval)
-            self.instance.siae = self.siae
+            # `approval` must be set before model validation to avoid violating a not-null constraint.
             self.instance.approval = self.approval
             self.fields["reason"].initial = None  # Uncheck radio buttons.
 
@@ -42,13 +44,30 @@ class RequestProlongationForm(forms.ModelForm):
         self.fields["end_at"].input_formats = [DatePickerField.DATE_FORMAT]
         self.fields["end_at"].label = _(f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au')
 
+    email = forms.EmailField(
+        required=True,
+        label=gettext_lazy("E-mail du prescripteur habilité qui a autorisé cette prolongation"),
+        help_text=gettext_lazy(
+            "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
+        ),
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        self.user = get_user_model().objects.filter(email=email).first()
+        if not self.user or not self.user.is_prescriber_with_authorized_org:
+            error = _("Cet utilisateur n'est pas un prescripteur habilité.")
+            raise forms.ValidationError(error)
+        return email
+
     class Meta:
         model = Prolongation
         fields = [
             # Order is important for the template.
             "reason",
-            "reason_explanation",
             "end_at",
+            "reason_explanation",
+            "email",
         ]
         widgets = {
             "end_at": DatePickerField(),

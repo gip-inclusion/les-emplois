@@ -633,7 +633,7 @@ class Prolongation(models.Model):
     reason = models.CharField(
         verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
     )
-    reason_explanation = models.TextField(verbose_name=_("Motivez la demande"), blank=True)
+    reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
 
     declared_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -652,7 +652,7 @@ class Prolongation(models.Model):
     # It is assumed that an authorized prescriber has validated the prolongation beforehand.
     validated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Validé par"),
+        verbose_name=_("Prescripteur habilité qui a autorisé cette prolongation"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -736,6 +736,13 @@ class Prolongation(models.Model):
         if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
             if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
                 raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
+
+        if (
+            hasattr(self, "validated_by")
+            and self.validated_by
+            and not self.validated_by.is_prescriber_with_authorized_org
+        ):
+            raise ValidationError(_("Cet utilisateur n'est pas un prescripteur habilité."))
 
         if hasattr(self, "approval"):
 
