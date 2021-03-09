@@ -411,7 +411,7 @@ class JobSeekerProfile(models.Model):
         choices=LaneExtension.choices,
     )
     hexa_non_std_extension = models.CharField(
-        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True
+        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True, null=True
     )
     hexa_lane_type = models.CharField(
         max_length=4,
@@ -426,6 +426,7 @@ class JobSeekerProfile(models.Model):
         Commune,
         verbose_name=_("Commune (ref. ASP)"),
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
@@ -484,7 +485,7 @@ class JobSeekerProfile(models.Model):
         self._clean_social_allowances()
         self._clean_job_seeker_hexa_address()
 
-    def update_with_job_seeker_address(self):
+    def update_hexa_address(self):
         """
         This method tries to fill / guess the HEXA address fields
         with the current address of the job seeker.
@@ -514,6 +515,8 @@ class JobSeekerProfile(models.Model):
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
+
+        return self
 
     @property
     def is_employed(self):
