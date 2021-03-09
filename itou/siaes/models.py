@@ -209,7 +209,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         super().__init__(*args, **kwargs)
 
         # Add `kind` attributes, e.g.: `self.is_kind_etti`.
-        for kind, description in self.KIND_CHOICES:
+        for kind, _description in self.KIND_CHOICES:
             setattr(self, f"is_kind_{kind.lower()}", kind == self.kind)
 
     def __str__(self):

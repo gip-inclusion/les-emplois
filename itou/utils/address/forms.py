@@ -61,16 +61,16 @@ class AddressFormMixin(forms.Form):
             cleaned_data["city"] = city_name
 
         # Basic check of address fields
-        addr1, addr2, zip, city = (
+        addr1, addr2, post_code, city = (
             cleaned_data["address_line_1"],
             cleaned_data["address_line_2"],
             cleaned_data["post_code"],
             cleaned_data["city"],
         )
-        valid = all([addr1, zip, city]) or not any([addr1, addr2, zip, city])
+        valid = all([addr1, post_code, city]) or not any([addr1, addr2, post_code, city])
 
         if not valid:
-            raise (ValidationError(gettext_lazy("Adresse incomplète")))
+            raise ValidationError(gettext_lazy("Adresse incomplète"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -43,17 +43,17 @@ def _call_api(api_path, token):
         result = resp.json()
         # logger.debug(f"CALL {url}: {result}")
         return result
-    else:
-        # Track it for QoS
-        logger.warning(f"API call to: {url} returned status code {resp.status_code}")
-        return None
+
+    # Track it for QoS
+    logger.warning(f"API call to: {url} returned status code {resp.status_code}")
+    return None
 
 
 def _fields_or_failed(result, keys):
     if not result:
         return None
-    else:
-        return {k: v for k, v in result.items() if k in keys}
+
+    return {k: v for k, v in result.items() if k in keys}
 
 
 def _get_userinfo(token):
@@ -102,8 +102,8 @@ def _get_status(token):
     if result:
         code = result.get(key)
         return {key: int(code)}
-    else:
-        return None
+
+    return None
 
 
 def _get_address(token):

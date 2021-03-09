@@ -109,7 +109,7 @@ class Command(BaseCommand):
                 if not dry_run:
                     pe_kind = PrescriberOrganization.Kind.PE
 
-                    org, created = PrescriberOrganization.objects.get_or_create(
+                    org, _created = PrescriberOrganization.objects.get_or_create(
                         code_safir_pole_emploi=code_safir,
                         kind=pe_kind,
                         defaults={

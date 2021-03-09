@@ -69,10 +69,10 @@ def format_address(obj, update_coords=False, strict=True):
     lane = None
     if not address.get("lane") and not address.get("address"):
         return None, "Unable to get address lane"
-    else:
-        lane = address.get("lane") or address.get("address")
-        lane = unidecode(lane)
-        result["lane"] = lane
+
+    lane = address.get("lane") or address.get("address")
+    lane = unidecode(lane)
+    result["lane"] = lane
 
     # Lane type processing (Avenue, RUe, Boulevard ...)
     lane_type = lane.split(maxsplit=1)[0]

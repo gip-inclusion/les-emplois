@@ -292,8 +292,7 @@ class EmployerType(models.TextChoices):
             return cls.ACI
         elif siae_kind == "EA":
             return cls.EA
-        else:
-            return cls.OTHER
+        return cls.OTHER
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):

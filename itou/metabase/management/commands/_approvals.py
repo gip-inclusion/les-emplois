@@ -40,18 +40,18 @@ def get_approval_type(approval):
     if isinstance(approval, Approval):
         if approval.number.startswith(settings.ASP_ITOU_PREFIX):
             return f"PASS IAE ({settings.ASP_ITOU_PREFIX})"
-        else:
-            return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
+
+        return f"Agrément PE via ITOU (non {settings.ASP_ITOU_PREFIX})"
     elif isinstance(approval, PoleEmploiApproval):
         if len(approval.number) == 12:
             return "Agrément PE"
         elif len(approval.number) == 15:
             suffix = approval.number[12]
             return f"{PoleEmploiApproval.Suffix[suffix].label} PE"
-        else:
-            raise ValueError("Unexpected PoleEmploiApproval.number length")
-    else:
-        raise ValueError("Unknown approval type.")
+
+        raise ValueError("Unexpected PoleEmploiApproval.number length")
+
+    raise ValueError("Unknown approval type.")
 
 
 TABLE_COLUMNS = [
