@@ -126,7 +126,7 @@ class LaneType(Enum):
 _LANE_TYPE_ALIASES = {
     "^r": LaneType.RUE,
     "^che": LaneType.CHEM,
-    "^grande?[ \-']rue": LaneType.GR,  # noqa W605
+    "^grande?[ -]rue": LaneType.GR,
     "^qu": LaneType.QUAI,
     "^voies": LaneType.VOIE,
     "^domaines": LaneType.DOM,
