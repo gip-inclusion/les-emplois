@@ -159,9 +159,11 @@ class LaneTypeTest(TestCase):
         """Test some variants / alternatives used by api.geo.gouv.fr for lane types"""
         self.assertEquals(LaneType.GR, find_lane_type_aliases("grand rue"))
         self.assertEquals(LaneType.GR, find_lane_type_aliases("grande-rue"))
+        self.assertIsNone(None, find_lane_type_aliases("grande'rue"))
         self.assertEquals(LaneType.RUE, find_lane_type_aliases("R"))
         self.assertEquals(LaneType.RUE, find_lane_type_aliases("r"))
         self.assertEquals(LaneType.LD, find_lane_type_aliases("lieu dit"))
+        self.assertEquals(LaneType.LD, find_lane_type_aliases("lieu-dit"))
         self.assertIsNone(find_lane_type_aliases("XXX"))
 
 
