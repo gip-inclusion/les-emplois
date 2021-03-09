@@ -137,15 +137,6 @@ class Approval(CommonApprovalMixin):
         "pour lui pendant la période de suspension."
     )
 
-    ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_USER = _(
-        "La prolongation de votre PASS IAE est en attente de validation. "
-        "Vous ne pouvez pas postuler pendant cette période."
-    )
-    ERROR_PASS_IAE_HAS_PENDING_PROLONGATION_FOR_PROXY = _(
-        "La prolongation du PASS IAE du candidat en attente de validation. "
-        "Vous ne pouvez pas postuler pour lui pendant cette période."
-    )
-
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name=_("Demandeur d'emploi"),
@@ -252,6 +243,8 @@ class Approval(CommonApprovalMixin):
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
 
+    # Postpone start date.
+
     @property
     def can_postpone_start_date(self):
         return self.start_at > timezone.now().date()
@@ -274,10 +267,6 @@ class Approval(CommonApprovalMixin):
     # Prolongation.
 
     @cached_property
-    def has_pending_prolongation(self):
-        return self.prolongation_set.pending().exists()
-
-    @cached_property
     def prolongations_by_start_date_asc(self):
         return self.prolongation_set.all().order_by("start_at")
 
@@ -291,7 +280,7 @@ class Approval(CommonApprovalMixin):
 
     @cached_property
     def can_be_prolonged(self):
-        return self.is_open_to_prolongation and not self.is_suspended and not self.has_pending_prolongation
+        return self.is_open_to_prolongation and not self.is_suspended
 
     def can_be_prolonged_by_siae(self, siae):
         return self.user.last_hire_was_made_by_siae(siae) and self.can_be_prolonged
@@ -583,12 +572,6 @@ class ProlongationQuerySet(models.QuerySet):
     def not_in_progress(self):
         return self.exclude(self.in_progress_lookup)
 
-    def pending(self):
-        return self.filter(status=self.model.Status.PENDING)
-
-    def validated(self):
-        return self.filter(status=self.model.Status.VALIDATED)
-
 
 class ProlongationManager(models.Manager):
     def get_cumulative_duration_for(self, approval, reason=None):
@@ -600,31 +583,26 @@ class ProlongationManager(models.Manager):
         if reason:
             kwargs["reason"] = reason
         duration = datetime.timedelta(0)
-        for prolongation in self.validated().filter(**kwargs):
+        for prolongation in self.filter(**kwargs):
             duration += prolongation.duration
         return duration
 
 
 class Prolongation(models.Model):
     """
-    A request for prolongation can be issued by an SIAE for a PASS IAE.
+    Stores a prolongation made by an SIAE for a PASS IAE.
 
-    It must then be validated by a Pôle emploi agent because a self-validated
-    prolongation made by an SIAE would increase the risk of staying on
-    insertion for a candidate.
+    It is assumed that an authorized prescriber has validated the prolongation
+    beforehand because a self-validated prolongation made by an SIAE would
+    increase the risk of staying on insertion for a candidate.
 
     When a prolongation is saved/edited/deleted, the end date of its approval
     is automatically pushed back or forth with a PostgreSQL trigger:
     `trigger_update_approval_end_at_for_prolongation`.
     """
 
-    # Max duration: 12 months (but it depends on the `reason` field).
+    # Max duration: 12 months but it depends on the `reason` field, see `get_max_end_at`.
     MAX_DURATION_MONTHS = 12
-
-    class Status(models.TextChoices):
-        PENDING = "PENDING", _("À traiter")
-        VALIDATED = "VALIDATED", _("Validée")
-        REFUSED = "REFUSED", _("Refusée")
 
     class Reason(models.TextChoices):
         COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Fin d'une formation (6 mois maximum)")
@@ -652,39 +630,33 @@ class Prolongation(models.Model):
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
     start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
     end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
-    requested_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        verbose_name=_("Demandée par"),
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name="approvals_prolongation_requests_set",
-    )
-    siae = models.ForeignKey(
-        "siaes.Siae",
-        verbose_name=_("SIAE"),
-        null=True,
-        on_delete=models.SET_NULL,
-        related_name="approvals_prolongated",
-    )
     reason = models.CharField(
         verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
     )
     reason_explanation = models.TextField(verbose_name=_("Motivez la demande"), blank=True)
 
-    status = models.CharField(
-        verbose_name=_("Statut"),
-        max_length=30,
-        choices=Status.choices,
-        default=Status.PENDING,
-    )
-    status_updated_at = models.DateTimeField(verbose_name=_("Date de mise à jour du statut"), null=True)
-    status_updated_by = models.ForeignKey(
+    declared_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Statut mis à jour par"),
-        related_name="approvals_prolongations_status_set",
+        verbose_name=_("Déclarée par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongation_declared_set",
+    )
+    declared_by_siae = models.ForeignKey(
+        "siaes.Siae",
+        verbose_name=_("SIAE du déclarant"),
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    # It is assumed that an authorized prescriber has validated the prolongation beforehand.
+    validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Validé par"),
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+        related_name="approvals_prolongations_validated_set",
     )
 
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
@@ -693,7 +665,7 @@ class Prolongation(models.Model):
         verbose_name=_("Créé par"),
         null=True,
         on_delete=models.SET_NULL,
-        related_name="approvals_prolongated_set",
+        related_name="approvals_prolongations_created_set",
     )
     updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
     updated_by = models.ForeignKey(
@@ -726,18 +698,8 @@ class Prolongation(models.Model):
                     ),
                     ("approval", RangeOperators.EQUAL),
                 ),
-                # Exclude the REFUSED status in order to be able to make a new request
-                # for prolongation with dates that overlap with those of another.
-                condition=(~Q(status="REFUSED")),
             ),
         ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Add `status` attributes, e.g.: `self.is_pending`.
-        for status in self.Status:
-            setattr(self, f"is_{status.lower()}", status == self.status)
 
     def __str__(self):
         return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
@@ -822,9 +784,6 @@ class Prolongation(models.Model):
             "start_at__lte": self.end_at,  # Inclusive start.
             "end_at__gt": self.start_at,  # Exclusive end.
             "approval": self.approval,
-            # Exclude the REFUSED status in order to be able to make a new request
-            # for prolongation with dates that overlap with those of another.
-            "status__in": [self.Status.PENDING, self.Status.VALIDATED],
         }
         return self._meta.model.objects.exclude(pk=self.pk).filter(**filter_args)
 

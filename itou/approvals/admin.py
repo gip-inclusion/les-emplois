@@ -57,8 +57,8 @@ class ProlongationInline(admin.TabularInline):
     extra = 0
     show_change_link = True
     can_delete = False
-    fields = ("start_at", "end_at", "reason", "created_by", "siae", "status", "status_updated_by")
-    raw_id_fields = ("approval", "siae", "created_by", "updated_by", "status_updated_by")
+    fields = ("start_at", "end_at", "reason", "declared_by", "validated_by")
+    raw_id_fields = ("declared_by", "validated_by")
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -198,11 +198,26 @@ class SuspensionAdmin(admin.ModelAdmin):
 
 @admin.register(models.Prolongation)
 class ProlongationAdmin(admin.ModelAdmin):
-    list_display = ("pk", "approval", "start_at", "end_at", "created_at", "status", "is_in_progress")
+    list_display = (
+        "pk",
+        "approval",
+        "start_at",
+        "end_at",
+        "declared_by",
+        "validated_by",
+        "created_at",
+        "is_in_progress",
+    )
     list_display_links = ("pk", "approval")
-    raw_id_fields = ("approval", "requested_by", "siae", "created_by", "updated_by", "status_updated_by")
+    raw_id_fields = (
+        "approval",
+        "declared_by",
+        "declared_by_siae",
+        "validated_by",
+        "created_by",
+        "updated_by",
+    )
     list_filter = (
-        "status",
         IsInProgressFilter,
         "reason",
     )
