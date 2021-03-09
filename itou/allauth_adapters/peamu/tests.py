@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 # Heavily inspired by
 # https://github.com/pennersr/django-allauth/blob/master/allauth/socialaccount/providers/google/tests.py
-from __future__ import absolute_import, unicode_literals
 
 from allauth.account.models import EmailAddress, EmailConfirmation
 from allauth.account.signals import user_signed_up
