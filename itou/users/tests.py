@@ -6,7 +6,8 @@ from django.utils import timezone
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory
-from itou.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
+import itou.asp.factories as asp
+from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 
 
 class ModelTest(TestCase):
@@ -107,6 +108,7 @@ class ModelTest(TestCase):
         job_seeker.last_login = timezone.now()
         self.assertFalse(job_seeker.is_handled_by_proxy)
 
+<<<<<<< HEAD
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         user = job_application.job_seeker
@@ -114,3 +116,123 @@ class ModelTest(TestCase):
         self.assertTrue(user.last_hire_was_made_by_siae(siae))
         siae2 = SiaeFactory()
         self.assertFalse(user.last_hire_was_made_by_siae(siae2))
+=======
+    def test_valid_birth_place_and_country(self):
+        """
+        Birth place and country are not mandatory except for ASP / FS
+        We must check that if the job seeker is born in France,
+        if the commune is provided
+
+        Otherwise, if the job seeker is born in another country,
+        the commune must remain empty.
+        """
+        job_seeker = JobSeekerFactory()
+
+        # Valid use cases:
+
+        # No commune and no country
+        self.assertIsNone(job_seeker.clean())
+
+        # France and Commune filled
+        job_seeker.birth_country = asp.CountryFranceFactory()
+        job_seeker.birth_place = asp.CommuneFactory()
+        self.assertIsNone(job_seeker.clean())
+
+        # Europe and no commune
+        job_seeker.birth_place = None
+        job_seeker.birth_country = asp.CountryEuropeFactory()
+        self.assertIsNone(job_seeker.clean())
+
+        # Outside Europe and no commune
+        job_seeker.birth_country = asp.CountryOutsideEuropeFactory()
+        self.assertIsNone(job_seeker.clean())
+
+        # Invalid use cases:
+
+        # Europe and Commune filled
+        job_seeker.birth_country = asp.CountryEuropeFactory()
+        job_seeker.birth_place = asp.CommuneFactory()
+        with self.assertRaises(ValidationError):
+            job_seeker.clean()
+
+        # Outside Europe and Commune filled
+        job_seeker.birth_country = asp.CountryOutsideEuropeFactory()
+        with self.assertRaises(ValidationError):
+            job_seeker.clean()
+
+    def test_create_job_seeker_profile(self):
+        """
+        User title is not needed for validation of a User objects
+
+        It is mandatory for validation of JobSeekerProfile objects
+        """
+        job_seeker = JobSeekerFactory()
+        job_seeker.create_job_seeker_profile()
+
+        self.assertIsNotNone(job_seeker.jobseeker_profile)
+
+
+class JobSeekerProfileModelTest(TestCase):
+    """
+    Model test for JobSeekerProfile
+
+    Job seeker profile is extra-data from the ASP and EmployeeRecord domains
+    """
+
+    def setUp(self):
+        self.profile = JobSeekerProfileFactory()
+
+    def test_job_seeker_details(self):
+        User = get_user_model()
+
+        # No title on User
+        with self.assertRaises(ValidationError):
+            self.profile.clean()
+
+        self.profile.user.title = User.Title.M
+
+        # Won't raise exception
+        self.profile.clean()
+
+    def test_social_allowances(self):
+        """
+        Check if the allowance part is coherent
+        """
+        self.profile.resourceless = True
+        self.profile.rqth_employee = True
+
+        with self.assertRaises(ValidationError):
+            self.profile.clean()
+
+        self.profile.resourceless = False
+        self.profile.clean()
+
+        self.profile.resourceless = True
+        self.profile.oeth_employee = True
+        self.profile.rqth_employee = False
+
+        with self.assertRaises(ValidationError):
+            self.profile.clean()
+
+        self.profile.resourceless = False
+        self.profile.clean()
+
+        # More to come ...
+
+    def test_update_hexa_address(self):
+        """
+        Check creation of an HEXA address from job seeker address
+        """
+        # TODO mock
+
+    def test_job_seeker_hexa_address(self):
+        """
+        Check if HEXA address profile fields are complete
+        """
+        # TODO mock
+
+    def test_profile_is_complete(self):
+        """
+        Check if profile is complete, from a FS / ASP export perspective
+        """
+>>>>>>> dd87d412 (More tests and factories)

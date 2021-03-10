@@ -172,7 +172,9 @@ class LaneTypeTest(TestCase):
 )
 class LaneExtensionTest(TestCase):
     def test_standard_extension(self, _):
-        """Check if lane extension is included in ASP ref file"""
+        """
+        Check if lane extension is included in ASP ref file
+        """
         user = _users_with_mock_address(0)
         result, _error = format_address(user, strict=False)
         self.assertEqual(result.get("std_extension"), LaneExtension.B.name)
@@ -182,7 +184,9 @@ class LaneExtensionTest(TestCase):
         self.assertEqual(result.get("std_extension"), LaneExtension.T.name)
 
     def test_non_standard_extension(self, _):
-        """Non-standard extension, i.e. not in ASP ref file"""
+        """
+        Non-standard extension, i.e. not in ASP ref file
+        """
         user = _users_with_mock_address(17)
         result, _error = format_address(user, strict=False)
         self.assertEqual(result.get("non_std_extension"), "G")

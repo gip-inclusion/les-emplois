@@ -59,6 +59,9 @@ class User(AbstractUser, AddressMixin):
     ERROR_MUST_PROVIDE_BIRTH_PLACE = _(
         "Si le pays de naissance est la France, la commune de naissance est obligatoire"
     )
+    ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = _(
+        "Il n'est pas possible de saisir une commune de naissance hors de France"
+    )
 
     class Title(models.TextChoices):
         M = "M", _("Monsieur")
@@ -153,8 +156,15 @@ class User(AbstractUser, AddressMixin):
         return self.email
 
     def clean(self):
+        """
+        Validation for FS
+        Mainly ASP concerns for now
+        """
         if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
             raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
+
+        if self.birth_country and self.birth_country.code != self.INSEE_CODE_FRANCE and self.birth_place:
+            raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
 
     def save(self, *args, **kwargs):
         # Update department from postal code (if possible).
@@ -338,6 +348,8 @@ class JobSeekerProfile(models.Model):
     ERROR_HEXA_COMMUNE = _("La commune INSEE est obligatoire")
     ERROR_HEXA_LOOKUP_COMMUNE = _("Impossible de trouver la commune à partir du code INSEE")
 
+    ERROR_JOBSEEKER_TITLE = _("La civilité du demandeur d'emploi est obligatoire")
+
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -438,8 +450,12 @@ class JobSeekerProfile(models.Model):
         return f"JobSeekerProfile: {self.user}"
 
     def _clean_job_seeker_details(self):
-        # TODO
-        pass
+        # Title is not mandatory for User, but it is for ASP
+        if not self.user.title:
+            raise ValidationError(self.ERROR_JOBSEEKER_TITLE)
+
+        # Birth place an country are checked is User.clean()
+        self.user.clean()
 
     def _clean_social_allowances(self):
         if self.resourceless and self.is_employed:
@@ -541,11 +557,3 @@ class JobSeekerProfile(models.Model):
     @property
     def has_social_allowance(self):
         return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
-
-    @classmethod
-    def from_user_address(cls, user):
-        """
-        Partial constructor
-        """
-        if not user:
-            return
