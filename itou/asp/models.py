@@ -349,6 +349,17 @@ class Department(PrettyPrintMixin, AbstractPeriod):
         verbose_name = _("Département")
 
 
+class CountryQuerySet(models.QuerySet):
+    def france(self):
+        return self.filter(group=Country.Group.FRANCE)
+
+    def europe(self):
+        return self.filter(group=Country.Group.CEE)
+
+    def outside_europe(self):
+        return self.filter(group=Country.Group.OUTSIDE_CEE)
+
+
 class Country(PrettyPrintMixin, models.Model):
     """
     INSEE country code
@@ -364,9 +375,11 @@ class Country(PrettyPrintMixin, models.Model):
         CEE = "2", _("CEE")
         OUTSIDE_CEE = "3", _("Hors CEE")
 
+    objects = models.Manager.from_queryset(CountryQuerySet)()
+
     code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
-    group = models.CharField(max_length=15, choices=Group.choices)
+    group = models.CharField(max_length=15, verbose_name=_("Groupe"), choices=Group.choices)
 
     # For compatibility, no usage yet
     department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
@@ -374,6 +387,14 @@ class Country(PrettyPrintMixin, models.Model):
     class Meta:
         verbose_name = _("Pays")
         verbose_name_plural = _("Pays")
+
+    @property
+    def is_france(self):
+        """
+        Check if provided country is France
+        Polynesian islands are considered as a disting country but are french in fine
+        """
+        return self.group == self.Group.FRANCE
 
 
 class SiaeKind(PrettyPrintMixin, AbstractPeriod):
