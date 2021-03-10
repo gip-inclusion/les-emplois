@@ -109,11 +109,11 @@ class JobApplicationQuerySet(models.QuerySet):
             if getattr(job_application, fk_field)
         ]
 
-    def created_in_past_hours(self, hours):
+    def created_in_past(self, seconds=0, minutes=0, hours=0):
         """
-        Returns objects created during the specified hours period.
+        Returns objects created during the specified time period.
         """
-        past_dt = timezone.now() - timezone.timedelta(hours=hours)
+        past_dt = timezone.now() - timezone.timedelta(seconds=seconds, minutes=minutes, hours=hours)
         return self.filter(created_at__gte=past_dt)
 
     def manual_approval_delivery_required(self):
