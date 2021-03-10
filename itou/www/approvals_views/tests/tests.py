@@ -1,21 +1,26 @@
 from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
-from django.core.exceptions import ObjectDoesNotExist
+
+# from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from requests import exceptions as requests_exceptions
 
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Suspension
 from itou.eligibility.factories import EligibilityDiagnosisFactory
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+
+# from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.factories import DEFAULT_PASSWORD
 
 from .pdfshift_mock import BITES_FILE
+
+
+# from requests import exceptions as requests_exceptions
 
 
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
