@@ -35,6 +35,14 @@
         </div>
     {% endif %}
 
+    {% if current_siae and current_siae.is_subject_to_eligibility_rules %}
+        <div class="alert alert-primary">
+            {% blocktranslate %}
+                Le téléchargement des PASS IAE est indisponible momentanément car un problème technique impacte la génération de PDF sur notre site. Nous nous excusons pour la gêne occasionnée.
+            {% endblocktranslate %}
+        </div>
+    {% endif %}
+
     {% if current_prescriber_organization and current_prescriber_organization.has_pending_authorization %}
         <div class="alert alert-warning pb-0" role="alert">
             <p>
