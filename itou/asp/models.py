@@ -400,7 +400,7 @@ class Country(PrettyPrintMixin, models.Model):
 
     @classmethod
     def metropolitan_france(cls):
-        return cls.objects.get(code=Country._CODE_FRANCE)
+        return cls.objects.get(code=cls._CODE_FRANCE)
 
 
 class SiaeKind(PrettyPrintMixin, AbstractPeriod):

@@ -28,12 +28,12 @@ class FormatASPAdresses(TestCase):
     def test_empty(self, _mock):
         result, error = format_address({})
         self.assertFalse(result)
-        self.assertEqual(error, "Only valid for User objects")
+        self.assertEqual(error, "Impossible de transformer cet objet en adresse HEXA")
 
     def test_none(self, _mock):
         result, error = format_address(None)
         self.assertFalse(result)
-        self.assertEqual(error, "Only valid for User objects")
+        self.assertEqual(error, "Impossible de transformer cet objet en adresse HEXA")
 
     def test_not_existing_address(self, _mock):
         job_seeker = JobSeekerFactory(
@@ -41,7 +41,7 @@ class FormatASPAdresses(TestCase):
         )
         result, error = format_address(job_seeker)
         self.assertFalse(result)
-        self.assertEqual(error, "Geocoding error, unable to get result")
+        self.assertEqual(error, "Erreur de geocoding, impossible d'obtenir un résultat")
 
     def test_sanity(self, _):
         """

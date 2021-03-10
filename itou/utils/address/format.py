@@ -5,7 +5,7 @@ from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-def format_address(obj, update_coords=False):
+def format_address(obj):
     """
     Formats the address contained in obj into a valid address "structure" for ASP ER exports.
 
@@ -34,8 +34,8 @@ def format_address(obj, update_coords=False):
     - OK => (result_dict, None),
     - KO => (None, error_message)
     """
-    # if strict and not str(type(obj)) == "itou.users.models.User":
-    #    return None, _("Uniquement valable pour les objets de type User")
+    if not obj:
+        return None, _("Impossible de transformer cet objet en adresse HEXA")
 
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
@@ -100,13 +100,5 @@ def format_address(obj, update_coords=False):
     result["insee_code"] = address.get("insee_code")
     result["post_code"] = address.get("post_code")
     result["city"] = address.get("city")
-
-    if update_coords and address.get("coords", None) and address.get("score", -1) > obj.get("geocoding_score", 0):
-        # User, Siae and PrescribersOrganisation all have score and coords
-        # If update_coords is True AND if we get a better geo score,
-        # the existing address will be updated
-        obj.coords = address["coords"]
-        obj.geocoding_score = address["score"]
-        obj.save()
 
     return result, None
