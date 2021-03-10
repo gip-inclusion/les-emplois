@@ -244,12 +244,6 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
     # Limit the possibility of applying to the same SIAE for 24 hours.
-    # ---
-    # Some employers cancel applications because they cannot change information.
-    # Then they are contacting the support to say that they cannot apply again.
-    # Pending a clean solution to this issue, we drop the 24-hour restriction for employers only.
-    # This allow them to submit a clean application.
-    if not request.user.is_siae_staff and prev_applications.created_in_past_hours(24).exists():
     if not request.user.is_siae_staff and prev_applications.created_in_past(hours=24).exists():
         if request.user == job_seeker:
             msg = _("Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.")
