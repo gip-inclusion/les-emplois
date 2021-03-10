@@ -21,6 +21,9 @@ from itou.www.approvals_views.forms import SuspensionForm
 @login_required
 def approval_as_pdf(request, job_application_id, template_name="approvals/approval_as_pdf.html"):
 
+    # Temporarily disable approval download due to PDF Shift unavailability.
+    return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+
     siae = get_current_siae_or_404(request)
 
     queryset = JobApplication.objects.select_related("job_seeker", "approval", "to_siae")
