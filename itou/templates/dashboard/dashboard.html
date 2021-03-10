@@ -35,12 +35,11 @@
         </div>
     {% endif %}
 
-    {% if current_siae %}
-        <div class="alert alert-warning">
+    {% if current_siae and current_siae.is_subject_to_eligibility_rules %}
+        <div class="alert alert-primary">
             {% blocktranslate %}
-                Un problème technique qui vient d’être résolu a impacté la transmission des CV entre le 25 janvier et le 17 février. Les CV manquants sont sur la fiche candidat.
+                Le téléchargement des PASS IAE est indisponible momentanément car un problème technique impacte la génération de PDF sur notre site. Nous nous excusons pour la gêne occasionnée.
             {% endblocktranslate %}
-             <a href="https://forum.inclusion.beta.gouv.fr/t/bug-dans-limportation-des-cv-en-cours-de-resolution/2817" rel="noopener" target="_blank">{% translate "Signaler un problème" %}</a>
         </div>
     {% endif %}
 
