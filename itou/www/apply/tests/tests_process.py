@@ -246,6 +246,8 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url_accept, data=post_data)
         self.assertEqual(response.status_code, 302)
 
+        # First job application has been accepted.
+        # All other job applications are obsolete.
         job_application.refresh_from_db()
         self.assertTrue(job_application.state.is_accepted)
         self.assertEqual(job_application.approval.start_at, job_application.hiring_start_at)
@@ -272,6 +274,8 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url_accept, data=post_data)
         job_app_starting_earlier.refresh_from_db()
 
+        # Second job application has been accepted.
+        # The job seeker has now two part-time jobs at the same time.
         self.assertEqual(response.status_code, 302)
         self.assertTrue(job_app_starting_earlier.state.is_accepted)
         self.assertEqual(job_app_starting_earlier.approval.start_at, job_app_starting_earlier.hiring_start_at)
@@ -297,6 +301,8 @@ class ProcessViewsTest(TestCase):
         response = self.client.post(url_accept, data=post_data)
         job_app_starting_later.refresh_from_db()
 
+        # Third job application has been accepted.
+        # The job seeker has now three part-time jobs at the same time.
         self.assertEqual(response.status_code, 302)
         self.assertTrue(job_app_starting_later.state.is_accepted)
         self.assertEqual(job_app_starting_later.approval.start_at, job_app_starting_earlier.hiring_start_at)
