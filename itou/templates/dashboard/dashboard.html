@@ -35,15 +35,6 @@
         </div>
     {% endif %}
 
-    {% if current_siae %}
-        <div class="alert alert-warning">
-            {% blocktranslate %}
-                Un problème technique qui vient d’être résolu a impacté la transmission des CV entre le 25 janvier et le 17 février. Les CV manquants sont sur la fiche candidat.
-            {% endblocktranslate %}
-             <a href="https://forum.inclusion.beta.gouv.fr/t/bug-dans-limportation-des-cv-en-cours-de-resolution/2817" rel="noopener" target="_blank">{% translate "Signaler un problème" %}</a>
-        </div>
-    {% endif %}
-
     {% if current_prescriber_organization and current_prescriber_organization.has_pending_authorization %}
         <div class="alert alert-warning pb-0" role="alert">
             <p>
