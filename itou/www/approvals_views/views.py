@@ -124,7 +124,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
             preview = True
         elif request.POST.get("save"):
             prolongation.save()
-            prolongation.notify_authorized_prescriber_by_email()
+            prolongation.notify_authorized_prescriber()
             messages.success(request, _("Déclaration de prolongation enregistrée."))
             return HttpResponseRedirect(back_url)
 

@@ -777,8 +777,8 @@ class Prolongation(models.Model):
     def is_in_progress(self):
         return self.start_at <= timezone.now().date() <= self.end_at
 
-    def notify_authorized_prescriber_by_email(self):
-        NewProlongationToAuthorizedPrescriberNotification(self).email.send()
+    def notify_authorized_prescriber(self):
+        NewProlongationToAuthorizedPrescriberNotification(self).send()
 
     def has_reached_max_cumulative_duration(self, additional_duration=None):
         if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
