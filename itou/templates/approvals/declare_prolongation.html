@@ -33,6 +33,15 @@
 
             {% bootstrap_form form %}
 
+            <p>
+                <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">
+                    {% translate "Rechercher des prescripteurs" %}
+                    {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                </a>
+            </p>
+
+            <hr>
+
             {% buttons %}
                 <a class="btn btn-secondary" href="{{ back_url }}">
                     {% translate "Retour" %}
