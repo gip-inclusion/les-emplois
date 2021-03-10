@@ -661,6 +661,7 @@ class Prolongation(models.Model):
         related_name="approvals_prolongations_validated_set",
     )
 
+    # `created_at` can be different from `validated_by` when created in admin.
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
