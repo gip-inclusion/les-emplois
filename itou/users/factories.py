@@ -38,6 +38,13 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
     city = factory.Faker("city", locale="fr_FR")
 
 
+class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.JobSeekerProfile
+
+    user = factory.SubFactory(JobSeekerWithAddressFactory)
+
+
 class PrescriberFactory(UserFactory):
     is_prescriber = True
 
