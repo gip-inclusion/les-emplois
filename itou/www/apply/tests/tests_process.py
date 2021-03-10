@@ -254,7 +254,7 @@ class ProcessViewsTest(TestCase):
 
         # SIAE 2 accepts the second job application
         # but its contract starts earlier than the approval delivered the first time.
-        # Approval's starting date should be postponed.
+        # Approval's starting date should be brought forward.
         user = job_app_starting_earlier.to_siae.members.first()
         hiring_start_at = hiring_start_at - relativedelta(months=1)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
