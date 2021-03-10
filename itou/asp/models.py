@@ -369,6 +369,8 @@ class Country(PrettyPrintMixin, models.Model):
     Imported from ASP reference file: ref_insee_pays_v4.csv
     """
 
+    _CODE_FRANCE = "100"
+
     class Group(models.TextChoices):
         FRANCE = "1", _("France")
         # FTR CEE = "Communauté Economique Européenne" and is not used since 1993...
@@ -395,6 +397,10 @@ class Country(PrettyPrintMixin, models.Model):
         Polynesian islands are considered as a disting country but are french in fine
         """
         return self.group == self.Group.FRANCE
+
+    @classmethod
+    def metropolitan_france(cls):
+        return cls.objects.get(code=Country._CODE_FRANCE)
 
 
 class SiaeKind(PrettyPrintMixin, AbstractPeriod):

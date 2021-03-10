@@ -47,7 +47,10 @@ class ASPModelAdmin(admin.ModelAdmin):
 
 @admin.register(models.Commune)
 class CommuneAdmin(ASPModelAdmin):
-    pass
+    search_fields = [
+        "name",
+        "code",
+    ]
 
 
 @admin.register(models.Department)
