@@ -21,8 +21,8 @@ class Status(models.TextChoices):
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
-    def complete(self):
-        return self.filter(status=Status.COMPLETE).order_by("-created_at")
+    def ready(self):
+        return self.filter(status=Status.READY).order_by("-created_at")
 
     def sent(self):
         return self.filter(status=Status.SENT).order_by("-created_at")
@@ -123,7 +123,7 @@ class EmployeeRecord(models.Model):
 
     def _clean_job_seeker(self):
         """
-        Check if data provided for the job seeker part of the E.R. is complete / valid
+        Check if data provided for the job seeker part of the FS is complete / valid
         """
         job_seeker = self.job_application.job_seeker
         job_seeker.clean()
