@@ -132,7 +132,7 @@ class JobApplicationModelTest(TestCase):
 
 
 class JobApplicationQuerySetTest(TestCase):
-    def test_created_in_past_hours(self):
+    def test_created_in_past(self):
 
         now = timezone.now()
         hours_ago_10 = now - timezone.timedelta(hours=10)
@@ -143,10 +143,10 @@ class JobApplicationQuerySetTest(TestCase):
         JobApplicationSentByJobSeekerFactory(created_at=hours_ago_20)
         JobApplicationSentByJobSeekerFactory(created_at=hours_ago_30)
 
-        self.assertEqual(JobApplication.objects.created_in_past_hours(5).count(), 0)
-        self.assertEqual(JobApplication.objects.created_in_past_hours(15).count(), 1)
-        self.assertEqual(JobApplication.objects.created_in_past_hours(25).count(), 2)
-        self.assertEqual(JobApplication.objects.created_in_past_hours(35).count(), 3)
+        self.assertEqual(JobApplication.objects.created_in_past(hours=5).count(), 0)
+        self.assertEqual(JobApplication.objects.created_in_past(hours=15).count(), 1)
+        self.assertEqual(JobApplication.objects.created_in_past(hours=25).count(), 2)
+        self.assertEqual(JobApplication.objects.created_in_past(hours=35).count(), 3)
 
     def test_get_unique_fk_objects(self):
         # Create 3 job applications for 2 candidates to check
