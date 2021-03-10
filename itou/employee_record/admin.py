@@ -6,7 +6,7 @@ from itou.job_applications.models import JobApplication
 
 class JobSeekerInline(admin.StackedInline):
     model = JobApplication
-    readonly_fields = ("pk",)
+    readonly_fields = ("pk", "user")
     fields = (
         "title",
         "birth_country",
@@ -35,6 +35,9 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
 
     raw_id_fields = ("job_application",)
     readonly_fields = (
+        "title",
+        "birth_country",
+        "birth_place",
         "created_at",
         "updated_at",
         "asp_processing_code",
@@ -43,3 +46,12 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
     )
 
     # inlines = (JobSeekerInline, )
+
+    def title(self, obj):
+        return obj.job_application.job_seeker.title
+
+    def birth_country(self, obj):
+        return obj.job_application.job_seeker.birth_country
+
+    def birth_place(self, obj):
+        return obj.job_application.job_seeker.birth_place

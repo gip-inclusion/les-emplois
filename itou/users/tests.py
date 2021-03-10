@@ -1,3 +1,5 @@
+from unittest import mock
+
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -8,6 +10,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory
 import itou.asp.factories as asp
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
 
 class ModelTest(TestCase):
@@ -172,6 +175,10 @@ class ModelTest(TestCase):
         self.assertIsNotNone(job_seeker.jobseeker_profile)
 
 
+def mock_get_geocoding_data(address, post_code=None, limit=1):
+    return RESULTS_BY_ADDRESS.get(address)
+
+
 class JobSeekerProfileModelTest(TestCase):
     """
     Model test for JobSeekerProfile
@@ -181,6 +188,15 @@ class JobSeekerProfileModelTest(TestCase):
 
     def setUp(self):
         self.profile = JobSeekerProfileFactory()
+        user = self.profile.user
+
+        # FIXME Crap, must find a better way of creating fixture
+        asp.MockedCommuneFactory()
+        data = BAN_GEOCODING_API_RESULTS_MOCK[0]
+
+        user.address_line_1 = data.get("address_line_1")
+        # user.
+        # user.post_code = data.get("post_code")
 
     def test_job_seeker_details(self):
         User = get_user_model()
@@ -198,6 +214,9 @@ class JobSeekerProfileModelTest(TestCase):
         """
         Check if the allowance part is coherent
         """
+        User = get_user_model()
+        self.profile.user.title = User.Title.M
+
         self.profile.resourceless = True
         self.profile.rqth_employee = True
 
@@ -219,20 +238,30 @@ class JobSeekerProfileModelTest(TestCase):
 
         # More to come ...
 
-    def test_update_hexa_address(self):
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_update_hexa_address(self, _mock):
         """
         Check creation of an HEXA address from job seeker address
         """
-        # TODO mock
+        User = get_user_model()
+        self.profile.user.title = User.Title.M
+        self.profile.update_hexa_address()
+        self.profile.clean()
 
-    def test_job_seeker_hexa_address(self):
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_job_seeker_hexa_address(self, _mock):
         """
         Check if HEXA address profile fields are complete
         """
-        # TODO mock
+        # TODO
 
     def test_profile_is_complete(self):
         """
         Check if profile is complete, from a FS / ASP export perspective
         """
->>>>>>> dd87d412 (More tests and factories)

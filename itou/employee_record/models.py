@@ -22,6 +22,9 @@ class Status(models.TextChoices):
 
 class EmployeeRecordQuerySet(models.QuerySet):
     def ready(self):
+        """
+        These FS are ready to to be sent to ASP
+        """
         return self.filter(status=Status.READY).order_by("-created_at")
 
     def sent(self):
@@ -108,7 +111,7 @@ class EmployeeRecord(models.Model):
 
     def _clean_job_application(self):
         """
-        Check if job application is valid for E.R.
+        Check if job application is valid for FS
         """
         ja = self.job_application
 
@@ -117,9 +120,6 @@ class EmployeeRecord(models.Model):
 
         if ja.can_be_cancelled:
             raise ValidationError(self.ERROR_JOB_APPLICATION_TOO_RECENT)
-
-        if ja and ja.to_siae:
-            self.siret = ja.to_siae.siret
 
     def _clean_job_seeker(self):
         """
@@ -244,4 +244,9 @@ class EmployeeRecord(models.Model):
         ):
             return None
 
-        return cls(job_application=job_application)
+        fs = cls(job_application=job_application)
+
+        # If the jobseeker has no profile, create one
+        job_application.job_seeker.create_job_seeker_profile()
+
+        return fs
