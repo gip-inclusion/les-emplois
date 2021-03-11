@@ -14,7 +14,6 @@ from itou.siaes.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.siaes.models import Siae
-from itou.users.factories import SiaeStaffFactory
 
 
 class FactoriesTest(TestCase):
@@ -151,29 +150,6 @@ class ModelTest(TestCase):
             self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
             self.assertEqual(len(email.to), 1)
             self.assertEqual(email.to[0], siae.auth_email)
-
-    def test_new_signup_warning_email_to_existing_members(self):
-        siae = SiaeWithMembershipFactory()
-        user = siae.members.first()
-
-        new_user = SiaeStaffFactory()
-
-        message = siae.new_signup_warning_email_to_existing_members(new_user)
-        message.send()
-
-        self.assertEqual(len(mail.outbox), 1)
-        email = mail.outbox[0]
-        self.assertIn("Un nouvel utilisateur vient de rejoindre votre structure", email.subject)
-        self.assertIn("Si vous ne connaissez pas cette personne, n'hésitez pas à nous prévenir par e-mail", email.body)
-        self.assertIn(new_user.first_name, email.body)
-        self.assertIn(new_user.last_name, email.body)
-        self.assertIn(new_user.email, email.body)
-        self.assertIn(siae.display_name, email.body)
-        self.assertIn(siae.siret, email.body)
-        self.assertIn(siae.kind, email.body)
-        self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(email.to[0], user.email)
 
     def test_deactivation_queryset_methods(self):
         siae = SiaeFactory()

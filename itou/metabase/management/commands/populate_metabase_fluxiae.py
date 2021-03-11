@@ -61,6 +61,7 @@ An EMI does not necessarily have a mission.
 
 """
 import logging
+from collections import OrderedDict
 
 import pandas as pd
 from django.conf import settings
@@ -268,6 +269,27 @@ class Command(BaseCommand):
         df = self.get_df(vue_name=vue_name, skip_first_row=skip_first_row)
         self.store_df(df=df, vue_name=vue_name)
 
+    def populate_departments(self):
+        """
+        Populate department codes, department names and region names.
+        """
+        rows = []
+
+        for dpt_code, dpt_name in DEPARTMENTS.items():
+            # We want to preserve the order of columns.
+            row = OrderedDict()
+
+            row["code_departement"] = dpt_code
+            row["nom_departement"] = dpt_name
+            row["nom_region"] = DEPARTMENT_TO_REGION[dpt_code]
+
+            rows.append(row)
+
+        # `columns=rows[0].keys()` trick is necessary to preserve the order of columns.
+        df = pd.DataFrame(rows, columns=rows[0].keys())
+
+        self.store_df(df=df, vue_name="departements")
+
     def build_table(self, table_name, sql_request):
         """
         Build a new table with given sql_request.
@@ -329,10 +351,13 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
 
+        # Custom views for our needs.
+        self.populate_departments()
+
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
             self.conn = conn
-            # Build custom tables.
+            # Build custom tables by running raw SQL queries on existing tables.
             self.build_update_date_table()
             self.build_missions_ai_ehpad_table()
 
