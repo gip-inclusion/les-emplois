@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0018_auto_20210303_2042_squashed_0023_auto_20210309_1641'),
+        ("users", "0018_auto_20210303_2042_squashed_0023_auto_20210309_1641"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='jobseekerprofile',
-            name='hexa_lane_name',
-            field=models.CharField(blank=True, max_length=120, verbose_name='Nom de la voie'),
+            model_name="jobseekerprofile",
+            name="hexa_lane_name",
+            field=models.CharField(blank=True, max_length=120, verbose_name="Nom de la voie"),
         ),
         migrations.AlterField(
-            model_name='jobseekerprofile',
-            name='hexa_lane_number',
-            field=models.CharField(blank=True, max_length=10, verbose_name='Numéro de la voie'),
+            model_name="jobseekerprofile",
+            name="hexa_lane_number",
+            field=models.CharField(blank=True, max_length=10, verbose_name="Numéro de la voie"),
         ),
         migrations.AlterField(
-            model_name='jobseekerprofile',
-            name='hexa_post_code',
-            field=models.CharField(blank=True, max_length=6, verbose_name='Code postal'),
+            model_name="jobseekerprofile",
+            name="hexa_post_code",
+            field=models.CharField(blank=True, max_length=6, verbose_name="Code postal"),
         ),
     ]
