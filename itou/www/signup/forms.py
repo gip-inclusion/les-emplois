@@ -130,9 +130,6 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         else:
             raise RuntimeError("This should never happen.")
 
-        if siae.has_members:
-            siae.new_signup_warning_email_to_existing_members(user).send()
-
         user.is_siae_staff = True
         user.save()
 
@@ -374,10 +371,6 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         # The first member becomes an admin.
         membership.is_admin = membership.organization.members.count() == 0
         membership.save()
-
-        # Send a notification to existing members.
-        if self.pole_emploi_org.active_members.count() > 1:
-            self.pole_emploi_org.new_signup_warning_email_to_existing_members(user).send()
 
         return user
 

@@ -63,6 +63,9 @@ $(document).ready(() => {
                     id="description-${appellation.code}"
                     name="description-${appellation.code}"
                     rows="3"></textarea>
+                <small class="form-text text-muted">
+                    Renseignez ici le détail des missions, les compétences/habilitations nécessaires, les conditions de travail, les éventuelles adaptations ou restrictions du poste.
+                </small>
             </div>
         </td>
         <td>${appellation.rome}</td>

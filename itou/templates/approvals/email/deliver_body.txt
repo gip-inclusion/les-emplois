@@ -14,8 +14,8 @@ Merci d'avoir confirmé l'embauche d'un candidat sur la Plateforme de l'inclusio
 {% translate "Date de naissance :" %} {{ job_application.approval.user.birthdate|date:"d/m/Y" }}
 
 {% translate "Pour un contrat d'insertion :" %}
-{% translate "Débutant le :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}{% if job_application.hiring_end_at %}
-{% translate "Se terminant le :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}{% endif %}
+{% translate "Débutant le :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}
+{% translate "Se terminant le :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}
 
 {% translate "Au sein de la structure :" %}
 {{ job_application.to_siae.display_name }}

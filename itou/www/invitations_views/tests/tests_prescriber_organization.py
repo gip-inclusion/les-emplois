@@ -190,13 +190,10 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].level_tag, "success")
 
-        # Two e-mails are sent: one to the invitation sender
-        # and a second one to the organization members.
-        self.assertEqual(len(mail.outbox), 2)
-
-        # Make sure an email is sent to the invitation sender
-        outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
-        self.assertIn(self.invitation.sender.email, outbox_emails)
+        # A confirmation e-mail is sent to the invitation sender.
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox[0].to), 1)
+        self.assertEqual(self.invitation.sender.email, mail.outbox[0].to[0])
 
         # Assert the user sees his new organization dashboard.
         current_org = get_current_org_or_404(self.response.wsgi_request)

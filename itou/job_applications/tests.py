@@ -694,10 +694,19 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
-        # Check sent email.
+
+        # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+
+        email = mail.outbox[0]
+        self.assertIn("Candidature acceptée", email.subject)
+        self.assertIn("Date de début du contrat", email.body)
+        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn("Date de fin du contrat", email.body)
+        self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body)
+
+        email = mail.outbox[1]
+        self.assertIn("PASS IAE pour", email.subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
