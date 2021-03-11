@@ -33,6 +33,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_ACCEPTED = "accepted"
     STATE_REFUSED = "refused"
     STATE_CANCELLED = "cancelled"
+    # When a job application is accepted, all other job seeker's pending applications become obsolete.
     STATE_OBSOLETE = "obsolete"
 
     STATE_CHOICES = (
@@ -66,7 +67,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     transitions = (
         (TRANSITION_PROCESS, STATE_NEW, STATE_PROCESSING),
         (TRANSITION_POSTPONE, STATE_PROCESSING, STATE_POSTPONED),
-        (TRANSITION_ACCEPT, [STATE_PROCESSING, STATE_POSTPONED], STATE_ACCEPTED),
+        (TRANSITION_ACCEPT, [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE], STATE_ACCEPTED),
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
@@ -462,6 +463,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if approvals_wrapper.has_valid:
                 # Automatically reuse an existing valid Itou or PE approval.
                 self.approval = Approval.get_or_create_from_valid(approvals_wrapper)
+                if self.approval.start_at > self.hiring_start_at:
+                    # As a job seeker can have multiple contracts at the same time,
+                    # the approval should start at the same time as most recent contract.
+                    self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 emails.append(self.email_deliver_approval(accepted_by))
             elif (
                 self.job_seeker.pole_emploi_id
