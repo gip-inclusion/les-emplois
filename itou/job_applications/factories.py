@@ -5,8 +5,8 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 
 from itou.approvals.factories import ApprovalFactory
-from itou.jobs.models import Appellation
 from itou.job_applications import models
+from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,

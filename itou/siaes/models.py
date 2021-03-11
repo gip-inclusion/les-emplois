@@ -5,10 +5,11 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import F, Prefetch, Q
+from django.db.models import BooleanField, Case, Count, F, Prefetch, Q, When
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
+from django.utils.functional import cached_property
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
@@ -50,11 +51,8 @@ class SiaeQuerySet(models.QuerySet):
         )
 
     def prefetch_job_description_through(self, **kwargs):
-        job_description_through = Prefetch(
-            "job_description_through",
-            queryset=(SiaeJobDescription.objects.filter(**kwargs).select_related("appellation__rome")),
-        )
-        return self.prefetch_related(job_description_through)
+        qs = SiaeJobDescription.objects.filter(**kwargs).with_is_popular().select_related("appellation__rome")
+        return self.prefetch_related(Prefetch("job_description_through", queryset=qs))
 
     def member_required(self, user):
         if user.is_superuser:
@@ -444,6 +442,33 @@ class SiaeMembership(models.Model):
         self.updated_by = user
 
 
+class SiaeJobDescriptionQuerySet(models.QuerySet):
+    def with_job_applications_count(self, filters=None):
+        if filters:
+            filters = Q(**filters)
+
+        return self.annotate(
+            job_applications_count=Count(
+                "jobapplication",
+                filter=filters,
+            ),
+        )
+
+    def with_is_popular(self):
+        # Avoid an infinite loop
+        from itou.job_applications.models import JobApplication
+
+        job_apps_filters = {"jobapplication__state__in": JobApplication.PENDING_STATES}
+        annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(
+            is_popular=Case(
+                When(job_applications_count__gt=self.model.POPULAR_THRESHOLD, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+        return annotation
+
+
 class SiaeJobDescription(models.Model):
     """
     A job description of a position in an SIAE.
@@ -452,6 +477,7 @@ class SiaeJobDescription(models.Model):
     """
 
     MAX_UI_RANK = 32767
+    POPULAR_THRESHOLD = 20
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
@@ -462,6 +488,8 @@ class SiaeJobDescription(models.Model):
     description = models.TextField(verbose_name=_("Description"), blank=True)
     # TODO: this will be used to order job description in UI.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
+
+    objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
 
     class Meta:
         verbose_name = _("Fiche de poste")
@@ -485,6 +513,10 @@ class SiaeJobDescription(models.Model):
 
     def get_absolute_url(self):
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
+
+    @cached_property
+    def is_popular(self):
+        return self.jobapplication_set.pending().count() > 20
 
 
 class SiaeConvention(models.Model):

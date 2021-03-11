@@ -236,6 +236,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
     WEEKS_BEFORE_CONSIDERED_OLD = 3
 
+    PENDING_STATES = [
+        JobApplicationWorkflow.STATE_NEW,
+        JobApplicationWorkflow.STATE_PROCESSING,
+        JobApplicationWorkflow.STATE_POSTPONED,
+    ]
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(

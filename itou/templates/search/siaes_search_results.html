@@ -75,7 +75,7 @@
                                 <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     {{ job.display_name }}
                                 </a>
-                                {% if job.jobapplication_set.count > 20 %}
+                                {% if job.is_popular %}
                                    <small>
                                        <span class="ml-3">
                                             {% include "includes/icon.html" with icon="trending-up" size=15 class="mr-1 text-danger" %}
