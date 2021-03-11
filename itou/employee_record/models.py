@@ -68,7 +68,7 @@ class EmployeeRecord(models.Model):
     # Itou part
 
     # Job application has references on many mandatory parts of the E.R.:
-    # - SIAE
+    # - SIAE / asp id
     # - Employee
     # - Approval
     job_application = models.ForeignKey(
@@ -77,6 +77,10 @@ class EmployeeRecord(models.Model):
         null=True,
         verbose_name=_("Candidature / embauche"),
     )
+
+    # These fields are duplicated to act as constraint fields on DB level
+    approval_number = models.CharField(max_length=12, verbose_name=_("Numéro d'agrément"))
+    asp_id = models.IntegerField(verbose_name=_("ID ASP de la SIAE"))
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), null=True)
@@ -95,6 +99,7 @@ class EmployeeRecord(models.Model):
     class Meta:
         verbose_name = _("Fiche salarié")
         verbose_name_plural = _("Fiches salarié")
+        constraints = [models.UniqueConstraint(fields=["asp_id", "approval_number"], name="un_asp_id_approval_number")]
 
     def __str__(self):
         return f"{self.siae} - {self.job_seeker} - {self.approval}"
@@ -199,18 +204,6 @@ class EmployeeRecord(models.Model):
     def approval(self):
         if self.job_application and self.job_application.approval:
             return self.job_application.approval
-
-        return None
-
-    @property
-    def approval_number(self):
-        """
-        Approval number (from job_application.approval)
-
-        There is a "soft" unique contraint with the asp_convention_id, approval_number pair
-        """
-        if self.approval:
-            return self.approval.number
 
         return None
 
