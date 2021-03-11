@@ -37,6 +37,7 @@ class Command(BaseCommand):
             # approvals.Prolongation
             "add_prolongation",
             "change_prolongation",
+            "delete_prolongation",
             "view_prolongation",
             # cities.City
             "view_city",
