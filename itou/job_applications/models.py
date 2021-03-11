@@ -33,6 +33,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_ACCEPTED = "accepted"
     STATE_REFUSED = "refused"
     STATE_CANCELLED = "cancelled"
+    # When a job application is accepted, all other job seeker's pending applications become obsolete.
     STATE_OBSOLETE = "obsolete"
 
     STATE_CHOICES = (
