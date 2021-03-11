@@ -16,6 +16,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
+from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric
 
@@ -42,8 +43,8 @@ class CommonApprovalMixin(models.Model):
     LOCKDOWN_END_AT = datetime.date(2020, 6, 16)
     LOCKDOWN_EXTENSION_DELAY_MONTHS = 3
 
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
     created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
 
     class Meta:
@@ -124,6 +125,9 @@ class Approval(CommonApprovalMixin):
 
     # This prefix is used by the ASP system to identify itou as the issuer of a number.
     ASP_ITOU_PREFIX = settings.ASP_ITOU_PREFIX
+
+    # The period of time during which it is possible to prolong a PASS IAE before it ends.
+    PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS = 3
 
     # Error messages.
     ERROR_PASS_IAE_SUSPENDED_FOR_USER = _(
@@ -215,6 +219,8 @@ class Approval(CommonApprovalMixin):
             return False
         return self.jobapplication_set.get().state == state_accepted
 
+    # Suspension.
+
     @cached_property
     def is_suspended(self):
         return self.suspension_set.in_progress().exists()
@@ -232,14 +238,14 @@ class Approval(CommonApprovalMixin):
         return self.is_in_progress and not self.is_suspended
 
     def can_be_suspended_by_siae(self, siae):
-        """
-        Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
-        """
         return (
             self.can_be_suspended
-            and siae == self.user.last_accepted_job_application.to_siae
+            # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
+            and self.user.last_hire_was_made_by_siae(siae)
             and not self.user.last_accepted_job_application.can_be_cancelled
         )
+
+    # Postpone start date.
 
     @property
     def can_postpone_start_date(self):
@@ -259,6 +265,27 @@ class Approval(CommonApprovalMixin):
             self.save()
             return True
         return False
+
+    # Prolongation.
+
+    @cached_property
+    def prolongations_by_start_date_asc(self):
+        return self.prolongation_set.all().select_related("validated_by").order_by("start_at")
+
+    @property
+    def is_open_to_prolongation(self):
+        now = timezone.now().date()
+        prolongation_threshold = self.end_at - relativedelta(
+            months=self.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS
+        )
+        return prolongation_threshold <= now <= self.end_at
+
+    @cached_property
+    def can_be_prolonged(self):
+        return self.is_open_to_prolongation and not self.is_suspended
+
+    def can_be_prolonged_by_siae(self, siae):
+        return self.user.last_hire_was_made_by_siae(siae) and self.can_be_prolonged
 
     @staticmethod
     def get_next_number(hiring_start_at=None):
@@ -365,8 +392,8 @@ class Suspension(models.Model):
         )
 
     approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.now, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.now, db_index=True)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
         "siaes.Siae",
         verbose_name=_("SIAE"),
@@ -428,15 +455,7 @@ class Suspension(models.Model):
             self.updated_at = timezone.now()
         super().save(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        """
-        The related Approval's end date is automatically pushed back
-        with a PostgreSQL trigger: `trigger_update_approval_end_at`.
-        """
-        super().delete(*args, **kwargs)
-
     def clean(self):
-        super().clean()
 
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
             raise ValidationError({"reason_explanation": _("En cas de force majeure, veuillez préciser le motif.")})
@@ -448,17 +467,6 @@ class Suspension(models.Model):
         # A suspension cannot be in the future.
         if self.start_in_future:
             raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
-
-        # The start of a suspension must be contained in its approval boundaries.
-        if not self.start_in_approval_boundaries:
-            raise ValidationError(
-                {
-                    "start_at": _(
-                        f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
-                        f"{self.approval.start_at.strftime('%d/%m/%Y')} - {self.approval.end_at.strftime('%d/%m/%Y')}."
-                    )
-                }
-            )
 
         # A suspension cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at)
@@ -472,20 +480,34 @@ class Suspension(models.Model):
                 }
             )
 
-        # A suspension cannot overlap another one for the same SIAE.
-        # This check is enforced by a constraint at the database level but
-        # still required here to avoid a 500 server error "IntegrityError"
-        # during form validation.
-        if self.get_overlapping_suspensions().exists():
-            overlap = self.get_overlapping_suspensions().first()
-            raise ValidationError(
-                {
-                    "start_at": _(
-                        f"La période chevauche une suspension déjà existante pour ce PASS IAE "
-                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
-                    )
-                }
-            )
+        if hasattr(self, "approval"):
+
+            # The start of a suspension must be contained in its approval boundaries.
+            if not self.start_in_approval_boundaries:
+                raise ValidationError(
+                    {
+                        "start_at": _(
+                            f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
+                            f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
+                            f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
+                )
+
+            # A suspension cannot overlap another one for the same SIAE.
+            # This check is enforced by a constraint at the database level but
+            # still required here to avoid a 500 server error "IntegrityError"
+            # during form validation.
+            if self.get_overlapping_suspensions().exists():
+                overlap = self.get_overlapping_suspensions().first()
+                raise ValidationError(
+                    {
+                        "start_at": _(
+                            f"La période chevauche une suspension déjà existante pour ce PASS IAE "
+                            f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                        )
+                    }
+                )
 
     @property
     def duration(self):
@@ -515,11 +537,11 @@ class Suspension(models.Model):
         """
         Only the SIAE currently hiring the job seeker can handle a suspension.
         """
-        can_be_handled_by_siae_cache = getattr(self, "_can_be_handled_by_siae_cache", None)
-        if can_be_handled_by_siae_cache:
-            return can_be_handled_by_siae_cache
-        self._can_be_handled_by_siae_cache = (
-            self.is_in_progress and siae == self.approval.user.last_accepted_job_application.to_siae
+        cached_result = getattr(self, "_can_be_handled_by_siae_cache", None)
+        if cached_result:
+            return cached_result
+        self._can_be_handled_by_siae_cache = self.is_in_progress and self.approval.user.last_hire_was_made_by_siae(
+            siae
         )
         return self._can_be_handled_by_siae_cache
 
@@ -538,6 +560,262 @@ class Suspension(models.Model):
         if approval.last_old_suspension:
             return approval.last_old_suspension.end_at + relativedelta(days=1)
         return approval.user.last_accepted_job_application.hiring_start_at
+
+
+class ProlongationQuerySet(models.QuerySet):
+    @property
+    def in_progress_lookup(self):
+        now = timezone.now().date()
+        return models.Q(start_at__lte=now, end_at__gte=now)
+
+    def in_progress(self):
+        return self.filter(self.in_progress_lookup)
+
+    def not_in_progress(self):
+        return self.exclude(self.in_progress_lookup)
+
+
+class ProlongationManager(models.Manager):
+    def get_cumulative_duration_for(self, approval, reason=None):
+        """
+        Returns the total duration of all prolongations of the given approval
+        for the given reason (if any).
+        """
+        kwargs = {"approval": approval}
+        if reason:
+            kwargs["reason"] = reason
+        duration = datetime.timedelta(0)
+        for prolongation in self.filter(**kwargs):
+            duration += prolongation.duration
+        return duration
+
+
+class Prolongation(models.Model):
+    """
+    Stores a prolongation made by an SIAE for a PASS IAE.
+
+    It is assumed that an authorized prescriber has validated the prolongation
+    beforehand because a self-validated prolongation made by an SIAE would
+    increase the risk of staying on insertion for a candidate.
+
+    When a prolongation is saved/edited/deleted, the end date of its approval
+    is automatically pushed back or forth with a PostgreSQL trigger:
+    `trigger_update_approval_end_at_for_prolongation`.
+    """
+
+    # Max duration: 12 months but it depends on the `reason` field, see `get_max_end_at`.
+    MAX_DURATION_MONTHS = 12
+
+    class Reason(models.TextChoices):
+        COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Fin d'une formation (6 mois maximum)")
+        RQTH = "RQTH", _("RQTH (12 mois maximum)")
+        SENIOR = "SENIOR", _("50 ans et plus (12 mois maximum)")
+        PARTICULAR_DIFFICULTIES = (
+            "PARTICULAR_DIFFICULTIES",
+            _(
+                "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi "
+                "(12 mois maximum dans la limite de 5 ans)"
+            ),
+        )
+
+    MAX_CUMULATIVE_DURATION = {
+        Reason.COMPLETE_TRAINING.value: {
+            "duration": datetime.timedelta(days=183),  # A leap year can contain 183 days in 6 months.
+            "label": _("6 mois"),
+        },
+        Reason.PARTICULAR_DIFFICULTIES.value: {
+            "duration": datetime.timedelta(days=365 * 5),
+            "label": _("5 ans"),
+        },
+    }
+
+    approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
+    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
+    reason = models.CharField(
+        verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
+    )
+    reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
+
+    declared_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Déclarée par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongation_declared_set",
+    )
+    declared_by_siae = models.ForeignKey(
+        "siaes.Siae",
+        verbose_name=_("SIAE du déclarant"),
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    # It is assumed that an authorized prescriber has validated the prolongation beforehand.
+    validated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Prescripteur habilité qui a autorisé cette prolongation"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongations_validated_set",
+    )
+
+    # `created_at` can be different from `validated_by` when created in admin.
+    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Créé par"),
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="approvals_prolongations_created_set",
+    )
+    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name=_("Mis à jour par"),
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
+
+    class Meta:
+        verbose_name = _("Prolongation")
+        verbose_name_plural = _("Prolongations")
+        ordering = ["-start_at"]
+        # Use an exclusion constraint to prevent overlapping date ranges.
+        # This requires the btree_gist extension on PostgreSQL.
+        # See "Tip of the Week" https://postgresweekly.com/issues/289
+        # https://docs.djangoproject.com/en/3.1/ref/contrib/postgres/constraints/
+        constraints = [
+            ExclusionConstraint(
+                name="exclude_overlapping_prolongations",
+                expressions=(
+                    (
+                        # [start_at, end_at) (inclusive start, exclusive end).
+                        # For prolongations: upper bound of preceding interval is the lower bound of the next.
+                        DateRange("start_at", "end_at", RangeBoundary(inclusive_lower=True, inclusive_upper=False)),
+                        RangeOperators.OVERLAPS,
+                    ),
+                    ("approval", RangeOperators.EQUAL),
+                ),
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.pk} {self.start_at.strftime('%d/%m/%Y')} - {self.end_at.strftime('%d/%m/%Y')}"
+
+    def save(self, *args, **kwargs):
+        """
+        The related Approval's end date is automatically pushed back/forth with
+        a PostgreSQL trigger: `trigger_update_approval_end_at_for_prolongation`.
+        """
+        if self.pk:
+            self.updated_at = timezone.now()
+        else:
+            self.created_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+
+        # Min duration == 1 day.
+        if self.end_at <= self.start_at:
+            raise ValidationError({"end_at": _("La durée minimale doit être d'au moins un jour.")})
+
+        # A prolongation cannot exceed max duration.
+        max_end_at = self.get_max_end_at(self.start_at, self.reason)
+        if self.end_at > max_end_at:
+            raise ValidationError(
+                {
+                    "end_at": _(
+                        f'La durée totale est trop longue pour le motif "{self.get_reason_display()}". '
+                        f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                    )
+                }
+            )
+
+        if self.reason == self.Reason.PARTICULAR_DIFFICULTIES.value:
+            if self.siae.kind not in [self.siae.KIND_AI, self.siae.KIND_ACI]:
+                raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
+
+        if (
+            hasattr(self, "validated_by")
+            and self.validated_by
+            and not self.validated_by.is_prescriber_with_authorized_org
+        ):
+            raise ValidationError(_("Cet utilisateur n'est pas un prescripteur habilité."))
+
+        if hasattr(self, "approval"):
+
+            # A prolongation cannot overlap another one for the same SIAE.
+            # This check is enforced by a constraint at the database level but
+            # still required here to avoid a 500 server error "IntegrityError"
+            # during form validation.
+            if self.get_overlapping_prolongations().exists():
+                overlap = self.get_overlapping_prolongations().first()
+                raise ValidationError(
+                    _(
+                        f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
+                        f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
+                    )
+                )
+
+            if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
+                raise ValidationError(
+                    _(
+                        f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
+                        f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
+                        f'pour le motif "{self.get_reason_display()}".'
+                    )
+                )
+
+    @property
+    def duration(self):
+        return self.end_at - self.start_at
+
+    @property
+    def is_in_progress(self):
+        return self.start_at <= timezone.now().date() <= self.end_at
+
+    def notify_authorized_prescriber(self):
+        NewProlongationToAuthorizedPrescriberNotification(self).send()
+
+    def has_reached_max_cumulative_duration(self, additional_duration=None):
+        if self.reason not in [self.Reason.COMPLETE_TRAINING.value, self.Reason.PARTICULAR_DIFFICULTIES.value]:
+            return False
+
+        cumulative_duration = Prolongation.objects.get_cumulative_duration_for(self.approval, reason=self.reason)
+        if additional_duration:
+            cumulative_duration += additional_duration
+
+        return cumulative_duration > self.MAX_CUMULATIVE_DURATION[self.reason]["duration"]
+
+    def get_overlapping_prolongations(self):
+        filter_args = {
+            "start_at__lte": self.end_at,  # Inclusive start.
+            "end_at__gt": self.start_at,  # Exclusive end.
+            "approval": self.approval,
+        }
+        return self._meta.model.objects.exclude(pk=self.pk).filter(**filter_args)
+
+    @staticmethod
+    def get_start_at(approval):
+        """
+        Returns the start date of the prolongation.
+        """
+        return approval.end_at
+
+    @staticmethod
+    def get_max_end_at(start_at, reason=None):
+        """
+        Returns the maximum date on which a prolongation can end.
+        """
+        max_duration_months = Prolongation.MAX_DURATION_MONTHS
+        if reason == Prolongation.Reason.COMPLETE_TRAINING.value:
+            max_duration_months = 6
+        return start_at + relativedelta(months=max_duration_months) - relativedelta(days=1)
 
 
 class PoleEmploiApprovalManager(models.Manager):
@@ -646,7 +924,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     first_name = models.CharField(_("Prénom"), max_length=150)
     last_name = models.CharField(_("Nom"), max_length=150)
     birth_name = models.CharField(_("Nom de naissance"), max_length=150)
-    birthdate = models.DateField(verbose_name=_("Date de naissance"), default=timezone.now)
+    birthdate = models.DateField(verbose_name=_("Date de naissance"), default=timezone.localdate)
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 

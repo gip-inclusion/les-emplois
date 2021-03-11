@@ -50,7 +50,7 @@
                 {% endblocktranslate %}
             </span>
 
-            <span class="d-block">{% translate "délivré par la Plateforme de l'inclusion" %}</span>
+            <span class="d-block">{% translate "délivré par les emplois de l'inclusion" %}</span>
 
             {% if job_seeker.pole_emploi_id %}
                 <span class="d-block">{% translate "Identifiant Pôle emploi :" %} {{ job_seeker.pole_emploi_id }}</span>
@@ -84,8 +84,8 @@
 
                 {% blocktranslate with user_name=job_seeker.get_full_name|title %}
                     la situation sociale et professionnelle de {{ user_name }}
-                    et de votre promesse d’embauche, la Plateforme de l’Inclusion vous délivre
-                    un PASS IAE pour un parcours d’insertion par l’activité économique,
+                    et de votre promesse d'embauche, les emplois de l'inclusion vous délivrent
+                    un PASS IAE pour un parcours d'insertion par l'activité économique,
                     conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
                 {% endblocktranslate %}
             </p>

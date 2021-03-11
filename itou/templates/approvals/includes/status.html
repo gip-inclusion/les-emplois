@@ -34,13 +34,6 @@
 
     <ul class="list-unstyled pl-2 border-left" style="border-left-width: 3px !important;">
 
-        {# Delivery date. #}
-        <li>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
-                Délivré le {{ start }}
-            {% endblocktranslate %}
-        </li>
-
         {# Validity. #}
         <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
             {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
@@ -48,30 +41,67 @@
             {% endblocktranslate %}
         </li>
 
+        {# Delivery date. #}
+        <li>
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
+                Délivrance : le {{ start }}
+            {% endblocktranslate %}
+        </li>
+
         {# Suspensions history. #}
         {% with approval.suspensions_by_start_date_asc as suspensions %}
-            {% if suspensions %}{% translate "Suspendu :" %}{% endif %}
-            <ul>
-                {% for s in suspensions %}
-                    <li{% if s.is_in_progress %} class="font-weight-bold"{% endif %}>
-                        {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
-                            du {{ start }} au {{ end }}
-                        {% endblocktranslate %}
-                        <small>({{ s.get_reason_display }})</small>
-                        {% if current_siae %}
-                            {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
-                            {% if can_be_handled %}
-                                <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                    <small>{% translate "Modifier" %}</small>
-                                </a>
-                                <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">
-                                    <small>{% translate "Annuler" %}</small>
-                                </a>
+            {% if suspensions %}
+                {% translate "Suspensions :" %}
+                <ul>
+                    {% for s in suspensions %}
+                        <li>
+                            <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
+                                {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
+                                    du {{ start }} au {{ end }}
+                                {% endblocktranslate %}
+                            </span>
+                            {% if s.is_in_progress %}
+                                <small>
+                                    <b>{% translate "En cours" %}</b>
+                                </small>
                             {% endif %}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
+                            {% if current_siae %}
+                                {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
+                                {% if can_be_handled %}
+                                    <small>
+                                        <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Modifier" %}</a>
+                                        <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Annuler" %}</a>
+                                    </small>
+                                {% endif %}
+                            {% endif %}
+                            <br>
+                            <small>{{ s.get_reason_display }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {# Prolongations history. #}
+        {% with approval.prolongations_by_start_date_asc as prolongations %}
+            {% if prolongations %}
+                {% translate "Prolongations :" %}
+                <ul>
+                    {% for p in prolongations %}
+                        <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
+                            {% blocktranslate with start=p.start_at|date:"d/m/Y" end=p.end_at|date:"d/m/Y" %}
+                                du {{ start }} au {{ end }}
+                            {% endblocktranslate %}
+                            <br>
+                            <small>{{ p.get_reason_display }}</small>
+                            <br>
+                            <small>
+                                {% blocktranslate with full_name=p.validated_by.get_full_name|title email=p.validated_by.email %}Autorisation par <i>{{ full_name }}</i> ({{ email }}){% endblocktranslate %}
+                            </small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endwith %}
 
     </ul>

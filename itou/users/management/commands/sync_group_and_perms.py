@@ -34,6 +34,11 @@ class Command(BaseCommand):
             "change_suspension",
             "delete_suspension",
             "view_suspension",
+            # approvals.Prolongation
+            "add_prolongation",
+            "change_prolongation",
+            "delete_prolongation",
+            "view_prolongation",
             # cities.City
             "view_city",
             # eligibility.AdministrativeCriteria

@@ -282,7 +282,7 @@ class PrescriberSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@pole-emploi.fr",
+            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
             "password1": password,
             "password2": password,
         }
@@ -388,7 +388,7 @@ class PrescriberSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@pole-emploi.fr",
+            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
             "password1": password,
             "password2": password,
         }
@@ -522,7 +522,7 @@ class PrescriberSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@pole-emploi.fr",
+            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
             "password1": password,
             "password2": password,
         }
@@ -622,7 +622,7 @@ class PrescriberSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@pole-emploi.fr",
+            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
             "password1": password,
             "password2": password,
         }
@@ -701,7 +701,7 @@ class PrescriberSignupTest(TestCase):
         post_data = {
             "first_name": "John",
             "last_name": "Doe",
-            "email": "john.doe@pole-emploi.fr",
+            "email": f"john.doe{settings.POLE_EMPLOI_EMAIL_SUFFIX}",
             "password1": password,
             "password2": password,
         }

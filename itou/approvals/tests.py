@@ -5,15 +5,17 @@ from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.template.defaultfilters import title
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Suspension
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
+from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.siaes.factories import SiaeFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
@@ -312,19 +314,27 @@ class ApprovalModelTest(TestCase):
         expected = "99999 00 00001"
         self.assertEqual(approval.number_with_spaces, expected)
 
-    def test_can_be_suspended_by_siae(self):
-        job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            # Ensure that the job_application cannot be canceled.
-            hiring_start_at=datetime.date.today()
-            - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
-            - relativedelta(days=1),
+    def test_is_open_to_prolongation(self):
+
+        # Set "now" to be "before" the day approval is open to prolongation.
+        end_at = (
+            datetime.date.today()
+            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
+            + relativedelta(days=1)
         )
-        self.assertFalse(job_application.can_be_cancelled)
-        siae = job_application.to_siae
-        self.assertTrue(job_application.approval.can_be_suspended_by_siae(siae))
-        siae2 = SiaeFactory()
-        self.assertFalse(job_application.approval.can_be_suspended_by_siae(siae2))
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_open_to_prolongation)
+
+        # Set "now" to be "after" the day approval is open to prolongation.
+        end_at = (
+            datetime.date.today()
+            + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
+            - relativedelta(days=1)
+        )
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertTrue(approval.is_open_to_prolongation)
 
     def test_get_or_create_from_valid(self):
 
@@ -584,9 +594,9 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 
-class CustomAdminViewsTest(TestCase):
+class CustomApprovalAdminViewsTest(TestCase):
     """
-    Test custom admin views.
+    Test custom Approval admin views.
     """
 
     def test_manually_add_approval(self):
@@ -660,24 +670,16 @@ class SuspensionQuerySetTest(TestCase):
     """
 
     def test_in_progress(self):
-        # In progress: started today.
-        start_at = datetime.date.today()
+        start_at = datetime.date.today()  # Starts today so it's in progress.
         expected_num = 5
         SuspensionFactory.create_batch(expected_num, start_at=start_at)
         self.assertEqual(expected_num, Suspension.objects.in_progress().count())
 
     def test_not_in_progress(self):
-        # Create "in progress" suspensions because Factory.create_batch() with
-        # a `start_at` in the past will trigger Suspension.save(), then
-        # Suspension.clean() and fail the validation.
-        start_at = datetime.date.today()
-        expected_num = 3
-        SuspensionFactory.create_batch(expected_num, start_at=start_at)
-        # Then make suspensions go back in time using a batch update() that
-        # won't trigger Suspension.save() nor Suspension.clean().
         start_at = datetime.date.today() - relativedelta(years=1)
-        end_at = Suspension.get_max_end_at(start_at)
-        Suspension.objects.all().update(start_at=start_at, end_at=end_at)
+        end_at = start_at + relativedelta(months=6)
+        expected_num = 3
+        SuspensionFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
         self.assertEqual(expected_num, Suspension.objects.not_in_progress().count())
 
     def test_old(self):
@@ -768,6 +770,12 @@ class SuspensionModelTest(TestCase):
         suspension2.end_at = Suspension.get_max_end_at(suspension2.start_at)
         self.assertFalse(suspension2.get_overlapping_suspensions().exists())
 
+
+class SuspensionModelTestTrigger(TestCase):
+    """
+    Test `trigger_update_approval_end_at`.
+    """
+
     def test_save(self):
         """
         Test `trigger_update_approval_end_at` with SQL INSERT.
@@ -832,3 +840,371 @@ class SuspensionModelTest(TestCase):
         self.assertNotEqual(initial_duration, approval_duration_2)
         self.assertNotEqual(approval_duration_2, approval_duration_3)
         self.assertEqual(approval_duration_3, initial_duration + suspension_duration_2)
+
+
+class ProlongationQuerySetTest(TestCase):
+    """
+    Test ProlongationQuerySet.
+    """
+
+    def test_in_progress(self):
+        start_at = datetime.date.today()  # Starts today so it's in progress.
+        expected_num = 5
+        ProlongationFactory.create_batch(expected_num, start_at=start_at)
+        self.assertEqual(expected_num, Prolongation.objects.in_progress().count())
+
+    def test_not_in_progress(self):
+        start_at = datetime.date.today() - relativedelta(years=1)
+        end_at = start_at + relativedelta(months=6)
+        expected_num = 3
+        ProlongationFactory.create_batch(expected_num, start_at=start_at, end_at=end_at)
+        self.assertEqual(expected_num, Prolongation.objects.not_in_progress().count())
+
+
+class ProlongationManagerTest(TestCase):
+    """
+    Test ProlongationManager.
+    """
+
+    def test_get_cumulative_duration_for_any_reasons(self):
+        """
+        It should return the cumulative duration of all prolongations of the given approval.
+        """
+
+        approval = ApprovalFactory()
+
+        prolongation1_days = 30
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + relativedelta(days=prolongation1_days),
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+        )
+
+        prolongation2_days = 14
+
+        ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
+            reason=Prolongation.Reason.RQTH.value,
+        )
+
+        expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days)
+        self.assertEqual(expected_duration, Prolongation.objects.get_cumulative_duration_for(approval))
+
+    def test_get_cumulative_duration_for_rqth(self):
+        """
+        It should return the cumulative duration of all prolongations of the given approval
+        only for the RQTH reason.
+        """
+
+        approval = ApprovalFactory()
+
+        prolongation1_days = 30
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + relativedelta(days=prolongation1_days),
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+        )
+
+        prolongation2_days = 14
+
+        prolongation2 = ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=prolongation1.end_at + relativedelta(days=prolongation2_days),
+            reason=Prolongation.Reason.RQTH.value,
+        )
+
+        prolongation3_days = 60
+
+        ProlongationFactory(
+            approval=approval,
+            start_at=prolongation2.end_at,
+            end_at=prolongation2.end_at + relativedelta(days=prolongation3_days),
+            reason=Prolongation.Reason.RQTH.value,
+        )
+
+        expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
+        self.assertEqual(
+            expected_duration,
+            Prolongation.objects.get_cumulative_duration_for(approval, reason=Prolongation.Reason.RQTH.value),
+        )
+
+
+class ProlongationModelTestTrigger(TestCase):
+    """
+    Test `trigger_update_approval_end_at_for_prolongation`.
+    """
+
+    def test_save(self):
+        """
+        Test `trigger_update_approval_end_at_for_prolongation` with SQL INSERT.
+        An approval's `end_at` is automatically pushed forward when it is prolongated.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at)
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + prolongation.duration)
+
+    def test_delete(self):
+        """
+        Test `trigger_update_approval_end_at_for_prolongation` with SQL DELETE.
+        An approval's `end_at` is automatically pushed back when its prolongation
+        is deleted.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_duration = approval.duration
+
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at)
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration + prolongation.duration)
+
+        prolongation.delete()
+
+        approval.refresh_from_db()
+        self.assertEqual(approval.duration, initial_duration)
+
+    def test_save_and_edit(self):
+        """
+        Test `trigger_update_approval_end_at_for_prolongation` with SQL UPDATE.
+        An approval's `end_at` is automatically pushed back and forth when
+        one of its valid prolongation is saved, then edited to be shorter.
+        """
+        start_at = datetime.date.today()
+
+        approval = ApprovalFactory(start_at=start_at)
+        initial_approval_duration = approval.duration
+
+        # New prolongation.
+        prolongation = ProlongationFactory(approval=approval, start_at=start_at)
+        prolongation_duration_1 = prolongation.duration
+        approval.refresh_from_db()
+        approval_duration_2 = approval.duration
+
+        # Edit prolongation to be shorter.
+        prolongation.end_at -= relativedelta(months=2)
+        prolongation.save()
+        prolongation_duration_2 = prolongation.duration
+        approval.refresh_from_db()
+        approval_duration_3 = approval.duration
+
+        # Prolongation durations must be different.
+        self.assertNotEqual(prolongation_duration_1, prolongation_duration_2)
+
+        # Approval durations must be different.
+        self.assertNotEqual(initial_approval_duration, approval_duration_2)
+        self.assertNotEqual(approval_duration_2, approval_duration_3)
+
+        self.assertEqual(approval_duration_3, initial_approval_duration + prolongation_duration_2)
+
+
+class ProlongationModelTestConstraint(TestCase):
+    def test_exclusion_constraint(self):
+
+        approval = ApprovalFactory()
+
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+        )
+
+        with self.assertRaises(IntegrityError):
+            # A prolongation that starts the same day as initial_prolongation.
+            ProlongationFactory(
+                approval=approval,
+                declared_by_siae=initial_prolongation.declared_by_siae,
+                start_at=approval.end_at,
+            )
+
+
+class ProlongationModelTest(TestCase):
+    """
+    Test Prolongation model.
+    """
+
+    def test_get_start_at(self):
+
+        end_at = datetime.date(2021, 2, 1)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+
+        prolongation_start_at = Prolongation.get_start_at(approval)
+        self.assertEqual(prolongation_start_at, end_at)
+
+    def test_get_max_end_at(self):
+
+        start_at = datetime.date(2021, 2, 1)
+
+        reason = Prolongation.Reason.COMPLETE_TRAINING.value
+        expected_max_end_at = datetime.date(2021, 7, 31)  # 6 months.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.RQTH.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.SENIOR.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+        reason = Prolongation.Reason.PARTICULAR_DIFFICULTIES.value
+        expected_max_end_at = datetime.date(2022, 1, 31)  # 1 year.
+        max_end_at = Prolongation.get_max_end_at(start_at, reason=reason)
+        self.assertEqual(max_end_at, expected_max_end_at)
+
+    def test_time_boundaries(self):
+        """
+        Test that the upper bound of preceding time interval is the lower bound of the next.
+        E.g.:
+                  Approval: 02/03/2019 -> 01/03/2021
+            Prolongation 1: 01/03/2021 -> 31/03/2021
+            Prolongation 2: 31/03/2021 -> 30/04/2021
+        """
+
+        # Approval.
+
+        start_at = datetime.date(2019, 3, 2)
+        end_at = datetime.date(2021, 3, 1)
+        approval = ApprovalFactory(start_at=start_at, end_at=end_at)
+        initial_approval_duration = approval.duration
+
+        # Prolongation 1.
+
+        expected_end_at = datetime.date(2021, 3, 31)
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=expected_end_at,
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+        )
+
+        approval.refresh_from_db()
+        self.assertEqual(prolongation1.end_at, expected_end_at)
+        self.assertEqual(approval.end_at, expected_end_at)
+
+        # Prolongation 2.
+
+        expected_end_at = datetime.date(2021, 4, 30)
+
+        prolongation2 = ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=expected_end_at,
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+        )
+
+        approval.refresh_from_db()
+        self.assertEqual(prolongation2.end_at, expected_end_at)
+        self.assertEqual(approval.end_at, expected_end_at)
+
+        # Check duration.
+
+        self.assertEqual(
+            approval.duration, initial_approval_duration + prolongation1.duration + prolongation2.duration
+        )
+
+    def test_get_overlapping_prolongations(self):
+
+        approval = ApprovalFactory()
+
+        initial_prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+        )
+
+        # A prolongation that starts the same day as initial_prolongation.
+        # Build provides a local object without saving it to the database.
+        valid_prolongation = ProlongationFactory.build(
+            approval=approval,
+            declared_by_siae=initial_prolongation.declared_by_siae,
+            start_at=approval.end_at,
+        )
+        self.assertTrue(valid_prolongation.get_overlapping_prolongations().exists())
+        self.assertTrue(initial_prolongation, valid_prolongation.get_overlapping_prolongations().exists())
+
+    def test_has_reached_max_cumulative_duration_for_complete_training(self):
+
+        approval = ApprovalFactory()
+
+        duration = Prolongation.MAX_CUMULATIVE_DURATION[Prolongation.Reason.COMPLETE_TRAINING.value]["duration"]
+
+        prolongation = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + duration,
+            reason=Prolongation.Reason.COMPLETE_TRAINING.value,
+        )
+
+        self.assertFalse(prolongation.has_reached_max_cumulative_duration())
+        self.assertTrue(
+            prolongation.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
+        )
+
+    def test_has_reached_max_cumulative_duration_for_particular_difficulties(self):
+
+        approval = ApprovalFactory()
+
+        prolongation1 = ProlongationFactory(
+            approval=approval,
+            start_at=approval.end_at,
+            end_at=approval.end_at + datetime.timedelta(days=365 * 4),  # 4 years
+            reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
+        )
+
+        self.assertFalse(prolongation1.has_reached_max_cumulative_duration())
+
+        prolongation2 = ProlongationFactory(
+            approval=approval,
+            start_at=prolongation1.end_at,
+            end_at=prolongation1.end_at + datetime.timedelta(days=365),  # 1 year,
+            reason=Prolongation.Reason.PARTICULAR_DIFFICULTIES.value,
+        )
+
+        self.assertFalse(prolongation2.has_reached_max_cumulative_duration())
+        self.assertTrue(
+            prolongation2.has_reached_max_cumulative_duration(additional_duration=datetime.timedelta(days=1))
+        )
+
+
+class ProlongationNotificationsTest(TestCase):
+    """
+    Test Prolongation notifications.
+    """
+
+    def test_new_prolongation_to_authorized_prescriber_notification(self):
+
+        prolongation = ProlongationFactory()
+
+        email = NewProlongationToAuthorizedPrescriberNotification(prolongation).email
+
+        # To.
+        self.assertIn(prolongation.validated_by.email, email.to)
+        self.assertEqual(len(email.to), 1)
+
+        # Body.
+
+        self.assertIn(prolongation.start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(prolongation.end_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(prolongation.get_reason_display(), email.body)
+        self.assertIn(title(prolongation.declared_by.get_full_name()), email.body)
+
+        self.assertIn(prolongation.declared_by_siae.display_name, email.body)
+        self.assertIn(prolongation.approval.number_with_spaces, email.body)
+        self.assertIn(title(prolongation.approval.user.first_name), email.body)
+        self.assertIn(title(prolongation.approval.user.last_name), email.body)

@@ -15,7 +15,7 @@ from itou.job_applications.models import JobApplication
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.approvals_views.forms import SuspensionForm
+from itou.www.approvals_views.forms import DeclareProlongationForm, SuspensionForm
 
 
 @login_required
@@ -94,6 +94,50 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
 
 
 @login_required
+def declare_prolongation(request, approval_id, template_name="approvals/declare_prolongation.html"):
+    """
+    Declare a prolongation for the given approval.
+    """
+
+    siae = get_current_siae_or_404(request)
+    approval = get_object_or_404(Approval, pk=approval_id)
+
+    if not approval.can_be_prolonged_by_siae(siae):
+        raise PermissionDenied()
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    preview = False
+
+    form = DeclareProlongationForm(approval=approval, siae=siae, data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+
+        prolongation = form.save(commit=False)
+        prolongation.created_by = request.user
+        prolongation.declared_by = request.user
+        prolongation.declared_by_siae = form.siae
+        prolongation.validated_by = form.validated_by
+
+        if request.POST.get("edit"):
+            preview = False
+        if request.POST.get("preview"):
+            preview = True
+        elif request.POST.get("save"):
+            prolongation.save()
+            prolongation.notify_authorized_prescriber()
+            messages.success(request, _("Déclaration de prolongation enregistrée."))
+            return HttpResponseRedirect(back_url)
+
+    context = {
+        "approval": approval,
+        "back_url": back_url,
+        "form": form,
+        "preview": preview,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
     """
     Suspend the given approval.
@@ -108,18 +152,18 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
     preview = False
 
-    initial = {"approval": approval, "siae": siae, "reason": None}
-    form = SuspensionForm(approval=approval, initial=initial, data=request.POST or None)
+    form = SuspensionForm(approval=approval, siae=siae, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
+
+        suspension = form.save(commit=False)
+        suspension.created_by = request.user
 
         if request.POST.get("edit"):
             preview = False
         if request.POST.get("preview"):
             preview = True
         elif request.POST.get("save"):
-            suspension = form.save(commit=False)
-            suspension.created_by = request.user
             suspension.save()
             messages.success(request, _("Suspension effectuée."))
             return HttpResponseRedirect(back_url)
@@ -147,7 +191,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
 
-    form = SuspensionForm(approval=suspension.approval, instance=suspension, data=request.POST or None)
+    form = SuspensionForm(approval=suspension.approval, siae=siae, instance=suspension, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         suspension = form.save(commit=False)

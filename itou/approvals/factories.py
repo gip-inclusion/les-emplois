@@ -6,8 +6,9 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 from faker import Faker
 
-from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
-from itou.siaes.factories import SiaeFactory
+from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, Suspension
+from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory
 
 
@@ -36,6 +37,31 @@ class SuspensionFactory(factory.django.DjangoModelFactory):
     start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
     end_at = factory.LazyAttribute(lambda obj: Suspension.get_max_end_at(obj.start_at))
     siae = factory.SubFactory(SiaeFactory)
+
+
+class ProlongationFactory(factory.django.DjangoModelFactory):
+    """Generate a Prolongation() object for unit tests."""
+
+    class Meta:
+        model = Prolongation
+
+    approval = factory.SubFactory(ApprovalFactory)
+    start_at = factory.LazyAttribute(lambda obj: obj.approval.start_at)
+    end_at = factory.LazyAttribute(lambda obj: Prolongation.get_max_end_at(obj.start_at, reason=obj.reason))
+    reason = Prolongation.Reason.COMPLETE_TRAINING.value
+    reason_explanation = "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+    declared_by = factory.LazyAttribute(lambda obj: obj.declared_by_siae.members.first())
+    declared_by_siae = factory.SubFactory(SiaeWithMembershipFactory)
+    created_by = factory.LazyAttribute(lambda obj: obj.declared_by)
+
+    @factory.post_generation
+    def set_validated_by(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        authorized_prescriber_org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        self.validated_by = authorized_prescriber_org.members.first()
+        self.save()
 
 
 class PoleEmploiApprovalFactory(factory.django.DjangoModelFactory):

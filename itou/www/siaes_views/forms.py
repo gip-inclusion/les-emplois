@@ -78,12 +78,12 @@ class CreateSiaeForm(forms.ModelForm):
                 " pour être contacté(e) si nécessaire."
             )
             mail_to = settings.ITOU_EMAIL_ASSISTANCE
-            mail_subject = _("Se rattacher à une structure existante - Plateforme de l'inclusion")
+            mail_subject = _("Se rattacher à une structure existante - Les emplois de l'inclusion")
 
             mail_body = _(
                 "Veuillez rattacher mon compte (%(first_name)s %(last_name)s %(email)s)"
                 " à la structure existante (%(kind)s %(siret)s ID=%(id)s)"
-                " sur la Plateforme de l'inclusion."
+                " sur les emplois de l'inclusion."
             ) % {
                 "first_name": user.first_name,
                 "last_name": user.last_name,
