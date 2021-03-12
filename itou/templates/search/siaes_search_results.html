@@ -3,7 +3,7 @@
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
-        {% blocktranslate %}Employeurs solidaires à {{ distance }} Km autour de {{ city }}{% endblocktranslate %}
+        {% blocktranslate %}Employeurs solidaires à {{ distance }} Km du centre de {{ city }}{% endblocktranslate %}
     {% endwith %}
     {{ block.super }}
 {% endblock %}
@@ -18,7 +18,7 @@
 
     <h3>
         {% with request.GET.city_name as city and request.GET.distance as distance %}
-            {% blocktranslate %}Employeurs solidaires à <b>{{ distance }} Km</b> autour de <b>{{ city }}</b>{% endblocktranslate %}
+            {% blocktranslate %}Employeurs solidaires à <b>{{ distance }} Km</b> du centre de <b>{{ city }}</b>{% endblocktranslate %}
         {% endwith %}
     </h3>
 
