@@ -6,10 +6,32 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [14] - 2021-03-11
+
+### Ajouté
+- Ajout de la possibilité de se désabonner de certaines notifications :
+    - nouvelle candidature spontanée
+    - nouvelle candidature pour une fiche de poste
+- Ajout des dates de contrat dans le mail de notification d'embauche
+- Gestion de la prolongation des PASS IAE
+
+### Modifié
+- Améliorations de l'interface de configuration des fiches de poste
+- Mise à jour du logo pour rester cohérent suite au changement du nom de domaine `inclusion.beta.gouv.fr` vers `emplois.inclusion.beta.gouv.fr`
+- Remplacement du texte *Plateforme de l'Inclusision* par *Les emplois de l'inclusion*
+- Changement des coordonnées GPS de Berre-l'Étang
+- L'attestation du PASS IAE est maintenant téléchargeable même lorsque le PASS IAE est expiré
+- Possibilité pour un employeur d'accepter une candidature dont le statut est "Embauché ailleurs"
+
+### Supprimé
+- Suppression du délai d'1h avant de pouvoir repositionner un candidat en tant que SIAE
+- Suppression de certaines notifications employeur et prescripteur :
+    - nouveau membre
+    - invitation acceptée
+
 ## [13] - 2021-02-25
 
 ### Ajouté
-
 - Un nouveau compte de démonstration est disponible pour les E.A. (Entreprise Adaptée) avec connexion automatique
 - Résultats de recherche employeurs : ajout d'une étiquette "Priorité aux bénéficiaires de RQTH" aux entreprises adaptées
 - Metabase : ajout de trois colonnes à la table Organisations (date_dernière_candidature, latitude et longitude) et transformation de la colonne temps_écoulé_depuis_dernière_candidature en date_dernière_candidature
@@ -19,9 +41,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Point d'accès API permettant aux éditeurs de logiciel de récupérer des fiches salarié de test. [Ce point d'accès a une documentation](https://github.com/betagouv/itou/blob/master/itou/api/README-FS-SSII.md)
 - Fiches salarié: ajout d'un profil utilisateur pour compléter les données personnnelles du salarié
 
-
 ### Modifié
-
 - Autocomplétion de la recherche par ville : affichage des 12 derniers résultats (au lieu de 10)
 - Formulaire d'acceptation d'une candidature : "Date de fin de contrat" remplacé par "Date prévisionnelle de fin de contrat"
 - Résolution d'un bug qui rompait la communication entre Typeform et notre service, entrainant une mauvaise sauvegarde des CV depuis le 22 janvier. Les CV en question ont pu être reliés à leurs candidats a posteriori
@@ -36,7 +56,6 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 ## [12] - 2021-02-12
 
 ### Ajouté
-
 - A la saisie du message de candidature par une SIAE, il est précisé que ce message sera visible par le prescripteur et le demandeur d'emploi
 - Affichage pour le prescripteur et le demandeur d'emploi de la raison de la mise en file d'attente d'une candidature 
 - Ajout d'un bouton non-contextuel vers la FAQ en bas de page (absent sur mobile et page d'accueil)  
@@ -44,7 +63,6 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Mise en place d'alertes en cas de problème du système d'envoi d'e-mails (suite à incident) 
 
 ### Modifié
-
 - Améliorations mineures des scripts d'import GEIQ/SIAE/EA
 - Mise à jour vers Django 3.1.6
 - Amélioration du traçage des erreurs lors d'un problème d'import de données PE Connect
@@ -55,7 +73,6 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 ## [11] - 2021-01-28
 
 ### Ajouté
-
 - Import et traitement des fichiers de référence ASP pour les fiches salarié
 - Les employeurs peuvent modifier les informations des candidatures :
     - pour les candidats considérés comme "autonomes"
@@ -66,7 +83,6 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Nouveau logo "Ministère du travail, de l'emploi et de l'insertion" dans le pied de page
 
 ### Modifié
-
 - Changement des noms de domaine :
     - `inclusion.beta.gouv.fr` **devient** `emplois.inclusion.beta.gouv.fr`
     - `staging.inclusion.beta.gouv.fr` **devient** `staging.emplois.inclusion.beta.gouv.fr`
@@ -81,7 +97,6 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
     - celles de l'organisation active
 
 ### Supprimé
-
 - Suppression de la mention "Agrément expiré" dans les candidatures envoyées aux SIAE par des prescripteurs habilités pour des candidats en période de carence
 - Suppression des mentions "pièces justificatives" dans l'écran de validation des critères d'éligibilité des prescripteurs
 - Simplification des étapes de diagnostic :
