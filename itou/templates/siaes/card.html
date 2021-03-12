@@ -69,14 +69,14 @@
 
     {% else %}
 
-        {% if siae.job_description_through.exists %}
+        {% if siae.active_job_descriptions %}
             <hr>
             <p class="mb-2">
                 {% include "includes/icon.html" with icon="briefcase" %}
                 {% translate "Métiers proposés" %}
             </p>
             <ul>
-            {% for job in siae.job_description_through.all %}
+            {% for job in siae.active_job_descriptions %}
                 <li>
                     <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% translate job.display_name %}</a>
                 </li>

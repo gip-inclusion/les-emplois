@@ -43,8 +43,10 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
                     When(_total_active_members__gte=1, then=Value(1)), default=Value(0), output_field=IntegerField()
                 )
             )
-            .prefetch_job_description_through(is_active=True)
-            .prefetch_related("members")
+            .prefetch_related(
+                "members",
+                "job_description_through__appellation__rome",
+            )
             # Sort in 4 subgroups in the following order, each subgroup being shuffled.
             # 1) has_active_members and not block_job_applications
             # These are the siaes which can currently hire, and should be on top.

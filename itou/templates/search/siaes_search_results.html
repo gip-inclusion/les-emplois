@@ -67,10 +67,10 @@
                             <span class="badge badge-dark">{% translate "Priorité aux bénéficiaires de RQTH" %}</span>
                         </p>
                     {% endif %}
-                    {% if siae.job_description_through.exists and not siae.block_job_applications %}
+                    {% if siae.active_job_descriptions and not siae.block_job_applications %}
                         <h6 class="border-bottom border-gray pb-2">{% translate "Métiers proposés" %}</h6>
                         <ul class="mb-0">
-                        {% for job in siae.job_description_through.all %}
+                        {% for job in siae.active_job_descriptions %}
                             <li>
                                 <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     {{ job.display_name }}

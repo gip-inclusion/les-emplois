@@ -325,7 +325,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     """
     Create and submit the job application.
     """
-    queryset = Siae.objects.prefetch_job_description_through()
+    queryset = Siae.objects.prefetch_related("job_description_through__appellation__rome")
     siae = get_object_or_404(queryset, pk=siae_pk)
 
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]

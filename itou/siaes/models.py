@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import F, Prefetch, Q
+from django.db.models import F, Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -48,13 +48,6 @@ class SiaeQuerySet(models.QuerySet):
             .annotate(distance=Distance("coords", point))
             .order_by("distance")
         )
-
-    def prefetch_job_description_through(self, **kwargs):
-        job_description_through = Prefetch(
-            "job_description_through",
-            queryset=(SiaeJobDescription.objects.filter(**kwargs).select_related("appellation__rome")),
-        )
-        return self.prefetch_related(job_description_through)
 
     def member_required(self, user):
         if user.is_superuser:
@@ -390,6 +383,19 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def grace_period_has_expired(self):
         return not self.is_active and timezone.now() > self.grace_period_end_date
+
+    @property
+    def active_job_descriptions(self):
+        """
+        Return a list (not a queryset) of all active job descriptions.
+
+        Here we assume that job_description_through has already been loaded with a prefetch_related.
+        We cannot use job_description_through.filter(is_active=True) here as it would trigger extra SQL requests.
+        We have to use job_description_through.all() and do the filtering in python.
+        This is how prefetch_related works. See the note at the very end of this section:
+        https://docs.djangoproject.com/en/3.1/ref/models/querysets/#prefetch-related
+        """
+        return [jd for jd in self.job_description_through.all() if jd.is_active]
 
 
 class SiaeMembershipQuerySet(models.QuerySet):
