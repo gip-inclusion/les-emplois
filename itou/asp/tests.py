@@ -155,7 +155,9 @@ class FormatASPAdresses(TestCase):
 
 class LaneTypeTest(TestCase):
     def test_aliases(self):
-        """Test some variants / alternatives used by api.geo.gouv.fr for lane types"""
+        """
+        Test some variants / alternatives used by api.geo.gouv.fr for lane types
+        """
         self.assertEqual(LaneType.GR, find_lane_type_aliases("grand rue"))
         self.assertEqual(LaneType.GR, find_lane_type_aliases("grande-rue"))
         self.assertIsNone(None, find_lane_type_aliases("grande'rue"))
