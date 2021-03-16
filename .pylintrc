@@ -1,0 +1,10 @@
+[MASTER]
+load-plugins=pylint_django
+
+[MESSAGES CONTROL]
+disable=missing-docstring,invalid-name,duplicate-code,bad-continuation,arguments-differ,too-few-public-methods,no-self-use
+
+[FORMAT]
+
+# Maximum number of characters on a single line.
+max-line-length=119
