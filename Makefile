@@ -31,6 +31,9 @@ setup_git_pre_commit_hook:
 	docker exec -t itou_django isort itou\n\
 	" > .git/hooks/pre-commit
 
+setup_git_pre_commit_hook_venv:
+	pre-commit install
+
 # Django.
 # =============================================================================
 
