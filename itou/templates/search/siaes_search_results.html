@@ -62,7 +62,7 @@
                         {% if siae.brand %}<small class="text-muted">({{ siae.name|title }})</small>{% endif %}
                     </h5>
                     <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
-                    {% if siae.is_kind_ea %}
+                    {% if siae.is_kind_ea or siae.is_kind_eatt %}
                         <p class="card-text">
                             <span class="badge badge-dark">{% translate "Priorité aux bénéficiaires de RQTH" %}</span>
                         </p>
