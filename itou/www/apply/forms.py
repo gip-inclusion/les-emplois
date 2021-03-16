@@ -22,7 +22,9 @@ class UserExistsForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.user = None
 
-    email = forms.EmailField(label=gettext_lazy("E-mail personnel du candidat"))
+    email = forms.EmailField(
+        label=gettext_lazy("E-mail personnel du candidat"), widget=forms.TextInput(attrs={"autocomplete": "off"})
+    )
 
     def clean_email(self):
         email = self.cleaned_data["email"]
