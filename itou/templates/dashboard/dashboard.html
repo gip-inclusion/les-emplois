@@ -224,7 +224,7 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'siaes_views:configure_jobs' %}">
-                            {% translate "Configurer les descriptions de postes" %}
+                            {% translate "Publier/gérer les fiches de postes" %}
                         </a>
                     </p>
                     {% if current_siae.is_active and user_is_siae_admin %}
