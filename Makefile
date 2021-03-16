@@ -19,6 +19,11 @@ quality:
 	docker exec -ti itou_django isort --check-only itou
 	docker exec -ti itou_django flake8 itou
 
+quality_venv:
+	black --check itou
+	isort --check-only itou
+	flake8 itou
+
 style:
 	docker exec -ti itou_django black itou
 	docker exec -ti itou_django isort itou
@@ -57,7 +62,7 @@ COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers
 graph_models_itou:
 	docker exec -ti itou_django django-admin $(COMMAND_GRAPH_MODELS)
 
-local_graph_models_itou:
+graph_models_itou_venv:
 	./manage.py $(COMMAND_GRAPH_MODELS)
 
 # Tests.
