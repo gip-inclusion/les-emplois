@@ -61,6 +61,8 @@ class EmployeeRecord(models.Model):
     ERROR_JOB_SEEKER_TITLE = _("La civilité du salarié est obligatoire")
     ERROR_JOB_SEEKER_BIRTH_COUNTRY = _("Le pays de naissance est obligatoire")
 
+    ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
+
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
     status = models.CharField(max_length=10, verbose_name=_("Statut"), choices=Status.choices, default=Status.NEW)
@@ -102,16 +104,12 @@ class EmployeeRecord(models.Model):
         constraints = [models.UniqueConstraint(fields=["asp_id", "approval_number"], name="un_asp_id_approval_number")]
 
     def __str__(self):
-        return f"{self.siae} - {self.job_seeker} - {self.approval}"
-
-    def clean(self):
-        self._clean_job_application()
-        self._clean_job_seeker()
-        self._clean_job_seeker_address()
+        return f"{self.asp_id} - {self.approval.approval_number} - {self.job_seeker}"
 
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
+
         super().save(*args, **kwargs)
 
     def _clean_job_application(self):
@@ -133,17 +131,16 @@ class EmployeeRecord(models.Model):
         job_seeker = self.job_application.job_seeker
         job_seeker.clean()
 
-        if not job_seeker.title:
-            raise ValidationError(self.ERROR_JOB_SEEKER_TITLE)
+        if not job_seeker.has_jobseeker_profile:
+            raise ValidationError(self.ERROR_JOB_SEEKER_HAS_NO_PROFILE)
 
-        if not job_seeker.birth_country:
-            raise ValidationError(self.ERROR_JOB_SEEKER_BIRTH_COUNTRY)
+        # Validation takes place in the job seeker profile
+        job_seeker.jobseeker_profile.clean()
 
-    def _clean_job_seeker_address(self):
-        """
-        Check the correct format (Hexaposte) for the address
-        """
-        # TBD / WIP
+    def clean(self):
+        # see private methods above
+        self._clean_job_application()
+        self._clean_job_seeker()
 
     # Business methods
 
