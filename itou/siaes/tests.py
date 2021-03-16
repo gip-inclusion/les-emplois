@@ -16,9 +16,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
-
 from itou.siaes.models import Siae, SiaeJobDescription
-from itou.users.factories import SiaeStaffFactory
 
 
 class SiaeFactoriesTest(TestCase):
