@@ -255,13 +255,62 @@ class JobSeekerProfileModelTest(TestCase):
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_job_seeker_hexa_address(self, _mock):
-        """
-        Check if HEXA address profile fields are complete
-        """
-        # TODO
+    def test_job_seeker_hexa_address_complete(self, _mock):
+        # Nothing to validate if no address is given
+        self.profile._clean_job_seeker_hexa_address()
 
-    def test_profile_is_complete(self):
-        """
-        Check if profile is complete, from a FS / ASP export perspective
-        """
+        # If any field of the hexa address is filled
+        # the whole address must be valid
+        self.profile.hexa_lane_name = "Privet Drive"
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_hexa_address()
+
+        self.profile.hexa_lane_number = "4"
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_hexa_address()
+
+        self.profile.hexa_lane_type = "RUE"
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_hexa_address()
+
+        self.profile.hexa_post_code = "12345"
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_hexa_address()
+
+        # address should be complete now
+        self.profile.hexa_commune = asp.CommuneFactory()
+        self.profile._clean_job_seeker_hexa_address()
+
+    def test_job_seeker_situation_complete(self):
+        # Both PE ID and situation must be filled or none
+        self.profile._clean_job_seeker_situation()
+
+        user = self.profile.user
+
+        user.pole_emploi_id = None
+        self.profile.pole_emploi_since = "MORE_THAN_24_MONTHS"
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_situation()
+
+        # Both PE fields are provided: OK
+        user.pole_emploi_id = "1234567"
+        self.profile._clean_job_seeker_situation()
+
+    def test_job_seeker_details_complete(self):
+        self.profile.user.title = None
+
+        # No user title provided
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_details()
+
+        self.profile.user.title = get_user_model().Title.M
+
+        # No education level provided
+        self.profile.education_level = None
+        with self.assertRaises(ValidationError):
+            self.profile._clean_job_seeker_details()
+
+        self.profile.education_level = "00"
+        self.profile._clean_job_seeker_details()
+
+        # Birth place / birth country are checked in User tests
