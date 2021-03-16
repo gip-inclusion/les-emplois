@@ -1,9 +1,10 @@
 # Global tasks.
 # =============================================================================
+PYTHON_VERSION := python3.7
 
 .PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook
 
-# Run a local server.
+# Run Docker images
 run:
 	docker-compose up
 
@@ -11,7 +12,7 @@ clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
 cdsitepackages:
-	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/bash
+	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality:
 	docker exec -ti itou_django black --check itou
