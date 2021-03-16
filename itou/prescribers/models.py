@@ -197,6 +197,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
         unique_together = ("siret", "kind")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Add `kind` attributes, e.g.: `self.is_kind_plie`.
+        for kind in self.Kind:
+            setattr(self, f"is_kind_{kind.value.lower()}", kind == self.kind)
+
     def __str__(self):
         return f"{self.name}"
 
@@ -214,14 +221,14 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         """
         A code SAFIR can only be set for PE agencies.
         """
-        if self.kind != self.Kind.PE and self.code_safir_pole_emploi:
+        if not self.is_kind_pe and self.code_safir_pole_emploi:
             raise ValidationError({"code_safir_pole_emploi": _("Le Code Safir est réservé aux agences Pôle emploi.")})
 
     def clean_siret(self):
         """
         SIRET is required for all organizations, except for PE agencies.
         """
-        if self.kind != self.Kind.PE:
+        if not self.is_kind_pe:
             if not self.siret:
                 raise ValidationError({"siret": _("Le SIRET est obligatoire.")})
             if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
@@ -289,7 +296,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         """
         An unknown organization claiming to be authorized must provide a written proof.
         """
-        return self.kind == self.Kind.OTHER and self.authorization_status == self.AuthorizationStatus.NOT_SET
+        return self.is_kind_other and self.authorization_status == self.AuthorizationStatus.NOT_SET
 
     def get_admins(self):
         return self.members.filter(is_active=True, prescribermembership__is_admin=True)

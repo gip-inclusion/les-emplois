@@ -16,7 +16,7 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
         for required_field in required_fields:
             self.fields[required_field].required = True
 
-        if self.instance.kind == self.instance.Kind.PE:
+        if self.instance.is_kind_pe:
             # Do not edit the name of a Pôle emploi agency.
             del self.fields["name"]
             # Duplicates are identified through SAFIR code which makes the SIRET not required.
