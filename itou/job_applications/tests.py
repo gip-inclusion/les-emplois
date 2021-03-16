@@ -395,6 +395,8 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         self.assertIn(approval.user.get_full_name(), email.subject)
         self.assertIn(approval.number_with_spaces, email.body)
+        self.assertIn(approval.start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(approval.end_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn(approval.user.last_name, email.body)
         self.assertIn(approval.user.first_name, email.body)
         self.assertIn(approval.user.birthdate.strftime("%d/%m/%Y"), email.body)
