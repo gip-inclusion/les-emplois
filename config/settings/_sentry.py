@@ -1,7 +1,9 @@
 import os
+
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import ignore_logger
+
 
 def strip_sentry_sensitive_data(event, hint):
     """

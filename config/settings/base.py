@@ -42,7 +42,7 @@ DJANGO_APPS = [
     "django.contrib.sites",
     "django.contrib.gis",
     "django.contrib.postgres",
-    "django.forms", # Required to override default Django widgets. See FORM_RENDERER
+    "django.forms",  # Required to override default Django widgets. See FORM_RENDERER
 ]
 
 THIRD_PARTY_APPS = [
@@ -54,7 +54,7 @@ THIRD_PARTY_APPS = [
     "bootstrap_datepicker_plus",
     "django_select2",
     "huey.contrib.djhuey",
-    "rest_framework", # DRF (Django Rest Framework).
+    "rest_framework",  # DRF (Django Rest Framework).
     "rest_framework.authtoken",  # Required for DRF TokenAuthentication.
 ]
 
@@ -157,7 +157,7 @@ TEMPLATES = [
 # Override default Django forms widgets templates.
 # Requires django.forms in INSTALLED_APPS
 # https://timonweb.com/django/overriding-field-widgets-in-django-doesnt-work-template-not-found-the-solution/
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 # Database.
 # ------------------------------------------------------------------------------
@@ -179,9 +179,7 @@ ATOMIC_REQUESTS = True
 # ------------------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -285,7 +283,7 @@ AUTHENTICATION_BACKENDS = (
 # User authentication callbacks such as redirections after login.
 # Replaces LOGIN_REDIRECT_URL, which is static, by ACCOUNT_ADAPTER which is dynamic.
 # https://django-allauth.readthedocs.io/en/latest/advanced.html#custom-redirects
-ACCOUNT_ADAPTER = 'itou.users.adapter.UserAdapter'
+ACCOUNT_ADAPTER = "itou.users.adapter.UserAdapter"
 
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
@@ -341,14 +339,10 @@ API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 # - PEAM "Utilisateur", PEAM-U or PEAMU for short.
 # To avoid confusion between the two when contacting ESD support,
 # we get the habit to always explicitely state that we are using PEAM*U*.
-PEAMU_AUTH_BASE_URL = 'https://authentification-candidat.pole-emploi.fr'
+PEAMU_AUTH_BASE_URL = "https://authentification-candidat.pole-emploi.fr"
 SOCIALACCOUNT_PROVIDERS = {
     "peamu": {
-        "APP": {
-            "key": "peamu",
-            "client_id": API_ESD_KEY,
-            "secret": API_ESD_SECRET
-        },
+        "APP": {"key": "peamu", "client_id": API_ESD_KEY, "secret": API_ESD_SECRET},
     },
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
@@ -469,7 +463,10 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 HUEY = {
     "name": "ITOU",
     "url": REDIS_URL + f"/?db={REDIS_DB}",
-    "consumer": {"workers": 2, "worker_type": "thread", },
+    "consumer": {
+        "workers": 2,
+        "worker_type": "thread",
+    },
     "immediate": False,
 }
 
@@ -502,11 +499,11 @@ SEND_EMAIL_RETRY_TOTAL_TIME_IN_SECONDS = 24 * 3600
 REST_FRAMEWORK = {
     # Namespace versioning e.g. `GET /api/v1/something/`.
     # https://www.django-rest-framework.org/api-guide/versioning/#namespaceversioning
-    'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.NamespaceVersioning',
-    'DEFAULT_VERSION': 'v1',
-    'ALLOWED_VERSIONS': ['v1'],
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",
+    "DEFAULT_VERSION": "v1",
+    "ALLOWED_VERSIONS": ["v1"],
     # Pagination.
     # https://www.django-rest-framework.org/api-guide/pagination/#pagenumberpagination
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
