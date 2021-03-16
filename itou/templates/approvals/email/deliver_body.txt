@@ -7,6 +7,7 @@ Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion.
 {% endblocktranslate %}
 
 {% translate "PASS IAE N° :" %} {{ job_application.approval.number_with_spaces }}
+{% blocktranslate with start_at=job_application.approval.start_at|date:"d/m/Y" end_at=job_application.approval.end_at|date:"d/m/Y" %}Valide du {{ start_at }} au {{ end_at }}{% endblocktranslate %}
 
 {% translate "Délivré pour l'embauche de :" %}
 {% translate "Nom :" %} {{ job_application.approval.user.last_name }}
