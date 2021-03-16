@@ -37,8 +37,8 @@
         {% endif %}
 
         {% if job_application.job_seeker.resume_link %}
-            <li>{% translate "Lien vers CV :" %} <a
-                    href="{{ job_application.job_seeker.resume_link }}">{{ job_application.job_seeker.resume_link }}</a>
+            <li>
+                <a href="{{ job_application.job_seeker.resume_link }}">{% translate "Lien vers CV" %}</a>
             </li>
         {% endif %}
     </ul>
