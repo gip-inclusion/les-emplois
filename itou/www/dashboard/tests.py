@@ -88,6 +88,10 @@ class EditJobSeekerInfo(TestCase):
         job_application = JobApplicationSentByPrescriberFactory()
         user = job_application.to_siae.members.first()
 
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
