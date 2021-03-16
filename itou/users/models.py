@@ -308,9 +308,9 @@ class JobSeekerProfile(models.Model):
 
     1 - Job seeker "administrative" situation
 
-    These fields are part of the requires fields for EmployeeRecord processing:
+    These fields are part of the mandatory fields for EmployeeRecord processing:
     - education level
-    - various social allowances flags and duration
+    - various social allowances flags and durations
 
     2 - Job seeker address in HEXA address format:
 
@@ -319,7 +319,7 @@ class JobSeekerProfile(models.Model):
     - Hexacle: house number level
     - Hexaposte: zip code level
     - Hexavia: street level
-    + others
+    + many others...
 
     For the employee record domain, this means that the job seeker address has to be
     formatted in a very specific way to be accepted as valid by ASP backend.
@@ -514,16 +514,17 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(self.ERROR_HEXA_COMMUNE)
 
     def clean(self):
+        # see validation methods above
         self._clean_job_seeker_details()
         self._clean_job_seeker_situation()
         self._clean_job_seeker_hexa_address()
 
     def update_hexa_address(self):
         """
-        This method tries to fill / guess the HEXA address fields
-        with the current address of the job seeker.
+        This method tries to fill the HEXA address fields
+        based the current address of the job seeker (User model).
 
-        Conversion from standard itou address to HEXA is making
+        Conversion from standard itou address to HEXA is making sync
         geo API calls.
 
         Returns current object or re-raise error,

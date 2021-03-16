@@ -238,17 +238,22 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             _("Informations"),
-            {"fields": ("user", "education_level")},
+            {
+                "fields": (
+                    "user",
+                    "education_level",
+                    "pole_emploi_since",
+                    "unemployed_since",
+                    "resourceless",
+                    "rqth_employee",
+                    "oeth_employee",
+                )
+            },
         ),
         (
             _("Aides et prestations sociales"),
             {
                 "fields": (
-                    "resourceless",
-                    "rqth_employee",
-                    "oeth_employee",
-                    "pole_emploi_since",
-                    "unemployed_since",
                     "rsa_allocation_since",
                     "ass_allocation_since",
                     "aah_allocation_since",

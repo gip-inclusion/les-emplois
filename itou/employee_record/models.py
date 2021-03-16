@@ -13,11 +13,12 @@ class Status(models.TextChoices):
     - after that, the FS is "archived" and can't be used for further interaction
     """
 
-    NEW = "NEW", "Nouvelle fiche salarié"
-    READY = "READY", "Données complètes, prêtes à l'envoi ASP"
-    SENT = "SENT", "Envoyée ASP"
-    REJECTED = "REJECTED", "Rejet ASP"
-    PROCESSED = "PROCESSED", "Traitée ASP"
+    NEW = "NEW", _("Nouvelle fiche salarié")
+    READY = "READY", _("Données complètes, prêtes à l'envoi ASP")
+    SENT = "SENT", _("Envoyée ASP")
+    REJECTED = "REJECTED", _("Rejet ASP")
+    PROCESSED = "PROCESSED", _("Traitée ASP")
+    ARCHIVED = "ARCHIVED", _("Archivée")
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
@@ -40,7 +41,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         Archived employee records (completed and having a JSON archive)
         """
-        return self.processed().exclude(archived_json=None)
+        return self.filter(status=Status.ARCHIVED).order_by("-created_at")
 
     def with_job_seeker_and_siae(self, job_seeker, siae):
         """
