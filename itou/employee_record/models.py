@@ -43,12 +43,6 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(status=Status.ARCHIVED).order_by("-created_at")
 
-    def with_job_seeker_and_siae(self, job_seeker, siae):
-        """
-        Only one employee record is stored for a given job_seeker / SIAE pair
-        """
-        return self.filter(job_application__to_siae=siae, job_application__job_seeker=job_seeker)
-
 
 class EmployeeRecord(models.Model):
     """
@@ -96,7 +90,6 @@ class EmployeeRecord(models.Model):
     # except for the archive serialization, which occurs once.
     # It will only return a list of this JSON field for archived employee records.
     archived_json = models.JSONField(verbose_name=_("Fiche salarié au format JSON (archive)"), null=True)
-
     objects = models.Manager.from_queryset(EmployeeRecordQuerySet)()
 
     class Meta:
@@ -171,27 +164,6 @@ class EmployeeRecord(models.Model):
         return self.status != Status.SENT and not self.is_archived
 
     @property
-    def job_seeker_data_complete():
-        """
-        Jobseeker profile data are complete for further processing
-        """
-        return True
-
-    @property
-    def address_data_complete():
-        """
-        Jobseeker address is complete for further processing
-        """
-        return True
-
-    @property
-    def siae(self):
-        if self.job_application:
-            return self.job_application.to_siae
-
-        return None
-
-    @property
     def job_seeker(self):
         if self.job_application:
             return self.job_application.job_seeker
@@ -209,8 +181,6 @@ class EmployeeRecord(models.Model):
     def asp_convention_id(self):
         """
         ASP convention ID (from siae.convention.asp_convention_id)
-
-        There is a "soft" unique contraint with the asp_convention_id, approval_number pair
         """
         if self.job_application and self.job_application.to_siae:
             return self.job_application.to_siae.convention.asp_convention_id
@@ -239,5 +209,8 @@ class EmployeeRecord(models.Model):
 
         # If the jobseeker has no profile, create one
         job_application.job_seeker.create_job_seeker_profile()
+
+        fs.asp_id = fs.asp_convention_id
+        fs.approval = fs.approval.number
 
         return fs
