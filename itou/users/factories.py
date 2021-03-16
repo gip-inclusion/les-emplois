@@ -1,9 +1,11 @@
 import datetime
+import random
 import string
 
 import factory
 import factory.fuzzy
 
+from itou.asp.models import AllocationDuration, EducationLevel
 from itou.users import models
 from itou.utils.address.departments import DEPARTMENTS
 
@@ -43,6 +45,9 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         model = models.JobSeekerProfile
 
     user = factory.SubFactory(JobSeekerWithAddressFactory)
+    education_level = random.choice(EducationLevel.values)
+    # JobSeeker are created with a Pôle emploi ID
+    pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
 
 
 class PrescriberFactory(UserFactory):

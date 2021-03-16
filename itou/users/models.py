@@ -158,11 +158,16 @@ class User(AbstractUser, AddressMixin):
     def clean(self):
         """
         Validation for FS
-        Mainly ASP concerns for now
+
+        Mainly coherence checks for birth country / place.
+
+        Must be non blocking if these fields are not provided.
         """
+        # If birth country is France, then birth place must be provided
         if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
             raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
 
+        # If birth country is not France, do not fill a birth place (no ref file)
         if self.birth_country and self.birth_country.code != self.INSEE_CODE_FRANCE and self.birth_place:
             raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
 
@@ -307,7 +312,7 @@ class JobSeekerProfile(models.Model):
     - education level
     - various social allowances flags and duration
 
-    2- Job seeker address in HEXA address format:
+    2 - Job seeker address in HEXA address format:
 
     The SNA (Service National de l'Adresse) has several certification / validation
     norms to verify french addresses:
@@ -349,6 +354,8 @@ class JobSeekerProfile(models.Model):
     ERROR_HEXA_LOOKUP_COMMUNE = _("Impossible de trouver la commune à partir du code INSEE")
 
     ERROR_JOBSEEKER_TITLE = _("La civilité du demandeur d'emploi est obligatoire")
+    ERROR_JOBSEEKER_EDUCATION_LEVEL = _("Le niveau de formation du demandeur d'emploi est obligatoire")
+    ERROR_JOBSEEKER_PE_FIELDS = _("L'identifiant et la durée d'inscription à Pôle emploi vont de pair")
 
     user = models.OneToOneField(
         User,
@@ -454,10 +461,13 @@ class JobSeekerProfile(models.Model):
         if not self.user.title:
             raise ValidationError(self.ERROR_JOBSEEKER_TITLE)
 
-        # Birth place an country are checked is User.clean()
+        # Birth place an country are checked in User.clean()
         self.user.clean()
 
-    def _clean_social_allowances(self):
+        if not self.education_level:
+            raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
+
+    def _clean_job_seeker_situation(self):
         if self.resourceless and self.is_employed:
             raise ValidationError(self.ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH)
 
@@ -466,6 +476,12 @@ class JobSeekerProfile(models.Model):
 
         if self.unemployed_since and self.is_employed:
             raise ValidationError(self.ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH)
+
+        if bool(self.pole_emploi_since) != bool(self.user.pole_emploi_id):
+            raise ValidationError(self.ERROR_JOBSEEKER_PE_FIELDS)
+
+        # Social allowances fields are not mandatory
+        # However we may add some coherence check later on
 
     def _clean_job_seeker_hexa_address(self):
         # Check if any fields of the hexa address is filled
@@ -480,6 +496,7 @@ class JobSeekerProfile(models.Model):
                 self.hexa_commune,
             ]
         ):
+            # Nothing to check
             return
 
         # if any 'hexa' field is given, then check all mandatory fields
@@ -498,7 +515,7 @@ class JobSeekerProfile(models.Model):
 
     def clean(self):
         self._clean_job_seeker_details()
-        self._clean_social_allowances()
+        self._clean_job_seeker_situation()
         self._clean_job_seeker_hexa_address()
 
     def update_hexa_address(self):
@@ -510,7 +527,7 @@ class JobSeekerProfile(models.Model):
         geo API calls.
 
         Returns current object or re-raise error,
-        thus calling this method should be in a try / except block
+        thus calling this method should be done in a try/except block
         """
         result, error = format_address(self.user)
 
@@ -536,7 +553,7 @@ class JobSeekerProfile(models.Model):
 
     @property
     def is_employed(self):
-        return self.rqth_employee or self.oeth_employee
+        return self.rqth_employee or self.oeth_employee or not self.unemployed_since
 
     @property
     def has_rsa_allocation(self):
