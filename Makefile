@@ -47,6 +47,15 @@ populate_db:
 	docker exec -ti itou_postgres bash -c "psql -d itou -f backups/cities.sql"
 	docker exec -ti itou_django bash -c "ls -d itou/fixtures/django/* | xargs django-admin loaddata"
 
+
+COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers job_applications approvals eligibility invitations asp --pygraphviz -o itou-graph-models.png
+
+graph_models_itou:
+	docker exec -ti itou_django django-admin $(COMMAND_GRAPH_MODELS)
+
+local_graph_models_itou:
+	./manage.py $(COMMAND_GRAPH_MODELS)
+
 # Tests.
 # =============================================================================
 
