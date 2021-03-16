@@ -149,6 +149,9 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
     if not current_siae_pk or current_siae_pk != job_application.to_siae.pk:
         raise PermissionDenied
 
+    if not job_application.has_editable_job_seeker:
+        raise PermissionDenied
+
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
     form = EditUserInfoForm(instance=job_application.job_seeker, data=request.POST or None)
