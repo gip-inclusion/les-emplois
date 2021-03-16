@@ -200,15 +200,6 @@
                         {% translate "La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site." %}
                     </div>
 
-                    {# Temporary message during the transition to the new domains. #}
-                    {% if not request.META.HTTP_REFERER %}
-                        <div class="alert alert-warning" role="alert">
-                            {% blocktranslate %}
-                                Notre nom de domaine change. Nous vous accueillons maintenant sur <b>{{ ITOU_FQDN }}</b>
-                            {% endblocktranslate %}
-                        </div>
-                    {% endif %}
-
                 {% endblock %}
             </div>
         </div>
