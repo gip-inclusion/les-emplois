@@ -163,7 +163,6 @@
                             <a href="{% url 'prescribers_views:members' %}">
                                 {% translate "Gérer vos collaborateurs" %}
                             </a>
-                            <span class="badge badge-info">{% translate "Nouveau" %}</span>
                         </p>
                         {% if current_prescriber_organization.is_authorized %}
                             <hr>
@@ -292,12 +291,10 @@
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
                         <a href="{% url 'stats:advanced_stats' %}">{% translate "Voir les statistiques avancées"%}</a>
-                        <span class="badge badge-info">{% translate "Nouveau" %}</span>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
                         <a href="{% url 'stats:stats_vip' %}">{% translate "Voir les données sur mon territoire"%}</a>
-                        <span class="badge badge-info">{% translate "Nouveau" %}</span>
                     </p>
                 </div>
             </div>
