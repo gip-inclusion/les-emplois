@@ -170,7 +170,7 @@ class ModelTest(TestCase):
         It is mandatory for validation of JobSeekerProfile objects
         """
         job_seeker = JobSeekerFactory()
-        job_seeker.create_job_seeker_profile()
+        job_seeker.get_or_create_job_seeker_profile()
 
         self.assertIsNotNone(job_seeker.jobseeker_profile)
 

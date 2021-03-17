@@ -70,14 +70,12 @@ class User(AbstractUser, AddressMixin):
     title = models.CharField(
         max_length=3,
         verbose_name=_("Civilité"),
-        null=True,
         blank=True,
         choices=Title.choices,
     )
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"),
-        null=True,
         blank=True,
         validators=[validate_birthdate],
     )
@@ -85,14 +83,12 @@ class User(AbstractUser, AddressMixin):
         "asp.Commune",
         verbose_name=_("Commune de naissance"),
         null=True,
-        blank=True,
         on_delete=models.SET_NULL,
     )
     birth_country = models.ForeignKey(
         "asp.Country",
         verbose_name=_("Pays de naissance"),
         null=True,
-        blank=True,
         on_delete=models.SET_NULL,
     )
     email = CIEmailField(
@@ -215,6 +211,10 @@ class User(AbstractUser, AddressMixin):
     @property
     def has_external_data(self):
         return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
+
+    @property
+    def has_jobseeker_profile(self):
+        return self.is_job_seeker and hasattr(self, "jobseeker_profile")
 
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined
@@ -425,17 +425,17 @@ class JobSeekerProfile(models.Model):
     hexa_std_extension = models.CharField(
         max_length=1,
         verbose_name=_("Extension de voie"),
-        null=True,
         blank=True,
         choices=LaneExtension.choices,
     )
     hexa_non_std_extension = models.CharField(
-        max_length=10, verbose_name=_("Extension de voie (non-repertoriée)"), blank=True, null=True
+        max_length=10,
+        verbose_name=_("Extension de voie (non-repertoriée)"),
+        blank=True,
     )
     hexa_lane_type = models.CharField(
         max_length=4,
         verbose_name=_("Type de voie"),
-        null=True,
         blank=True,
         choices=LaneType.choices,
     )
@@ -445,7 +445,6 @@ class JobSeekerProfile(models.Model):
         Commune,
         verbose_name=_("Commune (ref. ASP)"),
         null=True,
-        blank=True,
         on_delete=models.SET_NULL,
     )
 
@@ -545,7 +544,7 @@ class JobSeekerProfile(models.Model):
 
         # Special field: Commune object contains both city name and INSEE code
         insee_code = result.get("insee_code")
-        self.hexa_commune = Commune.by_insee_code(insee_code)
+        self.hexa_commune = Commune.objects.by_insee_code(insee_code)
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
@@ -575,3 +574,7 @@ class JobSeekerProfile(models.Model):
     @property
     def has_social_allowance(self):
         return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
+
+    @property
+    def hexa_address_filled(self):
+        return self.hexa_lane_name and self.hexa_lane_type and self.hexa_post_code and self.hexa_commune

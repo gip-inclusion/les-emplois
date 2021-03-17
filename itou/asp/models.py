@@ -294,14 +294,17 @@ class EmployerType(models.TextChoices):
         return cls.OTHER
 
 
-class CommuneQuerySet(PeriodQuerySet):
-    def with_code(self, insee_code):
+class CommuneManager(models.Manager):
+    def get_queryset(self):
+        return PeriodQuerySet(self.model)
+
+    def by_insee_code(self, insee_code):
         """
         Lookup a Commune by INSEE code
 
         May return several results if not used with PeriodQuerySet.current
         """
-        return self.filter(code=insee_code)
+        return self.get_queryset().filter(code=insee_code).first()
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
@@ -320,17 +323,10 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
     name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
 
-    objects = models.Manager.from_queryset(CommuneQuerySet)()
+    objects = CommuneManager()
 
     class Meta:
         verbose_name = _("Commune")
-
-    @staticmethod
-    def by_insee_code(insee_code):
-        """
-        Simple lookup of Commune by INSEE code
-        """
-        return Commune.objects.current().with_code(insee_code).first()
 
 
 class Department(PrettyPrintMixin, AbstractPeriod):
@@ -397,10 +393,6 @@ class Country(PrettyPrintMixin, models.Model):
         Polynesian islands are considered as a disting country but are french in fine
         """
         return self.group == self.Group.FRANCE
-
-    @classmethod
-    def metropolitan_france(cls):
-        return cls.objects.get(code=cls._CODE_FRANCE)
 
 
 class SiaeKind(PrettyPrintMixin, AbstractPeriod):

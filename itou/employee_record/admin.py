@@ -1,26 +1,6 @@
 from django.contrib import admin
 
 import itou.employee_record.models as models
-from itou.job_applications.models import JobApplication
-
-
-class JobSeekerInline(admin.StackedInline):
-    model = JobApplication
-    readonly_fields = ("pk", "user")
-    fields = (
-        "title",
-        "birth_country",
-        "birth_place",
-    )
-
-    def title(self, obj):
-        return obj.job_seeker.title
-
-    def birth_country(self, obj):
-        return obj.job_seeker.birth_country
-
-    def birth_place(self, obj):
-        return obj.job_seeker.birth_place
 
 
 @admin.register(models.EmployeeRecord)
