@@ -6,7 +6,6 @@ from django.forms.models import model_to_dict
 from django.utils.dateparse import parse_datetime
 
 from itou.external_data.models import ExternalDataImport, JobSeekerExternalData
-from itou.users.models import User
 
 
 # PE Connect API data retrieval tools
@@ -35,17 +34,17 @@ logger = logging.getLogger(__name__)
 def _call_api(api_path, token):
     """
     Make a sync call to an API
-    For further processing, returning smth else than `None` if considered a success
+    For further processing, returning something else than `None` is considered a success
     """
     url = f"{API_ESD_BASE_URL}/{api_path}"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=settings.REQUESTS_TIMEOUT)
-    if resp.status_code == 200:
-        result = resp.json()
+    response = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=settings.REQUESTS_TIMEOUT)
+    if response.status_code == 200:
+        result = response.json()
         # logger.debug(f"CALL {url}: {result}")
         return result
 
     # Track it for QoS
-    logger.warning(f"API call to: {url} returned status code {resp.status_code}")
+    logger.warning("API call to: %s returned status code %s", url, response.status_code)
     return None
 
 
@@ -64,7 +63,6 @@ def _get_userinfo(token):
         * email address
 
     See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-individu-v1.html  # noqa E501
-
     """
     # Fields of interest
     keys = ["given_name", "family_name", "gender", "email"]
@@ -76,15 +74,14 @@ def _get_birthdate(token):
     Get birthdate of user (format `YYYY-MM-DDTHH:MM:SSZ`), converted as `datetime` object.
 
     See: https://www.emploi-store-dev.fr/portail-developpeur-cms/home/catalogue-des-api/documentation-des-api/api/api-pole-emploi-connect/api-peconnect-datenaissance-v1.html  # noqa E501
-
     """
     key = "dateDeNaissance"
     # code, resp = _call_api(ESD_BIRTHDATE_API, token)
     result = _fields_or_failed(_call_api(ESD_BIRTHDATE_API, token), [key])
     if result:
         return {key: result.get(key)}
-    else:
-        return None
+
+    return None
 
 
 def _get_status(token):
@@ -166,11 +163,11 @@ def _get_aggregated_user_data(token):
     else:
         status = ExternalDataImport.STATUS_FAILED
 
-    resp = {}
+    user_data = {}
     for result in cleaned_results:
-        resp.update(result)
+        user_data.update(result)
 
-    return status, resp
+    return status, user_data
 
 
 def _model_fields_changed(initial, final_instance):
@@ -188,7 +185,7 @@ def _model_fields_changed(initial, final_instance):
 # * or store as key / value if needed
 
 
-def _store_user_data(user, status, data):
+def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
     """
     Store user data and produce a "report" containing a JSON object, with these fields:
         - fields_fetched (array): successfully imported field names
@@ -198,20 +195,17 @@ def _store_user_data(user, status, data):
 
     Return a ExternalDataImport object containing outcome of the data import
     """
-    # Set a trace of data import, whatever the resulting status
-    data_import = user.externaldataimport_set.pe_imports().first()
+    fields_fetched = [k for k, v in user_data.items() if v is not None]
+    fields_failed = [k for k, v in user_data.items() if v is None]
 
-    fields_fetched = [k for k, v in data.items() if v is not None]
-    fields_failed = [k for k, v in data.items() if v is None]
-
-    job_seeker_data, _ = JobSeekerExternalData.objects.get_or_create(user=user, data_import=data_import)
+    job_seeker_data, _ = JobSeekerExternalData.objects.get_or_create(user=user, data_import=pe_data_import)
 
     # Record changes on model objects:
     initial_job_seekeer_data = model_to_dict(job_seeker_data)
     initial_user = model_to_dict(user)
 
     for k in fields_fetched:
-        v = data.get(k)
+        v = user_data.get(k)
 
         # User part:
         if k == "dateDeNaissance":
@@ -227,7 +221,7 @@ def _store_user_data(user, status, data):
 
         # JobSeekerExternalData part:
         if k == "codeStatutIndividu":
-            job_seeker_data.is_pe_jobseeker = True if v == 1 else False
+            job_seeker_data.is_pe_jobseeker = v == 1
         elif k == "beneficiairePrestationSolidarite":
             job_seeker_data.has_minimal_social_allowance = v
 
@@ -241,49 +235,46 @@ def _store_user_data(user, status, data):
     job_seeker_data.save()
 
     report = {"fields_fetched": fields_fetched, "fields_failed": fields_failed, "fields_updated": fields_updated}
-
-    data_import.status = status
-    data_import.report = report
-    data_import.save()
-
-    return data_import
+    pe_data_import.status = status
+    pe_data_import.report = report
+    return pe_data_import
 
 
 #  Public
 
 
-def import_user_data(user_pk, token):
+def import_user_pe_data(
+    user,
+    token,
+    pe_data_import=None,
+):
     """
     Import external user data via PE Connect
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
-
-    This function is *synchronous*
-
     """
-    user = User.objects.get(pk=user_pk)
-    data_import, _ = ExternalDataImport.objects.get_or_create(
-        source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user
-    )
+    if not pe_data_import:
+        pe_data_import = ExternalDataImport.objects.create(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user)
 
-    # Save pending status if updating record
-    if data_import != ExternalDataImport.STATUS_PENDING:
-        data_import.status = ExternalDataImport.STATUS_PENDING
-        data_import.save()
+    # Save pending status if updating record (transitive state)
+    if pe_data_import != ExternalDataImport.STATUS_PENDING:
+        pe_data_import.status = ExternalDataImport.STATUS_PENDING
+        pe_data_import.save()
 
     try:
-        status, result = _get_aggregated_user_data(token)
-        data_import = _store_user_data(user, status, result)
+        status, user_data = _get_aggregated_user_data(token)
+        set_pe_data_import_from_user_data(pe_data_import, user, status, user_data)
+        pe_data_import.save()
 
         # At the moment, results are stored only if OK
         if status == ExternalDataImport.STATUS_OK:
-            logger.info(f"Stored external data for user {user}")
+            logger.info("Stored external data for user %s", user)
         elif status == ExternalDataImport.STATUS_PARTIAL:
-            logger.warning(f"Could only fetch partial results for {user}")
+            logger.warning("Could only fetch partial results for %s", user)
         else:
-            logger.error(f"Could not fetch any data for {user}: not data stored")
-    except Exception as ex:
-        logger.error(f"Data import for {user} failed: {ex}")
-        data_import.status = ExternalDataImport.STATUS_FAILED
-        data_import.save()
+            logger.error("Could not fetch any data for %s: not data stored", user)
+    except Exception as e:
+        logger.error("Data import for %s failed: %s", user, e)
+        pe_data_import.status = ExternalDataImport.STATUS_FAILED
+        pe_data_import.save()
 
-    return data_import
+    return pe_data_import
