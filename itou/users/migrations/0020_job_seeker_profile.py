@@ -176,7 +176,10 @@ class Migration(migrations.Migration):
             model_name="user",
             name="birthdate",
             field=models.DateField(
-                blank=True, validators=[itou.utils.validators.validate_birthdate], verbose_name="Date de naissance"
+                null=True,
+                blank=True,
+                validators=[itou.utils.validators.validate_birthdate],
+                verbose_name="Date de naissance",
             ),
         ),
         migrations.AlterField(
