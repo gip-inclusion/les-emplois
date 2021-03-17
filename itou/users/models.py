@@ -76,6 +76,7 @@ class User(AbstractUser, AddressMixin):
 
     birthdate = models.DateField(
         verbose_name=_("Date de naissance"),
+        null=True,
         blank=True,
         validators=[validate_birthdate],
     )
