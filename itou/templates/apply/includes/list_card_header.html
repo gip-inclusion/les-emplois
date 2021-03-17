@@ -16,7 +16,9 @@
 
     <br>
 
-    {% if request.user.is_prescriber %}
+    {% if request.user.is_job_seeker %}
+        <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+    {% else %}
         {% if job_application.last_state_change %}
             <small class="text-muted"><b>{% translate "Envoyée le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}</small>
             <br>
@@ -25,12 +27,9 @@
             </small>
         {% else %}
             <small class="{% if job_application.is_old %}text-danger{% else %}text-muted{% endif %}">
-            <b>{% translate "Sans réponse depuis le " %}{{ job_application.created_at|date:"d F Y à H:i" }}</b>
+            <b>{% translate "Sans réponse depuis le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}
             </small>
         {% endif %}
-
-    {% else %}
-        <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
     {% endif %}
 
 
