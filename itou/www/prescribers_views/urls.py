@@ -15,4 +15,5 @@ urlpatterns = [
     re_path(
         "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
     ),
+    path("list_accredited_organizations", views.list_accredited_organizations, name="list_accredited_organizations"),
 ]

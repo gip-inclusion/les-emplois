@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -9,7 +10,41 @@ from itou.prescribers.factories import (
 from itou.prescribers.models import PrescriberOrganization
 
 
-class ModelTest(TestCase):
+class PrescriberOrganizationManagerTest(TestCase):
+    """
+    Test PrescriberOrganizationManager.
+    """
+
+    def test_get_accredited_orgs_for(self):
+        """
+        Test `get_accredited_orgs_for`.
+        """
+
+        expected_num = 3
+
+        departmental_council_org = AuthorizedPrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.DEPT)
+
+        # An org accredited by a departmental council:
+        # - is in the same department
+        # - is of kind `DEPT_BRSA`
+        AuthorizedPrescriberOrganizationFactory.create_batch(
+            expected_num, department=departmental_council_org.department, kind=PrescriberOrganization.Kind.DEPT_BRSA
+        )
+
+        other_org = AuthorizedPrescriberOrganizationFactory(
+            department=departmental_council_org.department, kind=PrescriberOrganization.Kind.CAP_EMPLOI
+        )
+
+        # `expected_num` orgs should be accredited by the departmental council.
+        accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(departmental_council_org)
+        self.assertEqual(accredited_orgs.count(), expected_num)
+
+        # No orgs should be accredited by the other org.
+        accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
+        self.assertEqual(accredited_orgs.count(), 0)
+
+
+class PrescriberOrganizationModelTest(TestCase):
     def test_clean_siret(self):
         """
         Test that a SIRET number is required only for non-PE organizations.
