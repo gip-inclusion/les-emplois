@@ -9,6 +9,7 @@ from django.db import models
 from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
@@ -128,14 +129,18 @@ class JobApplicationQuerySet(models.QuerySet):
         Stop the deluge of database queries that is caused by accessing related
         objects in job applications's lists.
         """
-        qs = self.select_related(
-            "approval",
-            "job_seeker",
-            "sender",
-            "sender_siae",
-            "sender_prescriber_organization",
-            "to_siae__convention",
-        ).prefetch_related("selected_jobs__appellation")
+        qs = (
+            self.select_related(
+                "approval",
+                "job_seeker",
+                "sender",
+                "sender_siae",
+                "sender_prescriber_organization",
+                "to_siae__convention",
+            )
+            .prefetch_related("selected_jobs__appellation")
+            .prefetch_related("logs")
+        )
         has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
         return qs.annotate(has_suspended_approval=Exists(has_suspended_approval))
 
@@ -436,13 +441,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # Job application freshness
 
-    @property
-    def last_answer_from_siae(self):
+    @cached_property
+    def last_state_change(self):
         if not self.logs:
             return None
-        return self.logs.all().order_by("timestamp").last()
+        # Ordering is explicitly defined in JobApplicationTransitionLog.
+        return self.logs.first()
 
-    @property
+    @cached_property
     def is_old(self):
         """
         A job application is considered to be old when:
@@ -450,9 +456,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         - or the employer did not answer since a long time ago.
         """
         freshness_limit = timezone.now() - relativedelta(weeks=self.WEEKS_BEFORE_CONSIDERED_OLD)
-        if not self.last_answer_from_siae:
+        if not self.last_state_change:
             return freshness_limit > self.created_at
-        return freshness_limit > self.last_answer_from_siae.timestamp
+        return freshness_limit > self.last_state_change.timestamp
 
     @property
     def is_pending(self):
