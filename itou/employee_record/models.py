@@ -199,9 +199,12 @@ class EmployeeRecord(models.Model):
 
         if (
             job_application.can_be_cancelled
-            or not job_application.is_accepted
+            or not job_application.is_state_accepted
             or not job_application.approval
-            or cls.objects.with_job_seeker_and_siae(job_application.job_seeker, job_application.to_siae).exists()
+            or cls.objects.filter(
+                asp_id=job_application.to_siae.convention.asp_id,
+                approval_number=job_application.approval.number,
+            ).exists()
         ):
             return None
 
@@ -210,7 +213,7 @@ class EmployeeRecord(models.Model):
         # If the jobseeker has no profile, create one
         job_application.job_seeker.create_job_seeker_profile()
 
-        fs.asp_id = fs.asp_convention_id
-        fs.approval = fs.approval.number
+        fs.asp_id = job_application.to_siae.convention.asp_id
+        fs.approval_number = job_application.approval.number
 
         return fs
