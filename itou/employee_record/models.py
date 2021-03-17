@@ -26,22 +26,22 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         These FS are ready to to be sent to ASP
         """
-        return self.filter(status=Status.READY).order_by("-created_at")
+        return self.filter(status=Status.READY)
 
     def sent(self):
-        return self.filter(status=Status.SENT).order_by("-created_at")
+        return self.filter(status=Status.SENT)
 
     def rejected(self):
-        return self.filter(status=Status.REJECTED).order_by("-created_at")
+        return self.filter(status=Status.REJECTED)
 
     def processed(self):
-        return self.filter(status=Status.PROCESSED).order_by("-created_at")
+        return self.filter(status=Status.PROCESSED)
 
     def archived(self):
         """
         Archived employee records (completed and having a JSON archive)
         """
-        return self.filter(status=Status.ARCHIVED).order_by("-created_at")
+        return self.filter(status=Status.ARCHIVED)
 
 
 class EmployeeRecord(models.Model):
@@ -95,7 +95,10 @@ class EmployeeRecord(models.Model):
     class Meta:
         verbose_name = _("Fiche salarié")
         verbose_name_plural = _("Fiches salarié")
-        constraints = [models.UniqueConstraint(fields=["asp_id", "approval_number"], name="un_asp_id_approval_number")]
+        constraints = [
+            models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
+        ]
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"{self.asp_id} - {self.approval.approval_number} - {self.job_seeker}"
@@ -137,6 +140,25 @@ class EmployeeRecord(models.Model):
         self._clean_job_seeker()
 
     # Business methods
+
+    def prepare(self):
+        """
+        Prepare the employee record for transmission
+
+        This method can raise ValidationError
+        """
+        profile = self.job_seeker.jobseeker_profile
+
+        if not profile.hexa_address_filled:
+            # Format job seeker address
+            profile.update_hexa_address()
+
+        self.job_seeker.clean()
+        profile.clean()
+
+        # If we reach this point, the employee record is ready to be serialized
+        # and can be sent to ASP
+        self.status = Status.READY
 
     @property
     def is_archived(self):
@@ -199,7 +221,7 @@ class EmployeeRecord(models.Model):
 
         if (
             job_application.can_be_cancelled
-            or not job_application.is_state_accepted
+            or not job_application.state.is_accepted
             or not job_application.approval
             or cls.objects.filter(
                 asp_id=job_application.to_siae.convention.asp_id,
@@ -210,10 +232,10 @@ class EmployeeRecord(models.Model):
 
         fs = cls(job_application=job_application)
 
-        # If the jobseeker has no profile, create one
-        job_application.job_seeker.create_job_seeker_profile()
-
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number
+
+        # If the jobseeker has no profile, create one
+        job_application.job_seeker.get_or_create_job_seeker_profile()
 
         return fs

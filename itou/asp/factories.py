@@ -42,9 +42,9 @@ class CountryFranceFactory(CountryFactory):
     code, name, group = "100", "FRANCE", "1"
 
 
-class CountryFranceOtherFactory(CountryFactory):
+class CountryCollectiviteOutremerFactory(CountryFactory):
     """
-    Parts of France but having their own INSEE country code
+    Parts or regions of France having their own INSEE country code
 
     Most of them are "Collectivités d'Outre-Mer"
     """
