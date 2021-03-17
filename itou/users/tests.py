@@ -111,7 +111,6 @@ class ModelTest(TestCase):
         job_seeker.last_login = timezone.now()
         self.assertFalse(job_seeker.is_handled_by_proxy)
 
-<<<<<<< HEAD
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         user = job_application.job_seeker
@@ -119,7 +118,7 @@ class ModelTest(TestCase):
         self.assertTrue(user.last_hire_was_made_by_siae(siae))
         siae2 = SiaeFactory()
         self.assertFalse(user.last_hire_was_made_by_siae(siae2))
-=======
+
     def test_valid_birth_place_and_country(self):
         """
         Birth place and country are not mandatory except for ASP / FS
