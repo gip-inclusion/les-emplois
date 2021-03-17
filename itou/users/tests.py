@@ -211,7 +211,7 @@ class JobSeekerProfileModelTest(TestCase):
 
     def test_social_allowances(self):
         """
-        Check if the social allowance part is coherent
+        Check if the social allowances part is coherent
         """
         User = get_user_model()
         self.profile.user.title = User.Title.M
