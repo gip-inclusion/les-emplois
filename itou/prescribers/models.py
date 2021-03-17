@@ -376,6 +376,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         return get_email_message(to, context, subject, body)
 
 
+class PrescriberMembershipQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True, user__is_active=True)
+
+
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""
 
@@ -393,6 +398,8 @@ class PrescriberMembership(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
     )
+
+    objects = models.Manager.from_queryset(PrescriberMembershipQuerySet)()
 
     class Meta:
         unique_together = ("user_id", "organization_id")
