@@ -24,9 +24,9 @@ class PEAMUOAuth2Adapter(OAuth2Adapter):
     def complete_login(self, request, app, token, **kwargs):
         id_token = token.token
         headers = {"Authorization": f"Bearer {id_token}"}
-        resp = requests.get(self.profile_url, params=None, headers=headers, timeout=settings.REQUESTS_TIMEOUT)
-        resp.raise_for_status()
-        extra_data = resp.json()
+        response = requests.get(self.profile_url, params=None, headers=headers, timeout=settings.REQUESTS_TIMEOUT)
+        response.raise_for_status()
+        extra_data = response.json()
         extra_data["id_token"] = id_token
         login = self.get_provider().sociallogin_from_response(request, extra_data)
         return login

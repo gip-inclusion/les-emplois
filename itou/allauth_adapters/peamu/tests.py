@@ -30,7 +30,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
             """,
         )
 
-    @mock.patch("itou.external_data.signals.save_pe_token_on_peamu_login")
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_data_created_by_peamu_login(self, mock_login_signal):
         test_email = "john.doe@example.com"
         self.login(self.get_mocked_response())
@@ -56,7 +56,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         self.assertEqual(email_address.user.is_siae_staff, False)
         self.assertEqual(email_address.user.is_staff, False)
 
-    @mock.patch("itou.external_data.signals.save_pe_token_on_peamu_login")
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_peamu_connection_for_existing_non_peamu_user(self, mock_login_signal):
         email = "user@example.com"
         user = get_user_model().objects.create(username="user", is_active=True, email=email, is_job_seeker=True)
@@ -77,7 +77,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         self.assertEqual(EmailAddress.objects.filter(email=email).count(), 1)
         self.assertEqual(EmailAddress.objects.filter(email="john.doe@example.com").count(), 0)
 
-    @mock.patch("itou.external_data.signals.save_pe_token_on_peamu_login")
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_email_verification_is_skipped_for_peamu_account(self, mock_login_signal):
         test_email = "john.doe@example.com"
         self.login(self.get_mocked_response())
@@ -88,7 +88,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         self.assertFalse(EmailConfirmation.objects.filter(email_address__email=test_email).exists())
         self.assertEqual(len(mail.outbox), 0)
 
-    @mock.patch("itou.external_data.signals.save_pe_token_on_peamu_login")
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_username_is_based_on_first_name(self, mock_login_signal):
         first_name = "jessica"
         last_name = "parker"
@@ -98,7 +98,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         user = get_user_model().objects.get(email=email)
         self.assertEqual(user.username, "jessica")
 
-    @mock.patch("itou.external_data.signals.save_pe_token_on_peamu_login")
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_username_is_based_on_email_if_first_name_is_exotic(self, mock_login_signal):
         first_name = "明"
         last_name = "小"
@@ -108,7 +108,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         user = get_user_model().objects.get(email=email)
         self.assertEqual(user.username, "john.doe")
 
-    @mock.patch("itou.external_data.signals.save_pe_token_on_peamu_login")
+    @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_user_signed_up_signal(self, mock_login_signal):
         sent_signals = []
 

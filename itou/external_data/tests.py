@@ -6,12 +6,12 @@ from django.test import TestCase
 import itou.external_data.apis.pe_connect as pec
 from itou.users.factories import JobSeekerFactory
 
-from .apis.pe_connect import import_user_data
+from .apis.pe_connect import import_user_pe_data
 from .models import ExternalDataImport
 
 
 # Test data import status (All ok, failed, partial)
-# Tests are SYNCHRONOUS (because calls to `import_user_data` are)
+# Tests are SYNCHRONOUS (because calls to `import_user_pe_data` are)
 
 FOO_TOKEN = "kreacher_token"
 
@@ -96,8 +96,8 @@ class ExternalDataImportTest(TestCase):
         # Mock all PE APIs
         _status_ok(m)
 
-        result = import_user_data(user.pk, FOO_TOKEN)
-        self.assertEqual(result.status, ExternalDataImport.STATUS_OK)
+        result = import_user_pe_data(user, FOO_TOKEN)
+        self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
 
         report = result.report
 
@@ -112,8 +112,8 @@ class ExternalDataImportTest(TestCase):
         user = JobSeekerFactory()
         _status_partial(m)
 
-        result = import_user_data(user.pk, FOO_TOKEN)
-        self.assertEqual(result.status, ExternalDataImport.STATUS_PARTIAL)
+        result = import_user_pe_data(user, FOO_TOKEN)
+        self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
 
         report = result.report
         self.assertTrue(user.has_external_data)
@@ -130,8 +130,8 @@ class ExternalDataImportTest(TestCase):
         user = JobSeekerFactory()
         _status_failed(m)
 
-        result = import_user_data(user.pk, FOO_TOKEN)
-        self.assertEqual(result.status, ExternalDataImport.STATUS_FAILED)
+        result = import_user_pe_data(user, FOO_TOKEN)
+        self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
 
         report = result.report
         self.assertEqual(0, len(report.get("fields_updated")))
@@ -150,7 +150,7 @@ class JobSeekerExternalDataTest(TestCase):
         user.birthdate = None
         user.save()
 
-        result = import_user_data(user.pk, FOO_TOKEN)
+        result = import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
         self.assertTrue(user.has_external_data)
 
@@ -172,7 +172,7 @@ class JobSeekerExternalDataTest(TestCase):
         user = JobSeekerFactory()
         birthdate = user.birthdate
 
-        report = import_user_data(user.pk, FOO_TOKEN).report
+        report = import_user_pe_data(user, FOO_TOKEN).report
 
         user.refresh_from_db()
 
@@ -184,7 +184,7 @@ class JobSeekerExternalDataTest(TestCase):
         _status_partial(m)
 
         user = JobSeekerFactory()
-        import_user_data(user.pk, FOO_TOKEN)
+        import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
         self.assertTrue(user.has_external_data)
 
@@ -202,7 +202,7 @@ class JobSeekerExternalDataTest(TestCase):
         _status_failed(m)
 
         user = JobSeekerFactory()
-        import_user_data(user.pk, FOO_TOKEN)
+        import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
         self.assertTrue(user.has_external_data)
 
@@ -217,7 +217,7 @@ class JobSeekerExternalDataTest(TestCase):
         user1 = JobSeekerFactory()
         user2 = JobSeekerFactory()
 
-        import_user_data(user1.pk, FOO_TOKEN)
+        import_user_pe_data(user1, FOO_TOKEN)
         user1.refresh_from_db()
 
         self.assertTrue(user1.has_external_data)

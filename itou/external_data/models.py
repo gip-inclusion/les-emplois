@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ExternalDataImportQuerySet(models.QuerySet):
-    def pe_imports(self):
+    def pe_sources(self):
         return self.filter(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT)
 
 
