@@ -34,7 +34,7 @@ pylint:
 setup_git_pre_commit_hook:
 	touch .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
-	echo "\
+	echo -e "\
 	docker exec -t itou_django black itou\n\
 	docker exec -t itou_django isort itou\n\
 	" > .git/hooks/pre-commit

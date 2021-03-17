@@ -294,6 +294,15 @@ class User(AbstractUser, AddressMixin):
         ):
             raise ValidationError(_("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."))
 
+    def get_or_create_job_seeker_profile(self):
+        if hasattr(self, "jobseeker_profile"):
+            return self.jobseeker_profile
+
+        profile = JobSeekerProfile(user=self)
+        profile.save()
+
+        return profile
+
 
 def get_allauth_account_user_display(user):
     return user.email
