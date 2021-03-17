@@ -5,10 +5,10 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
+import itou.asp.factories as asp
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import SiaeFactory
-import itou.asp.factories as asp
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
@@ -211,7 +211,7 @@ class JobSeekerProfileModelTest(TestCase):
 
     def test_social_allowances(self):
         """
-        Check if the allowance part is coherent
+        Check if the social allowance part is coherent
         """
         User = get_user_model()
         self.profile.user.title = User.Title.M
