@@ -445,8 +445,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def last_state_change(self):
         if not self.logs:
             return None
-        # Ordering is explicitly defined in JobApplicationTransitionLog.
-        return self.logs.first()
+
+        return self.logs.most_recent()
 
     @cached_property
     def is_old(self):
@@ -663,6 +663,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
 
+class JobApplicationTransitionLogQuerySet(models.QuerySet):
+    def most_recent(self):
+        # Ordering is set in JobApplicationTransitionLog.Meta
+        return self.first()
+
+
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     """
     JobApplication's transition logs are stored in this table.
@@ -673,6 +679,7 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    objects = models.Manager.from_queryset(JobApplicationTransitionLogQuerySet)()
 
     class Meta:
         verbose_name = _("Log des transitions de la candidature")
