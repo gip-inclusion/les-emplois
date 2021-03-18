@@ -233,10 +233,14 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         # Popular job descriptions count related **pending** job applications.
         # They should ignore other states.
         job_description = siae_job_descriptions[2]
-        for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
-            JobApplicationFactory(
-                to_siae=self.siae, selected_jobs=[popular_job_description], state=JobApplicationWorkflow.STATE_ACCEPTED
-            )
+        threshold_exceeded = SiaeJobDescription.POPULAR_THRESHOLD + 1
+
+        JobApplicationFactory.create_batch(
+            threshold_exceeded,
+            to_siae=self.siae,
+            selected_jobs=[popular_job_description],
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        )
 
         self.assertFalse(SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular)
 
