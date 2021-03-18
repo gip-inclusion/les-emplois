@@ -9,6 +9,10 @@
     >{% translate "Plus d'informations" %}</a>
     <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
         <p>
+            <b>{% translate "Candidat :" %}</b>
+            {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
+        </p>
+        <p>
             <b>{% translate "Message de candidature :" %}</b>
         </p>
         <div>
@@ -17,7 +21,7 @@
         {% if job_application.state.is_refused %}
             {% if user.is_prescriber %}
                 <p>
-                    <b>{% translate "Motif du refus :" %}</b>
+                    <b>{% translate "Motif du refus :" %}</b>
                 </p>
                 <p>{{ job_application.get_refusal_reason_display }}</p>
             {% endif %}
