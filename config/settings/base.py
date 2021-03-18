@@ -328,8 +328,8 @@ API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
-API_ESD_KEY = os.environ.get("API_ESD_KEY")
-API_ESD_SECRET = os.environ.get("API_ESD_SECRET")
+API_ESD_KEY = os.environ.get("API_ESD_KEY", "")
+API_ESD_SECRET = os.environ.get("API_ESD_SECRET", "")
 API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
 API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
 
@@ -347,7 +347,7 @@ SOCIALACCOUNT_PROVIDERS = {
     },
 }
 SOCIALACCOUNT_EMAIL_VERIFICATION = "none"
-SOCIALACCOUNT_ADAPTER = "itou.allauth.peamu.adapter.PEAMUSocialAccountAdapter"
+SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountAdapter"
 
 # PDFShift
 # ------------------------------------------------------------------------------
@@ -362,6 +362,21 @@ TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
 
 # Itou.
 # ------------------------------------------------------------------------------
+
+# This trick
+# https://github.com/pennersr/django-allauth/issues/749#issuecomment-70402595
+# fixes the following issue
+# https://github.com/pennersr/django-allauth/issues/749
+# Without this trick, python manage.py makemigrations
+# would want to create a migration in django-allauth dependency
+# /usr/local/lib/python3.7/site-packages/allauth/socialaccount/migrations/0004_auto_20200415_1510.py
+# - Alter field provider on socialaccount
+# - Alter field provider on socialapp
+#
+# This setting redirects the migrations for socialaccount to our directory
+MIGRATION_MODULES = {
+    "socialaccount": "itou.allauth_adapters.migrations",
+}
 
 # Environment, sets the type of env of the app (DEMO, REVIEW_APP, STAGING, DEV…)
 ITOU_ENVIRONMENT = "PROD"

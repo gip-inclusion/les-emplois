@@ -4,6 +4,7 @@ from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -36,6 +37,20 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
             .annotate(distance=Distance("coords", point))
             .order_by("distance")
         )
+
+    def prefetch_active_memberships(self):
+        qs = PrescriberMembership.objects.active().select_related("user")
+        return self.prefetch_related(Prefetch("prescribermembership_set", queryset=qs))
+
+
+class PrescriberOrganizationManager(models.Manager):
+    def get_accredited_orgs_for(self, org):
+        """
+        Returns organizations accredited by the given organization.
+        """
+        if org.kind == self.model.Kind.DEPT and org.is_authorized:
+            return self.filter(department=org.department, kind=PrescriberOrganization.Kind.DEPT_BRSA)
+        return self.none()
 
 
 class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
@@ -184,7 +199,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         on_delete=models.SET_NULL,
     )
 
-    objects = models.Manager.from_queryset(PrescriberOrganizationQuerySet)()
+    objects = PrescriberOrganizationManager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
         verbose_name = _("Organisation")
@@ -369,6 +384,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         return get_email_message(to, context, subject, body)
 
 
+class PrescriberMembershipQuerySet(models.QuerySet):
+    def active(self):
+        return self.filter(is_active=True, user__is_active=True)
+
+
 class PrescriberMembership(models.Model):
     """Intermediary model between `User` and `PrescriberOrganization`."""
 
@@ -386,6 +406,8 @@ class PrescriberMembership(models.Model):
         on_delete=models.CASCADE,
         verbose_name=_("Mis à jour par"),
     )
+
+    objects = models.Manager.from_queryset(PrescriberMembershipQuerySet)()
 
     class Meta:
         unique_together = ("user_id", "organization_id")

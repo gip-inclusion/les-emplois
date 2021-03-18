@@ -11,9 +11,7 @@ from itou.www.login import views as login_views
 register_converter(SiretConverter, "siret")
 
 urlpatterns = [
-
     path("admin/", admin.site.urls),
-
     # --------------------------------------------------------------------------------------
     # allauth URLs. Order is important because some URLs are overriden.
     # --------------------------------------------------------------------------------------
@@ -21,18 +19,14 @@ urlpatterns = [
     # /accounts/signup/ <=> account_signup
     # We don't want any user to be able to signup using the default allauth `signup` url
     # because we have multiple specific signup processes for different kind of users.
-    re_path(
-        r"^accounts/signup/$", signup_views.signup
-    ),
+    re_path(r"^accounts/signup/$", signup_views.signup),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_login` URL.
     # /accounts/login/ <=> account_login
     # We override this view because the login page should look slightly differently
     # for job seekers, prescribers and employers.
     # Also, PEAMU is only available for job seekers.
-    re_path(
-        r"^accounts/login/$", login_views.login
-    ),
+    re_path(r"^accounts/login/$", login_views.login),
     # --------------------------------------------------------------------------------------
     # Override allauth `account_change_password` URL.
     # /accounts/password/change/ <=> account_change_password
@@ -51,12 +45,10 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
     # PEAMU URLs.
-    path("accounts/", include("itou.allauth.peamu.urls")),
+    path("accounts/", include("itou.allauth_adapters.peamu.urls")),
     # --------------------------------------------------------------------------------------
-
     # API.
-    path("api/v1/", include("itou.api.urls", namespace='v1')),
-
+    path("api/v1/", include("itou.api.urls", namespace="v1")),
     # www.
     path("", include("itou.www.home.urls")),
     path("apply/", include("itou.www.apply.urls")),
@@ -70,12 +62,10 @@ urlpatterns = [
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
-
     # Errors pages.
     path("403/", TemplateView.as_view(template_name="403.html"), name="403"),
     path("404/", TemplateView.as_view(template_name="404.html"), name="404"),
     path("500/", TemplateView.as_view(template_name="500.html"), name="500"),
-
 ]
 
 if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:

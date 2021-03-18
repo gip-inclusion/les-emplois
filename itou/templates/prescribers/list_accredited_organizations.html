@@ -1,0 +1,101 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Liste des organisations conventionnées" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    <h1>
+        {% translate "Liste des organisations conventionnées" %}
+    </h1>
+
+    <h2>
+         <span class="text-muted">{{ prescriber_org.display_name }}</span>
+    </h2>
+
+    <div class="alert alert-info" role="alert">
+        {% translate "Seuls les administrateurs peuvent voir cette liste." %}
+    </div>
+
+    <hr>
+
+    {% if not accredited_orgs %}
+
+        <div class="alert alert-secondary" role="info">
+            {% translate "Aucun résultat." %}
+        </div>
+
+    {% else %}
+
+        <ul>
+
+            {% for org in accredited_orgs %}
+
+                <li>
+
+                    <p>
+                        <b>{{ org.display_name }}</b>
+                         -
+                         <span class="text-muted">{{ org.city }}</span>
+                         <br>
+                        <a
+                            data-toggle="collapse"
+                            href="#collapse_membership_{{ org.pk }}"
+                            role="button"
+                            aria-expanded="false"
+                            aria-controls="collapse_membership_{{ org.pk }}"
+                        >
+                            {% translate "Voir les membres" %}
+                        </a>
+                    </p>
+
+                    <div class="collapse" id="collapse_membership_{{ org.pk }}">
+
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">{% translate "Nom" %}</th>
+                                        <th scope="col">{% translate "Prénom" %}</th>
+                                        <th scope="col">{% translate "Email" %}</th>
+                                        <th scope="col">{% translate "Administrateur" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for membership in org.prescribermembership_set.all %}
+                                        <tr>
+                                            <th scope="row">{{ forloop.counter }}</th>
+                                            <td>
+                                                {{ membership.user.last_name|title }}
+                                            </td>
+                                            <td>
+                                                {{ membership.user.first_name|title }}
+                                            </td>
+                                            <td>
+                                                <a href="mailto:{{ membership.user.email }}">
+                                                    {{ membership.user.email }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                {% if membership.is_admin %}
+                                                    {% include "includes/icon.html" with icon="check" %}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </li>
+
+            {% endfor %}
+
+        </ul>
+
+    {% endif %}
+
+{% endblock %}

@@ -147,3 +147,27 @@ def update_admin_role(request, action, user_id, template_name="prescribers/updat
     }
 
     return render(request, template_name, context)
+
+
+@login_required
+def list_accredited_organizations(request, template_name="prescribers/list_accredited_organizations.html"):
+    """
+    List organizations accredited by a departmental council ("Conseil Départemental").
+    """
+    prescriber_org = get_current_org_or_404(request)
+
+    required_permissions = [
+        prescriber_org.is_authorized,
+        prescriber_org.kind == prescriber_org.Kind.DEPT,
+        prescriber_org.has_admin(request.user),
+    ]
+
+    if not all(required_permissions):
+        raise PermissionDenied
+
+    accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(
+        prescriber_org
+    ).prefetch_active_memberships()
+
+    context = {"prescriber_org": prescriber_org, "accredited_orgs": accredited_orgs}
+    return render(request, template_name, context)

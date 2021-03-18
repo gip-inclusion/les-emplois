@@ -21,6 +21,13 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     kind = models.PrescriberOrganization.Kind.PE
 
 
+class AuthorizedPrescriberOrganizationFactory(PrescriberOrganizationFactory):
+    """Returns an authorized PrescriberOrganization() object."""
+
+    is_authorized = True
+    authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
+
+
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
     """
     Returns a PrescriberMembership() object with:

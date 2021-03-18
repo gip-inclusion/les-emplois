@@ -7,8 +7,8 @@ from allauth.utils import get_request_param
 from django.core.exceptions import PermissionDenied
 from requests import RequestException
 
-from itou.allauth.peamu.adapter import PEAMUOAuth2Adapter
-from itou.allauth.peamu.client import PEAMUOAuth2Client
+from itou.allauth_adapters.peamu.adapter import PEAMUOAuth2Adapter
+from itou.allauth_adapters.peamu.client import PEAMUOAuth2Client
 
 
 class PEAMUOAuth2CallbackView(OAuth2CallbackView):
