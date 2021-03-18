@@ -28,6 +28,9 @@ style:
 	docker exec -ti itou_django black itou
 	docker exec -ti itou_django isort itou
 
+pylint:
+	docker exec -ti itou_django pylint itou
+
 setup_git_pre_commit_hook:
 	touch .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
