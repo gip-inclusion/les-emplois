@@ -80,7 +80,7 @@ class EmployeeRecord(models.Model):
     asp_id = models.IntegerField(verbose_name=_("ID ASP de la SIAE"))
 
     # ASP processing part
-    asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), null=True)
+    asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), blank=True)
     asp_process_response = models.JSONField(verbose_name=_("Réponse du traitement ASP"), null=True)
 
     # Once correctly processed by ASP, the employee record is archived:
