@@ -12,6 +12,10 @@
     {{ organization.display_name }}
 </h2>
 
+<div class="alert alert-info" role="alert">
+    {% translate "Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés." %}
+</div>
+
 <form method="post" action="" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
