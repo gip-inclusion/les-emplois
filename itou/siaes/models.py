@@ -9,7 +9,6 @@ from django.db.models import BooleanField, Case, Count, F, Prefetch, Q, When
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
-from django.utils.functional import cached_property
 from django.utils.http import urlsafe_base64_encode
 from django.utils.translation import gettext_lazy as _
 
@@ -51,7 +50,11 @@ class SiaeQuerySet(models.QuerySet):
         )
 
     def prefetch_job_description_through(self, **kwargs):
-        qs = SiaeJobDescription.objects.filter(**kwargs).with_is_popular().select_related("appellation__rome")
+        qs = (
+            SiaeJobDescription.objects.filter(**kwargs)
+            .with_annotation_is_popular()
+            .select_related("appellation__rome")
+        )
         return self.prefetch_related(Prefetch("job_description_through", queryset=qs))
 
     def member_required(self, user):
@@ -454,7 +457,7 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
             ),
         )
 
-    def with_is_popular(self):
+    def with_annotation_is_popular(self):
         # Avoid an infinite loop
         from itou.job_applications.models import JobApplication
 
