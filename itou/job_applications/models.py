@@ -451,7 +451,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @cached_property
     def is_old(self):
         """
-        A job application is considered to be old when:
+        A job application is considered old when:
         - it was sent before a certain period of time
         - or the employer did not answer since a long time ago.
         """
