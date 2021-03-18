@@ -135,7 +135,11 @@ class ItouUserAdmin(UserAdmin):
     list_display_links = ("pk", "email")
     list_filter = UserAdmin.list_filter + (KindFilter, CreatedByProxyFilter)
     ordering = ("-id",)
-    raw_id_fields = ("created_by",)
+    raw_id_fields = (
+        "created_by",
+        "birth_place",
+        "birth_country",
+    )
     search_fields = UserAdmin.search_fields + ("pk",)
     readonly_fields = ("pk",)
 
@@ -145,7 +149,10 @@ class ItouUserAdmin(UserAdmin):
             {
                 "fields": (
                     "pk",
+                    "title",
                     "birthdate",
+                    "birth_place",
+                    "birth_country",
                     "phone",
                     "resume_link",
                     "address_line_1",
@@ -222,8 +229,53 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     Inlines would only be possible the other way around
     """
 
-    raw_id_fields = ("user",)
+    raw_id_fields = (
+        "user",
+        "hexa_commune",
+    )
     list_display = ("pk", "user", "username")
+
+    fieldsets = (
+        (
+            _("Informations"),
+            {
+                "fields": (
+                    "user",
+                    "education_level",
+                    "pole_emploi_since",
+                    "unemployed_since",
+                    "resourceless",
+                    "rqth_employee",
+                    "oeth_employee",
+                )
+            },
+        ),
+        (
+            _("Aides et prestations sociales"),
+            {
+                "fields": (
+                    "rsa_allocation_since",
+                    "ass_allocation_since",
+                    "aah_allocation_since",
+                    "ata_allocation_since",
+                )
+            },
+        ),
+        (
+            _("Adresse salarié au format Hexa"),
+            {
+                "fields": (
+                    "hexa_lane_number",
+                    "hexa_std_extension",
+                    "hexa_non_std_extension",
+                    "hexa_lane_type",
+                    "hexa_lane_name",
+                    "hexa_post_code",
+                    "hexa_commune",
+                )
+            },
+        ),
+    )
 
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"

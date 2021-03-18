@@ -127,3 +127,8 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
 
     state = models.JobApplicationWorkflow.STATE_ACCEPTED
     hiring_without_approval = True
+
+
+class JobApplicationWithApprovalNotCancellableFactory(JobApplicationWithApprovalFactory):
+    hiring_start_at = datetime.date.today() - relativedelta(days=5)
+    hiring_end_at = datetime.date.today() + relativedelta(years=2, days=-5)

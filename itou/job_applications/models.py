@@ -335,6 +335,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name_plural = _("Candidatures")
         ordering = ["-created_at"]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def __str__(self):
         return str(self.id)
 

@@ -1,11 +1,11 @@
+from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
-from itou.users.models import User
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-def format_address(obj, update_coords=False, strict=True):
+def format_address(obj):
     """
     Formats the address contained in obj into a valid address "structure" for ASP ER exports.
 
@@ -34,18 +34,18 @@ def format_address(obj, update_coords=False, strict=True):
     - OK => (result_dict, None),
     - KO => (None, error_message)
     """
-    if strict and not isinstance(obj, User):
-        return None, "Only valid for User objects"
+    if not obj:
+        return None, _("Impossible de transformer cet objet en adresse HEXA")
 
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
-        return None, "Incomplete address data"
+        return None, _("Données d'adresse incomplètes")
 
     # first we use geo API to get a 'lane' and a number
     address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
 
     if not address:
-        return None, "Geocoding error, unable to get result"
+        return None, _("Erreur de geocoding, impossible d'obtenir un résultat")
 
     result = {}
 
@@ -69,10 +69,10 @@ def format_address(obj, update_coords=False, strict=True):
     lane = None
     if not address.get("lane") and not address.get("address"):
         return None, "Unable to get address lane"
-    else:
-        lane = address.get("lane") or address.get("address")
-        lane = unidecode(lane)
-        result["lane"] = lane
+
+    lane = address.get("lane") or address.get("address")
+    lane = unidecode(lane)
+    result["lane"] = lane
 
     # Lane type processing (Avenue, RUe, Boulevard ...)
     lane_type = lane.split(maxsplit=1)[0]
@@ -83,7 +83,7 @@ def format_address(obj, update_coords=False, strict=True):
         LaneType.with_similar_name(lane_type)
         # The API field is similar to an exiting value
         # example: got "allee" for "Allée"
-        or LaneType.with_similar_value(unidecode(lane_type.lower()))
+        or LaneType.with_similar_value(lane_type)
         # Maybe the geo API mispelled the lane type (happens sometimes)
         # so we use an aliases table as a last change to get the type
         # example: got "R" or "r" instead of "Rue"
@@ -100,13 +100,5 @@ def format_address(obj, update_coords=False, strict=True):
     result["insee_code"] = address.get("insee_code")
     result["post_code"] = address.get("post_code")
     result["city"] = address.get("city")
-
-    if update_coords and address.get("coords", None) and address.get("score", -1) > obj.get("geocoding_score", 0):
-        # User, Siae and PrescribersOrganisation all have score and coords
-        # If update_coords is True AND if we get a better geo score,
-        # the existing address will be updated
-        obj.coords = address["coords"]
-        obj.geocoding_score = address["score"]
-        obj.save()
 
     return result, None

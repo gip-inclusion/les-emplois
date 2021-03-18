@@ -1,9 +1,10 @@
 # Global tasks.
 # =============================================================================
+PYTHON_VERSION := python3.7
 
 .PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook
 
-# Run a local server.
+# Run Docker images
 run:
 	docker-compose up
 
@@ -11,24 +12,35 @@ clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
 cdsitepackages:
-	docker exec -ti -w /usr/local/lib/python3.7/site-packages itou_django /bin/bash
+	docker exec -ti -w /usr/local/lib/$(PYTHON_VERSION)/site-packages itou_django /bin/bash
 
 quality:
 	docker exec -ti itou_django black --check itou
 	docker exec -ti itou_django isort --check-only itou
 	docker exec -ti itou_django flake8 itou
 
+quality_venv:
+	black --check itou
+	isort --check-only itou
+	flake8 itou
+
 style:
 	docker exec -ti itou_django black itou
 	docker exec -ti itou_django isort itou
 
+pylint:
+	docker exec -ti itou_django pylint itou
+
 setup_git_pre_commit_hook:
 	touch .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
-	echo "\
+	echo -e "\
 	docker exec -t itou_django black itou\n\
 	docker exec -t itou_django isort itou\n\
 	" > .git/hooks/pre-commit
+
+setup_git_pre_commit_hook_venv:
+	pre-commit install
 
 # Django.
 # =============================================================================
@@ -46,6 +58,15 @@ populate_db:
 	docker cp itou/fixtures/postgres/* itou_postgres:/backups/
 	docker exec -ti itou_postgres bash -c "psql -d itou -f backups/cities.sql"
 	docker exec -ti itou_django bash -c "ls -d itou/fixtures/django/* | xargs django-admin loaddata"
+
+
+COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers job_applications approvals eligibility invitations asp --pygraphviz -o itou-graph-models.png
+
+graph_models_itou:
+	docker exec -ti itou_django django-admin $(COMMAND_GRAPH_MODELS)
+
+graph_models_itou_venv:
+	./manage.py $(COMMAND_GRAPH_MODELS)
 
 # Tests.
 # =============================================================================

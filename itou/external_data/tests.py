@@ -97,15 +97,15 @@ class ExternalDataImportTest(TestCase):
         _status_ok(m)
 
         result = import_user_data(user.pk, FOO_TOKEN)
-        self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
+        self.assertEqual(result.status, ExternalDataImport.STATUS_OK)
 
         report = result.report
 
         # Birthdate is already filled by factory:
         self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
 
-        self.assertEquals(6, len(report.get("fields_updated")))
-        self.assertEquals(12, len(report.get("fields_fetched")))
+        self.assertEqual(6, len(report.get("fields_updated")))
+        self.assertEqual(12, len(report.get("fields_fetched")))
 
     @requests_mock.Mocker()
     def test_status_partial(self, m):
@@ -113,7 +113,7 @@ class ExternalDataImportTest(TestCase):
         _status_partial(m)
 
         result = import_user_data(user.pk, FOO_TOKEN)
-        self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
+        self.assertEqual(result.status, ExternalDataImport.STATUS_PARTIAL)
 
         report = result.report
         self.assertTrue(user.has_external_data)
@@ -121,9 +121,9 @@ class ExternalDataImportTest(TestCase):
         self.assertIn(
             f"JobSeekerExternalData/{user.jobseekerexternaldata.pk}/is_pe_jobseeker", report.get("fields_updated")
         )
-        self.assertEquals(5, len(report.get("fields_updated")))
-        self.assertEquals(9, len(report.get("fields_fetched")))
-        self.assertEquals(2, len(report.get("fields_failed")))
+        self.assertEqual(5, len(report.get("fields_updated")))
+        self.assertEqual(9, len(report.get("fields_fetched")))
+        self.assertEqual(2, len(report.get("fields_failed")))
 
     @requests_mock.Mocker()
     def test_status_failed(self, m):
@@ -131,12 +131,12 @@ class ExternalDataImportTest(TestCase):
         _status_failed(m)
 
         result = import_user_data(user.pk, FOO_TOKEN)
-        self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
+        self.assertEqual(result.status, ExternalDataImport.STATUS_FAILED)
 
         report = result.report
-        self.assertEquals(0, len(report.get("fields_updated")))
-        self.assertEquals(0, len(report.get("fields_fetched")))
-        self.assertEquals(0, len(report.get("fields_failed")))
+        self.assertEqual(0, len(report.get("fields_updated")))
+        self.assertEqual(0, len(report.get("fields_fetched")))
+        self.assertEqual(0, len(report.get("fields_failed")))
 
 
 class JobSeekerExternalDataTest(TestCase):
@@ -159,14 +159,14 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertFalse(data.has_minimal_social_allowance)
         self.assertTrue(data.is_pe_jobseeker)
 
-        self.assertEquals(user.address_line_1, "4, Privet Drive")
-        self.assertEquals(user.address_line_2, "The cupboard under the stairs")
-        self.assertEquals(str(user.birthdate), "1970-01-01")
+        self.assertEqual(user.address_line_1, "4, Privet Drive")
+        self.assertEqual(user.address_line_2, "The cupboard under the stairs")
+        self.assertEqual(str(user.birthdate), "1970-01-01")
 
         report = result.report
         self.assertIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertEquals(7, len(report.get("fields_updated")))
-        self.assertEquals(12, len(report.get("fields_fetched")))
+        self.assertEqual(7, len(report.get("fields_updated")))
+        self.assertEqual(12, len(report.get("fields_fetched")))
 
         # Just checking birthdate is not overriden
         user = JobSeekerFactory()
@@ -177,7 +177,7 @@ class JobSeekerExternalDataTest(TestCase):
         user.refresh_from_db()
 
         self.assertNotIn(f"User/{user.pk}/birthdate", report.get("fields_updated"))
-        self.assertEquals(birthdate, user.birthdate)
+        self.assertEqual(birthdate, user.birthdate)
 
     @requests_mock.Mocker()
     def test_import_partial(self, m):
@@ -193,8 +193,8 @@ class JobSeekerExternalDataTest(TestCase):
         self.assertIsNone(data.has_minimal_social_allowance)
         self.assertTrue(data.is_pe_jobseeker)
 
-        self.assertEquals(user.address_line_1, "4, Privet Drive")
-        self.assertEquals(user.address_line_2, "The cupboard under the stairs")
+        self.assertEqual(user.address_line_1, "4, Privet Drive")
+        self.assertEqual(user.address_line_2, "The cupboard under the stairs")
         self.assertNotEquals(str(user.birthdate), "1970-01-01")
 
     @requests_mock.Mocker()

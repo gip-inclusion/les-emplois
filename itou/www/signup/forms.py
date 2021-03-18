@@ -37,7 +37,7 @@ class FullnameFormMixin(forms.Form):
 
 class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
-        super(JobSeekerSignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
 
     def clean_email(self):
@@ -90,7 +90,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
     """
 
     def __init__(self, *args, **kwargs):
-        super(SiaeSignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs["placeholder"] = _("Adresse e-mail professionnelle")
         self.fields["email"].help_text = _(
             "Utilisez plutôt votre adresse e-mail professionnelle, "
