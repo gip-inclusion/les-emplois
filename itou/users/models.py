@@ -153,7 +153,7 @@ class User(AbstractUser, AddressMixin):
     )
 
     def __str__(self):
-        return self.email
+        return str(self.email)
 
     def clean(self):
         """
