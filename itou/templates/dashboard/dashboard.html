@@ -164,7 +164,7 @@
                                 {% translate "Gérer vos collaborateurs" %}
                             </a>
                         </p>
-                        {% if current_prescriber_organization.is_kind_dept and user_is_prescriber_org_admin %}
+                        {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_prescriber_org_admin %}
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="list" %}
                                 <a href="{% url 'prescribers_views:list_accredited_organizations' %}">

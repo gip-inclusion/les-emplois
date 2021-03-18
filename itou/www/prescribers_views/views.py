@@ -158,7 +158,7 @@ def list_accredited_organizations(request, template_name="prescribers/list_accre
 
     required_permissions = [
         prescriber_org.is_authorized,
-        prescriber_org.is_kind_dept,
+        prescriber_org.kind == prescriber_org.Kind.DEPT,
         prescriber_org.has_admin(request.user),
     ]
 
