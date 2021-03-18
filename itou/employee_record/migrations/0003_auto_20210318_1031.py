@@ -5,29 +5,35 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('employee_record', '0003_auto_20210317_1513'), ('employee_record', '0004_auto_20210318_1031')]
+    replaces = [("employee_record", "0003_auto_20210317_1513"), ("employee_record", "0004_auto_20210318_1031")]
 
     dependencies = [
-        ('employee_record', '0002_auto_20210316_1749'),
+        ("employee_record", "0002_auto_20210316_1749"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='employeerecord',
-            options={'ordering': ['-created_at'], 'verbose_name': 'Fiche salarié', 'verbose_name_plural': 'Fiches salarié'},
+            name="employeerecord",
+            options={
+                "ordering": ["-created_at"],
+                "verbose_name": "Fiche salarié",
+                "verbose_name_plural": "Fiches salarié",
+            },
         ),
         migrations.RemoveConstraint(
-            model_name='employeerecord',
-            name='un_asp_id_approval_number',
+            model_name="employeerecord",
+            name="un_asp_id_approval_number",
         ),
         migrations.AddConstraint(
-            model_name='employeerecord',
-            constraint=models.UniqueConstraint(fields=('asp_id', 'approval_number'), name='unique_asp_id_approval_number'),
+            model_name="employeerecord",
+            constraint=models.UniqueConstraint(
+                fields=("asp_id", "approval_number"), name="unique_asp_id_approval_number"
+            ),
         ),
         migrations.AlterField(
-            model_name='employeerecord',
-            name='asp_processing_code',
-            field=models.CharField(blank=True, default='', max_length=4, verbose_name='Code de traitement ASP'),
+            model_name="employeerecord",
+            name="asp_processing_code",
+            field=models.CharField(blank=True, default="", max_length=4, verbose_name="Code de traitement ASP"),
             preserve_default=False,
         ),
     ]
