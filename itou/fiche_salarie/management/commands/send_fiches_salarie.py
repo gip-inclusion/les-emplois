@@ -248,18 +248,18 @@ class Command(BaseCommand):
         # RIAE_FS_AAAAMMJJHHMMSS as specified by the ASP.
         filename = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
 
-        with open(f"downloads/{filename}", "w") as f:
+        with open(f"exports/{filename}", "w") as f:
             f.write(json.dumps(batch))
-            print(f"Wrote file {filename} to local downloads dir.")
+            print(f"Wrote file {filename} to local exports dir.")
 
         # cat .ssh/known_hosts | grep valechange.asp-public.fr > .ssh/itou_asp_sftp_test.host_key
-        # mkdir -p /app/downloads/.ssh
-        # docker cp ~/.ssh/itou_asp_sftp_test itou_django:/app/downloads/.ssh
-        # docker cp ~/.ssh/itou_asp_sftp_test.host_key itou_django:/app/downloads/.ssh/known_hosts
+        # mkdir -p /app/exports/.ssh
+        # docker cp ~/.ssh/itou_asp_sftp_test itou_django:/app/exports/.ssh
+        # docker cp ~/.ssh/itou_asp_sftp_test.host_key itou_django:/app/exports/.ssh/known_hosts
 
         cnopts = pysftp.CnOpts()
         cnopts.hostkeys = None
-        # cnopts.hostkeys.load("/app/downloads/.ssh/known_hosts")
+        # cnopts.hostkeys.load("/app/exports/.ssh/known_hosts")
         with pysftp.Connection(
             host=settings.API_FS_SFTP_HOST,
             port=settings.API_FS_SFTP_PORT,
@@ -271,7 +271,7 @@ class Command(BaseCommand):
             print(f"Dirs in current dir are {sftp.listdir()}.")
             with sftp.cd("depot"):
                 try:
-                    sftp.put(f"/app/downloads/{filename}")
+                    sftp.put(f"/app/exports/{filename}")
                 except:
                     # Ignore cryptic error due to cryptic SFTP implementation on ASP side.
                     # FIXME catch specific exception.
@@ -282,10 +282,10 @@ class Command(BaseCommand):
             with sftp.cd("retrait"):
                 print(f"Files present in retrait dir: {sftp.listdir()}.")
                 for receipt in sftp.listdir():
-                    sftp.get(receipt, localpath=f"downloads/{receipt}")
+                    sftp.get(receipt, localpath=f"exports/{receipt}")
                     sftp.remove(receipt)
                     print(f"Downloaded {receipt} to local and deleted it on server.")
-                    with open(f"downloads/{receipt}") as json_file:
+                    with open(f"exports/{receipt}") as json_file:
                         data = json.load(json_file)
                         for row in data["lignesTelechargement"]:
                             print(f"Code {row['codeTraitement']} : " f"{row['libelleTraitement']}")
