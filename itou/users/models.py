@@ -71,6 +71,7 @@ class User(AbstractUser, AddressMixin):
         max_length=3,
         verbose_name=_("Civilité"),
         blank=True,
+        default="",
         choices=Title.choices,
     )
 
@@ -84,12 +85,14 @@ class User(AbstractUser, AddressMixin):
         "asp.Commune",
         verbose_name=_("Commune de naissance"),
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
     birth_country = models.ForeignKey(
         "asp.Country",
         verbose_name=_("Pays de naissance"),
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
     email = CIEmailField(
