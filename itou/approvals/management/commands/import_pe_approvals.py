@@ -5,6 +5,7 @@ import os
 import pandas as pd
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from tqdm import tqdm
 
 from itou.approvals.models import PoleEmploiApproval
 
@@ -75,20 +76,15 @@ class Command(BaseCommand):
         df["DATE_NAISS_BENE"] = pd.to_datetime(df.DATE_NAISS_BENE, format=DATE_FORMAT)
 
         self.stdout.write("Ready.")
-        self.stdout.write(f"Importing approvals from {first_approval_date} to {last_approval_date}")
-        self.stdout.write("Creating approvals… 0%")
+        self.stdout.write(f"Importing up to {len(df)} approvals from {first_approval_date} to {last_approval_date}")
 
-        last_progress = 0
+        pbar = tqdm(total=len(df))
         for idx, row in df.iterrows():
+            pbar.update(1)
 
             if idx == 0:
                 # Skip XLSX header.
                 continue
-
-            progress = int((100 * idx) / len(df))
-            if progress > last_progress + 5:
-                self.stdout.write(f"Creating approvals… {progress}%")
-                last_progress = progress
 
             CODE_STRUCT_AFFECT_BENE = str(row["CODE_STRUCT_AFFECT_BENE"])
             assert len(CODE_STRUCT_AFFECT_BENE) in [4, 5]
@@ -177,6 +173,8 @@ class Command(BaseCommand):
                     PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
                     bulk_create_queue = []
 
+        pbar.close()
+
         # Create any remaining objects.
         if not dry_run and bulk_create_queue:
             PoleEmploiApproval.objects.bulk_create(bulk_create_queue, ignore_conflicts=True)
@@ -186,7 +184,7 @@ class Command(BaseCommand):
         self.stdout.write("-" * 80)
         self.stdout.write(f"Before: {count_before}")
         self.stdout.write(f"After: {count_after}")
-        self.stdout.write(f"New ojects: {count_after - count_before}")
+        self.stdout.write(f"New objects: {count_after - count_before} (in case of dry run this will always be zero)")
         self.stdout.write(f"Skipped {count_canceled_approvals} canceled approvals")
         self.stdout.write(f"Unique suffixes: {unique_approval_suffixes}")
         self.stdout.write("Done.")
