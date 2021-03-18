@@ -70,7 +70,7 @@ class User(AbstractUser, AddressMixin):
     title = models.CharField(
         max_length=3,
         verbose_name=_("Civilité"),
-        blank=True,
+        null=True,
         choices=Title.choices,
     )
 
