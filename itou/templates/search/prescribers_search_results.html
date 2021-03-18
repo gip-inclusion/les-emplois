@@ -3,7 +3,7 @@
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
-        {% blocktranslate %}Prescripteurs à {{ distance }} Km du centre de {{ city }}{% endblocktranslate %}
+        {% blocktranslate %}Prescripteurs à {{ distance }} km du centre de {{ city }}{% endblocktranslate %}
     {% endwith %}
     {{ block.super }}
 {% endblock %}
@@ -20,7 +20,7 @@
         {% translate "Prescripteurs" %}
         {% if request.GET.city_name and request.GET.distance %}
             {% with request.GET.city_name as city and request.GET.distance as distance %}
-                {% blocktranslate %}à <b>{{ distance }} Km</b> du centre de <b>{{ city }}</b>{% endblocktranslate %}
+                {% blocktranslate %}à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>{% endblocktranslate %}
             {% endwith %}
         {% endif %}
     </h3>
@@ -61,7 +61,7 @@
                     </h6>
                     <p class="card-text">
                         {% blocktranslate with distance=prescriber_org.distance.km|floatformat:1 %}
-                            <span class="badge badge-dark">{{ distance }} Km</span>
+                            <span class="badge badge-dark">{{ distance }} km</span>
                             de votre lieu de recherche
                         {% endblocktranslate %}
                     </p>
