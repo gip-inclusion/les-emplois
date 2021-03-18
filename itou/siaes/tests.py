@@ -206,11 +206,11 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
     def setUp(self):
         self.siae = SiaeWithJobsFactory()
 
-    def test_with_is_popular(self):
+    def test_with_annotation_is_popular(self):
         siae_job_descriptions = self.siae.job_description_through.all()
 
         # Test attribute presence
-        siae_job_description = SiaeJobDescription.objects.with_is_popular().first()
+        siae_job_description = SiaeJobDescription.objects.with_annotation_is_popular().first()
         self.assertTrue(hasattr(siae_job_description, "is_popular"))
 
         # Test popular threshold: popular job description
@@ -218,13 +218,17 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
         for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
             JobApplicationFactory(to_siae=self.siae, selected_jobs=[popular_job_description])
 
-        self.assertTrue(SiaeJobDescription.objects.with_is_popular().get(pk=popular_job_description.pk).is_popular)
+        self.assertTrue(
+            SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
+        )
 
         # Test popular threshold: unpopular job description
         unpopular_job_description = siae_job_descriptions[1]
         JobApplicationFactory(to_siae=self.siae, selected_jobs=[unpopular_job_description])
 
-        self.assertFalse(SiaeJobDescription.objects.with_is_popular().get(pk=unpopular_job_description.pk).is_popular)
+        self.assertFalse(
+            SiaeJobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
+        )
 
         # Popular job descriptions count related **pending** job applications.
         # They should ignore other states.
@@ -234,7 +238,7 @@ class SiaeJobDescriptionQuerySetTest(TestCase):
                 to_siae=self.siae, selected_jobs=[popular_job_description], state=JobApplicationWorkflow.STATE_ACCEPTED
             )
 
-        self.assertFalse(SiaeJobDescription.objects.with_is_popular().get(pk=job_description.pk).is_popular)
+        self.assertFalse(SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular)
 
     def test_with_job_applications_count(self):
         job_description = self.siae.job_description_through.first()
