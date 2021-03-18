@@ -514,10 +514,6 @@ class SiaeJobDescription(models.Model):
     def get_absolute_url(self):
         return reverse("siaes_views:job_description_card", kwargs={"job_description_id": self.pk})
 
-    @cached_property
-    def is_popular(self):
-        return self.jobapplication_set.pending().count() > 20
-
 
 class SiaeConvention(models.Model):
     """
