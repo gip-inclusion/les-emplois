@@ -22,10 +22,16 @@ Ceci est une documentation publique à destination des logiciels SSII pour la r�
 
 ### Obtention d'un token
 
-Exemple :
+Exemple en production avec un compte employeur réel :
 
 ```
 curl -H 'Accept: application/json; indent=4' -d "username=john.doe@mail.com&password=abcdef" https://emplois.inclusion.beta.gouv.fr/api/v1/token-auth/
+```
+
+Exemple en démo avec le compte de test :
+
+```
+curl -H 'Accept: application/json; indent=4' -d "username=test%2Betti@inclusion.beta.gouv.fr&password=password" https://demo.emplois.inclusion.beta.gouv.fr/api/v1/token-auth/
 ```
 
 Réponse :
@@ -44,10 +50,16 @@ Notes :
 
 ### Obtention des FS
 
-Exemple :
+Exemple en production avec un compte employeur réel :
 
 ```
 curl -H 'Accept: application/json; indent=4' -H 'Authorization: Token 123abc123abc123abc123abc123abc123abc123abc' https://emplois.inclusion.beta.gouv.fr/api/v1/dummy-employee-records/
+```
+
+Exemple en démo avec le compte de test :
+
+```
+curl -H 'Accept: application/json; indent=4' -H 'Authorization: Token 123abc123abc123abc123abc123abc123abc123abc' https://demo.emplois.inclusion.beta.gouv.fr/api/v1/dummy-employee-records/
 ```
 
 Réponse (première page présentant 20 des 25 FS) :
