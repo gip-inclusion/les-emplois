@@ -1,6 +1,8 @@
 import datetime
 
 from django.contrib import admin, messages
+from django.contrib.gis import forms as gis_forms
+from django.contrib.gis.db import models as gis_models
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -85,7 +87,6 @@ class SiaeAdmin(admin.ModelAdmin):
     raw_id_fields = ("created_by", "convention")
     readonly_fields = (
         "pk",
-        "coords",  # Quick tip to disable GeoDjango's Openlayers map.
         "source",
         "created_by",
         "created_at",
@@ -135,6 +136,10 @@ class SiaeAdmin(admin.ModelAdmin):
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
     inlines = (MembersInline, JobsInline)
+    formfield_overrides = {
+        # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
+        gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
+    }
 
     def member_count(self, obj):
         return obj._member_count
