@@ -53,9 +53,6 @@ xlrd==1.2.0  # https://pypi.org/project/xlrd/
 # Third-party applications
 # ------------------------------------------------------------------------------
 
-# Turn HTML files into PDF
-pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
-
 # Huey for async processing
 # https://huey.readthedocs.io/en/latest/
 huey==2.3.1  # https://github.com/coleifer/huey
