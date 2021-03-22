@@ -36,7 +36,12 @@ def get_creatable_and_deletable_afs(dry_run):
             af.start_at = row.start_at
             if not dry_run:
                 af.save()
-        assert af.end_at == row.end_date
+
+        # Sometimes an AF end date changes.
+        if af.end_at != row.end_date:
+            af.end_at = row.end_date
+            if not dry_run:
+                af.save()
 
         # Sometimes an AF state changes.
         if af.state != row.state:
