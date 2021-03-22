@@ -222,10 +222,10 @@ class AllocationDuration(models.TextChoices):
     Note: effect periods are not handled
     """
 
-    LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
-    FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
-    FROM_12_TO_23_MONTHS = "FROM_12_TO_23_MONTHS", _("De 12 à 23 mois")
-    MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
+    LESS_THAN_6_MONTHS = "01", _("Moins de 6 mois")
+    FROM_6_TO_11_MONTHS = "02", _("De 6 à 11 mois")
+    FROM_12_TO_23_MONTHS = "03", _("De 12 à 23 mois")
+    MORE_THAN_24_MONTHS = "04", _("24 mois et plus")
 
 
 class EducationLevel(models.TextChoices):
