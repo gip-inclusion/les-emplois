@@ -1,8 +1,7 @@
 import io
 
-import pdfshift
+import requests
 from django.conf import settings
-from requests import exceptions as requests_exceptions
 
 
 class HtmlToPdf:
@@ -33,14 +32,20 @@ class HtmlToPdf:
 
     @classmethod
     def html_to_bytes(cls, html):
-        try:
-            pdfshift.api_key = settings.PDFSHIFT_API_KEY
-            binary_file = pdfshift.convert(html, sandbox=settings.PDFSHIFT_SANDBOX_MODE)
-        except requests_exceptions.ConnectionError as error:
-            # With Django 3 we could use RequestAborted here.
-            raise ConnectionAbortedError(error)
+        response = requests.post(
+            "https://api.pdfshift.io/v3/convert/pdf",
+            auth=("api", settings.PDFSHIFT_API_KEY),
+            json={"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
+            stream=True,
+            timeout=10,  # in seconds
+        )
+        response.raise_for_status()
 
-        return binary_file
+        result = io.BytesIO()
+        for chunk in response.iter_content(1024):
+            result.write(chunk)
+
+        return result.getvalue()
 
     def __init__(self, html, autoclose=True):
         self.bytes = self.html_to_bytes(html)
