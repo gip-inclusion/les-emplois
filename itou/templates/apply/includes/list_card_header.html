@@ -16,19 +16,16 @@
 
     <br>
 
-    {% if request.user.is_job_seeker %}
+
         <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-    {% else %}
-        {% if job_application.last_change == job_application.created_at %}
-            <small class="{% if job_application.is_pending_for_too_long %}text-danger{% else %}text-muted{% endif %}">
-            <b>{% translate "Sans réponse depuis le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}
-            </small>
-        {% else %}
-            <small class="text-muted"><b>{% translate "Envoyée le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+
+        {% if job_application.is_pending_for_too_long and not request.user_is_job_seeker %}
             <br>
-            <small class="{% if job_application.is_pending_for_too_long %}text-danger{% else %}text-muted{% endif %}">
-            <b>{% translate "Mise à jour du statut le " %}</b>{{ job_application.last_change|date:"d F Y à H:i" }}
+            <small class="text-danger font-weight-bold">
+                {% blocktranslate with weeks=job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
+                    En attente de réponse depuis plus de {{ weeks }} semaines.
+                {% endblocktranslate %}
             </small>
         {% endif %}
-    {% endif %}
+
 </div>
