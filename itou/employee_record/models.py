@@ -106,7 +106,9 @@ class EmployeeRecord(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
-
+        if self.job_seeker_profile:
+            print("saving")
+            self.job_seeker_profile.save()
         super().save(*args, **kwargs)
 
     def _clean_job_application(self):
@@ -159,6 +161,7 @@ class EmployeeRecord(models.Model):
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
         self.status = Status.READY
+        self.save()
 
     @property
     def is_archived(self):
@@ -189,6 +192,13 @@ class EmployeeRecord(models.Model):
     def job_seeker(self):
         if self.job_application:
             return self.job_application.job_seeker
+
+        return None
+
+    @property
+    def job_seeker_profile(self):
+        if self.job_application and hasattr(self.job_application.job_seeker, "jobseeker_profile"):
+            return self.job_application.job_seeker.jobseeker_profile
 
         return None
 
@@ -234,6 +244,8 @@ class EmployeeRecord(models.Model):
 
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number
+
+        fs.save()
 
         # If the jobseeker has no profile, create one
         job_application.job_seeker.get_or_create_job_seeker_profile()

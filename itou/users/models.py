@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
@@ -297,9 +297,13 @@ class User(AbstractUser, AddressMixin):
         ):
             raise ValidationError(_("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."))
 
+    @transaction.atomic
     def get_or_create_job_seeker_profile(self):
         if hasattr(self, "jobseeker_profile"):
             return self.jobseeker_profile
+
+        if not self.id:
+            self.save()
 
         profile = JobSeekerProfile(user=self)
         profile.save()
@@ -434,17 +438,19 @@ class JobSeekerProfile(models.Model):
 
     # Jobseeker address in Hexa format
 
-    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), blank=True)
+    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), blank=True, default="")
     hexa_std_extension = models.CharField(
         max_length=1,
         verbose_name=_("Extension de voie"),
         blank=True,
+        default="",
         choices=LaneExtension.choices,
     )
     hexa_non_std_extension = models.CharField(
         max_length=10,
         verbose_name=_("Extension de voie (non-repertoriée)"),
         blank=True,
+        default="",
     )
     hexa_lane_type = models.CharField(
         max_length=4,
@@ -458,6 +464,7 @@ class JobSeekerProfile(models.Model):
         Commune,
         verbose_name=_("Commune (ref. ASP)"),
         null=True,
+        blank=True,
         on_delete=models.SET_NULL,
     )
 
@@ -466,7 +473,7 @@ class JobSeekerProfile(models.Model):
         verbose_name_plural = _("Profils demandeur d'emploi")
 
     def __str__(self):
-        return f"JobSeekerProfile: {self.user}"
+        return str(self.user)
 
     def _clean_job_seeker_details(self):
         # Title is not mandatory for User, but it is for ASP
@@ -548,10 +555,12 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(error)
 
         # Fill matching fields
+        # Must override None value with empty string# (field not null)
+        _empty = ""
         self.hexa_lane_type = result.get("lane_type")
-        self.hexa_lane_number = result.get("number")
-        self.hexa_std_extension = result.get("std_extension")
-        self.hexa_non_std_extension = result.get("non_std_extension")
+        self.hexa_lane_number = result.get("number", _empty)
+        self.hexa_std_extension = result.get("std_extension", _empty)
+        self.hexa_non_std_extension = result.get("non_std_extension", _empty)
         self.hexa_lane_name = result.get("lane")
         self.hexa_post_code = result.get("post_code")
 
