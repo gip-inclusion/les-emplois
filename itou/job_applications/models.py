@@ -6,10 +6,10 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import Exists, OuterRef
+from django.db.models import BooleanField, Case, Exists, Max, OuterRef, When
+from django.db.models.functions import Greatest
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
@@ -124,6 +124,24 @@ class JobApplicationQuerySet(models.QuerySet):
             approval_manually_refused_at=None,
         )
 
+    def with_has_suspended_approval(self):
+        has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
+        return self.annotate(has_suspended_approval=Exists(has_suspended_approval))
+
+    def with_last_change(self):
+        return self.annotate(last_change=Greatest("created_at", Max("logs__timestamp")))
+
+    def with_is_pending_for_too_long(self):
+        freshness_limit = timezone.now() - relativedelta(weeks=self.model.WEEKS_BEFORE_CONSIDERED_OLD)
+        pending_states = JobApplicationWorkflow.PENDING_STATES
+        return self.with_last_change().annotate(
+            is_pending_for_too_long=Case(
+                When(last_change__lt=freshness_limit, state__in=pending_states, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+
     def with_list_related_data(self):
         """
         Stop the deluge of database queries that is caused by accessing related
@@ -141,8 +159,8 @@ class JobApplicationQuerySet(models.QuerySet):
             .prefetch_related("selected_jobs__appellation")
             .prefetch_related("logs")
         )
-        has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
-        return qs.annotate(has_suspended_approval=Exists(has_suspended_approval))
+
+        return qs.with_has_suspended_approval().with_is_pending_for_too_long().order_by("-created_at")
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
@@ -438,34 +456,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_POSTPONED,
         ]
-
-    # Job application freshness
-
-    @cached_property
-    def last_state_change(self):
-        if not self.logs:
-            return None
-
-        return self.logs.most_recent()
-
-    @cached_property
-    def is_old(self):
-        """
-        A job application is considered old when:
-        - it was sent before a certain period of time
-        - or the employer did not answer since a long time ago.
-        """
-        freshness_limit = timezone.now() - relativedelta(weeks=self.WEEKS_BEFORE_CONSIDERED_OLD)
-        if not self.last_state_change:
-            return freshness_limit > self.created_at
-        return freshness_limit > self.last_state_change.timestamp
-
-    @property
-    def is_pending(self):
-        """
-        The job application is waiting for an answer from the employer.
-        """
-        return self.state in JobApplicationWorkflow.PENDING_STATES
 
     # Workflow transitions.
 
