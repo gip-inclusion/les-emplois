@@ -6,11 +6,15 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from itou.job_applications.factories import JobApplicationSentByPrescriberFactory
+from itou.job_applications.factories import (
+    JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
+    JobApplicationSentByPrescriberFactory,
+)
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.prescribers import factories as prescribers_factories
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
@@ -84,7 +88,7 @@ class EditUserInfoViewTest(TestCase):
 
 
 class EditJobSeekerInfo(TestCase):
-    def test_edit(self):
+    def test_edit_by_siae(self):
         job_application = JobApplicationSentByPrescriberFactory()
         user = job_application.to_siae.members.first()
 
@@ -120,11 +124,55 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
         self.assertEqual(job_seeker.phone, post_data["phone"])
 
-    def test_edit_not_allowed(self):
+    def test_edit_by_prescriber(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        user = job_application.sender
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_by_prescriber_of_organization(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        prescriber = job_application.sender
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = prescriber
+        job_application.job_seeker.save()
+
+        # Log as other member of the same organization
+        other_prescriber = PrescriberFactory()
+        prescribers_factories.PrescriberMembershipFactory(
+            user=other_prescriber, organization=job_application.sender_prescriber_organization
+        )
+        self.client.login(username=other_prescriber.email, password=DEFAULT_PASSWORD)
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_edit_autonomous_not_allowed(self):
         job_application = JobApplicationSentByPrescriberFactory()
+        # The job seeker manages his own personal information (autonomous)
         user = job_application.sender
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_edit_not_allowed(self):
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application = JobApplicationSentByPrescriberFactory(job_seeker__created_by=PrescriberFactory())
+
+        # Lambda prescriber not member of the sender organization
+        prescriber = PrescriberFactory()
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
 
         response = self.client.get(url)
