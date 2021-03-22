@@ -9,6 +9,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
 from itou.siaes import models
+from itou.siaes.admin_forms import SiaeAdminForm
 
 
 class MembersInline(admin.TabularInline):
@@ -82,6 +83,7 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
+    form = SiaeAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
@@ -129,6 +131,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "post_code",
                     "city",
                     "department",
+                    "extra_field_refresh_geocoding",
                     "coords",
                     "geocoding_score",
                 )
@@ -160,11 +163,9 @@ class SiaeAdmin(admin.ModelAdmin):
                 # Set geocoding.
                 obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
-        if change and obj.geocoding_address:
-            old_obj = self.model.objects.get(id=obj.id)
-            if obj.geocoding_address != old_obj.geocoding_address:
-                # Refresh geocoding.
-                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+        if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
+            # Refresh geocoding.
+            obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
         # Pulled-up the save action:
         # many-to-many relationships / cross-tables references
