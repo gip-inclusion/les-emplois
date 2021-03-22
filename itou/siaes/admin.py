@@ -92,6 +92,7 @@ class SiaeAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "job_applications_blocked_at",
+        "geocoding_score",
     )
     fieldsets = (
         (

@@ -152,6 +152,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "authorization_status",
         "authorization_updated_at",
         "authorization_updated_by",
+        "geocoding_score",
     )
     search_fields = (
         "pk",
