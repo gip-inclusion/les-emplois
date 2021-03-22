@@ -1,7 +1,11 @@
 from rest_framework import serializers
 
+from itou.asp.models import AllocationDuration
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import JobSeekerProfile, User
+
+
+# from itou.asp.models import EducationLevel, AllocationDuration
 
 
 class _EmployeeSerializer(serializers.ModelSerializer):
@@ -31,6 +35,7 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "codeInseePays",
             "codeGroupePays",
         ]
+        # extra_kwargs = {""}
 
 
 class _EmployeeAddress(serializers.ModelSerializer):
@@ -65,13 +70,67 @@ class _EmployeeAddress(serializers.ModelSerializer):
         ]
 
 
+class _EmployeeSituation(serializers.ModelSerializer):
+
+    niveauFormation = serializers.CharField(source="jobseeker_profile.education_level")
+    salarieEnEmploi = serializers.BooleanField(source="jobseeker_profile.is_employed")
+
+    # TBD: employer type and orienter
+
+    salarieSansEmploiDepuis = serializers.CharField(source="jobseeker_profile.unemployed_since")
+    salarieSansRessource = serializers.CharField(source="jobseeker_profile.resourceless")
+    inscritPoleEmploi = serializers.BooleanField(source="pole_emploi_id")
+    inscritPoleEmploiDepuis = serializers.CharField(source="jobseeker_profile.pole_emploi_since")
+    numeroIDE = serializers.CharField(source="pole_emploi_id")
+    salarieRQTH = serializers.BooleanField(source="jobseeker_profile.rqth_employee")
+    salarieOETH = serializers.BooleanField(source="jobseeker_profile.oeth_employee")
+    salarieAideSociale = serializers.BooleanField(source="jobseeker_profile.has_social_allowance")
+    salarieBenefRSA = serializers.BooleanField(source="jobseeker_profile.has_rsa_allocation")
+    salarieBenefRSADepuis = serializers.CharField(source="jobseeker_profile.rsa_allocation_since")
+    salarieBenefASS = serializers.BooleanField(source="jobseeker_profile.has_ass_allocation")
+    salarieBenefASSDepuis = serializers.CharField(source="jobseeker_profile.ass_allocation_since")
+    salarieBenefAAH = serializers.BooleanField(source="jobseeker_profile.has_aah_allocation")
+    salarieBenefAAHDepuis = serializers.CharField(source="jobseeker_profile.aah_allocation_since")
+    salarieBenefATA = serializers.BooleanField(source="jobseeker_profile.has_ata_allocation")
+    salarieBenefATADepuis = serializers.CharField(source="jobseeker_profile.ata_allocation_since")
+
+    class Meta:
+        model = User
+        fields = [
+            "niveauFormation",
+            "salarieEnEmploi",
+            "salarieSansEmploiDepuis",
+            "salarieSansRessource",
+            "inscritPoleEmploi",
+            "inscritPoleEmploiDepuis",
+            "numeroIDE",
+            "salarieRQTH",
+            "salarieOETH",
+            "salarieAideSociale",
+            "salarieBenefRSA",
+            "salarieBenefRSADepuis",
+            "salarieBenefASS",
+            "salarieBenefASSDepuis",
+            "salarieBenefAAH",
+            "salarieBenefAAHDepuis",
+            "salarieBenefATA",
+            "salarieBenefATADepuis",
+        ]
+
+
 class EmployeeRecordSerializer(serializers.ModelSerializer):
 
     passIae = serializers.CharField(max_length=12, source="approval_number")
     personnePhysique = _EmployeeSerializer(source="job_application.job_seeker")
     adresse = _EmployeeAddress(source="job_application.job_seeker")
+    situationSalarie = _EmployeeSituation(source="job_application.job_seeker")
 
     class Meta:
         model = EmployeeRecord
-        fields = ["passIae", "personnePhysique", "adresse"]
+        fields = [
+            "passIae",
+            "personnePhysique",
+            "adresse",
+            "situationSalarie",
+        ]
         read_only_fields = fields

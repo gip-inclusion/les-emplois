@@ -582,27 +582,29 @@ class JobSeekerProfile(models.Model):
 
     @property
     def is_employed(self):
-        return self.rqth_employee or self.oeth_employee or not self.unemployed_since
+        return bool(self.rqth_employee or self.oeth_employee or not self.unemployed_since)
 
     @property
     def has_rsa_allocation(self):
-        return self.rsa_allocation_since != AllocationDuration.NONE
+        return bool(self.rsa_allocation_since)
 
     @property
     def has_ass_allocation(self):
-        return self.ass_allocation_since != AllocationDuration.NONE
+        return bool(self.ass_allocation_since)
 
     @property
     def has_aah_allocation(self):
-        return self.aah_allocation_since != AllocationDuration.NONE
+        return bool(self.aah_allocation_since)
 
     @property
     def has_ata_allocation(self):
-        return self.ata_allocation_since != AllocationDuration.NONE
+        return bool(self.ata_allocation_since)
 
     @property
     def has_social_allowance(self):
-        return self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
+        return bool(
+            self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
+        )
 
     @property
     def hexa_address_filled(self):
