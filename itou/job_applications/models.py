@@ -147,18 +147,14 @@ class JobApplicationQuerySet(models.QuerySet):
         Stop the deluge of database queries that is caused by accessing related
         objects in job applications's lists.
         """
-        qs = (
-            self.select_related(
-                "approval",
-                "job_seeker",
-                "sender",
-                "sender_siae",
-                "sender_prescriber_organization",
-                "to_siae__convention",
-            )
-            .prefetch_related("selected_jobs__appellation")
-            .prefetch_related("logs")
-        )
+        qs = self.select_related(
+            "approval",
+            "job_seeker",
+            "sender",
+            "sender_siae",
+            "sender_prescriber_organization",
+            "to_siae__convention",
+        ).prefetch_related("selected_jobs__appellation")
 
         return qs.with_has_suspended_approval().with_is_pending_for_too_long().order_by("-created_at")
 
@@ -653,12 +649,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email.send()
 
 
-class JobApplicationTransitionLogQuerySet(models.QuerySet):
-    def most_recent(self):
-        # Ordering is set in JobApplicationTransitionLog.Meta
-        return self.first()
-
-
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     """
     JobApplication's transition logs are stored in this table.
@@ -669,7 +659,6 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
-    objects = models.Manager.from_queryset(JobApplicationTransitionLogQuerySet)()
 
     class Meta:
         verbose_name = _("Log des transitions de la candidature")
