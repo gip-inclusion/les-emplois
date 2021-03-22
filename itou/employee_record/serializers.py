@@ -1,11 +1,7 @@
 from rest_framework import serializers
 
-from itou.asp.models import AllocationDuration
 from itou.employee_record.models import EmployeeRecord
-from itou.users.models import JobSeekerProfile, User
-
-
-# from itou.asp.models import EducationLevel, AllocationDuration
+from itou.users.models import User
 
 
 class _EmployeeSerializer(serializers.ModelSerializer):
@@ -35,7 +31,6 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "codeInseePays",
             "codeGroupePays",
         ]
-        # extra_kwargs = {""}
 
 
 class _EmployeeAddress(serializers.ModelSerializer):
@@ -43,16 +38,11 @@ class _EmployeeAddress(serializers.ModelSerializer):
     adrTelephone = serializers.CharField(source="phone")
     adrEmail = serializers.CharField(source="email")
 
-    # TBD optional fields ?
-    adrPointRemise = ""
-    adrCpltPointGeo = ""
-
     adrNumeroVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_number")
     codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension")
     codetypeVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
 
-    # TBD: double check coherence with ASP ref file
     codeinseecom = serializers.IntegerField(source="jobseeker_profile.hexa_commune.code")
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
 
