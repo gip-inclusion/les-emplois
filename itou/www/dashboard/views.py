@@ -141,15 +141,37 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     return render(request, template_name, context)
 
 
+def is_user_from_sender_prescriber_organization(user, job_application):
+    return (
+        user.is_prescriber
+        and job_application.is_sent_by_authorized_prescriber
+        and job_application.sender_prescriber_organization_id
+        in user.prescribermembership_set.values_list("organization_id", flat=True)
+    )
+
+
 @login_required
 def edit_job_seeker_info(request, job_application_id, template_name="dashboard/edit_job_seeker_info.html"):
-    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-    job_application = get_object_or_404(JobApplication, pk=job_application_id)
+    job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
 
-    if not current_siae_pk or current_siae_pk != job_application.to_siae.pk:
+    # Some job seekers manage their own personal information
+    if not job_application.has_editable_job_seeker:
         raise PermissionDenied
 
-    if not job_application.has_editable_job_seeker:
+    current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
+    # Only one condition is required to allow the user to edit the job seeker information:
+    # - same sender
+    # - member of the SIAE that offers the job application
+    # - member of the authorized prescriber organization who sent the job application
+    if not (
+        # Fast path w/o SQL request to check identical sender and current user
+        job_application.sender_id == request.user.id
+        or
+        # SIAE (no SQL request)
+        (current_siae_pk and current_siae_pk == job_application.to_siae_id)
+        # Authorized prescriber
+        or is_user_from_sender_prescriber_organization(request.user, job_application)
+    ):
         raise PermissionDenied
 
     dashboard_url = reverse_lazy("dashboard:index")
