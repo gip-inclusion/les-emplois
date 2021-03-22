@@ -19,18 +19,16 @@
     {% if request.user.is_job_seeker %}
         <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
     {% else %}
-        {% if job_application.last_state_change %}
-            <small class="text-muted"><b>{% translate "Envoyée le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}</small>
-            <br>
-            <small class="{% if job_application.is_old and job_application.is_pending %}text-danger{% else %}text-muted{% endif %}">
-            <b>{% translate "Mise à jour du statut le " %}</b>{{ job_application.last_state_change.timestamp|date:"d F Y à H:i" }}
+        {% if job_application.last_change == job_application.created_at %}
+            <small class="{% if job_application.is_pending_for_too_long %}text-danger{% else %}text-muted{% endif %}">
+            <b>{% translate "Sans réponse depuis le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}
             </small>
         {% else %}
-            <small class="{% if job_application.is_old %}text-danger{% else %}text-muted{% endif %}">
-            <b>{% translate "Sans réponse depuis le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}
+            <small class="text-muted"><b>{% translate "Envoyée le " %}</b>{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+            <br>
+            <small class="{% if job_application.is_pending_for_too_long %}text-danger{% else %}text-muted{% endif %}">
+            <b>{% translate "Mise à jour du statut le " %}</b>{{ job_application.last_change|date:"d F Y à H:i" }}
             </small>
         {% endif %}
     {% endif %}
-
-
 </div>
