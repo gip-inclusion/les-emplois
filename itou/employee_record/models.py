@@ -110,7 +110,6 @@ class EmployeeRecord(models.Model):
         if self.pk:
             self.updated_at = timezone.now()
         if self.job_seeker_profile:
-            print("saving")
             self.job_seeker_profile.save()
         super().save(*args, **kwargs)
 

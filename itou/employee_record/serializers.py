@@ -138,17 +138,24 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def to_representation(self, instance):
+        """
+        Overriding this method allows fine-tuning final JSON rendering
+
+        For EmployeeRecord objects, we just want to push-down
+        some top-level fields into the JSON objects hierarchy.
+        """
+
         result = super().to_representation(instance)
 
-        # Get passIae field out of root level
+        # Get 'passIae' field out of root level
         # and stick it into the personnePhysique JSON object
         person = result["personnePhysique"]
         person["passIae"] = result.pop("passIae")
 
-        # at first position (this is an OrderedDict)
+        # At first position (this is an OrderedDict)
         person.move_to_end("passIae", last=False)
 
-        # employerType is top-level but must be inserted in situationSalarie
+        # 'employerType' is top-level but must be inserted in 'situationSalarie'
         employee_situation = result["situationSalarie"]
         employee_situation["salarieTypeEmployeur"] = instance.employer_type
 
