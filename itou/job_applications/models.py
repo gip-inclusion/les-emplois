@@ -236,12 +236,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
     WEEKS_BEFORE_CONSIDERED_OLD = 3
 
-    PENDING_STATES = [
-        JobApplicationWorkflow.STATE_NEW,
-        JobApplicationWorkflow.STATE_PROCESSING,
-        JobApplicationWorkflow.STATE_POSTPONED,
-    ]
-
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     job_seeker = models.ForeignKey(
@@ -365,6 +359,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def is_pending(self):
+        return self.state in JobApplicationWorkflow.PENDING_STATES
 
     @property
     def is_sent_by_proxy(self):
