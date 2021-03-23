@@ -161,6 +161,49 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertEqual(len(unique_job_seekers), 2)
         self.assertEqual(type(unique_job_seekers[0]), get_user_model())
 
+    def test_with_has_suspended_approval(self):
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_has_suspended_approval().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "has_suspended_approval"))
+        self.assertFalse(qs.has_suspended_approval)
+
+    def test_with_last_change(self):
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "last_change"))
+        self.assertEqual(qs.last_change, job_app.created_at)
+
+        job_app.process()
+        qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
+        last_change = job_app.logs.order_by("-timestamp").first()
+        self.assertEqual(qs.last_change, last_change.timestamp)
+
+    def test_with_is_pending_for_too_long(self):
+        freshness_limit = timezone.now() - relativedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
+
+        # Sent before the freshness limit.
+        job_app = JobApplicationSentByJobSeekerFactory(created_at=freshness_limit - relativedelta(days=1))
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "is_pending_for_too_long"))
+        self.assertTrue(qs.is_pending_for_too_long)
+
+        # Freshly sent.
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertFalse(qs.is_pending_for_too_long)
+
+        # Sent before the freshness limit but accepted.
+        job_app = JobApplicationSentByJobSeekerFactory(
+            created_at=freshness_limit - relativedelta(days=1), state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertFalse(qs.is_pending_for_too_long)
+
+        # Freshly sent and freshly accepted. The Holy Grail!
+        job_app = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertFalse(qs.is_pending_for_too_long)
+
 
 class JobApplicationFactoriesTest(TestCase):
     def test_job_application_factory(self):
