@@ -1,14 +1,17 @@
 import datetime
+from unittest import mock
 
+import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from itou.approvals.models import ApprovalsWrapper
+from itou.approvals.models import ApprovalsWrapper, PoleEmploiApproval
 from itou.cities.factories import create_test_cities
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
@@ -161,25 +164,30 @@ class ApplyAsJobSeekerTest(TestCase):
     def test_apply_as_jobseeker_with_approval_in_waiting_period(self):
         """Apply as jobseeker with an approval in waiting period."""
 
-        siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-        user = JobSeekerFactory()
-        end_at = datetime.date.today() - relativedelta(days=30)
-        start_at = end_at - relativedelta(years=2)
-        PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
-        )
-        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        # Avoid COVID lockdown specific cases
+        now_date = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(months=1)
+        now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=pytz.utc)
 
-        url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
+        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
+            siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+            user = JobSeekerFactory()
+            end_at = now_date - relativedelta(days=30)
+            start_at = end_at - relativedelta(years=2)
+            PoleEmploiApprovalFactory(
+                pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
+            )
+            self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 
-        # Follow all redirections…
-        response = self.client.get(url, follow=True)
+            url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
 
-        # …until the expected 403.
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER)
-        last_url = response.redirect_chain[-1][0]
-        self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
+            # Follow all redirections…
+            response = self.client.get(url, follow=True)
+
+            # …until the expected 403.
+            self.assertEqual(response.status_code, 403)
+            self.assertEqual(response.context["exception"], ApprovalsWrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER)
+            last_url = response.redirect_chain[-1][0]
+            self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
 
 class ApplyAsAuthorizedPrescriberTest(TestCase):

@@ -105,7 +105,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
     def is_valid(self, obj):
-        return obj.is_valid
+        return obj.is_valid()
 
     is_valid.boolean = True
     is_valid.short_description = _("En cours de validité")
@@ -263,7 +263,7 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
     date_hierarchy = "birthdate"
 
     def is_valid(self, obj):
-        return obj.is_valid
+        return obj.is_valid()
 
     is_valid.boolean = True
     is_valid.short_description = _("En cours de validité")
