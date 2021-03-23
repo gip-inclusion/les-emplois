@@ -1,9 +1,12 @@
 from django.contrib import admin
+from django.contrib.gis import forms as gis_forms
+from django.contrib.gis.db import models as gis_models
 from django.db.models import Count
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
 
 from itou.prescribers import models
+from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm
 
 
 class TmpMissingSiretFilter(admin.SimpleListFilter):
@@ -94,6 +97,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": ("css/itou-admin.css",)}
 
+    form = PrescriberOrganizationAdminForm
     change_form_template = "admin/prescribers/change_form.html"
     fieldsets = (
         (
@@ -109,6 +113,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                     "post_code",
                     "city",
                     "department",
+                    "extra_field_refresh_geocoding",
                     "coords",
                     "geocoding_score",
                 )
@@ -143,7 +148,6 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     raw_id_fields = ("created_by",)
     readonly_fields = (
         "pk",
-        "coords",  # Quick tip to disable GeoDjango's Openlayers map.
         "created_by",
         "created_at",
         "updated_at",
@@ -151,6 +155,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "authorization_status",
         "authorization_updated_at",
         "authorization_updated_by",
+        "geocoding_score",
     )
     search_fields = (
         "pk",
@@ -162,6 +167,10 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         "post_code",
         "address_line_1",
     )
+    formfield_overrides = {
+        # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
+        gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
+    }
 
     def member_count(self, obj):
         return obj._member_count
@@ -181,11 +190,9 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
                 # Set geocoding.
                 obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
-        if change and obj.geocoding_address:
-            old_obj = self.model.objects.get(id=obj.id)
-            if obj.geocoding_address != old_obj.geocoding_address:
-                # Refresh geocoding.
-                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+        if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
+            # Refresh geocoding.
+            obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
         super().save_model(request, obj, form, change)
 

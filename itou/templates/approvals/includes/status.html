@@ -108,18 +108,31 @@
 
 {% elif approval.is_in_waiting_period %}
 
-    {% comment %}
-    Hide the "expired" status when a job application is sent by an authorized prescriber
-    for a job seeker with an approval in waiting period. The "expired" status suggests to
-    employers that they cannot hire the job seeker. But authorized prescribers can bypass
-    approvals in waiting period.
-    {% endcomment %}
-    {% if not job_application.is_sent_by_authorized_prescriber %}
+    {% if job_application.is_pending and job_application.is_sent_by_authorized_prescriber %}
+
+        {% comment %}
+        Display nothing about the status.
+
+        When an authorized prescriber bypasses the waiting period and sends a candidate
+        with an "expired" approval, the employer receives the application with the mention
+        "expired". He thinks that the hiring is impossible when he just has to validate
+        the job application to get a new PASS IAE.
+
+        The mention "expired" is removed if the job application is sent by an authorized
+        prescriber and is still waiting to be processed.
+
+        Otherwise the employer could decline the job application thinking that the hiring
+        is impossible.
+        {% endcomment %}
+
+    {% else %}
+
         <p class="text-danger">
             {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
                 <b>Expiré</b> le {{ end }} (depuis {{ since }})
             {% endblocktranslate %}
         </p>
+
     {% endif %}
 
 {% endif %}

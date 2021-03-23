@@ -189,7 +189,22 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
             if job_application.approval:
-                messages.success(request, mark_safe(_("Embauche acceptée !")))
+                PRO_CONTRACT_URL = (
+                    "https://www.pole-emploi.fr/employeur/aides-aux-recrutements/"
+                    "les-aides-a-lembauche/insertion-par-lactivite-economiq.html"
+                )
+                messages.success(
+                    request,
+                    mark_safe(
+                        _(
+                            "Embauche acceptée ! "
+                            "C'est une embauche en contrat de professionnalisation ? "
+                            f'<a href="{PRO_CONTRACT_URL}" rel="noopener" target="_blank">'
+                            "J'effectue ma demande d'aide"
+                            "</a>."
+                        )
+                    ),
+                )
                 messages.success(
                     request,
                     _(

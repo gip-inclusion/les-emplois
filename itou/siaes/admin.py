@@ -1,12 +1,15 @@
 import datetime
 
 from django.contrib import admin, messages
+from django.contrib.gis import forms as gis_forms
+from django.contrib.gis.db import models as gis_models
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
 from itou.siaes import models
+from itou.siaes.admin_forms import SiaeAdminForm
 
 
 class MembersInline(admin.TabularInline):
@@ -80,17 +83,18 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
+    form = SiaeAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     readonly_fields = (
         "pk",
-        "coords",  # Quick tip to disable GeoDjango's Openlayers map.
         "source",
         "created_by",
         "created_at",
         "updated_at",
         "job_applications_blocked_at",
+        "geocoding_score",
     )
     fieldsets = (
         (
@@ -127,6 +131,7 @@ class SiaeAdmin(admin.ModelAdmin):
                     "post_code",
                     "city",
                     "department",
+                    "extra_field_refresh_geocoding",
                     "coords",
                     "geocoding_score",
                 )
@@ -135,6 +140,10 @@ class SiaeAdmin(admin.ModelAdmin):
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
     inlines = (MembersInline, JobsInline)
+    formfield_overrides = {
+        # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/forms-api/#widget-classes
+        gis_models.PointField: {"widget": gis_forms.OSMWidget(attrs={"map_width": 800, "map_height": 500})}
+    }
 
     def member_count(self, obj):
         return obj._member_count
@@ -154,11 +163,9 @@ class SiaeAdmin(admin.ModelAdmin):
                 # Set geocoding.
                 obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
-        if change and obj.geocoding_address:
-            old_obj = self.model.objects.get(id=obj.id)
-            if obj.geocoding_address != old_obj.geocoding_address:
-                # Refresh geocoding.
-                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+        if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
+            # Refresh geocoding.
+            obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
 
         # Pulled-up the save action:
         # many-to-many relationships / cross-tables references
