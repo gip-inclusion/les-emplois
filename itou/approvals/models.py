@@ -94,6 +94,10 @@ class CommonApprovalMixin(models.Model):
         starts_after_lockdown = self.start_at > self.LOCKDOWN_END_AT
         return not (ends_before_lockdown or starts_after_lockdown)
 
+    @property
+    def display_end_at(self):
+        return self.end_at
+
 
 class CommonApprovalQuerySet(models.QuerySet):
     """
@@ -950,6 +954,13 @@ class PoleEmploiApproval(CommonApprovalMixin):
         Upper-case ASCII transliterations of Unicode text.
         """
         return unidecode(name.strip()).upper()
+
+    @property
+    def display_end_at(self):
+        end_at = self.end_at
+        if self.overlaps_covid_lockdown:
+            end_at = end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+        return end_at
 
     @property
     def number_with_spaces(self):
