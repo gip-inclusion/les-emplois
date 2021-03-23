@@ -50,10 +50,10 @@ class CommonApprovalMixin(models.Model):
     class Meta:
         abstract = True
 
-    @property
-    def is_valid(self):
+    def is_valid(self, end_at=None):
+        end_at = end_at or self.end_at
         now = timezone.now().date()
-        return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
+        return (self.start_at <= now <= end_at) or (self.start_at >= now)
 
     @property
     def is_in_progress(self):
@@ -327,7 +327,7 @@ class Approval(CommonApprovalMixin):
         a pre-existing valid PoleEmploiApproval by copying its data.
         """
         approval = approvals_wrapper.latest_approval
-        if not approval.is_valid or not isinstance(approval, (cls, PoleEmploiApproval)):
+        if not approval.is_valid() or not isinstance(approval, (cls, PoleEmploiApproval)):
             raise RuntimeError(_("Invalid approval."))
         if isinstance(approval, cls):
             return approval
@@ -937,6 +937,12 @@ class PoleEmploiApproval(CommonApprovalMixin):
     def __str__(self):
         return self.number
 
+    def is_valid(self):
+        end_at = self.end_at
+        if self.overlaps_covid_lockdown:
+            end_at = end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+        return super().is_valid(end_at=end_at)
+
     @staticmethod
     def format_name_as_pole_emploi(name):
         """
@@ -1012,7 +1018,7 @@ class ApprovalsWrapper:
             self.status = self.NONE_FOUND
         else:
             self.latest_approval = self.merged_approvals[0]
-            if self.latest_approval.is_valid:
+            if self.latest_approval.is_valid():
                 self.status = self.VALID
             elif self.latest_approval.waiting_period_has_elapsed:
                 # The `Période de carence` is over. A job seeker can get a new Approval.
@@ -1033,7 +1039,7 @@ class ApprovalsWrapper:
 
         # If an ongoing PASS IAE exists, consider it's the latest valid approval
         # even if a PoleEmploiApproval is more recent.
-        if any(approval.is_valid for approval in approvals):
+        if any(approval.is_valid() for approval in approvals):
             return approvals
 
         approvals_numbers = [approval.number for approval in approvals]
