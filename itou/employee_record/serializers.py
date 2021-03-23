@@ -4,15 +4,6 @@ from itou.employee_record.models import EmployeeRecord
 from itou.users.models import User
 
 
-class RemoveEmptyStringSerializer(serializers.ModelSerializer):
-    def to_representation(self, instance):
-
-        print(self.data)
-        print(self.__dict__)
-
-        return super().to_representation(instance)
-
-
 class _EmployeeSerializer(serializers.ModelSerializer):
 
     idItou = serializers.IntegerField(source="id")
@@ -143,13 +134,12 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         result = super().to_representation(instance)
 
-        print(result)
-
         # Get passIae field out of root level
         # and stick it into the personnePhysique JSON object
         person = result["personnePhysique"]
         person["passIae"] = result.pop("passIae")
-        # At first position (this is an OrderedDict)
+
+        # at first position (this is an OrderedDict)
         person.move_to_end("passIae", last=False)
 
         return result
