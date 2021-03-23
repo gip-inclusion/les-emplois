@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from itou.asp.models import EmployerType
 
 
 class Status(models.TextChoices):
@@ -218,6 +219,13 @@ class EmployeeRecord(models.Model):
             return self.job_application.to_siae.convention.asp_convention_id
 
         return None
+
+    @property
+    def employer_type(self):
+        """
+        This is a mapping between itou internal SIAE kinds and ASP ones
+        """
+        return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
 
     @classmethod
     def from_job_application(cls, job_application):
