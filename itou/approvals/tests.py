@@ -421,7 +421,7 @@ class PoleEmploiApprovalModelTest(TestCase):
         now = datetime.datetime(year=now_date.year, month=now_date.month, day=now_date.day)
 
         with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
-            # End today.
+            # Ends today.
             end_at = now_date
             start_at = end_at - relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
@@ -433,7 +433,7 @@ class PoleEmploiApprovalModelTest(TestCase):
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
             self.assertFalse(approval.is_valid())
 
-            # Start tomorrow.
+            # Starts tomorrow.
             start_at = now_date + relativedelta(days=1)
             end_at = start_at + relativedelta(years=2)
             approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
