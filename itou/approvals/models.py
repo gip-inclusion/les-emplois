@@ -962,16 +962,20 @@ class PoleEmploiApproval(CommonApprovalMixin):
     @property
     def display_end_at(self):
         """
-        When importing Pôle emploi approvals from a file, the COVID prolongation is not integrated to the set we receive and we decided not to apply it at this moment to preserve data integrity.
+        When importing Pôle emploi approvals from a file, the COVID prolongation is not integrated
+        to the set we receive and we decided not to apply it at this moment to preserve data integrity.
         We set it when transforming an approval into a PASS IAE (concretely PoleEmploiApproval => Approval).
-        But a beforehand step is distorting the process: the fetching of valid approvals (see ApprovalsWrapper). In fact, an expired approval that could benefit from the COVID prolongation is still considered invalid as its end date has not been updated yet.
+        But a beforehand step is distorting the process: the fetching of valid approvals (see
+        ApprovalsWrapper). In fact, an expired approval that could benefit from the COVID prolongation
+        is still considered invalid as its end date has not been updated yet.
 
         Steps:
         - Fetching of the last available approval: Approval.get_or_create_from_valid(approvals_wrapper)
         - If a PoleEmploiApproval is found and is valid, continue to the save()
         - In Approval > save(), apply the COVID prolongation.
 
-        To apply this prolongation without reflecting it into the database, we override two parent methods:
+        To apply this prolongation without reflecting it into the database,
+        we override two parent methods:
         - self.is_valid()
         - self.display_end_at: extended end_at
         """
