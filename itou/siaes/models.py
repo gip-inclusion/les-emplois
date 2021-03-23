@@ -459,9 +459,9 @@ class SiaeJobDescriptionQuerySet(models.QuerySet):
 
     def with_annotation_is_popular(self):
         # Avoid an infinite loop
-        from itou.job_applications.models import JobApplication
+        from itou.job_applications.models import JobApplicationWorkflow
 
-        job_apps_filters = {"jobapplication__state__in": JobApplication.PENDING_STATES}
+        job_apps_filters = {"jobapplication__state__in": JobApplicationWorkflow.PENDING_STATES}
         annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(
             is_popular=Case(
                 When(job_applications_count__gt=self.model.POPULAR_THRESHOLD, then=True),
