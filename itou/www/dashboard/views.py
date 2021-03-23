@@ -150,28 +150,26 @@ def is_user_from_sender_prescriber_organization(user, job_application):
     )
 
 
+def user_can_edit_job_seeker_info(user, job_application, current_siae_pk=None):
+    return (
+        # Only when the information is not managed by job seekers themselves
+        job_application.has_editable_job_seeker
+        and (
+            # Same sender (no SQL)
+            job_application.sender_id == user.id
+            # Member of the SIAE that offers the job application
+            or (current_siae_pk and current_siae_pk == job_application.to_siae_id)
+            # Member of the authorized prescriber organization who propose the candidate to the job application
+            or is_user_from_sender_prescriber_organization(user, job_application)
+        )
+    )
+
+
 @login_required
 def edit_job_seeker_info(request, job_application_id, template_name="dashboard/edit_job_seeker_info.html"):
     job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
-
-    # Some job seekers manage their own personal information
-    if not job_application.has_editable_job_seeker:
-        raise PermissionDenied
-
     current_siae_pk = request.session.get(settings.ITOU_SESSION_CURRENT_SIAE_KEY)
-    # Only one condition is required to allow the user to edit the job seeker information:
-    # - same sender
-    # - member of the SIAE that offers the job application
-    # - member of the authorized prescriber organization who sent the job application
-    if not (
-        # Fast path w/o SQL request to check identical sender and current user
-        job_application.sender_id == request.user.id
-        or
-        # SIAE (no SQL request)
-        (current_siae_pk and current_siae_pk == job_application.to_siae_id)
-        # Authorized prescriber
-        or is_user_from_sender_prescriber_organization(request.user, job_application)
-    ):
+    if not user_can_edit_job_seeker_info(request.user, job_application, current_siae_pk):
         raise PermissionDenied
 
     dashboard_url = reverse_lazy("dashboard:index")
