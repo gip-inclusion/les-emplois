@@ -302,14 +302,13 @@ class PrescriberType(models.TextChoices):
 
     Mapping between ASP and Itou prescriber types
 
-
     Prescriber (ASP "Orienteur") types are:
-    - dispatched by "Mesure" (ASP SIAE kind )
+    - dispatched by "Mesure" (ASP SIAE kind)
     - not likely to change
 
     So they can be summarized as a simple list of text choices.
 
-    Similar to EmployerType above, and has the same padding issue
+    Similar to EmployerType above, and with the same padding issue
     """
 
     ML = "01", _("Mission locale")
