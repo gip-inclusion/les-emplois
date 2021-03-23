@@ -14,9 +14,8 @@ class _EmployeeSerializer(serializers.ModelSerializer):
 
     dateNaissance = serializers.DateField(format="%d/%m/%Y", source="birthdate")
     codeComInsee = serializers.IntegerField(source="birth_place.code")
-    # TBD birth dpt
+    codeDpt = serializers.CharField(source="birth_place.department_code")
     codeInseePays = serializers.IntegerField(source="birth_country.code")
-    # Nationalité TBD
     codeGroupePays = serializers.IntegerField(source="birth_country.group")
 
     class Meta:
@@ -28,6 +27,7 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "prenom",
             "dateNaissance",
             "codeComInsee",
+            "codeDpt",
             "codeInseePays",
             "codeGroupePays",
         ]
@@ -38,7 +38,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
     adrTelephone = serializers.CharField(source="phone")
     adrEmail = serializers.CharField(source="email")
 
-    adrNumeroVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_number")
+    adrNumeroVoie = serializers.IntegerField(source="jobseeker_profile.hexa_lane_number")
     codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension")
     codetypeVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
@@ -65,7 +65,7 @@ class _EmployeeSituation(serializers.ModelSerializer):
     # Placeholder: updated at top-level serialization
     orienteur = serializers.CharField(required=False)
 
-    niveauFormation = serializers.CharField(source="jobseeker_profile.education_level")
+    niveauFormation = serializers.IntegerField(source="jobseeker_profile.education_level")
     salarieEnEmploi = serializers.BooleanField(source="jobseeker_profile.is_employed")
 
     # Placeholder: updated at top-level serialization
