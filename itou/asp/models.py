@@ -295,6 +295,47 @@ class EmployerType(models.TextChoices):
         return cls.OTHER
 
 
+class PrescriberType(models.TextChoices):
+    """
+    Prescriber type
+
+    Mapping between ASP and Itou prescriber types
+
+
+    Prescriber (ASP "Orienteur") types are:
+    - dispatched by "Mesure" (ASP SIAE kind )
+    - not likely to change
+
+    So they can be summarized as a simple list of text choices.
+
+    Similar to EmployerType above, and has the same padding issue
+    """
+
+    ML = "01", _("Mission locale")
+    CAP_EMPLOI = "02", _("CAP emploi")
+    PE = "03", _("Pôle emploi")
+    PLIE = "04", _("Plan local pour l'insertion et l'emploi")
+    DEPT = "05", _("Service départementaux")
+    AUTHORIZED_PRESCRIBERS = "06", _("Prescripteurs habilités")
+    SPONTANEOUS_APPLICATION = "07", _("Candidature spontanée")
+    UNKNOWN = "99", _("Non connu")
+
+    @classmethod
+    def from_itou_prescriber_kind(cls, prescriber_kind):
+        if prescriber_kind == "ML":
+            return cls.ML
+        elif prescriber_kind == "CAP_EMPLOI":
+            return cls.CAP_EMPLOI
+        elif prescriber_kind == "PE":
+            return cls.PE
+        elif prescriber_kind == "PLIE":
+            return cls.PLIE
+        elif prescriber_kind == "DEPT":
+            return cls.DEPT
+
+        return cls.UNKNOWN
+
+
 class CommuneManager(models.Manager):
     def get_queryset(self):
         return PeriodQuerySet(self.model)

@@ -2,7 +2,9 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from itou.asp.models import EmployerType
+
+from itou.asp.models import EmployerType, PrescriberType
+from itou.job_applications.models import JobApplication
 
 
 class Status(models.TextChoices):
@@ -226,6 +228,23 @@ class EmployeeRecord(models.Model):
         This is a mapping between itou internal SIAE kinds and ASP ones
         """
         return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
+
+    @property
+    def prescriber_type(self):
+        """
+        This is mapping between itou internal prescriber kinds and ASP ones
+        """
+
+        sender_kind = self.job_application.sender_kind
+
+        if sender_kind == JobApplication.SENDER_KIND_JOB_SEEKER:
+            # the job seeker applied directly
+            return PrescriberType.SPONTANEOUS_APPLICATION
+        elif sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+            # an SIAE applied
+            return PrescriberType.UNKNOWN
+
+        return PrescriberType.from_itou_prescriber_kind(self.job_application.sender_kind)
 
     @classmethod
     def from_job_application(cls, job_application):
