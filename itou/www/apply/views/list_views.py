@@ -22,7 +22,6 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     filters_form = FilterJobApplicationsForm(request.GET or None)
     filters = None
     job_applications = request.user.job_applications
-
     job_applications = job_applications.with_list_related_data()
 
     if filters_form.is_valid():
