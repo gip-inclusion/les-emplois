@@ -1,6 +1,7 @@
 import re
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
@@ -369,6 +370,16 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     class Meta:
         verbose_name = _("Commune")
+
+    @cached_property
+    def department_code(self):
+        """
+        INSEE department code are the first 2 characters of the commune code
+        With no exception.
+
+        For processing concerns, ASP expects 3 characters: 0-padding is the way
+        """
+        return f"0{self.code[0:2]}"
 
 
 class Department(PrettyPrintMixin, AbstractPeriod):
