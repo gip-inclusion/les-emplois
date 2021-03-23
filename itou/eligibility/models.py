@@ -205,7 +205,7 @@ class EligibilityDiagnosis(models.Model):
     @property
     def considered_to_expire_at(self):
         if self.job_seeker.approvals_wrapper.has_valid:
-            return self.job_seeker.approvals_wrapper.latest_approval.end_at
+            return self.job_seeker.approvals_wrapper.latest_approval.display_end_at
         return self.expires_at
 
     @classmethod
