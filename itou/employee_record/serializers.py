@@ -62,10 +62,14 @@ class _EmployeeAddress(serializers.ModelSerializer):
 
 class _EmployeeSituation(serializers.ModelSerializer):
 
+    # Placeholder: updated at top-level serialization
+    orienteur = serializers.CharField(required=False)
+
     niveauFormation = serializers.CharField(source="jobseeker_profile.education_level")
     salarieEnEmploi = serializers.BooleanField(source="jobseeker_profile.is_employed")
 
-    # TBD: employer type and orienter
+    # Placeholder: updated at top-level serialization
+    salarieTypeEmployeur = serializers.CharField(required=False)
 
     salarieSansEmploiDepuis = serializers.CharField(source="jobseeker_profile.unemployed_since")
     salarieSansRessource = serializers.CharField(source="jobseeker_profile.resourceless")
@@ -93,8 +97,10 @@ class _EmployeeSituation(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "orienteur",
             "niveauFormation",
             "salarieEnEmploi",
+            "salarieTypeEmployeur",
             "salarieSansEmploiDepuis",
             "salarieSansRessource",
             "inscritPoleEmploi",
@@ -141,5 +147,10 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
         # at first position (this is an OrderedDict)
         person.move_to_end("passIae", last=False)
+
+        # employerType is top-level but must be inserted in situationSalarie
+        employee_situation = result["situationSalarie"]
+        ks = list(employee_situation.keys())
+        employee_situation[ks["salarieTypeEmployeur"]] = instance.employer_type
 
         return result
