@@ -36,7 +36,7 @@
 
         {# Validity. #}
         <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
+            {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.display_end_at|date:"d/m/Y" %}
                 Valide du {{ start }} au {{ end }}
             {% endblocktranslate %}
         </li>
@@ -128,7 +128,7 @@
     {% else %}
 
         <p class="text-danger">
-            {% blocktranslate with end=approval.end_at|date:"d/m/Y" since=approval.end_at|timesince %}
+            {% blocktranslate with end=approval.display_end_at|date:"d/m/Y" since=approval.display_end_at|timesince %}
                 <b>Expiré</b> le {{ end }} (depuis {{ since }})
             {% endblocktranslate %}
         </p>
