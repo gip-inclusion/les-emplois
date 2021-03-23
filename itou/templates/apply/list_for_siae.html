@@ -39,11 +39,10 @@
 
             <div class="card-footer">
                 <div class="row">
-                    <div class="col-sm-2">
+                    <div class="col-sm-3">
                         <a href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">
                             {% translate "Gérer la candidature" %}
                         </a>
-
                     </div>
                     {% if job_application.can_download_approval_as_pdf %}
                         <div class="col-sm-3">

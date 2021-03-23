@@ -25,10 +25,43 @@
 
             {% include "apply/includes/list_card_body.html" with job_application=job_application %}
 
-            {% include "apply/includes/list_card_footer.html" with job_application=job_application %}
+            <div class="card-footer">
+                <a
+                    href="#"
+                    data-toggle="collapse"
+                    data-target="#answer{{ forloop.counter0 }}"
+                    aria-expanded="false"
+                    aria-controls="answer{{ forloop.counter0 }}"
+                >{% translate "Plus d'informations" %}</a>
+                <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
+                    <p>
+                        <b>Candidat :</b>
+                        {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
+                    </p>
 
+                    <p>
+                        <b>Message de candidature :</b>
+                    </p>
+                    <p>{{ job_application.message|linebreaks }}</p>
+
+                    {% if job_application.answer %}
+                    <p>
+                        <b>{% if job_application.state.is_postponed %}Motif de la mise en liste d'attente :{% else %}Réponse :{% endif %}</b>
+                    </p>
+                    <p>
+                        {{ job_application.answer|linebreaks }}
+                    </p>
+                    {% endif %}
+
+                    {% if job_application.get_refusal_reason_display %}
+                    <p>
+                        <b>Motif du refus :</b>
+                    </p>
+                    <p>{{ job_application.get_refusal_reason_display }}</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-
     {% endfor %}
 
     {% include "includes/pagination.html" with page=job_applications_page %}

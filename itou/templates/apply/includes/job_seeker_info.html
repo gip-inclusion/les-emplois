@@ -28,7 +28,7 @@
     </li>
     {% endif %}
 </ul>
-
+<p>
 {% if job_application.has_editable_job_seeker %}
 <p>
     <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
@@ -36,4 +36,6 @@
         {% translate "Modifier les informations" %}
     </a>
 </p>
+{% else %}
+<p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.<p>
 {% endif %}
