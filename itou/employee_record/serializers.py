@@ -150,7 +150,9 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
         # employerType is top-level but must be inserted in situationSalarie
         employee_situation = result["situationSalarie"]
-        ks = list(employee_situation.keys())
-        employee_situation[ks["salarieTypeEmployeur"]] = instance.employer_type
+        employee_situation["salarieTypeEmployeur"] = instance.employer_type
+
+        # same workaroud for prescriber type (orienteur)
+        employee_situation["orienteur"] = instance.prescriber_type
 
         return result
