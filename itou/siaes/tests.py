@@ -4,19 +4,22 @@ from django.conf import settings
 from django.core import mail
 from django.test import RequestFactory, TestCase
 
+from itou.job_applications.factories import JobApplicationFactory
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
     SiaeFactory,
     SiaePendingGracePeriodFactory,
     SiaeWith2MembershipsFactory,
     SiaeWith4MembershipsFactory,
+    SiaeWithJobsFactory,
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeJobDescription
 
 
-class FactoriesTest(TestCase):
+class SiaeFactoriesTest(TestCase):
     def test_siae_with_membership_factory(self):
         siae = SiaeWithMembershipFactory()
         self.assertEqual(siae.members.count(), 1)
@@ -48,7 +51,7 @@ class FactoriesTest(TestCase):
         self.assertEqual(siae.active_admin_members.count(), 1)
 
 
-class ModelTest(TestCase):
+class SiaeModelTest(TestCase):
     def test_is_kind(self):
         siae = SiaeFactory(kind=Siae.KIND_GEIQ)
         self.assertTrue(siae.is_kind_geiq)
@@ -186,3 +189,64 @@ class ModelTest(TestCase):
         self.assertFalse(user in siae1.active_members)
         self.assertEqual(siae2.members.count(), 3)
         self.assertEqual(siae2.active_members.count(), 3)
+
+
+class SiaeQuerySetTest(TestCase):
+    def test_prefetch_job_description_through(self):
+        siae = SiaeWithJobsFactory()
+
+        siae_result = Siae.objects.prefetch_job_description_through().get(pk=siae.pk)
+        self.assertTrue(hasattr(siae_result, "job_description_through"))
+
+        first_job_description = siae_result.job_description_through.first()
+        self.assertTrue(hasattr(first_job_description, "is_popular"))
+
+
+class SiaeJobDescriptionQuerySetTest(TestCase):
+    def setUp(self):
+        self.siae = SiaeWithJobsFactory()
+
+    def test_with_annotation_is_popular(self):
+        siae_job_descriptions = self.siae.job_description_through.all()
+
+        # Test attribute presence
+        siae_job_description = SiaeJobDescription.objects.with_annotation_is_popular().first()
+        self.assertTrue(hasattr(siae_job_description, "is_popular"))
+
+        # Test popular threshold: popular job description
+        popular_job_description = siae_job_descriptions[0]
+        for _ in range(SiaeJobDescription.POPULAR_THRESHOLD + 1):
+            JobApplicationFactory(to_siae=self.siae, selected_jobs=[popular_job_description])
+
+        self.assertTrue(
+            SiaeJobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
+        )
+
+        # Test popular threshold: unpopular job description
+        unpopular_job_description = siae_job_descriptions[1]
+        JobApplicationFactory(to_siae=self.siae, selected_jobs=[unpopular_job_description])
+
+        self.assertFalse(
+            SiaeJobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
+        )
+
+        # Popular job descriptions count related **pending** job applications.
+        # They should ignore other states.
+        job_description = siae_job_descriptions[2]
+        threshold_exceeded = SiaeJobDescription.POPULAR_THRESHOLD + 1
+
+        JobApplicationFactory.create_batch(
+            threshold_exceeded,
+            to_siae=self.siae,
+            selected_jobs=[popular_job_description],
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+        )
+
+        self.assertFalse(SiaeJobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular)
+
+    def test_with_job_applications_count(self):
+        job_description = self.siae.job_description_through.first()
+        JobApplicationFactory(to_siae=self.siae, selected_jobs=[job_description])
+        siae_job_description = SiaeJobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
+        self.assertTrue(hasattr(siae_job_description, "job_applications_count"))
+        self.assertEqual(siae_job_description.job_applications_count, 1)

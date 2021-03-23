@@ -6,7 +6,8 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import Exists, OuterRef
+from django.db.models import BooleanField, Case, Exists, Max, OuterRef, When
+from django.db.models.functions import Greatest
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -73,6 +74,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
     )
 
+    PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
     initial_state = STATE_NEW
 
     log_model = "job_applications.JobApplicationTransitionLog"
@@ -85,13 +87,7 @@ class JobApplicationQuerySet(models.QuerySet):
         return self.filter(to_siae__members=user, to_siae__members__is_active=True)
 
     def pending(self):
-        return self.filter(
-            state__in=[
-                JobApplicationWorkflow.STATE_NEW,
-                JobApplicationWorkflow.STATE_PROCESSING,
-                JobApplicationWorkflow.STATE_POSTPONED,
-            ]
-        )
+        return self.filter(state__in=JobApplicationWorkflow.PENDING_STATES)
 
     def accepted(self):
         return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
@@ -128,6 +124,24 @@ class JobApplicationQuerySet(models.QuerySet):
             approval_manually_refused_at=None,
         )
 
+    def with_has_suspended_approval(self):
+        has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
+        return self.annotate(has_suspended_approval=Exists(has_suspended_approval))
+
+    def with_last_change(self):
+        return self.annotate(last_change=Greatest("created_at", Max("logs__timestamp")))
+
+    def with_is_pending_for_too_long(self):
+        freshness_limit = timezone.now() - relativedelta(weeks=self.model.WEEKS_BEFORE_CONSIDERED_OLD)
+        pending_states = JobApplicationWorkflow.PENDING_STATES
+        return self.with_last_change().annotate(
+            is_pending_for_too_long=Case(
+                When(last_change__lt=freshness_limit, state__in=pending_states, then=True),
+                default=False,
+                output_field=BooleanField(),
+            )
+        )
+
     def with_list_related_data(self):
         """
         Stop the deluge of database queries that is caused by accessing related
@@ -141,8 +155,8 @@ class JobApplicationQuerySet(models.QuerySet):
             "sender_prescriber_organization",
             "to_siae__convention",
         ).prefetch_related("selected_jobs__appellation")
-        has_suspended_approval = Suspension.objects.filter(approval=OuterRef("approval")).in_progress()
-        return qs.annotate(has_suspended_approval=Exists(has_suspended_approval))
+
+        return qs.with_has_suspended_approval().with_is_pending_for_too_long().order_by("-created_at")
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
@@ -220,6 +234,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
+    WEEKS_BEFORE_CONSIDERED_OLD = 3
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -344,6 +359,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def save(self, *args, **kwargs):
         self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def is_pending(self):
+        return self.state in JobApplicationWorkflow.PENDING_STATES
 
     @property
     def is_sent_by_proxy(self):

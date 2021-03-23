@@ -16,6 +16,16 @@
 
     <br>
 
-    <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+
+        <small class="text-muted">{{ job_application.created_at|date:"d F Y à H:i" }}</small>
+
+        {% if job_application.is_pending_for_too_long and not request.user_is_job_seeker %}
+            <br>
+            <small class="text-danger font-weight-bold">
+                {% blocktranslate with weeks=job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
+                    En attente de réponse depuis plus de {{ weeks }} semaines.
+                {% endblocktranslate %}
+            </small>
+        {% endif %}
 
 </div>

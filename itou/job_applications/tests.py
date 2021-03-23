@@ -161,6 +161,49 @@ class JobApplicationQuerySetTest(TestCase):
         self.assertEqual(len(unique_job_seekers), 2)
         self.assertEqual(type(unique_job_seekers[0]), get_user_model())
 
+    def test_with_has_suspended_approval(self):
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_has_suspended_approval().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "has_suspended_approval"))
+        self.assertFalse(qs.has_suspended_approval)
+
+    def test_with_last_change(self):
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "last_change"))
+        self.assertEqual(qs.last_change, job_app.created_at)
+
+        job_app.process()
+        qs = JobApplication.objects.with_last_change().get(pk=job_app.pk)
+        last_change = job_app.logs.order_by("-timestamp").first()
+        self.assertEqual(qs.last_change, last_change.timestamp)
+
+    def test_with_is_pending_for_too_long(self):
+        freshness_limit = timezone.now() - relativedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
+
+        # Sent before the freshness limit.
+        job_app = JobApplicationSentByJobSeekerFactory(created_at=freshness_limit - relativedelta(days=1))
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertTrue(hasattr(qs, "is_pending_for_too_long"))
+        self.assertTrue(qs.is_pending_for_too_long)
+
+        # Freshly sent.
+        job_app = JobApplicationSentByJobSeekerFactory()
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertFalse(qs.is_pending_for_too_long)
+
+        # Sent before the freshness limit but accepted.
+        job_app = JobApplicationSentByJobSeekerFactory(
+            created_at=freshness_limit - relativedelta(days=1), state=JobApplicationWorkflow.STATE_ACCEPTED
+        )
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertFalse(qs.is_pending_for_too_long)
+
+        # Freshly sent and freshly accepted. The Holy Grail!
+        job_app = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
+        self.assertFalse(qs.is_pending_for_too_long)
+
 
 class JobApplicationFactoriesTest(TestCase):
     def test_job_application_factory(self):
@@ -481,13 +524,10 @@ class JobApplicationNotificationsTest(TestCase):
 class NewQualifiedJobAppEmployersNotificationTest(TestCase):
     def test_one_selected_job(self):
         siae = SiaeWithMembershipAndJobsFactory()
-        job_application = JobApplicationFactory(to_siae=siae)
-
-        # Add a selected job description to the application
         job_descriptions = siae.job_description_through.all()
+
         selected_job = job_descriptions[0]
-        job_application.selected_jobs.add(selected_job)
-        job_application.save()
+        job_application = JobApplicationFactory(to_siae=siae, selected_jobs=[selected_job])
 
         membership = siae.siaemembership_set.first()
         self.assertFalse(membership.notifications)
@@ -503,10 +543,8 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 
         # A job application is sent concerning another job_description.
         # He should then be subscribed to two different notifications.
-        job_application = JobApplicationFactory(to_siae=siae)
         selected_job = job_descriptions[1]
-        job_application.selected_jobs.add(selected_job)
-        job_application.save()
+        job_application = JobApplicationFactory(to_siae=siae, selected_jobs=[selected_job])
 
         NewQualifiedJobAppEmployersNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
         self.assertTrue(
@@ -524,11 +562,9 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 
     def test_multiple_selected_jobs_multiple_recipients(self):
         siae = SiaeWithMembershipAndJobsFactory()
-        job_descriptions = siae.job_description_through.all()
+        job_descriptions = siae.job_description_through.all()[:2]
 
-        user = SiaeStaffFactory(siae=siae)
-        siae.members.add(user)
-        membership = siae.siaemembership_set.get(user=user)
+        membership = siae.siaemembership_set.first()
         NewQualifiedJobAppEmployersNotification.subscribe(
             recipient=membership, subscribed_pks=[job_descriptions[0].pk]
         )
@@ -541,13 +577,9 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         )
 
         # Two selected jobs. Each user subscribed to one of them. We should have two recipients.
-        job_application = JobApplicationFactory(to_siae=siae)
-        job_application.selected_jobs.add(job_descriptions[0])
-        job_application.selected_jobs.add(job_descriptions[1])
-        job_application.save()
-
+        job_application = JobApplicationFactory(to_siae=siae, selected_jobs=job_descriptions)
         notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-        notification.SEND_TO_UNSET_RECIPIENTS = False  # Disable default subscription to test "manual" subscription
+
         self.assertEqual(len(notification.recipients_emails), 2)
 
     def test_default_subscription(self):
@@ -558,12 +590,8 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         user = SiaeStaffFactory(siae=siae)
         siae.members.add(user)
 
-        job_application = JobApplicationFactory(to_siae=siae)
-
-        # Add a job description to the application
         selected_job = siae.job_description_through.first()
-        job_application.selected_jobs.add(selected_job)
-        job_application.save()
+        job_application = JobApplicationFactory(to_siae=siae, selected_jobs=[selected_job])
 
         notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
 
@@ -572,13 +600,10 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 
     def test_unsubscribe(self):
         siae = SiaeWithMembershipAndJobsFactory()
-        job_application = JobApplicationFactory(to_siae=siae)
+        selected_job = siae.job_description_through.first()
+        job_application = JobApplicationFactory(to_siae=siae, selected_jobs=[selected_job])
         self.assertEqual(siae.members.count(), 1)
 
-        # Add a job description to the application
-        selected_job = siae.job_description_through.first()
-        job_application.selected_jobs.add(selected_job)
-        job_application.save()
         recipient = siae.siaemembership_set.first()
 
         NewQualifiedJobAppEmployersNotification.subscribe(recipient=recipient, subscribed_pks=[selected_job.pk])

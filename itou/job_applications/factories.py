@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 
 from itou.approvals.factories import ApprovalFactory
 from itou.job_applications import models
+from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationWithMembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -45,8 +46,11 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
         if extracted:
             # A list of jobs were passed in, use them.
-            for appellation in extracted:
-                siae_job_description = SiaeJobDescription.objects.create(siae=self.to_siae, appellation=appellation)
+            for siae_job_description in extracted:
+                if isinstance(siae_job_description, Appellation):
+                    siae_job_description = SiaeJobDescription.objects.create(
+                        siae=self.to_siae, appellation=siae_job_description
+                    )
                 self.selected_jobs.add(siae_job_description)
 
 

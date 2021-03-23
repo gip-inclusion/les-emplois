@@ -75,6 +75,16 @@
                                 <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     {{ job.display_name }}
                                 </a>
+                                {% if job.is_popular %}
+                                   <small>
+                                       <span class="ml-3">
+                                            {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
+                                            {% blocktranslate with threshold=job.POPULAR_THRESHOLD %} 
+                                                Plus de {{ threshold }} candidatures reçues
+                                            {% endblocktranslate %}
+                                        </span>
+                                   </small>
+                                {% endif %}
                             </li>
                         {% endfor %}
                         </ul>

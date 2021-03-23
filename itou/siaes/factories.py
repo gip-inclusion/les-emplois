@@ -101,13 +101,13 @@ class SiaeWith4MembershipsFactory(SiaeFactory):
     membership4 = factory.RelatedFactory(SiaeMembershipFactory, "siae", is_siae_admin=False, user__is_active=False)
 
 
-class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
+class SiaeWithJobsFactory(SiaeFactory):
     """
-    Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.
+    Generates an Siae() object with random jobs (based on given ROME codes) for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
 
     Usage:
-        SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+        SiaeWithJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
     """
 
     @factory.post_generation
@@ -121,6 +121,18 @@ class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory):
         # Pick random results.
         appellations = Appellation.objects.order_by("?")[: len(romes)]
         self.jobs.add(*appellations)
+
+
+class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory, SiaeWithJobsFactory):
+    """
+    Generates an Siae() object with a member and random jobs (based on given ROME codes) for unit tests.
+    https://factoryboy.readthedocs.io/en/latest/recipes.html#simple-many-to-many-relationship
+
+    Usage:
+        SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+    """
+
+    pass
 
 
 class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
