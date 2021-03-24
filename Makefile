@@ -1,6 +1,6 @@
 # Global tasks.
 # =============================================================================
-PYTHON_VERSION := python3.7
+PYTHON_VERSION := python3.9
 
 .PHONY: run clean cdsitepackages quality style setup_git_pre_commit_hook
 
