@@ -133,15 +133,20 @@ class _EmployeeSituation(serializers.ModelSerializer):
 
 class EmployeeRecordSerializer(serializers.ModelSerializer):
 
-    passIae = serializers.CharField(max_length=12, source="approval_number")
+    passIae = serializers.CharField(source="approval_number")
     personnePhysique = _EmployeeSerializer(source="job_application.job_seeker")
     adresse = _EmployeeAddress(source="job_application.job_seeker")
     situationSalarie = _EmployeeSituation(source="job_application.job_seeker")
+
+    siret = serializers.CharField(source="job_application.to_siae.siret")
+    typeMouvement = serializers.CharField(default="C")
 
     class Meta:
         model = EmployeeRecord
         fields = [
             "passIae",
+            "siret",
+            "typeMouvement",
             "personnePhysique",
             "adresse",
             "situationSalarie",

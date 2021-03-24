@@ -438,7 +438,7 @@ class Country(PrettyPrintMixin, models.Model):
         verbose_name = _("Pays")
         verbose_name_plural = _("Pays")
 
-    @property
+    @cached_property
     def is_france(self):
         """
         Check if provided country is France
@@ -447,24 +447,50 @@ class Country(PrettyPrintMixin, models.Model):
         return self.group == self.Group.FRANCE
 
 
-class SiaeKind(PrettyPrintMixin, AbstractPeriod):
+class SiaeKind(models.TextChoices):
     """
     ASP SIAE kind (mesure)
 
     ASP Equivalent to Siae.Kind, but codes are different
+
+    Was previously a Django model, but overkill.
+    We only need a subset of the available codes.
     """
 
-    # Field code and display code are inverted for current usage, so:
-    # - 'Measure.code' is 'Rme_code_mesure_disp' ASP field
-    # - 'Measure.display_code' is 'Rme_code_mesure'
-    # - 'help_code' is 'Rme_code_aide'
-    code = models.CharField(max_length=10, verbose_name=_("Code mesure ASP complet"))
-    display_code = models.CharField(max_length=5, verbose_name=_("Code mesure ASP resumé"))
-    help_code = models.CharField(max_length=5, verbose_name=_("Code d'aide mesure ASP"))
-    name = models.CharField(max_length=80, verbose_name=_("Libellé mesure ASP"))
+    AI = "AI_DC", _("Droit Commun - Association Intermédiaire")
+    ACI = "ACI_DC", _("Droit Commun - Atelier et Chantier d'Insertion")
+    EI = "EI_DC", _("Droit Commun -  Entreprise d'Insertion")
+    ETTI = "ETTI_DC", _("Droit Commun -  Entreprise de Travail Temporaire d'Insertion")
+    EITI = "EITI_DC", _("Entreprise d'Insertion par le Travail Indépendant")
 
-    # I don't know what this ID is about yet, seems unused but kept for compatibility
-    rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
+    # These codes are currently not used at Itou
+    FDI = "FDI_DC", _("Droit Commun -  Fonds Départemental pour l'Insertion")
+    EI_MP = "EI_MP", _("Milieu Pénitentiaire - Entreprise d'Insertion")
+    ACI_MP = "ACI_MP", _("Milieu Pénitentiaire - Atelier et Chantier d'Insertion")
 
-    class Meta:
-        verbose_name = _("Mesure")
+    @cached_property
+    def valid_kind_for_employee_record(self):
+        """
+        The ASP SIAE kind ("Mesure") must be one of the following
+        to be eligible for ASP employee record processing
+        """
+        return self.value in ["AI_DC", "ACI_DC", "ETTI_DC", "EI_DC"]
+
+    @classmethod
+    def from_siae_kind(cls, kind):
+        """
+        Mapping between Itou SIAE kinds and ASP "Mesures"
+        """
+        if kind == "AI":
+            return cls.AI
+        if kind == "ACI":
+            return cls.ACI
+        if kind == "EI":
+            return cls.EI
+        if kind == "ETTI":
+            return cls.ETTI
+        if kind == "EITI":
+            return cls.EITI
+
+        # No mapping in ASP
+        return None
