@@ -133,23 +133,35 @@ class _EmployeeSituation(serializers.ModelSerializer):
 
 class EmployeeRecordSerializer(serializers.ModelSerializer):
 
+    # Placeholder: not the final position in the JSON result
     passIae = serializers.CharField(source="approval_number")
+
+    numLigne = serializers.IntegerField(source="batch_line_number")
+    typeMouvement = serializers.CharField(source="movement_type")
+    mesure = serializers.CharField(source="asp_siae_type")
+    siret = serializers.CharField(source="job_application.to_siae.siret")
+
     personnePhysique = _EmployeeSerializer(source="job_application.job_seeker")
     adresse = _EmployeeAddress(source="job_application.job_seeker")
     situationSalarie = _EmployeeSituation(source="job_application.job_seeker")
 
-    siret = serializers.CharField(source="job_application.to_siae.siret")
-    typeMouvement = serializers.CharField(default="C")
+    # These fields are null at the beginning of the ASP processing
+    codeTraitement = serializers.CharField(source="asp_processing_code")
+    libelleTraitement = serializers.CharField(source="asp_processing_label")
 
     class Meta:
         model = EmployeeRecord
         fields = [
             "passIae",
-            "siret",
+            "numLigne",
             "typeMouvement",
+            "mesure",
+            "siret",
             "personnePhysique",
             "adresse",
             "situationSalarie",
+            "codeTraitement",
+            "libelleTraitement",
         ]
         read_only_fields = fields
 
@@ -173,9 +185,9 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
         # 'employerType' is top-level but must be inserted in 'situationSalarie'
         employee_situation = result["situationSalarie"]
-        employee_situation["salarieTypeEmployeur"] = instance.employer_type
+        employee_situation["salarieTypeEmployeur"] = instance.asp_employer_type
 
         # same workaroud for prescriber type (orienteur)
-        employee_situation["orienteur"] = instance.prescriber_type
+        employee_situation["orienteur"] = instance.asp_prescriber_type
 
         return result

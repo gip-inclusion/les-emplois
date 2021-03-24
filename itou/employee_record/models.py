@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from itou.asp.models import EmployerType, PrescriberType
+from itou.asp.models import EmployerType, PrescriberType, SiaeType
 from itou.job_applications.models import JobApplication
 
 
@@ -61,6 +61,8 @@ class EmployeeRecord(models.Model):
 
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
+    _ASP_MOVEMENT_TYPE = "C"
+
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
     status = models.CharField(max_length=10, verbose_name=_("Statut"), choices=Status.choices, default=Status.NEW)
@@ -84,6 +86,7 @@ class EmployeeRecord(models.Model):
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), blank=True)
+    asp_processing_label = models.CharField(max_length=100, verbose_name=_("Libellé de traitement ASP"), blank=True)
     asp_process_response = models.JSONField(verbose_name=_("Réponse du traitement ASP"), null=True)
 
     # Once correctly processed by ASP, the employee record is archived:
@@ -222,14 +225,14 @@ class EmployeeRecord(models.Model):
         return None
 
     @property
-    def employer_type(self):
+    def asp_employer_type(self):
         """
         This is a mapping between itou internal SIAE kinds and ASP ones
         """
         return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
 
     @property
-    def prescriber_type(self):
+    def asp_prescriber_type(self):
         """
         This is mapping between itou internal prescriber kinds and ASP ones
         """
@@ -244,6 +247,33 @@ class EmployeeRecord(models.Model):
             return PrescriberType.UNKNOWN
 
         return PrescriberType.from_itou_prescriber_kind(self.job_application.sender_kind)
+
+    @property
+    def asp_siae_type(self):
+        """
+        Mapping between ASP and itou models for SIAE kind ("Mesure")
+        """
+        return SiaeType.from_siae_kind(self.job_application.to_siae.kind)
+
+    @property
+    def movement_type(self):
+        """
+        This field is constant and needed for JSON serialization
+        It means 'C'reation
+        """
+        return self._ASP_MOVEMENT_TYPE
+
+    @property
+    def batch_line_number(self):
+        """
+        This transient field is updated at runtime for JSON serialization.
+
+        It is the batch line number of the employee record.
+        """
+        if not hasattr(self, "_batch_line_number"):
+            self._batch_line_number = 1
+
+        return self._batch_line_number
 
     @classmethod
     def from_job_application(cls, job_application):
