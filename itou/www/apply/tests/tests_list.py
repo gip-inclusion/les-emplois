@@ -103,7 +103,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
         # Result page should contain all SIAE's job applications.
         self.assertEqual(total_applications, self.maggie.job_applications.count())
 
-    def test_list_for_job_seeker_view__filtered_by_state(self):
+    def test_list_for_job_seeker_view_filtered_by_state(self):
         """
         Provide a list of job applications sent by a job seeker
         and filtered by a state.

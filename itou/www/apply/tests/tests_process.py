@@ -24,13 +24,22 @@ class ProcessViewsTest(TestCase):
     def test_details_for_siae(self):
         """Display the details of a job application."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(job_seeker__is_job_seeker=True)
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertFalse(job_application.has_editable_job_seeker)
+        self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
+
+        job_application.job_seeker.created_by = siae_user
+        job_application.job_seeker.save()
+
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertTrue(job_application.has_editable_job_seeker)
+        self.assertContains(response, "Modifier les informations")
 
     def test_process(self):
         """Ensure that the `process` transition is triggered."""
