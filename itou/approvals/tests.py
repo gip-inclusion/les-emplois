@@ -1,4 +1,5 @@
 import datetime
+from unittest import mock
 
 from dateutil.relativedelta import relativedelta
 from django.contrib.auth.models import Permission
@@ -119,26 +120,6 @@ class CommonApprovalMixinTest(TestCase):
         expected = datetime.date(2002, 1, 1)
         self.assertEqual(approval.waiting_period_end, expected)
 
-    def test_is_valid(self):
-
-        # End today.
-        end_at = datetime.date.today()
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
-
-        # Ended yesterday.
-        end_at = datetime.date.today() - relativedelta(days=1)
-        start_at = end_at - relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
-
-        # Start tomorrow.
-        start_at = datetime.date.today() + relativedelta(days=1)
-        end_at = start_at + relativedelta(years=2)
-        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
-
     def test_is_in_progress(self):
         start_at = datetime.date.today() - relativedelta(days=10)
         approval = ApprovalFactory(start_at=start_at)
@@ -150,28 +131,28 @@ class CommonApprovalMixinTest(TestCase):
         end_at = datetime.date.today() + relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
+        self.assertTrue(approval.is_valid())
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is today.
         end_at = datetime.date.today()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
+        self.assertTrue(approval.is_valid())
         self.assertFalse(approval.is_in_waiting_period)
 
         # End is yesterday.
         end_at = datetime.date.today() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
+        self.assertFalse(approval.is_valid())
         self.assertTrue(approval.is_in_waiting_period)
 
         # Ended since more than WAITING_PERIOD_YEARS.
         end_at = datetime.date.today() - relativedelta(years=Approval.WAITING_PERIOD_YEARS, days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
+        self.assertFalse(approval.is_valid())
         self.assertFalse(approval.is_in_waiting_period)
 
     def test_originates_from_itou(self):
@@ -288,25 +269,25 @@ class ApprovalModelTest(TestCase):
         start_at = datetime.date.today()
         end_at = start_at + relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
+        self.assertTrue(approval.is_valid())
 
         # End today.
         end_at = datetime.date.today()
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertTrue(approval.is_valid)
+        self.assertTrue(approval.is_valid())
 
         # Ended 1 year ago.
         end_at = datetime.date.today() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
+        self.assertFalse(approval.is_valid())
 
         # Ended yesterday.
         end_at = datetime.date.today() - relativedelta(days=1)
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
-        self.assertFalse(approval.is_valid)
+        self.assertFalse(approval.is_valid())
 
     def test_number_with_spaces(self):
 
@@ -433,6 +414,54 @@ class PoleEmploiApprovalModelTest(TestCase):
         pole_emploi_approval = PoleEmploiApprovalFactory(number="010331610106A01")
         expected = "01033 16 10106 A01"
         self.assertEqual(pole_emploi_approval.number_with_spaces, expected)
+
+    def test_is_valid(self):
+        # Avoid COVID lockdown specific cases
+        now_date = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(months=1)
+        now = datetime.datetime(year=now_date.year, month=now_date.month, day=now_date.day)
+
+        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
+            # Ends today.
+            end_at = now_date
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertTrue(approval.is_valid())
+
+            # Ended yesterday.
+            end_at = now_date - relativedelta(days=1)
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertFalse(approval.is_valid())
+
+            # Starts tomorrow.
+            start_at = now_date + relativedelta(days=1)
+            end_at = start_at + relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertTrue(approval.is_valid())
+
+    def test_is_valid_overlaps_covid_lockdown(self):
+        now_date = PoleEmploiApproval.LOCKDOWN_END_AT + relativedelta(months=6)
+        now = datetime.datetime(year=now_date.year, month=now_date.month, day=now_date.day)
+
+        # Overlaps COVID lockdown: should be prolonged
+        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
+            end_at = now_date - relativedelta(days=1)
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertTrue(approval.is_valid())
+
+        # Overlaps COVID lockdown but is expired even with the prolongation
+        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
+            end_at = now_date - relativedelta(months=PoleEmploiApproval.LOCKDOWN_EXTENSION_DELAY_MONTHS, days=1)
+            start_at = end_at - relativedelta(years=2)
+            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+            self.assertFalse(approval.is_valid())
+
+        # Does not overlap COVID lockdown: should not be prolonged
+        end_at = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        self.assertFalse(approval.is_valid())
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
