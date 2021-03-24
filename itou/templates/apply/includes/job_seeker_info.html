@@ -9,33 +9,33 @@
     </li>
 
     {% if job_application.job_seeker.phone %}
-    <li>{% translate "Téléphone :" %}
-        <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a>
-    </li>
+        <li>{% translate "Téléphone :" %}
+            <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a>
+        </li>
     {% endif %}
 
     {% if job_application.job_seeker.address_on_one_line %}
-    <li>{% translate "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
+        <li>{% translate "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
     {% endif %}
 
     {% if job_application.job_seeker.pole_emploi_id %}
-    <li>{% translate "Identifiant Pôle emploi :" %} <b>{{ job_application.job_seeker.pole_emploi_id }}</b></li>
+        <li>{% translate "Identifiant Pôle emploi :" %} <b>{{ job_application.job_seeker.pole_emploi_id }}</b></li>
     {% endif %}
 
     {% if job_application.job_seeker.resume_link %}
-    <li>
-        <a href="{{ job_application.job_seeker.resume_link }}">{% translate "Lien vers CV" %}</a>
-    </li>
+        <li>
+            <a href="{{ job_application.job_seeker.resume_link }}">{% translate "Lien vers CV" %}</a>
+        </li>
     {% endif %}
 </ul>
 <p>
 {% if job_application.has_editable_job_seeker %}
-<p>
-    <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
-        class="btn btn-outline-primary">
-        {% translate "Modifier les informations" %}
-    </a>
-</p>
+    <p>
+        <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
+            class="btn btn-outline-primary">
+            {% translate "Modifier les informations" %}
+        </a>
+    </p>
 {% else %}
-<p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.<p>
+    <p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.<p>
 {% endif %}
