@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
 from django.utils import timezone
+from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -243,6 +244,17 @@ class User(AbstractUser, AddressMixin):
         if not self.is_job_seeker:
             return None
         return self.job_applications.accepted().latest("created_at")
+
+    @cached_property
+    def jobseeker_hash_id(self):
+        """
+        Obfuscation of internal user id provided to ASP
+        """
+        if not self.is_job_seeker:
+            return None
+
+        salt = salted_hmac(key_salt="job_seeker.id", value=self.id, secret=settings.SECRET_KEY)
+        return salt.hexdigest()[:30]
 
     def last_hire_was_made_by_siae(self, siae):
         if not self.is_job_seeker:
