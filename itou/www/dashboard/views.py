@@ -141,15 +141,6 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     return render(request, template_name, context)
 
 
-def is_user_from_sender_prescriber_organization(user, job_application):
-    return (
-        user.is_prescriber
-        and job_application.is_sent_by_authorized_prescriber
-        and job_application.sender_prescriber_organization_id
-        in user.prescribermembership_set.values_list("organization_id", flat=True)
-    )
-
-
 def user_can_edit_job_seeker_info(user, job_application, current_siae_pk=None):
     return (
         # Only when the information is not managed by job seekers themselves
@@ -160,7 +151,7 @@ def user_can_edit_job_seeker_info(user, job_application, current_siae_pk=None):
             # Member of the SIAE that offers the job application
             or (current_siae_pk and current_siae_pk == job_application.to_siae_id)
             # Member of the authorized prescriber organization who propose the candidate to the job application
-            or is_user_from_sender_prescriber_organization(user, job_application)
+            or user.is_prescriber_of_authorized_organization(job_application.sender_prescriber_organization_id)
         )
     )
 
