@@ -32,6 +32,17 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "codeGroupePays",
         ]
 
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+
+        # Another ASP subtlety, making top-level and children with the same name
+        result["codeComInsee"] = {
+            "codeComInsee": result.pop("codeComInsee"),
+            "codeDpt": result.pop("codeDpt"),
+        }
+
+        return result
+
 
 class _EmployeeAddress(serializers.ModelSerializer):
 
