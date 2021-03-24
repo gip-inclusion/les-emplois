@@ -40,16 +40,16 @@
                     <p>{{ job_application.message|linebreaks }}</p>
 
                     {% if job_application.state.is_refused and job_application.answer %}
-                    <p>
-                        <b>Réponse :</b>
-                    </p>
-                    <p>{{ job_application.answer|linebreaks }}</p>
+                        <p>
+                            <b>Réponse :</b>
+                        </p>
+                        <p>{{ job_application.answer|linebreaks }}</p>
 
                     {% elif job_application.state.is_postponed and job_application.answer %}
-                    <p>
-                        <b>Motif de la mise en liste d'attente :</b>
-                    </p>
-                    <p>{{ job_application.answer|linebreaks }}</p>
+                        <p>
+                            <b>Motif de la mise en liste d'attente :</b>
+                        </p>
+                        <p>{{ job_application.answer|linebreaks }}</p>
                     {% endif %}
                 </div>
             </div>

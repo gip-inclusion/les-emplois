@@ -45,19 +45,19 @@
                     <p>{{ job_application.message|linebreaks }}</p>
 
                     {% if job_application.answer %}
-                    <p>
-                        <b>{% if job_application.state.is_postponed %}Motif de la mise en liste d'attente :{% else %}Réponse :{% endif %}</b>
-                    </p>
-                    <p>
-                        {{ job_application.answer|linebreaks }}
-                    </p>
+                        <p>
+                            <b>{% if job_application.state.is_postponed %}Motif de la mise en liste d'attente :{% else %}Réponse :{% endif %}</b>
+                        </p>
+                        <p>
+                            {{ job_application.answer|linebreaks }}
+                        </p>
                     {% endif %}
 
                     {% if job_application.get_refusal_reason_display %}
-                    <p>
-                        <b>Motif du refus :</b>
-                    </p>
-                    <p>{{ job_application.get_refusal_reason_display }}</p>
+                        <p>
+                            <b>Motif du refus :</b>
+                        </p>
+                        <p>{{ job_application.get_refusal_reason_display }}</p>
                     {% endif %}
                 </div>
             </div>
