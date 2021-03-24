@@ -3,6 +3,11 @@ import io
 import requests
 from django.conf import settings
 
+from itou.utils.requests_adapters import ItouTimeout
+
+
+requests.adapters.TimeoutSauce = ItouTimeout
+
 
 class HtmlToPdf:
     """
@@ -37,7 +42,6 @@ class HtmlToPdf:
             auth=("api", settings.PDFSHIFT_API_KEY),
             json={"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
             stream=True,
-            timeout=10,  # in seconds
         )
         response.raise_for_status()
 
