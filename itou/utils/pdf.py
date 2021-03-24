@@ -3,10 +3,7 @@ import io
 import requests
 from django.conf import settings
 
-from itou.utils.requests_adapters import ItouTimeout
-
-
-requests.adapters.TimeoutSauce = ItouTimeout
+from itou.utils.requests_adapters import itou_requests_config
 
 
 class HtmlToPdf:
@@ -36,6 +33,7 @@ class HtmlToPdf:
     """
 
     @classmethod
+    @itou_requests_config
     def html_to_bytes(cls, html):
         response = requests.post(
             "https://api.pdfshift.io/v3/convert/pdf",

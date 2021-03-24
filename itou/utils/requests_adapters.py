@@ -2,6 +2,7 @@
 Requests library custom configuration
 See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
 """
+import requests
 from django.conf import settings
 from requests.adapters import TimeoutSauce
 
@@ -27,3 +28,11 @@ class ItouTimeout(TimeoutSauce):
         if kwargs["read"] is None:
             kwargs["read"] = REQUESTS_TIMEOUT_SECONDS
         super().__init__(*args, **kwargs)
+
+
+def itou_requests_config(func):
+    def wrapper(*args, **kwargs):
+        requests.adapters.TimeoutSauce = ItouTimeout
+        func(*args, **kwargs)
+
+    return wrapper
