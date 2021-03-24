@@ -6,7 +6,7 @@ from itou.users.models import User
 
 class _EmployeeSerializer(serializers.ModelSerializer):
 
-    idItou = serializers.IntegerField(source="id")
+    idItou = serializers.CharField(source="jobseeker_hash_id")
 
     civilite = serializers.ChoiceField(choices=User.Title.choices, source="title")
     nomUsage = serializers.CharField(source="last_name")
