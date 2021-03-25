@@ -1,14 +1,14 @@
-Pillow==7.2.0  # https://github.com/python-pillow/Pillow
-psycopg2-binary==2.8.5  # https://github.com/psycopg/psycopg2
-pytz==2020.1  # https://github.com/stub42/pytz
-requests==2.24.0  # https://github.com/psf/requests
+Pillow==8.1.2  # https://github.com/python-pillow/Pillow
+psycopg2-binary==2.8.6  # https://github.com/psycopg/psycopg2
+pytz==2021.1  # https://github.com/stub42/pytz
+requests==2.25.1  # https://github.com/psf/requests
 python-dateutil==2.8.1  # https://pypi.org/project/python-dateutil/
-openpyxl==3.0.3  # https://openpyxl.readthedocs.io/en/stable/
+openpyxl==3.0.7  # https://openpyxl.readthedocs.io/en/stable/
 
 # lxml improves performance of Excel file generation with openpyxl
-lxml==4.6.2  # https://lxml.de/
+lxml==4.6.3  # https://lxml.de/
 
-Unidecode==1.1.1  # https://github.com/avian2/unidecode
+Unidecode==1.2.0  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ django==3.1.7  # pyup: < 4.0  # https://www.djangoproject.com/
 django-allauth==0.43.0  # https://github.com/pennersr/django-allauth
 
 # django-anymail
-django-anymail==8.0  # https://github.com/anymail/django-anymail
+django-anymail==8.2  # https://github.com/anymail/django-anymail
 
 # Django-XWorkflows
 django-xworkflows==1.0.0  # https://github.com/rbarrois/django_xworkflows
@@ -36,7 +36,7 @@ django-bootstrap4==1.1.0  # https://github.com/zostera/django-bootstrap4
 django-bootstrap-datepicker-plus==3.0.5  # https://github.com/monim67/django-bootstrap-datepicker-plus
 
 # Enhance select fields in forms with jQuery Select plugin
-django_select2==7.4.2  # https://github.com/codingjoe/django-select2
+django_select2==7.6.2  # https://github.com/codingjoe/django-select2
 
 # Data management
 # ------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ django_select2==7.4.2  # https://github.com/codingjoe/django-select2
 pandas==1.2.3  # https://github.com/pandas-dev/pandas
 
 # Eye candy progress bar
-tqdm==4.46.1  # https://github.com/tqdm/tqdm
+tqdm==4.59.0  # https://github.com/tqdm/tqdm
 
 # Read Excel files with Pandas
 xlrd==1.2.0  # https://pypi.org/project/xlrd/
@@ -58,8 +58,8 @@ pdfshift==1.0.4  # https://github.com/pdfshift/pdfshift-python
 
 # Huey for async processing
 # https://huey.readthedocs.io/en/latest/
-huey==2.3.0  # https://github.com/coleifer/huey
+huey==2.3.1  # https://github.com/coleifer/huey
 redis==3.5.3  # https://github.com/andymccurdy/redis-py
 
 # Embedding Metabase signed dashboards
-PyJWT==1.7.1  # https://github.com/jpadilla/pyjwt
+PyJWT==2.0.1  # https://github.com/jpadilla/pyjwt

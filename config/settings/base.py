@@ -369,7 +369,7 @@ TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
 # https://github.com/pennersr/django-allauth/issues/749
 # Without this trick, python manage.py makemigrations
 # would want to create a migration in django-allauth dependency
-# /usr/local/lib/python3.7/site-packages/allauth/socialaccount/migrations/0004_auto_20200415_1510.py
+# /usr/local/lib/python3.9/site-packages/allauth/socialaccount/migrations/0004_auto_20200415_1510.py
 # - Alter field provider on socialaccount
 # - Alter field provider on socialapp
 #

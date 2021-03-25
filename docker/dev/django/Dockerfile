@@ -1,5 +1,5 @@
 # Debian Buster slim variant.
-FROM python:3.7.4-slim-buster
+FROM python:3.9.2-slim-buster
 
 # Inspiration
 # https://github.com/azavea/docker-django/blob/1ef366/Dockerfile-slim.template

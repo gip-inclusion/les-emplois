@@ -8,12 +8,24 @@ from django.utils import timezone
 import itou.asp.factories as asp
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
+from itou.prescribers.factories import PrescriberMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
 
 class ModelTest(TestCase):
+    def test_prescriber_of_authorized_organization(self):
+        prescriber = PrescriberFactory()
+
+        self.assertFalse(prescriber.is_prescriber_of_authorized_organization(1))
+
+        prescribermembership = PrescriberMembershipFactory(user=prescriber, organization__is_authorized=False)
+        self.assertFalse(prescriber.is_prescriber_of_authorized_organization(prescribermembership.organization_id))
+
+        prescribermembership = PrescriberMembershipFactory(user=prescriber, organization__is_authorized=True)
+        self.assertTrue(prescriber.is_prescriber_of_authorized_organization(prescribermembership.organization_id))
+
     def test_create_job_seeker_by_proxy(self):
 
         User = get_user_model()

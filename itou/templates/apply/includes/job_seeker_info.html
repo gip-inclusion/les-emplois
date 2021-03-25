@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load format_filters %}
+<ul>
+    <li>{% translate "Prénom :" %} <b>{{ job_application.job_seeker.first_name }}</b></li>
+    <li>{% translate "Nom :" %} <b>{{ job_application.job_seeker.last_name }}</b></li>
+    <li>{% translate "Date de naissance :" %} <b>{{ job_application.job_seeker.birthdate|date:"d/m/Y" }}</b></li>
+    <li>{% translate "E-mail :" %}
+        <a href="mailto:{{ job_application.job_seeker.email }}">{{ job_application.job_seeker.email }}</a>
+    </li>
+
+    {% if job_application.job_seeker.phone %}
+        <li>{% translate "Téléphone :" %}
+            <a href="tel:{{ job_application.job_seeker.phone }}">{{ job_application.job_seeker.phone|format_phone }}</a>
+        </li>
+    {% endif %}
+
+    {% if job_application.job_seeker.address_on_one_line %}
+        <li>{% translate "Adresse" %} : <b>{{ job_application.job_seeker.address_on_one_line }}</b></li>
+    {% endif %}
+
+    {% if job_application.job_seeker.pole_emploi_id %}
+        <li>{% translate "Identifiant Pôle emploi :" %} <b>{{ job_application.job_seeker.pole_emploi_id }}</b></li>
+    {% endif %}
+
+    {% if job_application.job_seeker.resume_link %}
+        <li>
+            <a href="{{ job_application.job_seeker.resume_link }}">{% translate "Lien vers CV" %}</a>
+        </li>
+    {% endif %}
+</ul>
+<p>
+{% if job_application.has_editable_job_seeker %}
+    <p>
+        <a href="{% url 'dashboard:edit_job_seeker_info' job_application_id=job_application.pk %}?back_url={{ request.get_full_path|urlencode }}"
+            class="btn btn-outline-primary">
+            {% translate "Modifier les informations" %}
+        </a>
+    </p>
+{% else %}
+    <p>Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.<p>
+{% endif %}
