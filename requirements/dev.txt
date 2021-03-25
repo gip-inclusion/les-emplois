@@ -22,6 +22,7 @@ isort==5.8.0  # https://github.com/timothycrosley/isort
 pylint==2.7.2  # https://github.com/PyCQA/pylint
 pylint-django==2.4.2  # https://github.com/PyCQA/pylint-django
 pre-commit==2.11.1  # https://github.com/pre-commit/pre-commit
+coverage==5.5  # https://github.com/nedbat/coveragepy
 
 # Django
 # ------------------------------------------------------------------------------
