@@ -107,7 +107,7 @@ class EmployeeRecord(models.Model):
         ordering = ["-created_at"]
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         self.batch_line_line = 1
 
@@ -318,8 +318,6 @@ class EmployeeRecord(models.Model):
 
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number
-
-        fs.save()
 
         # If the jobseeker has no profile, create one
         job_application.job_seeker.get_or_create_job_seeker_profile()
