@@ -137,7 +137,7 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     passIae = serializers.CharField(source="approval_number")
 
     numLigne = serializers.IntegerField(source="batch_line_number")
-    typeMouvement = serializers.CharField(source="movement_type")
+    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
     mesure = serializers.CharField(source="asp_siae_type")
     siret = serializers.CharField(source="job_application.to_siae.siret")
 
