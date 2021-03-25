@@ -314,9 +314,6 @@ class User(AbstractUser, AddressMixin):
         if hasattr(self, "jobseeker_profile"):
             return self.jobseeker_profile
 
-        if not self.id:
-            self.save()
-
         profile = JobSeekerProfile(user=self)
         profile.save()
 

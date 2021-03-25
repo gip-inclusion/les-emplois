@@ -53,6 +53,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
     codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension")
     codetypeVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
+    adrCpltDistribution = serializers.CharField(source="address_line_2")
 
     codeinseecom = serializers.IntegerField(source="jobseeker_profile.hexa_commune.code")
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
@@ -66,6 +67,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
             "codeextensionVoie",
             "codetypeVoie",
             "adrLibelleVoie",
+            "adrCpltDistribution",
             "codeinseecom",
             "codepostalcedex",
         ]
