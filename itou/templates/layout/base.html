@@ -261,9 +261,6 @@
                                     </a>
                                 </li>
                                 <li>
-                                  {% translate "Accessibilité : non conforme" %}
-                                </li>
-                                <li>
                                     <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
                                         {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
@@ -278,6 +275,12 @@
                                 <li>
                                     <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
                                         {% translate "Mentions légales" %}
+                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://beta.gouv.fr/accessibilite/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
+                                        {% translate "Accessibilité : non conforme" %}
                                         {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                                     </a>
                                 </li>
