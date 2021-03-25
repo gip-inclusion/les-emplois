@@ -112,8 +112,11 @@ class EmployeeRecord(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
+
+        # FIXME: crap
         if self.job_seeker_profile:
             self.job_seeker_profile.save()
+
         super().save(*args, **kwargs)
 
     def _clean_job_application(self):
@@ -195,6 +198,9 @@ class EmployeeRecord(models.Model):
 
     @property
     def job_seeker(self):
+        """
+        Shortcut to job application user / job seeker
+        """
         if self.job_application:
             return self.job_application.job_seeker
 
@@ -202,6 +208,9 @@ class EmployeeRecord(models.Model):
 
     @property
     def job_seeker_profile(self):
+        """
+        Shortcut to job seeker profile
+        """
         if self.job_application and hasattr(self.job_application.job_seeker, "jobseeker_profile"):
             return self.job_application.job_seeker.jobseeker_profile
 
@@ -209,6 +218,9 @@ class EmployeeRecord(models.Model):
 
     @property
     def approval(self):
+        """
+        Shortcut to job application approval
+        """
         if self.job_application and self.job_application.approval:
             return self.job_application.approval
 
@@ -234,7 +246,7 @@ class EmployeeRecord(models.Model):
     @property
     def asp_prescriber_type(self):
         """
-        This is mapping between itou internal prescriber kinds and ASP ones
+        This is a mapping between itou internal prescriber kinds and ASP ones
         """
 
         sender_kind = self.job_application.sender_kind
@@ -259,6 +271,7 @@ class EmployeeRecord(models.Model):
     def movement_type(self):
         """
         This field is constant and needed for JSON serialization
+
         It means 'C'reation
         """
         return self._ASP_MOVEMENT_TYPE
@@ -280,7 +293,7 @@ class EmployeeRecord(models.Model):
         """
         Alternative and main FS constructor from a JobApplication object
 
-        If a job application with given criterias (approval, SIAE/ASP structure)
+        If an employee record with given criterias (approval, SIAE/ASP structure)
         already exists, this method returns None
         """
         assert job_application
