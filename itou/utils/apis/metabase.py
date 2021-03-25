@@ -10,7 +10,7 @@ from django.conf import settings
 # * https://github.com/jpadilla/pyjwt
 # * https://github.com/metabase/embedding-reference-apps/blob/master/django/embedded_analytics/user_stats/views.py
 def _get_token(payload):
-    return jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256").decode("utf8")
+    return jwt.encode(payload, settings.METABASE_SECRET_KEY, algorithm="HS256")
 
 
 def metabase_embedded_url(dashboard_id):
