@@ -333,7 +333,15 @@ class PrescriberType(models.TextChoices):
         elif prescriber_kind == "DEPT":
             return cls.DEPT
 
-        return cls.UNKNOWN
+        kinds = {
+            "ML": cls.ML,
+            "CAP_EMPLOI": cls.CAP_EMPLOI,
+            "PE": cls.PE,
+            "PLIE": cls.PLIE,
+            "DEPT": cls.DEPT,
+        }
+
+        return kinds.get(prescriber_kind, cls.UNKNOWN)
 
 
 class CommuneManager(models.Manager):
@@ -438,7 +446,7 @@ class Country(PrettyPrintMixin, models.Model):
         verbose_name = _("Pays")
         verbose_name_plural = _("Pays")
 
-    @cached_property
+    @property
     def is_france(self):
         """
         Check if provided country is France
@@ -468,7 +476,7 @@ class SiaeType(models.TextChoices):
     EI_MP = "EI_MP", _("Milieu Pénitentiaire - Entreprise d'Insertion")
     ACI_MP = "ACI_MP", _("Milieu Pénitentiaire - Atelier et Chantier d'Insertion")
 
-    @cached_property
+    @property
     def valid_kind_for_employee_record(self):
         """
         The ASP SIAE kind ("Mesure") must be one of the following
@@ -492,5 +500,12 @@ class SiaeType(models.TextChoices):
         if kind == "EITI":
             return cls.EITI
 
-        # No mapping in ASP
-        return None
+        kinds = {
+            "AI": cls.AI,
+            "ACI": cls.ACI,
+            "EI": cls.EI,
+            "ETTI": cls.ETTI,
+            "EITI": cls.EITI,
+        }
+        # No fallback (None)
+        return kinds.get(kind)

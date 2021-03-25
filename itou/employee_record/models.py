@@ -61,7 +61,7 @@ class EmployeeRecord(models.Model):
 
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
-    _ASP_MOVEMENT_TYPE = "C"
+    ASP_MOVEMENT_TYPE = "C"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -105,6 +105,11 @@ class EmployeeRecord(models.Model):
             models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
         ]
         ordering = ["-created_at"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+        self.batch_line_line = 1
 
     def __str__(self):
         return f"{self.asp_id} - {self.approval_number} - {self.job_seeker}"
