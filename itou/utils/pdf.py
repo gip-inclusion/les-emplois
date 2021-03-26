@@ -37,9 +37,7 @@ class HtmlToPdf:
             "json": {"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
         }
         with httpx.stream("POST", "https://api.pdfshift.io/v3/convert/pdf", **kwargs) as response:
-
             response.raise_for_status()
-
             result = io.BytesIO()
             for chunk in response.iter_bytes(1024):
                 result.write(chunk)
