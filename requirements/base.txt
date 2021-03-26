@@ -60,3 +60,6 @@ redis==3.5.3  # https://github.com/andymccurdy/redis-py
 
 # Embedding Metabase signed dashboards
 PyJWT==2.0.1  # https://github.com/jpadilla/pyjwt
+
+# Requests alternative
+httpx==0.17.1  # https://github.com/encode/httpx/
