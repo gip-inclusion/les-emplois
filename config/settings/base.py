@@ -523,7 +523,3 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }
-
-# Requests custom configuration
-# See itou.utils.requests_adapters
-REQUESTS_TIMEOUT_SECONDS = os.environ.get("REQUESTS_TIMEOUT_SECONDS", 10)
