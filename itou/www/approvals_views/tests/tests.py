@@ -7,7 +7,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from requests import exceptions as requests_exceptions
 
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Approval, Prolongation, Suspension
@@ -56,18 +55,6 @@ class TestDownloadApprovalAsPDF(TestCase):
             reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk})
         )
         self.assertEqual(response.status_code, 404)
-
-    @patch("requests.post", side_effect=requests_exceptions.Timeout)
-    def test_pdfshift_api_is_down(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
-        siae_member = job_application.to_siae.members.first()
-        job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
-
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
-
-        with self.assertRaises(requests_exceptions.Timeout):
-            self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))
 
     @patch("itou.utils.pdf.HtmlToPdf.html_to_bytes", return_value=BITES_FILE)
     @patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", False)

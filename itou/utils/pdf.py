@@ -1,6 +1,6 @@
 import io
 
-import requests
+import httpx
 from django.conf import settings
 
 
@@ -32,19 +32,19 @@ class HtmlToPdf:
 
     @classmethod
     def html_to_bytes(cls, html):
-        response = requests.post(
-            "https://api.pdfshift.io/v3/convert/pdf",
-            auth=("api", settings.PDFSHIFT_API_KEY),
-            json={"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
-            stream=True,
-        )
-        response.raise_for_status()
+        kwargs = {
+            "auth": ("api", settings.PDFSHIFT_API_KEY),
+            "json": {"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
+        }
+        with httpx.stream("POST", "https://api.pdfshift.io/v3/convert/pdf", **kwargs) as response:
 
-        result = io.BytesIO()
-        for chunk in response.iter_content(1024):
-            result.write(chunk)
+            response.raise_for_status()
 
-        return result.getvalue()
+            result = io.BytesIO()
+            for chunk in response.iter_bytes(1024):
+                result.write(chunk)
+
+            return result.getvalue()
 
     def __init__(self, html, autoclose=True):
         self.bytes = self.html_to_bytes(html)
