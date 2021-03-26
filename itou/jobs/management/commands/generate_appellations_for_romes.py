@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-import requests
+import httpx
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
                 token = get_access_token("api_romev1 nomenclatureRome")
                 url = f"{settings.API_ESD_BASE_URL}/rome/v1/metier/{rome_code}/appellation"
-                r = requests.get(url, headers={"Authorization": token})
+                r = httpx.get(url, headers={"Authorization": token})
                 r.raise_for_status()
 
                 result[rome_code] = r.json()

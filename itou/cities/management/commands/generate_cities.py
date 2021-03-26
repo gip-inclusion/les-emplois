@@ -1,6 +1,6 @@
 import os
 
-import requests
+import httpx
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -29,7 +29,7 @@ class Command(BaseCommand):
         extra = "&format=json"
         url = f"{base_url}{fields}{extra}"
 
-        r = requests.get(url)
+        r = httpx.get(url)
 
         file_path = f"{CURRENT_DIR}/data/cities.json"
         with open(file_path, "wb") as f:

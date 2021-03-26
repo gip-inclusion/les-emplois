@@ -1,6 +1,6 @@
 import logging
 
-import requests
+import httpx
 from django.conf import settings
 from django.utils.http import urlencode
 from django.utils.translation import gettext as _, gettext_lazy
@@ -38,10 +38,10 @@ class EtablissementAPI:
         headers = {"Authorization": f"Bearer {settings.API_ENTREPRISE_TOKEN}"}
 
         try:
-            r = requests.get(url, headers=headers)
+            r = httpx.get(url, headers=headers)
             r.raise_for_status()
             data = r.json()
-        except requests.exceptions.HTTPError as e:
+        except httpx.HTTPError as e:
             if e.response.status_code == 422:
                 error = _("SIRET non reconnu.")
             else:
