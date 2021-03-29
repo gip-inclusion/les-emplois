@@ -60,6 +60,8 @@ One mission has many EMI.
 An EMI does not necessarily have a mission.
 
 """
+import csv
+import gzip
 import logging
 from collections import OrderedDict
 
@@ -176,14 +178,26 @@ class Command(BaseCommand):
             # Some fluxIAE exports have a leading "DEB***" row, some don't.
             kwargs["skiprows"] = 1
 
-        if self.dry_run:
-            kwargs["nrows"] = 100
-        else:
-            # Ignore last row. All fluxIAE exports have a final "FIN***" row.
-            # Note that `skipfooter` and `nrows` are mutually exclusive.
-            kwargs["skipfooter"] = 1
-            # Fix warning caused by using `skipfooter`.
-            kwargs["engine"] = "python"
+        # All fluxIAE exports have a final "FIN***" row which should be ignored. The most obvious way to do this is
+        # to use `skipfooter=1` option in `pd.read_csv` however this causes several issues:
+        # - it forces the use of the 'python' engine instead of the default 'c' engine
+        # - the 'python' engine is much slower than the 'c' engine
+        # - the 'python' engine does not play well when faced with special characters (e.g. `"`) inside a row value,
+        #   it will break or require the `error_bad_lines=False` option to ignore all those rows
+
+        # Thus we decide to always use the 'c' engine and implement the `skipfooter=1` option ourselves by counting
+        # the rows in the CSV file beforehands instead. Always using the 'c' engine is proven to significantly reduce
+        # the duration and frequency of the maintaining developer's headaches.
+
+        with gzip.open(filename) as f:
+            # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
+            nrows = -3
+            for line in f:
+                nrows += 1
+                if self.dry_run and nrows == 100:
+                    break
+
+        self.log(f"Will load {nrows} rows for {vue_name}.")
 
         if converters:
             kwargs["converters"] = converters
@@ -191,13 +205,20 @@ class Command(BaseCommand):
         df = pd.read_csv(
             filename,
             sep="|",
-            error_bad_lines=False,
+            # Some rows have a single `"` in a field, for example in fluxIAE_Mission the mission_descriptif field of
+            # the mission id 1003399237 is `"AIEHPAD` (no closing double quote). This screws CSV parsing big time
+            # as the parser will read many rows until the next `"` and consider all of them as part of the
+            # initial mission_descriptif field value o_O. Let's just disable quoting alltogether to avoid that.
+            quoting=csv.QUOTE_NONE,
+            nrows=nrows,
             **kwargs,
         )
 
         # If there is only one column, something went wrong, let's break early.
         # Most likely an incorrect skip_first_row value.
         assert len(df.columns.tolist()) >= 2
+
+        assert len(df) == nrows
 
         df = self.anonymize_df(df)
 
