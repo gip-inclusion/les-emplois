@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from itou.asp.models import EmployerType, PrescriberType, SiaeType
+from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.models import JobApplication
 
 
@@ -61,6 +61,7 @@ class EmployeeRecord(models.Model):
 
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
+    # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
@@ -117,10 +118,6 @@ class EmployeeRecord(models.Model):
     def save(self, *args, **kwargs):
         if self.pk:
             self.updated_at = timezone.now()
-
-        # FIXME: crap
-        if self.job_seeker_profile:
-            self.job_seeker_profile.save()
 
         super().save(*args, **kwargs)
 
@@ -206,10 +203,7 @@ class EmployeeRecord(models.Model):
         """
         Shortcut to job application user / job seeker
         """
-        if self.job_application:
-            return self.job_application.job_seeker
-
-        return None
+        return self.job_application.job_seeker if self.job_application else None
 
     @property
     def job_seeker_profile(self):
@@ -226,10 +220,7 @@ class EmployeeRecord(models.Model):
         """
         Shortcut to job application approval
         """
-        if self.job_application and self.job_application.approval:
-            return self.job_application.approval
-
-        return None
+        return self.job_application.approval if self.job_application and self.job_application.approval else None
 
     @property
     def asp_convention_id(self):
@@ -270,16 +261,7 @@ class EmployeeRecord(models.Model):
         """
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
-        return SiaeType.from_siae_kind(self.job_application.to_siae.kind)
-
-    @property
-    def movement_type(self):
-        """
-        This field is constant and needed for JSON serialization
-
-        It means 'C'reation
-        """
-        return self._ASP_MOVEMENT_TYPE
+        return SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
 
     @property
     def batch_line_number(self):
@@ -298,7 +280,7 @@ class EmployeeRecord(models.Model):
         """
         Alternative and main FS constructor from a JobApplication object
 
-        If an employee record with given criterias (approval, SIAE/ASP structure)
+        If an employee record with given criteria (approval, SIAE/ASP structure)
         already exists, this method returns None
         """
         assert job_application
