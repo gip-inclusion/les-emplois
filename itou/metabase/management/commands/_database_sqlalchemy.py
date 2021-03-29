@@ -19,5 +19,8 @@ If SQLAlchemy is not installed, a fallback is only provided for sqlite`
 """
 PG_ENGINE = create_engine(
     f"postgresql://{settings.METABASE_USER}:{settings.METABASE_PASSWORD}"
-    f"@{settings.METABASE_HOST}:{settings.METABASE_PORT}/{settings.METABASE_DATABASE}"
+    f"@{settings.METABASE_HOST}:{settings.METABASE_PORT}/{settings.METABASE_DATABASE}",
+    # Reduce likelyhood of random disconnections.
+    # See https://docs.sqlalchemy.org/en/13/core/pooling.html#pool-disconnects
+    pool_pre_ping=True,
 )

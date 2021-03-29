@@ -6,6 +6,44 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [15] - 2021-03-25
+
+### Ajouté
+
+- Mise en avant des candidatures sans activité depuis plus de 3 semaines pour les employeurs et prescripteurs
+- Affichage d'un message si une fiche de poste a déjà reçu beaucoup de candidatures dans les résultats de recherche ("Plus de 20 candidatures reçues")
+- Mise en avant du contrat de professionnalisation lors de la demande d'un PASS IAE
+- Affichage et modification des informations d'un candidat par les prescripteurs pour pouvoir les modifier après envoi d'une candidature
+- Ajout des modèles de base de données des fiches salarié et du profil de demandeur d'emploi
+- Possibilité pour un conseil départemental de visualiser ses organisations conventionnées avec les membres
+- Ajout du champ "Date de création" dans l'export des PASS IAE
+- Ajout d'un message d'avertissement aux prescripteurs : "Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés"
+- Affichage des dates de début et de fin du PASS IAE dans l'e-mail de confirmation d'envoi du PASS ("Valide du … au …")
+- Possibilité de modifier les informations d'un candidat quand sa candidature es à l'état "Nouvelle candidature" (auparavant possible uniquement sur "Candidature à l'étude" et "Candidature acceptée")
+- Affichage du badge "Priorité aux bénéficiaires de RQTH" pour les EATT dans les résultats de recherche
+- Ajout d'une mention "Accessibilité : non conforme" dans le pied de page
+- Ajout d'outils de vérification de la qualité du code
+
+### Modifié
+
+- Mise à jour majeure du langage Python de la version 3.7 à la 3.9 et des dépendances Python du projet
+- Correction d'un bogue relatif à la prise en compte de la prolongation COVID pour les agréments en provenance de Pôle emploi
+- Les informations du PASS IAE sont visible quand il est expiré : si une candidature est envoyée par un prescripteur habilité pour un candidat en période de carence et qu'elle est toujours en attente de traitement, alors on masque le caractère "expiré" ainsi que les dates du PASS IAE pour ne pas qu'un employeur refuse la candidature en pensant que le PASS est expiré. Dans tous les autres cas, on affiche la mention "expiré" avec les dates du PASS IAE.
+- Amélioration des termes relatifs à la distance sur la recherche : on remplace "à 5km de Metz" par "à 5km du centre de Metz"
+- Sur le tableau de bord des employeurs, le texte du lien "Configurer vos fiches de postes" devient "Publier/gérer les fiches de postes"
+- Désactivation de l'auto-complétion du champ "E-mail personnel du candidat" dans le tunnel de candidature (pour éviter de se tromper pendant la saisie d'un email de candidat)
+- On affiche plus le lien complet du CV pour éviter de casser la mise en page quand le lien est trop long, à la place on a un lien intitulé "Lien vers le CV"
+- Admin des prescripteurs et des employeurs :
+    - possibilité de supprimer les coordonnées géographiques
+    - possibilité de demander un re-calcul des coordonnées géographiques
+    - possibilité de modifier une adresse sans toucher aux coordonnées géographiques
+    - possibilité de modifier les coordonnées géographiques sur une carte
+- Correctif pour que notre mécanisme d'intégration continue puisse vérifier la présence de migrations de base de données manquantes
+
+### Supprimé
+
+- Suppression du message d'alerte "Notre nom de domaine change pour emplois.inclusion.beta.gouv.fr"
+
 ## [14] - 2021-03-11
 
 ### Ajouté
