@@ -315,7 +315,6 @@ class User(AbstractUser, AddressMixin):
             return self.jobseeker_profile
 
         profile = JobSeekerProfile(user=self)
-        profile.save()
 
         return profile
 

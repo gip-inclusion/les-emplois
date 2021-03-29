@@ -322,17 +322,6 @@ class PrescriberType(models.TextChoices):
 
     @classmethod
     def from_itou_prescriber_kind(cls, prescriber_kind):
-        if prescriber_kind == "ML":
-            return cls.ML
-        elif prescriber_kind == "CAP_EMPLOI":
-            return cls.CAP_EMPLOI
-        elif prescriber_kind == "PE":
-            return cls.PE
-        elif prescriber_kind == "PLIE":
-            return cls.PLIE
-        elif prescriber_kind == "DEPT":
-            return cls.DEPT
-
         kinds = {
             "ML": cls.ML,
             "CAP_EMPLOI": cls.CAP_EMPLOI,
@@ -455,7 +444,7 @@ class Country(PrettyPrintMixin, models.Model):
         return self.group == self.Group.FRANCE
 
 
-class SiaeType(models.TextChoices):
+class SiaeKind(models.TextChoices):
     """
     ASP SIAE kind (mesure)
 
@@ -468,8 +457,8 @@ class SiaeType(models.TextChoices):
     AI = "AI_DC", _("Droit Commun - Association Intermédiaire")
     ACI = "ACI_DC", _("Droit Commun - Atelier et Chantier d'Insertion")
     EI = "EI_DC", _("Droit Commun -  Entreprise d'Insertion")
-    ETTI = "ETTI_DC", _("Droit Commun -  Entreprise de Travail Temporaire d'Insertion")
-    EITI = "EITI_DC", _("Entreprise d'Insertion par le Travail Indépendant")
+    ETTI = "ETTI_DC", _("Droit Commun - Entreprise de Travail Temporaire d'Insertion")
+    EITI = "EITI_DC", _("Droit Commun - Entreprise d'Insertion par le Travail Indépendant")
 
     # These codes are currently not used at Itou
     FDI = "FDI_DC", _("Droit Commun -  Fonds Départemental pour l'Insertion")
@@ -489,17 +478,6 @@ class SiaeType(models.TextChoices):
         """
         Mapping between Itou SIAE kinds and ASP "Mesures"
         """
-        if kind == "AI":
-            return cls.AI
-        if kind == "ACI":
-            return cls.ACI
-        if kind == "EI":
-            return cls.EI
-        if kind == "ETTI":
-            return cls.ETTI
-        if kind == "EITI":
-            return cls.EITI
-
         kinds = {
             "AI": cls.AI,
             "ACI": cls.ACI,
