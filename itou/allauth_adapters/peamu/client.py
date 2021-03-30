@@ -2,6 +2,7 @@ from urllib.parse import parse_qsl
 
 import requests
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client, OAuth2Error
+from django.conf import settings
 
 
 class PEAMUOAuth2Client(OAuth2Client):
@@ -31,7 +32,13 @@ class PEAMUOAuth2Client(OAuth2Client):
             params = data
             data = None
         resp = requests.request(
-            self.access_token_method, url, params=params, data=data, headers=self.headers, auth=auth
+            self.access_token_method,
+            url,
+            params=params,
+            data=data,
+            headers=self.headers,
+            auth=auth,
+            timeout=settings.REQUESTS_TIMEOUT,
         )
 
         access_token = None

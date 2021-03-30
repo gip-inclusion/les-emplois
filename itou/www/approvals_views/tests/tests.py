@@ -7,7 +7,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from requests import exceptions as requests_exceptions
 
 from itou.approvals.factories import SuspensionFactory
 from itou.approvals.models import Approval, Prolongation, Suspension
@@ -22,7 +21,7 @@ from .pdfshift_mock import BITES_FILE
 
 @patch.object(JobApplication, "can_be_cancelled", new_callable=PropertyMock, return_value=False)
 class TestDownloadApprovalAsPDF(TestCase):
-    @patch("pdfshift.convert", return_value=BITES_FILE)
+    @patch("itou.utils.pdf.HtmlToPdf.html_to_bytes", return_value=BITES_FILE)
     def test_download_job_app_approval_as_pdf(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()
         siae_member = job_application.to_siae.members.first()
@@ -57,19 +56,7 @@ class TestDownloadApprovalAsPDF(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-    @patch("pdfshift.convert", side_effect=requests_exceptions.ConnectionError)
-    def test_pdfshift_api_is_down(self, *args, **kwargs):
-        job_application = JobApplicationWithApprovalFactory()
-        siae_member = job_application.to_siae.members.first()
-        job_seeker = job_application.job_seeker
-        EligibilityDiagnosisFactory(job_seeker=job_seeker)
-
-        self.client.login(username=siae_member.email, password=DEFAULT_PASSWORD)
-
-        with self.assertRaises(ConnectionAbortedError):
-            self.client.get(reverse("approvals:approval_as_pdf", kwargs={"job_application_id": job_application.pk}))
-
-    @patch("pdfshift.convert", return_value=BITES_FILE)
+    @patch("itou.utils.pdf.HtmlToPdf.html_to_bytes", return_value=BITES_FILE)
     @patch("itou.approvals.models.CommonApprovalMixin.originates_from_itou", False)
     def test_download_approval_even_if_diagnosis_is_missing(self, *args, **kwargs):
         job_application = JobApplicationWithApprovalFactory()

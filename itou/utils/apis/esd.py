@@ -6,7 +6,7 @@ import collections
 import datetime
 import logging
 
-import requests
+import httpx
 from django.conf import settings
 
 
@@ -26,7 +26,7 @@ def get_access_token(scope):
             logger.debug("Found %s in cache. Expiration = %s, now = %s.", token.value, token.expiration, now)
             return token.value
 
-    auth_request = requests.post(
+    auth_request = httpx.post(
         f"{settings.API_ESD_AUTH_BASE_URL}/connexion/oauth2/access_token",
         data={
             "realm": "/partenaire",
