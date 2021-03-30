@@ -1,6 +1,6 @@
+import uuid
 from unittest import mock
 
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
@@ -11,6 +11,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberMembershipFactory
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
+from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 
 
@@ -26,9 +27,11 @@ class ModelTest(TestCase):
         prescribermembership = PrescriberMembershipFactory(user=prescriber, organization__is_authorized=True)
         self.assertTrue(prescriber.is_prescriber_of_authorized_organization(prescribermembership.organization_id))
 
-    def test_create_job_seeker_by_proxy(self):
+    def test_generate_unique_username(self):
+        unique_username = User.generate_unique_username()
+        self.assertEqual(unique_username, uuid.UUID(unique_username, version=4).hex)
 
-        User = get_user_model()
+    def test_create_job_seeker_by_proxy(self):
 
         proxy_user = PrescriberFactory()
 
@@ -46,6 +49,7 @@ class ModelTest(TestCase):
         self.assertIsNotNone(user.password)
         self.assertIsNotNone(user.username)
 
+        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertEqual(user.email, user_data["email"])
         self.assertEqual(user.first_name, user_data["first_name"])
         self.assertEqual(user.last_name, user_data["last_name"])
@@ -60,8 +64,6 @@ class ModelTest(TestCase):
             User.create_job_seeker_by_proxy(proxy_user, **user_data)
 
     def test_clean_pole_emploi_fields(self):
-
-        User = get_user_model()
 
         job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
 
@@ -84,7 +86,6 @@ class ModelTest(TestCase):
 
     def test_email_already_exists(self):
         JobSeekerFactory(email="foo@bar.com")
-        User = get_user_model()
         self.assertTrue(User.email_already_exists("foo@bar.com"))
         self.assertTrue(User.email_already_exists("FOO@bar.com"))
 
@@ -210,7 +211,6 @@ class JobSeekerProfileModelTest(TestCase):
         # user.post_code = data.get("post_code")
 
     def test_job_seeker_details(self):
-        User = get_user_model()
 
         # No title on User
         with self.assertRaises(ValidationError):
@@ -225,7 +225,6 @@ class JobSeekerProfileModelTest(TestCase):
         """
         Check if the social allowances part is coherent
         """
-        User = get_user_model()
         self.profile.user.title = User.Title.M
 
         self.profile.resourceless = True
@@ -257,7 +256,6 @@ class JobSeekerProfileModelTest(TestCase):
         """
         Check creation of an HEXA address from job seeker address
         """
-        User = get_user_model()
         self.profile.user.title = User.Title.M
         self.profile.update_hexa_address()
         self.profile.clean()
@@ -314,7 +312,7 @@ class JobSeekerProfileModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self.profile._clean_job_seeker_details()
 
-        self.profile.user.title = get_user_model().Title.M
+        self.profile.user.title = User.Title.M
 
         # No education level provided
         self.profile.education_level = None

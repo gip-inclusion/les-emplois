@@ -1,4 +1,5 @@
-from allauth.utils import generate_unique_username
+import uuid
+
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
@@ -280,7 +281,7 @@ class User(AbstractUser, AddressMixin):
                 "last_name": "Foo",
             }
         """
-        username = generate_unique_username([fields["first_name"], fields["last_name"], fields["email"]])
+        username = cls.generate_unique_username()
         fields["is_job_seeker"] = True
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(
@@ -290,6 +291,19 @@ class User(AbstractUser, AddressMixin):
             **fields,
         )
         return user
+
+    @classmethod
+    def generate_unique_username(cls):
+        """
+        `AbstractUser.username` is a required field. It is not used in Itou but
+         it is still required in places like `User.objects.create_user()` etc.
+
+        We used to rely on `allauth.utils.generate_unique_username` to populate
+        it with a random username but it often failed causing errors in Sentry.
+
+        We now use a UUID4.
+        """
+        return uuid.uuid4().hex
 
     @classmethod
     def email_already_exists(cls, email, exclude_pk=None):
