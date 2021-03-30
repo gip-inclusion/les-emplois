@@ -1,6 +1,7 @@
 import re
 
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
@@ -222,10 +223,10 @@ class AllocationDuration(models.TextChoices):
     Note: effect periods are not handled
     """
 
-    LESS_THAN_6_MONTHS = "LESS_THAN_6_MONTHS", _("Moins de 6 mois")
-    FROM_6_TO_11_MONTHS = "FROM_6_TO_11_MONTHS", _("De 6 à 11 mois")
-    FROM_12_TO_23_MONTHS = "FROM_12_TO_23_MONTHS", _("De 12 à 23 mois")
-    MORE_THAN_24_MONTHS = "MORE_THAN_24_MONTHS", _("24 mois et plus")
+    LESS_THAN_6_MONTHS = "01", _("Moins de 6 mois")
+    FROM_6_TO_11_MONTHS = "02", _("De 6 à 11 mois")
+    FROM_12_TO_23_MONTHS = "03", _("De 12 à 23 mois")
+    MORE_THAN_24_MONTHS = "04", _("24 mois et plus")
 
 
 class EducationLevel(models.TextChoices):
@@ -291,7 +292,45 @@ class EmployerType(models.TextChoices):
             return cls.ACI
         elif siae_kind == "EA":
             return cls.EA
+
         return cls.OTHER
+
+
+class PrescriberType(models.TextChoices):
+    """
+    Prescriber type
+
+    Mapping between ASP and Itou prescriber types
+
+    Prescriber (ASP "Orienteur") types are:
+    - dispatched by "Mesure" (ASP SIAE kind)
+    - not likely to change
+
+    So they can be summarized as a simple list of text choices.
+
+    Similar to EmployerType above, and with the same padding issue
+    """
+
+    ML = "01", _("Mission locale")
+    CAP_EMPLOI = "02", _("CAP emploi")
+    PE = "03", _("Pôle emploi")
+    PLIE = "04", _("Plan local pour l'insertion et l'emploi")
+    DEPT = "05", _("Service départementaux")
+    AUTHORIZED_PRESCRIBERS = "06", _("Prescripteurs habilités")
+    SPONTANEOUS_APPLICATION = "07", _("Candidature spontanée")
+    UNKNOWN = "99", _("Non connu")
+
+    @classmethod
+    def from_itou_prescriber_kind(cls, prescriber_kind):
+        kinds = {
+            "ML": cls.ML,
+            "CAP_EMPLOI": cls.CAP_EMPLOI,
+            "PE": cls.PE,
+            "PLIE": cls.PLIE,
+            "DEPT": cls.DEPT,
+        }
+
+        return kinds.get(prescriber_kind, cls.UNKNOWN)
 
 
 class CommuneManager(models.Manager):
@@ -327,6 +366,16 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     class Meta:
         verbose_name = _("Commune")
+
+    @cached_property
+    def department_code(self):
+        """
+        INSEE department code are the first 2 characters of the commune code
+        With no exception.
+
+        For processing concerns, ASP expects 3 characters: 0-padding is the way
+        """
+        return f"0{self.code[0:2]}"
 
 
 class Department(PrettyPrintMixin, AbstractPeriod):
@@ -395,24 +444,46 @@ class Country(PrettyPrintMixin, models.Model):
         return self.group == self.Group.FRANCE
 
 
-class SiaeKind(PrettyPrintMixin, AbstractPeriod):
+class SiaeKind(models.TextChoices):
     """
     ASP SIAE kind (mesure)
 
     ASP Equivalent to Siae.Kind, but codes are different
+
+    Was previously a Django model, but overkill.
+    We only need a subset of the available codes.
     """
 
-    # Field code and display code are inverted for current usage, so:
-    # - 'Measure.code' is 'Rme_code_mesure_disp' ASP field
-    # - 'Measure.display_code' is 'Rme_code_mesure'
-    # - 'help_code' is 'Rme_code_aide'
-    code = models.CharField(max_length=10, verbose_name=_("Code mesure ASP complet"))
-    display_code = models.CharField(max_length=5, verbose_name=_("Code mesure ASP resumé"))
-    help_code = models.CharField(max_length=5, verbose_name=_("Code d'aide mesure ASP"))
-    name = models.CharField(max_length=80, verbose_name=_("Libellé mesure ASP"))
+    AI = "AI_DC", _("Droit Commun - Association Intermédiaire")
+    ACI = "ACI_DC", _("Droit Commun - Atelier et Chantier d'Insertion")
+    EI = "EI_DC", _("Droit Commun -  Entreprise d'Insertion")
+    ETTI = "ETTI_DC", _("Droit Commun - Entreprise de Travail Temporaire d'Insertion")
+    EITI = "EITI_DC", _("Droit Commun - Entreprise d'Insertion par le Travail Indépendant")
 
-    # I don't know what this ID is about yet, seems unused but kept for compatibility
-    rdi_id = models.CharField(max_length=1, verbose_name=_("Identifiant RDI ?"))
+    # These codes are currently not used at Itou
+    FDI = "FDI_DC", _("Droit Commun -  Fonds Départemental pour l'Insertion")
+    EI_MP = "EI_MP", _("Milieu Pénitentiaire - Entreprise d'Insertion")
+    ACI_MP = "ACI_MP", _("Milieu Pénitentiaire - Atelier et Chantier d'Insertion")
 
-    class Meta:
-        verbose_name = _("Mesure")
+    @property
+    def valid_kind_for_employee_record(self):
+        """
+        The ASP SIAE kind ("Mesure") must be one of the following
+        to be eligible for ASP employee record processing
+        """
+        return self.value in ["AI_DC", "ACI_DC", "ETTI_DC", "EI_DC"]
+
+    @classmethod
+    def from_siae_kind(cls, kind):
+        """
+        Mapping between Itou SIAE kinds and ASP "Mesures"
+        """
+        kinds = {
+            "AI": cls.AI,
+            "ACI": cls.ACI,
+            "EI": cls.EI,
+            "ETTI": cls.ETTI,
+            "EITI": cls.EITI,
+        }
+        # No fallback (None)
+        return kinds.get(kind)

@@ -1,7 +1,6 @@
 from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.utils.http import urlsafe_base64_decode
@@ -9,6 +8,7 @@ from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
+from itou.users.models import User
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -22,14 +22,14 @@ BLANK_CHOICE = (("", "---------"),)
 class FullnameFormMixin(forms.Form):
     first_name = forms.CharField(
         label=gettext_lazy("Prénom"),
-        max_length=get_user_model()._meta.get_field("first_name").max_length,
+        max_length=User._meta.get_field("first_name").max_length,
         required=True,
         strip=True,
     )
 
     last_name = forms.CharField(
         label=gettext_lazy("Nom"),
-        max_length=get_user_model()._meta.get_field("last_name").max_length,
+        max_length=User._meta.get_field("last_name").max_length,
         required=True,
         strip=True,
     )
@@ -47,6 +47,11 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         return email
 
     def save(self, request):
+
+        # Avoid django-allauth to call its own often failing `generate_unique_username`
+        # function by forcing a username.
+        self.cleaned_data["username"] = User.generate_unique_username()
+        # Create the user.
         user = super().save(request)
 
         user.first_name = self.cleaned_data["first_name"]
@@ -124,6 +129,10 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
     token = forms.CharField(widget=forms.HiddenInput())
 
     def save(self, request):
+        # Avoid django-allauth to call its own often failing `generate_unique_username`
+        # function by forcing a username.
+        self.cleaned_data["username"] = User.generate_unique_username()
+        # Create the user.
         user = super().save(request)
 
         if self.check_siae_signup_credentials():
@@ -358,6 +367,9 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
 
     def save(self, request):
 
+        # Avoid django-allauth to call its own often failing `generate_unique_username`
+        # function by forcing a username.
+        self.cleaned_data["username"] = User.generate_unique_username()
         # Create the user.
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
@@ -391,6 +403,9 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
 
     def save(self, request):
 
+        # Avoid django-allauth to call its own often failing `generate_unique_username`
+        # function by forcing a username.
+        self.cleaned_data["username"] = User.generate_unique_username()
         # Create the user.
         user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]

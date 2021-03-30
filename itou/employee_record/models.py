@@ -3,6 +3,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from itou.asp.models import EmployerType, PrescriberType, SiaeKind
+from itou.job_applications.models import JobApplication
+
 
 class Status(models.TextChoices):
     """
@@ -58,6 +61,9 @@ class EmployeeRecord(models.Model):
 
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
+    # 'C' stands for Creation
+    ASP_MOVEMENT_TYPE = "C"
+
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
     status = models.CharField(max_length=10, verbose_name=_("Statut"), choices=Status.choices, default=Status.NEW)
@@ -81,6 +87,7 @@ class EmployeeRecord(models.Model):
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), blank=True)
+    asp_processing_label = models.CharField(max_length=100, verbose_name=_("Libellé de traitement ASP"), blank=True)
     asp_process_response = models.JSONField(verbose_name=_("Réponse du traitement ASP"), null=True)
 
     # Once correctly processed by ASP, the employee record is archived:
@@ -99,6 +106,11 @@ class EmployeeRecord(models.Model):
             models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
         ]
         ordering = ["-created_at"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.batch_line_line = 1
 
     def __str__(self):
         return f"{self.asp_id} - {self.approval_number} - {self.job_seeker}"
@@ -159,6 +171,7 @@ class EmployeeRecord(models.Model):
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
         self.status = Status.READY
+        self.save()
 
     @property
     def is_archived(self):
@@ -187,17 +200,27 @@ class EmployeeRecord(models.Model):
 
     @property
     def job_seeker(self):
-        if self.job_application:
-            return self.job_application.job_seeker
+        """
+        Shortcut to job application user / job seeker
+        """
+        return self.job_application.job_seeker if self.job_application else None
+
+    @property
+    def job_seeker_profile(self):
+        """
+        Shortcut to job seeker profile
+        """
+        if self.job_application and hasattr(self.job_application.job_seeker, "jobseeker_profile"):
+            return self.job_application.job_seeker.jobseeker_profile
 
         return None
 
     @property
     def approval(self):
-        if self.job_application and self.job_application.approval:
-            return self.job_application.approval
-
-        return None
+        """
+        Shortcut to job application approval
+        """
+        return self.job_application.approval if self.job_application and self.job_application.approval else None
 
     @property
     def asp_convention_id(self):
@@ -209,12 +232,55 @@ class EmployeeRecord(models.Model):
 
         return None
 
+    @property
+    def asp_employer_type(self):
+        """
+        This is a mapping between itou internal SIAE kinds and ASP ones
+        """
+        return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
+
+    @property
+    def asp_prescriber_type(self):
+        """
+        This is a mapping between itou internal prescriber kinds and ASP ones
+        """
+
+        sender_kind = self.job_application.sender_kind
+
+        if sender_kind == JobApplication.SENDER_KIND_JOB_SEEKER:
+            # the job seeker applied directly
+            return PrescriberType.SPONTANEOUS_APPLICATION
+        elif sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+            # an SIAE applied
+            return PrescriberType.UNKNOWN
+
+        return PrescriberType.from_itou_prescriber_kind(self.job_application.sender_kind)
+
+    @property
+    def asp_siae_type(self):
+        """
+        Mapping between ASP and itou models for SIAE kind ("Mesure")
+        """
+        return SiaeKind.from_siae_kind(self.job_application.to_siae.kind)
+
+    @property
+    def batch_line_number(self):
+        """
+        This transient field is updated at runtime for JSON serialization.
+
+        It is the batch line number of the employee record.
+        """
+        if not hasattr(self, "_batch_line_number"):
+            self._batch_line_number = 1
+
+        return self._batch_line_number
+
     @classmethod
     def from_job_application(cls, job_application):
         """
         Alternative and main FS constructor from a JobApplication object
 
-        If a job application with given criterias (approval, SIAE/ASP structure)
+        If an employee record with given criteria (approval, SIAE/ASP structure)
         already exists, this method returns None
         """
         assert job_application
