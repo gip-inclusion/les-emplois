@@ -532,8 +532,8 @@ REQUESTS_TIMEOUT = 5  # in seconds
 
 # ASP SFTP connection
 # ------------------------------------------------------------------------------
-ASP_FS_SFTP_HOST = os.getenv("ASP_FS_SFTP_HOST")
-ASP_FS_SFTP_PORT = 22
+ASP_FS_SFTP_HOST = os.getenv("ASP_FS_SFTP_HOST", "localhost")
+ASP_FS_SFTP_PORT = os.getenv("ASP_FS_SFTP_PORT", 22)
 ASP_FS_SFTP_USER = os.getenv("API_FS_SFTP_USER")
 ASP_FS_SFTP_PRIVATE_KEY_PATH = None
 # SFTP path: Where to put new employee records for ASP validation

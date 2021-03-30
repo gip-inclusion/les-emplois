@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -109,7 +111,7 @@ class EmployeeRecord(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.batch_line_line = 1
+        self.batch_line = 1
 
     def __str__(self):
         return f"{self.asp_id} - {self.approval_number} - {self.job_seeker}"
@@ -304,3 +306,23 @@ class EmployeeRecord(models.Model):
         job_application.job_seeker.get_or_create_job_seeker_profile()
 
         return fs
+
+
+class EmployeeRecordBatch:
+    """
+    Transient wrapper for a list of employee records.
+
+    Only used by JSON serializer as an header for ASP transmission
+    """
+
+    def __init__(self, employee_records, message=None):
+        self.id = uuid.uuid4()
+        self.message = message or f"Fiches salarié - {timezone.now()}"
+        self.employee_records = employee_records
+
+        # add a line number to each FS for JSON serialization
+        for idx, er in enumerate(self.employee_records):
+            er.batch_line = idx
+
+    def __str__(self):
+        return f"{self.id}"

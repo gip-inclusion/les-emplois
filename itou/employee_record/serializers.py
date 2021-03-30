@@ -193,3 +193,10 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         employee_situation["orienteur"] = instance.asp_prescriber_type
 
         return result
+
+
+class EmployeeRecordBatchSerializer(serializers.Serializer):
+
+    msgInformatif = serializers.CharField(source="message")
+    telId = serializers.CharField(source="id")
+    lignesTelechargement = EmployeeRecordSerializer(many=True, source="employee_records")
