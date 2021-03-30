@@ -523,3 +523,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
 }
+
+# Requests
+# ------------------------------------------------------------------------------
+# Requests default timeout is None... See https://blog.mathieu-leplatre.info/handling-requests-timeout-in-python.html
+# Use `httpx`, which has a default timeout, when possible. Otherwise, set a default timeout like this:
+# requests.get(timeout=settings.REQUESTS_TIMEOUT)
+REQUESTS_TIMEOUT = 5  # in seconds
