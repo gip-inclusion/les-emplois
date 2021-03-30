@@ -38,7 +38,7 @@ def _call_api(api_path, token):
     For further processing, returning smth else than `None` if considered a success
     """
     url = f"{API_ESD_BASE_URL}/{api_path}"
-    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"})
+    resp = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=settings.REQUESTS_TIMEOUT)
     if resp.status_code == 200:
         result = resp.json()
         # logger.debug(f"CALL {url}: {result}")
