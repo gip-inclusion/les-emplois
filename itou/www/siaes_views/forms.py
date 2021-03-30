@@ -71,7 +71,9 @@ class CreateSiaeForm(forms.ModelForm):
             )
 
             assistance_url = settings.ITOU_ASSISTANCE_URL
-            assistance_html = f'<a href="{assistance_url}" target="_blank" class="alert-link">{assistance_url}</a>'
+            assistance_html = (
+                f'<a href="{assistance_url}" target="_blank" rel="noopener" class="alert-link">{assistance_url}</a>'
+            )
 
             error_message_siret = _(
                 "en précisant votre numéro de SIRET (si existant),"
