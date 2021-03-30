@@ -78,7 +78,7 @@ class EligibilityDiagnosisManager(models.Manager):
 
         # A diagnosis is considered valid for the duration of an approval,
         # we just retrieve the last one no matter if it's valid or not.
-        if job_seeker.approvals_wrapper.has_valid:
+        if job_seeker.approvals_wrapper and job_seeker.approvals_wrapper.has_valid:
             last = query.by_author_kind_prescriber().last()
             if not last and for_siae:
                 last = query.authored_by_siae(for_siae).last()
