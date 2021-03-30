@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
@@ -17,6 +16,7 @@ from itou.job_applications.notifications import (
 )
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.tokens import resume_signer
@@ -156,7 +156,7 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     Ensure the job seeker has all required info.
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
     next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
@@ -216,7 +216,7 @@ def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_res
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
-    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     job_seeker_signed_pk = resume_signer.sign(job_seeker.pk)
 
     form = ResumeFormMixin(data=request.POST or None)
@@ -240,7 +240,7 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
-    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
@@ -287,7 +287,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         return HttpResponseRedirect(next_url)
 
     user_info = get_user_info(request)
-    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
 
     skip = (
@@ -332,11 +332,10 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     initial_data = {"selected_jobs": [session_data["job_description_id"]]}
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
-    job_seeker = get_user_model().objects.get(pk=session_data["job_seeker_pk"])
+    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
     approvals_wrapper = get_approvals_wrapper(request, job_seeker)
 
     if request.method == "POST" and form.is_valid():
-
         next_url = reverse("apply:list_for_job_seeker")
         if request.user.is_prescriber:
             next_url = reverse("apply:list_for_prescriber")
@@ -348,18 +347,17 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         if job_seeker.job_applications.filter(to_siae=siae).created_in_past(seconds=10).exists():
             return HttpResponseRedirect(next_url)
 
-        sender_prescriber_organization_pk = session_data.get("sender_prescriber_organization_pk")
-        sender_siae_pk = session_data.get("sender_siae_pk")
         job_application = form.save(commit=False)
         job_application.job_seeker = job_seeker
-        job_application.sender = get_user_model().objects.get(pk=session_data["sender_pk"])
+
+        job_application.sender = get_object_or_404(User, pk=session_data["sender_pk"])
         job_application.sender_kind = session_data["sender_kind"]
-        if sender_prescriber_organization_pk:
-            job_application.sender_prescriber_organization = PrescriberOrganization.objects.get(
-                pk=sender_prescriber_organization_pk
+        if sender_prescriber_organization_pk := session_data.get("sender_prescriber_organization_pk"):
+            job_application.sender_prescriber_organization = get_object_or_404(
+                PrescriberOrganization, pk=sender_prescriber_organization_pk
             )
-        if sender_siae_pk:
-            job_application.sender_siae = Siae.objects.get(pk=sender_siae_pk)
+        if sender_siae_pk := session_data.get("sender_siae_pk"):
+            job_application.sender_siae = get_object_or_404(Siae, pk=sender_siae_pk)
         job_application.to_siae = siae
         job_application.save()
 
