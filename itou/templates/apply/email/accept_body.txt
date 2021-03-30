@@ -32,7 +32,7 @@ Afin de nous aider à évaluer la performance de notre service, accepteriez-vous
 
 Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ survey_link }}
 
-Merci de votre participation et à très bientôt sur la Plateforme !
+Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
 {% endblocktranslate %}
 
 {% endblock body %}

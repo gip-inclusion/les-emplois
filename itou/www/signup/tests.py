@@ -130,7 +130,7 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(len(mail.outbox), 2)
             subjects = [email.subject for email in mail.outbox]
             self.assertIn("[Action requise] Un nouvel utilisateur souhaite rejoindre votre structure !", subjects)
-            self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subjects)
+            self.assertIn("Confirmez votre adresse e-mail", subjects)
 
             # Magic link is no longer valid because siae.members.count() has changed.
             response = self.client.get(magic_link, follow=True)
@@ -213,7 +213,7 @@ class JobSeekerSignupTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
+        self.assertIn("Confirmez votre adresse e-mail", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
@@ -316,7 +316,7 @@ class PrescriberSignupTest(TestCase):
         # Check sent email.
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
+        self.assertIn("Confirmez votre adresse e-mail", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
@@ -433,7 +433,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check email has been sent to confirm the user's email.
         email = mail.outbox[1]
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
+        self.assertIn("Confirmez votre adresse e-mail", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.from_email, settings.DEFAULT_FROM_EMAIL)
         self.assertEqual(len(email.to), 1)
@@ -566,7 +566,7 @@ class PrescriberSignupTest(TestCase):
         self.assertIn("Vérification de l'habilitation d'une nouvelle organisation", subject)
         # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
         subject = mail.outbox[1].subject
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
+        self.assertIn("Confirmez votre adresse e-mail", subject)
 
     @mock.patch(
         "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
@@ -665,7 +665,7 @@ class PrescriberSignupTest(TestCase):
         # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
         self.assertEqual(len(mail.outbox), 1)
         subject = mail.outbox[0].subject
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
+        self.assertIn("Confirmez votre adresse e-mail", subject)
 
     def test_create_user_prescriber_without_org(self):
         """
@@ -739,7 +739,7 @@ class PrescriberSignupTest(TestCase):
         # Full email validation process is tested in `test_create_user_prescriber_with_authorized_org_of_known_kind`
         self.assertEqual(len(mail.outbox), 1)
         subject = mail.outbox[0].subject
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", subject)
+        self.assertIn("Confirmez votre adresse e-mail", subject)
 
     @mock.patch(
         "itou.utils.apis.api_entreprise.EtablissementAPI.get", return_value=(ETABLISSEMENT_API_RESULT_MOCK, None)
