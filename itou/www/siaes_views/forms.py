@@ -63,8 +63,6 @@ class CreateSiaeForm(forms.ModelForm):
         existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
 
         if existing_siae_query.exists():
-            existing_siae = existing_siae_query.get()
-            user = self.current_user
             error_message = _(
                 """
                 La structure à laquelle vous souhaitez vous rattacher est déjà
@@ -72,32 +70,17 @@ class CreateSiaeForm(forms.ModelForm):
                 """
             )
 
+            assistance_url = settings.ITOU_ASSISTANCE_URL
+            assistance_html = (
+                f'<a href="{assistance_url}" target="_blank" rel="noopener" class="alert-link">{assistance_url}</a>'
+            )
+
             error_message_siret = _(
                 "en précisant votre numéro de SIRET (si existant),"
                 " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
                 " pour être contacté(e) si nécessaire."
             )
-            mail_to = settings.ITOU_EMAIL_ASSISTANCE
-            mail_subject = _("Se rattacher à une structure existante - Les emplois de l'inclusion")
-
-            mail_body = _(
-                "Veuillez rattacher mon compte (%(first_name)s %(last_name)s %(email)s)"
-                " à la structure existante (%(kind)s %(siret)s ID=%(id)s)"
-                " sur les emplois de l'inclusion."
-            ) % {
-                "first_name": user.first_name,
-                "last_name": user.last_name,
-                "email": user.email,
-                "kind": existing_siae.kind,
-                "siret": existing_siae.siret,
-                "id": existing_siae.id,
-            }
-
-            mailto_html = (
-                f'<a href="mailto:{mail_to}?subject={mail_subject}&body={mail_body}"'
-                f' target="_blank" class="alert-link">{mail_to}</a>'
-            )
-            error_message = mark_safe(f"{error_message} {mailto_html} {error_message_siret}")
+            error_message = mark_safe(f"{error_message} {assistance_html} {error_message_siret}")
             raise forms.ValidationError(error_message)
 
         if not siret.startswith(self.current_siae.siren):

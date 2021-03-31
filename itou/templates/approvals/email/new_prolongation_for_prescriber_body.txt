@@ -17,7 +17,7 @@ Bonjour,
 
 Si vous avez autorisé cette prolongation, vous n'avez aucune démarche à faire.
 
-Si vous n'avez pas autorisé cette prolongation, merci de contacter notre assistance technique : {{ itou_email_assistance }}
+Si vous n'avez pas autorisé cette prolongation, merci de contacter notre assistance technique : {{ itou_assistance_url }}
 
 {% endblocktranslate %}
 

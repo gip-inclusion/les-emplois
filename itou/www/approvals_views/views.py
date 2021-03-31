@@ -74,7 +74,7 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
     context = {
         "approval": job_application.approval,
         "base_url": base_url,
-        "contact_email": settings.ITOU_EMAIL_CONTACT,
+        "assistance_url": settings.ITOU_ASSISTANCE_URL,
         "diagnosis_author": diagnosis_author,
         "diagnosis_author_org_name": diagnosis_author_org_name,
         "siae": job_application.to_siae,

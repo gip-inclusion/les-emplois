@@ -13,9 +13,9 @@ Si vous êtes bien un prescripteur habilité, nous avons besoin d'une preuve de 
 
 - si votre organisation appartient à la liste des organisations habilitées au national ({{ itou_doc_url }}/pourquoi-une-plateforme-de-linclusion/qui-sont-les-differents-prescripteurs/prescripteur-habilite#liste-des-prescripteurs-habilites-en-national) : merci de nous communiquer par retour de mail le type de structure et l'ID de votre organisation (ce numéro est affiché dans votre tableau de bord)
 
-- si vous êtes une organisation conventionnée par un Conseil départemental pour le suivi des BRSA : vous devez demander au Conseil départemental de nous adresser un mail à {{ itou_email_assistance }} afin de nous confirmer votre conventionnement (nous n'acceptons pas les transferts de mail). Communiquez à cette personne l'ID de votre structure en lui demandant de le mentionner dans l'e-mail attestant de votre habilitation pour que nous fassions le rapprochement
+- si vous êtes une organisation conventionnée par un Conseil départemental pour le suivi des BRSA : vous devez demander au Conseil départemental de nous contacter via {{ itou_assistance_url }} afin de nous confirmer votre conventionnement (nous n'acceptons pas les transferts de mail). Communiquez à cette personne l'ID de votre structure en lui demandant de le mentionner dans l'e-mail attestant de votre habilitation pour que nous fassions le rapprochement
 
-- si vous êtes une organisation conventionnée par un PLIE : vous devez demander à l'organisme gestionnaire du PLIE de nous adresser un mail à {{ itou_email_assistance }} afin de nous confirmer votre conventionnement (nous n'acceptons pas les transferts de mail)
+- si vous êtes une organisation conventionnée par un PLIE : vous devez demander à l'organisme gestionnaire du PLIE de nous contacter via {{ itou_assistance_url }} afin de nous confirmer votre conventionnement (nous n'acceptons pas les transferts de mail)
 
 Nous restons à votre disposition pour tout renseignement complémentaire.{% endblocktranslate %}
 

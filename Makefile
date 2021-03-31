@@ -31,6 +31,13 @@ style:
 pylint:
 	docker exec -ti itou_django pylint itou
 
+coverage:
+  # Use .coveragerc
+	docker exec -ti itou_django coverage run --source=itou django-admin test project && coverage html
+
+coverage_venv:
+	coverage run --source=itou ./manage.py test itou.www --settings=config.settings.test && coverage html
+
 setup_git_pre_commit_hook:
 	touch .git/hooks/pre-commit
 	chmod +x .git/hooks/pre-commit
