@@ -47,7 +47,7 @@ class _EmployeeSerializer(serializers.ModelSerializer):
 class _EmployeeAddress(serializers.ModelSerializer):
 
     adrTelephone = serializers.CharField(source="phone")
-    adrEmail = serializers.CharField(source="email")
+    adrMail = serializers.CharField(source="email")
 
     adrNumeroVoie = serializers.IntegerField(source="jobseeker_profile.hexa_lane_number")
     codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension")
@@ -62,7 +62,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
         model = User
         fields = [
             "adrTelephone",
-            "adrEmail",
+            "adrMail",
             "adrNumeroVoie",
             "codeextensionVoie",
             "codetypeVoie",
