@@ -13,6 +13,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Suspension
+from itou.asp.models import PrescriberType
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
@@ -453,6 +454,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             JobApplicationWorkflow.STATE_ACCEPTED,
             JobApplicationWorkflow.STATE_POSTPONED,
         ]
+
+    @property
+    def prescriber_type(self):
+        """
+        Converts itou internal prescriber kinds into something readable
+        """
+
+        if self.sender_kind == JobApplication.SENDER_KIND_JOB_SEEKER:
+            # the job seeker applied directly
+            return PrescriberType.SPONTANEOUS_APPLICATION
+        elif self.sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+            # an SIAE applied
+            return PrescriberType.UNKNOWN
+
+        return self.sender_kind
 
     # Workflow transitions.
 
