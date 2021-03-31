@@ -264,7 +264,7 @@ class Approval(CommonApprovalMixin):
         Returns True if date has been updated, False otherwise
         """
         if self.can_postpone_start_date:
-            delay = relativedelta(new_start_date, self.start_at)
+            delay = new_start_date - self.start_at
             self.start_at = new_start_date
             self.end_at = self.end_at + delay
             self.save()
