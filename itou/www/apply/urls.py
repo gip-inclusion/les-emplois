@@ -28,7 +28,19 @@ urlpatterns = [
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriber/list", list_views.list_for_prescriber, name="list_for_prescriber"),
+    path("prescriber/list/exports", list_views.list_for_prescriber_exports, name="list_for_prescriber_exports"),
+    path(
+        "prescriber/list/exports/download/<str:export_month>",
+        list_views.list_for_prescriber_exports_download,
+        name="list_for_prescriber_exports_download",
+    ),
     path("siae/list", list_views.list_for_siae, name="list_for_siae"),
+    path("siae/list/exports", list_views.list_for_siae_exports, name="list_for_siae_exports"),
+    path(
+        "siae/list/exports/download/<str:export_month>",
+        list_views.list_for_siae_exports_download,
+        name="list_for_siae_exports_download",
+    ),
     # Process.
     path("<uuid:job_application_id>/siae/details", process_views.details_for_siae, name="details_for_siae"),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),

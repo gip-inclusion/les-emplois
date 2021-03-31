@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Q
+from django.db.models import Count, Q
+from django.db.models.functions import TruncMonth
 from django.shortcuts import render
+from django.utils.text import slugify
 
+from itou.job_applications.csv_export import generate_csv_export_for_download
 from itou.job_applications.models import JobApplication
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -11,6 +14,49 @@ from itou.www.apply.forms import (
     PrescriberFilterJobApplicationsForm,
     SiaeFilterJobApplicationsForm,
 )
+
+
+def get_prescriber_job_application_list(request):
+    """
+    Returns the list of job_applications the current prescriber has
+    """
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
+        # Show all applications organization-wide + applications sent by the
+        # current user for backward compatibility (in the past, a user could
+        # create his prescriber's organization later on).
+        job_applications = JobApplication.objects.filter(
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=prescriber_organization)
+        )
+    else:
+        job_applications = request.user.job_applications_sent
+    return job_applications
+
+
+def get_job_applications_by_month(job_applications):
+    """
+    Takes a list of job_applications, and returns a list of
+    pairs (month, amount of job applications in this month)
+    sorted by month
+    """
+    return (
+        job_applications.annotate(month=TruncMonth("created_at"))
+        .values("month")
+        .annotate(c=Count("id"))
+        .values("month", "c")
+        .order_by("-month")
+    )
+
+
+def get_job_applications_for_export(job_applications, export_month):
+    """
+    Filters a list of job application in order only to return those created during the
+    requested export_month (whose format is YYYY-mm)
+    """
+    year, month = export_month.split("-")
+    job_applications = job_applications.filter(created_at__year=year, created_at__month=month)
+    return job_applications.with_list_related_data()
 
 
 @login_required
@@ -40,18 +86,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     """
     List of applications for a prescriber.
     """
-
-    if request.user.is_prescriber_with_org:
-        prescriber_organization = get_current_org_or_404(request)
-        # Show all applications organization-wide + applications sent by the
-        # current user for backward compatibility (in the past, a user could
-        # create his prescriber's organization later on).
-        job_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=prescriber_organization)
-        )
-    else:
-        job_applications = request.user.job_applications_sent
+    job_applications = get_prescriber_job_application_list(request)
 
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
     filters = None
@@ -66,6 +101,33 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
     context = {"job_applications_page": job_applications_page, "filters_form": filters_form, "filters": filters}
     return render(request, template_name, context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+def list_for_prescriber_exports(request, template_name="apply/list_of_available_prescriber_exports.html"):
+    """
+    List of applications for a prescriber, sorted by month, displaying the count of applications per month
+    with the possibiliy to download those applications as a CSV file.
+    """
+
+    job_applications = get_prescriber_job_application_list(request)
+    job_applications_by_month = get_job_applications_by_month(job_applications)
+
+    context = {"job_applications_by_month": job_applications_by_month}
+    return render(request, template_name, context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+def list_for_prescriber_exports_download(request, export_month):
+    """
+    List of applications for a prescriber for a given month (YYYY-mm), exported as a CSV file with immediate download
+    """
+    job_applications = get_prescriber_job_application_list(request)
+    job_applications = get_job_applications_for_export(job_applications, export_month)
+
+    return generate_csv_export_for_download(job_applications, f"candidatures-{export_month}.csv")
 
 
 @login_required
@@ -94,3 +156,32 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "filters": filters,
     }
     return render(request, template_name, context)
+
+
+@login_required
+def list_for_siae_exports(request, template_name="apply/list_of_available_siae_exports.html"):
+    """
+    List of applications for a SIAE, sorted by month, displaying the count of applications per month
+    with the possibiliy to download those applications as a CSV file.
+    """
+
+    siae = get_current_siae_or_404(request)
+    job_applications = siae.job_applications_received
+    job_applications_by_month = get_job_applications_by_month(job_applications)
+
+    context = {"job_applications_by_month": job_applications_by_month, "siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+def list_for_siae_exports_download(request, export_month):
+    """
+    List of applications for a SIAE for a given month (YYYY-mm), exported as a CSV file with immediate download
+    """
+    siae = get_current_siae_or_404(request)
+    job_applications = siae.job_applications_received
+    job_applications = get_job_applications_for_export(job_applications, export_month)
+
+    return generate_csv_export_for_download(
+        job_applications, f"candidatures-{slugify(siae.display_name)}-{export_month}.csv"
+    )

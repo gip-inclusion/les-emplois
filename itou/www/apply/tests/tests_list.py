@@ -72,6 +72,8 @@ class ProcessListTest(TestCase):
         self.prescriber_base_url = reverse("apply:list_for_prescriber")
         self.job_seeker_base_url = reverse("apply:list_for_job_seeker")
         self.siae_base_url = reverse("apply:list_for_siae")
+        self.prescriber_exports_url = reverse("apply:list_for_prescriber_exports")
+        self.siae_exports_url = reverse("apply:list_for_siae_exports")
 
         # Variables available for unit tests
         self.pole_emploi = pole_emploi
@@ -301,6 +303,31 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         self.assertEqual(total_applications, self.pole_emploi.jobapplication_set.count())
 
+    def test_list_for_prescriber_exports_view(self):
+        """
+        Connect as Thibault to see a list of available job applications exports
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.prescriber_exports_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_list_for_prescriber_exports_download_view(self):
+        """
+        Connect as Thibault to see a list of available job applications exports
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.prescriber_exports_url)
+        sample_date = response.context["job_applications_by_month"][0]["month"]
+        export_month = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_prescriber_exports_download", kwargs={"export_month": export_month})
+
+        response = self.client.get(download_url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn("text/csv", response.get("Content-Type"))
+
     def test_view__filtered_by_state(self):
         """
         Thibault wants to filter a list of job applications
@@ -366,3 +393,129 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         for application in applications:
             self.assertIn(application.to_siae.pk, to_siaes_ids)
+
+
+####################################################
+################### Prescriber export list #########
+####################################################
+
+
+class ProcessListExportsPrescriberTest(ProcessListTest):
+    def test_list_for_prescriber_exports_view(self):
+        """
+        Connect as Thibault to see a list of available job applications exports
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.prescriber_exports_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_list_for_prescriber_exports_as_siae_view(self):
+        """
+        Connect as a SIAE and try to see the prescriber export -> redirected
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.prescriber_exports_url)
+
+        self.assertEqual(302, response.status_code)
+
+
+####################################################
+################### SIAE export list #########
+####################################################
+
+
+class ProcessListExportsSiaeTest(ProcessListTest):
+    def test_list_for_siae_exports_view(self):
+        """
+        Connect as a SIAE to see a list of available job applications exports
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.siae_exports_url)
+
+        self.assertEqual(200, response.status_code)
+
+    def test_list_for_siae_exports_as_prescriber_view(self):
+        """
+        Connect as Thibault and try to see the siae export -> redirected
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.siae_exports_url)
+
+        self.assertEqual(404, response.status_code)
+
+
+####################################################
+################### Prescriber export download #########
+####################################################
+
+
+class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
+    def test_list_for_prescriber_exports_download_view(self):
+        """
+        Connect as Thibault to download a CSV export of available job applications
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.prescriber_exports_url)
+        sample_date = response.context["job_applications_by_month"][0]["month"]
+        export_month = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_prescriber_exports_download", kwargs={"export_month": export_month})
+
+        response = self.client.get(download_url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn("text/csv", response.get("Content-Type"))
+
+    def test_list_for_siae_exports_download_view(self):
+        """
+        Connect as Thibault and attempt to download a CSV export of available job applications from SIAE
+        """
+        self.client.login(username=self.thibault_pe.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.prescriber_exports_url)
+        sample_date = response.context["job_applications_by_month"][0]["month"]
+        export_month = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_siae_exports_download", kwargs={"export_month": export_month})
+
+        response = self.client.get(download_url)
+
+        self.assertEqual(404, response.status_code)
+
+
+####################################################
+################### Prescriber export download #########
+####################################################
+
+
+class ProcessListExportsDownloadSiaeTest(ProcessListTest):
+    def test_list_for_siae_exports_download_view(self):
+        """
+        Connect as Thibault to download a CSV export of available job applications
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.siae_exports_url)
+        sample_date = response.context["job_applications_by_month"][0]["month"]
+        export_month = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_siae_exports_download", kwargs={"export_month": export_month})
+
+        response = self.client.get(download_url)
+
+        self.assertEqual(200, response.status_code)
+        self.assertIn("text/csv", response.get("Content-Type"))
+
+    def test_list_for_prescriber_exports_download_view(self):
+        """
+        Connect as SIAE and attempt to download a CSV export of available job applications from prescribers
+        """
+        self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.siae_exports_url)
+        sample_date = response.context["job_applications_by_month"][0]["month"]
+        export_month = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_prescriber_exports_download", kwargs={"export_month": export_month})
+
+        response = self.client.get(download_url)
+
+        self.assertEqual(302, response.status_code)
