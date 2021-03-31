@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis import forms as gis_forms
 from django.contrib.gis.db import models as gis_models
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.utils.timezone import now
 from django.utils.translation import gettext as _
@@ -203,19 +204,27 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         * validating authorization
         """
         if "_authorization_action_refuse" in request.POST:
-            obj.is_authorized = False
-            obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.REFUSED
-            obj.authorization_updated_at = now()
-            obj.authorization_updated_by = request.user
-            obj.save()
-            obj.refused_prescriber_organization_email().send()
+            # Same checks in change_form template to display the button
+            if request.user.is_superuser or obj.has_pending_authorization():
+                obj.is_authorized = False
+                obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.REFUSED
+                obj.authorization_updated_at = now()
+                obj.authorization_updated_by = request.user
+                obj.save()
+                obj.refused_prescriber_organization_email().send()
+            else:
+                return PermissionDenied()
 
         if "_authorization_action_validate" in request.POST:
-            obj.is_authorized = True
-            obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
-            obj.authorization_updated_at = now()
-            obj.authorization_updated_by = request.user
-            obj.save()
-            obj.validated_prescriber_organization_email().send()
+            # Same checks as change_form template to display the button
+            if request.user.is_superuser or obj.has_pending_authorization() or obj.has_refused_authorization():
+                obj.is_authorized = True
+                obj.authorization_status = models.PrescriberOrganization.AuthorizationStatus.VALIDATED
+                obj.authorization_updated_at = now()
+                obj.authorization_updated_by = request.user
+                obj.save()
+                obj.validated_prescriber_organization_email().send()
+            else:
+                raise PermissionDenied()
 
         return super().response_change(request, obj)
