@@ -1,5 +1,3 @@
-import uuid
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
@@ -312,17 +310,39 @@ class EmployeeRecordBatch:
     """
     Transient wrapper for a list of employee records.
 
-    Only used by JSON serializer as an header for ASP transmission
+    Some business validation rules from ASP:
+    - no more than 700 employee records per upload
+    - serialized JSON file must be 2Mb at most
+
+    This model used by JSON serializer as an header for ASP transmission
     """
 
-    def __init__(self, employee_records, message=None):
-        self.id = uuid.uuid4()
-        self.message = message or f"Fiches salarié - {timezone.now()}"
+    # Max number of employee records per upload batch
+    MAX_EMPLOYEE_RECORDS = 700
+
+    # Max size of upload file
+    MAX_SIZE_BYTES = 2048 * 1024
+
+    # File name format for upload
+    REMOTE_PATH_FORMAT = "RIAE_FS_{}.json"
+
+    def __init__(self, employee_records):
+        # id and message fields must be null for upload
+        # they may have a value after download
+        self.id = None
+        self.message = None
+
+        if len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
+            raise ValidationError(
+                f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} employee records"
+            )
+
         self.employee_records = employee_records
+        self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
 
         # add a line number to each FS for JSON serialization
         for idx, er in enumerate(self.employee_records):
             er.batch_line = idx
 
     def __str__(self):
-        return f"{self.id}"
+        return f"{self.upload_filename}"
