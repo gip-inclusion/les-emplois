@@ -48,7 +48,7 @@
 
 {% endif %}
 
-{% translate "Candidature envoyée à l'entreprise" %} {{ job_application.to_siae.display_name }}, {{ job_application.to_siae.city }}. Identifiant sur la plateforme : {{ job_application.to_siae.pk }}.
+{% translate "Candidature envoyée à l'entreprise" %} {{ job_application.to_siae.display_name }}, {{ job_application.to_siae.city }}. Identifiant sur les emplois de l'inclusion : {{ job_application.to_siae.pk }}.
 
 --------------------
 

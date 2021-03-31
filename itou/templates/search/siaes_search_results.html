@@ -96,7 +96,7 @@
                         <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
                         </a>
-                        <small>{% translate "Cet employeur n'a pas encore créé son compte sur la plateforme." %}</small>
+                        <small>{% translate "Cet employeur n'a pas encore créé son compte." %}</small>
                     {% elif siae.block_job_applications %}
                         <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
                             {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}

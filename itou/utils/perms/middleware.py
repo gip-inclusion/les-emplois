@@ -49,7 +49,7 @@ class ItouCurrentOrganizationMiddleware:
                                 "Nous sommes désolés, votre compte n'est "
                                 "actuellement rattaché à aucune structure.<br>"
                                 "Nous espérons cependant avoir l'occasion de vous accueillir de "
-                                "nouveau sur la Plateforme."
+                                "nouveau."
                             )
                         else:
                             message = (
@@ -58,7 +58,7 @@ class ItouCurrentOrganizationMiddleware:
                                 "structures associées ne sont plus "
                                 "conventionnées. Nous espérons cependant "
                                 "avoir l'occasion de vous accueillir de "
-                                "nouveau sur la Plateforme."
+                                "nouveau."
                             )
                         message = safestring.mark_safe(message)
                         messages.warning(request, _(message))

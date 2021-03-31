@@ -25,7 +25,7 @@
 
     {% csrf_token %}
 
-    {% bootstrap_label "Nom à afficher sur la plateforme" label_title="a" label_for=form.brand.id  %}
+    {% bootstrap_label "Nom à afficher" label_title="a" label_for=form.brand.id  %}
     {% bootstrap_field form.brand show_label=False %}
 
     {% bootstrap_form form exclude="brand" %}

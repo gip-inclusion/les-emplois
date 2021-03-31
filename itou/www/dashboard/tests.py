@@ -219,7 +219,7 @@ class ChangeEmailViewTest(TestCase):
 
         # User receives an email to confirm his new address.
         email = mail.outbox[0]
-        self.assertIn("Confirmez votre adresse e-mail pour la Plateforme", email.subject)
+        self.assertIn("Confirmez votre adresse e-mail", email.subject)
         self.assertIn("Afin de finaliser votre inscription, cliquez sur le lien suivant", email.body)
         self.assertEqual(email.to[0], new_email)
 
