@@ -7,6 +7,7 @@ from itou.users.models import User
 class _EmployeeSerializer(serializers.ModelSerializer):
 
     idItou = serializers.CharField(source="jobseeker_hash_id")
+    sufPassIae = serializers.CharField(required=False)
 
     civilite = serializers.ChoiceField(choices=User.Title.choices, source="title")
     nomUsage = serializers.CharField(source="last_name")
@@ -21,6 +22,7 @@ class _EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
+            "sufPassIae",
             "idItou",
             "civilite",
             "nomUsage",
@@ -41,6 +43,8 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "codeDpt": result.pop("codeDpt"),
         }
 
+        result["sufPassIae"] = None
+
         return result
 
 
@@ -51,7 +55,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
 
     adrNumeroVoie = serializers.IntegerField(source="jobseeker_profile.hexa_lane_number")
     codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension")
-    codetypeVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
+    codetypevoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
     adrCpltDistribution = serializers.CharField(source="address_line_2")
 
@@ -65,7 +69,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
             "adrMail",
             "adrNumeroVoie",
             "codeextensionVoie",
-            "codetypeVoie",
+            "codetypevoie",
             "adrLibelleVoie",
             "adrCpltDistribution",
             "codeinseecom",
