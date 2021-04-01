@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
+from tqdm import tqdm
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
@@ -16,6 +17,14 @@ from itou.utils.iterators import chunks
 # Global SFTP connection options
 cnopts = pysftp.CnOpts()
 cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
+
+# FIXME
+# Temporary mock of some FS fields
+
+
+def _mock_fs(fs):
+    #    ACI 023 20 1111 A0 M0
+    pass
 
 
 class Command(BaseCommand):
@@ -30,6 +39,8 @@ class Command(BaseCommand):
         parser.add_argument(
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
+
+        parser.add_argument("--test", dest="test", action="store_true", help="Send sample file")
 
     def set_logger(self, verbosity):
         """
@@ -56,6 +67,24 @@ class Command(BaseCommand):
             private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
             cnopts=cnopts,
         )
+
+    def _put_sample_file(self, conn):
+        """
+        Send a test file
+
+        Will be removed ...
+        """
+        sample_file = "samples/RIAE_FS_20201113151303.json"
+
+        with conn.cd(settings.ASP_FS_UPLOAD_DIR):
+            content = None
+
+            with open(sample_file, "rb") as f:
+                content = f.read()
+                remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
+                conn.putfo(BytesIO(content), remote_path, confirm=False)
+
+                self.logger.info(f"Sent test file: {remote_path}")
 
     def _get_ready_employee_records(self):
         """
@@ -113,32 +142,41 @@ class Command(BaseCommand):
 
         """
         self.logger.info("Downloading result files...")
+
         with conn.cd(settings.ASP_FS_DOWNLOAD_DIR):
             result_files = conn.listdir()
-            for result_file in result_files:
-                self.logger.info("Fetching result file: '%s'", result_file)
+
+            tmp = []
+            pbar = tqdm(result_files)
+
+            for result_file in pbar:
+                pbar.set_description(f"Fetching '{result_file}'")
+
                 with BytesIO() as result_stream:
                     conn.getfo(result_file, result_stream)
                     result_stream.seek(0)
-                    self._process_result_stream(result_stream)
+                    tmp.append(self._process_result_stream(result_stream))
+
             if len(result_files) == 0:
                 self.logger.info("No result files found")
             else:
                 self.logger.info("Processed %s files", len(result_files))
+                print(tmp)
                 # TODO: conn.remove(result_file)
                 # Once all ok
 
     def _process_result_stream(self, result_stream):
         result = JSONParser().parse(result_stream)
-        self.logger.info(result)
+        # self.logger.info(result)
+        return result
 
-    def handle(self, dry_run=False, upload=True, download=True, **options):
+    def handle(self, dry_run=False, upload=True, download=True, test=True, **options):
         self.set_logger(options.get("verbosity"))
         self.logger.info(
             f"Connecting to {settings.ASP_FS_SFTP_USER}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}"
         )
 
-        both = not (download or upload)
+        both = not (download or upload) and not test
 
         with self._get_sftp_connection() as sftp:
             self.logger.info(f"Current dir: {sftp.pwd}")
@@ -151,5 +189,9 @@ class Command(BaseCommand):
             # Fetch result files
             if both or download:
                 self._get_batch_file(sftp)
+
+            # Send test file (debug)
+            if test:
+                self._put_sample_file(sftp)
 
         print("Done!")
