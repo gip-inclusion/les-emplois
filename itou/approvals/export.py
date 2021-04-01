@@ -66,7 +66,7 @@ def _format_pass_worksheet(wb):
     ws.title = "Export PASS IAE " + current_dt.strftime(DATE_FMT)
 
     # Start timer
-    st = time.clock()
+    start_counter = time.perf_counter()
 
     job_applications = JobApplication.objects.exclude(approval=None).select_related(
         "job_seeker", "approval", "to_siae"
@@ -107,7 +107,7 @@ def _format_pass_worksheet(wb):
 
     export_count = job_applications.count()
 
-    logger.info(f"Exported {export_count} approvals in {time.clock() - st} sec.")
+    logger.info("Exported %s approvals in %.2f sec.", export_count, time.perf_counter() - start_counter)
 
 
 def _format_suspended_pass_worksheet(wb):

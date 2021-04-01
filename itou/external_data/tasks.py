@@ -1,8 +1,8 @@
 from huey.contrib.djhuey import db_task
 
-from .apis.pe_connect import import_user_data
+from .apis.pe_connect import import_user_pe_data
 
 
 @db_task()
-def import_pe_data(user_pk, token):
-    import_user_data(user_pk, token)
+def huey_import_user_pe_data(user, token, pe_data_import):
+    import_user_pe_data(user, token, pe_data_import)

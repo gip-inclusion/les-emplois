@@ -5,7 +5,8 @@
 
     {% translate "Êtes vous certain ?" as confirm %}
 
-    {% if original.has_pending_authorization %}
+    {# Whatever the state, the super user has access to refuse and validate actions #}
+    {% if original.has_pending_authorization or user.is_superuser %}
 
         <div class="submit-row">
             <input class="danger" type="submit" value="{% translate "Refuser l'habilitation" %}"
@@ -16,8 +17,7 @@
                    onclick="return confirm('{{ confirm }}')">
         </div>
 
-    {% elif original.has_refused_authorization %}
-
+    {% elif original.has_refused_authorization and not user.is_superuser %}
         {# Allow to validate an authorization after an error in a refusal. #}
 
         <div class="submit-row">
