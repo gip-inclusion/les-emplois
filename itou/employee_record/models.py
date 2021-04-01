@@ -274,6 +274,11 @@ class EmployeeRecord(models.Model):
 
         return self._batch_line_number
 
+    @property
+    def financial_annex_number(self):
+        # FIXME false placeholder
+        return "ACI023201111A0M0"
+
     @classmethod
     def from_job_application(cls, job_application):
         """

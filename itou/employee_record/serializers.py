@@ -82,14 +82,14 @@ class _EmployeeSituation(serializers.ModelSerializer):
     # Placeholder: updated at top-level serialization
     orienteur = serializers.CharField(required=False)
 
-    niveauFormation = serializers.IntegerField(source="jobseeker_profile.education_level")
+    niveauFormation = serializers.CharField(source="jobseeker_profile.education_level")
     salarieEnEmploi = serializers.BooleanField(source="jobseeker_profile.is_employed")
 
     # Placeholder: updated at top-level serialization
     salarieTypeEmployeur = serializers.CharField(required=False)
 
     salarieSansEmploiDepuis = serializers.CharField(source="jobseeker_profile.unemployed_since")
-    salarieSansRessource = serializers.CharField(source="jobseeker_profile.resourceless")
+    salarieSansRessource = serializers.BooleanField(source="jobseeker_profile.resourceless")
 
     inscritPoleEmploi = serializers.BooleanField(source="pole_emploi_id")
     inscritPoleEmploiDepuis = serializers.CharField(source="jobseeker_profile.pole_emploi_since")
@@ -144,6 +144,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
     numLigne = serializers.IntegerField(source="batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
+
+    numeroAnnexe = serializers.CharField(source="financial_annex_number")
     mesure = serializers.CharField(source="asp_siae_type")
     siret = serializers.CharField(source="job_application.to_siae.siret")
 
@@ -161,6 +163,7 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
             "passIae",
             "numLigne",
             "typeMouvement",
+            "numeroAnnexe",
             "mesure",
             "siret",
             "personnePhysique",
