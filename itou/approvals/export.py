@@ -107,7 +107,7 @@ def _format_pass_worksheet(wb):
 
     export_count = job_applications.count()
 
-    logger.info(f"Exported {export_count} approvals in {time.perf_counter() - start_counter} sec.")
+    logger.info("Exported %s approvals in %.2f sec.", export_count, time.perf_counter() - start_counter)
 
 
 def _format_suspended_pass_worksheet(wb):
