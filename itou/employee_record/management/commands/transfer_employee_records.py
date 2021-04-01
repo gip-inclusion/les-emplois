@@ -27,7 +27,9 @@ class Command(BaseCommand):
         parser.add_argument(
             "--download", dest="download", action="store_true", help="Download employee record processing feedback"
         )
-        parser.add_argument("--upload", dest="upload", action="store_true", help="Upload ready employee records")
+        parser.add_argument(
+            "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
+        )
 
     def set_logger(self, verbosity):
         """
@@ -130,21 +132,24 @@ class Command(BaseCommand):
         result = JSONParser().parse(result_stream)
         self.logger.info(result)
 
-    def handle(self, dry_run=False, **options):
+    def handle(self, dry_run=False, upload=True, download=True, **options):
         self.set_logger(options.get("verbosity"))
-        print("-" * 80)
         self.logger.info(
             f"Connecting to {settings.ASP_FS_SFTP_USER}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}"
         )
+
+        both = not (download or upload)
 
         with self._get_sftp_connection() as sftp:
             self.logger.info(f"Current dir: {sftp.pwd}")
 
             # Send files
-            for batch in self._get_ready_employee_records():
-                self._put_batch_file(sftp, batch, dry_run)
+            if both or upload:
+                for batch in self._get_ready_employee_records():
+                    self._put_batch_file(sftp, batch, dry_run)
 
             # Fetch result files
-            self._get_batch_file(sftp)
+            if both or download:
+                self._get_batch_file(sftp)
 
         print("Done!")
