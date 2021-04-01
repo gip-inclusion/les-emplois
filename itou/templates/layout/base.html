@@ -44,7 +44,7 @@
             <div class="layout-header py-2 px-0 px-sm-3">
                 <a href="/" class="text-decoration-none text-reset">
                     <div class="row">
-                        <img src="{% static 'img/logo_header.svg' %}" alt="{{ ITOU_FQDN }}" class="layout-header-logo">
+                        <img class="layout-header-logo" src="{% static 'img/logo_header.svg' %}" alt="{{ ITOU_FQDN }}">
                     </div>
                 </a>
                 <div class="layout-header-content">
@@ -116,7 +116,7 @@
                                                     class="dropdown-item text-primary {% if s.pk == current_siae.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="siae_id"
-                                                    value="{{ s.pk }}">{{ s.display_name }} <span class="badge badge-primary">{{ s.kind }}</span> 
+                                                    value="{{ s.pk }}">{{ s.display_name }} <span class="badge badge-primary">{{ s.kind }}</span>
                                                 </button>
                                             {% endfor %}
                                         </form>
@@ -137,7 +137,7 @@
                                                     class="dropdown-item text-primary {% if po.pk == current_prescriber_organization.pk %} font-weight-bold disabled{% endif %}"
                                                     type="submit"
                                                     name="prescriber_organization_id"
-                                                    value="{{ po.pk }}">{{ po.display_name }} <span class="badge badge-primary">{{ s.kind }}</span> 
+                                                    value="{{ po.pk }}">{{ po.display_name }} <span class="badge badge-primary">{{ s.kind }}</span>
                                                 </button>
                                             {% endfor %}
                                         </form>
