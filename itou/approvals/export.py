@@ -118,7 +118,7 @@ def _format_suspended_pass_worksheet(wb):
     ws = wb.create_sheet("Suspensions PASS IAE")
 
     # Start timer
-    st = time.clock()
+    start_counter = time.perf_counter()
 
     suspensions = Suspension.objects.all().select_related("approval", "created_by")
 
@@ -145,7 +145,7 @@ def _format_suspended_pass_worksheet(wb):
         ws.column_dimensions[get_column_letter(idx + 1)].width = CELL_WIDTH
 
     export_count = suspensions.count()
-    logger.info(f"Exported {export_count} suspensions in {time.clock() - st} sec.")
+    logger.info("Exported %s suspensions in %.2f sec.", export_count, time.perf_counter() - start_counter)
 
 
 def export_approvals(tmp_file=None):
