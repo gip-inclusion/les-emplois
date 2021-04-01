@@ -14,7 +14,8 @@ class SiaeSearchForm(forms.Form):
 
     CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
-    KIND_CHOICES = [("", "---")] + [(k[0], k[0]) for k in Siae.KIND_CHOICES]
+    # We temporarily hide ACIPHC kind in search filter until our staff has input enough of them, per their request.
+    KIND_CHOICES = [("", "---")] + [(k[0], k[0]) for k in Siae.KIND_CHOICES if k[0] != Siae.KIND_ACIPHC]
 
     distance = forms.ChoiceField(
         label=gettext_lazy("Distance"),

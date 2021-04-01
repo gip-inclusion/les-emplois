@@ -108,7 +108,7 @@ class Command(BaseCommand):
     def update_siret_and_auth_email_of_existing_siaes(self):
         auth_email_updates = 0
         for siae in Siae.objects.select_related("convention").filter(source=Siae.SOURCE_ASP, convention__isnull=False):
-            assert siae.is_subject_to_eligibility_rules
+            assert siae.is_asp_managed
 
             asp_id = siae.asp_id
             row = ASP_ID_TO_SIAE_ROW.get(asp_id)
@@ -189,7 +189,7 @@ class Command(BaseCommand):
                 # Siaes with this asp_id already exist, no need to create one more.
                 total_existing_siae_with_asp_source = 0
                 for existing_siae in existing_siae_query.all():
-                    assert existing_siae.is_subject_to_eligibility_rules
+                    assert existing_siae.is_asp_managed
                     if existing_siae.source == Siae.SOURCE_ASP:
                         total_existing_siae_with_asp_source += 1
                         if not self.dry_run:
@@ -210,7 +210,7 @@ class Command(BaseCommand):
                     assert self.dry_run
                     continue
                 assert existing_siae.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]
-                assert existing_siae.is_subject_to_eligibility_rules
+                assert existing_siae.is_asp_managed
                 self.log(
                     f"siae.id={existing_siae.id} already exists "
                     f"with wrong source={existing_siae.source} "

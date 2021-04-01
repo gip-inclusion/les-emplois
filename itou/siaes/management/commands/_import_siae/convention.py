@@ -175,11 +175,13 @@ def check_convention_data_consistency(dry_run):
             assert siae.siren == convention.siren_signature
 
     asp_siaes_without_convention = Siae.objects.filter(
-        kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True
+        kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True
     ).count()
     print(f"{asp_siaes_without_convention} siaes of ASP source have no convention (no solution)")
 
     user_created_siaes_without_convention = Siae.objects.filter(
-        kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS, source=Siae.SOURCE_USER_CREATED, convention__isnull=True
+        kind__in=Siae.ASP_MANAGED_KINDS,
+        source=Siae.SOURCE_USER_CREATED,
+        convention__isnull=True,
     ).count()
     print(f"{user_created_siaes_without_convention} user created siaes still have no convention (technical debt)")
