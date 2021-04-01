@@ -86,6 +86,16 @@ class Command(BaseCommand):
 
                 self.logger.info(f"Sent test file: {remote_path}")
 
+    def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_DOWNLOAD_DIR):
+        """
+        Store ASP processing results in a local file
+
+        content is a string
+        """
+        with open(f"{local_path}/{remote_path}", "w") as f:
+            f.write(content)
+        self.logger.info("Wrote '%s' to local path '%s'", remote_path, local_path)
+
     def _get_ready_employee_records(self):
         """
         Get a list of employee records in 'ready' state (ready to be sent)
@@ -139,7 +149,6 @@ class Command(BaseCommand):
     def _get_batch_file(self, conn):
         """
         Fetch ASP processing results
-
         """
         self.logger.info("Downloading result files...")
 
@@ -155,13 +164,16 @@ class Command(BaseCommand):
                 with BytesIO() as result_stream:
                     conn.getfo(result_file, result_stream)
                     result_stream.seek(0)
+
                     tmp.append(self._process_result_stream(result_stream))
 
             if len(result_files) == 0:
                 self.logger.info("No result files found")
             else:
                 self.logger.info("Processed %s files", len(result_files))
-                print(tmp)
+
+                for elt in tmp:
+                    print(elt)
                 # TODO: conn.remove(result_file)
                 # Once all ok
 
