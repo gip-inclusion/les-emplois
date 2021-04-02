@@ -325,6 +325,10 @@ class Command(BaseCommand):
         Build a new table with given sql_request.
         Minimize downtime by building a temporary table first then swap the two tables atomically.
         """
+        if self.dry_run:
+            # Note that during a dry run, the dry run version of the current table will be built
+            # from the wet run version of the underlying tables.
+            table_name += "_dry_run"
         self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
         self.cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
         self.switch_table_atomically(table_name=table_name)
@@ -336,9 +340,6 @@ class Command(BaseCommand):
         Store fluxIAE latest update date in dedicated table for convenience.
         This way we can show on metabase dashboards how fresh our data is.
         """
-        if self.dry_run:
-            # This table makes no sense for a dry run.
-            return
         table_name = "fluxIAE_DateDerniereMiseAJour"
         sql_request = """
             select
@@ -352,9 +353,6 @@ class Command(BaseCommand):
         """
         Build custom missions_ai_ehpad table by joining all relevant raw tables.
         """
-        if self.dry_run:
-            # This table makes no sense for a dry run.
-            return
         table_name = "missions_ai_ehpad"
         sql_request = MISSIONS_AI_EPHAD_SQL_REQUEST
         self.build_table(table_name=table_name, sql_request=sql_request)
