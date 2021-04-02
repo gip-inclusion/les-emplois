@@ -232,7 +232,7 @@ class Command(BaseCommand):
         if self.dry_run:
             vue_name += "_dry_run"
         df.to_sql(
-            name=vue_name,
+            name=f"{vue_name}_new",
             con=PG_ENGINE,
             if_exists="replace",
             index=False,
@@ -240,6 +240,7 @@ class Command(BaseCommand):
             # INSERT by batch and not one by one. Increases speed x100.
             method="multi",
         )
+        self.switch_table_atomically(table_name=vue_name)
         self.log(f"Stored {vue_name} in database ({len(df)} rows).")
 
     @timeit
@@ -311,6 +312,14 @@ class Command(BaseCommand):
 
         self.store_df(df=df, vue_name="departements")
 
+    def switch_table_atomically(self, table_name):
+        self.conn.commit()
+        self.cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
+        self.cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
+        self.conn.commit()
+        self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
+        self.conn.commit()
+
     def build_table(self, table_name, sql_request):
         """
         Build a new table with given sql_request.
@@ -318,12 +327,7 @@ class Command(BaseCommand):
         """
         self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
         self.cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
-        self.conn.commit()
-        self.cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
-        self.cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
-        self.conn.commit()
-        self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
-        self.conn.commit()
+        self.switch_table_atomically(table_name=table_name)
         self.log(f"Built {table_name} table using given sql_request.")
 
     @timeit
@@ -361,23 +365,24 @@ class Command(BaseCommand):
             self.log("Populating metabase is not allowed in this environment.")
             return
 
-        # Specific views with specific needs.
-        self.populate_fluxiae_structures()
-
-        # Regular views with no special treatment.
-        self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
-        self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
-        self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
-        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
-        self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
-        self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
-
-        # Custom views for our needs.
-        self.populate_departments()
-
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
             self.conn = conn
+
+            # Specific views with specific needs.
+            self.populate_fluxiae_structures()
+
+            # Regular views with no special treatment.
+            self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
+            self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
+            self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
+            self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
+            self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
+            self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
+
+            # Custom views for our needs.
+            self.populate_departments()
+
             # Build custom tables by running raw SQL queries on existing tables.
             self.build_update_date_table()
             self.build_missions_ai_ehpad_table()
