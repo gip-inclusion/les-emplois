@@ -42,6 +42,23 @@ def timeit(f):
     return wrap
 
 
+def get_fluxiae_referential_filenames():
+    path = f"{CURRENT_DIR}/../data"
+
+    filename_prefixes = [
+        # Example of raw filename: fluxIAE_RefCategorieJuridique_29032021_090124.csv.gz
+        # Let's drop the digits and keep the first relevant part only.
+        "_".join(filename.split("_")[:2])
+        for filename in os.listdir(path)
+        if filename.startswith("fluxIAE_Ref")
+    ]
+
+    if len(filename_prefixes) != 28:
+        raise RuntimeError(f"Fatal error: 28 fluxIAE referentials expected but only {len(filename_prefixes)} found.")
+
+    return filename_prefixes
+
+
 def get_filename(filename_prefix, filename_extension, description=None):
     """
     Automatically detect the correct filename.

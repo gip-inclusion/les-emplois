@@ -72,7 +72,7 @@ from django.core.management.base import BaseCommand
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import PG_ENGINE
 from itou.metabase.management.commands._missions_ai_ehpad import MISSIONS_AI_EPHAD_SQL_REQUEST
-from itou.siaes.management.commands._import_siae.utils import get_filename, timeit
+from itou.siaes.management.commands._import_siae.utils import get_filename, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
@@ -242,6 +242,7 @@ class Command(BaseCommand):
         )
         self.switch_table_atomically(table_name=vue_name)
         self.log(f"Stored {vue_name} in database ({len(df)} rows).")
+        self.log("")
 
     @timeit
     def populate_fluxiae_structures(self):
@@ -290,6 +291,10 @@ class Command(BaseCommand):
     def populate_fluxiae_view(self, vue_name, skip_first_row=True):
         df = self.get_df(vue_name=vue_name, skip_first_row=skip_first_row)
         self.store_df(df=df, vue_name=vue_name)
+
+    def populate_fluxiae_referentials(self):
+        for filename in get_fluxiae_referential_filenames():
+            self.populate_fluxiae_view(vue_name=filename)
 
     def populate_departments(self):
         """
@@ -368,6 +373,8 @@ class Command(BaseCommand):
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
             self.conn = conn
+
+            self.populate_fluxiae_referentials()
 
             # Specific views with specific needs.
             self.populate_fluxiae_structures()
