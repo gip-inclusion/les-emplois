@@ -329,10 +329,12 @@ class Command(BaseCommand):
             # Note that during a dry run, the dry run version of the current table will be built
             # from the wet run version of the underlying tables.
             table_name += "_dry_run"
+
+        self.log(f"Building {table_name} table using given sql_request...")
         self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
         self.cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
         self.switch_table_atomically(table_name=table_name)
-        self.log(f"Built {table_name} table using given sql_request.")
+        self.log("Done.")
 
     @timeit
     def build_update_date_table(self):
