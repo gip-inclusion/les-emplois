@@ -68,6 +68,7 @@ from collections import OrderedDict
 import pandas as pd
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import PG_ENGINE
@@ -164,8 +165,6 @@ class Command(BaseCommand):
         """
         Load fluxIAE CSV file as a dataframe.
         """
-        self.log(f"Loading {vue_name} as a dataframe ...")
-
         filename = get_filename(
             filename_prefix=vue_name,
             filename_extension=".csv",
@@ -197,7 +196,7 @@ class Command(BaseCommand):
                 if self.dry_run and nrows == 100:
                     break
 
-        self.log(f"Will load {nrows} rows for {vue_name}.")
+        self.log(f"Loading {nrows} rows for {vue_name} ...")
 
         if converters:
             kwargs["converters"] = converters
@@ -222,24 +221,36 @@ class Command(BaseCommand):
 
         df = self.anonymize_df(df)
 
-        self.log(f"Loaded {len(df)} rows for {vue_name}.")
         return df
 
     def store_df(self, df, vue_name):
         """
         Store dataframe in database.
+
+        Do this dataframe chunk by dataframe chunk to solve
+        psycopg2.OperationalError "server closed the connection unexpectedly" error.
         """
         if self.dry_run:
             vue_name += "_dry_run"
-        df.to_sql(
-            name=f"{vue_name}_new",
-            con=PG_ENGINE,
-            if_exists="replace",
-            index=False,
-            chunksize=1000,
-            # INSERT by batch and not one by one. Increases speed x100.
-            method="multi",
-        )
+
+        # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
+        rows_per_chunk = 10 * 1000
+        df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]
+
+        self.log(f"Storing {len(df_chunks)} chunks of (max) {rows_per_chunk} rows each ...")
+        if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
+        for df_chunk in tqdm(df_chunks):
+            df_chunk.to_sql(
+                name=f"{vue_name}_new",
+                con=PG_ENGINE,
+                if_exists=if_exists,
+                index=False,
+                chunksize=1000,
+                # INSERT by batch and not one by one. Increases speed x100.
+                method="multi",
+            )
+            if_exists = "append"  # For all other chunks, append to table in progress.
+
         self.switch_table_atomically(table_name=vue_name)
         self.log(f"Stored {vue_name} in database ({len(df)} rows).")
         self.log("")
