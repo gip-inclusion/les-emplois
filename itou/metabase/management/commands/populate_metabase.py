@@ -224,10 +224,14 @@ class Command(BaseCommand):
         """
         Populate job descriptions with various statistics.
         """
-        queryset = SiaeJobDescription.objects.select_related(
-            "siae",
-            "appellation__rome",
-        ).all()
+        queryset = (
+            SiaeJobDescription.objects.select_related(
+                "siae",
+                "appellation__rome",
+            )
+            .with_job_applications_count()
+            .all()
+        )
 
         self.populate_table(
             table_name="fiches_de_poste", table_columns=_job_descriptions.TABLE_COLUMNS, queryset=queryset
