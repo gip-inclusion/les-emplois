@@ -10,18 +10,26 @@ For more explanations about the mission / mei / emi tables, see `populate_metaba
 
 """
 MISSIONS_AI_EPHAD_SQL_REQUEST = """
+    with missions as (
+        select
+            case
+                /* ILIKE means (case) Insensitive LIKE */
+                when mission_descriptif ilike '%AIEHPAD%'
+                    or mission_descriptif ilike '%AI EHPAD%'
+                    or mission_descriptif ilike '%AI-EHPAD%'
+                    or mission_descriptif ilike '%AIEPADH%'
+                    or mission_descriptif ilike '%AIEPAHD%'
+                    or mission_descriptif ilike '%AIHEPAD%'
+                then 'AIEHPAD'
+                when mission_descriptif ilike '%AIPH%'
+                then 'AIPH'
+                else 'AUTRE'
+            end as code_operation,
+            *
+        from "fluxIAE_Missions"
+    )
     select
-        /* ILIKE means (case) Insensitive LIKE */
-        case
-            when m.mission_descriptif ilike '%EHPAD%'
-            then TRUE
-            else FALSE
-        end as mission_has_ehpad_in_description,
-        case
-            when m.mission_descriptif ilike '%AIEHPAD%'
-            then TRUE
-            else FALSE
-        end as mission_has_aiehpad_in_description,
+        m.code_operation,
         TO_DATE(m.mission_date_creation, 'DD/MM/YYYY') as mission_date_creation,
         TO_DATE(m.mission_date_modification, 'DD/MM/YYYY') as mission_date_modification,
         m.mission_id_ctr,
@@ -62,7 +70,7 @@ MISSIONS_AI_EPHAD_SQL_REQUEST = """
         s.itou_longitude as longitude_structure
     from
         /* TODO use lateral joins instead maybe */
-        "fluxIAE_Missions" m
+        missions m
         left outer join "fluxIAE_MissionsEtatMensuelIndiv" mei
             on m.mission_id_mis = mei.mei_mis_id
         left outer join "fluxIAE_EtatMensuelIndiv" emi
@@ -73,5 +81,5 @@ MISSIONS_AI_EPHAD_SQL_REQUEST = """
             on cm.contrat_id_structure = s.structure_id_siae
         left outer join "codes_rome" r
             on m.mission_code_rome = r.code_rome
-    where m.mission_descriptif ilike '%EHPAD%'
+    where m.code_operation in ('AIEHPAD', 'AIPH')
 """

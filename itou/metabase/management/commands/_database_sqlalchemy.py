@@ -17,6 +17,8 @@ Quoting: https://pandas.pydata.org/pandas-docs/stable/user_guide/io.html#sql-que
 `Database abstraction is provided by SQLAlchemy if installed.
 If SQLAlchemy is not installed, a fallback is only provided for sqlite`
 """
+
+
 PG_ENGINE = create_engine(
     f"postgresql://{settings.METABASE_USER}:{settings.METABASE_PASSWORD}"
     f"@{settings.METABASE_HOST}:{settings.METABASE_PORT}/{settings.METABASE_DATABASE}",

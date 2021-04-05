@@ -68,11 +68,12 @@ from collections import OrderedDict
 import pandas as pd
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import PG_ENGINE
 from itou.metabase.management.commands._missions_ai_ehpad import MISSIONS_AI_EPHAD_SQL_REQUEST
-from itou.siaes.management.commands._import_siae.utils import get_filename, timeit
+from itou.siaes.management.commands._import_siae.utils import get_filename, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
@@ -164,8 +165,6 @@ class Command(BaseCommand):
         """
         Load fluxIAE CSV file as a dataframe.
         """
-        self.log(f"Loading {vue_name} as a dataframe ...")
-
         filename = get_filename(
             filename_prefix=vue_name,
             filename_extension=".csv",
@@ -197,7 +196,7 @@ class Command(BaseCommand):
                 if self.dry_run and nrows == 100:
                     break
 
-        self.log(f"Will load {nrows} rows for {vue_name}.")
+        self.log(f"Loading {nrows} rows for {vue_name} ...")
 
         if converters:
             kwargs["converters"] = converters
@@ -222,25 +221,39 @@ class Command(BaseCommand):
 
         df = self.anonymize_df(df)
 
-        self.log(f"Loaded {len(df)} rows for {vue_name}.")
         return df
 
     def store_df(self, df, vue_name):
         """
         Store dataframe in database.
+
+        Do this dataframe chunk by dataframe chunk to solve
+        psycopg2.OperationalError "server closed the connection unexpectedly" error.
         """
         if self.dry_run:
             vue_name += "_dry_run"
-        df.to_sql(
-            name=vue_name,
-            con=PG_ENGINE,
-            if_exists="replace",
-            index=False,
-            chunksize=1000,
-            # INSERT by batch and not one by one. Increases speed x100.
-            method="multi",
-        )
+
+        # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
+        rows_per_chunk = 10 * 1000
+        df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]
+
+        self.log(f"Storing {len(df_chunks)} chunks of (max) {rows_per_chunk} rows each ...")
+        if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
+        for df_chunk in tqdm(df_chunks):
+            df_chunk.to_sql(
+                name=f"{vue_name}_new",
+                con=PG_ENGINE,
+                if_exists=if_exists,
+                index=False,
+                chunksize=1000,
+                # INSERT by batch and not one by one. Increases speed x100.
+                method="multi",
+            )
+            if_exists = "append"  # For all other chunks, append to table in progress.
+
+        self.switch_table_atomically(table_name=vue_name)
         self.log(f"Stored {vue_name} in database ({len(df)} rows).")
+        self.log("")
 
     @timeit
     def populate_fluxiae_structures(self):
@@ -290,6 +303,10 @@ class Command(BaseCommand):
         df = self.get_df(vue_name=vue_name, skip_first_row=skip_first_row)
         self.store_df(df=df, vue_name=vue_name)
 
+    def populate_fluxiae_referentials(self):
+        for filename in get_fluxiae_referential_filenames():
+            self.populate_fluxiae_view(vue_name=filename)
+
     def populate_departments(self):
         """
         Populate department codes, department names and region names.
@@ -311,20 +328,29 @@ class Command(BaseCommand):
 
         self.store_df(df=df, vue_name="departements")
 
-    def build_table(self, table_name, sql_request):
-        """
-        Build a new table with given sql_request.
-        Minimize downtime by building a temporary table first then swap the two tables atomically.
-        """
-        self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
-        self.cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
+    def switch_table_atomically(self, table_name):
         self.conn.commit()
         self.cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
         self.cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
         self.conn.commit()
         self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
         self.conn.commit()
-        self.log(f"Built {table_name} table using given sql_request.")
+
+    def build_table(self, table_name, sql_request):
+        """
+        Build a new table with given sql_request.
+        Minimize downtime by building a temporary table first then swap the two tables atomically.
+        """
+        if self.dry_run:
+            # Note that during a dry run, the dry run version of the current table will be built
+            # from the wet run version of the underlying tables.
+            table_name += "_dry_run"
+
+        self.log(f"Building {table_name} table using given sql_request...")
+        self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
+        self.cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
+        self.switch_table_atomically(table_name=table_name)
+        self.log("Done.")
 
     @timeit
     def build_update_date_table(self):
@@ -332,9 +358,6 @@ class Command(BaseCommand):
         Store fluxIAE latest update date in dedicated table for convenience.
         This way we can show on metabase dashboards how fresh our data is.
         """
-        if self.dry_run:
-            # This table makes no sense for a dry run.
-            return
         table_name = "fluxIAE_DateDerniereMiseAJour"
         sql_request = """
             select
@@ -348,9 +371,6 @@ class Command(BaseCommand):
         """
         Build custom missions_ai_ehpad table by joining all relevant raw tables.
         """
-        if self.dry_run:
-            # This table makes no sense for a dry run.
-            return
         table_name = "missions_ai_ehpad"
         sql_request = MISSIONS_AI_EPHAD_SQL_REQUEST
         self.build_table(table_name=table_name, sql_request=sql_request)
@@ -361,23 +381,26 @@ class Command(BaseCommand):
             self.log("Populating metabase is not allowed in this environment.")
             return
 
-        # Specific views with specific needs.
-        self.populate_fluxiae_structures()
-
-        # Regular views with no special treatment.
-        self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
-        self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
-        self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
-        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
-        self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
-        self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
-
-        # Custom views for our needs.
-        self.populate_departments()
-
         with MetabaseDatabaseCursor() as (cur, conn):
             self.cur = cur
             self.conn = conn
+
+            self.populate_fluxiae_referentials()
+
+            # Specific views with specific needs.
+            self.populate_fluxiae_structures()
+
+            # Regular views with no special treatment.
+            self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
+            self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
+            self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
+            self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
+            self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
+            self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
+
+            # Custom views for our needs.
+            self.populate_departments()
+
             # Build custom tables by running raw SQL queries on existing tables.
             self.build_update_date_table()
             self.build_missions_ai_ehpad_table()
