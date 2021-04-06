@@ -71,7 +71,7 @@ from django.core.management.base import BaseCommand
 from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
-from itou.metabase.management.commands._database_sqlalchemy import PG_ENGINE
+from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
 from itou.metabase.management.commands._missions_ai_ehpad import MISSIONS_AI_EPHAD_SQL_REQUEST
 from itou.siaes.management.commands._import_siae.utils import get_filename, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
@@ -240,15 +240,18 @@ class Command(BaseCommand):
         self.log(f"Storing {len(df_chunks)} chunks of (max) {rows_per_chunk} rows each ...")
         if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
         for df_chunk in tqdm(df_chunks):
+            pg_engine = get_pg_engine()
             df_chunk.to_sql(
                 name=f"{vue_name}_new",
-                con=PG_ENGINE,
+                # Use a new connection for each chunk to avoid random disconnections.
+                con=pg_engine,
                 if_exists=if_exists,
                 index=False,
                 chunksize=1000,
                 # INSERT by batch and not one by one. Increases speed x100.
                 method="multi",
             )
+            pg_engine.dispose()
             if_exists = "append"  # For all other chunks, append to table in progress.
 
         self.switch_table_atomically(table_name=vue_name)
@@ -329,12 +332,12 @@ class Command(BaseCommand):
         self.store_df(df=df, vue_name="departements")
 
     def switch_table_atomically(self, table_name):
-        self.conn.commit()
-        self.cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
-        self.cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
-        self.conn.commit()
-        self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
-        self.conn.commit()
+        with MetabaseDatabaseCursor() as (cur, conn):
+            cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
+            cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
+            conn.commit()
+            cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
+            conn.commit()
 
     def build_table(self, table_name, sql_request):
         """
@@ -347,8 +350,13 @@ class Command(BaseCommand):
             table_name += "_dry_run"
 
         self.log(f"Building {table_name} table using given sql_request...")
-        self.cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
-        self.cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
+
+        with MetabaseDatabaseCursor() as (cur, conn):
+            cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
+            conn.commit()
+            cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
+            conn.commit()
+
         self.switch_table_atomically(table_name=table_name)
         self.log("Done.")
 
@@ -381,29 +389,25 @@ class Command(BaseCommand):
             self.log("Populating metabase is not allowed in this environment.")
             return
 
-        with MetabaseDatabaseCursor() as (cur, conn):
-            self.cur = cur
-            self.conn = conn
+        self.populate_fluxiae_referentials()
 
-            self.populate_fluxiae_referentials()
+        # Specific views with specific needs.
+        self.populate_fluxiae_structures()
 
-            # Specific views with specific needs.
-            self.populate_fluxiae_structures()
+        # Regular views with no special treatment.
+        self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
+        self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
+        self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
+        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
+        self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
+        self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
 
-            # Regular views with no special treatment.
-            self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
-            self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
-            self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
-            self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
-            self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
-            self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
+        # Custom views for our needs.
+        self.populate_departments()
 
-            # Custom views for our needs.
-            self.populate_departments()
-
-            # Build custom tables by running raw SQL queries on existing tables.
-            self.build_update_date_table()
-            self.build_missions_ai_ehpad_table()
+        # Build custom tables by running raw SQL queries on existing tables.
+        self.build_update_date_table()
+        self.build_missions_ai_ehpad_table()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
