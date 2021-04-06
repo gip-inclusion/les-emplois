@@ -235,8 +235,14 @@ class EmployeeRecord(models.Model):
     def asp_employer_type(self):
         """
         This is a mapping between itou internal SIAE kinds and ASP ones
+
+        Only needed if profile.is_employed is True
+
+        MUST return None otherwise
         """
-        return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
+        if self.job_seeker_profile and self.job_seeker_profile.is_employed:
+            return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
+        return None
 
     @property
     def asp_prescriber_type(self):
