@@ -85,7 +85,6 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
             message = safestring.mark_safe(message)
 
             messages.success(request, message)
-            formset = NewPrescriberWithOrgInvitationFormSet(form_kwargs=form_kwargs)
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_prescriber_with_org")
@@ -141,7 +140,6 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
             message = safestring.mark_safe(message)
 
             messages.success(request, message)
-            formset = NewSiaeStaffInvitationFormSet(form_kwargs=form_kwargs)
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_siae_staff")
