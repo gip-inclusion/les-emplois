@@ -1,20 +1,20 @@
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from itou.users.models import User
 
 
 PASSWORD = "A23kf&!9jd"
 
 
 def get_confirm_email_url(request, email):
-    user = get_user_model().objects.get(email=email)
+    user = User.objects.get(email=email)
     user_email = user.emailaddress_set.first()
     return get_adapter().get_email_confirmation_url(request, EmailConfirmationHMAC(user_email))
 

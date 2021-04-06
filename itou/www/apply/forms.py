@@ -2,7 +2,6 @@ import datetime
 
 from dateutil.relativedelta import relativedelta
 from django import forms
-from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _, gettext_lazy
@@ -12,6 +11,7 @@ from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField
@@ -28,7 +28,7 @@ class UserExistsForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.user = get_user_model().objects.filter(email__iexact=email).first()
+        self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:
                 error = _("Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé.")
@@ -56,7 +56,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
             "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
@@ -93,7 +93,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = [
             "email",
             "first_name",
@@ -115,8 +115,8 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if get_user_model().email_already_exists(email):
-            raise forms.ValidationError(get_user_model().ERROR_EMAIL_ALREADY_EXISTS)
+        if User.email_already_exists(email):
+            raise forms.ValidationError(User.ERROR_EMAIL_ALREADY_EXISTS)
         return email
 
     def clean(self):
@@ -340,7 +340,7 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {"birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978.")}
 
@@ -363,7 +363,7 @@ class UserAddressForm(AddressFormMixin, forms.ModelForm):
             self.fields[field].required = True
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = ["address_line_1", "address_line_2", "post_code", "city_name", "city"]
 
 
@@ -482,7 +482,7 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         return sorted(users, key=lambda l: l[1])
 
     def _humanize_multiple_choice_for_users(self, user_ids, field_name):
-        users = get_user_model().objects.filter(pk__in=[int(user_id) for user_id in user_ids])
+        users = User.objects.filter(pk__in=[int(user_id) for user_id in user_ids])
         values = [user.get_full_name().title() for user in users]
         value = ", ".join(values)
         label = self.base_fields.get(field_name).label

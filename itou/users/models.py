@@ -404,7 +404,7 @@ class JobSeekerProfile(models.Model):
     ERROR_JOBSEEKER_PE_FIELDS = _("L'identifiant et la durée d'inscription à Pôle emploi vont de pair")
 
     user = models.OneToOneField(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         primary_key=True,
         verbose_name=_("Demandeur d'emploi"),

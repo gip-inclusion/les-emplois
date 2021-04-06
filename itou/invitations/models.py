@@ -3,13 +3,13 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
+from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.urls import get_absolute_url
@@ -172,7 +172,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         return get_absolute_url(acceptance_path)
 
     def add_invited_user_to_organization(self):
-        user = get_user_model().objects.get(email=self.email)
+        user = User.objects.get(email=self.email)
         self.organization.members.add(user)
         user.save()
         # We must be able to invite a former member of this prescriber organization
@@ -183,7 +183,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
             membership.save()
 
     def guest_can_join_organization(self, request):
-        user = get_object_or_404(get_user_model(), email=self.email)
+        user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_prescriber
 
     def set_guest_type(self, user):
@@ -246,7 +246,7 @@ class SiaeStaffInvitation(InvitationAbstract):
         return get_absolute_url(acceptance_path)
 
     def add_invited_user_to_siae(self):
-        user = get_user_model().objects.get(email=self.email)
+        user = User.objects.get(email=self.email)
         self.siae.members.add(user)
         user.save()
         # We must be able to invite a former member of this  SIAE
@@ -257,7 +257,7 @@ class SiaeStaffInvitation(InvitationAbstract):
             membership.save()
 
     def guest_can_join_siae(self, request):
-        user = get_object_or_404(get_user_model(), email=self.email)
+        user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_siae_staff
 
     def set_guest_type(self, user):

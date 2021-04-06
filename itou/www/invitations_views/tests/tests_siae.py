@@ -1,5 +1,4 @@
 from allauth.account.models import EmailAddress
-from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
@@ -10,6 +9,7 @@ from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
+from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.invitations_views.forms import NewSiaeStaffInvitationForm
 
@@ -189,7 +189,7 @@ class TestAcceptSiaeInvitation(TestCase):
         self.siae = SiaeWith2MembershipsFactory()
         self.sender = self.siae.members.first()
         self.invitation = SiaeSentInvitationFactory(sender=self.sender, siae=self.siae)
-        self.user = get_user_model()
+        self.user = User
         self.response = None
 
     def tearDown(self):
@@ -225,7 +225,7 @@ class TestAcceptSiaeInvitation(TestCase):
 
         self.response = self.client.post(self.invitation.acceptance_link, data=form_data, follow=True)
 
-        self.user = get_user_model().objects.get(email=self.invitation.email)
+        self.user = User.objects.get(email=self.invitation.email)
 
     def test_accept_existing_user_is_employer(self):
         self.user = SiaeWith2MembershipsFactory().members.first()
@@ -291,7 +291,7 @@ class TestAcceptSiaeInvitationExceptions(TestCase):
         self.siae = SiaeWith2MembershipsFactory()
         self.sender = self.siae.members.first()
         self.invitation = SiaeSentInvitationFactory(sender=self.sender, siae=self.siae)
-        self.user = get_user_model()
+        self.user = User
 
     def test_accept_existing_user_is_not_employer(self):
         self.user = PrescriberOrganizationWithMembershipFactory().members.first()

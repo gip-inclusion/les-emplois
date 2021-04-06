@@ -1,10 +1,10 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.approvals.models import Prolongation, Suspension
+from itou.users.models import User
 from itou.utils.widgets import DatePickerField
 
 
@@ -54,7 +54,7 @@ class DeclareProlongationForm(forms.ModelForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.validated_by = get_user_model().objects.filter(email=email).first()
+        self.validated_by = User.objects.filter(email=email).first()
         if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
             error = _("Cet utilisateur n'est pas un prescripteur habilité.")
             raise forms.ValidationError(error)

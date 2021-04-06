@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
@@ -7,6 +6,7 @@ from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationF
 from itou.invitations.models import SiaeStaffInvitation
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.users.factories import DEFAULT_PASSWORD, UserFactory
+from itou.users.models import User
 from itou.www.invitations_views.forms import NewSiaeStaffInvitationForm
 
 
@@ -155,7 +155,7 @@ class AcceptInvitationTest(TestCase):
         for key, data in form_data.items():
             self.assertEqual(form.fields[key].initial, data)
 
-        total_users_before = get_user_model().objects.count()
+        total_users_before = User.objects.count()
 
         # Fill in the password and send
         response = self.client.post(
@@ -164,13 +164,13 @@ class AcceptInvitationTest(TestCase):
             follow=True,
         )
 
-        total_users_after = get_user_model().objects.count()
+        total_users_after = User.objects.count()
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.wsgi_request.path, redirect_to)
         self.assertEqual((total_users_before + 1), total_users_after)
 
-        user = get_user_model().objects.get(email=invitation.email)
+        user = User.objects.get(email=invitation.email)
         self.assertTrue(user.emailaddress_set.first().verified)
 
     def test_accept_invitation_logged_in_user(self):
@@ -201,7 +201,7 @@ class AcceptInvitationTest(TestCase):
         # Fill in the password and send
         response = self.client.post(invitation.acceptance_link, data={**form_data}, follow=True)
 
-        user = get_user_model().objects.get(email=invitation.email)
+        user = User.objects.get(email=invitation.email)
         self.assertEqual(invitation.email, user.email)
 
     def test_accept_invitation_signup_weak_password(self):

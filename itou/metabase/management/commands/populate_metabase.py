@@ -24,7 +24,6 @@ import logging
 
 import psycopg2
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from tqdm import tqdm
@@ -44,6 +43,7 @@ from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabas
 from itou.metabase.management.commands._utils import chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
+from itou.users.models import User
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -296,8 +296,7 @@ class Command(BaseCommand):
         Note that job seeker id is anonymized.
         """
         queryset = (
-            get_user_model()
-            .objects.filter(is_job_seeker=True)
+            User.objects.filter(is_job_seeker=True)
             .prefetch_related(
                 "eligibility_diagnoses",
                 "eligibility_diagnoses__administrative_criteria",

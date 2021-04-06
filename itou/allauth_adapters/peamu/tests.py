@@ -7,10 +7,10 @@ from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.tests import OAuth2TestsMixin
 from allauth.tests import MockedResponse, TestCase
-from django.contrib.auth import get_user_model
 from django.core import mail
 
 from itou.allauth_adapters.peamu.provider import PEAMUProvider
+from itou.users.models import User
 
 
 class PEAMUTests(OAuth2TestsMixin, TestCase):
@@ -59,7 +59,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
     def test_peamu_connection_for_existing_non_peamu_user(self, mock_login_signal):
         email = "user@example.com"
-        user = get_user_model().objects.create(username="user", is_active=True, email=email, is_job_seeker=True)
+        user = User.objects.create(username="user", is_active=True, email=email, is_job_seeker=True)
         user.set_password("test")
         user.save()
         EmailAddress.objects.create(user=user, email=email, primary=True)
@@ -95,7 +95,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         email = "john.doe@example.com"
         self.login(self.get_mocked_response(email=email, given_name=first_name, family_name=last_name))
         self.assertEqual(mock_login_signal.call_count, 1)
-        user = get_user_model().objects.get(email=email)
+        user = User.objects.get(email=email)
         self.assertEqual(user.username, "jessica")
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")
@@ -105,7 +105,7 @@ class PEAMUTests(OAuth2TestsMixin, TestCase):
         email = "john.doe@example.com"
         self.login(self.get_mocked_response(email=email, given_name=first_name, family_name=last_name))
         self.assertEqual(mock_login_signal.call_count, 1)
-        user = get_user_model().objects.get(email=email)
+        user = User.objects.get(email=email)
         self.assertEqual(user.username, "john.doe")
 
     @mock.patch("itou.external_data.signals.import_user_pe_data_on_peamu_login")

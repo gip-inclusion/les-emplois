@@ -5,7 +5,6 @@ from allauth.account.forms import default_token_generator
 from allauth.account.models import EmailConfirmationHMAC
 from allauth.account.utils import user_pk_to_url_str
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -20,6 +19,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -106,8 +106,8 @@ class SiaeSignupTest(TestCase):
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-            self.assertFalse(get_user_model().objects.filter(email=user_email).exists())
-            user = get_user_model().objects.get(email=user_secondary_email)
+            self.assertFalse(User.objects.filter(email=user_email).exists())
+            user = User.objects.get(email=user_secondary_email)
 
             # Check `User` state.
             self.assertFalse(user.is_job_seeker)
@@ -198,7 +198,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
+        user = User.objects.get(email=post_data["email"])
         # Check that `username` is not overriden by django-allauth.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertTrue(user.is_job_seeker)
@@ -295,7 +295,7 @@ class PrescriberSignupTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
-        user = get_user_model().objects.get(email=post_data["email"])
+        user = User.objects.get(email=post_data["email"])
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
         self.assertFalse(user.is_siae_staff)
@@ -402,7 +402,7 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
+        user = User.objects.get(email=post_data["email"])
         # Check that `username` is not overriden by django-allauth.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
@@ -538,7 +538,7 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
+        user = User.objects.get(email=post_data["email"])
         # Check that `username` is not overriden by django-allauth.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
@@ -640,7 +640,7 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
+        user = User.objects.get(email=post_data["email"])
         # Check that `username` is not overriden by django-allauth.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
@@ -721,7 +721,7 @@ class PrescriberSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
-        user = get_user_model().objects.get(email=post_data["email"])
+        user = User.objects.get(email=post_data["email"])
         # Check that `username` is not overriden by django-allauth.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)

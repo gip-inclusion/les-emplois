@@ -4,7 +4,6 @@ from unittest import mock
 import pytz
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -19,6 +18,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
+from itou.users.models import User
 
 
 class ApplyAsJobSeekerTest(TestCase):
@@ -108,7 +108,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        user = get_user_model().objects.get(pk=user.pk)
+        user = User.objects.get(pk=user.pk)
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
         self.assertEqual(user.phone, post_data["phone"])
 
@@ -276,7 +276,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        new_job_seeker = get_user_model().objects.get(email=post_data["email"])
+        new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
@@ -457,7 +457,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        new_job_seeker = get_user_model().objects.get(email=post_data["email"])
+        new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
@@ -608,7 +608,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        new_job_seeker = get_user_model().objects.get(email=post_data["email"])
+        new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
@@ -795,7 +795,7 @@ class ApplyAsSiaeTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        new_job_seeker = get_user_model().objects.get(email=post_data["email"])
+        new_job_seeker = User.objects.get(email=post_data["email"])
 
         session = self.client.session
         session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]

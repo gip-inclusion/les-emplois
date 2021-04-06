@@ -1,7 +1,6 @@
 from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render, reverse
@@ -9,6 +8,7 @@ from django.utils import formats, safestring
 from django.utils.translation import gettext as _, ngettext as __
 
 from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
@@ -40,7 +40,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
             return redirect("account_logout")
 
     if invitation.can_be_accepted:
-        user = get_user_model().objects.filter(email__iexact=invitation.email)
+        user = User.objects.filter(email__iexact=invitation.email)
         if not user:
             form = NewUserForm(data=request.POST or None, invitation=invitation)
             context["form"] = form
