@@ -70,8 +70,8 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
 
     def _invited_user_exists_error(self, email):
         """
-        If the guest is already a user, he should be a prescriber
-        whether he belongs to another organization or not
+        If the guest is already a user, he should be a prescriber whether he
+        belongs to another organization or not
         """
         self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
@@ -87,10 +87,10 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
         invitation = invitation_model.objects.filter(email__iexact=email, organization=self.organization).first()
-        # We can re-invite *deactivated* members,
-        # even if they already received an invitation
-        user_is_member = self.organization.active_members.filter(email=email).exists()
         if invitation:
+            # We can re-invite *deactivated* members,
+            # even if they already received an invitation
+            user_is_member = self.organization.active_members.filter(email=email).exists()
             if invitation.accepted and user_is_member:
                 error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
                 self.add_error("email", error)
