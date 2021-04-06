@@ -66,6 +66,7 @@
 {% endblock %}
 
 {% block script %}
+    {{ block.super }}
     <script src="{% static 'js/formset_add_remove_row.js' %}"></script>
     <script type='text/javascript'>
         $(document).ready(function(){
