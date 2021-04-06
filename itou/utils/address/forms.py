@@ -1,10 +1,10 @@
 import django.forms as forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy
 
 from itou.cities.models import City
+from itou.users.models import User
 
 
 class AddressFormMixin(forms.Form):
@@ -28,19 +28,19 @@ class AddressFormMixin(forms.Form):
 
     address_line_1 = forms.CharField(
         required=False,
-        max_length=get_user_model()._meta.get_field("address_line_1").max_length,
+        max_length=User._meta.get_field("address_line_1").max_length,
         label=gettext_lazy("Adresse"),
     )
 
     address_line_2 = forms.CharField(
         required=False,
-        max_length=get_user_model()._meta.get_field("address_line_2").max_length,
+        max_length=User._meta.get_field("address_line_2").max_length,
         label=gettext_lazy("Complément d'adresse"),
     )
 
     post_code = forms.CharField(
         required=False,
-        max_length=get_user_model()._meta.get_field("post_code").max_length,
+        max_length=User._meta.get_field("post_code").max_length,
         label=gettext_lazy("Code postal"),
     )
 

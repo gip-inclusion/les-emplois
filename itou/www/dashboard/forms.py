@@ -1,5 +1,4 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy
 
@@ -7,6 +6,7 @@ from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
@@ -39,7 +39,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = [
             "first_name",
             "last_name",
@@ -93,7 +93,7 @@ class EditUserEmailForm(forms.Form):
         email = self.cleaned_data["email"]
         if email == self.user_email:
             raise ValidationError(gettext_lazy("Veuillez indiquer une adresse différente de l'actuelle."))
-        if get_user_model().objects.filter(email=email):
+        if User.objects.filter(email=email):
             raise ValidationError(gettext_lazy("Cette adresse est déjà utilisée par un autre utilisateur."))
         return email
 

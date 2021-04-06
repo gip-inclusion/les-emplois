@@ -3,7 +3,6 @@ from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -29,6 +28,7 @@ from itou.jobs.models import Appellation
 from itou.siaes.factories import SiaeFactory, SiaeWithMembershipAndJobsFactory
 from itou.siaes.models import Siae
 from itou.users.factories import JobSeekerFactory, SiaeStaffFactory, UserFactory
+from itou.users.models import User
 from itou.utils.templatetags import format_filters
 
 
@@ -159,7 +159,7 @@ class JobApplicationQuerySetTest(TestCase):
 
         self.assertEqual(JobApplication.objects.count(), 3)
         self.assertEqual(len(unique_job_seekers), 2)
-        self.assertEqual(type(unique_job_seekers[0]), get_user_model())
+        self.assertEqual(type(unique_job_seekers[0]), User)
 
     def test_with_has_suspended_approval(self):
         job_app = JobApplicationSentByJobSeekerFactory()

@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
@@ -77,7 +76,7 @@ class JobSeekerExternalData(models.Model):
     data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
     user = models.OneToOneField(
-        get_user_model(), verbose_name=_("Demandeur d'emploi"), on_delete=models.CASCADE, primary_key=True
+        settings.AUTH_USER_MODEL, verbose_name=_("Demandeur d'emploi"), on_delete=models.CASCADE, primary_key=True
     )
 
     # Is the user a job seeker ? (from PE perspective)

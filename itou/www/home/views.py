@@ -5,12 +5,12 @@ import json
 import logging
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseServerError
 from django.shortcuts import get_object_or_404, render
 from django.utils.encoding import force_bytes
 from django.views.decorators.csrf import csrf_exempt
 
+from itou.users.models import User
 from itou.utils.tokens import resume_signer
 from itou.www.search.forms import SiaeSearchForm
 
@@ -46,7 +46,7 @@ def update_resume_link(request):
     response = json.loads(request.read().decode("utf-8"))
     job_seeker_pk = response["form_response"]["hidden"]["job_seeker_pk"]
     job_seeker_pk = int(resume_signer.unsign(job_seeker_pk))
-    user = get_object_or_404(get_user_model(), pk=job_seeker_pk)
+    user = get_object_or_404(User, pk=job_seeker_pk)
 
     resume_link = response["form_response"]["answers"][0]["file_url"]
     user.resume_link = resume_link

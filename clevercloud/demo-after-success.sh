@@ -34,9 +34,9 @@ ls -d $APP_HOME/itou/fixtures/django/* | xargs django-admin loaddata
 echo "Updating super admin password"
 django-admin shell <<EOF
 import os
-from django.contrib.auth import get_user_model
+from itou.users.models import User
 password = os.environ.get("ADMIN_PASSWORD")
-user = get_user_model().objects.get(email="admin@test.com")
+user = User.objects.get(email="admin@test.com")
 user.set_password(password)
 user.save()
 EOF

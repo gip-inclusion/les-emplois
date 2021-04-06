@@ -1,6 +1,5 @@
 from allauth.account.models import EmailAddress
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
@@ -12,6 +11,7 @@ from itou.prescribers.factories import PrescriberOrganizationWithMembershipFacto
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
+from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.invitations_views.forms import NewPrescriberWithOrgInvitationForm
 
@@ -173,7 +173,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.org.save()
         self.sender = self.org.members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.org)
-        self.user = get_user_model()
+        self.user = User
         self.response = None
 
     def tearDown(self):
@@ -214,7 +214,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
 
         self.response = self.client.post(self.invitation.acceptance_link, data=form_data, follow=True)
 
-        self.user = get_user_model().objects.get(email=self.invitation.email)
+        self.user = User.objects.get(email=self.invitation.email)
 
     def test_accept_existing_user_is_prescriber_without_org(self):
         self.user = PrescriberFactory()
@@ -269,7 +269,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.org = PrescriberOrganizationWithMembershipFactory()
         self.sender = self.org.members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.org)
-        self.user = get_user_model()
+        self.user = User
 
     def test_existing_user_is_not_prescriber(self):
         self.user = SiaeWithMembershipFactory().members.first()
