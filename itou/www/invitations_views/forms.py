@@ -37,22 +37,6 @@ class NewInvitationMixinForm(forms.ModelForm):
             invitation.save()
         return invitation
 
-    def _invited_user_exists_error(self, email):
-        user = User.objects.filter(email__iexact=email).first()
-        if user:
-            error = forms.ValidationError(_("Cet utilisateur existe déjà."))
-            self.add_error("email", error)
-
-    def _extend_expiration_date_or_error(self, email):
-        invitation_model = self.Meta.model
-        invitation = invitation_model.objects.filter(email__iexact=email).first()
-        if invitation:
-            if invitation.has_expired:
-                invitation.extend_expiration_date()
-            else:
-                error = forms.ValidationError(_("Cette personne a déjà été invitée."))
-                self.add_error("email", error)
-
 
 ########################################################################
 ##################### PrescriberWithOrg invitation #####################
