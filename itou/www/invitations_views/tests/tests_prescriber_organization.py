@@ -307,6 +307,6 @@ class TestNewPrescriberOrganizationForm(TestCase):
         org = PrescriberOrganizationWithMembershipFactory()
         sender = org.members.first()
         form = NewPrescriberWithOrgInvitationForm(sender=sender, organization=org)
-        form.save()
-        invitation = PrescriberWithOrgInvitation.objects.get(sender=sender)
+        invitation = form.save()
+        self.assertEqual(invitation.sender, sender)
         self.assertEqual(invitation.organization.pk, org.pk)

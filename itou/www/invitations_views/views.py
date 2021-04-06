@@ -65,26 +65,27 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
     if request.POST:
         if formset.is_valid():
             invitations = formset.save()
-            count = len(formset.forms)
 
+            for invitation in invitations:
+                invitation.send()
+
+            count = len(formset.forms)
             message_singular = (
                 "Votre invitation a été envoyée par courriel.<br>"
                 "Pour rejoindre votre organisation, il suffira simplement à votre invité(e) "
                 "de cliquer sur le lien de validation contenu dans le courriel.<br>"
             )
-
             message_plural = (
                 "Vos invitations ont été envoyées par courriel.<br>"
                 "Pour rejoindre votre organisation, il suffira simplement à vos invités "
                 "de cliquer sur le lien de validation contenu dans le courriel.<br>"
             )
-
             message = __(message_singular, message_plural, count) % {"count": count}
             expiration_date = formats.date_format(invitations[0].expiration_date)
             message += _(f"Le lien de validation est valable jusqu'au {expiration_date}.")
             message = safestring.mark_safe(message)
-
             messages.success(request, message)
+
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_prescriber_with_org")
@@ -120,26 +121,27 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
     if request.POST:
         if formset.is_valid():
             invitations = formset.save()
-            count = len(formset.forms)
 
+            for invitation in invitations:
+                invitation.send()
+
+            count = len(formset.forms)
             message_singular = (
                 "Votre invitation a été envoyée par e-mail.<br>"
                 "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
                 "sur le lien de validation reçu dans le courriel.<br>"
             )
-
             message_plural = (
                 "Vos invitations ont été envoyées par e-mail.<br>"
                 "Pour rejoindre votre organisation, vos invités peuvent désormais "
                 "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
             )
-
             message = __(message_singular, message_plural, count) % {"count": count}
             expiration_date = formats.date_format(invitations[0].expiration_date)
             message += _(f"Le lien de validation est valable jusqu'au {expiration_date}.")
             message = safestring.mark_safe(message)
-
             messages.success(request, message)
+
             return redirect(request.path)
 
     form_post_url = reverse("invitations_views:invite_siae_staff")
