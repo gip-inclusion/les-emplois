@@ -10,14 +10,12 @@ from itou.users.models import User
 from itou.www.invitations_views.forms import NewSiaeStaffInvitationForm
 
 
-BASE_INVITATION_MODEL = SiaeStaffInvitation
 NEW_INVITATION_URL = reverse("invitations_views:invite_siae_staff")
 
 
 class SendInvitationTest(TestCase):
     def setUp(self):
         self.new_invitation_url = NEW_INVITATION_URL
-        self.invitation_model = BASE_INVITATION_MODEL
         self.guest = UserFactory.build(first_name="Léonie", last_name="Bathiat")
         self.siae = SiaeWith2MembershipsFactory()
         self.sender = self.siae.members.first()
@@ -52,10 +50,10 @@ class SendInvitationTest(TestCase):
             fetch_redirect_response=True,
         )
 
-        invitations = self.invitation_model.objects.count()
+        invitations = SiaeStaffInvitation.objects.count()
         self.assertEqual(invitations, 1)
 
-        invitation = self.invitation_model.objects.first()
+        invitation = SiaeStaffInvitation.objects.first()
         self.assertEqual(invitation.sender.pk, self.sender.pk)
 
         # Make sure a success message is present
@@ -75,7 +73,7 @@ class SendInvitationTest(TestCase):
         response = self.client.post(self.new_invitation_url, data=self.post_data)
         self.assertEqual(response.status_code, 200)
 
-        invitations = self.invitation_model.objects.count()
+        invitations = SiaeStaffInvitation.objects.count()
         self.assertEqual(invitations, 0)
 
     def test_send_multiple_invitations(self):
@@ -99,7 +97,7 @@ class SendInvitationTest(TestCase):
         }
 
         self.client.post(self.new_invitation_url, data=data)
-        invitations = self.invitation_model.objects.count()
+        invitations = SiaeStaffInvitation.objects.count()
         self.assertEqual(invitations, 2)
 
     def test_send_multiple_invitations_duplicated_email(self):
@@ -135,7 +133,7 @@ class SendInvitationTest(TestCase):
             fetch_redirect_response=True,
         )
 
-        invitations = self.invitation_model.objects.count()
+        invitations = SiaeStaffInvitation.objects.count()
         self.assertEqual(invitations, 2)
 
 
