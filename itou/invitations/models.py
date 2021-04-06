@@ -116,8 +116,8 @@ class InvitationAbstract(models.Model):
     def send(self):
         self.sent = True
         self.sent_at = timezone.now()
-        self.send_invitation()
         self.save()
+        self.send_invitation()
 
     def set_guest_type(self, user):
         user.is_job_seeker = True
