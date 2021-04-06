@@ -5,37 +5,9 @@ from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.invitations.models import PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
-
-
-class NewInvitationMixinForm(forms.ModelForm):
-    """
-    ModelForm based on an abstract class. It should not be used alone!
-    Inherit from it when you need a new kind of invitation.
-    """
-
-    class Meta:
-        model = InvitationAbstract
-        fields = ["first_name", "last_name", "email"]
-
-    def __init__(self, sender, *args, **kwargs):
-        self.sender = sender
-        super().__init__(*args, **kwargs)
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        self._invited_user_exists_error(email)
-        self._extend_expiration_date_or_error(email)
-        return email
-
-    def save(self, commit=True, *args, **kwargs):
-        invitation = super().save(commit=False)
-        invitation.sender = self.sender
-        if commit:
-            invitation.save()
-        return invitation
 
 
 ########################################################################
@@ -43,14 +15,15 @@ class NewInvitationMixinForm(forms.ModelForm):
 ########################################################################
 
 
-class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
+class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
     class Meta:
-        fields = NewInvitationMixinForm.Meta.fields
         model = PrescriberWithOrgInvitation
+        fields = ["first_name", "last_name", "email"]
 
     def __init__(self, sender, organization, *args, **kwargs):
+        self.sender = sender
         self.organization = organization
-        super().__init__(sender=sender, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _invited_user_exists_error(self, email):
         """
@@ -79,10 +52,14 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
                 error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
                 self.add_error("email", error)
             else:
+                # FIXME Wrong instance
                 invitation.extend_expiration_date()
 
     def clean_email(self):
-        email = super().clean_email()
+        email = self.cleaned_data["email"]
+
+        self._invited_user_exists_error(email)
+        self._extend_expiration_date_or_error(email)
         if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith(
             settings.POLE_EMPLOI_EMAIL_SUFFIX
         ):
@@ -92,6 +69,7 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
 
     def save(self, *args, **kwargs):
         invitation = super().save(commit=False)
+        invitation.sender = self.sender
         invitation.organization = self.organization
         invitation.save()
         return invitation
@@ -128,14 +106,15 @@ NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
 #############################################################
 
 
-class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
+class NewSiaeStaffInvitationForm(forms.ModelForm):
     class Meta:
-        fields = NewInvitationMixinForm.Meta.fields
+        fields = ["first_name", "last_name", "email"]
         model = SiaeStaffInvitation
 
     def __init__(self, sender, siae, *args, **kwargs):
+        self.sender = sender
         self.siae = siae
-        super().__init__(sender=sender, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _invited_user_exists_error(self, email):
         """
@@ -165,8 +144,15 @@ class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
             else:
                 invitation.extend_expiration_date()
 
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        self._invited_user_exists_error(email)
+        self._extend_expiration_date_or_error(email)
+        return email
+
     def save(self, *args, **kwargs):
         invitation = super().save(commit=False)
+        invitation.sender = self.sender
         invitation.siae = self.siae
         invitation.save()
         return invitation
