@@ -37,16 +37,15 @@ class TestSendSiaeInvitation(TestCase):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.send_invitation_url = reverse("invitations_views:invite_siae_staff")
 
-    def tearDown(self):
-        invitation_query = self.invitations_model.objects.filter(siae=self.siae)
-        self.assertTrue(invitation_query.exists())
-        invitation = invitation_query.first()
+    def assert_invitation_created(self):
+        invitation = self.invitations_model.objects.filter(siae=self.siae).first()
         self.assertEqual(invitation.first_name, self.guest.first_name)
         self.assertEqual(invitation.last_name, self.guest.last_name)
         self.assertEqual(invitation.email, self.guest.email)
 
     def test_invite_not_existing_user(self):
         self.client.post(self.send_invitation_url, data=self.post_data)
+        self.assert_invitation_created()
 
     def test_invite_existing_user_is_employer(self):
         self.guest = SiaeWith2MembershipsFactory().members.first()
@@ -55,6 +54,7 @@ class TestSendSiaeInvitation(TestCase):
         self.post_data["form-0-email"] = self.guest.email
         response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
         self.assertContains(response, "Votre invitation a été envoyée par e-mail")
+        self.assert_invitation_created()
 
     def test_invite_existing_user_with_existing_inactive_siae(self):
         """
@@ -70,10 +70,12 @@ class TestSendSiaeInvitation(TestCase):
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("invitations_views:invite_siae_staff"))
+        self.assert_invitation_created()
 
     def test_two_employers_invite_the_same_guest(self):
         # SIAE 1 invites guest.
         self.client.post(self.send_invitation_url, data=self.post_data)
+        self.assert_invitation_created()
 
         # SIAE 2 invites guest as well.
         siae_2 = SiaeWith2MembershipsFactory()
@@ -89,9 +91,7 @@ class TestSendSiaeInvitation(TestCase):
             "form-0-email": self.guest.email,
         }
         self.client.post(self.send_invitation_url, data=post_data)
-        invitation_query = self.invitations_model.objects.filter(siae=siae_2)
-        self.assertTrue(invitation_query.exists())
-        invitation = invitation_query.first()
+        invitation = self.invitations_model.objects.get(siae=siae_2)
         self.assertEqual(invitation.first_name, self.guest.first_name)
         self.assertEqual(invitation.last_name, self.guest.last_name)
         self.assertEqual(invitation.email, self.guest.email)
@@ -119,6 +119,7 @@ class TestSendSiaeInvitation(TestCase):
         self.assertEqual(response.status_code, 200)
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("invitations_views:invite_siae_staff"))
+        self.assert_invitation_created()
 
 
 class TestSendSiaeInvitationExceptions(TestCase):
@@ -128,8 +129,8 @@ class TestSendSiaeInvitationExceptions(TestCase):
         self.send_invitation_url = reverse("invitations_views:invite_siae_staff")
         self.invitations_model = SiaeStaffInvitation
 
-    def tearDown(self):
-        invitation_query = self.invitations_model.objects.filter(siae=self.siae)
+    def assert_no_invitations(self):
+        invitation_query = self.invitations_model.objects.all()
         self.assertFalse(invitation_query.exists())
 
     def test_invite_existing_user_is_prescriber(self):
@@ -148,6 +149,7 @@ class TestSendSiaeInvitationExceptions(TestCase):
         # Make sure form is not valid
         self.assertFalse(response.context["formset"].is_valid())
         self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assert_no_invitations()
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
@@ -165,6 +167,7 @@ class TestSendSiaeInvitationExceptions(TestCase):
         # Make sure form is not valid
         self.assertFalse(response.context["formset"].is_valid())
         self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assert_no_invitations()
 
     def test_already_a_member(self):
         # The invited user is already a member
@@ -183,6 +186,7 @@ class TestSendSiaeInvitationExceptions(TestCase):
         # Make sure form is not valid
         self.assertFalse(response.context["formset"].is_valid())
         self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assert_no_invitations()
 
 
 class TestAcceptSiaeInvitation(TestCase):
@@ -193,7 +197,7 @@ class TestAcceptSiaeInvitation(TestCase):
         self.user = User
         self.response = None
 
-    def tearDown(self):
+    def assert_accepted_invitation(self):
         self.assertEqual(self.response.status_code, 200)
         self.user.refresh_from_db()
         self.invitation.refresh_from_db()
@@ -227,6 +231,7 @@ class TestAcceptSiaeInvitation(TestCase):
         self.response = self.client.post(self.invitation.acceptance_link, data=form_data, follow=True)
 
         self.user = User.objects.get(email=self.invitation.email)
+        self.assert_accepted_invitation()
 
     def test_accept_existing_user_is_employer(self):
         self.user = SiaeWith2MembershipsFactory().members.first()
@@ -242,6 +247,7 @@ class TestAcceptSiaeInvitation(TestCase):
 
         current_siae = get_current_siae_or_404(self.response.wsgi_request)
         self.assertEqual(self.invitation.siae.pk, current_siae.pk)
+        self.assert_accepted_invitation()
 
     def test_accept_existing_user_with_existing_inactive_siae(self):
         """
@@ -262,6 +268,7 @@ class TestAcceptSiaeInvitation(TestCase):
 
         current_siae = get_current_siae_or_404(self.response.wsgi_request)
         self.assertEqual(self.invitation.siae.pk, current_siae.pk)
+        self.assert_accepted_invitation()
 
     def test_accept_existing_user_not_logged_in(self):
         self.user = SiaeWith2MembershipsFactory().members.first()
@@ -285,6 +292,7 @@ class TestAcceptSiaeInvitation(TestCase):
             follow=True,
         )
         self.assertTrue(self.response.wsgi_request.user.is_authenticated)
+        self.assert_accepted_invitation()
 
 
 class TestAcceptSiaeInvitationExceptions(TestCase):
