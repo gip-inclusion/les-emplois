@@ -35,7 +35,6 @@ class NewInvitationMixinForm(forms.ModelForm):
         invitation.sender = self.sender
         if commit:
             invitation.save()
-            invitation.send()
         return invitation
 
     def _invited_user_exists_error(self, email):
@@ -111,7 +110,6 @@ class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
         invitation = super().save(commit=False)
         invitation.organization = self.organization
         invitation.save()
-        invitation.send()
         return invitation
 
 
@@ -187,7 +185,6 @@ class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
         invitation = super().save(commit=False)
         invitation.siae = self.siae
         invitation.save()
-        invitation.send()
         return invitation
 
 

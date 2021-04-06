@@ -106,8 +106,8 @@ class InvitationAbstract(models.Model):
     def accept(self):
         self.accepted = True
         self.accepted_at = timezone.now()
-        self.accepted_notif_sender()
         self.save()
+        self.accepted_notif_sender()
 
     def extend_expiration_date(self):
         self.sent_at = timezone.now()
