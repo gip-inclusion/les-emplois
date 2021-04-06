@@ -53,7 +53,8 @@ class TestSendSiaeInvitation(TestCase):
         self.post_data["form-0-first_name"] = self.guest.first_name
         self.post_data["form-0-last_name"] = self.guest.last_name
         self.post_data["form-0-email"] = self.guest.email
-        self.client.post(self.send_invitation_url, data=self.post_data)
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertContains(response, "Votre invitation a été envoyée par e-mail")
 
     def test_invite_existing_user_with_existing_inactive_siae(self):
         """
