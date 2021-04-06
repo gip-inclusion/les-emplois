@@ -10,7 +10,7 @@ from itou.users.models import User
 from itou.www.invitations_views.forms import NewSiaeStaffInvitationForm
 
 
-NEW_INVITATION_URL = reverse("invitations_views:invite_siae_staff")
+INVITATION_URL = reverse("invitations_views:invite_siae_staff")
 
 
 class SendInvitationTest(TestCase):
@@ -30,7 +30,7 @@ class SendInvitationTest(TestCase):
 
     def test_send_one_invitation(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(NEW_INVITATION_URL)
+        response = self.client.get(INVITATION_URL)
 
         # Assert form is present
         form = NewSiaeStaffInvitationForm(sender=self.sender, siae=self.siae)
@@ -38,11 +38,11 @@ class SendInvitationTest(TestCase):
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
 
-        response = self.client.post(NEW_INVITATION_URL, data=self.post_data, follow=True)
+        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
 
         self.assertRedirects(
             response,
-            NEW_INVITATION_URL,
+            INVITATION_URL,
             status_code=302,
             target_status_code=200,
             msg_prefix="",
@@ -69,7 +69,7 @@ class SendInvitationTest(TestCase):
     def test_send_invitation_user_already_exists(self):
         self.guest.save()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.post(NEW_INVITATION_URL, data=self.post_data)
+        response = self.client.post(INVITATION_URL, data=self.post_data)
         self.assertEqual(response.status_code, 200)
 
         invitations = SiaeStaffInvitation.objects.count()
@@ -79,7 +79,7 @@ class SendInvitationTest(TestCase):
         invited_user = UserFactory.build()
         second_invited_user = UserFactory.build()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(NEW_INVITATION_URL)
+        response = self.client.get(INVITATION_URL)
 
         self.assertTrue(response.context["formset"])
         data = {
@@ -95,14 +95,14 @@ class SendInvitationTest(TestCase):
             "form-1-email": second_invited_user.email,
         }
 
-        self.client.post(NEW_INVITATION_URL, data=data)
+        self.client.post(INVITATION_URL, data=data)
         invitations = SiaeStaffInvitation.objects.count()
         self.assertEqual(invitations, 2)
 
     def test_send_multiple_invitations_duplicated_email(self):
         second_invited_user = UserFactory.build()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.get(NEW_INVITATION_URL)
+        response = self.client.get(INVITATION_URL)
 
         self.assertTrue(response.context["formset"])
         data = {
@@ -121,11 +121,11 @@ class SendInvitationTest(TestCase):
             "form-2-email": self.guest.email,
         }
 
-        response = self.client.post(NEW_INVITATION_URL, data=data, follow=True)
+        response = self.client.post(INVITATION_URL, data=data, follow=True)
 
         self.assertRedirects(
             response,
-            NEW_INVITATION_URL,
+            INVITATION_URL,
             status_code=302,
             target_status_code=200,
             msg_prefix="",
@@ -255,7 +255,7 @@ class NewInvitationFormTest(TestCase):
     def test_send_invitation_user_already_exists(self):
         self.guest.save()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.post(NEW_INVITATION_URL, data=self.data)
+        response = self.client.post(INVITATION_URL, data=self.data)
 
         for error_dict in response.context["formset"].errors:
             for key, errors in error_dict.items():
@@ -271,7 +271,7 @@ class NewInvitationFormTest(TestCase):
             email=self.guest.email,
         )
 
-        response = self.client.post(NEW_INVITATION_URL, data=self.data)
+        response = self.client.post(INVITATION_URL, data=self.data)
 
         for error_dict in response.context["formset"].errors:
             for key, errors in error_dict.items():
@@ -286,11 +286,11 @@ class NewInvitationFormTest(TestCase):
             email=self.guest.email,
         )
 
-        response = self.client.post(NEW_INVITATION_URL, data=self.data, follow=True)
+        response = self.client.post(INVITATION_URL, data=self.data, follow=True)
 
         self.assertRedirects(
             response,
-            NEW_INVITATION_URL,
+            INVITATION_URL,
             status_code=302,
             target_status_code=200,
             msg_prefix="",
