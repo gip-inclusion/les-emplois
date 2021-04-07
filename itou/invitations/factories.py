@@ -8,10 +8,7 @@ from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.users.factories import UserFactory
 
 
-# FIXME Wrong name
-class InvitationFactory(factory.django.DjangoModelFactory):
-    """Generate an Invitation() object for unit tests."""
-
+class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SiaeStaffInvitation
 
@@ -22,12 +19,13 @@ class InvitationFactory(factory.django.DjangoModelFactory):
     siae = factory.SubFactory(SiaeWith2MembershipsFactory)
 
 
-class SentInvitationFactory(InvitationFactory):
+class SentSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
     sent = True
     sent_at = factory.LazyFunction(timezone.now)
 
 
-class ExpiredInvitationFactory(SentInvitationFactory):
+class ExpiredSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
+    sent = True
     sent_at = factory.LazyAttribute(
         lambda self: timezone.now()
         - relativedelta(days=models.InvitationAbstract.EXPIRATION_DAYS)
@@ -35,7 +33,7 @@ class ExpiredInvitationFactory(SentInvitationFactory):
     )
 
 
-class SiaeSentInvitationFactory(SentInvitationFactory):
+class SiaeSentInvitationFactory(SentSiaeStaffInvitationFactory):
     """
     Same as InvitationFactory but lets us test
     Siae invitations specific use cases.
