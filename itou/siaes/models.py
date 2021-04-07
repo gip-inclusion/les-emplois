@@ -442,14 +442,14 @@ class SiaeMembership(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
-    def toggle_user_membership(self, user):
+    def deactivate_membership_by_user(self, user):
         """
-        Toggles the SIAE membership of a member (reference held by self)
+        Deactivates the SIAE membership of a member (reference held by self)
         `user` is the admin updating this user (`updated_by` field)
         """
-        self.is_active = not self.is_active
+        self.is_active = False
         self.updated_by = user
-        return self.is_active
+        return False
 
     def set_admin_role(self, active, user):
         """
