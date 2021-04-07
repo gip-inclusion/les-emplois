@@ -30,13 +30,13 @@ class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
         If the guest is already a user, he should be a prescriber whether he
         belongs to another organization or not
         """
-        self.user = User.objects.filter(email__iexact=email).first()
-        if self.user:
-            if not self.user.is_prescriber:
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            if not user.is_prescriber:
                 error = forms.ValidationError(_("Cet utilisateur n'est pas un prescripteur."))
                 self.add_error("email", error)
             else:
-                user_is_member = self.organization.active_members.filter(email=self.user.email).exists()
+                user_is_member = self.organization.active_members.filter(email=user.email).exists()
                 if user_is_member:
                     error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
                     self.add_error("email", error)
@@ -67,7 +67,7 @@ class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
             self.add_error("email", error)
         return email
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         invitation = super().save(commit=False)
         invitation.sender = self.sender
         invitation.organization = self.organization
@@ -89,9 +89,9 @@ class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
         self.forms[0].empty_permitted = False
 
 
-"""
-Formset used when a prescriber invites a person to join his structure.
-"""
+#
+# Formset used when a prescriber invites a person to join his structure.
+#
 NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
     PrescriberWithOrgInvitation,
     form=NewPrescriberWithOrgInvitationForm,
@@ -120,13 +120,13 @@ class NewSiaeStaffInvitationForm(forms.ModelForm):
         """
         An employer can only invite another employer to join his structure.
         """
-        self.user = User.objects.filter(email__iexact=email).first()
-        if self.user:
-            if not self.user.is_siae_staff:
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            if not user.is_siae_staff:
                 error = forms.ValidationError(_("Cet utilisateur n'est pas un employeur."))
                 self.add_error("email", error)
             else:
-                user_is_member = self.siae.active_members.filter(email=self.user.email).exists()
+                user_is_member = self.siae.active_members.filter(email=user.email).exists()
                 if user_is_member:
                     error = forms.ValidationError(_("Cette personne fait déjà partie de votre structure."))
                     self.add_error("email", error)
@@ -150,7 +150,7 @@ class NewSiaeStaffInvitationForm(forms.ModelForm):
         self._extend_expiration_date_or_error(email)
         return email
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         invitation = super().save(commit=False)
         invitation.sender = self.sender
         invitation.siae = self.siae
@@ -172,9 +172,9 @@ class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
         self.forms[0].empty_permitted = False
 
 
-"""
-Formset used when an employer invites other employers to join his structure.
-"""
+#
+# Formset used when an employer invites other employers to join his structure.
+#
 NewSiaeStaffInvitationFormSet = modelformset_factory(
     SiaeStaffInvitation, form=NewSiaeStaffInvitationForm, formset=SiaeStaffInvitationFormSet, extra=1, max_num=30
 )
