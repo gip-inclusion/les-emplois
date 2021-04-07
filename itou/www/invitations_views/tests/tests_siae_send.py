@@ -3,7 +3,7 @@ from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils import timezone
 
-from itou.invitations.factories import ExpiredInvitationFactory
+from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory
 from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWith2MembershipsFactory
@@ -113,7 +113,7 @@ class TestSendSingleSiaeInvitation(TestCase):
 
     def test_extend_expired_invitation(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        invitation = ExpiredInvitationFactory(
+        invitation = ExpiredSiaeStaffInvitationFactory(
             sender=self.sender,
             first_name=self.guest_data["first_name"],
             last_name=self.guest_data["last_name"],

@@ -4,7 +4,11 @@ from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 
-from itou.invitations.factories import ExpiredInvitationFactory, SentInvitationFactory, SiaeSentInvitationFactory
+from itou.invitations.factories import (
+    ExpiredSiaeStaffInvitationFactory,
+    SentSiaeStaffInvitationFactory,
+    SiaeSentInvitationFactory,
+)
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.users.factories import DEFAULT_PASSWORD, UserFactory
@@ -14,7 +18,7 @@ from itou.utils.perms.siae import get_current_siae_or_404
 
 class TestAcceptInvitation(TestCase):
     def test_accept_invitation_signup(self):
-        invitation = SentInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory()
 
         response = self.client.get(invitation.acceptance_link, follow=True)
         redirect_to = reverse("dashboard:index")
@@ -48,7 +52,7 @@ class TestAcceptInvitation(TestCase):
         # A logged in user should log out before accepting an invitation.
         logged_in_user = UserFactory()
         self.client.login(email=logged_in_user.email, password=DEFAULT_PASSWORD)
-        invitation = SentInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory()
         self.client.get(invitation.acceptance_link, follow=True)
 
         # FIXME I don't understand how it works, no changes, just a move and the test doesn't work anymore
@@ -56,7 +60,7 @@ class TestAcceptInvitation(TestCase):
         # self.assertEqual(response.wsgi_request.path, reverse("account_logout"))
 
     def test_accept_invitation_signup_changed_email(self):
-        invitation = SentInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory()
 
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertTrue(response.status_code, 200)
@@ -78,7 +82,7 @@ class TestAcceptInvitation(TestCase):
         self.assertEqual(invitation.email, user.email)
 
     def test_accept_invitation_signup_weak_password(self):
-        invitation = SentInvitationFactory()
+        invitation = SentSiaeStaffInvitationFactory()
         form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
 
         # Fill in the password and send
@@ -92,7 +96,7 @@ class TestAcceptInvitation(TestCase):
         self.assertTrue(response.wsgi_request.path, invitation.acceptance_link)
 
     def test_expired_invitation(self):
-        invitation = ExpiredInvitationFactory()
+        invitation = ExpiredSiaeStaffInvitationFactory()
 
         # User wants to join our website but it's too late!
         response = self.client.get(invitation.acceptance_link, follow=True)
@@ -100,12 +104,14 @@ class TestAcceptInvitation(TestCase):
         self.assertContains(response, "expirée")
 
     def test_non_existent_invitation(self):
-        invitation = SentInvitationFactory.build(first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com")
+        invitation = SentSiaeStaffInvitationFactory.build(
+            first_name="Léonie", last_name="Bathiat", email="leonie@bathiat.com"
+        )
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 404)
 
     def test_accepted_invitation(self):
-        invitation = SentInvitationFactory(accepted=True)
+        invitation = SentSiaeStaffInvitationFactory(accepted=True)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "acceptée")
@@ -158,7 +164,7 @@ class TestAcceptSiaeInvitation(TestCase):
 
     def test_accept_existing_user_is_employer(self):
         self.user = SiaeWith2MembershipsFactory().members.first()
-        self.invitation = SiaeSentInvitationFactory(
+        self.invitation = SentSiaeStaffInvitationFactory(
             sender=self.sender,
             siae=self.siae,
             first_name=self.user.first_name,
@@ -179,7 +185,7 @@ class TestAcceptSiaeInvitation(TestCase):
         We test here that this is indeed possible.
         """
         self.user = SiaeWith2MembershipsFactory(convention__is_active=False).members.first()
-        self.invitation = SiaeSentInvitationFactory(
+        self.invitation = SentSiaeStaffInvitationFactory(
             sender=self.sender,
             siae=self.siae,
             first_name=self.user.first_name,
@@ -197,7 +203,7 @@ class TestAcceptSiaeInvitation(TestCase):
         self.user = SiaeWith2MembershipsFactory().members.first()
         # The user verified its email
         EmailAddress(user_id=self.user.pk, email=self.user.email, verified=True, primary=True).save()
-        self.invitation = SiaeSentInvitationFactory(
+        self.invitation = SentSiaeStaffInvitationFactory(
             sender=self.sender,
             siae=self.siae,
             first_name=self.user.first_name,
@@ -219,7 +225,7 @@ class TestAcceptSiaeInvitation(TestCase):
 
     def test_accept_existing_user_is_not_employer(self):
         self.user = PrescriberOrganizationWithMembershipFactory().members.first()
-        self.invitation = SiaeSentInvitationFactory(
+        self.invitation = SentSiaeStaffInvitationFactory(
             sender=self.sender,
             siae=self.siae,
             first_name=self.user.first_name,
