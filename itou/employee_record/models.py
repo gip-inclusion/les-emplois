@@ -109,6 +109,9 @@ class EmployeeRecord(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Needed for serialization
+        self.asp_processing_code = None
+        self.asp_processing_label = None
         self.batch_line = 1
 
     def __str__(self):
