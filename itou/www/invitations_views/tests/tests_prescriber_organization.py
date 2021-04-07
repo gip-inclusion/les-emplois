@@ -13,7 +13,6 @@ from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.www.invitations_views.forms import NewPrescriberWithOrgInvitationForm
 
 
 class TestSendPrescriberWithOrgInvitation(TestCase):
@@ -61,10 +60,10 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.org.members.add(PrescriberFactory())
         self.sender = self.org.members.first()
 
-        self.guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
-        self.post_data["form-0-first_name"] = self.guest.first_name
-        self.post_data["form-0-last_name"] = self.guest.last_name
-        self.post_data["form-0-email"] = self.guest.email
+        guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
+        self.post_data["form-0-first_name"] = guest.first_name
+        self.post_data["form-0-last_name"] = guest.last_name
+        self.post_data["form-0-email"] = guest.email
 
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
@@ -77,21 +76,21 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         A deactivated member must be able to receive new invitations.
         """
         # Invite user (part 1)
-        self.guest = PrescriberFactory()
-        self.post_data["form-0-first_name"] = self.guest.first_name
-        self.post_data["form-0-last_name"] = self.guest.last_name
-        self.post_data["form-0-email"] = self.guest.email
+        guest = PrescriberFactory()
+        self.post_data["form-0-first_name"] = guest.first_name
+        self.post_data["form-0-last_name"] = guest.last_name
+        self.post_data["form-0-email"] = guest.email
         response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
         self.assertRedirects(response, self.send_invitation_url)
         self.assert_created_invitation()
 
         # Deactivate user
-        self.org.members.add(self.guest)
-        self.guest.save()
-        membership = self.guest.prescribermembership_set.first()
+        self.org.members.add(guest)
+        guest.save()
+        membership = guest.prescribermembership_set.first()
         membership.toggle_user_membership(self.org.members.first())
         membership.save()
-        self.assertFalse(self.guest in self.org.active_members)
+        self.assertFalse(guest in self.org.active_members)
         # Invite user (the revenge)
         response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
         self.assertRedirects(response, self.send_invitation_url)
