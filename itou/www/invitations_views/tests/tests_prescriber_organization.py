@@ -16,11 +16,6 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.www.invitations_views.forms import NewPrescriberWithOrgInvitationForm
 
 
-#####################################################################
-############################## Views ################################
-#####################################################################
-
-
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
         self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
@@ -302,18 +297,3 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertFalse(self.invitation.accepted)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-
-
-#####################################################################
-############################## Forms ################################
-#####################################################################
-
-
-class TestNewPrescriberOrganizationForm(TestCase):
-    def test_new_prescriber_with_org_form(self):
-        org = PrescriberOrganizationWithMembershipFactory()
-        sender = org.members.first()
-        form = NewPrescriberWithOrgInvitationForm(sender=sender, organization=org)
-        invitation = form.save()
-        self.assertEqual(invitation.sender, sender)
-        self.assertEqual(invitation.organization.pk, org.pk)
