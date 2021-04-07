@@ -131,7 +131,8 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn(self.guest_data["email"], mail.outbox[0].to)
 
-        # FIXME Should check other invitations in DB and the updated date
+        # but there is still only one invitation in DB
+        self.assertEqual(SiaeStaffInvitation.objects.count(), 1)
 
     def test_two_employers_invite_the_same_guest(self):
         # SIAE 1 invites guest.
