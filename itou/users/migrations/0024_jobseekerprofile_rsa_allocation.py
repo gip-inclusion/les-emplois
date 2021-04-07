@@ -5,8 +5,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [("users", "0024_jobseekerprofile_rsa_allocation"), ("users", "0025_auto_20210406_1829")]
-
     dependencies = [
         ("users", "0023_auto_20210322_1826"),
     ]
