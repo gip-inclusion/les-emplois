@@ -8,6 +8,7 @@ from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.users.factories import UserFactory
 
 
+# FIXME Wrong name
 class InvitationFactory(factory.django.DjangoModelFactory):
     """Generate an Invitation() object for unit tests."""
 

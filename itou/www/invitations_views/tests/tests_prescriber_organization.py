@@ -40,6 +40,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
 
     def tearDown(self):
+        # FIXME tearDown should be reserved to cleanup
+        # It's difficult to maintain tests where self is used to pass params
         invitation_query = self.invitations_model.objects.filter(organization=self.org)
         self.assertTrue(invitation_query.exists())
         invitation = invitation_query.first()
