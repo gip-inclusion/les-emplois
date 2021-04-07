@@ -39,28 +39,25 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
 
-    def tearDown(self):
-        # FIXME tearDown should be reserved to cleanup
-        # It's difficult to maintain tests where self is used to pass params
-        invitation_query = self.invitations_model.objects.filter(organization=self.org)
-        self.assertTrue(invitation_query.exists())
-        invitation = invitation_query.first()
-        self.assertEqual(invitation.first_name, self.guest.first_name)
-        self.assertEqual(invitation.last_name, self.guest.last_name)
-        self.assertEqual(invitation.email, self.guest.email)
-        self.assertEqual(self.response.status_code, 200)
-        # The user is redirected to the same page.
-        self.assertEqual(self.response.wsgi_request.path, self.send_invitation_url)
+    def assert_created_invitation(self):
+        invitation = PrescriberWithOrgInvitation.objects.get(organization=self.org)
+        self.assertEqual(invitation.first_name, self.post_data["form-0-first_name"])
+        self.assertEqual(invitation.last_name, self.post_data["form-0-last_name"])
+        self.assertEqual(invitation.email, self.post_data["form-0-email"])
 
     def test_invite_not_existing_user(self):
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertRedirects(response, self.send_invitation_url)
+        self.assert_created_invitation()
 
     def test_invite_existing_user_is_prescriber_without_org(self):
-        self.guest = PrescriberFactory()
-        self.post_data["form-0-first_name"] = self.guest.first_name
-        self.post_data["form-0-last_name"] = self.guest.last_name
-        self.post_data["form-0-email"] = self.guest.email
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        guest = PrescriberFactory()
+        self.post_data["form-0-first_name"] = guest.first_name
+        self.post_data["form-0-last_name"] = guest.last_name
+        self.post_data["form-0-email"] = guest.email
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertRedirects(response, self.send_invitation_url)
+        self.assert_created_invitation()
 
     def test_pe_organization_invitation_successful(self):
         self.client.logout()
@@ -68,13 +65,16 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.org = PrescriberPoleEmploiFactory()
         self.org.members.add(PrescriberFactory())
         self.sender = self.org.members.first()
+
         self.guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
         self.post_data["form-0-first_name"] = self.guest.first_name
         self.post_data["form-0-last_name"] = self.guest.last_name
         self.post_data["form-0-email"] = self.guest.email
 
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertRedirects(response, self.send_invitation_url)
+        self.assert_created_invitation()
 
     def test_invite_former_member(self):
         """
@@ -86,7 +86,10 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.post_data["form-0-first_name"] = self.guest.first_name
         self.post_data["form-0-last_name"] = self.guest.last_name
         self.post_data["form-0-email"] = self.guest.email
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertRedirects(response, self.send_invitation_url)
+        self.assert_created_invitation()
+
         # Deactivate user
         self.org.members.add(self.guest)
         self.guest.save()
@@ -95,7 +98,9 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         membership.save()
         self.assertFalse(self.guest in self.org.active_members)
         # Invite user (the revenge)
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
+        self.assertRedirects(response, self.send_invitation_url)
+        self.assert_created_invitation()
 
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
