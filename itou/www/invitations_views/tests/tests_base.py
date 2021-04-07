@@ -261,7 +261,7 @@ class NewInvitationFormTest(TestCase):
             for key, _errors in error_dict.items():
                 self.assertEqual(key, "email")
 
-    def test_send_invitation_existing_invitation(self):
+    def test_send_invitation_to_not_employer(self):
         self.guest.save()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         SentInvitationFactory(
@@ -276,6 +276,9 @@ class NewInvitationFormTest(TestCase):
         for error_dict in response.context["formset"].errors:
             for key, _errors in error_dict.items():
                 self.assertEqual(key, "email")
+                self.assertEqual(error_dict["email"][0], "Cet utilisateur n'est pas un employeur.")
+
+        self.assertEqual(SiaeStaffInvitation.objects.count(), 1)
 
     def test_send_invitation_expired(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
