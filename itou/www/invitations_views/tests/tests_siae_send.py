@@ -249,7 +249,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         # FIXME The comment is wrong and the test too because the wrong SIAE is used to toggle membership
         # BTW toggle is weak way to deactive (we're not sure about the initial state)
         membership = guest.siaemembership_set.first()
-        membership.toggle_user_membership(self.sender_siae.members.first())
+        membership.deactivate_membership_by_user(self.sender_siae.members.first())
         membership.save()
 
         self.post_data.update(

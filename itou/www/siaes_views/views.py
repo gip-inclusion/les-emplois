@@ -262,7 +262,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     if request.method == "POST":
         if user != target_member and user_is_admin:
             if membership.is_active:
-                membership.toggle_user_membership(user)
+                membership.deactivate_membership_by_user(user)
                 membership.save()
                 messages.success(
                     request,
