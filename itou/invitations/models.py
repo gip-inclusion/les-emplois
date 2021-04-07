@@ -37,7 +37,7 @@ class InvitationQuerySet(models.QuerySet):
 class InvitationAbstract(models.Model):
     # String representing the account type to use when logging in.
     # f"reverse("account_login")?account_type={account_type}"
-    SIGNIN_ACCOUNT_TYPE = None
+    SIGNIN_ACCOUNT_TYPE = ""
     EXPIRATION_DAYS = 14
     GUEST_TYPE_JOB_SEEKER = KIND_JOB_SEEKER
     GUEST_TYPE_PRESCRIBER = KIND_PRESCRIBER
