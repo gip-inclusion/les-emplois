@@ -57,7 +57,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
 
         self.organization = PrescriberPoleEmploiFactory()
         self.organization.members.add(PrescriberFactory())
-        self.sender = self.org.members.first()
+        self.sender = self.organization.members.first()
 
         guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
         self.post_data["form-0-first_name"] = guest.first_name
@@ -99,7 +99,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
-        self.sender = self.org.members.first()
+        self.sender = self.organization.members.first()
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
         self.post_data = {
             "form-TOTAL_FORMS": "1",
@@ -138,7 +138,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def test_already_a_member(self):
         # The invited user is already a member
         self.organization.members.add(PrescriberFactory())
-        guest = self.org.members.exclude(email=self.sender.email).first()
+        guest = self.organization.members.exclude(email=self.sender.email).first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
@@ -151,7 +151,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def test_pe_organization_invitation_unsuccessful(self):
         self.organization = PrescriberPoleEmploiFactory()
         self.organization.members.add(PrescriberFactory())
-        self.sender = self.org.members.first()
+        self.sender = self.organization.members.first()
         guest = UserFactory.build()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data.update(
