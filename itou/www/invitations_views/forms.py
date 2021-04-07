@@ -137,12 +137,15 @@ class NewSiaeStaffInvitationForm(forms.ModelForm):
         # We can re-invite *deactivated* members,
         # even if they already received an invitation
         user_is_member = self.siae.active_members.filter(email=email).exists()
+
         if invitation:
             if invitation.accepted and user_is_member:
                 error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
                 self.add_error("email", error)
             else:
-                invitation.extend_expiration_date()
+                # WARNING The form is now bound to this instance
+                self.instance = invitation
+                self.instance.extend_expiration_date()
 
     def clean_email(self):
         email = self.cleaned_data["email"]

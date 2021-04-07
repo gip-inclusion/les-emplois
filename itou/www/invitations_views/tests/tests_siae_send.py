@@ -111,13 +111,14 @@ class TestSendSingleSiaeInvitation(TestCase):
         # )
         pass
 
-    def test_send_invitation_expired(self):
+    def test_extend_expired_invitation(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         invitation = ExpiredInvitationFactory(
             sender=self.sender,
             first_name=self.guest_data["first_name"],
             last_name=self.guest_data["last_name"],
             email=self.guest_data["email"],
+            siae=self.siae,
         )
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         # Make sure a success message is present
