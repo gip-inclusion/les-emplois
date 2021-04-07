@@ -29,7 +29,6 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
             "form-0-last_name": self.guest_data["last_name"],
             "form-0-email": self.guest_data["email"],
         }
-        self.invitations_model = PrescriberWithOrgInvitation
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
 
@@ -102,7 +101,6 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.org.members.first()
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
-        self.invitations_model = PrescriberWithOrgInvitation
         self.post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
@@ -111,7 +109,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         }
 
     def tearDown(self):
-        invitation_query = self.invitations_model.objects.filter(organization=self.org)
+        invitation_query = PrescriberWithOrgInvitation.objects.filter(organization=self.org)
         self.assertFalse(invitation_query.exists())
         self.assertEqual(self.response.status_code, 200)
 
