@@ -68,7 +68,7 @@ class InvitationModelTest(TestCase):
         self.assertFalse(invitation.has_expired)
 
     def test_get_model_from_string(self):
-        invitation_type = SiaeStaffInvitationAbstract.get_model_from_string("siae_staff")
+        invitation_type = InvitationAbstract.get_model_from_string("siae_staff")
         self.assertEqual(invitation_type, SiaeStaffInvitation)
 
         with self.assertRaises(TypeError):

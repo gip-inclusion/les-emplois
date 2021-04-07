@@ -17,8 +17,8 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
-        self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
-        self.sender = self.org.members.first()
+        self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
+        self.sender = self.organization.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
         self.post_data = {
             "form-TOTAL_FORMS": "1",
@@ -33,7 +33,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
 
     def assert_created_invitation(self):
-        invitation = PrescriberWithOrgInvitation.objects.get(organization=self.org)
+        invitation = PrescriberWithOrgInvitation.objects.get(organization=self.organization)
         self.assertEqual(invitation.first_name, self.post_data["form-0-first_name"])
         self.assertEqual(invitation.last_name, self.post_data["form-0-last_name"])
         self.assertEqual(invitation.email, self.post_data["form-0-email"])
@@ -55,8 +55,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
     def test_pe_organization_invitation_successful(self):
         self.client.logout()
 
-        self.org = PrescriberPoleEmploiFactory()
-        self.org.members.add(PrescriberFactory())
+        self.organization = PrescriberPoleEmploiFactory()
+        self.organization.members.add(PrescriberFactory())
         self.sender = self.org.members.first()
 
         guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
@@ -84,12 +84,12 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.assert_created_invitation()
 
         # Deactivate user
-        self.org.members.add(guest)
+        self.organization.members.add(guest)
         guest.save()
         membership = guest.prescribermembership_set.first()
-        membership.deactivate_membership_by_user(self.org.members.first())
+        membership.deactivate_membership_by_user(self.organization.members.first())
         membership.save()
-        self.assertFalse(guest in self.org.active_members)
+        self.assertFalse(guest in self.organization.active_members)
         # Invite user (the revenge)
         response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
         self.assertRedirects(response, self.send_invitation_url)
@@ -98,7 +98,7 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
 
 class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
-        self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
+        self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.org.members.first()
         self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
         self.post_data = {
@@ -109,7 +109,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         }
 
     def tearDown(self):
-        invitation_query = PrescriberWithOrgInvitation.objects.filter(organization=self.org)
+        invitation_query = PrescriberWithOrgInvitation.objects.filter(organization=self.organization)
         self.assertFalse(invitation_query.exists())
         self.assertEqual(self.response.status_code, 200)
 
@@ -137,7 +137,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
 
     def test_already_a_member(self):
         # The invited user is already a member
-        self.org.members.add(PrescriberFactory())
+        self.organization.members.add(PrescriberFactory())
         guest = self.org.members.exclude(email=self.sender.email).first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data.update(
@@ -149,8 +149,8 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertTrue(self.response.context["formset"].errors[0].get("email"))
 
     def test_pe_organization_invitation_unsuccessful(self):
-        self.org = PrescriberPoleEmploiFactory()
-        self.org.members.add(PrescriberFactory())
+        self.organization = PrescriberPoleEmploiFactory()
+        self.organization.members.add(PrescriberFactory())
         self.sender = self.org.members.first()
         guest = UserFactory.build()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
@@ -165,13 +165,13 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
 
 class TestAcceptPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
-        self.org = PrescriberOrganizationWithMembershipFactory()
+        self.organization = PrescriberOrganizationWithMembershipFactory()
         # Create a second member to make sure emails are also
         # sent to regular members
-        self.org.members.add(PrescriberFactory())
-        self.org.save()
-        self.sender = self.org.members.first()
-        self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.org)
+        self.organization.members.add(PrescriberFactory())
+        self.organization.save()
+        self.sender = self.organization.members.first()
+        self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         self.user = None
         self.response = None
 
@@ -182,7 +182,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.assertTrue(self.user.is_prescriber)
         self.assertTrue(self.invitation.accepted)
         self.assertTrue(self.invitation.accepted_at)
-        self.assertEqual(self.org.members.count(), 3)
+        self.assertEqual(self.organization.members.count(), 3)
 
         self.assertEqual(reverse("dashboard:index"), self.response.wsgi_request.path)
         # Make sure there's a welcome message.
@@ -212,14 +212,13 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         }
 
         self.response = self.client.post(self.invitation.acceptance_link, data=form_data, follow=True)
-
         self.user = User.objects.get(email=self.invitation.email)
 
     def test_accept_existing_user_is_prescriber_without_org(self):
         self.user = PrescriberFactory()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
-            organization=self.org,
+            organization=self.organization,
             first_name=self.user.first_name,
             last_name=self.user.last_name,
             email=self.user.email,
@@ -231,7 +230,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.user = PrescriberOrganizationWithMembershipFactory().members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
-            organization=self.org,
+            organization=self.organization,
             first_name=self.user.first_name,
             last_name=self.user.last_name,
             email=self.user.email,
@@ -245,7 +244,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         EmailAddress(user_id=self.user.pk, email=self.user.email, verified=True, primary=True).save()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
-            organization=self.org,
+            organization=self.organization,
             first_name=self.user.first_name,
             last_name=self.user.last_name,
             email=self.user.email,
@@ -265,16 +264,16 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
 
 class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
-        self.org = PrescriberOrganizationWithMembershipFactory()
-        self.sender = self.org.members.first()
-        self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.org)
+        self.organization = PrescriberOrganizationWithMembershipFactory()
+        self.sender = self.organization.members.first()
+        self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         self.user = None
 
     def test_existing_user_is_not_prescriber(self):
         self.user = SiaeWithMembershipFactory().members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
-            organization=self.org,
+            organization=self.organization,
             first_name=self.user.first_name,
             last_name=self.user.last_name,
             email=self.user.email,
