@@ -14,7 +14,7 @@
    "pk": 2,
    "fields": {
       "user": 2,
-      "email": "job@test.com",
+      "email": "test+de@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
@@ -23,8 +23,8 @@
    "model": "account.emailaddress",
    "pk": 3,
    "fields": {
-      "user": 4,
-      "email": "siae@test.com",
+      "user": 3,
+      "email": "test+prescripteur@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
@@ -33,8 +33,8 @@
    "model": "account.emailaddress",
    "pk": 4,
    "fields": {
-      "user": 3,
-      "email": "prescriber@test.com",
+      "user": 4,
+      "email": "test+etti@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
@@ -44,7 +44,7 @@
    "pk": 5,
    "fields": {
       "user": 5,
-      "email": "prescriber-solo@test.com",
+      "email": "test+orienteur-solo@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
@@ -54,7 +54,7 @@
    "pk": 6,
    "fields": {
       "user": 6,
-      "email": "contact+siae2@inclusion.beta.gouv.fr",
+      "email": "test+ei@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
@@ -64,7 +64,7 @@
    "pk": 7,
    "fields": {
       "user": 7,
-      "email": "contact+orienteur@inclusion.beta.gouv.fr",
+      "email": "test+orienteur@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
@@ -74,7 +74,7 @@
    "pk": 8,
    "fields": {
       "user": 8,
-      "email": "contact+de2@inclusion.beta.gouv.fr",
+      "email": "test+de-proxy@inclusion.beta.gouv.fr",
       "verified": true,
       "primary": true
    }
