@@ -436,7 +436,10 @@ class JobSeekerProfile(models.Model):
     # this field is not a boolean, but has 3 different options
     # See asp.models.RSAAllocation for details
     has_rsa_allocation = models.CharField(
-        max_length=6, verbose_name=_("Salarié bénéficiaire du RSA"), choices=RSAAllocation.choices
+        max_length=6,
+        verbose_name=_("Salarié bénéficiaire du RSA"),
+        choices=RSAAllocation.choices,
+        default=RSAAllocation.NO,
     )
 
     rsa_allocation_since = models.CharField(

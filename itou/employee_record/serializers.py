@@ -99,7 +99,7 @@ class _EmployeeSituation(serializers.ModelSerializer):
     salarieOETH = serializers.BooleanField(source="jobseeker_profile.oeth_employee")
     salarieAideSociale = serializers.BooleanField(source="jobseeker_profile.has_social_allowance")
 
-    salarieBenefRSA = serializers.BooleanField(source="jobseeker_profile.has_rsa_allocation")
+    salarieBenefRSA = serializers.CharField(source="jobseeker_profile.has_rsa_allocation")
     salarieBenefRSADepuis = serializers.CharField(source="jobseeker_profile.rsa_allocation_since")
 
     salarieBenefASS = serializers.BooleanField(source="jobseeker_profile.has_ass_allocation")

@@ -253,6 +253,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
             "Aides et prestations sociales",
             {
                 "fields": (
+                    "has_rsa_allocation",
                     "rsa_allocation_since",
                     "ass_allocation_since",
                     "aah_allocation_since",
