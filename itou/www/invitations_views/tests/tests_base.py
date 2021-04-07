@@ -258,7 +258,7 @@ class NewInvitationFormTest(TestCase):
         response = self.client.post(INVITATION_URL, data=self.data)
 
         for error_dict in response.context["formset"].errors:
-            for key, errors in error_dict.items():
+            for key, _errors in error_dict.items():
                 self.assertEqual(key, "email")
 
     def test_send_invitation_existing_invitation(self):
@@ -274,7 +274,7 @@ class NewInvitationFormTest(TestCase):
         response = self.client.post(INVITATION_URL, data=self.data)
 
         for error_dict in response.context["formset"].errors:
-            for key, errors in error_dict.items():
+            for key, _errors in error_dict.items():
                 self.assertEqual(key, "email")
 
     def test_send_invitation_expired(self):
