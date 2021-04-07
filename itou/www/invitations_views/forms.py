@@ -52,8 +52,9 @@ class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
                 error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
                 self.add_error("email", error)
             else:
-                # FIXME Wrong instance
-                invitation.extend_expiration_date()
+                # WARNING The form is now bound to this instance
+                self.instance = invitation
+                self.instance.extend_expiration_date()
 
     def clean_email(self):
         email = self.cleaned_data["email"]
