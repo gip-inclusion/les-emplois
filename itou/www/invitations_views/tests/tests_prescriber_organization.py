@@ -175,7 +175,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.org.save()
         self.sender = self.org.members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.org)
-        self.user = User
+        self.user = None
         self.response = None
 
     def tearDown(self):
@@ -271,7 +271,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.org = PrescriberOrganizationWithMembershipFactory()
         self.sender = self.org.members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.org)
-        self.user = User
+        self.user = None
 
     def test_existing_user_is_not_prescriber(self):
         self.user = SiaeWithMembershipFactory().members.first()

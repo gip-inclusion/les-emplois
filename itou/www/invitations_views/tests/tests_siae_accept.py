@@ -122,8 +122,7 @@ class TestAcceptSiaeInvitation(TestCase):
         self.siae = SiaeWith2MembershipsFactory()
         self.sender = self.siae.members.first()
         self.invitation = SiaeSentInvitationFactory(sender=self.sender, siae=self.siae)
-        # FIXME OMG!
-        self.user = User
+        self.user = None
         self.response = None
 
     def assert_accepted_invitation(self):
