@@ -61,15 +61,15 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertIn(self.post_data["form-0-email"], outbox_emails)
 
     def test_send_invitation_user_already_exists(self):
+        self.guest.is_siae_staff = True
         self.guest.save()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.post(INVITATION_URL, data=self.post_data)
+        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         self.assertEqual(response.status_code, 200)
 
-        # FIXME Test nothing
-
+        # The guest will be able to join the structure
         invitations = SiaeStaffInvitation.objects.count()
-        self.assertEqual(invitations, 0)
+        self.assertEqual(invitations, 1)
 
     def test_send_invitation_to_not_employer(self):
         self.guest.save()
