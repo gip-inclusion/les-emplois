@@ -128,9 +128,8 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertTrue(invitation.sent)
 
         # Make sure an email has been sent to the invited person
-        # FIXME Should check the number of mails
-        outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
-        self.assertIn(self.guest_data["email"], outbox_emails)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(self.guest_data["email"], mail.outbox[0].to)
 
         # FIXME Should check other invitations in DB and the updated date
 
