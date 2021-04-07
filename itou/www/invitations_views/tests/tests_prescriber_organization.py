@@ -25,15 +25,15 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
         self.org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.org.members.first()
-        self.guest = UserFactory.build(first_name="Léonie", last_name="Bathiat")
+        self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
         self.post_data = {
             "form-TOTAL_FORMS": "1",
             "form-INITIAL_FORMS": "0",
             "form-MIN_NUM_FORMS": "",
             "form-MAX_NUM_FORMS": "",
-            "form-0-first_name": self.guest.first_name,
-            "form-0-last_name": self.guest.last_name,
-            "form-0-email": self.guest.email,
+            "form-0-first_name": self.guest_data["first_name"],
+            "form-0-last_name": self.guest_data["last_name"],
+            "form-0-email": self.guest_data["email"],
         }
         self.invitations_model = PrescriberWithOrgInvitation
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
