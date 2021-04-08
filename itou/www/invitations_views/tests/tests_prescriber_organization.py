@@ -1,6 +1,7 @@
+from datetime import timedelta
+
 from allauth.account.models import EmailAddress
 from django.conf import settings
-from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
@@ -295,3 +296,18 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertFalse(invitation.accepted)
         messages = list(response.context["messages"])
         self.assertEqual(len(messages), 1)
+
+    def test_expired_invitation_with_new_user(self):
+        invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
+        invitation.sent_at -= timedelta(days=invitation.EXPIRATION_DAYS)
+        invitation.save()
+        self.assertTrue(invitation.has_expired)
+
+        post_data = {
+            "first_name": invitation.first_name,
+            "last_name": invitation.last_name,
+            "password1": "Erls92#32",
+            "password2": "Erls92#32",
+        }
+        response = self.client.post(invitation.acceptance_link, data=post_data, follow=True)
+        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
