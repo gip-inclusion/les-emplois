@@ -74,70 +74,72 @@ ORGANIZATION_KIND_TO_READABLE_KIND = {
     PrescriberOrganization.Kind.OTHER: "Autre",
 }
 
-TABLE_COLUMNS = (
-    [
-        {"name": "id", "type": "integer", "comment": "ID organisation", "lambda": lambda o: o.id},
-        {"name": "nom", "type": "varchar", "comment": "Nom organisation", "lambda": lambda o: o.display_name},
-        {
-            "name": "type",
-            "type": "varchar",
-            "comment": "Type organisation (abrégé)",
-            "lambda": lambda o: ORGANIZATION_KIND_TO_READABLE_KIND.get(o.kind, o.kind),
-        },
-        {
-            "name": "type_complet",
-            "type": "varchar",
-            "comment": "Type organisation (détaillé)",
-            "lambda": lambda o: get_choice(choices=PrescriberOrganization.Kind.choices, key=o.kind),
-        },
-        {
-            "name": "habilitée",
-            "type": "boolean",
-            "comment": "Organisation habilitée par le Préfet",
-            "lambda": lambda o: o.is_authorized,
-        },
-    ]
-    + get_address_columns(comment_suffix=" de cette organisation")
-    + [
-        {
-            "name": "date_inscription",
-            "type": "date",
-            "comment": "Date inscription du premier compte prescripteur",
-            "lambda": get_org_first_join_date,
-        },
-        {
-            "name": "code_safir",
-            "type": "varchar",
-            "comment": "Code SAFIR Pôle Emploi",
-            "lambda": lambda o: o.code_safir_pole_emploi,
-        },
-        {
-            "name": "total_membres",
-            "type": "integer",
-            "comment": "Nombre de comptes prescripteurs rattachés à cette organisation",
-            "lambda": get_org_members_count,
-        },
-        {
-            "name": "total_candidatures",
-            "type": "integer",
-            "comment": "Nombre de candidatures émises par cette organisation",
-            "lambda": get_org_job_applications_count,
-        },
-        {
-            "name": "total_embauches",
-            "type": "integer",
-            "comment": "Nombre de candidatures en état accepté émises par cette organisation",
-            "lambda": get_org_accepted_job_applications_count,
-        },
-        {
-            "name": "date_dernière_candidature",
-            "type": "date",
-            "comment": "Date de la dernière création de candidature",
-            "lambda": get_org_last_job_application_creation_date,
-        },
-        {"name": "longitude", "type": "float", "comment": "Longitude", "lambda": lambda o: o.longitude},
-        {"name": "latitude", "type": "float", "comment": "Latitude", "lambda": lambda o: o.latitude},
-    ]
-    + get_establishment_last_login_date_column()
-    + get_establishment_is_active_column()
-)
+TABLE_COLUMNS = [
+    {"name": "id", "type": "integer", "comment": "ID organisation", "lambda": lambda o: o.id},
+    {"name": "nom", "type": "varchar", "comment": "Nom organisation", "lambda": lambda o: o.display_name},
+    {
+        "name": "type",
+        "type": "varchar",
+        "comment": "Type organisation (abrégé)",
+        "lambda": lambda o: ORGANIZATION_KIND_TO_READABLE_KIND.get(o.kind, o.kind),
+    },
+    {
+        "name": "type_complet",
+        "type": "varchar",
+        "comment": "Type organisation (détaillé)",
+        "lambda": lambda o: get_choice(choices=PrescriberOrganization.Kind.choices, key=o.kind),
+    },
+    {
+        "name": "habilitée",
+        "type": "boolean",
+        "comment": "Organisation habilitée par le Préfet",
+        "lambda": lambda o: o.is_authorized,
+    },
+]
+
+TABLE_COLUMNS += get_address_columns(comment_suffix=" de cette organisation")
+
+TABLE_COLUMNS += [
+    {
+        "name": "date_inscription",
+        "type": "date",
+        "comment": "Date inscription du premier compte prescripteur",
+        "lambda": get_org_first_join_date,
+    },
+    {
+        "name": "code_safir",
+        "type": "varchar",
+        "comment": "Code SAFIR Pôle Emploi",
+        "lambda": lambda o: o.code_safir_pole_emploi,
+    },
+    {
+        "name": "total_membres",
+        "type": "integer",
+        "comment": "Nombre de comptes prescripteurs rattachés à cette organisation",
+        "lambda": get_org_members_count,
+    },
+    {
+        "name": "total_candidatures",
+        "type": "integer",
+        "comment": "Nombre de candidatures émises par cette organisation",
+        "lambda": get_org_job_applications_count,
+    },
+    {
+        "name": "total_embauches",
+        "type": "integer",
+        "comment": "Nombre de candidatures en état accepté émises par cette organisation",
+        "lambda": get_org_accepted_job_applications_count,
+    },
+    {
+        "name": "date_dernière_candidature",
+        "type": "date",
+        "comment": "Date de la dernière création de candidature",
+        "lambda": get_org_last_job_application_creation_date,
+    },
+    {"name": "longitude", "type": "float", "comment": "Longitude", "lambda": lambda o: o.longitude},
+    {"name": "latitude", "type": "float", "comment": "Latitude", "lambda": lambda o: o.latitude},
+]
+
+TABLE_COLUMNS += get_establishment_last_login_date_column()
+
+TABLE_COLUMNS += get_establishment_is_active_column()

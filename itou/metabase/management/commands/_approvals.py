@@ -96,7 +96,9 @@ TABLE_COLUMNS = [
         "comment": "Nom de la structure qui a embauché si PASS IAE",
         "lambda": lambda o: getattr(get_siae_from_approval(o), "display_name", None),
     },
-] + get_department_and_region_columns(
+]
+
+TABLE_COLUMNS += get_department_and_region_columns(
     name_suffix="_structure_ou_org_pe",
     comment_suffix=(" de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"),
     custom_lambda=get_siae_or_pe_org_from_approval,
