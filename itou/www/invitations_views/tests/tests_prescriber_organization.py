@@ -161,6 +161,9 @@ class TestPEOrganizationInvitation(TestCase):
         )
 
 
+DASHBOARD_URL = reverse("dashboard:index")
+
+
 class TestAcceptPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
         self.organization = PrescriberOrganizationWithMembershipFactory()
@@ -172,19 +175,22 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
 
     def assert_invitation_is_accepted(self, response, user):
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, DASHBOARD_URL)
+
         user.refresh_from_db()
         self.invitation.refresh_from_db()
         self.assertTrue(user.is_prescriber)
+
         self.assertTrue(self.invitation.accepted)
         self.assertTrue(self.invitation.accepted_at)
         self.assertEqual(self.organization.members.count(), 3)
 
-        self.assertEqual(reverse("dashboard:index"), response.wsgi_request.path)
         # Make sure there's a welcome message.
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(len(messages), 1)
+        messages = list(response.context["messages"])
         self.assertEqual(messages[0].level_tag, "success")
+        self.assertEqual(
+            str(messages[0]), f"Vous êtes désormais membre de l'organisation {self.organization.display_name}."
+        )
 
         # A confirmation e-mail is sent to the invitation sender.
         self.assertEqual(len(mail.outbox), 1)
@@ -246,7 +252,6 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             email=user.email,
         )
         response = self.client.get(self.invitation.acceptance_link, follow=True)
-
         self.assertIn(reverse("account_login"), response.wsgi_request.get_full_path())
         self.assertFalse(self.invitation.accepted)
 
@@ -255,7 +260,7 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             data={"login": user.email, "password": DEFAULT_PASSWORD},
             follow=True,
         )
-        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        self.assertTrue(response.context["user"].is_authenticated)
         self.assert_invitation_is_accepted(response, user)
 
 
@@ -278,15 +283,13 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
 
         self.client.login(email=self.user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(self.invitation.acceptance_link, follow=True)
-
         self.assertEqual(response.status_code, 403)
         self.assertFalse(self.invitation.accepted)
 
     def test_connected_user_is_not_the_invited_user(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         response = self.client.get(self.invitation.acceptance_link, follow=True)
-
-        self.assertEqual(reverse("account_logout"), response.wsgi_request.path)
+        self.assertRedirects(response, reverse("account_logout"))
         self.assertFalse(self.invitation.accepted)
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(response.context["messages"])
         self.assertEqual(len(messages), 1)
