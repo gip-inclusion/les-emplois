@@ -24,7 +24,7 @@
 # -----------------------------------------------------------------
 
 echo "Loading cities"
-PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD psql -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER -d $DEMO_APP_DB_NAME -f $APP_HOME/itou/fixtures/postgres/cities.sql
+PGPASSWORD=$POSTGRESQL_ADDON_PASSWORD pg_restore -d $DEMO_APP_DB_NAME -h $POSTGRESQL_ADDON_HOST -p $POSTGRESQL_ADDON_PORT -U $POSTGRESQL_ADDON_USER --if-exists --clean --no-owner --no-privileges $APP_HOME/itou/fixtures/postgres/cities.sql
 
 # `ls $APP_HOME` does not work as the current user
 # does not have execution rights on the $APP_HOME directory.
