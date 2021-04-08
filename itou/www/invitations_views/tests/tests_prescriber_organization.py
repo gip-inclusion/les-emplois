@@ -170,21 +170,19 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.organization.save()
         self.sender = self.organization.members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        self.user = None
-        self.response = None
 
-    def tearDown(self):
-        self.assertEqual(self.response.status_code, 200)
-        self.user.refresh_from_db()
+    def assert_invitation_is_accepted(self, response, user):
+        self.assertEqual(response.status_code, 200)
+        user.refresh_from_db()
         self.invitation.refresh_from_db()
-        self.assertTrue(self.user.is_prescriber)
+        self.assertTrue(user.is_prescriber)
         self.assertTrue(self.invitation.accepted)
         self.assertTrue(self.invitation.accepted_at)
         self.assertEqual(self.organization.members.count(), 3)
 
-        self.assertEqual(reverse("dashboard:index"), self.response.wsgi_request.path)
+        self.assertEqual(reverse("dashboard:index"), response.wsgi_request.path)
         # Make sure there's a welcome message.
-        messages = list(get_messages(self.response.wsgi_request))
+        messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].level_tag, "success")
 
@@ -194,9 +192,9 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.assertEqual(self.invitation.sender.email, mail.outbox[0].to[0])
 
         # Assert the user sees his new organization dashboard.
-        current_org = get_current_org_or_404(self.response.wsgi_request)
+        current_org = get_current_org_or_404(response.wsgi_request)
         # A user can be member of one or more organizations
-        self.assertTrue(current_org in self.user.prescriberorganization_set.all())
+        self.assertTrue(current_org in user.prescriberorganization_set.all())
 
     def test_accept_prescriber_org_invitation(self):
         post_data = {
@@ -206,55 +204,59 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
             "password2": "Erls92#32",
         }
 
-        self.response = self.client.post(self.invitation.acceptance_link, data=post_data, follow=True)
-        self.user = User.objects.get(email=self.invitation.email)
+        response = self.client.post(self.invitation.acceptance_link, data=post_data, follow=True)
+        user = User.objects.get(email=self.invitation.email)
+        self.assert_invitation_is_accepted(response, user)
 
     def test_accept_existing_user_is_prescriber_without_org(self):
-        self.user = PrescriberFactory()
+        user = PrescriberFactory()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,
-            first_name=self.user.first_name,
-            last_name=self.user.last_name,
-            email=self.user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
         )
-        self.client.login(email=self.user.email, password=DEFAULT_PASSWORD)
-        self.response = self.client.get(self.invitation.acceptance_link, follow=True)
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.invitation.acceptance_link, follow=True)
+        self.assert_invitation_is_accepted(response, user)
 
     def test_accept_existing_user_belongs_to_another_organization(self):
-        self.user = PrescriberOrganizationWithMembershipFactory().members.first()
+        user = PrescriberOrganizationWithMembershipFactory().members.first()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,
-            first_name=self.user.first_name,
-            last_name=self.user.last_name,
-            email=self.user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
         )
-        self.client.login(email=self.user.email, password=DEFAULT_PASSWORD)
-        self.response = self.client.get(self.invitation.acceptance_link, follow=True)
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.invitation.acceptance_link, follow=True)
+        self.assert_invitation_is_accepted(response, user)
 
     def test_accept_existing_user_not_logged_in(self):
-        self.user = PrescriberFactory()
+        user = PrescriberFactory()
         # The user verified its email
-        EmailAddress(user_id=self.user.pk, email=self.user.email, verified=True, primary=True).save()
+        EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
         self.invitation = PrescriberWithOrgSentInvitationFactory(
             sender=self.sender,
             organization=self.organization,
-            first_name=self.user.first_name,
-            last_name=self.user.last_name,
-            email=self.user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
         )
         response = self.client.get(self.invitation.acceptance_link, follow=True)
 
         self.assertIn(reverse("account_login"), response.wsgi_request.get_full_path())
         self.assertFalse(self.invitation.accepted)
 
-        self.response = self.client.post(
+        response = self.client.post(
             response.wsgi_request.get_full_path(),
-            data={"login": self.user.email, "password": DEFAULT_PASSWORD},
+            data={"login": user.email, "password": DEFAULT_PASSWORD},
             follow=True,
         )
-        self.assertTrue(self.response.wsgi_request.user.is_authenticated)
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        self.assert_invitation_is_accepted(response, user)
 
 
 class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
