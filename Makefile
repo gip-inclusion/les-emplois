@@ -32,7 +32,8 @@ pylint:
 	docker exec -ti itou_django pylint itou
 
 coverage:
-	docker exec -ti itou_django coverage run --source=itou django-admin test itou --settings=config.settings.test && coverage html
+	docker exec -ti itou_django coverage run --source=itou ./manage.py test itou --settings=config.settings.test
+	docker exec -ti itou_django coverage html
 
 coverage_venv:
 	coverage run --source=itou ./manage.py test itou --settings=config.settings.test && coverage html
