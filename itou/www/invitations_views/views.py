@@ -20,7 +20,6 @@ from itou.www.invitations_views.forms import (
 
 
 def new_user(request, invitation_type, invitation_id, template_name="invitations_views/new_user.html"):
-
     invitation_type = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_type, pk=invitation_id)
     context = {"invitation": invitation}
