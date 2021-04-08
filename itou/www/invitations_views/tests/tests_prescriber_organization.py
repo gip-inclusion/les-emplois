@@ -90,6 +90,11 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.sender = self.organization.members.first()
         self.post_data = POST_DATA
 
+    def assert_invalid_user(self, response, reason):
+        self.assertFalse(response.context["formset"].is_valid())
+        self.assertEqual(response.context["formset"].errors[0]["email"][0], reason)
+        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
+
     def test_invite_existing_user_is_employer(self):
         guest = SiaeWithMembershipFactory().members.first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
@@ -98,11 +103,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
         self.assertEqual(response.status_code, 200)
-
-        # Make sure form is not valid
-        self.assertFalse(response.context["formset"].is_valid())
-        self.assertTrue(response.context["formset"].errors[0].get("email"))
-        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
+        self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
@@ -112,10 +113,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
         self.assertEqual(response.status_code, 200)
-        # Make sure form is not valid
-        self.assertFalse(response.context["formset"].is_valid())
-        self.assertTrue(response.context["formset"].errors[0].get("email"))
-        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
+        self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
     def test_already_a_member(self):
         # The invited user is already a member
@@ -127,10 +125,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
         self.assertEqual(response.status_code, 200)
-        # Make sure form is not valid
-        self.assertFalse(response.context["formset"].is_valid())
-        self.assertTrue(response.context["formset"].errors[0].get("email"))
-        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
+        self.assert_invalid_user(response, "Cette personne fait déjà partie de votre organisation.")
 
 
 class TestPEOrganizationInvitation(TestCase):
@@ -161,7 +156,9 @@ class TestPEOrganizationInvitation(TestCase):
         response = self.client.post(INVITATION_URL, data=post_data)
         # Make sure form is invalid
         self.assertFalse(response.context["formset"].is_valid())
-        self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assertEqual(
+            response.context["formset"].errors[0]["email"][0], "L'adresse e-mail doit être une adresse Pôle emploi"
+        )
 
 
 class TestAcceptPrescriberWithOrgInvitation(TestCase):
