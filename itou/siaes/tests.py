@@ -71,6 +71,13 @@ class SiaeModelTest(TestCase):
         siae = SiaeFactory(kind=Siae.KIND_EI)
         self.assertTrue(siae.is_subject_to_eligibility_rules)
 
+    def test_is_asp_managed(self):
+        siae = SiaeFactory(kind=Siae.KIND_ACIPHC)
+        self.assertFalse(siae.is_asp_managed)
+
+        siae = SiaeFactory(kind=Siae.KIND_EI)
+        self.assertTrue(siae.is_asp_managed)
+
     def test_has_members(self):
         siae1 = SiaeFactory()
         siae2 = SiaeWithMembershipFactory()

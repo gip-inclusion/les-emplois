@@ -22,8 +22,8 @@ class SiaeQuerySet(models.QuerySet):
     def active(self):
         # `~` means NOT, similarly to dataframes.
         return self.select_related("convention").filter(
-            # GEIQ, EA... have no convention logic and thus are always active.
-            ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
+            # GEIQ, EA, ACIPHC... have no convention logic and thus are always active.
+            ~Q(kind__in=Siae.ASP_MANAGED_KINDS)
             # User created siaes and staff created siaes do not yet
             # have convention logic and thus are always active.
             | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
@@ -35,7 +35,7 @@ class SiaeQuerySet(models.QuerySet):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
-            ~Q(kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS)
+            ~Q(kind__in=Siae.ASP_MANAGED_KINDS)
             | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
             | Q(convention__is_active=True)
             # Here we include siaes experiencing their grace period as well.
@@ -108,6 +108,12 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_EI = "EI"
     KIND_AI = "AI"
     KIND_ACI = "ACI"
+
+    # When an ACI does PHC ("Premières Heures en Chantier"), we have both an ACI created by
+    # the SIAE ASP import (plus its ACI antenna) and an ACIPHC created by our staff (plus its ACIPHC antenna).
+    # The first one is managed by ASP data, the second one is managed by our staff.
+    KIND_ACIPHC = "ACIPHC"
+
     KIND_ETTI = "ETTI"
     KIND_EITI = "EITI"
     KIND_GEIQ = "GEIQ"
@@ -118,6 +124,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
         (KIND_AI, _("Association intermédiaire")),
         (KIND_ACI, _("Atelier chantier d'insertion")),
+        (KIND_ACIPHC, _("Atelier chantier d'insertion premières heures en chantier")),
         (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
         (KIND_EITI, _("Entreprise d'insertion par le travail indépendant")),
         (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
@@ -139,13 +146,17 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         (SOURCE_STAFF_CREATED, _("Staff Itou")),
     )
 
+    # ASP data is used to keep the siae data of these kinds in sync.
+    # These kinds and only these kinds thus have convention/AF logic.
+    ASP_MANAGED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
+
     # https://code.travail.gouv.fr/code-du-travail/l5132-4
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
-    ELIGIBILITY_REQUIRED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
+    ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [KIND_ACIPHC]
 
     siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], db_index=True)
     naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True)
-    kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
+    kind = models.CharField(verbose_name=_("Type"), max_length=6, choices=KIND_CHOICES, default=KIND_EI)
     name = models.CharField(verbose_name=_("Nom"), max_length=255)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
     brand = models.CharField(verbose_name=_("Enseigne"), max_length=255, blank=True)
@@ -229,8 +240,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def is_active(self):
-        if not self.is_subject_to_eligibility_rules:
-            # GEIQ, EA... have no convention logic and thus are always active.
+        if not self.is_asp_managed:
+            # GEIQ, EA, ACIPHC... have no convention logic and thus are always active.
             return True
         if self.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]:
             # User created siaes and staff created siaes do not yet have convention logic.
@@ -282,6 +293,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def is_subject_to_eligibility_rules(self):
         return self.kind in self.ELIGIBILITY_REQUIRED_KINDS
+
+    @property
+    def is_asp_managed(self):
+        return self.kind in self.ASP_MANAGED_KINDS
 
     def get_card_url(self):
         return reverse("siaes_views:card", kwargs={"siae_id": self.pk})
