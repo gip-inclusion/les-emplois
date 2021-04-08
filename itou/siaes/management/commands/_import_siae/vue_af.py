@@ -88,7 +88,7 @@ def get_vue_af_df():
 
     # Ensure data quality.
     for _, row in df.iterrows():
-        assert row.kind in Siae.ELIGIBILITY_REQUIRED_KINDS
+        assert row.kind in Siae.ASP_MANAGED_KINDS
         validate_af_number(row.number)
 
     df["start_at"] = df.start_at.apply(timezone.make_aware)
