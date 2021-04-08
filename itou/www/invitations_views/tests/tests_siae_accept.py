@@ -21,7 +21,6 @@ class TestAcceptInvitation(TestCase):
         invitation = SentSiaeStaffInvitationFactory()
 
         response = self.client.get(invitation.acceptance_link, follow=True)
-        redirect_to = reverse("dashboard:index")
 
         form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name}
 
@@ -38,11 +37,9 @@ class TestAcceptInvitation(TestCase):
             data={**form_data, "password1": "Erls92#32", "password2": "Erls92#32"},
             follow=True,
         )
-
+        self.assertRedirects(response, reverse("dashboard:index"))
         total_users_after = User.objects.count()
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.wsgi_request.path, redirect_to)
         self.assertEqual((total_users_before + 1), total_users_after)
 
         user = User.objects.get(email=invitation.email)
