@@ -90,10 +90,6 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.sender = self.organization.members.first()
         self.post_data = POST_DATA
 
-    def tearDown(self):
-        invitation_query = PrescriberWithOrgInvitation.objects.filter(organization=self.organization)
-        self.assertFalse(invitation_query.exists())
-
     def test_invite_existing_user_is_employer(self):
         guest = SiaeWithMembershipFactory().members.first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
@@ -102,9 +98,11 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         )
         response = self.client.post(INVITATION_URL, data=self.post_data)
         self.assertEqual(response.status_code, 200)
+
         # Make sure form is not valid
         self.assertFalse(response.context["formset"].is_valid())
         self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
@@ -117,6 +115,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         # Make sure form is not valid
         self.assertFalse(response.context["formset"].is_valid())
         self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
 
     def test_already_a_member(self):
         # The invited user is already a member
@@ -131,6 +130,7 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         # Make sure form is not valid
         self.assertFalse(response.context["formset"].is_valid())
         self.assertTrue(response.context["formset"].errors[0].get("email"))
+        self.assertFalse(PrescriberWithOrgInvitation.objects.exists())
 
 
 class TestPEOrganizationInvitation(TestCase):
