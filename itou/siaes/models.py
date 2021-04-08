@@ -109,8 +109,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_AI = "AI"
     KIND_ACI = "ACI"
 
-    # When an ACI does PHC ("Premières Heures en Chantier"), we have both an ACI (plus its antenna)
-    # and an ACIPHC (plus its antenna). The first one is managed by ASP data, the second one is managed by our staff.
+    # When an ACI does PHC ("Premières Heures en Chantier"), we have both an ACI created by
+    # the SIAE ASP import (plus its ACI antenna) and an ACIPHC created by our staff (plus its ACIPHC antenna).
+    # The first one is managed by ASP data, the second one is managed by our staff.
     KIND_ACIPHC = "ACIPHC"
 
     KIND_ETTI = "ETTI"
