@@ -49,12 +49,10 @@ class TestAcceptInvitation(TestCase):
         # A logged in user should log out before accepting an invitation.
         logged_in_user = UserFactory()
         self.client.login(email=logged_in_user.email, password=DEFAULT_PASSWORD)
-        invitation = SentSiaeStaffInvitationFactory()
-        self.client.get(invitation.acceptance_link, follow=True)
-
-        # FIXME I don't understand how it works, no changes, just a move and the test doesn't work anymore
-        # https://github.com/betagouv/itou/blob/7b7b800f1c5a09680c4f8ac3f6a3e2953bd4a8ae/itou/www/invitations_views/tests/tests_base.py#L176
-        # self.assertEqual(response.wsgi_request.path, reverse("account_logout"))
+        # Invitation for another user
+        invitation = SentSiaeStaffInvitationFactory(email="loutre@example.com")
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertRedirects(response, reverse("account_logout"))
 
     def test_accept_invitation_signup_changed_email(self):
         invitation = SentSiaeStaffInvitationFactory()
