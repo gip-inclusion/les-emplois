@@ -29,14 +29,17 @@ from django.utils import timezone
 from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.cities.models import City
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.management.commands import (
     _approvals,
+    _insee_codes,
     _job_applications,
     _job_descriptions,
     _job_seekers,
     _organizations,
+    _rome_codes,
     _siaes,
 )
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
@@ -312,27 +315,14 @@ class Command(BaseCommand):
         self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, queryset=queryset)
 
     def populate_rome_codes(self):
-        """
-        Populate rome codes.
-        """
         queryset = Rome.objects.all()
 
-        table_columns = [
-            {
-                "name": "code_rome",
-                "type": "varchar",
-                "comment": "Code ROME",
-                "lambda": lambda o: o.code,
-            },
-            {
-                "name": "description_code_rome",
-                "type": "varchar",
-                "comment": "Description du code ROME",
-                "lambda": lambda o: o.name,
-            },
-        ]
+        self.populate_table(table_name="codes_rome", table_columns=_rome_codes.TABLE_COLUMNS, queryset=queryset)
 
-        self.populate_table(table_name="codes_rome", table_columns=table_columns, queryset=queryset)
+    def populate_insee_codes(self):
+        queryset = City.objects.all()
+
+        self.populate_table(table_name="communes", table_columns=_insee_codes.TABLE_COLUMNS, queryset=queryset)
 
     def populate_metabase(self):
         if not settings.ALLOW_POPULATING_METABASE:
@@ -348,6 +338,7 @@ class Command(BaseCommand):
             self.populate_job_applications()
             self.populate_approvals()
             self.populate_rome_codes()
+            self.populate_insee_codes()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
