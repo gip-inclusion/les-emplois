@@ -15,22 +15,27 @@ from itou.users.models import User
 from itou.utils.perms.prescriber import get_current_org_or_404
 
 
+POST_DATA = {
+    "form-TOTAL_FORMS": "1",
+    "form-INITIAL_FORMS": "0",
+    "form-MIN_NUM_FORMS": "",
+    "form-MAX_NUM_FORMS": "",
+}
+
+INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
+
+
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
-        self.post_data = {
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "0",
-            "form-MIN_NUM_FORMS": "",
-            "form-MAX_NUM_FORMS": "",
+        self.post_data = POST_DATA | {
             "form-0-first_name": self.guest_data["first_name"],
             "form-0-last_name": self.guest_data["last_name"],
             "form-0-email": self.guest_data["email"],
         }
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
 
     def assert_created_invitation(self):
         invitation = PrescriberWithOrgInvitation.objects.get(organization=self.organization)
@@ -39,8 +44,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.assertEqual(invitation.email, self.post_data["form-0-email"])
 
     def test_invite_not_existing_user(self):
-        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
-        self.assertRedirects(response, self.send_invitation_url)
+        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
+        self.assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
     def test_invite_existing_user_is_prescriber_without_org(self):
@@ -48,25 +53,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.post_data["form-0-first_name"] = guest.first_name
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
-        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
-        self.assertRedirects(response, self.send_invitation_url)
-        self.assert_created_invitation()
-
-    def test_pe_organization_invitation_successful(self):
-        self.client.logout()
-
-        self.organization = PrescriberPoleEmploiFactory()
-        self.organization.members.add(PrescriberFactory())
-        self.sender = self.organization.members.first()
-
-        guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
-        self.post_data["form-0-first_name"] = guest.first_name
-        self.post_data["form-0-last_name"] = guest.last_name
-        self.post_data["form-0-email"] = guest.email
-
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
-        self.assertRedirects(response, self.send_invitation_url)
+        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
+        self.assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
     def test_invite_former_member(self):
@@ -79,8 +67,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.post_data["form-0-first_name"] = guest.first_name
         self.post_data["form-0-last_name"] = guest.last_name
         self.post_data["form-0-email"] = guest.email
-        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
-        self.assertRedirects(response, self.send_invitation_url)
+        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
+        self.assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
         # Deactivate user
@@ -91,8 +79,8 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         membership.save()
         self.assertFalse(guest in self.organization.active_members)
         # Invite user (the revenge)
-        response = self.client.post(self.send_invitation_url, data=self.post_data, follow=True)
-        self.assertRedirects(response, self.send_invitation_url)
+        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
+        self.assertRedirects(response, INVITATION_URL)
         self.assert_created_invitation()
 
 
@@ -100,18 +88,11 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def setUp(self):
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
-        self.send_invitation_url = reverse("invitations_views:invite_prescriber_with_org")
-        self.post_data = {
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "0",
-            "form-MIN_NUM_FORMS": "",
-            "form-MAX_NUM_FORMS": "",
-        }
+        self.post_data = POST_DATA
 
     def tearDown(self):
         invitation_query = PrescriberWithOrgInvitation.objects.filter(organization=self.organization)
         self.assertFalse(invitation_query.exists())
-        self.assertEqual(self.response.status_code, 200)
 
     def test_invite_existing_user_is_employer(self):
         guest = SiaeWithMembershipFactory().members.first()
@@ -119,10 +100,11 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data)
+        response = self.client.post(INVITATION_URL, data=self.post_data)
+        self.assertEqual(response.status_code, 200)
         # Make sure form is not valid
-        self.assertFalse(self.response.context["formset"].is_valid())
-        self.assertTrue(self.response.context["formset"].errors[0].get("email"))
+        self.assertFalse(response.context["formset"].is_valid())
+        self.assertTrue(response.context["formset"].errors[0].get("email"))
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
@@ -130,10 +112,11 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data)
+        response = self.client.post(INVITATION_URL, data=self.post_data)
+        self.assertEqual(response.status_code, 200)
         # Make sure form is not valid
-        self.assertFalse(self.response.context["formset"].is_valid())
-        self.assertTrue(self.response.context["formset"].errors[0].get("email"))
+        self.assertFalse(response.context["formset"].is_valid())
+        self.assertTrue(response.context["formset"].errors[0].get("email"))
 
     def test_already_a_member(self):
         # The invited user is already a member
@@ -143,24 +126,42 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.post_data.update(
             {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
         )
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data)
+        response = self.client.post(INVITATION_URL, data=self.post_data)
+        self.assertEqual(response.status_code, 200)
         # Make sure form is not valid
-        self.assertFalse(self.response.context["formset"].is_valid())
-        self.assertTrue(self.response.context["formset"].errors[0].get("email"))
+        self.assertFalse(response.context["formset"].is_valid())
+        self.assertTrue(response.context["formset"].errors[0].get("email"))
 
-    def test_pe_organization_invitation_unsuccessful(self):
+
+class TestPEOrganizationInvitation(TestCase):
+    def setUp(self):
         self.organization = PrescriberPoleEmploiFactory()
         self.organization.members.add(PrescriberFactory())
         self.sender = self.organization.members.first()
-        guest = UserFactory.build()
+
+    def test_pe_organization_invitation_successful(self):
+        guest = UserFactory.build(email=f"sabine.lagrange{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
+        post_data = POST_DATA | {
+            "form-0-first_name": guest.first_name,
+            "form-0-last_name": guest.last_name,
+            "form-0-email": guest.email,
+        }
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        self.post_data.update(
-            {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
-        )
-        self.response = self.client.post(self.send_invitation_url, data=self.post_data)
-        # Make sure form is not valid
-        self.assertFalse(self.response.context["formset"].is_valid())
-        self.assertTrue(self.response.context["formset"].errors[0].get("email"))
+        response = self.client.post(INVITATION_URL, data=post_data, follow=True)
+        self.assertRedirects(response, INVITATION_URL)
+
+    def test_pe_organization_invitation_unsuccessful(self):
+        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
+        post_data = POST_DATA | {
+            "form-0-first_name": "René",
+            "form-0-last_name": "Boucher",
+            "form-0-email": "rene@example.com",
+        }
+
+        response = self.client.post(INVITATION_URL, data=post_data)
+        # Make sure form is invalid
+        self.assertFalse(response.context["formset"].is_valid())
+        self.assertTrue(response.context["formset"].errors[0].get("email"))
 
 
 class TestAcceptPrescriberWithOrgInvitation(TestCase):
@@ -201,17 +202,14 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.assertTrue(current_org in self.user.prescriberorganization_set.all())
 
     def test_accept_prescriber_org_invitation(self):
-        response = self.client.get(self.invitation.acceptance_link, follow=True)
-        self.assertIn(response.wsgi_request.path, self.invitation.acceptance_link)
-
-        form_data = {
+        post_data = {
             "first_name": self.invitation.first_name,
             "last_name": self.invitation.last_name,
             "password1": "Erls92#32",
             "password2": "Erls92#32",
         }
 
-        self.response = self.client.post(self.invitation.acceptance_link, data=form_data, follow=True)
+        self.response = self.client.post(self.invitation.acceptance_link, data=post_data, follow=True)
         self.user = User.objects.get(email=self.invitation.email)
 
     def test_accept_existing_user_is_prescriber_without_org(self):
