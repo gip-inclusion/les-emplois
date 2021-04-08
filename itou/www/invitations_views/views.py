@@ -40,18 +40,22 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
 
     if invitation.can_be_accepted:
         user = User.objects.filter(email__iexact=invitation.email)
-        if not user:
+        if user:
+            # The user exists but he should log in first
+            next_step = "{}?account_type={}&next={}".format(
+                reverse("account_login"), invitation.SIGNIN_ACCOUNT_TYPE, get_safe_url(request, "redirect_to")
+            )
+            next_step = redirect(next_step)
+        else:
+            # A new user should be created before joining
             form = NewUserForm(data=request.POST or None, invitation=invitation)
             context["form"] = form
             if form.is_valid():
                 user = form.save(request)
                 get_adapter().login(request, user)
                 next_step = redirect(get_safe_url(request, "redirect_to"))
-        else:
-            next_step = "{}?account_type={}&next={}".format(
-                reverse("account_login"), invitation.SIGNIN_ACCOUNT_TYPE, get_safe_url(request, "redirect_to")
-            )
-            next_step = redirect(next_step)
+    else:
+        messages.error(request, _("Cette invitation n'est plus valide."))
 
     return next_step or render(request, template_name, context=context)
 
