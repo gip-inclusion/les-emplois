@@ -283,6 +283,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 403)
+        invitation.refresh_from_db()
         self.assertFalse(invitation.accepted)
 
     def test_connected_user_is_not_the_invited_user(self):
@@ -290,6 +291,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("account_logout"))
+        invitation.refresh_from_db()
         self.assertFalse(invitation.accepted)
         messages = list(response.context["messages"])
         self.assertEqual(len(messages), 1)
