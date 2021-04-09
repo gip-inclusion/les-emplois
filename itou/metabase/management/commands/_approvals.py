@@ -59,19 +59,6 @@ TABLE_COLUMNS = [
     {"name": "date_début", "type": "date", "comment": "Date de début", "lambda": lambda o: o.start_at},
     {"name": "date_fin", "type": "date", "comment": "Date de fin", "lambda": lambda o: o.end_at},
     {"name": "durée", "type": "interval", "comment": "Durée", "lambda": lambda o: o.end_at - o.start_at},
-    # -------- Field not ready for code review yet --------
-    # # The rigorous date would be:
-    # # $ job_application.approval_number_sent_at
-    # # however some approvals have two or more job_applications
-    # # with different approval_number_sent_at values.
-    # # Thus we simply use approval.created_at here.
-    # {
-    #     "name": "date_de_délivrance",
-    #     "type": "date",
-    #     "comment": "Date de délivrance si PASS IAE",
-    #     "lambda": lambda o: o.created_at if isinstance(o, Approval) else None,
-    # },
-    # ------------------------------------------------------
     {
         "name": "id_structure",
         "type": "integer",
