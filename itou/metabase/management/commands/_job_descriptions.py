@@ -45,4 +45,10 @@ TABLE_COLUMNS += [
         "comment": "Total de candidatures reçues",
         "lambda": lambda o: o.job_applications_count,
     },
+    {
+        "name": "date_création",
+        "type": "date",
+        "comment": "Date de création",
+        "lambda": lambda o: o.created_at,
+    },
 ]
