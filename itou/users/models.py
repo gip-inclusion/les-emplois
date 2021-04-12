@@ -625,7 +625,10 @@ class JobSeekerProfile(models.Model):
     @property
     def has_social_allowance(self):
         return bool(
-            self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
+            self.has_rsa_allocation != RSAAllocation.NO
+            or self.has_ass_allocation
+            or self.has_aah_allocation
+            or self.has_ata_allocation
         )
 
     @property

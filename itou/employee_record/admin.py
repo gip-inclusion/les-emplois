@@ -13,7 +13,11 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
     )
     list_filter = ("status",)
 
-    raw_id_fields = ("job_application",)
+    raw_id_fields = (
+        "job_application",
+        "financial_annex",
+    )
+
     readonly_fields = (
         "title",
         "birth_country",
@@ -24,8 +28,6 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "asp_process_response",
         "archived_json",
     )
-
-    # inlines = (JobSeekerInline, )
 
     def title(self, obj):
         return obj.job_application.job_seeker.title
