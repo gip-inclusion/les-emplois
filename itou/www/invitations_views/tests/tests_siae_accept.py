@@ -1,5 +1,4 @@
 from allauth.account.models import EmailAddress
-from django.contrib.messages import get_messages
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
@@ -147,7 +146,7 @@ class TestAcceptSiaeInvitation(TestCase):
 
         self.assertEqual(reverse("dashboard:index"), self.response.wsgi_request.path)
         # Make sure there's a welcome message.
-        messages = list(get_messages(self.response.wsgi_request))
+        messages = list(self.response.context["messages"])
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].level_tag, "success")
 
@@ -255,5 +254,5 @@ class TestAcceptSiaeInvitation(TestCase):
 
         self.assertEqual(reverse("account_logout"), response.wsgi_request.path)
         self.assertFalse(self.invitation.accepted)
-        messages = list(get_messages(response.wsgi_request))
+        messages = list(response.context["messages"])
         self.assertEqual(len(messages), 1)
