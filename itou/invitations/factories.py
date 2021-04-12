@@ -1,5 +1,6 @@
+from datetime import timedelta
+
 import factory
-from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.invitations import models
@@ -27,9 +28,7 @@ class SentSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
 class ExpiredSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
     sent = True
     sent_at = factory.LazyAttribute(
-        lambda self: timezone.now()
-        - relativedelta(days=models.InvitationAbstract.EXPIRATION_DAYS)
-        - relativedelta(days=1)
+        lambda self: timezone.now() - timedelta(days=models.InvitationAbstract.EXPIRATION_DAYS)
     )
 
 
