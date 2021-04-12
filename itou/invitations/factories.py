@@ -13,7 +13,7 @@ class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SiaeStaffInvitation
 
-    email = factory.Sequence("email{0}@domain.com".format)
+    email = factory.Sequence("email{0}@siaestaff.com".format)
     first_name = factory.Sequence("first_name{0}".format)
     last_name = factory.Sequence("last_name{0}".format)
     sender = factory.SubFactory(UserFactory)
