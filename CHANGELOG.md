@@ -10,9 +10,8 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 ### Ajouté
 
-- Ajout du nouveau type ACIPHC, Atelier chantier d'insertion premières heures en chantier.
-- Autorise le super utilisateur à modifier l'état d'une habilitation depuis l'interface d'administration et nouveaux contrôles
-  de permission
+- Ajout du nouveau type ACIPHC, Atelier chantier d'insertion premières heures en chantier
+- Le super utilisateur peut maintenant modifier l'état d'une habilitation depuis l'interface d'administration
 - Ajout d'un outil d'analyse de couverture de code par les tests
 - Sérialisation JSON des fiches salarié avec l'ASP
 - Nouvelle documentation du projet générée à partir du Markdown et incluant Whimsical sur :
@@ -25,18 +24,18 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Mise à jour vers Django 3.1.8 pour prendre en compte un correctif de sécurité
 - Amélioration des scripts d'import des données dans Metabase
 - Correction d'un bogue quand la date de début d'un PASS est recalculée
-- Remplacement des dernières occurrences de "plateforme"
+- Remplacement des dernières occurrences de « plateforme »
 - Amélioration de l'import fluxIAE et ajout de nouveaux flux
-- Ajout d'un timeout aux appels à PDF Shift pour éviter que les requêtes restent en suspens quand le service ne réponds pas.
+- Ajout d'un timeout aux appels à PDF Shift pour éviter que les requêtes restent en suspens quand le service ne réponds pas
 - Réduction du nombre de requêtes SQL à l'import des comptes Pôle Emploi
 - Correction des données de test en recette jetable
 - Amélioration de l'accès aux données de la session utilisateur pour éviter l'utilisation de données incomplètes
 - Remplacement de l'email d'assistance par le portail assistance
 - Remplacement de la génération du nom utilisateur fournie par une librairie externe qui générait de nombreuses erreurs.
-- Affichage plus amical des erreurs de transaction, ces erreurs peuvent se produire lorsque un utilisateur effectue une action déjà effectuée (page non actualisée).
+- Affichage plus amical des erreurs de transaction, ces erreurs peuvent se produire lorsque un utilisateur effectue une action déjà effectuée (page non actualisée)
 - Correction des données de tests
-- Le script de téléchargement de la base de données de production récupère seulement la sauvegarde la plus récente.
-- Changement du logo du Ministère en entête.
+- Le script de téléchargement de la base de données de production récupère seulement la sauvegarde la plus récente
+- Changement du logo du Ministère en entête
 
 ### Supprimé
 
