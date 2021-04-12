@@ -43,7 +43,9 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "codeDpt": result.pop("codeDpt"),
         }
 
+        # Fields not mapped / ignored
         result["sufPassIae"] = None
+        result["nomNaissance"] = None
 
         return result
 
@@ -53,8 +55,8 @@ class _EmployeeAddress(serializers.ModelSerializer):
     adrTelephone = serializers.CharField(source="phone", allow_blank=True)
     adrMail = serializers.CharField(source="email", allow_blank=True)
 
-    adrNumeroVoie = serializers.IntegerField(source="jobseeker_profile.hexa_lane_number")
-    codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
+    adrNumeroVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_number")
+    codeextensionvoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
     codetypevoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
     adrCpltDistribution = serializers.CharField(source="address_line_2", allow_blank=True)
@@ -68,7 +70,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
             "adrTelephone",
             "adrMail",
             "adrNumeroVoie",
-            "codeextensionVoie",
+            "codeextensionvoie",
             "codetypevoie",
             "adrLibelleVoie",
             "adrCpltDistribution",
@@ -79,6 +81,7 @@ class _EmployeeAddress(serializers.ModelSerializer):
     def to_representation(self, instance):
         result = super().to_representation(instance)
 
+        # Replace these empty strings by JSON null values
         empty_as_null_fields = [
             "codeextensionVoie",
             "adrCpltDistribution",
@@ -153,6 +156,7 @@ class _EmployeeSituation(serializers.ModelSerializer):
     def to_representation(self, instance):
         result = super().to_representation(instance)
 
+        # Replace these empty strings by JSON null values
         empty_as_null_fields = [
             "salarieSansEmploiDepuis",
             "salarieBenefRSADepuis",
@@ -230,11 +234,20 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         # same workaroud for prescriber type (orienteur)
         employee_situation["orienteur"] = instance.asp_prescriber_type
 
+        # FIXME test override
+        # Remove 3 lines below after manual testing
+        result["mesure"] = "EI_DC"
+        result["siret"] = "33055039301440"
+        result["numeroAnnexe"] = "ACI023201111A0M0"
+
         return result
 
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):
+    """
+    This serializer is a wrapper for a list of employee records
+    """
 
-    msgInformatif = serializers.CharField(source="message", allow_blank=True)
+    msgInformatif = serializers.CharField(source="message")
     telId = serializers.CharField(source="id", allow_blank=True)
     lignesTelechargement = EmployeeRecordSerializer(many=True, source="employee_records")

@@ -4,6 +4,7 @@ from django.utils import timezone
 
 from itou.asp.models import EmployerType, PrescriberType, SiaeKind
 from itou.job_applications.models import JobApplication
+from itou.siaes.models import SiaeFinancialAnnex
 
 
 class Status(models.TextChoices):
@@ -45,6 +46,12 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(status=Status.ARCHIVED)
 
+    def find_from_batch(self, kind, siret, approval_number):
+        """
+        Fetch a single employee record with ASP batch file input parameters
+        """
+        return self.filter(job_application__approval__number=approval_number)
+
 
 class EmployeeRecord(models.Model):
     """
@@ -78,6 +85,13 @@ class EmployeeRecord(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name="Candidature / embauche",
+    )
+
+    # Employeerecords must be linked to a valid financial annex
+    # This field can't be automatically filled, the user will be asked
+    # to select a valid one manually
+    financial_annex = models.ForeignKey(
+        SiaeFinancialAnnex, verbose_name=_("Annexe financière"), null=True, on_delete=models.SET_NULL
     )
 
     # These fields are duplicated to act as constraint fields on DB level
@@ -225,6 +239,13 @@ class EmployeeRecord(models.Model):
         return self.job_application.approval if self.job_application and self.job_application.approval else None
 
     @property
+    def financial_annex_number(self):
+        """
+        Shortcut to financial annex number (can be null in early stages of life cycle)
+        """
+        return self.financial_annex.number if self.financial_annex else None
+
+    @property
     def asp_convention_id(self):
         """
         ASP convention ID (from siae.convention.asp_convention_id)
@@ -283,11 +304,6 @@ class EmployeeRecord(models.Model):
 
         return self._batch_line_number
 
-    @property
-    def financial_annex_number(self):
-        # FIXME false placeholder
-        return "ACI023201111A0M0"
-
     @classmethod
     def from_job_application(cls, job_application):
         """
@@ -341,15 +357,15 @@ class EmployeeRecordBatch:
     REMOTE_PATH_FORMAT = "RIAE_FS_{}.json"
 
     def __init__(self, employee_records):
+        if employee_records and len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
+            raise ValidationError(
+                f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} employee records"
+            )
+
         # id and message fields must be null for upload
         # they may have a value after download
         self.id = None
         self.message = None
-
-        if len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
-            raise ValidationError(
-                f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} employee records"
-            )
 
         self.employee_records = employee_records
         self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
