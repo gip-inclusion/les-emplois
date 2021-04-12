@@ -310,3 +310,27 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         }
         response = self.client.post(invitation.acceptance_link, data=post_data, follow=True)
         self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+
+    def test_expired_invitation_with_existing_user(self):
+        user = PrescriberFactory()
+        invitation = PrescriberWithOrgSentInvitationFactory(
+            first_name=user.first_name,
+            last_name=user.last_name,
+            email=user.email,
+            sender=self.sender,
+            organization=self.organization,
+        )
+        invitation.sent_at -= timedelta(days=invitation.EXPIRATION_DAYS)
+        invitation.save()
+        self.assertTrue(invitation.has_expired)
+
+        # GET or POST in this case
+        response = self.client.get(invitation.acceptance_link, follow=True)
+        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        # Try to bypass the first check by directly reaching the join endpoint
+        join_url = reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
+        response = self.client.get(join_url, follow=True)
+        # The 2 views return the same error message
+        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
