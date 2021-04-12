@@ -11,7 +11,7 @@ from itou.invitations.factories import (
 )
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWith2MembershipsFactory
-from itou.users.factories import DEFAULT_PASSWORD, UserFactory
+from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
 
@@ -92,11 +92,18 @@ class TestAcceptInvitation(TestCase):
 
     def test_expired_invitation(self):
         invitation = ExpiredSiaeStaffInvitationFactory()
+        self.assertTrue(invitation.has_expired)
 
         # User wants to join our website but it's too late!
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "expirée")
+
+        user = SiaeStaffFactory(email=invitation.email)
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
+        response = self.client.get(join_url, follow=True)
+        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
 
     def test_non_existent_invitation(self):
         invitation = SentSiaeStaffInvitationFactory.build(
