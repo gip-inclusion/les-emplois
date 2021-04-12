@@ -294,8 +294,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertRedirects(response, reverse("account_logout"))
         invitation.refresh_from_db()
         self.assertFalse(invitation.accepted)
-        messages = list(response.context["messages"])
-        self.assertEqual(len(messages), 1)
+        self.assertIn("Un utilisateur est déjà connecté.", str(list(response.context["messages"])[0]))
 
     def test_expired_invitation_with_new_user(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
