@@ -10,7 +10,7 @@ from itou.invitations.factories import (
     SiaeSentInvitationFactory,
 )
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeWith2MembershipsFactory
+from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
 from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -104,6 +104,15 @@ class TestAcceptInvitation(TestCase):
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+
+    def test_inactive_siae(self):
+        siae = SiaeFactory(convention__is_active=False)
+        invitation = SentSiaeStaffInvitationFactory(siae=siae)
+        user = SiaeStaffFactory(email=invitation.email)
+        self.client.login(email=user.email, password=DEFAULT_PASSWORD)
+        join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
+        response = self.client.get(join_url, follow=True)
+        self.assertEqual(str(list(response.context["messages"])[0]), "Cette structure n'est plus active.")
 
     def test_non_existent_invitation(self):
         invitation = SentSiaeStaffInvitationFactory.build(
