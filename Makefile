@@ -61,11 +61,15 @@ setup_git_pre_commit_hook_venv:
 django_admin:
 	docker exec -ti itou_django django-admin $(COMMAND)
 
+# After migrate
 populate_db:
 	docker cp itou/fixtures/postgres/* itou_postgres:/backups/
-	docker exec -ti itou_postgres bash -c "pg_restore -d itou --if-exists --clean --no-owner --no-privileges backups/cities.sql "
+	docker exec -ti itou_postgres bash -c "pg_restore -d itou --if-exists --clean --no-owner --no-privileges backups/cities.sql"
 	docker exec -ti itou_django bash -c "ls -d itou/fixtures/django/* | xargs django-admin loaddata"
 
+populate_db_venv:
+	pg_restore -d itou --if-exists --clean --no-owner --no-privileges itou/fixtures/postgres/cities.sql
+	ls -d itou/fixtures/django/* | xargs ./manage.py loaddata
 
 COMMAND_GRAPH_MODELS := graph_models --group-models jobs users siaes prescribers job_applications approvals eligibility invitations asp --pygraphviz -o itou-graph-models.png
 
