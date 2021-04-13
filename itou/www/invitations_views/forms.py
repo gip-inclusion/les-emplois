@@ -16,7 +16,7 @@ from itou.users.models import User
 ########################################################################
 
 
-class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
+class PrescriberWithOrgInvitationForm(forms.ModelForm):
     class Meta:
         model = PrescriberWithOrgInvitation
         fields = ["first_name", "last_name", "email"]
@@ -88,7 +88,7 @@ class BaseInvitationFormSet(forms.BaseModelFormSet):
             emails.append(email)
 
 
-class PrescriberWithOrgInvitationFormSet(BaseInvitationFormSet):
+class BasePrescriberWithOrgInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
@@ -105,10 +105,10 @@ class PrescriberWithOrgInvitationFormSet(BaseInvitationFormSet):
 #
 # Formset used when a prescriber invites a person to join his structure.
 #
-NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
+PrescriberWithOrgInvitationFormSet = modelformset_factory(
     PrescriberWithOrgInvitation,
-    form=NewPrescriberWithOrgInvitationForm,
-    formset=PrescriberWithOrgInvitationFormSet,
+    form=PrescriberWithOrgInvitationForm,
+    formset=BasePrescriberWithOrgInvitationFormSet,
     extra=1,
     max_num=30,
 )
@@ -119,7 +119,7 @@ NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
 #############################################################
 
 
-class NewSiaeStaffInvitationForm(forms.ModelForm):
+class SiaeStaffInvitationForm(forms.ModelForm):
     class Meta:
         fields = ["first_name", "last_name", "email"]
         model = SiaeStaffInvitation
@@ -168,7 +168,7 @@ class NewSiaeStaffInvitationForm(forms.ModelForm):
         return invitation
 
 
-class SiaeStaffInvitationFormSet(BaseInvitationFormSet):
+class BaseSiaeStaffInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
@@ -185,8 +185,8 @@ class SiaeStaffInvitationFormSet(BaseInvitationFormSet):
 #
 # Formset used when an employer invites other employers to join his structure.
 #
-NewSiaeStaffInvitationFormSet = modelformset_factory(
-    SiaeStaffInvitation, form=NewSiaeStaffInvitationForm, formset=SiaeStaffInvitationFormSet, extra=1, max_num=30
+SiaeStaffInvitationFormSet = modelformset_factory(
+    SiaeStaffInvitation, form=SiaeStaffInvitationForm, formset=BaseSiaeStaffInvitationFormSet, extra=1, max_num=30
 )
 
 
@@ -195,7 +195,7 @@ NewSiaeStaffInvitationFormSet = modelformset_factory(
 ###############################################################
 
 
-class NewUserForm(SignupForm):
+class NewUserInvitationForm(SignupForm):
     """
     Signup form shown when a user accepts an invitation.
     """

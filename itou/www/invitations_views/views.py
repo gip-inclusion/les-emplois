@@ -13,9 +13,9 @@ from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.invitations_views.forms import (
-    NewPrescriberWithOrgInvitationFormSet,
-    NewSiaeStaffInvitationFormSet,
-    NewUserForm,
+    NewUserInvitationForm,
+    PrescriberWithOrgInvitationFormSet,
+    SiaeStaffInvitationFormSet,
 )
 
 
@@ -48,7 +48,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
             next_step = redirect(next_step)
         else:
             # A new user should be created before joining
-            form = NewUserForm(data=request.POST or None, invitation=invitation)
+            form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
             context["form"] = form
             if form.is_valid():
                 user = form.save(request)
@@ -64,7 +64,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
 def invite_prescriber_with_org(request, template_name="invitations_views/create.html"):
     organization = get_current_org_or_404(request)
     form_kwargs = {"sender": request.user, "organization": organization}
-    formset = NewPrescriberWithOrgInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
+    formset = PrescriberWithOrgInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
             invitations = formset.save()
@@ -120,7 +120,7 @@ def join_prescriber_organization(request, invitation_id):
 def invite_siae_staff(request, template_name="invitations_views/create.html"):
     siae = get_current_siae_or_404(request)
     form_kwargs = {"sender": request.user, "siae": siae}
-    formset = NewSiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
+    formset = SiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
             invitations = formset.save()
