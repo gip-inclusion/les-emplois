@@ -18,6 +18,8 @@
 
         {{ formset.management_form }}
 
+        {% bootstrap_formset_errors formset type="non_field_errors" %}
+
         {% for form in formset %}
             {% bootstrap_form_errors form type="non_field_errors" %}
             <div class="inline-form-row row align-items-top mt-4">
