@@ -2,6 +2,7 @@ from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
 from django.utils import timezone
+from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory
 from itou.invitations.models import SiaeStaffInvitation
@@ -178,6 +179,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
         response = self.client.get(INVITATION_URL)
 
         self.assertTrue(response.context["formset"])
+        # The formset should ensure there are no duplicates in emails
         self.post_data.update(
             {
                 "form-TOTAL_FORMS": "3",
@@ -187,11 +189,12 @@ class TestSendMultipleSiaeInvitation(TestCase):
             }
         )
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-
+        self.assertContains(
+            response,
+            escape("Les invitations doivent avoir des adresses e-mail différentes."),
+        )
         invitations = SiaeStaffInvitation.objects.count()
-        # FIXME The initial test was wrong (TOTAL-FORMS wasn't properly set) and it didn't detect a real bug
-        # It should be 2 or 0 but not 3
-        self.assertEqual(invitations, 3)
+        self.assertEqual(invitations, 0)
 
 
 class TestSendInvitationToSpecialGuest(TestCase):

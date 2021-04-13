@@ -2,6 +2,7 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
 from django.utils.translation import gettext as _, gettext_lazy
 
@@ -76,7 +77,21 @@ class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
         return invitation
 
 
-class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
+class BaseInvitationFormSet(forms.BaseModelFormSet):
+    def clean(self):
+        """Checks that no two invitations have the same email."""
+        if any(self.errors):
+            return
+
+        emails = []
+        for form in self.forms:
+            email = form.cleaned_data.get("email")
+            if email in emails:
+                raise ValidationError("Les invitations doivent avoir des adresses e-mail différentes.")
+            emails.append(email)
+
+
+class PrescriberWithOrgInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
@@ -162,7 +177,7 @@ class NewSiaeStaffInvitationForm(forms.ModelForm):
         return invitation
 
 
-class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
+class SiaeStaffInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
