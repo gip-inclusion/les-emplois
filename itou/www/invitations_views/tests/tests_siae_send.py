@@ -235,8 +235,6 @@ class TestSendInvitationToSpecialGuest(TestCase):
         guest = SiaeWith2MembershipsFactory().members.first()
 
         # Deactivate user
-        # FIXME The comment is wrong and the test too because the wrong SIAE is used to toggle membership
-        # BTW toggle is weak way to deactive (we're not sure about the initial state)
         membership = guest.siaemembership_set.first()
         membership.deactivate_membership_by_user(self.sender_siae.members.first())
         membership.save()
