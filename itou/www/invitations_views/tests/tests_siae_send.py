@@ -42,19 +42,13 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertContains(response, form["email"].label)
 
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertContains(response, "Votre invitation a été envoyée par e-mail")
+        self.assertContains(response, "Votre invitation a été envoyée par e-mail.")
 
         invitations = SiaeStaffInvitation.objects.all()
         self.assertEqual(len(invitations), 1)
 
         invitation = invitations[0]
         self.assertEqual(invitation.sender.pk, self.sender.pk)
-
-        # Make sure a success message is present
-        messages = list(response.context["messages"])
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level_tag, "success")
-
         self.assertTrue(invitation.sent)
 
         # Make sure an email has been sent to the invited person
@@ -112,12 +106,7 @@ class TestSendSingleSiaeInvitation(TestCase):
             siae=self.siae,
         )
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        # Make sure a success message is present
-        messages = list(response.context["messages"])
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level_tag, "success")
-
-        self.assertTrue(invitation.sent)
+        self.assertContains(response, "Votre invitation a été envoyée par e-mail.")
 
         # Make sure an email has been sent to the invited person
         self.assertEqual(len(mail.outbox), 1)

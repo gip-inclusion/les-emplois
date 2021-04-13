@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
+from django.utils.html import escape
 
 from itou.invitations.factories import PrescriberWithOrgSentInvitationFactory
 from itou.invitations.models import PrescriberWithOrgInvitation
@@ -186,10 +187,8 @@ class TestAcceptPrescriberWithOrgInvitation(TestCase):
         self.assertEqual(self.organization.members.count(), 3)
 
         # Make sure there's a welcome message.
-        messages = list(response.context["messages"])
-        self.assertEqual(messages[0].level_tag, "success")
-        self.assertEqual(
-            str(messages[0]), f"Vous êtes désormais membre de l'organisation {self.organization.display_name}."
+        self.assertContains(
+            response, escape(f"Vous êtes désormais membre de l'organisation {self.organization.display_name}.")
         )
 
         # A confirmation e-mail is sent to the invitation sender.
@@ -294,7 +293,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
         self.assertRedirects(response, reverse("account_logout"))
         invitation.refresh_from_db()
         self.assertFalse(invitation.accepted)
-        self.assertIn("Un utilisateur est déjà connecté.", str(list(response.context["messages"])[0]))
+        self.assertContains(response, escape("Un utilisateur est déjà connecté."))
 
     def test_expired_invitation_with_new_user(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
@@ -309,7 +308,7 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
             "password2": "Erls92#32",
         }
         response = self.client.post(invitation.acceptance_link, data=post_data, follow=True)
-        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+        self.assertContains(response, escape("Cette invitation n'est plus valide."))
 
     def test_expired_invitation_with_existing_user(self):
         user = PrescriberFactory()
@@ -326,11 +325,11 @@ class TestAcceptPrescriberWithOrgInvitationExceptions(TestCase):
 
         # GET or POST in this case
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+        self.assertContains(response, escape("Cette invitation n'est plus valide."))
 
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         # Try to bypass the first check by directly reaching the join endpoint
         join_url = reverse("invitations_views:join_prescriber_organization", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         # The 2 views return the same error message
-        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+        self.assertContains(response, escape("Cette invitation n'est plus valide."))
