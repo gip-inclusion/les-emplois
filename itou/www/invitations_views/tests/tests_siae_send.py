@@ -77,7 +77,7 @@ class TestSendSingleSiaeInvitation(TestCase):
 
         invitation = invitations[0]
 
-        # At least one complte test of the invitation fields in our test suite
+        # At least one complete test of the invitation fields in our test suite
         self.assertFalse(invitation.accepted)
         self.assertTrue(invitation.sent_at < timezone.now())
         self.assertEqual(invitation.first_name, guest.first_name)
@@ -100,16 +100,6 @@ class TestSendSingleSiaeInvitation(TestCase):
             for key, _errors in error_dict.items():
                 self.assertEqual(key, "email")
                 self.assertEqual(error_dict["email"][0], "Cet utilisateur n'est pas un employeur.")
-
-    def test_send_invitation_existing_invitation(self):
-        # FIXME To write
-        # SentInvitationFactory(
-        #     sender=self.sender,
-        #     first_name=self.guest_data["first_name"],
-        #     last_name=self.guest_data["last_name"],
-        #     email=self.guest_data["email"],
-        # )
-        pass
 
     def test_extend_expired_invitation(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
