@@ -1,6 +1,7 @@
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
+from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -17,11 +18,6 @@ class TestAcceptInvitation(TestCase):
         self.assertTrue(user.is_siae_staff)
         self.assertTrue(invitation.accepted)
         self.assertTrue(invitation.accepted_at)
-
-        # Make sure there's a welcome message.
-        messages = list(response.context["messages"])
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level_tag, "success")
 
         # A confirmation e-mail is sent to the invitation sender.
         self.assertEqual(len(mail.outbox), 1)
@@ -116,7 +112,7 @@ class TestAcceptInvitation(TestCase):
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
-        self.assertEqual(str(list(response.context["messages"])[0]), "Cette invitation n'est plus valide.")
+        self.assertContains(response, escape("Cette invitation n'est plus valide."))
 
     def test_inactive_siae(self):
         siae = SiaeFactory(convention__is_active=False)
@@ -125,7 +121,7 @@ class TestAcceptInvitation(TestCase):
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
-        self.assertEqual(str(list(response.context["messages"])[0]), "Cette structure n'est plus active.")
+        self.assertContains(response, escape("Cette structure n'est plus active."))
 
     def test_non_existent_invitation(self):
         invitation = SentSiaeStaffInvitationFactory.build(
@@ -137,7 +133,6 @@ class TestAcceptInvitation(TestCase):
     def test_accepted_invitation(self):
         invitation = SentSiaeStaffInvitationFactory(accepted=True)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertEqual(response.status_code, 200)
         self.assertContains(response, "acceptée")
 
     def test_accept_existing_user_with_existing_inactive_siae(self):
@@ -185,7 +180,4 @@ class TestAcceptInvitation(TestCase):
 
         self.assertEqual(reverse("account_logout"), response.wsgi_request.path)
         self.assertFalse(invitation.accepted)
-        messages = list(response.context["messages"])
-
-        self.assertEqual(len(messages), 1)
-        self.assertIn("Un utilisateur est déjà connecté.", str(messages[0]))
+        self.assertContains(response, "Un utilisateur est déjà connecté.")
