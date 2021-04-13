@@ -1,7 +1,5 @@
 import csv
 
-from django.http import HttpResponse
-
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.metabase.management.commands._utils import get_choice
@@ -78,7 +76,7 @@ def _get_eligibility_status(job_application):
     return eligibility
 
 
-def _serialize_job_application_as_csv_array(job_application):
+def _job_application_as_dict(job_application):
     """
     The main CSV export mthod: it converts a JobApplication into a CSV array data
     """
@@ -93,42 +91,30 @@ def _serialize_job_application_as_csv_array(job_application):
         approval_start_date = job_application.approval.start_at
         approval_end_date = job_application.approval.end_at
 
-    return [
-        seeker.first_name,
-        seeker.last_name,
-        seeker.email,
-        seeker.phone,
-        _format_date(seeker.birthdate),
-        seeker.city,
-        seeker.post_code,
-        siae.display_name,
-        siae.kind,
-        _get_selected_jobs(job_application),
-        _get_job_application_origin(job_application),
-        _get_prescriber_name(job_application),
-        _get_prescriber_kind(job_application),
-        _format_date(job_application.created_at),
-        job_application.get_state_display(),
-        _format_date(job_application.hiring_start_at),
-        _format_date(job_application.hiring_end_at),
-        job_application.get_refusal_reason_display(),
-        _get_eligibility_status(job_application),
-        numero_pass_iae,
-        _format_date(approval_start_date),
-        _format_date(approval_end_date),
-    ]
-
-
-def generate_csv_export_for_download(job_applications, filename="candidatures.csv"):
-    """
-    Converts a list of job application to CSV and return an HTTP response for download
-    """
-    response = HttpResponse(content_type="text/csv", charset="utf-16")
-    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
-
-    generate_csv_export(job_applications, response)
-
-    return response
+    return {
+        "Nom candidat": seeker.last_name,
+        "Prénom candidat": seeker.first_name,
+        "Email candidat": seeker.email,
+        "Téléphone candidat": seeker.phone,
+        "Date de naissance candidat": _format_date(seeker.birthdate),
+        "Ville candidat": seeker.city,
+        "Département candidat": seeker.post_code,
+        "Nom structure employeur": siae.display_name,
+        "Type employeur": siae.kind,
+        "Métiers": _get_selected_jobs(job_application),
+        "Source de la candidature": _get_job_application_origin(job_application),
+        "Nom prescripteur": _get_prescriber_name(job_application),
+        "Type prescripteur": _get_prescriber_kind(job_application),
+        "Date de la candidature": _format_date(job_application.created_at),
+        "Statut de la candidature": job_application.get_state_display(),
+        "Dates de début d’embauche": _format_date(job_application.hiring_start_at),
+        "Dates de fin d’embauche": _format_date(job_application.hiring_end_at),
+        "Motifs de refus": job_application.get_refusal_reason_display(),
+        "Éligibilité IAE validée": _get_eligibility_status(job_application),
+        "Numéro Pass IAE": numero_pass_iae,
+        "Début Pass IAE": _format_date(approval_start_date),
+        "Fin Pass IAE": _format_date(approval_end_date),
+    }
 
 
 def generate_csv_export(job_applications, stream):
@@ -137,9 +123,9 @@ def generate_csv_export(job_applications, stream):
     The stream can be for instance an http response, a string (io.StringIO()) or a file
     """
 
-    writer = csv.writer(stream, quoting=csv.QUOTE_ALL)
+    rows = [_job_application_as_dict(job_application) for job_application in job_applications.iterator()]
 
-    writer.writerow(JOB_APPLICATION_CSV_HEADERS)
+    writer = csv.DictWriter(stream, quoting=csv.QUOTE_ALL, fieldnames=JOB_APPLICATION_CSV_HEADERS)
 
-    for job_application in job_applications.iterator():
-        writer.writerow(_serialize_job_application_as_csv_array(job_application))
+    writer.writeheader()
+    writer.writerows(rows)

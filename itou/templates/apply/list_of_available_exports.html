@@ -4,15 +4,18 @@
 {% block title %}{% translate "Export des suivis de candidatures" %}{{ block.super }}{% endblock %}
 
 {% block content %}
-
+    {% if export_for == "siae" %}
     <h1>Export des candidatures reçues chez {{ siae.display_name }}</h1>
+    {% else %}
+    <h1>Export des candidatures</h1>
+    {% endif %}
 
     {% if not job_applications_by_month %}
         <h2 class="font-weight-normal text-muted">
             {% translate "Aucune candidature pour le moment." %}
         </h2>
     {% else %}
-        
+
         {% include "apply/includes/info_csv.html" %}
 
         <div class="table-responsive">
@@ -30,9 +33,15 @@
                         <td>{{ month.month|date:"M Y" }}</td>
                         <td>{{ month.c }}</td>
                         <td>
+                        {% if export_for == "siae" %}
                             <a href="{% url 'apply:list_for_siae_exports_download' export_month=month.month|date:"Y-m" %}">
                                 {% include "includes/icon.html" with icon="download" %} Télécharger
                             </a>
+                        {% else %}
+                            <a href="{% url 'apply:list_for_prescriber_exports_download' export_month=month.month|date:"Y-m" %}">
+                                {% include "includes/icon.html" with icon="download" %} Télécharger
+                            </a>
+                        {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -41,8 +50,4 @@
         </div>
     {% endif %}
 
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
 {% endblock %}
