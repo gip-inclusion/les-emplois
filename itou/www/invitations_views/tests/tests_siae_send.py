@@ -98,7 +98,7 @@ class TestSendSingleSiaeInvitation(TestCase):
 
     def test_extend_expired_invitation(self):
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        invitation = ExpiredSiaeStaffInvitationFactory(
+        ExpiredSiaeStaffInvitationFactory(
             sender=self.sender,
             first_name=self.guest_data["first_name"],
             last_name=self.guest_data["last_name"],

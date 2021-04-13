@@ -12,7 +12,7 @@ from itou.utils.perms.siae import get_current_siae_or_404
 
 
 class TestAcceptInvitation(TestCase):
-    def assert_accepted_invitation(self, invitation, user, response):
+    def assert_accepted_invitation(self, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()
         self.assertTrue(user.is_siae_staff)
@@ -51,7 +51,7 @@ class TestAcceptInvitation(TestCase):
 
         user = User.objects.get(email=invitation.email)
         self.assertTrue(user.emailaddress_set.first().verified)
-        self.assert_accepted_invitation(invitation, user, response)
+        self.assert_accepted_invitation(invitation, user)
 
     def test_accept_invitation_logged_in_user(self):
         # A logged in user should log out before accepting an invitation.
@@ -157,7 +157,7 @@ class TestAcceptInvitation(TestCase):
 
         current_siae = get_current_siae_or_404(response.wsgi_request)
         self.assertEqual(siae.pk, current_siae.pk)
-        self.assert_accepted_invitation(invitation, user, response)
+        self.assert_accepted_invitation(invitation, user)
 
     def test_accept_existing_user_is_not_employer(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
