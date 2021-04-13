@@ -9,7 +9,7 @@ from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from itou.siaes.factories import SiaeWith2MembershipsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
-from itou.www.invitations_views.forms import NewSiaeStaffInvitationForm
+from itou.www.invitations_views.forms import SiaeStaffInvitationForm
 
 
 INVITATION_URL = reverse("invitations_views:invite_siae_staff")
@@ -36,7 +36,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         response = self.client.get(INVITATION_URL)
 
         # Assert form is present
-        form = NewSiaeStaffInvitationForm(sender=self.sender, siae=self.siae)
+        form = SiaeStaffInvitationForm(sender=self.sender, siae=self.siae)
         self.assertContains(response, form["first_name"].label)
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
