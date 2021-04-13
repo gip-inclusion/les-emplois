@@ -1,3 +1,4 @@
+from allauth.account.models import EmailAddress
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -18,6 +19,11 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        has_verified_email = EmailAddress.objects.filter(email=self.instance.email, verified=True)
+        if has_verified_email or not self.instance.is_job_seeker:
+            # We want the possibility to edit the email of job seekers
+            # until they validate their email
+            del self.fields["email"]
         if not self.instance.is_job_seeker:
             del self.fields["birthdate"]
             del self.fields["pole_emploi_id"]
@@ -40,6 +46,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = [
+            "email",
             "first_name",
             "last_name",
             "birthdate",
