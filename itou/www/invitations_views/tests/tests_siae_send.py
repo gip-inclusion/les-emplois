@@ -136,15 +136,11 @@ class TestSendSingleSiaeInvitation(TestCase):
         sender_2 = siae_2.members.first()
         self.client.login(email=sender_2.email, password=DEFAULT_PASSWORD)
         self.client.post(INVITATION_URL, data=self.post_data)
+        self.assertEqual(SiaeStaffInvitation.objects.count(), 2)
         invitation = SiaeStaffInvitation.objects.get(siae=siae_2)
         self.assertEqual(invitation.first_name, self.guest_data["first_name"])
         self.assertEqual(invitation.last_name, self.guest_data["last_name"])
         self.assertEqual(invitation.email, self.guest_data["email"])
-
-        # SIAE 1 should be able to refresh the invitation.
-        # FIXME Don't understand the goal of this POST and there is no test after the POST
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        self.client.post(INVITATION_URL, data=self.post_data)
 
 
 class TestSendMultipleSiaeInvitation(TestCase):
