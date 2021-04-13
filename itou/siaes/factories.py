@@ -147,8 +147,6 @@ class SiaeWithMembershipAndJobsFactory(SiaeWithMembershipFactory, SiaeWithJobsFa
         SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
     """
 
-    pass
-
 
 class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
     """
