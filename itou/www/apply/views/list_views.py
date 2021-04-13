@@ -4,7 +4,7 @@ from django.db.models.functions import TruncMonth
 from django.shortcuts import render
 from django.utils.text import slugify
 
-from itou.job_applications.csv_export import generate_csv_export_for_download
+from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.models import JobApplication
 from itou.utils.pagination import pager
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -14,6 +14,18 @@ from itou.www.apply.forms import (
     PrescriberFilterJobApplicationsForm,
     SiaeFilterJobApplicationsForm,
 )
+from django.http import HttpResponse
+
+def generate_csv_export_for_download(job_applications, filename="candidatures.csv"):
+    """
+    Converts a list of job application to CSV and return an HTTP response for download
+    """
+    response = HttpResponse(content_type="text/csv", charset="utf-16")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
+
+    generate_csv_export(job_applications, response)
+
+    return response
 
 
 def get_prescriber_job_application_list(request):
@@ -105,7 +117,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
 @login_required
 @user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
-def list_for_prescriber_exports(request, template_name="apply/list_of_available_prescriber_exports.html"):
+def list_for_prescriber_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
@@ -114,7 +126,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     job_applications = get_prescriber_job_application_list(request)
     job_applications_by_month = get_job_applications_by_month(job_applications)
 
-    context = {"job_applications_by_month": job_applications_by_month}
+    context = {"job_applications_by_month": job_applications_by_month, "export_for": "prescriber"}
     return render(request, template_name, context)
 
 
@@ -159,7 +171,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
 
 
 @login_required
-def list_for_siae_exports(request, template_name="apply/list_of_available_siae_exports.html"):
+def list_for_siae_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a SIAE, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
@@ -169,7 +181,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_siae_e
     job_applications = siae.job_applications_received
     job_applications_by_month = get_job_applications_by_month(job_applications)
 
-    context = {"job_applications_by_month": job_applications_by_month, "siae": siae}
+    context = {"job_applications_by_month": job_applications_by_month, "siae": siae, "export_for": "siae"}
     return render(request, template_name, context)
 
 
