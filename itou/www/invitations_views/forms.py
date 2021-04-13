@@ -44,18 +44,15 @@ class NewPrescriberWithOrgInvitationForm(forms.ModelForm):
 
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
-        invitation = invitation_model.objects.filter(email__iexact=email, organization=self.organization).first()
-        if invitation:
-            # We can re-invite *deactivated* members,
-            # even if they already received an invitation
-            user_is_member = self.organization.active_members.filter(email=email).exists()
-            if invitation.accepted and user_is_member:
-                error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
-                self.add_error("email", error)
-            else:
-                # WARNING The form is now bound to this instance
-                self.instance = invitation
-                self.instance.extend_expiration_date()
+        existing_invitation = invitation_model.objects.filter(
+            email__iexact=email, organization=self.organization
+        ).first()
+        if existing_invitation:
+            #
+            # WARNING The form is now bound to this instance
+            #
+            self.instance = existing_invitation
+            self.instance.extend_expiration_date()
 
     def clean_email(self):
         email = self.cleaned_data["email"]
@@ -149,19 +146,13 @@ class NewSiaeStaffInvitationForm(forms.ModelForm):
 
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
-        invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
-        # We can re-invite *deactivated* members,
-        # even if they already received an invitation
-        user_is_member = self.siae.active_members.filter(email=email).exists()
-
-        if invitation:
-            if invitation.accepted and user_is_member:
-                error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
-                self.add_error("email", error)
-            else:
-                # WARNING The form is now bound to this instance
-                self.instance = invitation
-                self.instance.extend_expiration_date()
+        existing_invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
+        if existing_invitation:
+            #
+            # WARNING The form is now bound to this instance
+            #
+            self.instance = existing_invitation
+            self.instance.extend_expiration_date()
 
     def clean_email(self):
         email = self.cleaned_data["email"]
