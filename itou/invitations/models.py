@@ -249,7 +249,7 @@ class SiaeStaffInvitation(InvitationAbstract):
         user = User.objects.get(email=self.email)
         self.siae.members.add(user)
         user.save()
-        # We must be able to invite a former member of this  SIAE
+        # We must be able to invite a former member of this SIAE
         # however `members.add()` does not update membership status if it already exists
         if user not in self.siae.active_members:
             membership = user.siaemembership_set.get(is_active=False, siae=self.siae)

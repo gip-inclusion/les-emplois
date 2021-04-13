@@ -7,7 +7,7 @@ from django.utils.html import escape
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory
 from itou.invitations.models import SiaeStaffInvitation
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeWith2MembershipsFactory
+from itou.siaes.factories import SiaeMembershipFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 from itou.www.invitations_views.forms import SiaeStaffInvitationForm
 
@@ -17,7 +17,7 @@ INVITATION_URL = reverse("invitations_views:invite_siae_staff")
 
 class TestSendSingleSiaeInvitation(TestCase):
     def setUp(self):
-        self.siae = SiaeWith2MembershipsFactory()
+        self.siae = SiaeWithMembershipFactory()
         # The sender is a member of the SIAE
         self.sender = self.siae.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
@@ -122,7 +122,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertEqual(SiaeStaffInvitation.objects.count(), 1)
 
         # SIAE 2 invites guest as well.
-        siae_2 = SiaeWith2MembershipsFactory()
+        siae_2 = SiaeWithMembershipFactory()
         sender_2 = siae_2.members.first()
         self.client.login(email=sender_2.email, password=DEFAULT_PASSWORD)
         self.client.post(INVITATION_URL, data=self.post_data)
@@ -142,7 +142,7 @@ class TestSendSingleSiaeInvitation(TestCase):
 
 class TestSendMultipleSiaeInvitation(TestCase):
     def setUp(self):
-        self.siae = SiaeWith2MembershipsFactory()
+        self.siae = SiaeWithMembershipFactory()
         # The sender is a member of the SIAE
         self.sender = self.siae.members.first()
         # Define instances not created in DB
@@ -195,7 +195,7 @@ class TestSendMultipleSiaeInvitation(TestCase):
 
 class TestSendInvitationToSpecialGuest(TestCase):
     def setUp(self):
-        self.sender_siae = SiaeWith2MembershipsFactory()
+        self.sender_siae = SiaeWithMembershipFactory()
         self.sender = self.sender_siae.members.first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data = {
@@ -211,7 +211,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         can only be ressucitated by being invited to a new SIAE.
         We test here that this is indeed possible.
         """
-        guest = SiaeWith2MembershipsFactory(convention__is_active=False).members.first()
+        guest = SiaeWithMembershipFactory(convention__is_active=False).members.first()
         self.post_data.update(
             {
                 "form-0-first_name": guest.first_name,
@@ -228,7 +228,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         Admins can "deactivate" members of the organization (making the membership inactive).
         A deactivated member must be able to receive new invitations.
         """
-        guest = SiaeWith2MembershipsFactory().members.first()
+        guest = SiaeWithMembershipFactory().members.first()
 
         # Deactivate user
         membership = guest.siaemembership_set.first()
@@ -282,6 +282,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
 
     def test_already_a_member(self):
         # The invited user is already a member
+        SiaeMembershipFactory(siae=self.sender_siae, is_siae_admin=False)
         guest = self.sender_siae.members.exclude(email=self.sender.email).first()
         self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
         self.post_data.update(
