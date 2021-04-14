@@ -132,13 +132,6 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.assertEqual(invitation.last_name, self.guest_data["last_name"])
         self.assertEqual(invitation.email, self.guest_data["email"])
 
-    def test_invitation_for_inactive_siae(self):
-        self.client.login(email=self.sender.email, password=DEFAULT_PASSWORD)
-        self.siae.convention.is_active = False
-        self.siae.convention.save()
-        response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)
-        self.assertEqual(response.status_code, 404)
-
 
 class TestSendMultipleSiaeInvitation(TestCase):
     def setUp(self):
