@@ -7,44 +7,27 @@ from itou.job_applications.models import JobApplication
 from itou.siaes.models import SiaeFinancialAnnex
 
 
-class Status(models.TextChoices):
-    """
-    Status of the employee record
-
-    Self-explanatory on the meaning, however:
-    - an E.R. can be modified until it is in the PROCESSED state
-    - after that, the FS is "archived" and can't be used for further interaction
-    """
-
-    NEW = "NEW", "Nouvelle fiche salarié"
-    READY = "READY", "Données complètes, prêtes à l'envoi ASP"
-    SENT = "SENT", "Envoyée ASP"
-    REJECTED = "REJECTED", "Rejet ASP"
-    PROCESSED = "PROCESSED", "Traitée ASP"
-    ARCHIVED = "ARCHIVED", "Archivée"
-
-
 class EmployeeRecordQuerySet(models.QuerySet):
     def ready(self):
         """
         These FS are ready to to be sent to ASP
         """
-        return self.filter(status=Status.READY)
+        return self.filter(status=EmployeeRecord.Status.READY)
 
     def sent(self):
-        return self.filter(status=Status.SENT)
+        return self.filter(status=EmployeeRecord.Status.SENT)
 
     def rejected(self):
-        return self.filter(status=Status.REJECTED)
+        return self.filter(status=EmployeeRecord.Status.REJECTED)
 
     def processed(self):
-        return self.filter(status=Status.PROCESSED)
+        return self.filter(status=EmployeeRecord.Status.PROCESSED)
 
     def archived(self):
         """
         Archived employee records (completed and having a JSON archive)
         """
-        return self.filter(status=Status.ARCHIVED)
+        return self.filter(status=EmployeeRecord.Status.ARCHIVED)
 
     def find_from_batch(self, kind, siret, approval_number):
         """
@@ -74,6 +57,22 @@ class EmployeeRecord(models.Model):
 
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
+
+    class Status(models.TextChoices):
+        """
+        Status of the employee record
+
+        Self-explanatory on the meaning, however:
+        - an E.R. can be modified until it is in the PROCESSED state
+        - after that, the FS is "archived" and can't be used for further interaction
+        """
+
+        NEW = "NEW", "Nouvelle fiche salarié"
+        READY = "READY", "Données complètes, prêtes à l'envoi ASP"
+        SENT = "SENT", "Envoyée ASP"
+        REJECTED = "REJECTED", "Rejet ASP"
+        PROCESSED = "PROCESSED", "Traitée ASP"
+        ARCHIVED = "ARCHIVED", "Archivée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -169,12 +168,14 @@ class EmployeeRecord(models.Model):
         Check if data provided for the job seeker part of the FS is complete / valid
         """
         job_seeker = self.job_application.job_seeker
+
+        # Check if user is "clean"
         job_seeker.clean()
 
         if not job_seeker.has_jobseeker_profile:
             raise ValidationError(self.ERROR_JOB_SEEKER_HAS_NO_PROFILE)
 
-        # Validation takes place in the job seeker profile
+        # Further validation in the job seeker profile
         job_seeker.jobseeker_profile.clean()
 
     def clean(self):
@@ -201,7 +202,7 @@ class EmployeeRecord(models.Model):
 
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
-        self.status = Status.READY
+        self.status = self.Status.READY
         self.save()
 
     @property
@@ -210,7 +211,7 @@ class EmployeeRecord(models.Model):
         Once in final state (PROCESSED), an EmployeeRecord is archived.
         See model save() and clean() method.
         """
-        return self.status == Status.PROCESSED and self.json is not None
+        return self.status == self.Status.PROCESSED and self.json is not None
 
     @property
     def is_updatable(self):
@@ -227,7 +228,7 @@ class EmployeeRecord(models.Model):
 
         See model save() and clean() method.
         """
-        return self.status != Status.SENT and not self.is_archived
+        return self.status != self.Status.SENT and not self.is_archived
 
     @property
     def job_seeker(self):
@@ -328,30 +329,17 @@ class EmployeeRecord(models.Model):
         already exists, this method returns None
 
         Defensive:
-        Raises exception if job application is not suitable for creation of a new employee record
-
+        - raises exception if job application is not suitable for creation of a new employee record
+        - job seeker profile must exist before creating an employee record
         """
         assert job_application
 
-        # if (
-        #     job_application.can_be_cancelled
-        #     or not job_application.state.is_accepted
-        #     or not job_application.approval
-        #     or cls.objects.filter(
-        #         asp_id=job_application.to_siae.convention.asp_id,
-        #         approval_number=job_application.approval.number,
-        #     ).exists()
-        # ):
-        #     return None
-
         fs = cls(job_application=job_application)
+
         fs.clean()
 
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number
-
-        # If the jobseeker has no profile, create one
-        job_application.job_seeker.get_or_create_job_seeker_profile()
 
         return fs
 

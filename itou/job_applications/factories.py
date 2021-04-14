@@ -13,7 +13,12 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from itou.users.factories import (
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    JobSeekerWithMockedAddressFactory,
+    PrescriberFactory,
+)
 from itou.users.models import User
 
 
@@ -160,6 +165,8 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
 
     Suitable for employee records tests
     """
+
+    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
 
     @factory.post_generation
     def set_job_seeker_profile(self, create, extracted, **kwargs):
