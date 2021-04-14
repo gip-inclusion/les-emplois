@@ -278,3 +278,7 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
 ]
 
 RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in BAN_GEOCODING_API_RESULTS_MOCK}
+
+
+def mock_get_geocoding_data(address, post_code=None, limit=1):
+    return RESULTS_BY_ADDRESS.get(address)
