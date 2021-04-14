@@ -5,7 +5,7 @@ from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory
+from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -79,7 +79,7 @@ class TestAcceptInvitation(TestCase):
         }
 
         # Fill in the password and send
-        response = self.client.post(invitation.acceptance_link, data={**form_data}, follow=True)
+        response = self.client.post(invitation.acceptance_link, data=form_data, follow=True)
         self.assertRedirects(response, reverse("dashboard:index"))
 
         user = User.objects.get(email=invitation.email)
@@ -135,10 +135,10 @@ class TestAcceptInvitation(TestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, "acceptée")
 
-    def test_accept_existing_user_with_existing_inactive_siae(self):
+    def test_accept_existing_user_already_member_of_inactive_siae(self):
         """
-        An inactive siae user (i.e. attached to a single inactive siae)
-        can only be ressucitated by being invited to a new siae.
+        An inactive SIAE user (i.e. attached to a single inactive SIAE)
+        can only be ressucitated by being invited to a new SIAE.
         We test here that this is indeed possible.
         """
         siae = SiaeWith2MembershipsFactory()
@@ -158,6 +158,23 @@ class TestAcceptInvitation(TestCase):
         current_siae = get_current_siae_or_404(response.wsgi_request)
         self.assertEqual(siae.pk, current_siae.pk)
         self.assert_accepted_invitation(invitation, user)
+
+    def test_accept_new_user_to_inactive_siae(self):
+        siae = SiaeWithMembershipFactory(convention__is_active=False)
+        sender = siae.members.first()
+        invitation = SentSiaeStaffInvitationFactory(
+            sender=sender,
+            siae=siae,
+        )
+        form_data = {
+            "first_name": invitation.first_name,
+            "last_name": invitation.last_name,
+            "email": invitation.email,
+            "password1": "Erls92#32",
+            "password2": "Erls92#32",
+        }
+        response = self.client.post(invitation.acceptance_link, data=form_data)
+        self.assertContains(response, escape("La structure que vous souhaitez rejoindre n'est plus active."))
 
     def test_accept_existing_user_is_not_employer(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()

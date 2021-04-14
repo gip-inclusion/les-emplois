@@ -226,6 +226,11 @@ class NewUserInvitationForm(SignupForm):
         self.fields["first_name"].initial = invitation.first_name
         self.fields["last_name"].initial = invitation.last_name
 
+    def clean(self):
+        if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
+            raise forms.ValidationError(_("La structure que vous souhaitez rejoindre n'est plus active."))
+        super().clean()
+
     def save(self, request):
         self.cleaned_data["email"] = self.email
         get_adapter().stash_verified_email(request, self.email)
