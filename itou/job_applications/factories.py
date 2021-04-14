@@ -13,7 +13,8 @@ from itou.prescribers.factories import (
 )
 from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import SiaeJobDescription
-from itou.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from itou.users.models import User
 
 
 class JobApplicationFactory(factory.django.DjangoModelFactory):
@@ -136,3 +137,34 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
 class JobApplicationWithApprovalNotCancellableFactory(JobApplicationWithApprovalFactory):
     hiring_start_at = datetime.date.today() - relativedelta(days=5)
     hiring_end_at = datetime.date.today() + relativedelta(years=2, days=-5)
+
+
+class JobApplicationWithJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):
+    """
+    This job application has a jobseeker with an EMPTY job seeker profile
+
+    Suitable for employee records tests
+    """
+
+    @factory.post_generation
+    def set_job_seeker_profile(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        JobSeekerProfileFactory(user=self.job_seeker).save()
+
+
+class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):
+    """
+    This job application has a jobseeker with a COMPLETE job seeker profile
+
+    Suitable for employee records tests
+    """
+
+    @factory.post_generation
+    def set_job_seeker_profile(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        self.job_seeker.title = User.Title.M
+        JobSeekerProfileFactory(user=self.job_seeker).save()
