@@ -64,8 +64,13 @@ class EmployeeRecord(models.Model):
     ERROR_JOB_APPLICATION_TOO_RECENT = "L'embauche a été validé trop récemment"
     ERROR_JOB_SEEKER_TITLE = "La civilité du salarié est obligatoire"
     ERROR_JOB_SEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
+    ERROR_JOB_APPLICATION_WITHOUT_APPROVAL = "L'embauche n'est pas reliée à un PASS IAE"
 
+    ERROR_JOB_SEEKER_TITLE = "La civilité du salarié est obligatoire"
+    ERROR_JOB_SEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
+
+    ERROR_EMPLOYEE_RECORD_IS_DUPLICATE = "Une fiche salarié pour ce PASS IAE et cette SIAE existe déjà"
 
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
@@ -91,7 +96,7 @@ class EmployeeRecord(models.Model):
     # This field can't be automatically filled, the user will be asked
     # to select a valid one manually
     financial_annex = models.ForeignKey(
-        SiaeFinancialAnnex, verbose_name=_("Annexe financière"), null=True, on_delete=models.SET_NULL
+        SiaeFinancialAnnex, verbose_name="Annexe financière", null=True, on_delete=models.SET_NULL
     )
 
     # These fields are duplicated to act as constraint fields on DB level
@@ -99,8 +104,8 @@ class EmployeeRecord(models.Model):
     asp_id = models.IntegerField(verbose_name="ID ASP de la SIAE")
 
     # ASP processing part
-    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", blank=True)
-    asp_processing_label = models.CharField(max_length=100, verbose_name="Libellé de traitement ASP", blank=True)
+    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
+    asp_processing_label = models.CharField(max_length=100, verbose_name="Libellé de traitement ASP", null=True)
     asp_process_response = models.JSONField(verbose_name="Réponse du traitement ASP", null=True)
 
     # Once correctly processed by ASP, the employee record is archived:
@@ -110,6 +115,7 @@ class EmployeeRecord(models.Model):
     # except for the archive serialization, which occurs once.
     # It will only return a list of this JSON field for archived employee records.
     archived_json = models.JSONField(verbose_name="Fiche salarié au format JSON (archive)", null=True)
+
     objects = models.Manager.from_queryset(EmployeeRecordQuerySet)()
 
     class Meta:
@@ -143,11 +149,20 @@ class EmployeeRecord(models.Model):
         """
         ja = self.job_application
 
-        if not ja.is_state_accepted:
+        if not ja.state.is_accepted:
             raise ValidationError(self.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED)
+
+        if not ja.approval:
+            raise ValidationError(self.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL)
 
         if ja.can_be_cancelled:
             raise ValidationError(self.ERROR_JOB_APPLICATION_TOO_RECENT)
+
+        if EmployeeRecord.objects.filter(
+            asp_id=ja.to_siae.convention.asp_id,
+            approval_number=ja.approval.number,
+        ).exists():
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
     def _clean_job_seeker(self):
         """
@@ -311,21 +326,26 @@ class EmployeeRecord(models.Model):
 
         If an employee record with given criteria (approval, SIAE/ASP structure)
         already exists, this method returns None
+
+        Defensive:
+        Raises exception if job application is not suitable for creation of a new employee record
+
         """
         assert job_application
 
-        if (
-            job_application.can_be_cancelled
-            or not job_application.state.is_accepted
-            or not job_application.approval
-            or cls.objects.filter(
-                asp_id=job_application.to_siae.convention.asp_id,
-                approval_number=job_application.approval.number,
-            ).exists()
-        ):
-            return None
+        # if (
+        #     job_application.can_be_cancelled
+        #     or not job_application.state.is_accepted
+        #     or not job_application.approval
+        #     or cls.objects.filter(
+        #         asp_id=job_application.to_siae.convention.asp_id,
+        #         approval_number=job_application.approval.number,
+        #     ).exists()
+        # ):
+        #     return None
 
         fs = cls(job_application=job_application)
+        fs.clean()
 
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number

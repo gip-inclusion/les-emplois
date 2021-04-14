@@ -7,7 +7,6 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
-from tqdm import tqdm
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
@@ -17,14 +16,6 @@ from itou.utils.iterators import chunks
 # Global SFTP connection options
 cnopts = pysftp.CnOpts()
 cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
-
-# FIXME
-# Temporary mock of some FS fields
-
-
-def _mock_fs(fs):
-    #    ACI 023 20 1111 A0 M0
-    pass
 
 
 class Command(BaseCommand):
@@ -115,6 +106,8 @@ class Command(BaseCommand):
         # JSONRenderer produces byte arrays
         json_b = JSONRenderer().render(batch.data)
 
+        # self.logger.info("BATCH content: %s", json_b)
+
         # Using FileIO objects allows to use them as files
         # Cool side effect: no temporary file needed
         json_bytes = BytesIO(json_b)
@@ -122,29 +115,66 @@ class Command(BaseCommand):
 
         if dry_run:
             self.logger.info("DRY-RUN: (not) sending '%s' (%d bytes)", remote_path, len(json_b))
+            self.logger.info("Content: \n%s", json_b)
             return
 
         # There are specific folders for upload and download on the SFTP server
         with conn.cd(settings.ASP_FS_UPLOAD_DIR):
-            # After creating a FileIO object, internal pointer is a the end of the buffer
+            # After creating a FileIO object, internal pointer is at the end of the buffer
             # It must be set back to 0 (rewind) otherwise an empty file is sent
             json_bytes.seek(0)
 
             # ASP SFTP server does not return a proper list of transmitted files
             # Whether it's a bug or a paranoid security parameter
             # we must assert that there is no verification of the remote file existence
-            # This is the meaning `confirm=False`
+            # This is the meaning of `confirm=False`
             try:
                 self.logger.info(json_b)
                 conn.putfo(json_bytes, remote_path, file_size=len(json_b), confirm=False)
-                # with conn.open(remote_path, "w") as remote_file:
-                #    remote_file.write(json_s)
                 self.logger.info("Succesfully uploaded '%s'", remote_path)
             except Exception as ex:
                 self.logger.error("Could not upload file: '%s', reason: %s", remote_path, ex)
 
-    def _update_employee_records_status(self, employe_record):
-        pass
+    def _update_employee_records_status(self, employee_records_batch):
+        """
+        Update status and add information to processed employee records
+        """
+
+        success_code = "0000"
+
+        for batch in employee_records_batch:
+            print(batch)
+            employee_records = batch.get("lignesTelechargement")
+
+            if not employee_records:
+                self.logger.error("Could not get any employee record from batch file")
+                continue
+
+            for employee_record in employee_records:
+                processing_code = employee_record.get("codeTraitement")
+                processing_label = employee_record.get("libelleTraitement")
+
+                self.logger.info("Processing code: %s", processing_code)
+                self.logger.info("Processing label: %s", processing_label)
+
+                # Now we must find the matching FS
+                approval_number = siret = kind = None
+
+                kind = employee_record.get("mesure")
+                siret = employee_record.get("siret")
+                if physical_person := employee_record.get("personnePhysique"):
+                    approval_number = physical_person.get("passIae")
+
+                if not any([kind, siret, approval_number]):
+                    self.logger.error(
+                        "Could not get valid employee record data for: SIRET=%s, PASSIAE=%s, KIND=%s",
+                        siret,
+                        approval_number,
+                        kind,
+                    )
+                    continue
+
+                # Find the matching employee record
 
     def _get_batch_file(self, conn):
         """
@@ -154,26 +184,23 @@ class Command(BaseCommand):
 
         with conn.cd(settings.ASP_FS_DOWNLOAD_DIR):
             result_files = conn.listdir()
+            results = []
 
-            tmp = []
-            pbar = tqdm(result_files)
-
-            for result_file in pbar:
-                pbar.set_description(f"Fetching '{result_file}'")
+            for result_file in result_files:
+                self.logger.info("Fetching: %s", result_file)
 
                 with BytesIO() as result_stream:
                     conn.getfo(result_file, result_stream)
                     result_stream.seek(0)
-
-                    tmp.append(self._process_result_stream(result_stream))
+                    results.append(self._process_result_stream(result_stream))
 
             if len(result_files) == 0:
                 self.logger.info("No result files found")
             else:
                 self.logger.info("Processed %s files", len(result_files))
+                # Post process file
+                self._update_employee_records_status(results)
 
-                for elt in tmp:
-                    print(elt)
                 # TODO: conn.remove(result_file)
                 # Once all ok
 
@@ -206,4 +233,4 @@ class Command(BaseCommand):
             if test:
                 self._put_sample_file(sftp)
 
-        print("Done!")
+        self.logger.info("Employee records processing done!")
