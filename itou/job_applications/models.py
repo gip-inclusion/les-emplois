@@ -456,19 +456,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         ]
 
     @property
-    def prescriber_type(self):
+    def display_sender_kind(self):
         """
         Converts itou internal prescriber kinds into something readable
         """
-
-        if self.sender_kind == JobApplication.SENDER_KIND_JOB_SEEKER:
-            # the job seeker applied directly
-            return PrescriberType.SPONTANEOUS_APPLICATION
-        elif self.sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
-            # an SIAE applied
-            return PrescriberType.UNKNOWN
-
-        return self.sender_kind
+        kind = "Candidature spontanée"
+        if self.sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
+            kind = "Auto-prescription"
+        elif self.sender_kind == JobApplication.SENDER_KIND_PRESCRIBER:
+            kind = "Orienteur"
+            if self.is_sent_by_authorized_prescriber:
+                kind = "Prescripteur habilité"
+        return kind
 
     # Workflow transitions.
 
