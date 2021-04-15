@@ -28,24 +28,6 @@ def generate_csv_export_for_download(job_applications, filename="candidatures.cs
     return response
 
 
-def get_prescriber_job_application_list(request):
-    """
-    Returns the list of job_applications the current prescriber has
-    """
-    if request.user.is_prescriber_with_org:
-        prescriber_organization = get_current_org_or_404(request)
-        # Show all applications organization-wide + applications sent by the
-        # current user for backward compatibility (in the past, a user could
-        # create his prescriber's organization later on).
-        job_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=prescriber_organization)
-        )
-    else:
-        job_applications = request.user.job_applications_sent
-    return job_applications
-
-
 def get_job_applications_by_month(job_applications):
     """
     Takes a list of job_applications, and returns a list of
@@ -98,7 +80,17 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     """
     List of applications for a prescriber.
     """
-    job_applications = get_prescriber_job_application_list(request)
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
+        # Show all applications organization-wide + applications sent by the
+        # current user for backward compatibility (in the past, a user could
+        # create his prescriber's organization later on).
+        job_applications = JobApplication.objects.filter(
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=prescriber_organization)
+        )
+    else:
+        job_applications = request.user.job_applications_sent
 
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
     filters = None
@@ -122,8 +114,18 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
     """
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
+        # Show all applications organization-wide + applications sent by the
+        # current user for backward compatibility (in the past, a user could
+        # create his prescriber's organization later on).
+        job_applications = JobApplication.objects.filter(
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=prescriber_organization)
+        )
+    else:
+        job_applications = request.user.job_applications_sent
 
-    job_applications = get_prescriber_job_application_list(request)
     job_applications_by_month = get_job_applications_by_month(job_applications)
 
     context = {"job_applications_by_month": job_applications_by_month, "export_for": "prescriber"}
@@ -136,7 +138,19 @@ def list_for_prescriber_exports_download(request, export_month):
     """
     List of applications for a prescriber for a given month (YYYY-mm), exported as a CSV file with immediate download
     """
-    job_applications = get_prescriber_job_application_list(request)
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
+        # Show all applications organization-wide + applications sent by the
+        # current user for backward compatibility (in the past, a user could
+        # create his prescriber's organization later on).
+        job_applications = JobApplication.objects.filter(
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=prescriber_organization)
+        )
+    else:
+        job_applications = request.user.job_applications_sent
+
+    job_applications_by_month = get_job_applications_by_month(job_applications)
     job_applications = get_job_applications_for_export(job_applications, export_month)
 
     return generate_csv_export_for_download(job_applications, f"candidatures-{export_month}.csv")
