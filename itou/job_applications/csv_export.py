@@ -1,8 +1,6 @@
 import csv
 
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
-from itou.metabase.management.commands._utils import get_choice
 
 
 JOB_APPLICATION_CSV_HEADERS = [
