@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
-from itou.siaes.factories import SiaeWith2MembershipsFactory
+from itou.siaes.factories import SiaeWithMembershipFactory
 
 
 BaseNotification = NewSpontaneousJobAppEmployersNotification
@@ -13,7 +13,7 @@ class NotificationsBaseClassTest(TestCase):
     # Use a child class to test parent class. Maybe refactor that later.
 
     def setUp(self):
-        self.siae = SiaeWith2MembershipsFactory()
+        self.siae = SiaeWithMembershipFactory()
         self.job_application = JobApplicationFactory(to_siae=self.siae)
         self.notification = BaseNotification(job_application=self.job_application)
 

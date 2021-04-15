@@ -5,7 +5,7 @@ from django.utils.html import escape
 
 from itou.invitations.factories import ExpiredSiaeStaffInvitationFactory, SentSiaeStaffInvitationFactory
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeFactory, SiaeWith2MembershipsFactory, SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD, SiaeStaffFactory, UserFactory
 from itou.users.models import User
 from itou.utils.perms.siae import get_current_siae_or_404
@@ -141,9 +141,9 @@ class TestAcceptInvitation(TestCase):
         can only be ressucitated by being invited to a new SIAE.
         We test here that this is indeed possible.
         """
-        siae = SiaeWith2MembershipsFactory()
+        siae = SiaeWithMembershipFactory()
         sender = siae.members.first()
-        user = SiaeWith2MembershipsFactory(convention__is_active=False).members.first()
+        user = SiaeWithMembershipFactory(convention__is_active=False).members.first()
         invitation = SentSiaeStaffInvitationFactory(
             sender=sender,
             siae=siae,
