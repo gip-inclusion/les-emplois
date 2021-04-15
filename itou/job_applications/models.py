@@ -6,8 +6,8 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.db import models
-from django.db.models import BooleanField, Case, Exists, Max, OuterRef, When
-from django.db.models.functions import Greatest
+from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, When
+from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
@@ -157,6 +157,20 @@ class JobApplicationQuerySet(models.QuerySet):
         ).prefetch_related("selected_jobs__appellation")
 
         return qs.with_has_suspended_approval().with_is_pending_for_too_long().order_by("-created_at")
+
+    def with_monthly_counts(self):
+        """
+        Takes a list of job_applications, and returns a list of
+        pairs (month, amount of job applications in this month)
+        sorted by month
+        """
+        return (
+            self.annotate(month=TruncMonth("created_at"))
+            .values("month")
+            .annotate(c=Count("id"))
+            .values("month", "c")
+            .order_by("-month")
+        )
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
