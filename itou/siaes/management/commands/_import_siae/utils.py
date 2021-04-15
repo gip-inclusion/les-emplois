@@ -172,13 +172,13 @@ def sync_structures(df, name, kinds, build_structure, dry_run):
 
     # Delete structures which no longer exist in the latest export.
     deletable_sirets = db_sirets - df_sirets
-    print(f"{len(deletable_sirets)} {name} will be deleted.")
+    undeletable_count = 0
     for siret in deletable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
 
         one_week_ago = timezone.now() - timezone.timedelta(days=7)
         if siae.source == Siae.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
-            print(f"siae.id={siae.id} is staff created and too recent to be deleted.")
+            # When our staff creates a siae, let's give the user sufficient time to join it before deleting it.
             continue
 
         if could_siae_be_deleted(siae):
@@ -187,6 +187,14 @@ def sync_structures(df, name, kinds, build_structure, dry_run):
                 siae.delete()
             continue
 
-        # As of 2020/10/16, 5 GEIQ are undeletable.
-        # As of 2020/12/11, 5 EA and EATT are undeletable.
-        print(f"siae.id={siae.id} cannot be deleted as it has data.")
+        if siae.source == Siae.SOURCE_USER_CREATED:
+            # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
+            # Thus we never attempt to delete it, as long as it has data.
+            continue
+
+        # As of 2021/04/15, 2 GEIQ are undeletable.
+        # As of 2021/04/15, 8 EA and EATT are undeletable.
+        print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} cannot be deleted as it has data.")
+        undeletable_count += 1
+
+    print(f"{undeletable_count} {name} cannot be deleted as they have data.")
