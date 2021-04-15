@@ -20,7 +20,7 @@ def generate_csv_export_for_download(job_applications, filename="candidatures.cs
     """
     Converts a list of job application to CSV and return an HTTP response for download
     """
-    response = HttpResponse(content_type="text/csv", charset="utf-16")
+    response = HttpResponse(content_type="text/csv", charset="utf-8")
     response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
 
     generate_csv_export(job_applications, response)
