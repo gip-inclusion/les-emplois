@@ -131,7 +131,9 @@ class Command(BaseCommand):
         self.set_logger(options.get("verbosity"))
 
         geiq_df = get_geiq_df()
-        sync_structures(df=geiq_df, name="GEIQ", kinds=[Siae.KIND_GEIQ], build_structure=build_geiq, dry_run=dry_run)
+        sync_structures(
+            df=geiq_df, source=Siae.SOURCE_GEIQ, kinds=[Siae.KIND_GEIQ], build_structure=build_geiq, dry_run=dry_run
+        )
 
         self.log("-" * 80)
         self.log("Done.")

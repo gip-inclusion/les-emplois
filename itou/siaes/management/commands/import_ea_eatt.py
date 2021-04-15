@@ -169,7 +169,7 @@ class Command(BaseCommand):
         ea_eatt_df = get_ea_eatt_df()
         sync_structures(
             df=ea_eatt_df,
-            name="EA and EATT",
+            source=Siae.SOURCE_EA_EATT,
             kinds=[Siae.KIND_EA, Siae.KIND_EATT],
             build_structure=build_ea_eatt,
             dry_run=dry_run,
