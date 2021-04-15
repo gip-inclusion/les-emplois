@@ -1,5 +1,4 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
-from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -245,7 +244,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, back_url)
 
-        job_seeker = get_user_model().objects.get(id=job_application.job_seeker.id)
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
         # The email is not changed, but other fields are taken into account
         self.assertNotEqual(job_seeker.email, new_email)
         self.assertEqual(job_seeker.phone, post_data["phone"])
