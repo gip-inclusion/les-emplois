@@ -143,25 +143,27 @@ def geocode_siae(siae):
     return siae
 
 
-def sync_structures(df, name, kinds, build_structure, dry_run):
+def sync_structures(df, source, kinds, build_structure, dry_run):
     """
     Sync structures between db and export.
 
     The same logic here is shared between import_geiq and import_ea_eatt.
 
+    This logic is *not* for actual SIAE from the ASP.
+
     - df: dataframe of structures, one row per structure
-    - name: user friendly name ("GEIQ" or "EA and EATT")
+    - source: either Siae.SOURCE_GEIQ or Siae.SOURCE_EA_EATT
     - kinds: possible kinds of the structures
     - build_structure: a method building a structure from a dataframe row
     """
-    print(f"Loaded {len(df)} {name} from export.")
+    print(f"Loaded {len(df)} {source} from export.")
 
     db_sirets = set([siae.siret for siae in Siae.objects.filter(kind__in=kinds)])
     df_sirets = set(df.siret.tolist())
 
     # Create structures which do not exist in database yet.
     creatable_sirets = df_sirets - db_sirets
-    print(f"{len(creatable_sirets)} {name} will be created.")
+    print(f"{len(creatable_sirets)} {source} will be created.")
     siret_to_row = {row.siret: row for _, row in df.iterrows()}
     for siret in creatable_sirets:
         row = siret_to_row[siret]
@@ -169,6 +171,18 @@ def sync_structures(df, name, kinds, build_structure, dry_run):
         if not dry_run:
             siae.save()
             print(f"siae.id={siae.id} has been created.")
+
+    # Update structures which already exist in database.
+    updatable_sirets = db_sirets.intersection(df_sirets)
+    for siret in updatable_sirets:
+        siae = Siae.objects.get(siret=siret, kind__in=kinds)
+        if siae.source != source:
+            # If a user/staff created structure already exists in db and its siret is later found in an export,
+            # it makes sense to convert it.
+            print(f"siae.id={siae.id} will be converted to source={source}.")
+            if not dry_run:
+                siae.source = source
+                siae.save()
 
     # Delete structures which no longer exist in the latest export.
     deletable_sirets = db_sirets - df_sirets
@@ -178,7 +192,7 @@ def sync_structures(df, name, kinds, build_structure, dry_run):
 
         one_week_ago = timezone.now() - timezone.timedelta(days=7)
         if siae.source == Siae.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
-            # When our staff creates a siae, let's give the user sufficient time to join it before deleting it.
+            # When our staff creates a structure, let's give the user sufficient time to join it before deleting it.
             continue
 
         if could_siae_be_deleted(siae):
@@ -193,8 +207,8 @@ def sync_structures(df, name, kinds, build_structure, dry_run):
             continue
 
         # As of 2021/04/15, 2 GEIQ are undeletable.
-        # As of 2021/04/15, 8 EA and EATT are undeletable.
+        # As of 2021/04/15, 8 EA_EATT are undeletable.
         print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} cannot be deleted as it has data.")
         undeletable_count += 1
 
-    print(f"{undeletable_count} {name} cannot be deleted as they have data.")
+    print(f"{undeletable_count} {source} cannot be deleted as they have data.")
