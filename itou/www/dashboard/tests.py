@@ -96,7 +96,6 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
@@ -190,7 +189,6 @@ class EditJobSeekerInfo(TestCase):
         user = job_application.to_siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
@@ -228,7 +226,6 @@ class EditJobSeekerInfo(TestCase):
 
         # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
