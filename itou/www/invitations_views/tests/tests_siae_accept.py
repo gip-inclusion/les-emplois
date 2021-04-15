@@ -133,7 +133,7 @@ class TestAcceptInvitation(TestCase):
     def test_accepted_invitation(self):
         invitation = SentSiaeStaffInvitationFactory(accepted=True)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "acceptée")
+        self.assertContains(response, escape("Invitation acceptée"))
 
     def test_accept_existing_user_already_member_of_inactive_siae(self):
         """
