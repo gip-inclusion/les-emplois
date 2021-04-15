@@ -28,13 +28,13 @@ def generate_csv_export_for_download(job_applications, filename="candidatures.cs
     return response
 
 
-def get_job_applications_for_export(job_applications, export_month):
+def get_job_applications_for_export(job_applications, month_identifier):
     """
     Filters a list of job application in order only to return those created during the
     requested export_month (whose format is YYYY-mm)
     """
-    year, month = export_month.split("-")
-    job_applications = job_applications.filter(created_at__year=year, created_at__month=month)
+    year, month = month_identifier.split("-")
+    job_applications = job_applications.created_on_given_year_and_month(year, month)
     return job_applications.with_list_related_data()
 
 
@@ -135,7 +135,6 @@ def list_for_prescriber_exports_download(request, export_month):
     else:
         job_applications = request.user.job_applications_sent
 
-    job_applications_by_month = get_job_applications_by_month(job_applications)
     job_applications = get_job_applications_for_export(job_applications, export_month)
 
     return generate_csv_export_for_download(job_applications, f"candidatures-{export_month}.csv")
