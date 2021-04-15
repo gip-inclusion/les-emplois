@@ -182,17 +182,19 @@ class EditJobSeekerInfo(TestCase):
         The SIAE can edit the email of a jobseeker it works with, provided he did not confirm its email.
         """
         new_email = "bidou@yopmail.com"
-        job_application = JobApplicationSentByPrescriberFactory()
-        user = job_application.to_siae.members.first()
+        siae = SiaeWithMembershipFactory()
+        job_application = JobApplicationSentByPrescriberFactory(
+            to_siae=siae, job_seeker__created_by=siae.members.first()
+        )
 
-        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
-        job_application.job_seeker.created_by = user
-        job_application.job_seeker.save()
+        user = job_application.to_siae.members.first()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
         self.assertContains(response, "Adresse électronique")
@@ -205,7 +207,10 @@ class EditJobSeekerInfo(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        job_seeker = get_user_model().objects.get(id=job_application.job_seeker.id)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, back_url)
+
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
         self.assertEqual(job_seeker.email, new_email)
 
     def test_edit_email_when_confirmed(self):
@@ -231,7 +236,9 @@ class EditJobSeekerInfo(TestCase):
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
         self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
         self.assertNotContains(response, "Adresse électronique")
@@ -244,8 +251,14 @@ class EditJobSeekerInfo(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, back_url)
+
         job_seeker = get_user_model().objects.get(id=job_application.job_seeker.id)
+        # The email is not changed, but other fields are taken into account
         self.assertNotEqual(job_seeker.email, new_email)
+        self.assertEqual(job_seeker.phone, post_data["phone"])
+        self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 
 
 class ChangeEmailViewTest(TestCase):
