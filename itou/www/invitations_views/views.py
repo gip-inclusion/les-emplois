@@ -42,10 +42,12 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
         user = User.objects.filter(email__iexact=invitation.email)
         if user:
             # The user exists but he should log in first
-            next_step = "{}?account_type={}&next={}".format(
-                reverse("account_login"), invitation.SIGNIN_ACCOUNT_TYPE, get_safe_url(request, "redirect_to")
+            next_step_url = "{url}?account_type={account_type}&next={redirect_to}".format(
+                url=reverse("account_login"),
+                account_type=invitation.SIGNIN_ACCOUNT_TYPE,
+                redirect_to=get_safe_url(request, "redirect_to"),
             )
-            next_step = redirect(next_step)
+            next_step = redirect(next_step_url)
         else:
             # A new user should be created before joining
             form = NewUserInvitationForm(data=request.POST or None, invitation=invitation)
