@@ -39,19 +39,18 @@ class EmployeeRecordModelTest(TestCase):
 
         # Job application is not accepted
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
-            employee_record = EmployeeRecord.from_job_application(
-                JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
-            )
+            job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
+            employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job application can be cancelled
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_TOO_RECENT):
-            employee_record = EmployeeRecord.from_job_application(
-                JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-            )
+            job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+            employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job application has no approval
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL):
-            employee_record = EmployeeRecord.from_job_application(JobApplicationWithoutApprovalFactory())
+            job_application = JobApplicationWithoutApprovalFactory()
+            employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job application is duplicated (already existing with same approval and SIAE)
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE):
@@ -63,36 +62,74 @@ class EmployeeRecordModelTest(TestCase):
 
         # Job seeker has no existing profile (must be filled before creation)
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_SEEKER_HAS_NO_PROFILE):
-            employee_record = EmployeeRecord.from_job_application(JobApplicationWithApprovalNotCancellableFactory())
+            job_application = JobApplicationWithApprovalNotCancellableFactory()
+            employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job seeker has an incomplete profile
         with self.assertRaises(ValidationError):
             # Message checked in profile tests
-            employee_record = EmployeeRecord.from_job_application(JobApplicationWithJobSeekerProfileFactory())
+            job_application = JobApplicationWithJobSeekerProfileFactory()
+            employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Standard / normal case
-        employee_record = EmployeeRecord.from_job_application(JobApplicationWithCompleteJobSeekerProfileFactory())
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
         self.assertIsNotNone(employee_record)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_prepare_successful(self, _):
+    def test_prepare_successful(self, _mock):
         """
         Mainly format the job seeker address to Hexa format
         """
-        employee_record = EmployeeRecord.from_job_application(JobApplicationWithCompleteJobSeekerProfileFactory())
-        self.assertEquals(employee_record.status, EmployeeRecord.Status.NEW)
-
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.prepare()
-        self.assertEquals(employee_record.status, EmployeeRecord.Status.READY)
 
-    def test_prepare_failed(self):
+        job_seeker = job_application.job_seeker
+        self.assertIsNotNone(job_seeker.jobseeker_profile)
+
+        # Surface check, this is not a job seeker profile test
+        profile = job_seeker.jobseeker_profile
+        self.assertIsNotNone(profile.hexa_commune)
+
+    def test_prepare_failed_geoloc(self):
         """
         Test the failure of employee record preparation
+
+        Mainly caused by:
+        - geoloc issues (no API mock on this test)
         """
+        # Complete profile, but geoloc API not reachable
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+
+        with self.assertRaises(ValidationError):
+            employee_record = EmployeeRecord.from_job_application(job_application)
+            employee_record.prepare()
 
 
 class EmployeeRecordLifeCycleTest(TestCase):
-    pass
+    """
+    Employee record status is never changed manually
+    """
+
+    fixtures = ["test_INSEE_communes.json"]
+
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_ready(self, _mock):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+
+        self.assertEquals(employee_record.status, EmployeeRecord.Status.NEW)
+
+        employee_record.prepare()
+
+        self.assertEquals(employee_record.status, EmployeeRecord.Status.READY)
+
+    def test_state_sent(self):
+        pass

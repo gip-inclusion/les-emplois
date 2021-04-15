@@ -7,6 +7,19 @@ from itou.job_applications.models import JobApplication
 from itou.siaes.models import SiaeFinancialAnnex
 
 
+# Validators
+
+
+def validate_asp_batch_filename(value):
+    """
+    Simple validation of batch file name
+    (ASP backend is picky about it)
+    """
+    if value and value.starts_with("RIAE_") and value.ends_with(".json") and len(value) == 27:
+        return
+    raise ValidationError(f"Le format du nom de fichier ASP est incorrect: {value}")
+
+
 class EmployeeRecordQuerySet(models.QuerySet):
     def ready(self):
         """
@@ -54,6 +67,7 @@ class EmployeeRecord(models.Model):
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
     ERROR_EMPLOYEE_RECORD_IS_DUPLICATE = "Une fiche salarié pour ce PASS IAE et cette SIAE existe déjà"
+    ERROR_EMPLOYEE_RECORD_INVALID_STATE = "La fiche salarié n'est pas dans l'état requis pour cette action"
 
     # 'C' stands for Creation
     ASP_MOVEMENT_TYPE = "C"
@@ -78,8 +92,6 @@ class EmployeeRecord(models.Model):
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
     status = models.CharField(max_length=10, verbose_name="Statut", choices=Status.choices, default=Status.NEW)
 
-    # Itou part
-
     # Job application has references on many mandatory parts of the E.R.:
     # - SIAE / asp id
     # - Employee
@@ -91,7 +103,7 @@ class EmployeeRecord(models.Model):
         verbose_name="Candidature / embauche",
     )
 
-    # Employeerecords must be linked to a valid financial annex
+    # Employee records must be linked to a valid financial annex
     # This field can't be automatically filled, the user will be asked
     # to select a valid one manually
     financial_annex = models.ForeignKey(
@@ -100,12 +112,22 @@ class EmployeeRecord(models.Model):
 
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="Numéro d'agrément")
-    asp_id = models.IntegerField(verbose_name="ID ASP de la SIAE")
+    asp_id = models.IntegerField(verbose_name="Identifiant ASP de la SIAE")
 
     # ASP processing part
     asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", null=True)
     asp_processing_label = models.CharField(max_length=100, verbose_name="Libellé de traitement ASP", null=True)
-    asp_process_response = models.JSONField(verbose_name="Réponse du traitement ASP", null=True)
+
+    # Employee records are sent to ASP in a JSON file,
+    # We keep track of the name for processing feedback
+    # The format of the file name is EXACTLY: RIAE_FS_ AAAAMMJJHHMMSS (27 chars)
+    asp_batch_file = models.CharField(
+        max_length=27,
+        verbose_name="Fichier de batch ASP",
+        null=True,
+        db_index=True,
+        validators=[validate_asp_batch_filename],
+    )
 
     # Once correctly processed by ASP, the employee record is archived:
     # - it can't be changed anymore
@@ -113,7 +135,7 @@ class EmployeeRecord(models.Model):
     # The API will not use JSON serializers on a regular basis,
     # except for the archive serialization, which occurs once.
     # It will only return a list of this JSON field for archived employee records.
-    archived_json = models.JSONField(verbose_name="Fiche salarié au format JSON (archive)", null=True)
+    archived_json = models.JSONField(verbose_name="Archive JSON de la fiche salarié", null=True)
 
     objects = models.Manager.from_queryset(EmployeeRecordQuerySet)()
 
@@ -189,8 +211,11 @@ class EmployeeRecord(models.Model):
         """
         Prepare the employee record for transmission
 
-        This method can raise ValidationError
+        Status: NEW => READY
         """
+        if self.status not in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
         profile = self.job_seeker.jobseeker_profile
 
         if not profile.hexa_address_filled:
@@ -203,6 +228,38 @@ class EmployeeRecord(models.Model):
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
         self.status = self.Status.READY
+        self.save()
+
+    def sent_in_asp_batch_file(self, asp_filename):
+        """
+        An employee record is sent to ASP via a JSON file,
+        The file name is stored for further feedback processing (also done via a file)
+
+        Status: READY => SENT
+        """
+        if not self.status == EmployeeRecord.Status.READY:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        self.clean()
+
+        self.asp_batch_file = asp_filename
+        self.status = EmployeeRecord.Status.SENT
+        self.save()
+
+    def rejected_by_asp(self, code, label):
+        """
+        Update status after an ASP rejection of the employee record
+
+        Status: SENT => REJECTED
+        """
+        if not self.status == EmployeeRecord.Status.SENT:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        self.clean()
+
+        self.status = EmployeeRecord.Status.REJECTED
+        self.asp_processing_code = code
+        self.asp_processing_label = label
         self.save()
 
     @property

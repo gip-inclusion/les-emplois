@@ -25,7 +25,7 @@ class EmployeeRecordAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "asp_processing_code",
-        "asp_process_response",
+        "asp_processing_label",
         "archived_json",
     )
 
