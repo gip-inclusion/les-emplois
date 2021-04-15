@@ -6,6 +6,41 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [16] - 2021-04-08
+
+### Ajouté
+
+- Ajout du nouveau type ACIPHC, Atelier chantier d'insertion premières heures en chantier
+- Le super utilisateur peut maintenant modifier l'état d'une habilitation depuis l'interface d'administration
+- Ajout d'un outil d'analyse de couverture de code par les tests
+- Sérialisation JSON des fiches salarié avec l'ASP
+- Nouvelle documentation du projet générée à partir du Markdown et incluant Whimsical sur :
+    - les outils de développement
+    - quelques fonctionnalités importantes du projet
+    - le détail des différentes commandes d'import (SIAE, AE, Metabase, etc)
+
+### Modifié
+
+- Mise à jour vers Django 3.1.8 pour prendre en compte un correctif de sécurité
+- Amélioration des scripts d'import des données dans Metabase
+- Correction d'un bogue quand la date de début d'un PASS est recalculée
+- Remplacement des dernières occurrences de « plateforme »
+- Amélioration de l'import fluxIAE et ajout de nouveaux flux
+- Ajout d'un timeout aux appels à PDF Shift pour éviter que les requêtes restent en suspens quand le service ne réponds pas
+- Réduction du nombre de requêtes SQL à l'import des comptes Pôle Emploi
+- Correction des données de test en recette jetable
+- Amélioration de l'accès aux données de la session utilisateur pour éviter l'utilisation de données incomplètes
+- Remplacement de l'email d'assistance par le portail assistance
+- Remplacement de la génération du nom utilisateur fournie par une librairie externe qui générait de nombreuses erreurs.
+- Affichage plus amical des erreurs de transaction, ces erreurs peuvent se produire lorsque un utilisateur effectue une action déjà effectuée (page non actualisée)
+- Correction des données de tests
+- Le script de téléchargement de la base de données de production récupère seulement la sauvegarde la plus récente
+- Changement du logo du Ministère en entête
+
+### Supprimé
+
+- La documentation technique n'est plus dans gitbook
+
 ## [15] - 2021-03-25
 
 ### Ajouté
@@ -95,10 +130,10 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 ### Ajouté
 - A la saisie du message de candidature par une SIAE, il est précisé que ce message sera visible par le prescripteur et le demandeur d'emploi
-- Affichage pour le prescripteur et le demandeur d'emploi de la raison de la mise en file d'attente d'une candidature 
-- Ajout d'un bouton non-contextuel vers la FAQ en bas de page (absent sur mobile et page d'accueil)  
+- Affichage pour le prescripteur et le demandeur d'emploi de la raison de la mise en file d'attente d'une candidature
+- Ajout d'un bouton non-contextuel vers la FAQ en bas de page (absent sur mobile et page d'accueil)
 - La liste des suspensions de PASS IAE est disponible dans l'export Excel
-- Mise en place d'alertes en cas de problème du système d'envoi d'e-mails (suite à incident) 
+- Mise en place d'alertes en cas de problème du système d'envoi d'e-mails (suite à incident)
 
 ### Modifié
 - Améliorations mineures des scripts d'import GEIQ/SIAE/EA
@@ -106,7 +141,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Amélioration du traçage des erreurs lors d'un problème d'import de données PE Connect
 - Django Admin : correction de l'export Excel des PASS IAE
 - Django Admin : correction d'un problème de performance dans la gestion des données externes PE Connect
-- Django Admin : correction de la gestion des notifications des employeurs 
+- Django Admin : correction de la gestion des notifications des employeurs
 
 ## [11] - 2021-01-28
 
@@ -187,7 +222,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Affichage du SIRET dans le tableau de bord des employeurs
 
 ### Modifié
-- Amélioration du lien "Besoin d'aide ?" qui pointe maintenant directement vers le champ recherche de la FAQ 
+- Amélioration du lien "Besoin d'aide ?" qui pointe maintenant directement vers le champ recherche de la FAQ
 - Réparation des tests de la plateforme d'intégration continue
 - Pérennisation de nouvelles données dans l'espace DEMO
 - Anonymisation des téléphones des siaes et organisations dans les fixtures
@@ -259,7 +294,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Ajout de la possibilité de refuser les PASS IAE dans l'admin
 - Nouveau type "Dispositif conventionné par le conseil départemental pour le suivi BRSA" pour les organisations de prescripteurs (visible uniquement dans l'admin)
 - Prolongation +3mois COVID pour les agréments existants préalablement côté PE et délivrés par Itou
-- Explication du classement des résultats d'une recherche de SIAE 
+- Explication du classement des résultats d'une recherche de SIAE
 - Rafraîchissement journalier des données Metabase
 - Stockage des conventions et des annexes financières en provenance de l'ASP
 - Ajout d'un lien vers un formulaire Typeform destiné au support pour signaler un problème d'inscription d'une SIAE qui ne trouverait pas sa structure
@@ -375,7 +410,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 - Si une fiche de poste est renseignée, le message "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." n'est plus affiché
 - Modification du message d'erreur qui apparait lors de l'inscription Employeur si le SIRET n'est pas reconnu.
 - Invitations Prescripteurs : un membre d'une organisation Pôle emploi ne peut inviter que des personnes dont l'adresse e-mail finit en "@pole-emploi.fr".
-- Evolution des _fixtures_ pour refléter les derniers changements. 
+- Evolution des _fixtures_ pour refléter les derniers changements.
 
 ### Supprimé
 - 154 SIAE fantômes pour débloquer les créations légitimes d'antennes
@@ -485,7 +520,7 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 ### Ajouté
 - Indicateur de validation de l'email dans l'admin (partie utilisateur)
 - Envoi d'un email au support lors du rattachement d'un prescripteur à une structure sans membres
-- Inscription sans boite email (redirection vers PE connect) 
+- Inscription sans boite email (redirection vers PE connect)
 - Connexion via PE Connect
 - Tracking Matomo pour PE Connect
 - Liens Typeform lors de l'envoi d'emails (confirmation d'embauche pour les SIAE et prescripteurs)
