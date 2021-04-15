@@ -223,14 +223,8 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
 
         # Confirm job seeker email
-        job_seeker = get_user_model().objects.get(id=job_application.job_seeker.id)
-        post_data = {"login": job_seeker.email, "password": DEFAULT_PASSWORD}
-        url = reverse("account_login")
-        response = self.client.post(url, data=post_data)
-        job_seeker.refresh_from_db()
-        confirmation_token = EmailConfirmationHMAC(job_seeker.emailaddress_set.first()).key
-        confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        response = self.client.post(confirm_email_url)
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
+        EmailAddress.objects.create(user=job_seeker, email=job_seeker.email, verified=True)
 
         # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
