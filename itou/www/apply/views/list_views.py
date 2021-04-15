@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Count, Q
-from django.db.models.functions import TruncMonth
+from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.text import slugify
 
@@ -14,7 +14,7 @@ from itou.www.apply.forms import (
     PrescriberFilterJobApplicationsForm,
     SiaeFilterJobApplicationsForm,
 )
-from django.http import HttpResponse
+
 
 def generate_csv_export_for_download(job_applications, filename="candidatures.csv"):
     """
@@ -26,21 +26,6 @@ def generate_csv_export_for_download(job_applications, filename="candidatures.cs
     generate_csv_export(job_applications, response)
 
     return response
-
-
-def get_job_applications_by_month(job_applications):
-    """
-    Takes a list of job_applications, and returns a list of
-    pairs (month, amount of job applications in this month)
-    sorted by month
-    """
-    return (
-        job_applications.annotate(month=TruncMonth("created_at"))
-        .values("month")
-        .annotate(c=Count("id"))
-        .values("month", "c")
-        .order_by("-month")
-    )
 
 
 def get_job_applications_for_export(job_applications, export_month):
@@ -126,7 +111,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     else:
         job_applications = request.user.job_applications_sent
 
-    job_applications_by_month = get_job_applications_by_month(job_applications)
+    job_applications_by_month = job_applications.with_monthly_counts()
 
     context = {"job_applications_by_month": job_applications_by_month, "export_for": "prescriber"}
     return render(request, template_name, context)
@@ -193,7 +178,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
 
     siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received
-    job_applications_by_month = get_job_applications_by_month(job_applications)
+    job_applications_by_month = job_applications.with_monthly_counts()
 
     context = {"job_applications_by_month": job_applications_by_month, "siae": siae, "export_for": "siae"}
     return render(request, template_name, context)
