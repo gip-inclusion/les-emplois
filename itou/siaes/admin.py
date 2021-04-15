@@ -84,7 +84,7 @@ class SiaeHasMembersFilter(admin.SimpleListFilter):
 @admin.register(models.Siae)
 class SiaeAdmin(admin.ModelAdmin):
     form = SiaeAdminForm
-    list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count")
+    list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
     list_filter = (SiaeHasMembersFilter, "kind", "block_job_applications", "source", "department")
     raw_id_fields = ("created_by", "convention")
     readonly_fields = (
