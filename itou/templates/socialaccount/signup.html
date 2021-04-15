@@ -14,7 +14,6 @@
     prompts the user to enter his email manually on this form to complete the signup process.
 {% endcomment %}
 
-
 {% block title %}Votre compte Pôle emploi doit être validé{{ block.super }}{% endblock %}
 
 {% block content %}
@@ -30,9 +29,7 @@
 </p>
 <p>
     <a href="{% url 'account_login' %}?account_type=job_seeker">
-        <button class="btn btn-secondary">
-            Retour
-        </button>
+        <button class="btn btn-secondary">Retour</button>
     </a>
 </p>
 
