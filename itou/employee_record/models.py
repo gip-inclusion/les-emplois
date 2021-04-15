@@ -168,22 +168,16 @@ class EmployeeRecord(models.Model):
         """
         Check if job application is valid for FS
         """
-        ja = self.job_application
+        job_application = self.job_application
 
-        if not ja.state.is_accepted:
+        if not job_application.state.is_accepted:
             raise ValidationError(self.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED)
 
-        if not ja.approval:
+        if not job_application.approval:
             raise ValidationError(self.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL)
 
-        if ja.can_be_cancelled:
+        if job_application.can_be_cancelled:
             raise ValidationError(self.ERROR_JOB_APPLICATION_TOO_RECENT)
-
-        if EmployeeRecord.objects.filter(
-            asp_id=ja.to_siae.convention.asp_id,
-            approval_number=ja.approval.number,
-        ).exists():
-            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
     def _clean_job_seeker(self):
         """
@@ -222,8 +216,7 @@ class EmployeeRecord(models.Model):
             # Format job seeker address
             profile.update_hexa_address()
 
-        self.job_seeker.clean()
-        profile.clean()
+        self.clean()
 
         # If we reach this point, the employee record is ready to be serialized
         # and can be sent to ASP
@@ -394,6 +387,13 @@ class EmployeeRecord(models.Model):
         fs = cls(job_application=job_application)
 
         fs.clean()
+
+        # Mandatory check, must be done only once
+        if EmployeeRecord.objects.filter(
+            asp_id=job_application.to_siae.convention.asp_id,
+            approval_number=job_application.approval.number,
+        ).exists():
+            raise ValidationError(EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE)
 
         fs.asp_id = job_application.to_siae.convention.asp_id
         fs.approval_number = job_application.approval.number

@@ -39,7 +39,7 @@ class EmployeeRecordModelTest(TestCase):
 
         # Job application is not accepted
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
-            job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
+            job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_NEW)
             employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job application can be cancelled
@@ -155,3 +155,4 @@ class EmployeeRecordLifeCycleTest(TestCase):
         employee_record = EmployeeRecord.from_job_application(job_application)
 
         employee_record.prepare()
+        employee_record.sent_in_asp_batch_file("RIAE_FS_20210410130000.json")
