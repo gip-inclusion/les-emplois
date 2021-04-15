@@ -11,10 +11,7 @@
     {% if form %}
         <h1>{% translate "Bienvenue !" %}</h1>
         <form method="post" action="{{ invitation.acceptance_link }}" role="form" class="js-prevent-multiple-submit">
-
             {% csrf_token %}
-
-            {% bootstrap_form_errors form %}
 
             {% bootstrap_form form %}
 

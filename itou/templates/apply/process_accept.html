@@ -24,22 +24,17 @@
                     {% translate "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
                 </div>
             {% endif %}
-            {% bootstrap_form_errors form_pe_status %}
             {% bootstrap_form form_pe_status %}
         {% endif %}
 
 
         {% if form_user_address %}
-            {% bootstrap_form_errors form_user_address %}
             {% bootstrap_form form_user_address %}
         {% endif %}
 
         <div class="mt-5">
 
             <h3>{% translate "Embauche" %}</h3>
-
-            {% bootstrap_form_errors form_accept %}
-
             {% bootstrap_form form_accept %}
 
         </div>
