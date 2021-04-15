@@ -32,18 +32,6 @@ class ExpiredSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
     )
 
 
-class SiaeSentInvitationFactory(SentSiaeStaffInvitationFactory):
-    """
-    Same as InvitationFactory but lets us test
-    Siae invitations specific use cases.
-    """
-
-    class Meta:
-        model = models.SiaeStaffInvitation
-
-    siae = factory.SubFactory(SiaeWithMembershipFactory)
-
-
 class PrescriberWithOrgSentInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.PrescriberWithOrgInvitation
