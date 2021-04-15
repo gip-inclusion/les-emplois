@@ -92,6 +92,9 @@ class JobApplicationQuerySet(models.QuerySet):
     def accepted(self):
         return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
 
+    def created_on_given_year_and_month(self, year, month):
+        return self.filter(created_at__year=year, created_at__month=month)
+
     def get_unique_fk_objects(self, fk_field):
         """
         Get unique foreign key objects in a single query.
