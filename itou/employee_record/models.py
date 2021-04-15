@@ -15,7 +15,7 @@ def validate_asp_batch_filename(value):
     Simple validation of batch file name
     (ASP backend is picky about it)
     """
-    if value and value.starts_with("RIAE_") and value.ends_with(".json") and len(value) == 27:
+    if value and value.startswith("RIAE_FS_") and value.endswith(".json") and len(value) == 27:
         return
     raise ValidationError(f"Le format du nom de fichier ASP est incorrect: {value}")
 

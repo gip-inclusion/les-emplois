@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationWithApprovalFactory,
@@ -109,6 +109,21 @@ class EmployeeRecordModelTest(TestCase):
             employee_record = EmployeeRecord.from_job_application(job_application)
             employee_record.prepare()
 
+    def test_batch_filename_validator(self):
+        """
+        Check format of ASP batch file name
+        """
+        with self.assertRaises(ValidationError):
+            validate_asp_batch_filename(None)
+
+        with self.assertRaises(ValidationError):
+            validate_asp_batch_filename("xyz")
+
+        with self.assertRaises(ValidationError):
+            validate_asp_batch_filename("RiAE_20210410130000.json")
+
+        validate_asp_batch_filename("RIAE_FS_20210410130000.json")
+
 
 class EmployeeRecordLifeCycleTest(TestCase):
     """
@@ -131,5 +146,12 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
         self.assertEquals(employee_record.status, EmployeeRecord.Status.READY)
 
-    def test_state_sent(self):
-        pass
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_sent(self, _mock):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+
+        employee_record.prepare()
