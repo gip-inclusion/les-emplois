@@ -26,7 +26,7 @@
 </form>
 
 {% blocktranslate with siren=current_siae.siren kind=current_siae.kind %}
-	Si votre annexe financière correspond à un SIREN différent de {{ siren }} ou à un type de structure différent de {{ kind }}, ou bien si elle n'apparait pas dans la liste ci-dessus, contactez-nous : <a href="mailto:{{ ITOU_EMAIL_ASSISTANCE }}">{{ ITOU_EMAIL_ASSISTANCE }}</a>
+	Si votre annexe financière correspond à un SIREN différent de {{ siren }} ou à un type de structure différent de {{ kind }}, ou bien si elle n'apparait pas dans la liste ci-dessus, contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>
 {% endblocktranslate %}
 
 {% endblock %}

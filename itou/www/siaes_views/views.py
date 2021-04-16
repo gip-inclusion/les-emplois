@@ -172,7 +172,8 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
         current_siae.convention = financial_annex.convention
         current_siae.save()
         message = _(
-            f"Nous avons bien attaché votre structure à l'annexe financière {financial_annex.number_prefix_with_spaces}."
+            f"Nous avons bien attaché votre structure à l'annexe financière"
+            f" {financial_annex.number_prefix_with_spaces}."
         )
         messages.success(request, message)
         return HttpResponseRedirect(reverse("siaes_views:show_financial_annexes"))
