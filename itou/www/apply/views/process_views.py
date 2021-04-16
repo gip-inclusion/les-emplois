@@ -211,10 +211,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     mark_safe(
                         _(
                             "Embauche acceptée ! "
-                            "C'est une embauche en contrat de professionnalisation ? "
+                            "(Pour un contrat de professionnalisation vous pouvez soit introduire une "
+                            "demande d’aide au poste ou demander l’aide spécifique de Pôle emploi "
                             f'<a href="{PRO_CONTRACT_URL}" rel="noopener" target="_blank">'
-                            "J'effectue ma demande d'aide"
-                            "</a>."
+                            "ici"
+                            "</a>)."
                         )
                     ),
                 )
