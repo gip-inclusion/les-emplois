@@ -356,6 +356,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     def member_activation_email(self, user):
         """
         Send email when an admin of the structure activates the membership of a given user.
+        TODO: I am never called, am I useless ?
         """
         to = [user.email]
         context = {"structure": self}
