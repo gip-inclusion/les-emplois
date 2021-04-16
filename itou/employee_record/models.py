@@ -261,6 +261,17 @@ class EmployeeRecord(models.Model):
         self.asp_processing_label = label
         self.save()
 
+    def accepted_by_asp(self, code, label):
+        if not self.status == EmployeeRecord.Status.SENT:
+            raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        self.clean()
+
+        self.status = EmployeeRecord.Status.PROCESSED
+        self.asp_processing_code = code
+        self.asp_processing_label = label
+        self.save()
+
     @property
     def is_archived(self):
         """
@@ -418,6 +429,8 @@ class EmployeeRecordBatch:
     This model used by JSON serializer as an header for ASP transmission
     """
 
+    ERROR_BAD_FEEDBACK_FILENAME = "Mauvais nom de fichier de retour ASP"
+
     # Max number of employee records per upload batch
     MAX_EMPLOYEE_RECORDS = 700
 
@@ -427,6 +440,7 @@ class EmployeeRecordBatch:
     # File name format for upload
     REMOTE_PATH_FORMAT = "RIAE_FS_{}.json"
 
+    # Feedback file names end with this string
     FEEDBACK_FILE_SUFFIX = "_FichierRetour"
 
     def __init__(self, employee_records):
@@ -453,7 +467,7 @@ class EmployeeRecordBatch:
     @staticmethod
     def feedback_filename(filename):
         """
-        Returns name of the feedback file
+        Return name of the feedback file
         """
         validate_asp_batch_filename(filename)
         separator = "."
@@ -461,3 +475,17 @@ class EmployeeRecordBatch:
         path += EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX
 
         return separator.join([path, ext])
+
+    @staticmethod
+    def batch_filename_from_feedback(filename):
+        """
+        Return name of original filename from feedback filename
+        """
+        separator = "."
+        path, ext = filename.split(separator)
+
+        if not path.endswith(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX):
+            raise ValidationError(EmployeeRecordBatch.ERROR_BAD_FEEDBACK_FILENAME)
+
+        # .removesuffix is Python 3.9
+        return separator.join([path.removesuffix(EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX), ext])

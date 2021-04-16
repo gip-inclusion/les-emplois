@@ -14,8 +14,11 @@ from itou.utils.iterators import chunks
 
 
 # Global SFTP connection options
+
 cnopts = pysftp.CnOpts()
-cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
+
+if settings.ASP_FS_KNOWN_HOSTS:
+    cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
 
 
 class Command(BaseCommand):
@@ -143,50 +146,55 @@ class Command(BaseCommand):
             except Exception as ex:
                 self.logger.error("Could not upload file: '%s', reason: %s", remote_path, ex)
 
-    def _update_employee_records_status(self, employee_records_batch):
+    def _update_employee_records_status(self, feedback_file_name, employee_records_batch):
         """
         - Parse ASP response file,
         - Update status of employee records,
         - Update metadata for processed employee records.
         """
-
+        batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file_name)
         success_code = "0000"
 
         for batch in employee_records_batch:
-            print(batch)
-            employee_records = batch.get("lignesTelechargement")
+            self.logger.info("Processing ASP feedback file: %s", feedback_file_name)
 
-            if not employee_records:
-                self.logger.error("Could not get any employee record from batch file")
+            batch_employee_records = batch.get("lignesTelechargement")
+
+            if not batch_employee_records:
+                self.logger.error("Could not get any employee record from file: %s", feedback_file_name)
                 continue
 
-            for employee_record in employee_records:
-                processing_code = employee_record.get("codeTraitement")
-                processing_label = employee_record.get("libelleTraitement")
+            for idx, batch_employee_record in enumerate(batch_employee_records):
+                processing_code = batch_employee_record.get("codeTraitement")
+                processing_label = batch_employee_record.get("libelleTraitement")
 
                 self.logger.info("Processing code: %s", processing_code)
                 self.logger.info("Processing label: %s", processing_label)
 
-                # Now we must find the matching FS
-                approval_number = siret = kind = None
+                line_number = batch_employee_record.get("numLigne")
 
-                kind = employee_record.get("mesure")
-                siret = employee_record.get("siret")
-                if physical_person := employee_record.get("personnePhysique"):
-                    approval_number = physical_person.get("passIae")
-
-                if not any([kind, siret, approval_number]):
-                    self.logger.error(
-                        "Could not get valid employee record data for: SIRET=%s, PASSIAE=%s, KIND=%s",
-                        siret,
-                        approval_number,
-                        kind,
+                if not line_number:
+                    self.logger.warning(
+                        "No line number for employee record (index: %s, file: )", idx, feedback_file_name
                     )
                     continue
 
-                # Find the matching employee record
+                # Now we must find the matching FS
+                employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
+                if not employee_record:
+                    self.logger.error(
+                        "Could not get existing employee record data: BATCH_FILE=%s, LINE_NUMBER=%s",
+                        batch_filename,
+                        line_number,
+                    )
+                    continue
 
-    def _get_batch_file(self, conn):
+                if processing_code == success_code:
+                    employee_record.accepted_by_asp(processing_code, processing_label)
+
+                employee_record.rejected_by_asp(processing_code, processing_label)
+
+    def _get_feedback_file(self, conn):
         """
         Fetch ASP processing results
         """
@@ -209,7 +217,7 @@ class Command(BaseCommand):
             else:
                 self.logger.info("Processed %s files", len(result_files))
                 # Post process file
-                self._update_employee_records_status(results)
+                self._update_employee_records_status(result_file, results)
 
                 # TODO: conn.remove(result_file)
                 # Once all ok
@@ -219,8 +227,8 @@ class Command(BaseCommand):
         # self.logger.info(result)
         return result
 
-    def handle(self, dry_run=False, upload=True, download=True, test=True, **options):
-        self.set_logger(options.get("verbosity"))
+    def handle(self, dry_run=False, upload=True, download=True, test=True, verbosity=1, **options):
+        self.set_logger(verbosity)
         self.logger.info(
             f"Connecting to {settings.ASP_FS_SFTP_USER}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}"
         )
@@ -228,6 +236,7 @@ class Command(BaseCommand):
         both = not (download or upload) and not test
 
         with self._get_sftp_connection() as sftp:
+            print(f"SFTP: {sftp}")
             self.logger.info(f"Current dir: {sftp.pwd}")
 
             # Send files
@@ -237,7 +246,7 @@ class Command(BaseCommand):
 
             # Fetch result files
             if both or download:
-                self._get_batch_file(sftp)
+                self._get_feedback_file(sftp)
 
             # Send test file (debug)
             if test:
