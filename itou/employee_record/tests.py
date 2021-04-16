@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.management.commands.transfer_employee_records import Command
-from itou.employee_record.mocks.transfer_employee_records import SFTPConnectionMock
+from itou.employee_record.mocks.transfer_employee_records import SFTPConnectionMock, SFTPGoodConnectionMock
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
@@ -230,6 +230,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEquals(self.employee_record.asp_processing_label, process_message)
 
 
+@mock.patch("pysftp.Connection", SFTPConnectionMock)
 class EmployeeRecordManagementCommandTest(TestCase):
     """
     Employee record management command, testing:
@@ -238,17 +239,40 @@ class EmployeeRecordManagementCommandTest(TestCase):
     - ...
     """
 
-    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    fixtures = ["test_INSEE_communes.json"]
+
     def test_smoke_download(self):
         command = Command()
         command.handle(download=True)
 
-    @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_upload(self):
         command = Command()
         command.handle(upload=True)
 
-    @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download_and_upload(self):
         command = Command()
         command.handle()
+
+    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_upload_and_download(self, _mock):
+        """
+        - Create an employee record
+        - Send it to ASP
+        - Get feedback
+        - Update employee record
+        """
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.prepare()
+
+        command = Command()
+        command.handle(upload=True)
+
+        command = Command()
+        command.handle(download=True)
+
+        employee_record.refresh_from_db()
