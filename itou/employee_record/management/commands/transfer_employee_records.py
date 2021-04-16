@@ -117,6 +117,7 @@ class Command(BaseCommand):
         batch = EmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
 
         # JSONRenderer produces byte arrays
+        print(batch.data)
         json_b = JSONRenderer().render(batch.data)
 
         # Using FileIO objects allows to use them as files
@@ -236,7 +237,6 @@ class Command(BaseCommand):
         both = not (download or upload) and not test
 
         with self._get_sftp_connection() as sftp:
-            print(f"SFTP: {sftp}")
             self.logger.info(f"Current dir: {sftp.pwd}")
 
             # Send files
