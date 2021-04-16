@@ -178,7 +178,7 @@ class UserMembershipDeactivationTest(TestCase):
         # User must have been notified of deactivation (we're human after all)
         self.assertEqual(len(mail.outbox), 1)
         email = mail.outbox[0]
-        self.assertIn("[Désactivation] Vous n'êtes plus membre de", email.subject)
+        self.assertEqual(f"[Désactivation] Vous n'êtes plus membre de {organization.display_name}", email.subject)
         self.assertIn("Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion", email.body)
         self.assertEqual(email.to[0], guest.email)
 
