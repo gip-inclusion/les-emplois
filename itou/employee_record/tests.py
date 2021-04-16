@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.employee_record.factories import EmployeeRecordFactory
-from itou.employee_record.models import EmployeeRecord, validate_asp_batch_filename
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
@@ -137,6 +137,21 @@ class EmployeeRecordModelTest(TestCase):
         result = EmployeeRecord.objects.find_by_batch(filename, 2).first()
 
         self.assertEquals(result.id, employee_record.id)
+
+
+class EmployeeRecordBatchTest(TestCase):
+    """
+    Misc tests on batch wrapper level
+    """
+
+    def test_feedback_filename(self):
+        with self.assertRaises(ValidationError):
+            EmployeeRecordBatch.feedback_filename("test.json")
+
+        self.assertEquals(
+            "RIAE_FS_20210410130000_FichierRetour.json",
+            EmployeeRecordBatch.feedback_filename("RIAE_FS_20210410130000.json"),
+        )
 
 
 class EmployeeRecordLifeCycleTest(TestCase):
