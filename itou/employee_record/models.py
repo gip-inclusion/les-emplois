@@ -42,11 +42,11 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(status=EmployeeRecord.Status.ARCHIVED)
 
-    def find_from_batch(self, kind, siret, approval_number):
+    def find_by_batch(self, filename, line_number):
         """
         Fetch a single employee record with ASP batch file input parameters
         """
-        return self.filter(job_application__approval__number=approval_number)
+        return self.filter(asp_batch_file=filename, asp_batch_line_number=line_number)
 
 
 class EmployeeRecord(models.Model):
@@ -128,6 +128,11 @@ class EmployeeRecord(models.Model):
         db_index=True,
         validators=[validate_asp_batch_filename],
     )
+    # Line number of the employee record in the batch file
+    # Unique pair with `asp_batch_file`
+    asp_batch_line_number = models.IntegerField(
+        verbose_name="Ligne correspondante dans le fichier batch ASP", null=True, db_index=True
+    )
 
     # Once correctly processed by ASP, the employee record is archived:
     # - it can't be changed anymore
@@ -145,6 +150,7 @@ class EmployeeRecord(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
         ]
+        unique_together = ["asp_batch_file", "asp_batch_line_number"]
         ordering = ["-created_at"]
 
     def __init__(self, *args, **kwargs):

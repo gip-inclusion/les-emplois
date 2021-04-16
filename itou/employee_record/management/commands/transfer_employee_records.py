@@ -19,7 +19,14 @@ cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
 
 
 class Command(BaseCommand):
+    """
+    TODO doc
+    """
+
     def add_arguments(self, parser):
+        """
+        Command line arguments
+        """
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Do not perform real SFTP transfer operations"
         )
@@ -51,6 +58,9 @@ class Command(BaseCommand):
         self.logger.debug(message)
 
     def _get_sftp_connection(self):
+        """
+        Get a new SFTP connection to remote server
+        """
         return pysftp.Connection(
             host=settings.ASP_FS_SFTP_HOST,
             port=settings.ASP_FS_SFTP_PORT,
@@ -81,7 +91,7 @@ class Command(BaseCommand):
         """
         Store ASP processing results in a local file
 
-        content is a string
+        Content is a string
         """
         with open(f"{local_path}/{remote_path}", "w") as f:
             f.write(content)
@@ -91,7 +101,7 @@ class Command(BaseCommand):
         """
         Get a list of employee records in 'ready' state (ready to be sent)
 
-        Returns a list of list to send several files if needed
+        Returns a list of list to send several files in batch if needed
 
         ASP currently accept EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS FS per batch file
         """
@@ -105,8 +115,6 @@ class Command(BaseCommand):
 
         # JSONRenderer produces byte arrays
         json_b = JSONRenderer().render(batch.data)
-
-        # self.logger.info("BATCH content: %s", json_b)
 
         # Using FileIO objects allows to use them as files
         # Cool side effect: no temporary file needed
@@ -137,7 +145,9 @@ class Command(BaseCommand):
 
     def _update_employee_records_status(self, employee_records_batch):
         """
-        Update status and add information to processed employee records
+        - Parse ASP response file,
+        - Update status of employee records,
+        - Update metadata for processed employee records.
         """
 
         success_code = "0000"
