@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from itou.employee_record.factories import EmployeeRecordFactory
+from itou.employee_record.management.commands.transfer_employee_records import Command
+from itou.employee_record.mocks.transfer_employee_records import SFTPConnectionMock
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
@@ -144,13 +146,22 @@ class EmployeeRecordBatchTest(TestCase):
     Misc tests on batch wrapper level
     """
 
-    def test_feedback_filename(self):
+    def test_format_feedback_filename(self):
         with self.assertRaises(ValidationError):
             EmployeeRecordBatch.feedback_filename("test.json")
 
         self.assertEquals(
             "RIAE_FS_20210410130000_FichierRetour.json",
             EmployeeRecordBatch.feedback_filename("RIAE_FS_20210410130000.json"),
+        )
+
+    def test_batch_filename_from_feedback(self):
+        with self.assertRaises(ValidationError):
+            EmployeeRecordBatch.batch_filename_from_feedback("test.json")
+
+        self.assertEquals(
+            "RIAE_FS_20210410130000.json",
+            EmployeeRecordBatch.batch_filename_from_feedback("RIAE_FS_20210410130000_FichierRetour.json"),
         )
 
 
@@ -201,3 +212,35 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEquals(self.employee_record.status, EmployeeRecord.Status.REJECTED)
         self.assertEquals(self.employee_record.asp_processing_code, err_code)
         self.assertEquals(self.employee_record.asp_processing_label, err_message)
+
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def _test_state_accepted(self, _mock):
+        self.employee_record.prepare()
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.sent_in_asp_batch_file(filename)
+
+        process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+        self.employee_record.accepted_by_asp(process_code, process_message)
+
+        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.PROCESSED)
+        self.assertEquals(self.employee_record.asp_processing_code, process_code)
+        self.assertEquals(self.employee_record.asp_processing_label, process_message)
+
+
+import pysftp
+
+
+class EmployeeRecordManagementCommandTest(TestCase):
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def test_download(self):
+        command = Command()
+        command.handle(download=True)
+
+    def test_upload(self):
+        pass
+
+    def test_download_and_upload(self):
+        pass
