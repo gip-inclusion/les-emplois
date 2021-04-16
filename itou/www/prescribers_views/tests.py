@@ -273,6 +273,15 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         organization.refresh_from_db()
         self.assertTrue(guest in organization.active_admin_members)
 
+        # The admin should receive a valid email
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            f"[Activation] Vous êtes désormais administrateur de {organization.display_name}", email.subject
+        )
+        self.assertIn("Vous êtes administrateur d'une structure sur les emplois de l'inclusion", email.body)
+        self.assertEqual(email.to[0], guest.email)
+
     def test_remove_admin(self):
         """
         Check the ability for an admin to remove another admin
@@ -299,6 +308,18 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
 
         organization.refresh_from_db()
         self.assertFalse(guest in organization.active_admin_members)
+
+        # The admin should receive a valid email
+        self.assertEqual(len(mail.outbox), 1)
+        email = mail.outbox[0]
+        self.assertEqual(
+            f"[Désactivation] Vous n'êtes plus administrateur de {organization.display_name}", email.subject
+        )
+        self.assertIn(
+            "Un administrateur vous a retiré les droits d'administrateur d'une structure",
+            email.body,
+        )
+        self.assertEqual(email.to[0], guest.email)
 
     def test_admin_management_permissions(self):
         """
