@@ -230,17 +230,25 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.assertEquals(self.employee_record.asp_processing_label, process_message)
 
 
-import pysftp
-
-
 class EmployeeRecordManagementCommandTest(TestCase):
+    """
+    Employee record management command, testing:
+    - mocked sftp connection
+    - basic upload / download modes
+    - ...
+    """
+
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def test_download(self):
+    def test_smoke_download(self):
         command = Command()
         command.handle(download=True)
 
-    def test_upload(self):
-        pass
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def test_smoke_upload(self):
+        command = Command()
+        command.handle(upload=True)
 
-    def test_download_and_upload(self):
-        pass
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def test_smoke_download_and_upload(self):
+        command = Command()
+        command.handle()
