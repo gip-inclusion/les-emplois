@@ -17,7 +17,7 @@
     {% elif current_siae_is_asp %}
         <div class="alert alert-danger" role="alert">
             {# Inactive siaes of ASP source cannot be fixed by user. #}
-            {% translate "Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez nous : " %}
+            {% translate "Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez nous via la rubrique votre structure sur " %}
             <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>
         </div>
     {% elif current_siae_is_user_created %}
