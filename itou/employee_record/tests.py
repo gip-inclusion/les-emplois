@@ -6,7 +6,6 @@ from django.test import TestCase
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.models import EmployeeRecord, validate_asp_batch_filename
 from itou.job_applications.factories import (
-    JobApplicationFactory,
     JobApplicationWithApprovalFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
@@ -132,27 +131,43 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
     fixtures = ["test_INSEE_communes.json"]
 
+    def setUp(self):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        self.employee_record = employee_record
+
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_ready(self, _mock):
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-        employee_record = EmployeeRecord.from_job_application(job_application)
-
-        self.assertEquals(employee_record.status, EmployeeRecord.Status.NEW)
-
-        employee_record.prepare()
-
-        self.assertEquals(employee_record.status, EmployeeRecord.Status.READY)
+        self.employee_record.prepare()
+        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_sent(self, _mock):
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-        employee_record = EmployeeRecord.from_job_application(job_application)
+        self.employee_record.prepare()
+        filename = "RIAE_FS_20210410130000.json"
+        self.employee_record.sent_in_asp_batch_file(filename)
 
-        employee_record.prepare()
-        employee_record.sent_in_asp_batch_file("RIAE_FS_20210410130000.json")
+        self.assertEquals(filename, self.employee_record.asp_batch_file)
+        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.SENT)
+
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_state_rejected(self, _mock):
+        self.employee_record.prepare()
+        filename = "RIAE_FS_20210410130001.json"
+        self.employee_record.sent_in_asp_batch_file(filename)
+
+        err_code, err_message = "12", "JSON Invalide"
+
+        self.employee_record.rejected_by_asp(err_code, err_message)
+        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.REJECTED)
+        self.assertEquals(self.employee_record.asp_processing_code, err_code)
+        self.assertEquals(self.employee_record.asp_processing_label, err_message)
