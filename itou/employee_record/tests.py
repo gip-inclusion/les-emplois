@@ -123,6 +123,21 @@ class EmployeeRecordModelTest(TestCase):
 
         validate_asp_batch_filename("RIAE_FS_20210410130000.json")
 
+    def test_find_by_batch(self):
+        """
+        How to find employee records given their ASP batch file name and line number ?
+        """
+        filename = "RIAE_FS_20210410130000.json"
+        employee_record = EmployeeRecordFactory(asp_batch_file=filename, asp_batch_line_number=2)
+
+        self.assertEquals(EmployeeRecord.objects.find_by_batch("X", 3).count(), 0)
+        self.assertEquals(EmployeeRecord.objects.find_by_batch(filename, 3).count(), 0)
+        self.assertEquals(EmployeeRecord.objects.find_by_batch("X", 2).count(), 0)
+
+        result = EmployeeRecord.objects.find_by_batch(filename, 2).first()
+
+        self.assertEquals(result.id, employee_record.id)
+
 
 class EmployeeRecordLifeCycleTest(TestCase):
     """
