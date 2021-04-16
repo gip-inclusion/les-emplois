@@ -222,7 +222,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 messages.success(
                     request,
                     _(
-                        "Le numéro d'agrément peut être utilisé pour la déclaration "
+                        "Le numéro de PASS IAE peut être utilisé pour la déclaration "
                         "de la personne dans l'extranet IAE 2.0 de l'ASP."
                     ),
                 )
