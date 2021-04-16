@@ -427,6 +427,8 @@ class EmployeeRecordBatch:
     # File name format for upload
     REMOTE_PATH_FORMAT = "RIAE_FS_{}.json"
 
+    FEEDBACK_FILE_SUFFIX = "_FichierRetour"
+
     def __init__(self, employee_records):
         if employee_records and len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
             raise ValidationError(
@@ -447,3 +449,15 @@ class EmployeeRecordBatch:
 
     def __str__(self):
         return f"{self.upload_filename}"
+
+    @staticmethod
+    def feedback_filename(filename):
+        """
+        Returns name of the feedback file
+        """
+        validate_asp_batch_filename(filename)
+        separator = "."
+        path, ext = filename.split(separator)
+        path += EmployeeRecordBatch.FEEDBACK_FILE_SUFFIX
+
+        return separator.join([path, ext])
