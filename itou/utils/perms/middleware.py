@@ -64,7 +64,7 @@ class ItouCurrentOrganizationMiddleware:
                                 "nouveau."
                             )
                         message = safestring.mark_safe(message)
-                        messages.warning(request, _(message))
+                        messages.warning(request, message)
                         return redirect("account_logout")
 
             elif user.is_prescriber:

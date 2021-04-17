@@ -34,7 +34,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
                 "reçu pour accepter l'invitation."
             )
             message = safestring.mark_safe(message)
-            messages.error(request, _(message))
+            messages.error(request, message)
             return redirect("account_logout")
 
     if invitation.can_be_accepted:
@@ -74,17 +74,19 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
                 invitation.send()
 
             count = len(formset.forms)
-            message_singular = (
-                "Votre invitation a été envoyée par courriel.<br>"
-                "Pour rejoindre votre organisation, il suffira simplement à votre invité(e) "
-                "de cliquer sur le lien de validation contenu dans le courriel.<br>"
-            )
-            message_plural = (
-                "Vos invitations ont été envoyées par courriel.<br>"
-                "Pour rejoindre votre organisation, il suffira simplement à vos invités "
-                "de cliquer sur le lien de validation contenu dans le courriel.<br>"
-            )
-            message = __(message_singular, message_plural, count) % {"count": count}
+            if count == 1:
+                message = (
+                    "Votre invitation a été envoyée par courriel.<br>"
+                    "Pour rejoindre votre organisation, il suffira simplement à votre invité(e) "
+                    "de cliquer sur le lien de validation contenu dans le courriel.<br>"
+                )
+            else:
+                message = (
+                    "Vos invitations ont été envoyées par courriel.<br>"
+                    "Pour rejoindre votre organisation, il suffira simplement à vos invités "
+                    "de cliquer sur le lien de validation contenu dans le courriel.<br>"
+                )
+
             expiration_date = formats.date_format(invitations[0].expiration_date)
             message += f"Le lien de validation est valable jusqu'au {expiration_date}."
             message = safestring.mark_safe(message)
@@ -130,17 +132,19 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
                 invitation.send()
 
             count = len(formset.forms)
-            message_singular = (
-                "Votre invitation a été envoyée par e-mail.<br>"
-                "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
-                "sur le lien de validation reçu dans le courriel.<br>"
-            )
-            message_plural = (
-                "Vos invitations ont été envoyées par e-mail.<br>"
-                "Pour rejoindre votre organisation, vos invités peuvent désormais "
-                "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
-            )
-            message = __(message_singular, message_plural, count) % {"count": count}
+            if count == 1:
+                message = (
+                    "Votre invitation a été envoyée par e-mail.<br>"
+                    "Pour rejoindre votre organisation, l'invité(e) peut désormais cliquer "
+                    "sur le lien de validation reçu dans le courriel.<br>"
+                )
+            else:
+                message = (
+                    "Vos invitations ont été envoyées par e-mail.<br>"
+                    "Pour rejoindre votre organisation, vos invités peuvent désormais "
+                    "cliquer sur le lien de validation reçu dans l'e-mail.<br>"
+                )
+
             expiration_date = formats.date_format(invitations[0].expiration_date)
             message += f"Le lien de validation est valable jusqu'au {expiration_date}."
             message = safestring.mark_safe(message)
