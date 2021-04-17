@@ -94,26 +94,26 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     """
 
     class Kind(models.TextChoices):
-        PE = "PE", _("Pôle emploi")
-        CAP_EMPLOI = "CAP_EMPLOI", _("CAP emploi")
-        ML = "ML", _("Mission locale")
-        DEPT = "DEPT", _("Service social du conseil départemental")
-        DEPT_BRSA = "DEPT_BRSA", _("Dispositif conventionné par le conseil départemental pour le suivi BRSA")
-        SPIP = "SPIP", _("SPIP - Service pénitentiaire d'insertion et de probation")
-        PJJ = "PJJ", _("PJJ - Protection judiciaire de la jeunesse")
-        CCAS = ("CCAS", _("CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale"))
-        PLIE = "PLIE", _("PLIE - Plan local pour l'insertion et l'emploi")
-        CHRS = "CHRS", _("CHRS - Centre d'hébergement et de réinsertion sociale")
-        CIDFF = ("CIDFF", _("CIDFF - Centre d'information sur les droits des femmes et des familles"))
-        PREVENTION = "PREVENTION", _("Service ou club de prévention")
-        AFPA = ("AFPA", _("AFPA - Agence nationale pour la formation professionnelle des adultes"))
-        PIJ_BIJ = "PIJ_BIJ", _("PIJ-BIJ - Point/Bureau information jeunesse")
-        CAF = "CAF", _("CAF - Caisse d'allocation familiale")
-        CADA = "CADA", _("CADA - Centre d'accueil de demandeurs d'asile")
-        ASE = "ASE", _("ASE - Aide sociale à l'enfance")
-        CAVA = "CAVA", _("CAVA - Centre d'adaptation à la vie active")
-        CPH = "CPH", _("CPH - Centre provisoire d'hébergement")
-        CHU = "CHU", _("CHU - Centre d'hébergement d'urgence")
+        PE = "PE", "Pôle emploi"
+        CAP_EMPLOI = "CAP_EMPLOI", "CAP emploi"
+        ML = "ML", "Mission locale"
+        DEPT = "DEPT", "Service social du conseil départemental"
+        DEPT_BRSA = "DEPT_BRSA", "Dispositif conventionné par le conseil départemental pour le suivi BRSA"
+        SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
+        PJJ = "PJJ", "PJJ - Protection judiciaire de la jeunesse"
+        CCAS = ("CCAS", "CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
+        PLIE = "PLIE", "PLIE - Plan local pour l'insertion et l'emploi"
+        CHRS = "CHRS", "CHRS - Centre d'hébergement et de réinsertion sociale"
+        CIDFF = ("CIDFF", "CIDFF - Centre d'information sur les droits des femmes et des familles")
+        PREVENTION = "PREVENTION", "Service ou club de prévention"
+        AFPA = ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes")
+        PIJ_BIJ = "PIJ_BIJ", "PIJ-BIJ - Point/Bureau information jeunesse"
+        CAF = "CAF", "CAF - Caisse d'allocation familiale"
+        CADA = "CADA", "CADA - Centre d'accueil de demandeurs d'asile"
+        ASE = "ASE", "ASE - Aide sociale à l'enfance"
+        CAVA = "CAVA", "CAVA - Centre d'adaptation à la vie active"
+        CPH = "CPH", "CPH - Centre provisoire d'hébergement"
+        CHU = "CHU", "CHU - Centre d'hébergement d'urgence"
         OACAS = (
             "OACAS",
             _(
@@ -121,13 +121,13 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
                 "d'accueil communautaire et d'activité solidaire"
             ),
         )
-        OTHER = "OTHER", _("Autre")
+        OTHER = "OTHER", "Autre"
 
     class AuthorizationStatus(models.TextChoices):
-        NOT_SET = "NOT_SET", _("Habilitation en attente de validation")
-        VALIDATED = "VALIDATED", _("Habilitation validée")
-        REFUSED = "REFUSED", _("Validation de l'habilitation refusée")
-        NOT_REQUIRED = "NOT_REQUIRED", _("Pas d'habilitation nécessaire")
+        NOT_SET = "NOT_SET", "Habilitation en attente de validation"
+        VALIDATED = "VALIDATED", "Habilitation validée"
+        REFUSED = "REFUSED", "Validation de l'habilitation refusée"
+        NOT_REQUIRED = "NOT_REQUIRED", "Pas d'habilitation nécessaire"
 
     # Rules:
     # - a SIRET was not mandatory in the past (some entries still have a "blank" siret)
@@ -138,30 +138,28 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     # objects with "blank" values (e.g. Pôle emploi agencies or old entries that existed
     # prior to the mandatory siret).
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
-    siret = models.CharField(
-        verbose_name=_("Siret"), max_length=14, validators=[validate_siret], null=True, blank=True
-    )
-    kind = models.CharField(verbose_name=_("Type"), max_length=20, choices=Kind.choices, default=Kind.OTHER)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255)
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
-    email = models.EmailField(verbose_name=_("E-mail"), blank=True)
-    website = models.URLField(verbose_name=_("Site web"), blank=True)
-    description = models.TextField(verbose_name=_("Description"), blank=True)
+    siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], null=True, blank=True)
+    kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
+    name = models.CharField(verbose_name="Nom", max_length=255)
+    phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
+    email = models.EmailField(verbose_name="E-mail", blank=True)
+    website = models.URLField(verbose_name="Site web", blank=True)
+    description = models.TextField(verbose_name="Description", blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Membres"),
+        verbose_name="Membres",
         through="PrescriberMembership",
         blank=True,
         through_fields=("organization", "user"),
     )
     is_authorized = models.BooleanField(
-        verbose_name=_("Habilitation"),
+        verbose_name="Habilitation",
         default=False,
-        help_text=_("Précise si l'organisation est habilitée par le Préfet."),
+        help_text="Précise si l'organisation est habilitée par le Préfet.",
     )
     code_safir_pole_emploi = models.CharField(
-        verbose_name=_("Code Safir"),
-        help_text=_("Code unique d'une agence Pole emploi."),
+        verbose_name="Code Safir",
+        help_text="Code unique d'une agence Pole emploi.",
         validators=[validate_code_safir],
         max_length=5,
         blank=True,
@@ -172,27 +170,25 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Créé par"),
+        verbose_name="Créé par",
         related_name="created_prescriber_organization_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     authorization_status = models.CharField(
-        verbose_name=_("Statut de l'habilitation"),
+        verbose_name="Statut de l'habilitation",
         max_length=20,
         choices=AuthorizationStatus.choices,
         default=AuthorizationStatus.NOT_SET,
     )
-    authorization_updated_at = models.DateTimeField(
-        verbose_name=_("Date de MAJ du statut de l'habilitation"), null=True
-    )
+    authorization_updated_at = models.DateTimeField(verbose_name="Date de MAJ du statut de l'habilitation", null=True)
     authorization_updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Dernière MAJ de l'habilitation par"),
+        verbose_name="Dernière MAJ de l'habilitation par",
         related_name="authorization_status_set",
         null=True,
         blank=True,
@@ -202,8 +198,8 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     objects = PrescriberOrganizationManager.from_queryset(PrescriberOrganizationQuerySet)()
 
     class Meta:
-        verbose_name = _("Organisation")
-        verbose_name_plural = _("Organisations")
+        verbose_name = "Organisation"
+        verbose_name_plural = "Organisations"
         # This DB constraint works with null fields, but not with blank ones
         # If both org1 and org2 are created:
         # OK  => org1: (kind="ML", siret=None) + org2: (kind="ML", siret=None)
@@ -230,7 +226,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         A code SAFIR can only be set for PE agencies.
         """
         if self.kind != self.Kind.PE and self.code_safir_pole_emploi:
-            raise ValidationError({"code_safir_pole_emploi": _("Le Code Safir est réservé aux agences Pôle emploi.")})
+            raise ValidationError({"code_safir_pole_emploi": "Le Code Safir est réservé aux agences Pôle emploi."})
 
     def clean_siret(self):
         """
@@ -238,9 +234,9 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         """
         if self.kind != self.Kind.PE:
             if not self.siret:
-                raise ValidationError({"siret": _("Le SIRET est obligatoire.")})
+                raise ValidationError({"siret": "Le SIRET est obligatoire."})
             if self._meta.model.objects.exclude(pk=self.pk).filter(siret=self.siret, kind=self.kind).exists():
-                raise ValidationError({"siret": _("Ce SIRET est déjà utilisé.")})
+                raise ValidationError({"siret": "Ce SIRET est déjà utilisé."})
 
     @property
     def display_name(self):
@@ -395,17 +391,17 @@ class PrescriberMembership(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
-    is_admin = models.BooleanField(verbose_name=_("Administrateur de la structure d'accompagnement"), default=False)
-    is_active = models.BooleanField(_("Rattachement actif"), default=True)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
+    joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
+    is_admin = models.BooleanField(verbose_name="Administrateur de la structure d'accompagnement", default=False)
+    is_active = models.BooleanField("Rattachement actif", default=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_prescribermembership_set",
         null=True,
         on_delete=models.CASCADE,
-        verbose_name=_("Mis à jour par"),
+        verbose_name="Mis à jour par",
     )
 
     objects = models.Manager.from_queryset(PrescriberMembershipQuerySet)()

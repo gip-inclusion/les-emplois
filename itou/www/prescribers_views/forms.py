@@ -61,7 +61,7 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
             .filter(siret=siret, kind=self.instance.kind)
             .exists()
         ):
-            error = _("Ce SIRET est déjà utilisé.")
+            error = "Ce SIRET est déjà utilisé."
             raise forms.ValidationError(error)
         return siret
 

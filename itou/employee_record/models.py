@@ -16,12 +16,12 @@ class Status(models.TextChoices):
     - after that, the FS is "archived" and can't be used for further interaction
     """
 
-    NEW = "NEW", _("Nouvelle fiche salarié")
-    READY = "READY", _("Données complètes, prêtes à l'envoi ASP")
-    SENT = "SENT", _("Envoyée ASP")
-    REJECTED = "REJECTED", _("Rejet ASP")
-    PROCESSED = "PROCESSED", _("Traitée ASP")
-    ARCHIVED = "ARCHIVED", _("Archivée")
+    NEW = "NEW", "Nouvelle fiche salarié"
+    READY = "READY", "Données complètes, prêtes à l'envoi ASP"
+    SENT = "SENT", "Envoyée ASP"
+    REJECTED = "REJECTED", "Rejet ASP"
+    PROCESSED = "PROCESSED", "Traitée ASP"
+    ARCHIVED = "ARCHIVED", "Archivée"
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
@@ -54,10 +54,10 @@ class EmployeeRecord(models.Model):
     Holds information needed for JSON exports and processing by ASP
     """
 
-    ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED = _("La candidature doit être acceptée")
-    ERROR_JOB_APPLICATION_TOO_RECENT = _("L'embauche a été validé trop récemment")
-    ERROR_JOB_SEEKER_TITLE = _("La civilité du salarié est obligatoire")
-    ERROR_JOB_SEEKER_BIRTH_COUNTRY = _("Le pays de naissance est obligatoire")
+    ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED = "La candidature doit être acceptée"
+    ERROR_JOB_APPLICATION_TOO_RECENT = "L'embauche a été validé trop récemment"
+    ERROR_JOB_SEEKER_TITLE = "La civilité du salarié est obligatoire"
+    ERROR_JOB_SEEKER_BIRTH_COUNTRY = "Le pays de naissance est obligatoire"
 
     ERROR_JOB_SEEKER_HAS_NO_PROFILE = "Cet utilisateur n'a pas de profil de demandeur d'emploi enregistré"
 
@@ -66,7 +66,7 @@ class EmployeeRecord(models.Model):
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
-    status = models.CharField(max_length=10, verbose_name=_("Statut"), choices=Status.choices, default=Status.NEW)
+    status = models.CharField(max_length=10, verbose_name="Statut", choices=Status.choices, default=Status.NEW)
 
     # Itou part
 
@@ -78,17 +78,17 @@ class EmployeeRecord(models.Model):
         "job_applications.jobapplication",
         on_delete=models.SET_NULL,
         null=True,
-        verbose_name=_("Candidature / embauche"),
+        verbose_name="Candidature / embauche",
     )
 
     # These fields are duplicated to act as constraint fields on DB level
-    approval_number = models.CharField(max_length=12, verbose_name=_("Numéro d'agrément"))
-    asp_id = models.IntegerField(verbose_name=_("ID ASP de la SIAE"))
+    approval_number = models.CharField(max_length=12, verbose_name="Numéro d'agrément")
+    asp_id = models.IntegerField(verbose_name="ID ASP de la SIAE")
 
     # ASP processing part
-    asp_processing_code = models.CharField(max_length=4, verbose_name=_("Code de traitement ASP"), blank=True)
-    asp_processing_label = models.CharField(max_length=100, verbose_name=_("Libellé de traitement ASP"), blank=True)
-    asp_process_response = models.JSONField(verbose_name=_("Réponse du traitement ASP"), null=True)
+    asp_processing_code = models.CharField(max_length=4, verbose_name="Code de traitement ASP", blank=True)
+    asp_processing_label = models.CharField(max_length=100, verbose_name="Libellé de traitement ASP", blank=True)
+    asp_process_response = models.JSONField(verbose_name="Réponse du traitement ASP", null=True)
 
     # Once correctly processed by ASP, the employee record is archived:
     # - it can't be changed anymore
@@ -96,12 +96,12 @@ class EmployeeRecord(models.Model):
     # The API will not use JSON serializers on a regular basis,
     # except for the archive serialization, which occurs once.
     # It will only return a list of this JSON field for archived employee records.
-    archived_json = models.JSONField(verbose_name=_("Fiche salarié au format JSON (archive)"), null=True)
+    archived_json = models.JSONField(verbose_name="Fiche salarié au format JSON (archive)", null=True)
     objects = models.Manager.from_queryset(EmployeeRecordQuerySet)()
 
     class Meta:
-        verbose_name = _("Fiche salarié")
-        verbose_name_plural = _("Fiches salarié")
+        verbose_name = "Fiche salarié"
+        verbose_name_plural = "Fiches salarié"
         constraints = [
             models.UniqueConstraint(fields=["asp_id", "approval_number"], name="unique_asp_id_approval_number")
         ]

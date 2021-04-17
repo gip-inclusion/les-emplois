@@ -82,7 +82,7 @@ def manually_add_approval(
         "form": form,
         "job_application": job_application,
         "opts": opts,
-        "title": _("Ajout manuel d'un numéro d'agrément"),
+        "title": "Ajout manuel d'un numéro d'agrément",
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
@@ -119,7 +119,7 @@ def manually_refuse_approval(
 
     if request.method == "POST" and request.POST.get("confirm") == "yes":
         job_application.manually_refuse_approval(refused_by=request.user)
-        messages.success(request, _("Délivrance du PASS IAE refusée."))
+        messages.success(request, "Délivrance du PASS IAE refusée.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     # Display a preview of the email that will be send.
@@ -138,7 +138,7 @@ def manually_refuse_approval(
         "email_subject_template": email_subject_template,
         "job_application": job_application,
         "opts": opts,
-        "title": _("Confirmer le refus manuel d'un numéro d'agrément"),
+        "title": "Confirmer le refus manuel d'un numéro d'agrément",
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)

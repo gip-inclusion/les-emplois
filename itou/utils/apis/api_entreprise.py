@@ -43,10 +43,10 @@ class EtablissementAPI:
             data = r.json()
         except httpx.HTTPError as e:
             if e.response.status_code == 422:
-                error = _("SIRET non reconnu.")
+                error = "SIRET non reconnu."
             else:
                 logger.error("Error while fetching `%s`: %s", url, e)
-                error = _("Problème de connexion à la base Sirene. Veuillez réessayer ultérieurement.")
+                error = "Problème de connexion à la base Sirene. Veuillez réessayer ultérieurement."
 
         if data and data.get("errors"):
             error = data["errors"][0]

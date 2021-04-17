@@ -44,22 +44,22 @@ class InvitationAbstract(models.Model):
     GUEST_TYPE_PRESCRIBER_WITH_ORG = KIND_PRESCRIBER
     GUEST_TYPE_SIAE_STAFF = KIND_SIAE_STAFF
     GUEST_TYPES = [
-        (GUEST_TYPE_JOB_SEEKER, _("Candidat")),
-        (GUEST_TYPE_PRESCRIBER, _("Prescripteur sans organisation")),
-        (GUEST_TYPE_PRESCRIBER_WITH_ORG, _("Prescripteur membre d'une organisation")),
-        (GUEST_TYPE_SIAE_STAFF, _("Employeur")),
+        (GUEST_TYPE_JOB_SEEKER, "Candidat"),
+        (GUEST_TYPE_PRESCRIBER, "Prescripteur sans organisation"),
+        (GUEST_TYPE_PRESCRIBER_WITH_ORG, "Prescripteur membre d'une organisation"),
+        (GUEST_TYPE_SIAE_STAFF, "Employeur"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(verbose_name=_("E-mail"))
-    first_name = models.CharField(verbose_name=_("Prénom"), max_length=255)
-    last_name = models.CharField(verbose_name=_("Nom"), max_length=255)
-    sent = models.BooleanField(verbose_name=_("Envoyée"), default=False)
+    email = models.EmailField(verbose_name="E-mail")
+    first_name = models.CharField(verbose_name="Prénom", max_length=255)
+    last_name = models.CharField(verbose_name="Nom", max_length=255)
+    sent = models.BooleanField(verbose_name="Envoyée", default=False)
 
-    accepted = models.BooleanField(verbose_name=_("Acceptée"), default=False)
-    accepted_at = models.DateTimeField(verbose_name=_("Date d'acceptation"), blank=True, null=True, db_index=True)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
-    sent_at = models.DateTimeField(verbose_name=_("Date d'envoi"), blank=True, null=True, db_index=True)
+    accepted = models.BooleanField(verbose_name="Acceptée", default=False)
+    accepted_at = models.DateTimeField(verbose_name="Date d'acceptation", blank=True, null=True, db_index=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
+    sent_at = models.DateTimeField(verbose_name="Date d'envoi", blank=True, null=True, db_index=True)
 
     objects = models.Manager.from_queryset(InvitationQuerySet)()
 
@@ -149,7 +149,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
     SIGNIN_ACCOUNT_TYPE = "prescriber"
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Parrain ou marraine"),
+        verbose_name="Parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="prescriber_org_invitations",
     )
@@ -225,7 +225,7 @@ class SiaeStaffInvitation(InvitationAbstract):
     SIGNIN_ACCOUNT_TYPE = "siae"
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Parrain ou marraine"),
+        verbose_name="Parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="siae_invitations",
     )

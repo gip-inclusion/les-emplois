@@ -24,11 +24,11 @@ class JobsInline(admin.TabularInline):
 
 
 class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
-    title = _("Délivrance manuelle de PASS IAE requise")
+    title = "Délivrance manuelle de PASS IAE requise"
     parameter_name = "manual_approval_delivery_required"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")),)
+        return (("yes", "Oui"),)
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -70,7 +70,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         """
         if obj and obj.manual_approval_delivery_required:
             url = reverse("admin:approvals_approval_manually_add_approval", args=[obj.pk])
-            text = _("Délivrer un PASS IAE dans l'admin")
+            text = "Délivrer un PASS IAE dans l'admin"
             help_texts = {"approval_manually_delivered_by": mark_safe(f'<a href="{url}">{text}</a>')}
             kwargs.update({"help_texts": help_texts})
         return super().get_form(request, obj, **kwargs)

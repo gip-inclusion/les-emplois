@@ -66,11 +66,11 @@ class SiaesInline(admin.TabularInline):
 
 
 class SiaeHasMembersFilter(admin.SimpleListFilter):
-    title = _("A des membres")
+    title = "A des membres"
     parameter_name = "has_members"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -98,7 +98,7 @@ class SiaeAdmin(admin.ModelAdmin):
     )
     fieldsets = (
         (
-            _("SIAE"),
+            "SIAE",
             {
                 "fields": (
                     "pk",
@@ -123,7 +123,7 @@ class SiaeAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Adresse"),
+            "Adresse",
             {
                 "fields": (
                     "address_line_1",
@@ -204,7 +204,7 @@ class SiaeConvention(admin.ModelAdmin):
     )
     fieldsets = (
         (
-            _("Informations"),
+            "Informations",
             {
                 "fields": (
                     "kind",
@@ -213,7 +213,7 @@ class SiaeConvention(admin.ModelAdmin):
             },
         ),
         (
-            _("Statut"),
+            "Statut",
             {
                 "fields": (
                     "is_active",
@@ -224,7 +224,7 @@ class SiaeConvention(admin.ModelAdmin):
             },
         ),
         (
-            _("Autres"),
+            "Autres",
             {
                 "fields": (
                     "created_at",
@@ -265,7 +265,7 @@ class SiaeFinancialAnnex(admin.ModelAdmin):
     )
     fieldsets = (
         (
-            _("Informations"),
+            "Informations",
             {
                 "fields": (
                     "number",
@@ -274,7 +274,7 @@ class SiaeFinancialAnnex(admin.ModelAdmin):
             },
         ),
         (
-            _("Statut"),
+            "Statut",
             {
                 "fields": (
                     "state",
@@ -284,7 +284,7 @@ class SiaeFinancialAnnex(admin.ModelAdmin):
             },
         ),
         (
-            _("Autres"),
+            "Autres",
             {
                 "fields": (
                     "created_at",

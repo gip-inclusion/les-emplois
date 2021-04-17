@@ -17,11 +17,11 @@ class TmpMissingSiretFilter(admin.SimpleListFilter):
     Delete this filter when all SIRETs are filled in.
     """
 
-    title = _("SIRET à renseigner")
+    title = "SIRET à renseigner"
     parameter_name = "missing_siret"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")),)
+        return (("yes", "Oui"),)
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -42,11 +42,11 @@ class TmpCanBeDeletedFilter(admin.SimpleListFilter):
     Delete this filter when they are all deleted.
     """
 
-    title = _("Sans membres à supprimer")
+    title = "Sans membres à supprimer"
     parameter_name = "missing_members"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")),)
+        return (("yes", "Oui"),)
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -56,11 +56,11 @@ class TmpCanBeDeletedFilter(admin.SimpleListFilter):
 
 
 class HasMembersFilter(admin.SimpleListFilter):
-    title = _("A des membres")
+    title = "A des membres"
     parameter_name = "has_members"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -72,11 +72,11 @@ class HasMembersFilter(admin.SimpleListFilter):
 
 
 class AuthorizationValidationRequired(admin.SimpleListFilter):
-    title = _("Validation de l'habilitation requise")
+    title = "Validation de l'habilitation requise"
     parameter_name = "authorization_validation_required"
 
     def lookups(self, request, model_admin):
-        return (("required", _("Requise")),)
+        return (("required", "Requise"),)
 
     def queryset(self, request, queryset):
         if self.value() == "required":
@@ -102,11 +102,11 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     change_form_template = "admin/prescribers/change_form.html"
     fieldsets = (
         (
-            _("Structure"),
+            "Structure",
             {"fields": ("pk", "siret", "kind", "name", "phone", "email", "code_safir_pole_emploi", "is_authorized")},
         ),
         (
-            _("Adresse"),
+            "Adresse",
             {
                 "fields": (
                     "address_line_1",
@@ -121,7 +121,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Info"),
+            "Info",
             {
                 "fields": (
                     "created_by",

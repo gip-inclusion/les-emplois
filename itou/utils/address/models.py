@@ -126,6 +126,6 @@ class AddressMixin(models.Model):
 
     def clean(self):
         if self.department != department_from_postcode(self.post_code):
-            raise ValidationError(_("Le département doit correspondre au code postal."))
+            raise ValidationError("Le département doit correspondre au code postal.")
 
         super().clean()

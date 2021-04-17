@@ -126,35 +126,35 @@ class EligibilityDiagnosis(models.Model):
     AUTHOR_KIND_SIAE_STAFF = KIND_SIAE_STAFF
 
     AUTHOR_KIND_CHOICES = (
-        (AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
-        (AUTHOR_KIND_SIAE_STAFF, _("Employeur (SIAE)")),
+        (AUTHOR_KIND_PRESCRIBER, "Prescripteur"),
+        (AUTHOR_KIND_SIAE_STAFF, "Employeur (SIAE)"),
     )
 
     EXPIRATION_DELAY_MONTHS = 6
 
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Demandeur d'emploi"),
+        verbose_name="Demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="eligibility_diagnoses",
     )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Auteur"),
+        verbose_name="Auteur",
         on_delete=models.CASCADE,
         related_name="eligibility_diagnoses_made",
     )
     author_kind = models.CharField(
-        verbose_name=_("Type de l'auteur"), max_length=10, choices=AUTHOR_KIND_CHOICES, default=AUTHOR_KIND_PRESCRIBER
+        verbose_name="Type de l'auteur", max_length=10, choices=AUTHOR_KIND_CHOICES, default=AUTHOR_KIND_PRESCRIBER
     )
     # When the author is an SIAE staff member, keep a track of his current SIAE.
     author_siae = models.ForeignKey(
-        "siaes.Siae", verbose_name=_("SIAE de l'auteur"), null=True, blank=True, on_delete=models.CASCADE
+        "siaes.Siae", verbose_name="SIAE de l'auteur", null=True, blank=True, on_delete=models.CASCADE
     )
     # When the author is a prescriber, keep a track of his current organization.
     author_prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
-        verbose_name=_("Organisation du prescripteur de l'auteur"),
+        verbose_name="Organisation du prescripteur de l'auteur",
         null=True,
         blank=True,
         on_delete=models.CASCADE,
@@ -162,19 +162,19 @@ class EligibilityDiagnosis(models.Model):
     # Administrative criteria are mandatory only when an SIAE is performing an eligibility diagnosis.
     administrative_criteria = models.ManyToManyField(
         "eligibility.AdministrativeCriteria",
-        verbose_name=_("Critères administratifs"),
+        verbose_name="Critères administratifs",
         through="SelectedAdministrativeCriteria",
         blank=True,
     )
 
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
 
     objects = EligibilityDiagnosisManager.from_queryset(EligibilityDiagnosisQuerySet)()
 
     class Meta:
-        verbose_name = _("Diagnostic d'éligibilité")
-        verbose_name_plural = _("Diagnostics d'éligibilité")
+        verbose_name = "Diagnostic d'éligibilité"
+        verbose_name_plural = "Diagnostics d'éligibilité"
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -256,29 +256,29 @@ class AdministrativeCriteria(models.Model):
     MAX_UI_RANK = 32767
 
     class Level(models.TextChoices):
-        LEVEL_1 = "1", _("Niveau 1")
-        LEVEL_2 = "2", _("Niveau 2")
+        LEVEL_1 = "1", "Niveau 1"
+        LEVEL_2 = "2", "Niveau 2"
 
-    level = models.CharField(verbose_name=_("Niveau"), max_length=1, choices=Level.choices, default=Level.LEVEL_1)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255)
-    desc = models.CharField(verbose_name=_("Description"), max_length=255, blank=True)
-    written_proof = models.CharField(verbose_name=_("Justificatif"), max_length=255, blank=True)
+    level = models.CharField(verbose_name="Niveau", max_length=1, choices=Level.choices, default=Level.LEVEL_1)
+    name = models.CharField(verbose_name="Nom", max_length=255)
+    desc = models.CharField(verbose_name="Description", max_length=255, blank=True)
+    written_proof = models.CharField(verbose_name="Justificatif", max_length=255, blank=True)
     written_proof_url = models.URLField(
-        verbose_name=_("Lien d'aide à propos du justificatif"), max_length=200, blank=True
+        verbose_name="Lien d'aide à propos du justificatif", max_length=200, blank=True
     )
     # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_("Créé par"), null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
 
     objects = models.Manager.from_queryset(AdministrativeCriteriaQuerySet)()
 
     class Meta:
-        verbose_name = _("Critère administratif")
-        verbose_name_plural = _("Critères administratifs")
+        verbose_name = "Critère administratif"
+        verbose_name_plural = "Critères administratifs"
         ordering = ["level", "ui_rank"]
 
     def __str__(self):
@@ -296,11 +296,11 @@ class SelectedAdministrativeCriteria(models.Model):
     administrative_criteria = models.ForeignKey(
         AdministrativeCriteria, on_delete=models.CASCADE, related_name="administrative_criteria_through"
     )
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
 
     class Meta:
-        verbose_name = _("Critère administratif sélectionné")
-        verbose_name_plural = _("Critères administratifs sélectionnés")
+        verbose_name = "Critère administratif sélectionné"
+        verbose_name_plural = "Critères administratifs sélectionnés"
         unique_together = ("eligibility_diagnosis", "administrative_criteria")
 
     def __str__(self):

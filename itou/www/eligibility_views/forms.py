@@ -18,7 +18,7 @@ class ConfirmEligibilityForm(forms.Form):
 
     def clean_confirm(self):
         if not self.cleaned_data["confirm"]:
-            error = _("Vous devez confirmer l'éligibilité du candidat.")
+            error = "Vous devez confirmer l'éligibilité du candidat."
             raise forms.ValidationError(error)
 
 

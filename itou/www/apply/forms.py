@@ -31,10 +31,10 @@ class UserExistsForm(forms.Form):
         self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:
-                error = _("Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé.")
+                error = "Vous ne pouvez pas postuler pour cet utilisateur car son compte a été désactivé."
                 raise forms.ValidationError(error)
             if not self.user.is_job_seeker:
-                error = _("Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi.")
+                error = "Vous ne pouvez pas postuler pour cet utilisateur car il n'est pas demandeur d'emploi."
                 raise forms.ValidationError(error)
         return email
 
@@ -454,7 +454,7 @@ class FilterJobApplicationsForm(forms.Form):
         if states:
             values = [str(JobApplicationWorkflow.states[state].title) for state in states]
             value = ", ".join(values)
-            label = _("Statuts") if (len(values) > 1) else _("Statut")
+            label = "Statuts" if (len(values) > 1) else "Statut"
             active_filters.append([label, value])
 
         return [{"label": f[0], "value": f[1]} for f in active_filters]
@@ -465,9 +465,9 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     Job applications filters common to SIAE and Prescribers.
     """
 
-    senders = forms.MultipleChoiceField(required=False, label=_("Nom"), widget=Select2MultipleWidget)
+    senders = forms.MultipleChoiceField(required=False, label="Nom", widget=Select2MultipleWidget)
 
-    job_seekers = forms.MultipleChoiceField(required=False, label=_("Candidat"), widget=Select2MultipleWidget)
+    job_seekers = forms.MultipleChoiceField(required=False, label="Candidat", widget=Select2MultipleWidget)
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         self.job_applications_qs = job_applications_qs
@@ -527,7 +527,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
     """
 
     sender_organizations = forms.MultipleChoiceField(
-        required=False, label=_("Prescripteur"), widget=Select2MultipleWidget
+        required=False, label="Prescripteur", widget=Select2MultipleWidget
     )
 
     def __init__(self, job_applications_qs, *args, **kwargs):
@@ -574,7 +574,7 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
     Job applications filters for Prescribers only.
     """
 
-    to_siaes = forms.MultipleChoiceField(required=False, label=_("Structure"), widget=Select2MultipleWidget)
+    to_siaes = forms.MultipleChoiceField(required=False, label="Structure", widget=Select2MultipleWidget)
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)

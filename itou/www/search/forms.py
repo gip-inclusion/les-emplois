@@ -51,7 +51,7 @@ class SiaeSearchForm(forms.Form):
         try:
             return City.objects.get(slug=slug)
         except City.DoesNotExist:
-            raise forms.ValidationError(_("Cette ville n'existe pas."))
+            raise forms.ValidationError("Cette ville n'existe pas.")
 
 
 class PrescriberSearchForm(forms.Form):
@@ -89,4 +89,4 @@ class PrescriberSearchForm(forms.Form):
         try:
             return City.objects.get(slug=slug)
         except City.DoesNotExist:
-            raise forms.ValidationError(_("Cette ville n'existe pas."))
+            raise forms.ValidationError("Cette ville n'existe pas.")

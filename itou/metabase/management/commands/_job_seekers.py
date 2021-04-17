@@ -17,8 +17,8 @@ from itou.metabase.management.commands._utils import (
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
 AUTHOR_KIND_CHOICES = (
-    (EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
-    (EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF, _("Employeur")),
+    (EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER, "Prescripteur"),
+    (EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF, "Employeur"),
 )
 
 

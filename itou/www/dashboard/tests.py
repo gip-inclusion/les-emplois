@@ -58,7 +58,7 @@ class DashboardViewTest(TestCase):
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("account_logout"))
 
-        expected_message = _("votre compte n'est malheureusement plus actif")
+        expected_message = "votre compte n'est malheureusement plus actif"
         self.assertContains(response, expected_message)
 
 

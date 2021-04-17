@@ -83,7 +83,7 @@ def process(request, job_application_id):
         # After each successful transition, a save() is performed by django-xworkflows.
         job_application.process(user=request.user)
     except xwf_models.InvalidTransitionError:
-        messages.error(request, _("Action déjà effectuée."))
+        messages.error(request, "Action déjà effectuée.")
 
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
@@ -107,9 +107,9 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
             job_application.refusal_reason = form.cleaned_data["refusal_reason"]
             job_application.answer = form.cleaned_data["answer"]
             job_application.refuse(user=request.user)
-            messages.success(request, _("Modification effectuée."))
+            messages.success(request, "Modification effectuée.")
         except xwf_models.InvalidTransitionError:
-            messages.error(request, _("Action déjà effectuée."))
+            messages.error(request, "Action déjà effectuée.")
 
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
@@ -140,9 +140,9 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.answer = form.cleaned_data["answer"]
             job_application.postpone(user=request.user)
-            messages.success(request, _("Modification effectuée."))
+            messages.success(request, "Modification effectuée.")
         except xwf_models.InvalidTransitionError:
-            messages.error(request, _("Action déjà effectuée."))
+            messages.error(request, "Action déjà effectuée.")
 
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
@@ -197,7 +197,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             job_application = form_accept.save(commit=False)
             job_application.accept(user=request.user)
         except xwf_models.InvalidTransitionError:
-            messages.error(request, _("Action déjà effectuée."))
+            messages.error(request, "Action déjà effectuée.")
             return HttpResponseRedirect(next_url)
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
@@ -242,9 +242,9 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         messages.warning(
             request,
             mark_safe(
-                _("Etes-vous satisfait des emplois de l'inclusion ? ")
+                "Etes-vous satisfait des emplois de l'inclusion ? "
                 + f"<a href='{settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}' rel='noopener' target='_blank'>"
-                + _("Je donne mon avis")
+                + "Je donne mon avis"
                 + "</a>"
             ),
         )
@@ -273,16 +273,16 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
 
     if not job_application.can_be_cancelled:
-        messages.error(request, _("Vous ne pouvez pas annuler cette embauche."))
+        messages.error(request, "Vous ne pouvez pas annuler cette embauche.")
         return HttpResponseRedirect(next_url)
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         try:
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.cancel(user=request.user)
-            messages.success(request, _("L'embauche a bien été annulée."))
+            messages.success(request, "L'embauche a bien été annulée.")
         except xwf_models.InvalidTransitionError:
-            messages.error(request, _("Action déjà effectuée."))
+            messages.error(request, "Action déjà effectuée.")
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -318,7 +318,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         EligibilityDiagnosis.create_diagnosis(
             job_application.job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
         )
-        messages.success(request, _("Éligibilité confirmée !"))
+        messages.success(request, "Éligibilité confirmée !")
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 

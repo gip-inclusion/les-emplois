@@ -92,7 +92,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                     job_through.is_active = new_is_active
                     job_through.save()
 
-            messages.success(request, _("Mise à jour effectuée !"))
+            messages.success(request, "Mise à jour effectuée !")
             return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae}
@@ -217,7 +217,7 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Mise à jour effectuée !"))
+        messages.success(request, "Mise à jour effectuée !")
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"form": form, "siae": siae}
@@ -266,7 +266,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
                 membership.save()
                 messages.success(
                     request,
-                    _("%(name)s a été retiré(e) des membres actifs de cette structure.")
+                    "%(name)s a été retiré(e) des membres actifs de cette structure."
                     % {"name": target_member.get_full_name()},
                 )
                 siae.member_deactivation_email(membership.user).send()
@@ -303,7 +303,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
                 membership.set_admin_role(True, user)
                 messages.success(
                     request,
-                    _("%(name)s a été ajouté(e) aux administrateurs de cette structure.")
+                    "%(name)s a été ajouté(e) aux administrateurs de cette structure."
                     % {"name": target_member.get_full_name()},
                 )
                 siae.add_admin_email(target_member).send()
@@ -311,7 +311,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
                 membership.set_admin_role(False, user)
                 messages.success(
                     request,
-                    _("%(name)s a été retiré(e) des administrateurs de cette structure.")
+                    "%(name)s a été retiré(e) des administrateurs de cette structure."
                     % {"name": target_member.get_full_name()},
                 )
                 siae.remove_admin_email(target_member).send()
@@ -340,7 +340,7 @@ def block_job_applications(request, template_name="siaes/block_job_applications.
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Mise à jour du blocage des candidatures effectuée !"))
+        messages.success(request, "Mise à jour du blocage des candidatures effectuée !")
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae, "form": form}

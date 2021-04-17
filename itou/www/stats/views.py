@@ -24,9 +24,9 @@ def public_stats(request, template_name=_STATS_HTML_TEMPLATE):
     """
     context = {
         "iframeurl": metabase_embedded_url(settings.PUBLIC_STATS_DASHBOARD_ID),
-        "page_title": _("Statistiques"),
+        "page_title": "Statistiques",
         "related_link": "stats:advanced_stats",
-        "related_title": _("Vers les statistiques avancées"),
+        "related_title": "Vers les statistiques avancées",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
@@ -40,9 +40,9 @@ def advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
     """
     context = {
         "iframeurl": metabase_embedded_url(settings.ADVANCED_STATS_DASHBOARD_ID),
-        "page_title": _("Statistiques avancées"),
+        "page_title": "Statistiques avancées",
         "related_link": "stats:public_stats",
-        "related_title": _("Vers les statistiques"),
+        "related_title": "Vers les statistiques",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
@@ -57,7 +57,7 @@ def reporting(request, template_name=_STATS_HTML_TEMPLATE):
     """
     context = {
         "iframeurl": metabase_embedded_url(settings.DIRECCTE_STATS_DASHBOARD_ID),
-        "page_title": _("Données par territoire"),
+        "page_title": "Données par territoire",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)

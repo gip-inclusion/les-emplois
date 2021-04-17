@@ -56,7 +56,7 @@ class DeclareProlongationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
         self.validated_by = User.objects.filter(email=email).first()
         if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
-            error = _("Cet utilisateur n'est pas un prescripteur habilité.")
+            error = "Cet utilisateur n'est pas un prescripteur habilité."
             raise forms.ValidationError(error)
         return email
 

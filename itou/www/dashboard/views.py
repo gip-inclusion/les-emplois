@@ -29,19 +29,19 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         can_show_financial_annexes = siae.convention_can_be_accessed_by(request.user)
         job_applications_categories = [
             {
-                "name": _("Candidatures à traiter"),
+                "name": "Candidatures à traiter",
                 "states": [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING],
                 "icon": "user-plus",
                 "badge": "badge-danger",
             },
             {
-                "name": _("Candidatures acceptées ou mises en liste d'attente"),
+                "name": "Candidatures acceptées ou mises en liste d'attente",
                 "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_POSTPONED],
                 "icon": "user-check",
                 "badge": "badge-secondary",
             },
             {
-                "name": _("Candidatures refusées/annulées"),
+                "name": "Candidatures refusées/annulées",
                 "states": [
                     JobApplicationWorkflow.STATE_REFUSED,
                     JobApplicationWorkflow.STATE_CANCELLED,
@@ -130,7 +130,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Mise à jour de vos informations effectuée !"))
+        messages.success(request, "Mise à jour de vos informations effectuée !")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
@@ -172,7 +172,7 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Les informations du candidat ont été mises à jour."))
+        messages.success(request, "Les informations du candidat ont été mises à jour.")
         return HttpResponseRedirect(back_url)
 
     context = {
@@ -233,7 +233,7 @@ def edit_user_preferences(request, template_name="dashboard/edit_user_preference
 
     if request.method == "POST" and new_job_app_notification_form.is_valid():
         new_job_app_notification_form.save()
-        messages.success(request, _("Vos préférences ont été modifiées."))
+        messages.success(request, "Vos préférences ont été modifiées.")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 

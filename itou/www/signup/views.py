@@ -121,7 +121,7 @@ class SiaeSignupView(SignupView):
 
     def warn_and_redirect(self, request):
         messages.warning(
-            request, _("Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.")
+            request, "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
         )
         return HttpResponseRedirect(reverse("signup:siae_select"))
 

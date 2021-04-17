@@ -10,9 +10,9 @@ from itou.utils.urls import get_safe_url
 class ItouLoginView(LoginView):
 
     ACCOUNT_TYPE_TO_DISPLAY_NAME = {
-        "job_seeker": _("Candidat"),
-        "prescriber": _("Prescripteur"),
-        "siae": _("Employeur solidaire"),
+        "job_seeker": "Candidat",
+        "prescriber": "Prescripteur",
+        "siae": "Employeur solidaire",
     }
 
     # The reverse() method cannot be used here as it causes

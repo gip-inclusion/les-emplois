@@ -4,7 +4,6 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
-from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.invitations.models import PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.models import PrescriberOrganization
@@ -34,12 +33,12 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         user = User.objects.filter(email__iexact=email).first()
         if user:
             if not user.is_prescriber:
-                error = forms.ValidationError(_("Cet utilisateur n'est pas un prescripteur."))
+                error = forms.ValidationError("Cet utilisateur n'est pas un prescripteur.")
                 self.add_error("email", error)
             else:
                 user_is_member = self.organization.active_members.filter(email=user.email).exists()
                 if user_is_member:
-                    error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
+                    error = forms.ValidationError("Cette personne fait déjà partie de votre organisation.")
                     self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
@@ -62,7 +61,7 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith(
             settings.POLE_EMPLOI_EMAIL_SUFFIX
         ):
-            error = forms.ValidationError(_("L'adresse e-mail doit être une adresse Pôle emploi"))
+            error = forms.ValidationError("L'adresse e-mail doit être une adresse Pôle emploi")
             self.add_error("email", error)
         return email
 
@@ -136,12 +135,12 @@ class SiaeStaffInvitationForm(forms.ModelForm):
         user = User.objects.filter(email__iexact=email).first()
         if user:
             if not user.is_siae_staff:
-                error = forms.ValidationError(_("Cet utilisateur n'est pas un employeur."))
+                error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
                 self.add_error("email", error)
             else:
                 user_is_member = self.siae.active_members.filter(email=user.email).exists()
                 if user_is_member:
-                    error = forms.ValidationError(_("Cette personne fait déjà partie de votre structure."))
+                    error = forms.ValidationError("Cette personne fait déjà partie de votre structure.")
                     self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
@@ -201,14 +200,14 @@ class NewUserInvitationForm(SignupForm):
     """
 
     first_name = forms.CharField(
-        label=gettext_lazy("Prénom"),
+        label="Prénom",
         max_length=User._meta.get_field("first_name").max_length,
         required=True,
         strip=True,
     )
 
     last_name = forms.CharField(
-        label=gettext_lazy("Nom"),
+        label="Nom",
         max_length=User._meta.get_field("last_name").max_length,
         required=True,
         strip=True,
@@ -228,7 +227,7 @@ class NewUserInvitationForm(SignupForm):
 
     def clean(self):
         if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
-            raise forms.ValidationError(_("La structure que vous souhaitez rejoindre n'est plus active."))
+            raise forms.ValidationError("La structure que vous souhaitez rejoindre n'est plus active.")
         super().clean()
 
     def save(self, request):

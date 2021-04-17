@@ -113,7 +113,7 @@ def join_prescriber_organization(request, invitation_id):
             request, _(f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}.")
         )
     else:
-        messages.error(request, _("Cette invitation n'est plus valide."))
+        messages.error(request, "Cette invitation n'est plus valide.")
 
     return redirect("dashboard:index")
 
@@ -163,13 +163,13 @@ def join_siae(request, invitation_id):
         raise PermissionDenied()
 
     if not invitation.siae.is_active:
-        messages.error(request, _("Cette structure n'est plus active."))
+        messages.error(request, "Cette structure n'est plus active.")
     elif invitation.can_be_accepted:
         invitation.add_invited_user_to_siae()
         invitation.accept()
         messages.success(request, _(f"Vous êtes désormais membre de la structure {invitation.siae.display_name}."))
     else:
-        messages.error(request, _("Cette invitation n'est plus valide."))
+        messages.error(request, "Cette invitation n'est plus valide.")
 
     request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = invitation.siae.pk
     return redirect("dashboard:index")

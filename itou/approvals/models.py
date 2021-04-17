@@ -43,9 +43,9 @@ class CommonApprovalMixin(models.Model):
     LOCKDOWN_END_AT = datetime.date(2020, 6, 16)
     LOCKDOWN_EXTENSION_DELAY_MONTHS = 3
 
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
 
     class Meta:
         abstract = True
@@ -145,26 +145,26 @@ class Approval(CommonApprovalMixin):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Demandeur d'emploi"),
+        verbose_name="Demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="approvals",
     )
     number = models.CharField(
-        verbose_name=_("Numéro"),
+        verbose_name="Numéro",
         max_length=12,
-        help_text=_("12 caractères alphanumériques."),
+        help_text="12 caractères alphanumériques.",
         validators=[alphanumeric, MinLengthValidator(12)],
         unique=True,
     )
     created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, verbose_name=_("Créé par"), null=True, blank=True, on_delete=models.SET_NULL
+        settings.AUTH_USER_MODEL, verbose_name="Créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
 
     objects = models.Manager.from_queryset(CommonApprovalQuerySet)()
 
     class Meta:
-        verbose_name = _("Agrément")
-        verbose_name_plural = _("Agréments")
+        verbose_name = "Agrément"
+        verbose_name_plural = "Agréments"
         ordering = ["-created_at"]
 
     def __str__(self):
@@ -193,7 +193,7 @@ class Approval(CommonApprovalMixin):
     def clean(self):
         try:
             if self.end_at <= self.start_at:
-                raise ValidationError(_("La date de fin doit être postérieure à la date de début."))
+                raise ValidationError("La date de fin doit être postérieure à la date de début.")
         except TypeError:
             # This can happen if `end_at` or `start_at` are empty or malformed
             # (e.g. when data comes from a form).
@@ -333,7 +333,7 @@ class Approval(CommonApprovalMixin):
         """
         approval = approvals_wrapper.latest_approval
         if not approval.is_valid() or not isinstance(approval, (cls, PoleEmploiApproval)):
-            raise RuntimeError(_("Invalid approval."))
+            raise RuntimeError("Invalid approval.")
         if isinstance(approval, cls):
             return approval
         approval_from_pe = cls(
@@ -380,14 +380,14 @@ class Suspension(models.Model):
     MAX_DURATION_MONTHS = 6
 
     class Reason(models.TextChoices):
-        SICKNESS = "SICKNESS", _("Arrêt pour longue maladie")
-        MATERNITY = "MATERNITY", _("Congé de maternité")
-        INCARCERATION = "INCARCERATION", _("Incarcération")
+        SICKNESS = "SICKNESS", "Arrêt pour longue maladie"
+        MATERNITY = "MATERNITY", "Congé de maternité"
+        INCARCERATION = "INCARCERATION", "Incarcération"
         TRIAL_OUTSIDE_IAE = (
             "TRIAL_OUTSIDE_IAE",
-            _("Période d'essai auprès d'un employeur ne relevant pas de l'insertion par l'activité économique"),
+            "Période d'essai auprès d'un employeur ne relevant pas de l'insertion par l'activité économique",
         )
-        DETOXIFICATION = "DETOXIFICATION", _("Période de cure pour désintoxication")
+        DETOXIFICATION = "DETOXIFICATION", "Période de cure pour désintoxication"
         FORCE_MAJEURE = (
             "FORCE_MAJEURE",
             _(
@@ -396,30 +396,30 @@ class Suspension(models.Model):
             ),
         )
 
-    approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
+    approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
+    start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
     siae = models.ForeignKey(
         "siaes.Siae",
-        verbose_name=_("SIAE"),
+        verbose_name="SIAE",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_suspended",
     )
-    reason = models.CharField(verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.SICKNESS)
-    reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    reason = models.CharField(verbose_name="Motif", max_length=30, choices=Reason.choices, default=Reason.SICKNESS)
+    reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Créé par"),
+        verbose_name="Créé par",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_suspended_set",
     )
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Mis à jour par"),
+        verbose_name="Mis à jour par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -428,8 +428,8 @@ class Suspension(models.Model):
     objects = models.Manager.from_queryset(SuspensionQuerySet)()
 
     class Meta:
-        verbose_name = _("Suspension")
-        verbose_name_plural = _("Suspensions")
+        verbose_name = "Suspension"
+        verbose_name_plural = "Suspensions"
         ordering = ["-start_at"]
         # Use an exclusion constraint to prevent overlapping date ranges.
         # This requires the btree_gist extension on PostgreSQL.
@@ -463,15 +463,15 @@ class Suspension(models.Model):
     def clean(self):
 
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
-            raise ValidationError({"reason_explanation": _("En cas de force majeure, veuillez préciser le motif.")})
+            raise ValidationError({"reason_explanation": "En cas de force majeure, veuillez préciser le motif."})
 
         # No min duration: a suspension may last only 1 day.
         if self.end_at < self.start_at:
-            raise ValidationError({"end_at": _("La date de fin doit être postérieure à la date de début.")})
+            raise ValidationError({"end_at": "La date de fin doit être postérieure à la date de début."})
 
         # A suspension cannot be in the future.
         if self.start_in_future:
-            raise ValidationError({"start_at": _("La suspension ne peut pas commencer dans le futur.")})
+            raise ValidationError({"start_at": "La suspension ne peut pas commencer dans le futur."})
 
         # A suspension cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at)
@@ -612,9 +612,9 @@ class Prolongation(models.Model):
     MAX_DURATION_MONTHS = 12
 
     class Reason(models.TextChoices):
-        COMPLETE_TRAINING = "COMPLETE_TRAINING", _("Fin d'une formation (6 mois maximum)")
-        RQTH = "RQTH", _("RQTH (12 mois maximum)")
-        SENIOR = "SENIOR", _("50 ans et plus (12 mois maximum)")
+        COMPLETE_TRAINING = "COMPLETE_TRAINING", "Fin d'une formation (6 mois maximum)"
+        RQTH = "RQTH", "RQTH (12 mois maximum)"
+        SENIOR = "SENIOR", "50 ans et plus (12 mois maximum)"
         PARTICULAR_DIFFICULTIES = (
             "PARTICULAR_DIFFICULTIES",
             _(
@@ -626,32 +626,32 @@ class Prolongation(models.Model):
     MAX_CUMULATIVE_DURATION = {
         Reason.COMPLETE_TRAINING.value: {
             "duration": datetime.timedelta(days=183),  # A leap year can contain 183 days in 6 months.
-            "label": _("6 mois"),
+            "label": "6 mois",
         },
         Reason.PARTICULAR_DIFFICULTIES.value: {
             "duration": datetime.timedelta(days=365 * 5),
-            "label": _("5 ans"),
+            "label": "5 ans",
         },
     }
 
-    approval = models.ForeignKey(Approval, verbose_name=_("PASS IAE"), on_delete=models.CASCADE)
-    start_at = models.DateField(verbose_name=_("Date de début"), default=timezone.localdate, db_index=True)
-    end_at = models.DateField(verbose_name=_("Date de fin"), default=timezone.localdate, db_index=True)
+    approval = models.ForeignKey(Approval, verbose_name="PASS IAE", on_delete=models.CASCADE)
+    start_at = models.DateField(verbose_name="Date de début", default=timezone.localdate, db_index=True)
+    end_at = models.DateField(verbose_name="Date de fin", default=timezone.localdate, db_index=True)
     reason = models.CharField(
-        verbose_name=_("Motif"), max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
+        verbose_name="Motif", max_length=30, choices=Reason.choices, default=Reason.COMPLETE_TRAINING
     )
-    reason_explanation = models.TextField(verbose_name=_("Explications supplémentaires"), blank=True)
+    reason_explanation = models.TextField(verbose_name="Explications supplémentaires", blank=True)
 
     declared_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Déclarée par"),
+        verbose_name="Déclarée par",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_prolongation_declared_set",
     )
     declared_by_siae = models.ForeignKey(
         "siaes.Siae",
-        verbose_name=_("SIAE du déclarant"),
+        verbose_name="SIAE du déclarant",
         null=True,
         on_delete=models.SET_NULL,
     )
@@ -659,7 +659,7 @@ class Prolongation(models.Model):
     # It is assumed that an authorized prescriber has validated the prolongation beforehand.
     validated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Prescripteur habilité qui a autorisé cette prolongation"),
+        verbose_name="Prescripteur habilité qui a autorisé cette prolongation",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -667,18 +667,18 @@ class Prolongation(models.Model):
     )
 
     # `created_at` can be different from `validated_by` when created in admin.
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Créé par"),
+        verbose_name="Créé par",
         null=True,
         on_delete=models.SET_NULL,
         related_name="approvals_prolongations_created_set",
     )
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Mis à jour par"),
+        verbose_name="Mis à jour par",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -687,8 +687,8 @@ class Prolongation(models.Model):
     objects = ProlongationManager.from_queryset(ProlongationQuerySet)()
 
     class Meta:
-        verbose_name = _("Prolongation")
-        verbose_name_plural = _("Prolongations")
+        verbose_name = "Prolongation"
+        verbose_name_plural = "Prolongations"
         ordering = ["-start_at"]
         # Use an exclusion constraint to prevent overlapping date ranges.
         # This requires the btree_gist extension on PostgreSQL.
@@ -727,7 +727,7 @@ class Prolongation(models.Model):
 
         # Min duration == 1 day.
         if self.end_at <= self.start_at:
-            raise ValidationError({"end_at": _("La durée minimale doit être d'au moins un jour.")})
+            raise ValidationError({"end_at": "La durée minimale doit être d'au moins un jour."})
 
         # A prolongation cannot exceed max duration.
         max_end_at = self.get_max_end_at(self.start_at, self.reason)
@@ -753,7 +753,7 @@ class Prolongation(models.Model):
             and self.validated_by
             and not self.validated_by.is_prescriber_with_authorized_org
         ):
-            raise ValidationError(_("Cet utilisateur n'est pas un prescripteur habilité."))
+            raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
         if hasattr(self, "approval"):
 
@@ -896,7 +896,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
     """
 
     # Matches prescriber_organisation.code_safir_pole_emploi.
-    pe_structure_code = models.CharField(_("Code structure Pôle emploi"), max_length=5)
+    pe_structure_code = models.CharField("Code structure Pôle emploi", max_length=5)
 
     # The normal length of a number is 12 chars.
     # Sometimes the number ends with an extension ('A01', 'E02', 'P03', 'S04' etc.) that
@@ -904,13 +904,13 @@ class PoleEmploiApproval(CommonApprovalMixin):
     # Suffixes meaning in French:
     class Suffix(models.TextChoices):
         # `P`: Prolongation = la personne a besoin d'encore quelques mois
-        P = "prolongation", _("Prolongation")
+        P = "prolongation", "Prolongation"
         # `E`: Extension = la personne est passée d'une structure à une autre
-        E = "extension", _("Extension")
+        E = "extension", "Extension"
         # `A`: Interruption = la personne ne s'est pas présentée
-        A = "interruption", _("Interruption")
+        A = "interruption", "Interruption"
         # `S`: Suspension = creux pendant la période justifié dans un cadre légal (incarcération, arrêt maladie etc.)
-        S = "suspension", _("Suspension")
+        S = "suspension", "Suspension"
 
     # Parts of an Approval number:
     #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
@@ -927,18 +927,18 @@ class PoleEmploiApproval(CommonApprovalMixin):
     #         - next 2 digits = refer to the act number (e.g. E02 = second extension)
     # An Approval number is not modifiable, there is a new entry for each new status change.
     # Suffixes are not taken into account in Itou.
-    number = models.CharField(verbose_name=_("Numéro"), max_length=15, unique=True)
-    pole_emploi_id = models.CharField(_("Identifiant Pôle emploi"), max_length=8)
-    first_name = models.CharField(_("Prénom"), max_length=150)
-    last_name = models.CharField(_("Nom"), max_length=150)
-    birth_name = models.CharField(_("Nom de naissance"), max_length=150)
-    birthdate = models.DateField(verbose_name=_("Date de naissance"), default=timezone.localdate)
+    number = models.CharField(verbose_name="Numéro", max_length=15, unique=True)
+    pole_emploi_id = models.CharField("Identifiant Pôle emploi", max_length=8)
+    first_name = models.CharField("Prénom", max_length=150)
+    last_name = models.CharField("Nom", max_length=150)
+    birth_name = models.CharField("Nom de naissance", max_length=150)
+    birthdate = models.DateField(verbose_name="Date de naissance", default=timezone.localdate)
 
     objects = PoleEmploiApprovalManager.from_queryset(CommonApprovalQuerySet)()
 
     class Meta:
-        verbose_name = _("Agrément Pôle emploi")
-        verbose_name_plural = _("Agréments Pôle emploi")
+        verbose_name = "Agrément Pôle emploi"
+        verbose_name_plural = "Agréments Pôle emploi"
         ordering = ["-start_at"]
         indexes = [models.Index(fields=["pole_emploi_id", "birthdate"], name="pe_id_and_birthdate_idx")]
 

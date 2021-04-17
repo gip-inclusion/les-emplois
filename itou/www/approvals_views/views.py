@@ -122,7 +122,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         elif request.POST.get("save"):
             prolongation.save()
             prolongation.notify_authorized_prescriber()
-            messages.success(request, _("Déclaration de prolongation enregistrée."))
+            messages.success(request, "Déclaration de prolongation enregistrée.")
             return HttpResponseRedirect(back_url)
 
     context = {
@@ -162,7 +162,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
             preview = True
         elif request.POST.get("save"):
             suspension.save()
-            messages.success(request, _("Suspension effectuée."))
+            messages.success(request, "Suspension effectuée.")
             return HttpResponseRedirect(back_url)
 
     context = {
@@ -194,7 +194,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         suspension = form.save(commit=False)
         suspension.updated_by = request.user
         suspension.save()
-        messages.success(request, _("Modification de suspension effectuée."))
+        messages.success(request, "Modification de suspension effectuée.")
         return HttpResponseRedirect(back_url)
 
     context = {
@@ -221,7 +221,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         suspension.delete()
-        messages.success(request, _("Annulation de suspension effectuée."))
+        messages.success(request, "Annulation de suspension effectuée.")
         return HttpResponseRedirect(back_url)
 
     context = {

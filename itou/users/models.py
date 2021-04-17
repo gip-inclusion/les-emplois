@@ -53,11 +53,11 @@ class User(AbstractUser, AddressMixin):
     REASON_FORGOTTEN = "FORGOTTEN"
     REASON_NOT_REGISTERED = "NOT_REGISTERED"
     REASON_CHOICES = (
-        (REASON_FORGOTTEN, _("Identifiant Pôle emploi oublié")),
-        (REASON_NOT_REGISTERED, _("Non inscrit auprès de Pôle emploi")),
+        (REASON_FORGOTTEN, "Identifiant Pôle emploi oublié"),
+        (REASON_NOT_REGISTERED, "Non inscrit auprès de Pôle emploi"),
     )
 
-    ERROR_EMAIL_ALREADY_EXISTS = _("Cet e-mail existe déjà.")
+    ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
     ERROR_MUST_PROVIDE_BIRTH_PLACE = _(
         "Si le pays de naissance est la France, la commune de naissance est obligatoire"
     )
@@ -66,39 +66,39 @@ class User(AbstractUser, AddressMixin):
     )
 
     class Title(models.TextChoices):
-        M = "M", _("Monsieur")
-        MME = "MME", _("Madame")
+        M = "M", "Monsieur"
+        MME = "MME", "Madame"
 
     title = models.CharField(
         max_length=3,
-        verbose_name=_("Civilité"),
+        verbose_name="Civilité",
         blank=True,
         default="",
         choices=Title.choices,
     )
 
     birthdate = models.DateField(
-        verbose_name=_("Date de naissance"),
+        verbose_name="Date de naissance",
         null=True,
         blank=True,
         validators=[validate_birthdate],
     )
     birth_place = models.ForeignKey(
         "asp.Commune",
-        verbose_name=_("Commune de naissance"),
+        verbose_name="Commune de naissance",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     birth_country = models.ForeignKey(
         "asp.Country",
-        verbose_name=_("Pays de naissance"),
+        verbose_name="Pays de naissance",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
     email = CIEmailField(
-        _("email address"),
+        "email address",
         blank=True,
         db_index=True,
         # Empty values are stored as NULL if both `null=True` and `unique=True` are set.
@@ -106,12 +106,12 @@ class User(AbstractUser, AddressMixin):
         null=True,
         unique=True,
     )
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
+    phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
 
-    is_job_seeker = models.BooleanField(verbose_name=_("Demandeur d'emploi"), default=False)
-    is_prescriber = models.BooleanField(verbose_name=_("Prescripteur"), default=False)
-    is_siae_staff = models.BooleanField(verbose_name=_("Employeur (SIAE)"), default=False)
-    is_stats_vip = models.BooleanField(verbose_name=_("Pilotage"), default=False)
+    is_job_seeker = models.BooleanField(verbose_name="Demandeur d'emploi", default=False)
+    is_prescriber = models.BooleanField(verbose_name="Prescripteur", default=False)
+    is_siae_staff = models.BooleanField(verbose_name="Employeur (SIAE)", default=False)
+    is_stats_vip = models.BooleanField(verbose_name="Pilotage", default=False)
 
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.
@@ -122,14 +122,14 @@ class User(AbstractUser, AddressMixin):
     # It looks like it pre-dates the national merger and may be unique
     # by user and by region…
     pole_emploi_id = models.CharField(
-        verbose_name=_("Identifiant Pôle emploi"),
-        help_text=_("7 chiffres suivis d'une 1 lettre ou d'un chiffre."),
+        verbose_name="Identifiant Pôle emploi",
+        help_text="7 chiffres suivis d'une 1 lettre ou d'un chiffre.",
         max_length=8,
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
         blank=True,
     )
     lack_of_pole_emploi_id_reason = models.CharField(
-        verbose_name=_("Pas d'identifiant Pôle emploi ?"),
+        verbose_name="Pas d'identifiant Pôle emploi ?",
         help_text=mark_safe(
             _(
                 "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
@@ -143,12 +143,12 @@ class User(AbstractUser, AddressMixin):
         choices=REASON_CHOICES,
         blank=True,
     )
-    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), blank=True)
-    has_completed_welcoming_tour = models.BooleanField(verbose_name=_("Parcours de bienvenue effectué"), default=False)
+    resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
+    has_completed_welcoming_tour = models.BooleanField(verbose_name="Parcours de bienvenue effectué", default=False)
 
     created_by = models.ForeignKey(
         "self",
-        verbose_name=_("Créé par"),
+        verbose_name="Créé par",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -328,7 +328,7 @@ class User(AbstractUser, AddressMixin):
         if (pole_emploi_id and lack_of_pole_emploi_id_reason) or (
             not pole_emploi_id and not lack_of_pole_emploi_id_reason
         ):
-            raise ValidationError(_("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence."))
+            raise ValidationError("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence.")
 
     @transaction.atomic
     def get_or_create_job_seeker_profile(self):
@@ -393,113 +393,113 @@ class JobSeekerProfile(models.Model):
         "La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"
     )
 
-    ERROR_HEXA_LANE_TYPE = _("Le type de voie est obligatoire")
-    ERROR_HEXA_LANE_NAME = _("Le nom de voie est obligatoire")
-    ERROR_HEXA_POST_CODE = _("Le code postal est obligatoire")
-    ERROR_HEXA_COMMUNE = _("La commune INSEE est obligatoire")
-    ERROR_HEXA_LOOKUP_COMMUNE = _("Impossible de trouver la commune à partir du code INSEE")
+    ERROR_HEXA_LANE_TYPE = "Le type de voie est obligatoire"
+    ERROR_HEXA_LANE_NAME = "Le nom de voie est obligatoire"
+    ERROR_HEXA_POST_CODE = "Le code postal est obligatoire"
+    ERROR_HEXA_COMMUNE = "La commune INSEE est obligatoire"
+    ERROR_HEXA_LOOKUP_COMMUNE = "Impossible de trouver la commune à partir du code INSEE"
 
-    ERROR_JOBSEEKER_TITLE = _("La civilité du demandeur d'emploi est obligatoire")
-    ERROR_JOBSEEKER_EDUCATION_LEVEL = _("Le niveau de formation du demandeur d'emploi est obligatoire")
-    ERROR_JOBSEEKER_PE_FIELDS = _("L'identifiant et la durée d'inscription à Pôle emploi vont de pair")
+    ERROR_JOBSEEKER_TITLE = "La civilité du demandeur d'emploi est obligatoire"
+    ERROR_JOBSEEKER_EDUCATION_LEVEL = "Le niveau de formation du demandeur d'emploi est obligatoire"
+    ERROR_JOBSEEKER_PE_FIELDS = "L'identifiant et la durée d'inscription à Pôle emploi vont de pair"
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         primary_key=True,
-        verbose_name=_("Demandeur d'emploi"),
+        verbose_name="Demandeur d'emploi",
         related_name="jobseeker_profile",
     )
 
     education_level = models.CharField(
         max_length=2,
-        verbose_name=_("Niveau de formation (ASP)"),
+        verbose_name="Niveau de formation (ASP)",
         blank=True,
         choices=EducationLevel.choices,
     )
 
-    resourceless = models.BooleanField(verbose_name=_("Sans ressource"), default=False)
+    resourceless = models.BooleanField(verbose_name="Sans ressource", default=False)
 
-    rqth_employee = models.BooleanField(verbose_name=_("Employé RQTH"), default=False)
-    oeth_employee = models.BooleanField(verbose_name=_("Employé OETH"), default=False)
+    rqth_employee = models.BooleanField(verbose_name="Employé RQTH", default=False)
+    oeth_employee = models.BooleanField(verbose_name="Employé OETH", default=False)
 
     pole_emploi_since = models.CharField(
         max_length=20,
-        verbose_name=_("Inscrit à Pôle emploi depuis"),
+        verbose_name="Inscrit à Pôle emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     unemployed_since = models.CharField(
         max_length=20,
-        verbose_name=_("Sans emploi depuis"),
+        verbose_name="Sans emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     rsa_allocation_since = models.CharField(
         max_length=20,
-        verbose_name=_("Allocataire du RSA depuis"),
+        verbose_name="Allocataire du RSA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
         max_length=20,
-        verbose_name=_("Allocataire de l'ASS depuis"),
+        verbose_name="Allocataire de l'ASS depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
         max_length=20,
-        verbose_name=_("Allocataire de l'AAH depuis"),
+        verbose_name="Allocataire de l'AAH depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ata_allocation_since = models.CharField(
         max_length=20,
-        verbose_name=_("Allocataire de l'ATA depuis"),
+        verbose_name="Allocataire de l'ATA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     # Jobseeker address in Hexa format
 
-    hexa_lane_number = models.CharField(max_length=10, verbose_name=_("Numéro de la voie"), blank=True, default="")
+    hexa_lane_number = models.CharField(max_length=10, verbose_name="Numéro de la voie", blank=True, default="")
     hexa_std_extension = models.CharField(
         max_length=1,
-        verbose_name=_("Extension de voie"),
+        verbose_name="Extension de voie",
         blank=True,
         default="",
         choices=LaneExtension.choices,
     )
     hexa_non_std_extension = models.CharField(
         max_length=10,
-        verbose_name=_("Extension de voie (non-repertoriée)"),
+        verbose_name="Extension de voie (non-repertoriée)",
         blank=True,
         default="",
     )
     hexa_lane_type = models.CharField(
         max_length=4,
-        verbose_name=_("Type de voie"),
+        verbose_name="Type de voie",
         blank=True,
         choices=LaneType.choices,
     )
-    hexa_lane_name = models.CharField(max_length=120, verbose_name=_("Nom de la voie"), blank=True)
-    hexa_post_code = models.CharField(max_length=6, verbose_name=_("Code postal"), blank=True)
+    hexa_lane_name = models.CharField(max_length=120, verbose_name="Nom de la voie", blank=True)
+    hexa_post_code = models.CharField(max_length=6, verbose_name="Code postal", blank=True)
     hexa_commune = models.ForeignKey(
         Commune,
-        verbose_name=_("Commune (ref. ASP)"),
+        verbose_name="Commune (ref. ASP)",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
 
     class Meta:
-        verbose_name = _("Profil demandeur d'emploi")
-        verbose_name_plural = _("Profils demandeur d'emploi")
+        verbose_name = "Profil demandeur d'emploi"
+        verbose_name_plural = "Profils demandeur d'emploi"
 
     def __str__(self):
         return str(self.user)
