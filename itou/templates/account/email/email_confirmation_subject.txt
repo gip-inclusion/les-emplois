@@ -1,4 +1,4 @@
 {% load i18n %}
 {% autoescape off %}
-{% if itou_environment == "DEMO" %}[DEMO] {% endif %}{% blocktranslate %}Confirmez votre adresse e-mail{% endblocktranslate %}
+{% if itou_environment == "DEMO" %}[DEMO] {% endif %}Confirmez votre adresse e-mail
 {% endautoescape %}

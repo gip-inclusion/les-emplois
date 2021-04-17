@@ -36,16 +36,12 @@
 
         {# Validity. #}
         <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.display_end_at|date:"d/m/Y" %}
-                Valide du {{ start }} au {{ end }}
-            {% endblocktranslate %}
+            Valide du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.display_end_at|date:"d/m/Y" }}
         </li>
 
         {# Delivery date. #}
         <li>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
-                Délivrance : le {{ start }}
-            {% endblocktranslate %}
+            Délivrance : le {{ approval.start_at|date:"d/m/Y" }}
         </li>
 
         {# Suspensions history. #}
@@ -56,9 +52,7 @@
                     {% for s in suspensions %}
                         <li>
                             <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
-                                {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
-                                    du {{ start }} au {{ end }}
-                                {% endblocktranslate %}
+                                du {{ s.start_at|date:"d/m/Y" }} au {{ s.end_at|date:"d/m/Y" }}
                             </span>
                             {% if s.is_in_progress %}
                                 <small>
@@ -89,14 +83,12 @@
                 <ul>
                     {% for p in prolongations %}
                         <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
-                            {% blocktranslate with start=p.start_at|date:"d/m/Y" end=p.end_at|date:"d/m/Y" %}
-                                du {{ start }} au {{ end }}
-                            {% endblocktranslate %}
+                            du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
                             <br>
                             <small>{{ p.get_reason_display }}</small>
                             <br>
                             <small>
-                                {% blocktranslate with full_name=p.validated_by.get_full_name|title email=p.validated_by.email %}Autorisation par <i>{{ full_name }}</i> ({{ email }}){% endblocktranslate %}
+                                Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
                             </small>
                         </li>
                     {% endfor %}
@@ -128,9 +120,7 @@
     {% else %}
 
         <p class="text-danger">
-            {% blocktranslate with end=approval.display_end_at|date:"d/m/Y" since=approval.display_end_at|timesince %}
-                <b>Expiré</b> le {{ end }} (depuis {{ since }})
-            {% endblocktranslate %}
+            <b>Expiré</b> le {{ approval.display_end_at|date:"d/m/Y" }} (depuis {{ approval.display_end_at|timesince }})
         </p>
 
     {% endif %}

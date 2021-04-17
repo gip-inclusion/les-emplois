@@ -5,9 +5,7 @@
 
 Embauche annulée
 
-{% blocktranslate with job_seeker_name=job_application.job_seeker.get_full_name %}
-Nous vous confirmons que l'embauche de {{ job_seeker_name }} a bien été annulée.
-{% endblocktranslate %}
+Nous vous confirmons que l'embauche de {{ job_application.job_seeker.get_full_name }} a bien été annulée.
 
 ----------------------------------------------------------
 

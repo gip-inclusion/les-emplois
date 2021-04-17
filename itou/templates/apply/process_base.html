@@ -68,9 +68,7 @@
                         {% endif %}
                         {% if job_application.can_be_cancelled %}
                             <a class="btn btn-outline-secondary disabled w-100">
-                                    {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
-                                        Disponible au téléchargement après le {{ cancellation_date }}
-                                    {% endblocktranslate %}
+                                Disponible au téléchargement après le {{ job_application.cancellation_delay_end|date:"d/m/Y" }}
                             </a>
                         {% endif %}
                     {% endif %}

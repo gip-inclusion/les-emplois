@@ -2,12 +2,8 @@
 
 {% if invitation.has_expired %}
     <h1>Invitation expirée</h1>
-    {% blocktranslate %}
-        <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
-    {% endblocktranslate %}
+    <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
 {% elif invitation.accepted %}
     <h1>Invitation acceptée</h1>
-    {% blocktranslate %}
-        <p>Cette invitation a déjà été acceptée.</p>
-    {% endblocktranslate %}
+    <p>Cette invitation a déjà été acceptée.</p>
 {% endif %}

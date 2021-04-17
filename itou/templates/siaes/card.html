@@ -84,7 +84,7 @@
         {% if siae.has_members %}
             <hr>
             <p>
-                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
+                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                     {% include "includes/icon.html" with icon="message-square" %} Postuler
                 </a>
             </p>

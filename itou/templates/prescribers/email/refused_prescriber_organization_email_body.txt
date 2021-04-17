@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktranslate %}Bonjour,
+Bonjour,
 
 Nous n'avons pas pu vérifier l'habilitation de votre structure, par conséquent nous vous avons attribué le statut d'orienteur. Vous pourrez envoyer des candidatures aux employeurs solidaires sans valider l'éligibilité IAE des candidats, c'est l'employeur qui se chargera de valider cette éligibilité sur la base de critères administratifs, et donc qui en portera la responsabilité juridique.
 
@@ -19,6 +19,6 @@ Si vous êtes bien un prescripteur habilité, nous avons besoin d'une preuve de 
 
 Pour les autres cas, utilisez également le portail {{ itou_assistance_url }}, rubrique « Habilitation / Prescripteur » pour nous faire part du motif et justificatif de demande d’habilitation.
 
-Nous restons à votre disposition pour tout renseignement complémentaire.{% endblocktranslate %}
+Nous restons à votre disposition pour tout renseignement complémentaire.
 
 {% endblock body %}

@@ -1,9 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
 {% block subject %}
-
-{% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst %}
-{{ first_name }} {{ last_name }} a accepté votre invitation.
-{% endblocktranslate %}
-
+{{ first_name|capfirst }} {{ last_name|capfirst }} a accepté votre invitation.
 {% endblock %}

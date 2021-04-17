@@ -3,9 +3,7 @@
 {% load static %}
 
 {% block title %}
-    {% blocktranslate %}
-        Attestation de délivrance d'agrément pour {{ job_seeker.get_full_name|title }}.
-    {% endblocktranslate %}
+    Attestation de délivrance d'agrément pour {{ job_seeker.get_full_name|title }}.
     {{ block.super }}
 {% endblock %}
 
@@ -45,9 +43,7 @@
             <span class="d-block">PASS IAE n° {{ approval.number_with_spaces }}</span>
 
             <span class="d-block">
-                {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.end_at|date:"d/m/Y" %}
-                    du {{ start }} au {{ end }}
-                {% endblocktranslate %}
+                du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}
             </span>
 
             <span class="d-block">délivré par les emplois de l'inclusion</span>
@@ -66,9 +62,7 @@
             </p>
             <p class="text-justify">
                 {% if diagnosis_author %}
-                    {% blocktranslate with diagnosis_author=diagnosis_author|title %}
-                        Au vu du diagnostic individuel réalisé par {{ diagnosis_author }}
-                    {% endblocktranslate %}
+                    Au vu du diagnostic individuel réalisé par {{ diagnosis_author|title }}
 
                     {% if diagnosis_author_org_name %}
                         ({{ diagnosis_author_org_name|title }})
@@ -82,18 +76,14 @@
 
                 {% endif %}
 
-                {% blocktranslate with user_name=job_seeker.get_full_name|title %}
-                    la situation sociale et professionnelle de {{ user_name }}
-                    et de votre promesse d'embauche, les emplois de l'inclusion vous délivrent
-                    un PASS IAE pour un parcours d'insertion par l'activité économique,
-                    conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
-                {% endblocktranslate %}
+                la situation sociale et professionnelle de {{ job_seeker.get_full_name|title }}
+                et de votre promesse d'embauche, les emplois de l'inclusion vous délivrent
+                un PASS IAE pour un parcours d'insertion par l'activité économique,
+                conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
             </p>
             <p>
-                {% blocktranslate with approval_nb=approval.number_with_spaces start=approval.start_at|date:"d/m/Y"  end=approval.end_at|date:"d/m/Y" %}
-                    Ce PASS IAE, inscrit sous le numéro {{ approval_nb }}, est valide du
-                    {{ start }} au {{ end }}.
-                {% endblocktranslate %}
+                Ce PASS IAE, inscrit sous le numéro {{ approval.number_with_spaces }}, est valide du
+                {{ approval.start_at|date:"d/m/Y" }} au {{ approval.end_at|date:"d/m/Y" }}.
             </p>
         </section>
     </div>

@@ -355,20 +355,14 @@
 
             <h3 class="font-weight-normal text-muted">Rétractation</h3>
             <p>
-                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" cancellation_days=cancellation_days %}
-                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ cancellation_date }} inclus.
-                {% endblocktranslate %}
+                Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ job_application.cancellation_delay_end|date:"d/m/Y" }} inclus.
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
-                    {% blocktranslate %}
-                        Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
-                    {% endblocktranslate %}
+                    Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
                 </p>
                 <p>
-                    {% blocktranslate with user_name=job_application.job_seeker.get_full_name|title %}
-                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
-                    {% endblocktranslate %}
+                    {{ job_application.job_seeker.get_full_name|title }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
                 </p>
             {% endif %}
             <p>
@@ -392,9 +386,7 @@
         <ul>
             {% for log in transition_logs %}
                 <li>
-                    {% blocktranslate with pretty_to_state=log.pretty_to_state %}
-                        Passé en "<b>{{ pretty_to_state }}</b>"
-                    {% endblocktranslate %}
+                    Passé en "<b>{{ log.pretty_to_state }}</b>"
                     <ul>
                         {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
                             <li>Par {{ log.user.get_full_name }}</li>

@@ -2,20 +2,18 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktranslate with job_seeker_full_name=job_application.job_seeker.get_full_name %}Bonjour,
+Bonjour,
 
-Nous faisons suite à votre demande de PASS IAE pour {{ job_seeker_full_name }} :{% endblocktranslate %}
+Nous faisons suite à votre demande de PASS IAE pour {{ job_application.job_seeker.get_full_name }} :
 {{ itou_protocol }}://{{ itou_fqdn }}{% url 'apply:details_for_siae' job_application.pk %}
 
-{% blocktranslate with job_seeker_full_name=job_application.job_seeker.get_full_name %}
 Nous sommes dans l'impossibilité de vous délivrer ce PASS IAE pour le motif suivant :
 
 Délai de carence non respecté, ce candidat a déjà bénéficié d'un parcours IAE il y a moins de 2 ans.
 
 Vous avez la possibilité de contacter un prescripteur habilité pour exposer la situation de votre candidat.
 
-Si le prescripteur habilité est favorable à une dérogation de son délai de carence, il doit vous transmettre la candidature de {{ job_seeker_full_name }} via les emplois de l'inclusion. Vous pourrez ensuite demander l'obtention d'un PASS IAE.
-{% endblocktranslate %}
+Si le prescripteur habilité est favorable à une dérogation de son délai de carence, il doit vous transmettre la candidature de {{ job_application.job_seeker.get_full_name }} via les emplois de l'inclusion. Vous pourrez ensuite demander l'obtention d'un PASS IAE.
 
 Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :
 {{ itou_protocol }}://{{ itou_fqdn }}{% url 'search:prescribers_home' %}

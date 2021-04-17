@@ -7,11 +7,9 @@
 {% block content %}
 
     <h1>
-        {% blocktranslate with full_name=suspension.approval.user.get_full_name|title %}
-            Modifier la suspension de PASS IAE
-            <br>
-            <span class="text-muted">{{ full_name }}</span>
-        {% endblocktranslate %}
+        Modifier la suspension de PASS IAE
+        <br>
+        <span class="text-muted">{{ suspension.approval.user.get_full_name|title }}</span>
     </h1>
 
     <form method="post" action="" class="js-prevent-multiple-submit">

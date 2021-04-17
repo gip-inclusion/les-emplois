@@ -3,7 +3,7 @@
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
-        {% blocktranslate %}Employeurs solidaires à {{ distance }} km du centre de {{ city }}{% endblocktranslate %}
+        Employeurs solidaires à {{ distance }} km du centre de {{ city }}
     {% endwith %}
     {{ block.super }}
 {% endblock %}
@@ -18,7 +18,7 @@
 
     <h3>
         {% with request.GET.city_name as city and request.GET.distance as distance %}
-            {% blocktranslate %}Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>{% endblocktranslate %}
+            Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
         {% endwith %}
     </h3>
 
@@ -37,14 +37,14 @@
         </p>
 
         <h4 class="font-weight-normal text-muted">
-            {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages %}
-                {% blocktranslate count counter=siaes_page.paginator.count %}
-                    <b>1</b> résultat
-                {% plural %}
+            {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages and siaes_page.paginator.count as counter %}
+                {% if counter > 1 %}
                     <b>{{ counter }}</b> résultats
-                {% endblocktranslate %}
+                {% else %}
+                    <b>1</b> résultat
+                {% endif %}
                 {% if siaes_page.paginator.num_pages > 1 %}
-                    {% blocktranslate %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktranslate %}
+                    - Page <b>{{ current_page }}</b>/{{ total_pages }}
                 {% endif %}
             {% endwith %}
         </h4>
@@ -79,9 +79,7 @@
                                    <small>
                                        <span class="ml-3">
                                             {% include "includes/icon.html" with icon="layers" size=15 class="mr-1 text-danger" %}
-                                            {% blocktranslate with threshold=job.POPULAR_THRESHOLD %} 
-                                                Plus de {{ threshold }} candidatures reçues
-                                            {% endblocktranslate %}
+                                            Plus de {{ job.POPULAR_THRESHOLD }} candidatures reçues
                                         </span>
                                    </small>
                                 {% endif %}
@@ -93,17 +91,17 @@
 
                 <div class="card-footer">
                     {% if not siae.has_active_members %}
-                        <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
+                        <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                             {% include "includes/icon.html" with icon="message-square" %} Postuler
                         </a>
                         <small>Cet employeur n'a pas encore créé son compte.</small>
                     {% elif siae.block_job_applications %}
-                        <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
+                        <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                             {% include "includes/icon.html" with icon="message-square" %} Postuler
                         </a>
                         <small>Cet employeur n'accepte plus de candidatures pour le moment</small>
                     {% else %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
+                        <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                             {% include "includes/icon.html" with icon="message-square" %} Postuler
                         </a>
                     {% endif %}

@@ -7,11 +7,9 @@
 {% block content %}
 
     <h1>
-        {% blocktranslate with full_name=suspension.approval.user.get_full_name|title %}
-            Annuler la suspension de PASS IAE
-            <br>
-            <span class="text-muted">{{ full_name }}</span>
-        {% endblocktranslate %}
+        Annuler la suspension de PASS IAE
+        <br>
+        <span class="text-muted">{{ suspension.approval.user.get_full_name|title }}</span>
     </h1>
 
     <div class="card my-3 text-center">
@@ -23,12 +21,10 @@
                 {{ suspension.get_reason_display }}
             </p>
             <p class="card-text">
-                {% blocktranslate with start=suspension.start_at|date:"d/m/Y" end=suspension.end_at|date:"d/m/Y" %}
-                    À partir du
-                    <span class="badge badge-dark">{{ start }}</span>
-                    jusqu'au
-                    <span class="badge badge-dark">{{ end }}</span>
-                {% endblocktranslate %}
+                À partir du
+                <span class="badge badge-dark">{{ suspension.start_at|date:"d/m/Y" }}</span>
+                jusqu'au
+                <span class="badge badge-dark">{{ suspension.end_at|date:"d/m/Y" }}</span>
             </p>
         </div>
     </div>

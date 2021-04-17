@@ -16,7 +16,7 @@
         {% else %}
             <p>
                 <i>
-                    {% blocktranslate with siae.display_name as display_name %}<b>{{ display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.{% endblocktranslate %}
+                    <b>{{ siae.display_name }}</b> n'a pas encore renseigné le descriptif de ce poste.
                 </i>
             </p>
         {% endif %}
@@ -24,7 +24,7 @@
 
     {% if siae.has_members %}
         <p>
-            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
+            <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                 {% include "includes/icon.html" with icon="message-square" %} Postuler
             </a>
         </p>

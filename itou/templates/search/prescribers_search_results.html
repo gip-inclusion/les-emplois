@@ -3,7 +3,7 @@
 
 {% block title %}
     {% with request.GET.city_name as city and request.GET.distance as distance %}
-        {% blocktranslate %}Prescripteurs à {{ distance }} km du centre de {{ city }}{% endblocktranslate %}
+        Prescripteurs à {{ distance }} km du centre de {{ city }}
     {% endwith %}
     {{ block.super }}
 {% endblock %}
@@ -20,7 +20,7 @@
         Prescripteurs
         {% if request.GET.city_name and request.GET.distance %}
             {% with request.GET.city_name as city and request.GET.distance as distance %}
-                {% blocktranslate %}à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>{% endblocktranslate %}
+                à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
             {% endwith %}
         {% endif %}
     </h3>
@@ -34,14 +34,14 @@
     {% else %}
 
         <h4 class="font-weight-normal text-muted">
-            {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages %}
-                {% blocktranslate count counter=prescriber_orgs_page.paginator.count %}
-                    <b>1</b> résultat
-                {% plural %}
+            {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
+                {% if counter > 1 %}
                     <b>{{ counter }}</b> résultats
-                {% endblocktranslate %}
+                {% else %}
+                    <b>1</b> résultat
+                {% endif %}
                 {% if prescriber_orgs_page.paginator.num_pages > 1 %}
-                    {% blocktranslate %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endblocktranslate %}
+                    - Page <b>{{ current_page }}</b>/{{ total_pages }}
                 {% endif %}
             {% endwith %}
         </h4>
@@ -60,10 +60,8 @@
                         {{ prescriber_org.address_on_one_line }}
                     </h6>
                     <p class="card-text">
-                        {% blocktranslate with distance=prescriber_org.distance.km|floatformat:1 %}
-                            <span class="badge badge-dark">{{ distance }} km</span>
-                            de votre lieu de recherche
-                        {% endblocktranslate %}
+                        <span class="badge badge-dark">{{ prescriber_org.distance.km|floatformat:1 }} km</span>
+                        de votre lieu de recherche
                     </p>
                 </div>
             </div>

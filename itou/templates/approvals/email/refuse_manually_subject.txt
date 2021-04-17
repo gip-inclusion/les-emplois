@@ -1,5 +1,5 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% load i18n %}
 {% block subject %}
-{% blocktranslate with job_seeker_full_name=job_application.job_seeker.get_full_name %}PASS IAE refusé pour {{ job_seeker_full_name }}{% endblocktranslate %}
+PASS IAE refusé pour {{ job_application.job_seeker.get_full_name }}
 {% endblock %}

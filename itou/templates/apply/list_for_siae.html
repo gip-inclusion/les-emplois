@@ -14,10 +14,8 @@
 
     {% if siae.is_subject_to_eligibility_rules %}
         <div class="alert alert-primary mt-3" role="alert">
-            {% blocktranslate %}
-                Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.<br>
-                Les demandes rétroactives ne sont pas autorisées.
-            {% endblocktranslate %}
+            Toute demande de PASS IAE doit être effectuée <b>au plus tard le jour de l'embauche</b>.<br>
+            Les demandes rétroactives ne sont pas autorisées.
         </div>
     {% endif %}
 
@@ -54,9 +52,7 @@
                     {% if siae.is_subject_to_eligibility_rules and job_application.approval and job_application.can_be_cancelled %}
                         <div class="col-sm-3">
                             <span class="text-muted text-nowrap">
-                                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
-                                    PASS IAE disponible au téléchargement après le {{ cancellation_date }}
-                                {% endblocktranslate %}
+                                PASS IAE disponible au téléchargement après le {{ job_application.cancellation_delay_end|date:"d/m/Y" }}
                             </span>
                         </div>
                     {% endif %}

@@ -2,9 +2,7 @@
 {% load i18n %}
 {% block body %}
 
-{% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst establishment_name=establishment_name %}
-{{ first_name }} {{ last_name }} est désormais membre de la structure {{ establishment_name }}.
-{% endblocktranslate %}
+{{ first_name|capfirst }} {{ last_name|capfirst }} est désormais membre de la structure {{ establishment_name }}.
 
 Détails
 -------------------

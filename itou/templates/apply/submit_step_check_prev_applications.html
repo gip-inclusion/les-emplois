@@ -11,15 +11,11 @@
         {% with prev_application.created_at|date:"d F Y à H:i" as prev_created_at %}
             {% if request.user == job_seeker %}
                 <p>
-                    {% blocktranslate %}
-                        Vous avez déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
-                    {% endblocktranslate %}
+                    Vous avez déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
                 </p>
             {% else %}
                 <p>
-                    {% blocktranslate %}
-                        Le candidat a déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
-                    {% endblocktranslate %}
+                    Le candidat a déjà postulé chez cet employeur le <b>{{ prev_created_at }}</b>
                 </p>
             {% endif %}
         {% endwith %}
