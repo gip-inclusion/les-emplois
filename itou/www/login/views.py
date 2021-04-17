@@ -2,7 +2,6 @@ from allauth.account.views import LoginView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.template.response import TemplateResponse
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 
 from itou.utils.urls import get_safe_url
 

@@ -4,7 +4,6 @@ from tempfile import NamedTemporaryFile
 from django.contrib import admin
 from django.http import FileResponse
 from django.urls import path
-from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval

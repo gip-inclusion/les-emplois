@@ -7,7 +7,6 @@ from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message

@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import ApprovalsWrapper
 from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType

@@ -5,7 +5,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership

@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.translation import gettext as _
 
 from itou.job_applications.models import JobApplication
 from itou.www.apply.forms import EditHiringDateForm

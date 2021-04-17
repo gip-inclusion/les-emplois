@@ -4,7 +4,6 @@ Specific widgets used in forms.
 
 from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
-from django.utils.translation import gettext_lazy
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 

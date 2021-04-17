@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from itou.prescribers.models import PrescriberOrganization

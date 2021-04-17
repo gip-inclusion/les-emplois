@@ -5,7 +5,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
@@ -171,7 +170,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
         financial_annex = select_form.cleaned_data["financial_annexes"]
         current_siae.convention = financial_annex.convention
         current_siae.save()
-        message = _(
+        message = (
             f"Nous avons bien attaché votre structure à l'annexe financière"
             f" {financial_annex.number_prefix_with_spaces}."
         )

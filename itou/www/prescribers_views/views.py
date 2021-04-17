@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User

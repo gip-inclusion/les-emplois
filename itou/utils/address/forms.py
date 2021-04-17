@@ -1,7 +1,6 @@
 import django.forms as forms
 from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy
 
 from itou.cities.models import City
 from itou.users.models import User

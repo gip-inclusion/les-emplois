@@ -13,7 +13,6 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
@@ -135,10 +134,10 @@ class Approval(CommonApprovalMixin):
     PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS = 3
 
     # Error messages.
-    ERROR_PASS_IAE_SUSPENDED_FOR_USER = _(
+    ERROR_PASS_IAE_SUSPENDED_FOR_USER = (
         "Votre PASS IAE est suspendu. Vous ne pouvez pas postuler pendant la période de suspension."
     )
-    ERROR_PASS_IAE_SUSPENDED_FOR_PROXY = _(
+    ERROR_PASS_IAE_SUSPENDED_FOR_PROXY = (
         "Le PASS IAE du candidat est suspendu. Vous ne pouvez pas postuler "
         "pour lui pendant la période de suspension."
     )

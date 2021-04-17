@@ -3,7 +3,6 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.template.defaultfilters import slugify
-from django.utils.translation import gettext_lazy as _
 
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENTS, REGIONS

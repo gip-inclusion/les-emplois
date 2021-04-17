@@ -7,7 +7,6 @@ from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from django.utils.translation import gettext_lazy as _
 
 from itou.users.models import User
 from itou.utils.emails import get_email_message

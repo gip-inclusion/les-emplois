@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import safestring
-from django.utils.translation import gettext as _
 
 
 class ItouCurrentOrganizationMiddleware:

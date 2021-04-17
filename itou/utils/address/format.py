@@ -1,4 +1,3 @@
-from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases

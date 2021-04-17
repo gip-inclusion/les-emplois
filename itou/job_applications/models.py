@@ -10,7 +10,6 @@ from django.db.models import BooleanField, Case, Exists, Max, OuterRef, When
 from django.db.models.functions import Greatest
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Suspension

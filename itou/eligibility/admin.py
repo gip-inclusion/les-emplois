@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.template.defaultfilters import date as date_filter
-from django.utils.translation import gettext as _
 
 from itou.eligibility import models
 

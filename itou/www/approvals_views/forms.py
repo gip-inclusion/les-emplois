@@ -1,7 +1,6 @@
 from django import forms
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.approvals.models import Prolongation, Suspension
 from itou.users.models import User

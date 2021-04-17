@@ -10,7 +10,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City

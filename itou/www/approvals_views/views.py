@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404, render
 from django.template.response import SimpleTemplateResponse
 from django.urls import reverse_lazy
 from django.utils.text import slugify
-from django.utils.translation import gettext as _
 
 from itou.approvals.models import Approval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis

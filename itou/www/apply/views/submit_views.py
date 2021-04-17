@@ -6,7 +6,6 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis

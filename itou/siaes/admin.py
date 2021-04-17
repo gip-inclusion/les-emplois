@@ -6,7 +6,6 @@ from django.contrib.gis.db import models as gis_models
 from django.db.models import Count
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
 
 from itou.siaes import models
 from itou.siaes.admin_forms import SiaeAdminForm

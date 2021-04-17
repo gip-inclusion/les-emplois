@@ -4,7 +4,6 @@ from django.contrib.gis.db import models as gis_models
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.utils.timezone import now
-from django.utils.translation import gettext as _
 
 from itou.prescribers import models
 from itou.prescribers.admin_forms import PrescriberOrganizationAdminForm

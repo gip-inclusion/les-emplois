@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
@@ -690,7 +689,7 @@ class SiaeConvention(models.Model):
     is_active = models.BooleanField(
         verbose_name="Active",
         default=True,
-        help_text=_(
+        help_text=(
             "Précise si la convention est active c.a.d. si elle a au moins une annexe financière valide à ce jour."
         ),
         db_index=True,

@@ -1,7 +1,6 @@
 import re
 
 import django.forms as forms
-from django.utils.translation import gettext as _, gettext_lazy
 
 
 class ResumeFormMixin(forms.Form):

@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 
 from itou.approvals.models import Approval
 from itou.utils.perms.user import KIND_PRESCRIBER, KIND_SIAE_STAFF

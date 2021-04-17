@@ -3,7 +3,6 @@ from functools import partial
 from operator import attrgetter
 
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow

@@ -3,7 +3,6 @@ from operator import attrgetter
 from django.conf import settings
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
-from django.utils.translation import gettext
 
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS

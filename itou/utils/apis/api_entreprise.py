@@ -3,7 +3,6 @@ import logging
 import httpx
 from django.conf import settings
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.utils.address.departments import department_from_postcode
 
