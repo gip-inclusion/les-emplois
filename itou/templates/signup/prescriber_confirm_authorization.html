@@ -3,14 +3,14 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Inscription{{ block.super }}{% endblock %}
 
 
 {% block content %}
 
     <h1>
-        {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur habilité" %}</small>
+        Inscription
+        <small class="text-muted">Prescripteur habilité</small>
     </h1>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -23,9 +23,9 @@
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                {% translate "Retour" %}
+                Retour
             </a>
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
 
     </form>

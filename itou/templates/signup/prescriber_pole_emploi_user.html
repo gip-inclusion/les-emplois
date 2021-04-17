@@ -2,19 +2,19 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% translate "Prescripteur Pôle emploi - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Prescripteur Pôle emploi - Inscription{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur Pôle emploi" %}</small>
+        Inscription
+        <small class="text-muted">Prescripteur Pôle emploi</small>
     </h1>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li>{% translate "Type de prescripteur" %}</li>
-        <li>{% translate "Code SAFIR" %}</li>
-        <li class="is-active">{% translate "Vos informations" %}</li>
+        <li>Type de prescripteur</li>
+        <li>Code SAFIR</li>
+        <li class="is-active">Vos informations</li>
     </ul>
 
     <div class="alert alert-secondary" role="alert">
@@ -33,7 +33,7 @@
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                {% translate "Retour" %}
+                Retour
             </a>
         {% endbuttons %}
 

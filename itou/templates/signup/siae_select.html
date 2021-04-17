@@ -2,14 +2,14 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% translate "Employeur solidaire - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Employeur solidaire - Inscription{{ block.super }}{% endblock %}
 
 
 {% block content %}
 
 <h1>
-    {% translate "Inscription" %}
-    <small class="text-muted">{% translate "Employeur solidaire" %}</small>
+    Inscription
+    <small class="text-muted">Employeur solidaire</small>
 </h1>
 
 <form method="get" action="" role="form">
@@ -19,7 +19,7 @@
     {% bootstrap_form siren_form %}
 
     {% buttons %}
-        <button type="submit" class="btn btn-primary">{% translate "Rechercher" %}</button>
+        <button type="submit" class="btn btn-primary">Rechercher</button>
     {% endbuttons %}
 
 </form>
@@ -53,10 +53,10 @@
 {% if siaes_without_members and siae_select_form %}
     <div class="mt-5">
 
-        <h3>{% translate "Entreprises disponibles" %}</h3>
+        <h3>Entreprises disponibles</h3>
 
         <div class="alert alert-secondary" role="info">
-            <i>{% translate "Les données sont fournies par l'extranet IAE 2.0 de l'ASP." %}</i>
+            <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
         </div>
 
         <form method="post" action="" class="js-prevent-multiple-submit">
@@ -98,10 +98,10 @@
 
             <div class="alert alert-warning pb-0" role="alert">
                 <p>
-                    {% translate "Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé au correspondant technique référencé dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure." %}
+                    Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé au correspondant technique référencé dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure.
                 </p>
                 {% buttons %}
-                    <button type="submit" class="btn btn-primary">{% translate "Continuer l'inscription" %}</button>
+                    <button type="submit" class="btn btn-primary">Continuer l'inscription</button>
                 {% endbuttons %}
             </div>
 
@@ -114,10 +114,10 @@
 {% if siaes_with_members %}
     <div class="mt-5">
 
-        <h3>{% translate "Entreprises déjà inscrites" %}</h3>
+        <h3>Entreprises déjà inscrites</h3>
 
         <div class="alert alert-secondary" role="info">
-            <i>{% translate "Par sécurité vous devez obtenir une invitation pour rejoindre ces structures." %}</i>
+            <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
         </div>
 
         <ul>

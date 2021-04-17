@@ -8,10 +8,10 @@
 Nous sommes ravis de vous annoncer que la candidature de {{ job_seeker_full_name }}, adressée par {{ sender_full_name }}, a été acceptée par {{ to_siae }}.
 {% endblocktranslate %}
 
-- {% translate "Date de début du contrat :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}
-- {% translate "Date de fin du contrat :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}
+- Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}
+- Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y" }}
 
-{% translate "Ces dates sont uniquement pour information. Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi." %} 
+Ces dates sont uniquement pour information. Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi. 
 
 {% else %}
 
@@ -22,7 +22,7 @@ Votre candidature a été acceptée par {{ to_siae }}.
 {% endif %}
 
 {% if job_application.answer %}
-{% translate "*Message de l'entreprise* :" %}
+*Message de l'entreprise* :
 
 {{ job_application.answer }}
 {% endif %}

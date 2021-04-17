@@ -3,14 +3,14 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Un administrateur vous a ajouté en tant que membre d'une structure sur les emplois de l'inclusion" %}
+Un administrateur vous a ajouté en tant que membre d'une structure sur les emplois de l'inclusion
 
-{% translate "Structure :" %}
+Structure :
 
-- {% translate "Nom" %} : {{ structure.display_name }}
-- {% translate "Type" %} : {{ structure.kind }}
-- {% translate "Email de contact" %} : {{ structure.email }}
+- Nom : {{ structure.display_name }}
+- Type : {{ structure.kind }}
+- Email de contact : {{ structure.email }}
 
-{% translate "Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion." %}
+Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.
 
 {% endblock body %}

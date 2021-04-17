@@ -20,7 +20,7 @@
                 {% with objects_dict|get_dict_item:field.name as criteria %}
                      {% if criteria.written_proof %}
                          <small class="form-text text-muted">
-                             {% translate "Pièce justificative :" %}
+                             Pièce justificative :
                              <i>{{ criteria.written_proof }}</i>
                          </small>
                      {% endif %}

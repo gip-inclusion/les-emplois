@@ -3,23 +3,23 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Un nouvel utilisateur souhaite rejoindre votre structure sur les emplois de l'inclusion !" %}
+Un nouvel utilisateur souhaite rejoindre votre structure sur les emplois de l'inclusion !
 
-{% translate "Structure :" %}
+Structure :
 
-- {% translate "Nom" %} : {{ siae.display_name }}
-- {% translate "SIRET" %} : {{ siae.siret }}
-- {% translate "Type" %} : {{ siae.kind }}
-- {% translate "Email de contact" %} : {{ siae.auth_email }}
+- Nom : {{ siae.display_name }}
+- SIRET : {{ siae.siret }}
+- Type : {{ siae.kind }}
+- Email de contact : {{ siae.auth_email }}
 
-{% translate "Ouvrez le lien suivant pour procéder à l'inscription" %} : {{ signup_magic_link }}
+Ouvrez le lien suivant pour procéder à l'inscription : {{ signup_magic_link }}
 
-{% translate "Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un collaborateur ou d'une collaboratrice. Transférez-lui cet email pour lui permettre de s'inscrire." %}
+Si vous n'êtes pas à l'origine de cette demande, peut-être s'agit-il d'un collaborateur ou d'une collaboratrice. Transférez-lui cet email pour lui permettre de s'inscrire.
 
-{% translate "Si vous êtes certain que cette demande n'émane d'aucun de vos collaborateurs ou collaboratrices, vous pouvez simplement ignorer notre e-mail." %}
+Si vous êtes certain que cette demande n'émane d'aucun de vos collaborateurs ou collaboratrices, vous pouvez simplement ignorer notre e-mail.
 
-{% translate "Cet e-mail a été envoyé à" %}
+Cet e-mail a été envoyé à
 {{ siae.auth_email }}
-{% translate "adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (extranet IAE 2.0 de l'ASP, GEIQ...)." %}
+adresse présente pour cette structure dans notre base de données alimentée par les données officielles de l'inclusion (extranet IAE 2.0 de l'ASP, GEIQ...).
 
 {% endblock body %}

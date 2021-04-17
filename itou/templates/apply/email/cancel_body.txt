@@ -3,7 +3,7 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Embauche annulée" %}
+Embauche annulée
 
 {% blocktranslate with job_seeker_name=job_application.job_seeker.get_full_name %}
 Nous vous confirmons que l'embauche de {{ job_seeker_name }} a bien été annulée.
@@ -11,7 +11,7 @@ Nous vous confirmons que l'embauche de {{ job_seeker_name }} a bien été annul�
 
 ----------------------------------------------------------
 
-{% translate "*Candidat* :" %}
+*Candidat* :
 
 - Nom : {{ job_application.job_seeker.last_name }}
 - Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
@@ -21,7 +21,7 @@ Nous vous confirmons que l'embauche de {{ job_seeker_name }} a bien été annul�
 
 {% if job_application.message %}
 
-{% translate "*Message du candidat* :" %}
+*Message du candidat* :
 
 {{ job_application.message }}
 
@@ -29,17 +29,17 @@ Nous vous confirmons que l'embauche de {{ job_seeker_name }} a bien été annul�
 
 {% if job_application.selected_jobs.exists %}
 
-{% translate "*Métier(s) recherché(s)* :" %}
+*Métier(s) recherché(s)* :
 
 {% for job in job_application.selected_jobs.all %}
 - {{ job.display_name }}{% endfor %}
 
 {% endif %}
 
-{% translate "*Candidature envoyée par :*" %}
+*Candidature envoyée par :*
 
 {% if job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
-{% translate "Le candidat lui même." %}
+Le candidat lui même.
 {% endif %}
 
 {% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}

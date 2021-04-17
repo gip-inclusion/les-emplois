@@ -3,9 +3,9 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "La candidature suivante a été envoyée avec succès !" %}
+La candidature suivante a été envoyée avec succès !
 
-{% translate "*Candidat* :" %}
+*Candidat* :
 
 - Nom : {{ job_application.job_seeker.last_name }}
 - Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
@@ -18,7 +18,7 @@
 
 {% if job_application.message %}
 
-{% translate "*Message de candidature* :" %}
+*Message de candidature* :
 
 {{ job_application.message }}
 
@@ -26,7 +26,7 @@
 
 {% if job_application.selected_jobs.exists %}
 
-{% translate "*Métier(s) recherché(s)* :" %}
+*Métier(s) recherché(s)* :
 
 {% for job in job_application.selected_jobs.all %}
 - {{ job.display_name }}{% endfor %}
@@ -35,7 +35,7 @@
 
 -----
 
-{% translate "*Candidature envoyée par* :" %}
+*Candidature envoyée par* :
 - {{ job_application.sender.get_full_name }}{% if job_application.sender_prescriber_organization %}
 - {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
 - {{ job_application.sender.email }}{% if job_application.sender.phone %}

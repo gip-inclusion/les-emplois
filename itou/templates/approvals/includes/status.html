@@ -14,7 +14,7 @@
         {% if approval.is_pass_iae and approval.is_suspended %}
             <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo PASS IAE">
             <br>
-            <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
+            <span class="badge badge-warning">PASS IAE suspendu</span>
         {% else %}
             <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
         {% endif %}
@@ -23,9 +23,9 @@
 
 <p>
     {% if approval.is_pass_iae %}
-        {% translate "Numéro de PASS IAE (agrément) :" %}
+        Numéro de PASS IAE (agrément) :
     {% else %}
-        {% translate "Agrément existant :" %}
+        Agrément existant :
     {% endif %}
     <b>{{ approval.number_with_spaces }}</b>
 </p>
@@ -51,7 +51,7 @@
         {# Suspensions history. #}
         {% with approval.suspensions_by_start_date_asc as suspensions %}
             {% if suspensions %}
-                {% translate "Suspensions :" %}
+                Suspensions :
                 <ul>
                     {% for s in suspensions %}
                         <li>
@@ -62,15 +62,15 @@
                             </span>
                             {% if s.is_in_progress %}
                                 <small>
-                                    <b>{% translate "En cours" %}</b>
+                                    <b>En cours</b>
                                 </small>
                             {% endif %}
                             {% if current_siae %}
                                 {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
                                 {% if can_be_handled %}
                                     <small>
-                                        <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Modifier" %}</a>
-                                        <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Annuler" %}</a>
+                                        <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
+                                        <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
                                     </small>
                                 {% endif %}
                             {% endif %}
@@ -85,7 +85,7 @@
         {# Prolongations history. #}
         {% with approval.prolongations_by_start_date_asc as prolongations %}
             {% if prolongations %}
-                {% translate "Prolongations :" %}
+                Prolongations :
                 <ul>
                     {% for p in prolongations %}
                         <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>

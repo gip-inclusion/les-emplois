@@ -23,7 +23,7 @@
 
     {% if request.user.is_siae_staff %}
         <h3>
-            {% translate "Critères administratifs de niveau 1" %}
+            Critères administratifs de niveau 1
         </h3>
     {% endif %}
 
@@ -35,7 +35,7 @@
 
     {% if request.user.is_siae_staff %}
         <h3>
-            {% translate "Critères administratifs de niveau 2" %}
+            Critères administratifs de niveau 2
         </h3>
     {% endif %}
 
@@ -55,9 +55,9 @@
         </p>
         {% buttons %}
             {% if cancel_url %}
-                <a class="btn btn-secondary" href="{{ cancel_url }}">{% translate "Annuler" %}</a>
+                <a class="btn btn-secondary" href="{{ cancel_url }}">Annuler</a>
             {% endif %}
-            <button type="submit" class="btn btn-primary">{% translate "Valider" %}</button>
+            <button type="submit" class="btn btn-primary">Valider</button>
         {% endbuttons %}
     </div>
 

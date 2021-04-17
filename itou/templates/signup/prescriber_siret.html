@@ -3,23 +3,23 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Prescripteur/Orienteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
+        Inscription
+        <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li>{% translate "Type de prescripteur" %}</li>
-        <li class="is-active">{% translate "SIRET" %}</li>
-        <li>{% translate "Vos informations" %}</li>
+        <li>Type de prescripteur</li>
+        <li class="is-active">SIRET</li>
+        <li>Vos informations</li>
     </ul>
 
     <div class="alert alert-secondary" role="alert">
-        {% translate "Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site" %}
+        Retrouvez facilement votre numéro SIRET à partir du nom de votre organisation sur le site
         <a href="https://sirene.fr/" rel="noopener" target="_blank">
             sirene.fr
             {% include "includes/icon.html" with icon="external-link" %}
@@ -34,9 +34,9 @@
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                {% translate "Retour" %}
+                Retour
             </a>
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
 
     </form>

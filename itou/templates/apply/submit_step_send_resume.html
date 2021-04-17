@@ -5,14 +5,14 @@
 {% block content %}
     {{ block.super }}
     {% include "utils/resume/typeform_form.html" %}
-    <p class="lines-on-sides">{% translate "ou" %}</p>
+    <p class="lines-on-sides">ou</p>
 
     <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
         {% csrf_token %}
         {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
     </form>
 {% endblock %}

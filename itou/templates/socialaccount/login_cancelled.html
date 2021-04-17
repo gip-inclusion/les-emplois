@@ -3,24 +3,24 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Connexion annulée" %}{{ block.super }}{% endblock %}
+{% block title %}Connexion annulée{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Connexion annulée" %}</h1>
+<h1>Connexion annulée</h1>
 
 <p>
-    {% translate "Vous avez annulé votre tentative de connexion." %}
+    Vous avez annulé votre tentative de connexion.
 </p>
 <p>
     <a href="{% url 'account_login' %}?account_type=job_seeker">
         <button class="btn btn-secondary">
-            {% translate "Retour" %}
+            Retour
         </button>
     </a>
     <a href="{% url 'peamu_login' %}">
         <button class="btn btn-primary">
-            {% translate "Se connecter à nouveau avec son compte Pôle emploi" %}
+            Se connecter à nouveau avec son compte Pôle emploi
         </button>
     </a>
 </p>

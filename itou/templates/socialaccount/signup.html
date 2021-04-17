@@ -16,22 +16,22 @@
 
 {% load i18n %}
 
-{% block title %}{% translate "Votre compte Pôle emploi doit être validé" %}{{ block.super }}{% endblock %}
+{% block title %}Votre compte Pôle emploi doit être validé{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Votre compte Pôle emploi doit être validé" %}</h1>
+<h1>Votre compte Pôle emploi doit être validé</h1>
 
 <p>
-    {% translate "Vous devez valider votre compte Pôle emploi pour pouvoir vous connecter ici." %}
+    Vous devez valider votre compte Pôle emploi pour pouvoir vous connecter ici.
 </p>
 <p>
-    {% translate "Veuillez retrouver l'email &laquo; <i>Confirmation de votre adresse électronique</i> &raquo; que Pôle emploi vous a envoyé le jour de la création de votre compte et y cliquer sur le lien &laquo; <i>Je confirme mon adresse électronique</i> &raquo;." %}
+    Veuillez retrouver l'email &laquo; <i>Confirmation de votre adresse électronique</i> &raquo; que Pôle emploi vous a envoyé le jour de la création de votre compte et y cliquer sur le lien &laquo; <i>Je confirme mon adresse électronique</i> &raquo;.
 </p>
 <p>
     <a href="{% url 'account_login' %}?account_type=job_seeker">
         <button class="btn btn-secondary">
-            {% translate "Retour" %}
+            Retour
         </button>
     </a>
 </p>

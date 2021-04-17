@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% translate "Bienvenue sur les emplois de l'inclusion !" %}{{ block.super }}{% endblock %}
+{% block title %}Bienvenue sur les emplois de l'inclusion !{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -15,7 +15,7 @@
     <div class="carousel-inner">
         <div class="carousel-item active">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Bienvenue sur les emplois de l'inclusion !" %}</h1>
+                <h1 class="text-center">Bienvenue sur les emplois de l'inclusion !</h1>
 
                 <img src="{% static 'img/welcoming_tour/candidat_1.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
@@ -27,14 +27,14 @@
                 </p>
                 <p class="pt-3 text-center">
                     <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next" >
-                      <button type="button" class="btn btn-primary">{% translate "Suivant" %}</button>
+                      <button type="button" class="btn btn-primary">Suivant</button>
                     </a>
                 </p>
             </div>
         </div>
         <div class="carousel-item">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Je suis informé de l’avancement de mes candidatures !" %}</h1>
+                <h1 class="text-center">Je suis informé de l’avancement de mes candidatures !</h1>
 
                 <img src="{% static 'img/welcoming_tour/candidat_2.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
@@ -52,10 +52,10 @@
                 </p>
                 <p class="pt-3 text-center">
                     <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev" >
-                      <button type="button" class="btn btn-secondary">{% translate "Précédent" %}</button>
+                      <button type="button" class="btn btn-secondary">Précédent</button>
                     </a>
                     <a class="text-decoration-none" href="{% url 'dashboard:index' %}" role="button" data-slide="next" >
-                      <button type="button" class="btn btn-primary">{% translate "Terminer" %}</button>
+                      <button type="button" class="btn btn-primary">Terminer</button>
                     </a>
                 </p>
             </div>
@@ -64,7 +64,7 @@
 </div>
 <p class="text-center pt-5 mb-0">
     <a href="{% url 'dashboard:index' %}">
-        <button type="button" class="btn btn-link">{% translate 'Ignorer la présentation' %}</button>
+        <button type="button" class="btn btn-link">Ignorer la présentation</button>
     </a>
 </p>
 

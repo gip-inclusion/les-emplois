@@ -17,7 +17,7 @@ Vous avez la possibilité de contacter un prescripteur habilité pour exposer la
 Si le prescripteur habilité est favorable à une dérogation de son délai de carence, il doit vous transmettre la candidature de {{ job_seeker_full_name }} via les emplois de l'inclusion. Vous pourrez ensuite demander l'obtention d'un PASS IAE.
 {% endblocktranslate %}
 
-{% translate "Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :" %}
+Pour trouver les prescripteurs habilités proches de vous, pensez à utiliser le moteur de recherche depuis votre tableau de bord :
 {{ itou_protocol }}://{{ itou_fqdn }}{% url 'search:prescribers_home' %}
 
 {% endblock body %}

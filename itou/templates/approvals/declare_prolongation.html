@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Déclarer une prolongation de PASS IAE" %}{{ block.super }}{% endblock %}
+{% block title %}Déclarer une prolongation de PASS IAE{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -35,7 +35,7 @@
 
             <p>
                 <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">
-                    {% translate "Rechercher des prescripteurs" %}
+                    Rechercher des prescripteurs
                     {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
                 </a>
             </p>
@@ -44,11 +44,11 @@
 
             {% buttons %}
                 <a class="btn btn-secondary" href="{{ back_url }}">
-                    {% translate "Retour" %}
+                    Retour
                 </a>
                 {# Enable preview mode: preview=1. #}
                 <button type="submit" name="preview" value="1" class="btn btn-primary">
-                    {% translate "Valider la déclaration" %}
+                    Valider la déclaration
                 </button>
             {% endbuttons %}
 
@@ -69,7 +69,7 @@
             <div class="card my-3 text-center">
                 <div class="card-body">
                     <h5 class="card-title">
-                        {% translate "Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :" %}
+                        Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
                     </h5>
                     <p class="card-text">
                         {{ form.instance.get_reason_display }}
@@ -93,16 +93,16 @@
 
             <div class="alert alert-warning" role="alert">
                 <p>
-                    {% translate "En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié." %}
+                    En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
                 </p>
                 {% buttons %}
                     {# Allow the user to modify the prolongation: edit=1. #}
                     <button type="submit" name="edit" value="1" class="btn btn-secondary">
-                        {% translate "Annuler" %}
+                        Annuler
                     </button>
                     {# Create a prolongation: save=1. #}
                     <button type="submit" name="save" value="1" class="btn btn-primary">
-                        {% translate "Confirmer la déclaration" %}
+                        Confirmer la déclaration
                     </button>
                 {% endbuttons %}
             </div>

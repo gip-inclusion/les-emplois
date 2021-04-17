@@ -3,14 +3,14 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur les emplois de l'inclusion !" %}
+Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur les emplois de l'inclusion !
 
-{% translate "*Structure* :" %}
+*Structure* :
 
-- {% translate "Nom" %} : {{ organization.display_name }}
-- {% translate "SIRET" %} : {{ organization.siret }}
-- {% translate "Type" %} : {{ organization.kind }}
+- Nom : {{ organization.display_name }}
+- SIRET : {{ organization.siret }}
+- Type : {{ organization.kind }}
 
-{% translate "Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus." %}
+Vous recevez cet email en tant que collaborateur d'un compte associé à l'organisation ci-dessus.
 
 {% endblock body %}

@@ -3,12 +3,12 @@
 {% load i18n %}
 {% block body %}
 
-{% translate "Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier." %}
+Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier.
 
-{% translate "*Structure* :" %}
+*Structure* :
 
-- {% translate "Nom" %} : {{ organization.display_name }}
-- {% translate "ID" %} : {{ organization.id }}
+- Nom : {{ organization.display_name }}
+- ID : {{ organization.id }}
 
 {{ itou_protocol }}://{{ itou_fqdn }}{% url 'admin:prescribers_prescriberorganization_change' organization.id %}
 

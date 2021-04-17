@@ -29,7 +29,7 @@ Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que v
 {% endif %}
 
 {% if job_application.answer %}
-{% translate "*Message de l'entreprise* :" %}
+*Message de l'entreprise* :
 
 {{ job_application.answer }}
 {% endif %}

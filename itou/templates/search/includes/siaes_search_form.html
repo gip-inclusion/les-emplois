@@ -12,12 +12,11 @@
                 {# Loading #}
                 <span class="input-group-text js-city-autocomplete-loading d-none">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span class="sr-only">{% translate "Chargement..." %}</span>
+                    <span class="sr-only">Chargement...</span>
                 </span>
                 {# No loading #}
                 <span class="input-group-text js-city-autocomplete-no-loading">
-                    {% translate "Logo du moteur de recherche" as map_pin_label %}
-                    {% include "includes/icon.html" with icon="map-pin" title=map_pin_label %}
+                    {% include "includes/icon.html" with icon="map-pin" title="Logo du moteur de recherche" %}
                 </span>
             </div>
             <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
@@ -29,8 +28,8 @@
         {{ form.kind }}
     </div>
     <div class="col-sm-2">
-        <button type="submit" class="btn btn-danger form-control js-search-button" title="{% translate 'Rechercher' %}">
-            {% translate "Rechercher" %}
+        <button type="submit" class="btn btn-danger form-control js-search-button" title="Rechercher">
+            Rechercher
         </button>
     </div>
 </div>

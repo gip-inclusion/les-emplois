@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Modifier votre profil" %}{{ block.super }}{% endblock %}
+{% block title %}Modifier votre profil{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% translate "Modifier votre adresse e-mail" %}</h1>
+<h1>Modifier votre adresse e-mail</h1>
 
 <div class="alert alert-warning" role="alert">
     {% blocktranslate %}
@@ -20,7 +20,7 @@
     {% bootstrap_form_errors form %}
     {% bootstrap_form form %}
 
-    <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
 </form>
 
 {% endblock %}

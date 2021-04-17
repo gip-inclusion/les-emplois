@@ -2,28 +2,28 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Créer une nouvelle structure" %}{{ block.super }}{% endblock %}
+{% block title %}Créer une nouvelle structure{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Créer/rejoindre une nouvelle structure" %}</h1>
+<h1>Créer/rejoindre une nouvelle structure</h1>
 
 <form method="post" action="" class="js-prevent-multiple-submit">
 
     <div class="alert alert-info" role="alert">
-        <p>{% translate "Vous souhaitez rejoindre une structure :"%}</p>
+        <p>Vous souhaitez rejoindre une structure :</p>
         <ul>
-            <li>{% translate "ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord"%}</b></li>
-            <li>{% translate "connue dans l'extranet IAE 2.0 de l'ASP mais n’ayant pas encore de membre : "%}<a href="{% url 'signup:siae_select' %}">{% translate "utilisez ce formulaire"%}</a></li>
+            <li>ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b></li>
+            <li>connue dans l'extranet IAE 2.0 de l'ASP mais n’ayant pas encore de membre : <a href="{% url 'signup:siae_select' %}">utilisez ce formulaire</a></li>
         </ul>
-        <p>{% translate "Dans les autres cas, complétez le formulaire ci-dessous."%}</p>
+        <p>Dans les autres cas, complétez le formulaire ci-dessous.</p>
     </div>
 
     {% csrf_token %}
 
     {% if form.non_field_errors %}
         <div class="alert alert-danger alert-dismissible alert-link" role="alert">
-            <button class="close" type="button" data-dismiss="alert" aria-label="{% translate 'close' %}">&#215;</button>
+            <button class="close" type="button" data-dismiss="alert" aria-label="close">&#215;</button>
             {% for error in form.non_field_errors %}
                 {{ error | safe }}{% if not forloop.last %}<br>{% endif %}
             {% endfor %}
@@ -39,8 +39,8 @@
             {% blocktranslate %}En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.{% endblocktranslate %}
         </p>
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% translate "Annuler" %}</a>
-            <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
         {% endbuttons %}
     </div>
 

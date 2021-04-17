@@ -2,24 +2,24 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Demandeur d'emploi - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Demandeur d'emploi - Inscription{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% translate "Inscription" %}
-    <small class="text-muted">{% translate "Candidat" %}</small>
+    Inscription
+    <small class="text-muted">Candidat</small>
 </h1>
 
 <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
 
-<p class="lines-on-sides">{% translate "ou" %}</p>
+<p class="lines-on-sides">ou</p>
 
 <p class="text-center">{% include "signup/includes/no_email_link.html" %}</p>
 
-<p class="lines-on-sides">{% translate "ou" %}</p>
+<p class="lines-on-sides">ou</p>
 
-<p>{% translate "Créer son compte" %}</p>
+<p>Créer son compte</p>
 
 <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
 
@@ -32,7 +32,7 @@
     {% bootstrap_form form alert_error_type="all" %}
 
     <div class="small pb-4 text-secondary">
-        {% translate "Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord." %}
+        Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
     </div>
 
     {% include "signup/includes/submit_rgpd.html" %}
@@ -42,7 +42,7 @@
 <hr>
 
 <p>
-    <a href="{% url 'account_login' %}">{% translate "Vous avez déjà un compte ?" %}</a>
+    <a href="{% url 'account_login' %}">Vous avez déjà un compte ?</a>
 </p>
 {% endblock %}
 

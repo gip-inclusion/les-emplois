@@ -3,11 +3,11 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Connexion" %}{{ block.super }}{% endblock %}
+{% block title %}Connexion{{ block.super }}{% endblock %}
 
 {% block content %}
 <h1>
-    {% translate "Connexion" %}
+    Connexion
     {% if account_type_display_name %}
         <small class="text-muted">{{ account_type_display_name }}</small>
     {% endif %}
@@ -17,13 +17,13 @@
 
     <p class="text-center">{% include "signup/includes/peamu_button.html" %}</p>
 
-    <p class="lines-on-sides">{% translate "ou" %}</p>
+    <p class="lines-on-sides">ou</p>
 
     <p class="text-center">{% include "signup/includes/no_email_link.html" %}</p>
 
-    <p class="lines-on-sides">{% translate "ou" %}</p>
+    <p class="lines-on-sides">ou</p>
 
-    <p>{% translate "Se connecter avec son compte" %}</p>
+    <p>Se connecter avec son compte</p>
 
 {% endif %}
 
@@ -44,19 +44,19 @@
     <input type="hidden" id="account_type" name="account_type" value="{{ account_type }}">
 
     {% buttons %}
-        <button type="submit" class="btn btn-primary">{% translate "Connexion" %}</button>
-        <a class="btn btn-link" href="{% url 'account_reset_password' %}">{% translate "Mot de passe oublié ?" %}</a>
+        <button type="submit" class="btn btn-primary">Connexion</button>
+        <a class="btn btn-link" href="{% url 'account_reset_password' %}">Mot de passe oublié ?</a>
     {% endbuttons %}
 
 </form>
 
 <hr>
 
-<p>{% translate "Vous n'avez pas de compte ?" %}</p>
+<p>Vous n'avez pas de compte ?</p>
 
 <p>
     <a class="btn btn-outline-primary" href="{{ signup_url }}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-    {% translate "Créer un compte" %}
+    Créer un compte
     {% if account_type_display_name %}
         {{ account_type_display_name|lower }}
     {% endif %}

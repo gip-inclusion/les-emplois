@@ -1,19 +1,19 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Suivi des candidatures" %}{{ block.super }}{% endblock %}
+{% block title %}Suivi des candidatures{{ block.super }}{% endblock %}
 
 {% block extra_head %}{{ filters_form.media.css }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% translate "Suivi des candidatures" %}</h1>
+    <h1>Suivi des candidatures</h1>
 
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
-            {% translate "Aucune candidature pour le moment." %}
+            Aucune candidature pour le moment.
         </h2>
     {% endif %}
 
@@ -32,7 +32,7 @@
                     data-target="#answer{{ forloop.counter0 }}"
                     aria-expanded="false"
                     aria-controls="answer{{ forloop.counter0 }}"
-                >{% translate "Plus d'informations" %}</a>
+                >Plus d'informations</a>
                 <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
                     <p>
                         <b>Candidat :</b>

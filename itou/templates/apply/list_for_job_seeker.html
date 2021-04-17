@@ -1,17 +1,17 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Candidatures envoyées" %}{{ block.super }}{% endblock %}
+{% block title %}Candidatures envoyées{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% translate "Candidatures envoyées" %}</h1>
+    <h1>Candidatures envoyées</h1>
 
     {% include "apply/includes/job_applications_filters.html" with filters=filters filters_form=filters_form %}
 
     {% if not job_applications_page %}
         <h2 class="font-weight-normal text-muted">
-            {% translate "Aucune candidature pour le moment." %}
+            Aucune candidature pour le moment.
         </h2>
     {% endif %}
 

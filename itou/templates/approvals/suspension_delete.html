@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Annuler la suspension de PASS IAE" %}{{ block.super }}{% endblock %}
+{% block title %}Annuler la suspension de PASS IAE{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -17,7 +17,7 @@
     <div class="card my-3 text-center">
         <div class="card-body">
             <h5 class="card-title">
-                {% translate "Vous êtes sur le point d'annuler la suspension" %}
+                Vous êtes sur le point d'annuler la suspension
             </h5>
             <p class="card-text">
                 {{ suspension.get_reason_display }}
@@ -41,10 +41,10 @@
 
         {% buttons %}
             <a class="btn btn-secondary" href="{{ back_url }}">
-                {% translate "Retour" %}
+                Retour
             </a>
             <button type="submit" class="btn btn-danger">
-                {% translate "Confirmer l'annulation de la suspension" %}
+                Confirmer l'annulation de la suspension
             </button>
         {% endbuttons %}
 

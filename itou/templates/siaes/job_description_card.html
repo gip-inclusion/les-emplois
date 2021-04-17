@@ -25,7 +25,7 @@
     {% if siae.has_members %}
         <p>
             <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}?job_description_id={{ job.pk }}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
-                {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                {% include "includes/icon.html" with icon="message-square" %} Postuler
             </a>
         </p>
     {% endif %}
@@ -33,7 +33,7 @@
     <hr>
 
     <p class="text-muted mb-0">
-        {% translate "Métier proposé par :" %}
+        Métier proposé par :
     </p>
 
     <h2 class="mb-0">
@@ -52,12 +52,12 @@
 
     <p>
       <a data-toggle="collapse" href="#share-job-description-job" role="button" aria-expanded="false">
-          {% translate "Partager cette fiche métier" %}
+          Partager cette fiche métier
       </a>
     </p>
     <div class="collapse form-group" id="share-job-description-job">
         <p>
-            {% translate "Copiez-collez le lien ci-dessous :" %}
+            Copiez-collez le lien ci-dessous :
         </p>
         {# Poor man's copy and paste with onClick #}
         <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{{ job.get_absolute_url }}" onClick="this.select()">
@@ -66,7 +66,7 @@
     {% if back_url %}
         <hr>
         <p>
-            <a href="{{ back_url }}">{% translate "Retour" %}</a>
+            <a href="{{ back_url }}">Retour</a>
         </p>
     {% endif %}
 

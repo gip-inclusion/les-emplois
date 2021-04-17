@@ -8,7 +8,7 @@
     {{ block.super }}
 
     <div class="alert alert-warning" role="alert">
-        {% translate "Cet email n'existe pas dans notre base de données. Vous devez créer un compte pour votre candidat en utilisant le formulaire ci-dessous afin de pouvoir continuer." %}
+        Cet email n'existe pas dans notre base de données. Vous devez créer un compte pour votre candidat en utilisant le formulaire ci-dessous afin de pouvoir continuer.
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -47,7 +47,7 @@
                             data-matomo-option="creation-candidat-par-prescripteur"
                         >
                             {% include "includes/icon.html" with icon="file-text" fill="#fff" stroke="#007bff" size=30 class="d-block w-100 mb-1" %}
-                            {% translate "Continuer avec un CV" %}
+                            Continuer avec un CV
                         </button>
                     </div>
                 {% endif %}
@@ -60,7 +60,7 @@
                         data-matomo-option="creation-candidat-par-prescripteur"
                     >
                         {% include "includes/icon.html" with icon="arrow-right-circle" fill="#fff" stroke="#007bff" size=30 class="d-block w-100 mb-1" %}
-                        {% translate "Continuer sans CV" %}
+                        Continuer sans CV
                     </button>
                 </div>
             </div>

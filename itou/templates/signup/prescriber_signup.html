@@ -2,19 +2,19 @@
 {% load bootstrap4 %}
 {% load i18n %}
 
-{% block title %}{% translate "Prescripteur/Orienteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
+        Inscription
+        <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li>{% translate "Type de prescripteur" %}</li>
-        {% if not join_as_orienteur_without_org %}<li>{% translate "SIRET" %}</li>{% endif %}
-        <li class="is-active">{% translate "Vos informations" %}</li>
+        <li>Type de prescripteur</li>
+        {% if not join_as_orienteur_without_org %}<li>SIRET</li>{% endif %}
+        <li class="is-active">Vos informations</li>
     </ul>
 
     {% if join_authorized_org and kind.value != "OTHER" %}
@@ -49,7 +49,7 @@
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                {% translate "Retour" %}
+                Retour
             </a>
         {% endbuttons %}
 

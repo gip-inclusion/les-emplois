@@ -13,8 +13,8 @@
         {% bootstrap_form form %}
 
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% translate "Annuler" %}</a>
-            <button type="submit" class="btn btn-success">{% translate "Mettre en liste d'attente" %}</button>
+            <a class="btn btn-secondary" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+            <button type="submit" class="btn btn-success">Mettre en liste d'attente</button>
         {% endbuttons %}
 
     </form>

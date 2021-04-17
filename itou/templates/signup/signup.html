@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Inscription{{ block.super }}{% endblock %}
 
 
 {% block content %}
@@ -10,11 +10,11 @@
         <div class="card p-4" style="flex: 0 0 23%;">
             <div class="card-body">
                 <h5 class="card-title font-weight-light mb-4">
-                    <span class="d-block">{% translate "Vous êtes un employeur solidaire" %}</span>
-                    <span class="d-block">{% translate "(SIAE, GEIQ, EA, ...)" %}</span>
+                    <span class="d-block">Vous êtes un employeur solidaire</span>
+                    <span class="d-block">(SIAE, GEIQ, EA, ...)</span>
                 </h5>
                 <a class="btn btn-primary" href="{% url 'signup:siae_select' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                    {% translate "Créer un compte" %}
+                    Créer un compte
                 </a>
             </div>
         </div>
@@ -22,10 +22,10 @@
         <div class="card p-4" style="flex: 0 0 23%;">
             <div class="card-body">
                 <h5 class="card-title font-weight-light mb-4">
-                    {% translate "Vous êtes prescripteur ou orienteur" %}
+                    Vous êtes prescripteur ou orienteur
                 </h5>
                 <a class="btn btn-primary" href="{% url 'signup:prescriber_is_pole_emploi' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                    {% translate "Créer un compte" %}
+                    Créer un compte
                 </a>
             </div>
         </div>
@@ -33,10 +33,10 @@
         <div class="card p-4" style="flex: 0 0 23%;">
             <div class="card-body">
                 <h5 class="card-title font-weight-light mb-4">
-                    {% translate "Vous êtes en recherche d'un emploi et souhaitez postuler" %}
+                    Vous êtes en recherche d'un emploi et souhaitez postuler
                 </h5>
                 <a class="btn btn-primary" href="{% url 'signup:job_seeker' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                    {% translate "Créer un compte" %}
+                    Créer un compte
                 </a>
             </div>
         </div>

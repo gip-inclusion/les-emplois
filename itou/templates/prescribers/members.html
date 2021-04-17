@@ -1,18 +1,18 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Collaborateurs" %}{{ block.super }}{% endblock %}
+{% block title %}Collaborateurs{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Collaborateurs" %}</h1>
+<h1>Collaborateurs</h1>
 
 <h2 class="text-muted">
     {{ organization.display_name }}
 </h2>
 
 <div class="alert alert-info" role="alert">
-    {% translate "Vous êtes connecté en tant que" %} <b>{{ user.get_full_name }}</b> ({{ user.email }})
+    Vous êtes connecté en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
 </div>
 
 {% with active_admin_members=organization.active_admin_members base_url="prescribers_views" %}
@@ -20,7 +20,7 @@
 {% endwith %}
 
 <a href="{% url 'invitations_views:invite_prescriber_with_org' %}" class="align-self-center">
-    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Inviter des collaborateurs" %}</button>
+    <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Inviter des collaborateurs</button>
 </a>
 
 {% if pending_invitations %}

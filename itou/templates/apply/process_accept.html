@@ -7,7 +7,7 @@
     {{ block.super }}
 
     <div class="alert alert-info" role="alert">
-        {% translate "Confirmez votre choix en renseignant quelques informations supplémentaires." %}
+        Confirmez votre choix en renseignant quelques informations supplémentaires.
     </div>
 
     <form method="post" action="" class="js-prevent-multiple-submit mt-5">
@@ -15,13 +15,13 @@
         {% csrf_token %}
 
         {% if form_address or form_pe_status %}
-            <h3>{% translate "Candidat" %}</h3>
+            <h3>Candidat</h3>
         {% endif %}
 
         {% if form_pe_status %}
             {% if not job_application.approval_not_needed %}
                 <div class="alert alert-warning" role="alert">
-                    {% translate "Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat." %}
+                    Pour obtenir un PASS IAE dans les meilleurs délais, assurez-vous de l'exactitude de la date de naissance et du statut Pôle emploi du candidat.
                 </div>
             {% endif %}
             {% bootstrap_form form_pe_status alert_error_type="all" %}
@@ -34,18 +34,18 @@
 
         <div class="mt-5">
 
-            <h3>{% translate "Embauche" %}</h3>
+            <h3>Embauche</h3>
             {% bootstrap_form form_accept alert_error_type="all" %}
 
         </div>
 
         {% buttons %}
             <a class="btn btn-secondary"
-               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">{% translate "Annuler" %}</a>
+               href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
-                <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">{% translate "Je l'embauche" %}</a>
+                <a href="#" class="btn btn-success" data-toggle="modal" data-target="#confirmModal">Je l'embauche</a>
             {% else %}
-                <button class="btn btn-success" type="submit">{% translate "Je l'embauche" %}</button>
+                <button class="btn btn-success" type="submit">Je l'embauche</button>
             {% endif %}
 
         {% endbuttons %}
@@ -56,15 +56,15 @@
                     <div class="modal-content">
                         <div class="modal-body text-center">
                             <h4 class="modal-title">
-                                {% translate "Obtention d'un PASS IAE" %}
+                                Obtention d'un PASS IAE
                             </h4>
                             <p class="pt-2">
-                                {% translate "Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?" %}
+                                Dans le cadre de cette embauche, souhaitez-vous obtenir un PASS IAE ?
                             </p>
                             <div class="row">
                                 <div class="col pr-2">
                                     <button type="submit" class="btn btn-success w-100">
-                                        {% translate "J'obtiens un PASS IAE" %}
+                                        J'obtiens un PASS IAE
                                     </button>
                                 </div>
                                 <div class="col pl-2">
@@ -72,15 +72,15 @@
                                         type="submit"
                                         class="btn btn-secondary w-100"
                                         onClick="$(&quot;input[name='hiring_without_approval']&quot;).val('True')">
-                                            {% translate "Je n'ai pas besoin d'un PASS IAE" %}
+                                            Je n'ai pas besoin d'un PASS IAE
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer justify-content-center">
                             <p class="m-0">
-                                <b>{% translate "Contrat de professionnalisation ?" %}</b>
-                                {% translate "Demande d'aide une fois le PASS IAE délivré !" %}
+                                <b>Contrat de professionnalisation ?</b>
+                                Demande d'aide une fois le PASS IAE délivré !
                             </p>
                         </div>
                     </div>

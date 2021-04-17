@@ -5,7 +5,7 @@
     {% if link_text %}
         {{ link_text }}
     {% else %}
-        {% translate "Je n'ai pas d'adresse e-mail" %}
+        Je n'ai pas d'adresse e-mail
     {% endif %}
 </a>
 
@@ -25,15 +25,15 @@
                             <img src="{% static 'img/no_email.svg' %}">
                         </div>
                         <div class="col">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="{% translate "Fermer" %}">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                             <h5 class="modal-title" id="no-email-modal-label">
-                                {% translate "Créer une adresse e-mail" %}
+                                Créer une adresse e-mail
                             </h5>
                             <br>
-                            <p>{% translate "Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net." %}</p>
-                            <p>{% translate "Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici." %}</p>
+                            <p>Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
+                            <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
                             <a
                                 href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
                                 class="btn btn-primary matomo-event"
@@ -42,7 +42,7 @@
                                 data-matomo-option="je-n-ai-pas-d-adresse-email"
                                 rel="noopener"
                                 target="_blank">
-                                {% translate "Créer une adresse e-mail" %}
+                                Créer une adresse e-mail
                             </a>
                         </div>
                     </div>

@@ -10,7 +10,7 @@
 
 {% block content %}
 
-    <h2>{% translate "Rechercher des employeurs solidaires" %}</h2>
+    <h2>Rechercher des employeurs solidaires</h2>
 
     <form method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
@@ -25,7 +25,7 @@
     {% if not siaes_page %}
 
         <h4 class="font-weight-normal text-muted">
-            {% translate "Aucun résultat." %}
+            Aucun résultat.
         </h4>
 
     {% else %}
@@ -64,11 +64,11 @@
                     <h6 class="card-subtitle mb-2 text-muted">{{ siae.address_on_one_line }}</h6>
                     {% if siae.is_kind_ea or siae.is_kind_eatt %}
                         <p class="card-text">
-                            <span class="badge badge-dark">{% translate "Priorité aux bénéficiaires de RQTH" %}</span>
+                            <span class="badge badge-dark">Priorité aux bénéficiaires de RQTH</span>
                         </p>
                     {% endif %}
                     {% if siae.job_description_through.exists and not siae.block_job_applications %}
-                        <h6 class="border-bottom border-gray pb-2">{% translate "Métiers proposés" %}</h6>
+                        <h6 class="border-bottom border-gray pb-2">Métiers proposés</h6>
                         <ul class="mb-0">
                         {% for job in siae.job_description_through.all %}
                             <li>
@@ -94,17 +94,17 @@
                 <div class="card-footer">
                     {% if not siae.has_active_members %}
                         <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
-                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                            {% include "includes/icon.html" with icon="message-square" %} Postuler
                         </a>
-                        <small>{% translate "Cet employeur n'a pas encore créé son compte." %}</small>
+                        <small>Cet employeur n'a pas encore créé son compte.</small>
                     {% elif siae.block_job_applications %}
                         <a class="btn btn-sm btn-outline-secondary disabled" href="" aria-label="{% blocktranslate with siae.display_name as display_name %}Vous ne pouvez pas postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
-                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                            {% include "includes/icon.html" with icon="message-square" %} Postuler
                         </a>
-                        <small>{% translate "Cet employeur n'accepte plus de candidatures pour le moment" %}</small>
+                        <small>Cet employeur n'accepte plus de candidatures pour le moment</small>
                     {% else %}
                         <a class="btn btn-sm btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
-                            {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                            {% include "includes/icon.html" with icon="message-square" %} Postuler
                         </a>
                     {% endif %}
 

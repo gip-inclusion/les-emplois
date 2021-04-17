@@ -1,25 +1,25 @@
 {% load i18n %}
 <div class="content-small">
-    <h1>{% translate "Retrait d'un collaborateur" %}</h1>
+    <h1>Retrait d'un collaborateur</h1>
     <div class="mt-4 alert alert-warning">
-        {% translate "Vous allez retirer" %} <b>{{ target_member.get_full_name }}</b>
-        {% translate " de votre organisation"%} <b>({{ structure.display_name }})</b>.
+        Vous allez retirer <b>{{ target_member.get_full_name }}</b>
+         de votre organisation <b>({{ structure.display_name }})</b>.
     </div>
 
     <ul>
-        <li>{% translate "Le tableau de bord de votre structure ne lui sera plus accessible." %}</li>
-        <li>{% translate "Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation." %}</li>
-        <li>{% translate "Cet utilisateur sera notifié par e-mail de son retrait de votre organisation." %}</li>
-        <li>{% translate "En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation." %}</li>
+        <li>Le tableau de bord de votre structure ne lui sera plus accessible.</li>
+        <li>Les modifications et ajouts réalisés sont toujours accessibles par les autres membres de votre organisation.</li>
+        <li>Cet utilisateur sera notifié par e-mail de son retrait de votre organisation.</li>
+        <li>En cas d'erreur, vous pourrez toujours lui renvoyer une invitation pour rejoindre votre organisation.</li>
     </ul>
 
     <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="POST">
         {% csrf_token %}
         <div class="mt-4 form-group">
             <a class="btn btn-secondary" href="{% url base_url|add:":members"%}">
-                {% translate "Annuler" %}
+                Annuler
             </a>
-            <button class="btn btn-primary submit">{% translate "Retirer l'utilisateur" %}</button>
+            <button class="btn btn-primary submit">Retirer l'utilisateur</button>
         </div>
     </form>
 </div>

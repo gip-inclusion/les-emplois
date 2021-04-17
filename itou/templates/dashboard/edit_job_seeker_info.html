@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Modification d'un candidat" %}{{ block.super }}{% endblock %}
+{% block title %}Modification d'un candidat{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% translate "Candidature de" %} <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
+<h1>Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span></h1>
 
 <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
 
@@ -13,8 +13,8 @@
     {% bootstrap_form form exclude="resume_link" alert_error_type="all" %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{{ prev_url }}">{% translate "Annuler" %}</a>
-        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
+        <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% endbuttons %}
 
 </form>

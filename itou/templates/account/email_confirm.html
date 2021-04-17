@@ -5,11 +5,11 @@
 {% load account %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Confirmer l'adresse e-mail" %}{{ block.super }}{% endblock %}
+{% block title %}Confirmer l'adresse e-mail{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Confirmer l'adresse e-mail" %}</h1>
+<h1>Confirmer l'adresse e-mail</h1>
 
 {% if confirmation %}
 
@@ -26,7 +26,7 @@
         {% endif %}
 
         {% buttons %}
-                <button type="submit" class="btn btn-primary">{% translate "Confirmer" %}</button>
+                <button type="submit" class="btn btn-primary">Confirmer</button>
         {% endbuttons %}
 
     </form>
