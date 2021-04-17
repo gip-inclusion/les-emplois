@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
 {% block subject %}
 
 {{ sender.first_name|capfirst }} {{ sender.last_name|capfirst }} vous a invité(e) à rejoindre l'organisation {{ org.display_name }} sur les emplois de l'inclusion.

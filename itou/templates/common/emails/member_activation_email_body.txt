@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
 Un administrateur vous a ajouté en tant que membre d'une structure sur les emplois de l'inclusion

@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
 {% block subject %}
 PASS IAE pour {{ job_application.job_seeker.get_full_name }} et avis sur les emplois de l'inclusion
 {% endblock %}

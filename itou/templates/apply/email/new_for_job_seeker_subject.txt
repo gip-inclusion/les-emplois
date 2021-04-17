@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
 {% block subject %}
 
 {% if job_application.is_sent_by_proxy %}

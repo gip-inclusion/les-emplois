@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load i18n %}
 {% block body %}
 
 {{ first_name|capfirst }} {{ last_name|capfirst }} est désormais membre de la structure {{ establishment_name }}.

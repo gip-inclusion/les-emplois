@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
 {% if job_application.is_sent_by_proxy %}

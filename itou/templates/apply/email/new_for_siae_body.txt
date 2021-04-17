@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
 Vous avez reçu une nouvelle candidature !

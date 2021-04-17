@@ -1,6 +1,5 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
 Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier.

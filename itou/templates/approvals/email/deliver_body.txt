@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load i18n %}
 {% block body %}
 
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :

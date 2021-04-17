@@ -1,4 +1,3 @@
-{% load account %}{% load i18n %}{% autoescape off %}Bonjour,
 
 Nous avons bien enregistré votre demande d'inscription et vous remercions de votre confiance.
 
