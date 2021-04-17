@@ -34,25 +34,23 @@ class AddressMixin(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    address_line_1 = models.CharField(verbose_name=gettext_lazy("Adresse"), max_length=255, blank=True)
+    address_line_1 = models.CharField(verbose_name="Adresse", max_length=255, blank=True)
     address_line_2 = models.CharField(
-        verbose_name=gettext_lazy("Complément d'adresse"),
+        verbose_name="Complément d'adresse",
         max_length=255,
         blank=True,
-        help_text=gettext_lazy("Appartement, suite, bloc, bâtiment, boite postale, etc."),
+        help_text="Appartement, suite, bloc, bâtiment, boite postale, etc.",
     )
-    post_code = models.CharField(
-        verbose_name=gettext_lazy("Code Postal"), validators=[validate_post_code], max_length=5, blank=True
-    )
-    city = models.CharField(verbose_name=gettext_lazy("Ville"), max_length=255, blank=True)
+    post_code = models.CharField(verbose_name="Code Postal", validators=[validate_post_code], max_length=5, blank=True)
+    city = models.CharField(verbose_name="Ville", max_length=255, blank=True)
     department = models.CharField(
-        verbose_name=gettext_lazy("Département"), choices=DEPARTMENT_CHOICES, max_length=3, blank=True, db_index=True
+        verbose_name="Département", choices=DEPARTMENT_CHOICES, max_length=3, blank=True, db_index=True
     )
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, null=True, blank=True)
     # BAN API score between 0 and 1 indicating the relevance of the geocoding result.
-    geocoding_score = models.FloatField(verbose_name=gettext_lazy("Score du geocoding"), blank=True, null=True)
+    geocoding_score = models.FloatField(verbose_name="Score du geocoding", blank=True, null=True)
 
     class Meta:
         abstract = True

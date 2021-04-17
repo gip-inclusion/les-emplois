@@ -34,6 +34,7 @@ def get_choice(choices, key):
         return choices[key]
     return None
 
+
 def chunks(items, n):
     """
     Yield successive n-sized chunks from items.

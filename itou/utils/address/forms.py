@@ -14,13 +14,13 @@ class AddressFormMixin(forms.Form):
     city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
 
     city_name = forms.CharField(
-        label=gettext_lazy("Ville"),
+        label="Ville",
         required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": gettext_lazy("Nom de la ville"),
+                "placeholder": "Nom de la ville",
                 "autocomplete": "off",
             }
         ),
@@ -29,19 +29,19 @@ class AddressFormMixin(forms.Form):
     address_line_1 = forms.CharField(
         required=False,
         max_length=User._meta.get_field("address_line_1").max_length,
-        label=gettext_lazy("Adresse"),
+        label="Adresse",
     )
 
     address_line_2 = forms.CharField(
         required=False,
         max_length=User._meta.get_field("address_line_2").max_length,
-        label=gettext_lazy("Complément d'adresse"),
+        label="Complément d'adresse",
     )
 
     post_code = forms.CharField(
         required=False,
         max_length=User._meta.get_field("post_code").max_length,
-        label=gettext_lazy("Code postal"),
+        label="Code postal",
     )
 
     def clean(self):
@@ -56,7 +56,7 @@ class AddressFormMixin(forms.Form):
             try:
                 cleaned_data["city"] = City.objects.get(slug=city).name
             except City.DoesNotExist:
-                raise forms.ValidationError(gettext_lazy("Cette ville n'existe pas."))
+                raise forms.ValidationError("Cette ville n'existe pas.")
         else:
             cleaned_data["city"] = city_name
 
@@ -70,7 +70,7 @@ class AddressFormMixin(forms.Form):
         valid = all([addr1, post_code, city]) or not any([addr1, addr2, post_code, city])
 
         if not valid:
-            raise ValidationError(gettext_lazy("Adresse incomplète"))
+            raise ValidationError("Adresse incomplète")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

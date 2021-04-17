@@ -46,8 +46,8 @@ class DeclareProlongationForm(forms.ModelForm):
 
     email = forms.EmailField(
         required=True,
-        label=gettext_lazy("E-mail du prescripteur habilité qui a autorisé cette prolongation"),
-        help_text=gettext_lazy(
+        label="E-mail du prescripteur habilité qui a autorisé cette prolongation",
+        help_text=(
             "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
         ),
     )
@@ -75,7 +75,7 @@ class DeclareProlongationForm(forms.ModelForm):
         }
         help_texts = {
             "end_at": mark_safe(
-                gettext_lazy(
+                (
                     "Date jusqu'à laquelle le PASS IAE doit être prolongé."
                     "<br>"
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
@@ -128,12 +128,12 @@ class SuspensionForm(forms.ModelForm):
         }
         help_texts = {
             "start_at": mark_safe(
-                gettext_lazy(
+                (
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
                     "<br>"
                     "La suspension ne peut pas commencer dans le futur."
                 )
             ),
-            "end_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
-            "reason_explanation": gettext_lazy("Obligatoire seulement en cas de force majeure."),
+            "end_at": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
+            "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }

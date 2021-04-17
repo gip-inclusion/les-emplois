@@ -44,14 +44,12 @@ class CreateSiaeForm(forms.ModelForm):
             "description",
         ]
         help_texts = {
-            "siret": gettext_lazy(
-                "Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."
-            ),
-            "kind": gettext_lazy("Votre nouvelle structure doit avoir le même type que votre structure actuelle."),
-            "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "phone": gettext_lazy("Par exemple 0610203040"),
-            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
-            "description": gettext_lazy("Texte de présentation de votre structure."),
+            "siret": ("Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."),
+            "kind": "Votre nouvelle structure doit avoir le même type que votre structure actuelle.",
+            "brand": "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche.",
+            "phone": "Par exemple 0610203040",
+            "website": "Votre site web doit commencer par http:// ou https://",
+            "description": "Texte de présentation de votre structure.",
         }
 
     def clean_kind(self):
@@ -153,13 +151,13 @@ class EditSiaeForm(forms.ModelForm):
             "department",
         ]
         help_texts = {
-            "brand": gettext_lazy(
+            "brand": (
                 "Si ce champ est renseigné, il sera utilisé en tant que nom "
                 "sur la fiche et dans les résultats de recherche."
             ),
-            "description": gettext_lazy("Texte de présentation de votre structure."),
-            "phone": gettext_lazy("Par exemple 0610203040"),
-            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
+            "description": "Texte de présentation de votre structure.",
+            "phone": "Par exemple 0610203040",
+            "website": "Votre site web doit commencer par http:// ou https://",
         }
 
     def save(self, commit=True):
@@ -178,7 +176,7 @@ class BlockJobApplicationsForm(forms.ModelForm):
     class Meta:
         model = Siae
         fields = ["block_job_applications"]
-        labels = {"block_job_applications": gettext_lazy("Ne plus recevoir de nouvelles candidatures")}
+        labels = {"block_job_applications": "Ne plus recevoir de nouvelles candidatures"}
 
     def save(self, commit=True):
         siae = super().save(commit=commit)

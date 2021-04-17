@@ -23,7 +23,7 @@ class UserExistsForm(forms.Form):
         self.user = None
 
     email = forms.EmailField(
-        label=gettext_lazy("E-mail personnel du candidat"), widget=forms.TextInput(attrs={"autocomplete": "off"})
+        label="E-mail personnel du candidat", widget=forms.TextInput(attrs={"autocomplete": "off"})
     )
 
     def clean_email(self):
@@ -59,8 +59,8 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         model = User
         fields = ["birthdate", "phone", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         help_texts = {
-            "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
-            "phone": gettext_lazy("Par exemple 0610203040."),
+            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
+            "phone": "Par exemple 0610203040.",
         }
 
     def clean(self):
@@ -109,8 +109,8 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "lack_of_pole_emploi_id_reason",
         ] + ResumeFormMixin.Meta.fields
         help_texts = {
-            "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
-            "phone": gettext_lazy("Par exemple 0610203040."),
+            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
+            "phone": "Par exemple 0610203040.",
         }
 
     def clean_email(self):
@@ -153,7 +153,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
             "selected_jobs": forms.CheckboxSelectMultiple(),
             "message": forms.Textarea(
                 attrs={
-                    "placeholder": gettext_lazy(
+                    "placeholder": (
                         "Message à destination de l’employeur (avec copie transmise au candidat)"
                         " et non modifiable après l’envoi : motivations du candidat, motifs d’orientation, "
                         "éléments du diagnostic socio-professionnel, ..."
@@ -161,7 +161,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
                 }
             ),
         }
-        labels = {"selected_jobs": gettext_lazy("Métiers recherchés (optionnel)")}
+        labels = {"selected_jobs": "Métiers recherchés (optionnel)"}
 
 
 class RefusalForm(forms.Form):
@@ -169,7 +169,7 @@ class RefusalForm(forms.Form):
     Allow an SIAE to specify a reason for refusal.
     """
 
-    ANSWER_INITIAL = gettext_lazy(
+    ANSWER_INITIAL = (
         "Nous avons étudié votre candidature avec la plus grande attention mais "
         "nous sommes au regret de vous informer que celle-ci n'a pas été retenue.\n\n"
         "Soyez assuré que cette décision ne met pas en cause vos qualités personnelles. "
@@ -179,16 +179,16 @@ class RefusalForm(forms.Form):
     )
 
     refusal_reason = forms.ChoiceField(
-        label=gettext_lazy("Motif du refus (ne sera pas envoyé au candidat)"),
+        label="Motif du refus (ne sera pas envoyé au candidat)",
         widget=forms.RadioSelect,
         choices=JobApplication.REFUSAL_REASON_CHOICES,
     )
     answer = forms.CharField(
-        label=gettext_lazy("Réponse envoyée au candidat"),
+        label="Réponse envoyée au candidat",
         widget=forms.Textarea(),
         strip=True,
         initial=ANSWER_INITIAL,
-        help_text=gettext_lazy("Vous pouvez modifier le texte proposé ou l'utiliser tel quel."),
+        help_text="Vous pouvez modifier le texte proposé ou l'utiliser tel quel.",
     )
 
 
@@ -198,10 +198,8 @@ class AnswerForm(forms.Form):
     """
 
     answer = forms.CharField(
-        label=gettext_lazy("Réponse"),
-        widget=forms.Textarea(
-            attrs={"placeholder": gettext_lazy("Votre réponse sera visible par le candidat et le prescripteur")}
-        ),
+        label="Réponse",
+        widget=forms.Textarea(attrs={"placeholder": "Votre réponse sera visible par le candidat et le prescripteur"}),
         required=False,
         strip=True,
     )
@@ -224,12 +222,12 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer", "hiring_without_approval"]
         help_texts = {
-            "hiring_start_at": gettext_lazy(
+            "hiring_start_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. Il n'est pas possible d'antidater un contrat. "
                 "Indiquez une date dans le futur."
             )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
-            "hiring_end_at": gettext_lazy(
+            "hiring_end_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. "
                 "Elle sert uniquement à des fins d'informations et est sans conséquence sur les déclarations "
                 "à faire dans l'extranet 2.0 de l'ASP."
@@ -284,13 +282,13 @@ class EditHiringDateForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at"]
         help_texts = {
-            "hiring_start_at": gettext_lazy(
+            "hiring_start_at": (
                 "Il n'est pas possible d'antidater un contrat. "
                 "Indiquez une date dans le futur. "
                 "Cette date peut-être repoussée de 30 jours au plus, "
                 "et avant la fin du PASS IAE éventuellement émis pour cette candidature."
             ),
-            "hiring_end_at": gettext_lazy(
+            "hiring_end_at": (
                 "Cette date sert uniquement à des fins d'informations et est sans conséquence"
                 " sur les déclarations à faire dans l'extranet 2.0 de l'ASP."
             ),
@@ -342,7 +340,7 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-        help_texts = {"birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978.")}
+        help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
     def clean(self):
         super().clean()
@@ -375,16 +373,16 @@ class FilterJobApplicationsForm(forms.Form):
     states = forms.MultipleChoiceField(
         required=False, choices=JobApplicationWorkflow.STATE_CHOICES, widget=forms.CheckboxSelectMultiple
     )
-    pass_iae_suspended = forms.BooleanField(label=gettext_lazy("PASS IAE suspendu"), required=False)
+    pass_iae_suspended = forms.BooleanField(label="PASS IAE suspendu", required=False)
     start_date = forms.DateField(
         input_formats=[DatePickerField.DATE_FORMAT],
-        label=gettext_lazy("Début"),
+        label="Début",
         required=False,
         widget=DatePickerField(),
     )
     end_date = forms.DateField(
         input_formats=[DatePickerField.DATE_FORMAT],
-        label=gettext_lazy("Fin"),
+        label="Fin",
         required=False,
         widget=DatePickerField(),
     )

@@ -10,10 +10,10 @@ class ResumeFormMixin(forms.Form):
     """
 
     resume_link = forms.URLField(
-        label=gettext_lazy("Indiquer le lien d'un CV existant"),
-        help_text=gettext_lazy("Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)"),
+        label="Indiquer le lien d'un CV existant",
+        help_text="Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)",
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("https://www.mon_cv.fr/dfROS")}),
+        widget=forms.TextInput(attrs={"placeholder": "https://www.mon_cv.fr/dfROS"}),
     )
 
     class Meta:

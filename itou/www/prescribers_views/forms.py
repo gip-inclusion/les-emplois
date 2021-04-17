@@ -47,10 +47,10 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
             "description",
         ]
         help_texts = {
-            "siret": gettext_lazy("Le numéro SIRET contient 14 chiffres."),
-            "phone": gettext_lazy("Par exemple 0610203040"),
-            "description": gettext_lazy("Texte de présentation de votre structure."),
-            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
+            "siret": "Le numéro SIRET contient 14 chiffres.",
+            "phone": "Par exemple 0610203040",
+            "description": "Texte de présentation de votre structure.",
+            "website": "Votre site web doit commencer par http:// ou https://",
         }
 
     def clean_siret(self):

@@ -10,7 +10,7 @@ class ConfirmEligibilityForm(forms.Form):
     """
 
     confirm = forms.BooleanField(
-        label=gettext_lazy(
+        label=(
             "Je confirme que le candidat remplit les critères d'éligibilité à l'IAE et "
             "m'engage à fournir les justificatifs correspondants en cas de contrôle a posteriori."
         )
@@ -35,18 +35,16 @@ class AdministrativeCriteriaForm(forms.Form):
     NAME_DELD_12 = "DELD (12-24 mois)"
     NAMES = [NAME_SENIOR, NAME_JUNIOR, NAME_DETLD_24, NAME_DELD_12]
 
-    ERROR_CRITERIA_NUMBER = gettext_lazy(
+    ERROR_CRITERIA_NUMBER = (
         "Vous devez sélectionner au moins un critère administratif de niveau 1 "
         "ou le cumul d'au moins trois critères de niveau 2."
     )
-    ERROR_CRITERIA_NUMBER_ETTI = gettext_lazy(
+    ERROR_CRITERIA_NUMBER_ETTI = (
         "Vous devez sélectionner au moins un critère administratif de niveau 1 "
         "ou le cumul d'au moins deux critères de niveau 2."
     )
-    ERROR_SENIOR_JUNIOR = gettext_lazy(
-        f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_SENIOR} et {NAME_JUNIOR}."
-    )
-    ERROR_LONG_TERM_JOB_SEEKER = gettext_lazy(
+    ERROR_SENIOR_JUNIOR = f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_SENIOR} et {NAME_JUNIOR}."
+    ERROR_LONG_TERM_JOB_SEEKER = (
         f"Vous ne pouvez pas sélectionner en même temps les critères {NAME_DETLD_24} et {NAME_DELD_12}."
     )
 
