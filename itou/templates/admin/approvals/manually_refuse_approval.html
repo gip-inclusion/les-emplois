@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<p>{% trans "En confirmant le refus, cet email sera envoyé à la personne ayant accepté la candidature :" %}</p>
+<p>En confirmant le refus, cet email sera envoyé à la personne ayant accepté la candidature :</p>
 
 <pre>
 {{ email_subject_template }}<br>
@@ -15,8 +15,8 @@
 
     <div>
         <input type="hidden" name="confirm" value="yes">
-        <input type="submit" value="{% trans "Oui, je confirme le refus" %}">
-        <a href="{% url "admin:approvals_approval_manually_add_approval" job_application.id %}" class="button cancel-link">{% trans "Non, revenir à la page précédente" %}</a>
+        <input type="submit" value="Oui, je confirme le refus"">
+        <a href="{% url "admin:approvals_approval_manually_add_approval" job_application.id %}" class="button cancel-link">Non, revenir à la page précédente</a>
     </div>
 
 </form>
