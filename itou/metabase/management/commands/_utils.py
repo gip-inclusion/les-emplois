@@ -29,9 +29,10 @@ def get_choice(choices, key):
     # due to laxy_gettext and psycopg2 not going well together.
     # See https://code.djangoproject.com/ticket/13965
     if key in choices:
-        return gettext(choices[key])
+        # FIXME: we dropped translations, this should be easier now.
+        # return gettext(choices[key])
+        return choices[key]
     return None
-
 
 def chunks(items, n):
     """
