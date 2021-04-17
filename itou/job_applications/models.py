@@ -216,11 +216,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     ERROR_START_IN_PAST = "Il n'est pas possible d'antidater un contrat. Indiquez une date dans le futur."
     ERROR_END_IS_BEFORE_START = "La date de fin du contrat doit être postérieure à la date de début."
-    ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
-    ERROR_START_AFTER_APPROVAL_END = _(
+    ERROR_DURATION_TOO_LONG = f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
+    ERROR_START_AFTER_APPROVAL_END = (
         "Attention, le PASS IAE sera expiré lors du début du contrat. Veuillez modifier la date de début."
     )
-    ERROR_POSTPONE_TOO_FAR = _(
+    ERROR_POSTPONE_TOO_FAR = (
         f"La date de début du contrat ne peut être repoussée de plus de {MAX_CONTRACT_POSTPONE_IN_DAYS} jours."
     )
 

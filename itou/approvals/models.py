@@ -200,7 +200,7 @@ class Approval(CommonApprovalMixin):
         already_exists = bool(self.pk)
         if not already_exists and hasattr(self, "user") and self.user.approvals.valid().exists():
             raise ValidationError(
-                _(
+                (
                     f"Un agrément dans le futur ou en cours de validité existe déjà "
                     f"pour {self.user.get_full_name()} ({self.user.email})."
                 )
@@ -389,7 +389,7 @@ class Suspension(models.Model):
         DETOXIFICATION = "DETOXIFICATION", "Période de cure pour désintoxication"
         FORCE_MAJEURE = (
             "FORCE_MAJEURE",
-            _(
+            (
                 "Raison de force majeure conduisant le salarié à quitter son emploi ou toute autre "
                 "situation faisant l'objet d'un accord entre les acteurs membres du CTA"
             ),
@@ -477,7 +477,7 @@ class Suspension(models.Model):
         if self.end_at > max_end_at:
             raise ValidationError(
                 {
-                    "end_at": _(
+                    "end_at": (
                         f"La durée totale ne peut excéder {self.MAX_DURATION_MONTHS} mois. "
                         f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
                     )
@@ -490,7 +490,7 @@ class Suspension(models.Model):
             if not self.start_in_approval_boundaries:
                 raise ValidationError(
                     {
-                        "start_at": _(
+                        "start_at": (
                             f"La suspension ne peut pas commencer en dehors des limites du PASS IAE "
                             f"{self.approval.start_at.strftime('%d/%m/%Y')} - "
                             f"{self.approval.end_at.strftime('%d/%m/%Y')}."
@@ -506,7 +506,7 @@ class Suspension(models.Model):
                 overlap = self.get_overlapping_suspensions().first()
                 raise ValidationError(
                     {
-                        "start_at": _(
+                        "start_at": (
                             f"La période chevauche une suspension déjà existante pour ce PASS IAE "
                             f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
                         )
@@ -616,7 +616,7 @@ class Prolongation(models.Model):
         SENIOR = "SENIOR", "50 ans et plus (12 mois maximum)"
         PARTICULAR_DIFFICULTIES = (
             "PARTICULAR_DIFFICULTIES",
-            _(
+            (
                 "Difficultés particulières qui font obstacle à l'insertion durable dans l’emploi "
                 "(12 mois maximum dans la limite de 5 ans)"
             ),
@@ -733,7 +733,7 @@ class Prolongation(models.Model):
         if self.end_at > max_end_at:
             raise ValidationError(
                 {
-                    "end_at": _(
+                    "end_at": (
                         f'La durée totale est trop longue pour le motif "{self.get_reason_display()}". '
                         f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
                     )
@@ -745,7 +745,7 @@ class Prolongation(models.Model):
                 self.declared_by_siae.KIND_AI,
                 self.declared_by_siae.KIND_ACI,
             ]:
-                raise ValidationError(_(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.'))
+                raise ValidationError(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.')
 
         if (
             hasattr(self, "validated_by")
@@ -763,7 +763,7 @@ class Prolongation(models.Model):
             if self.get_overlapping_prolongations().exists():
                 overlap = self.get_overlapping_prolongations().first()
                 raise ValidationError(
-                    _(
+                    (
                         f"La période chevauche une prolongation déjà existante pour ce PASS IAE "
                         f"{overlap.start_at.strftime('%d/%m/%Y')} - {overlap.end_at.strftime('%d/%m/%Y')}."
                     )
@@ -771,7 +771,7 @@ class Prolongation(models.Model):
 
             if self.has_reached_max_cumulative_duration(additional_duration=self.duration):
                 raise ValidationError(
-                    _(
+                    (
                         f"Vous ne pouvez pas cumuler des prolongations pendant plus de "
                         f'{self.MAX_CUMULATIVE_DURATION[self.reason]["label"]} '
                         f'pour le motif "{self.get_reason_display()}".'
@@ -1030,13 +1030,13 @@ class ApprovalsWrapper:
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
 
     # Error messages.
-    ERROR_CANNOT_OBTAIN_NEW_FOR_USER = _(
+    ERROR_CANNOT_OBTAIN_NEW_FOR_USER = (
         "Vous avez terminé un parcours il y a moins de deux ans. "
         "Pour prétendre à nouveau à un parcours en structure d'insertion "
         "par l'activité économique vous devez rencontrer un prescripteur "
         "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
     )
-    ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = _(
+    ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = (
         "Le candidat a terminé un parcours il y a moins de deux ans. "
         "Pour prétendre à nouveau à un parcours en structure d'insertion "
         "par l'activité économique il doit rencontrer un prescripteur "

@@ -86,7 +86,7 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
             )
             message = __(message_singular, message_plural, count) % {"count": count}
             expiration_date = formats.date_format(invitations[0].expiration_date)
-            message += _(f"Le lien de validation est valable jusqu'au {expiration_date}.")
+            message += f"Le lien de validation est valable jusqu'au {expiration_date}."
             message = safestring.mark_safe(message)
             messages.success(request, message)
 
@@ -109,7 +109,7 @@ def join_prescriber_organization(request, invitation_id):
         invitation.add_invited_user_to_organization()
         invitation.accept()
         messages.success(
-            request, _(f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}.")
+            request, f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}."
         )
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
@@ -142,7 +142,7 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
             )
             message = __(message_singular, message_plural, count) % {"count": count}
             expiration_date = formats.date_format(invitations[0].expiration_date)
-            message += _(f"Le lien de validation est valable jusqu'au {expiration_date}.")
+            message += f"Le lien de validation est valable jusqu'au {expiration_date}."
             message = safestring.mark_safe(message)
             messages.success(request, message)
 
@@ -166,7 +166,7 @@ def join_siae(request, invitation_id):
     elif invitation.can_be_accepted:
         invitation.add_invited_user_to_siae()
         invitation.accept()
-        messages.success(request, _(f"Vous êtes désormais membre de la structure {invitation.siae.display_name}."))
+        messages.success(request, f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
 

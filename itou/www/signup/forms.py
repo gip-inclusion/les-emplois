@@ -96,7 +96,7 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["email"].widget.attrs["placeholder"] = "Adresse e-mail professionnelle"
-        self.fields["email"].help_text = _(
+        self.fields["email"].help_text = (
             "Utilisez plutôt votre adresse e-mail professionnelle, "
             "cela nous permettra de vous identifier plus facilement comme membre de cette structure."
         )
@@ -276,10 +276,10 @@ class PrescriberSiretForm(forms.Form):
         # Does an org with this SIRET already exist?
         org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
         if org:
-            error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
+            error = f'"{org.display_name}" utilise déjà ce SIRET.'
             admin = org.get_admins().first()
             if admin:
-                error += _(
+                error += (
                     f" "
                     f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
                     f"{admin.first_name.title()} {admin.last_name[0].upper()}."
@@ -356,7 +356,7 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         self.pole_emploi_org = kwargs.pop("pole_emploi_org")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = _(f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
+        self.fields["email"].help_text = f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
 
     def clean_email(self):
         email = super().clean_email()

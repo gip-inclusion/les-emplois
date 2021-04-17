@@ -115,7 +115,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         CHU = "CHU", "CHU - Centre d'hébergement d'urgence"
         OACAS = (
             "OACAS",
-            _(
+            (
                 "OACAS - Structure porteuse d'un agrément national organisme "
                 "d'accueil communautaire et d'activité solidaire"
             ),

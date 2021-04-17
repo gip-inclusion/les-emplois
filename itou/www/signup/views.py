@@ -95,7 +95,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
     if request.method == "POST" and siae_select_form and siae_select_form.is_valid():
         siae_selected = siae_select_form.cleaned_data["siaes"]
         siae_selected.new_signup_activation_email_to_official_contact(request).send()
-        message = _(
+        message = (
             f"Nous venons d'envoyer un e-mail à l'adresse {siae_selected.obfuscated_auth_email} "
             f"pour continuer votre inscription. Veuillez consulter votre boite "
             f"de réception."

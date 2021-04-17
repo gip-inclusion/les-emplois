@@ -41,7 +41,7 @@ class DeclareProlongationForm(forms.ModelForm):
         max_end_at_str = Prolongation.get_max_end_at(self.instance.start_at).strftime("%Y/%m/%d")
         self.fields["end_at"].widget = DatePickerField({"minDate": min_end_at_str, "maxDate": max_end_at_str})
         self.fields["end_at"].input_formats = [DatePickerField.DATE_FORMAT]
-        self.fields["end_at"].label = _(f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au')
+        self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
     email = forms.EmailField(
         required=True,

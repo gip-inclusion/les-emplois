@@ -208,7 +208,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 messages.success(
                     request,
                     mark_safe(
-                        _(
+                        (
                             "Embauche acceptée ! "
                             "(Pour un contrat de professionnalisation vous pouvez soit introduire une "
                             "demande d’aide au poste ou demander l’aide spécifique de Pôle emploi "
@@ -220,7 +220,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 )
                 messages.success(
                     request,
-                    _(
+                    (
                         "Le numéro de PASS IAE peut être utilisé pour la déclaration "
                         "de la personne dans l'extranet IAE 2.0 de l'ASP."
                     ),
@@ -230,7 +230,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 messages.success(
                     request,
                     mark_safe(
-                        _(
+                        (
                             "Votre demande de Pass IAE est en cours de vérification auprès de nos équipes.<br>"
                             "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
                             "<a href='" + link + "'>consulter notre espace documentation</a>."

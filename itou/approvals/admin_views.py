@@ -67,9 +67,7 @@ def manually_add_approval(
         job_application.approval = approval
         job_application.save()
         job_application.manually_deliver_approval(delivered_by=request.user)
-        messages.success(
-            request, _(f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
-        )
+        messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     context = {

@@ -32,7 +32,7 @@ class ResumeFormMixin(forms.Form):
         match = re.search(pole_emploi_pattern, resume_link)
         if match:
             error = forms.ValidationError(
-                _(
+                (
                     "Les CV hébergés par l'intranet de Pôle emploi ne sont pas publics. "
                     "Indiquez une autre adresse ou laissez ce champ vide pour continuer."
                 )

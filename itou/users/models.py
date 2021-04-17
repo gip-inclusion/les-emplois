@@ -57,10 +57,8 @@ class User(AbstractUser, AddressMixin):
     )
 
     ERROR_EMAIL_ALREADY_EXISTS = "Cet e-mail existe déjà."
-    ERROR_MUST_PROVIDE_BIRTH_PLACE = _(
-        "Si le pays de naissance est la France, la commune de naissance est obligatoire"
-    )
-    ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = _(
+    ERROR_MUST_PROVIDE_BIRTH_PLACE = "Si le pays de naissance est la France, la commune de naissance est obligatoire"
+    ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = (
         "Il n'est pas possible de saisir une commune de naissance hors de France"
     )
 
@@ -130,7 +128,7 @@ class User(AbstractUser, AddressMixin):
     lack_of_pole_emploi_id_reason = models.CharField(
         verbose_name="Pas d'identifiant Pôle emploi ?",
         help_text=mark_safe(
-            _(
+            (
                 "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
                 "Renseigner l'identifiant Pôle emploi des candidats inscrits "
                 "permet d'instruire instantanément votre demande.<br>"
@@ -382,13 +380,11 @@ class JobSeekerProfile(models.Model):
     with Hexa norms (but compliant enough to be accepted by ASP backend).
     """
 
-    ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = _(
-        "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
-    )
-    ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD = _(
+    ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
+    ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD = (
         "La personne ne peut avoir de période sans emploi si actuellement employée"
     )
-    ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = _(
+    ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = (
         "La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"
     )
 

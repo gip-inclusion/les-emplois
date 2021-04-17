@@ -138,7 +138,7 @@ class SiaeSignupTest(TestCase):
             next_url = reverse("signup:siae_select")
             self.assertEqual(redirect_url, next_url)
             self.assertEqual(response.status_code, 200)
-            expected_message = _(
+            expected_message = (
                 "Ce lien d'inscription est invalide ou a expiré. " "Veuillez procéder à une nouvelle inscription."
             )
             self.assertContains(response, escape(expected_message))

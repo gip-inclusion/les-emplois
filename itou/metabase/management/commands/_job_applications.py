@@ -1,4 +1,3 @@
-
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import anonymize, get_choice, get_department_and_region_columns
 
