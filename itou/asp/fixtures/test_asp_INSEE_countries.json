@@ -1,0 +1,202 @@
+[
+  {
+    "model": "asp.Country",
+    "pk": 308,
+    "fields": {
+      "code": 443,
+      "name": "BONAIRE, SAINT EUSTACHE ET SABA",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 19,
+    "fields": {
+      "code": 721,
+      "name": "HIKUERU",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 31,
+    "fields": {
+      "code": 733,
+      "name": "PAEA",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 2,
+    "fields": {
+      "code": 412,
+      "name": "ARCHIPEL DES KERGUELEN",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 236,
+    "fields": {
+      "code": 334,
+      "name": "MALAWI",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 107,
+    "fields": {
+      "code": 116,
+      "name": "TCHEQUE (REPUBLIQUE)",
+      "group": 2,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 46,
+    "fields": {
+      "code": 748,
+      "name": "TAIARAPU-OUEST",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 97,
+    "fields": {
+      "code": 106,
+      "name": "ESTONIE",
+      "group": 2,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 20,
+    "fields": {
+      "code": 722,
+      "name": "HITIAA O TE RA",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 59,
+    "fields": {
+      "code": 803,
+      "name": "BOURAIL",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 325,
+    "fields": {
+      "code": 515,
+      "name": "MARSHALL (ILES)",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 45,
+    "fields": {
+      "code": 747,
+      "name": "TAIARAPU-EST",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 5,
+    "fields": {
+      "code": 415,
+      "name": "ILES EPARSES DE L'OCEAN INDIEN",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 310,
+    "fields": {
+      "code": 445,
+      "name": "SAINT-MARTIN (PARTIE NEERLANDAISE)",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 16,
+    "fields": {
+      "code": 718,
+      "name": "FATU-HIVA",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 228,
+    "fields": {
+      "code": 326,
+      "name": "COTE D'IVOIRE",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 54,
+    "fields": {
+      "code": 756,
+      "name": "UA-HUKA",
+      "group": 1,
+      "department": 98
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 253,
+    "fields": {
+      "code": 351,
+      "name": "TUNISIE",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 188,
+    "fields": {
+      "code": 248,
+      "name": "QATAR",
+      "group": 3,
+      "department": 99
+    }
+  },
+  {
+    "model": "asp.Country",
+    "pk": 278,
+    "fields": {
+      "code": 413,
+      "name": "PANAMA",
+      "group": 3,
+      "department": 99
+    }
+  }
+]

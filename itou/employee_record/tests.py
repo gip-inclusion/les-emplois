@@ -242,7 +242,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
     - ...
     """
 
-    fixtures = ["test_INSEE_communes.json", "asp_countries.json"]
+    fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download(self):
