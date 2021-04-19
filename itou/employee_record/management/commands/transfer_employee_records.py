@@ -10,7 +10,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
-from itou.employee_record.serializers import EmployeeRecordBatchSerializer
+from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
 
 
@@ -149,10 +149,10 @@ class Command(BaseCommand):
                 self.logger.error("Could not upload file: '%s', reason: %s", remote_path, ex)
                 return
 
-            # Now that file is transfered, update employee records satus (SENT)
-            for employee_record in employee_records:
-                employee_record.status = EmployeeRecord.Status.SENT
-                employee_record.save()
+            # Now that file is transfered, update employee records status (SENT)
+            # and store in which file they have been sent
+            for idx, employee_record in enumerate(employee_records, 1):
+                employee_record.sent_in_asp_batch_file(remote_path, idx)
 
     def _update_employee_records_status(self, feedback_file_name, employee_records_batch):
         """
@@ -162,6 +162,7 @@ class Command(BaseCommand):
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file_name)
         success_code = "0000"
+        renderer = JSONRenderer()
 
         for batch in employee_records_batch:
             self.logger.info("Processing ASP feedback file: %s", feedback_file_name)
@@ -189,6 +190,7 @@ class Command(BaseCommand):
 
                 # Now we must find the matching FS
                 employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
+
                 if not employee_record:
                     self.logger.error(
                         "Could not get existing employee record data: BATCH_FILE=%s, LINE_NUMBER=%s",
@@ -198,7 +200,14 @@ class Command(BaseCommand):
                     continue
 
                 if processing_code == success_code:
-                    employee_record.accepted_by_asp(processing_code, processing_label)
+
+                    # Archive JSON copy of employee record
+                    serializer = EmployeeRecordSerializer(employee_record)
+                    employee_record.accepted_by_asp(
+                        processing_code, processing_label, renderer.render(serializer.data).decode()
+                    )
+
+                    continue
 
                 employee_record.rejected_by_asp(processing_code, processing_label)
 
@@ -224,15 +233,16 @@ class Command(BaseCommand):
                 self.logger.info("No result files found")
             else:
                 self.logger.info("Processed %s files", len(result_files))
+
                 # Post process file
                 self._update_employee_records_status(result_file, results)
 
+                self.logger.info("Removing %s from SFTP server", result_file)
                 # TODO: conn.remove(result_file)
                 # Once all ok
 
     def _process_result_stream(self, result_stream):
         result = JSONParser().parse(result_stream)
-        # self.logger.info(result)
         return result
 
     def handle(self, dry_run=False, upload=True, download=True, test=True, verbosity=1, **options):
