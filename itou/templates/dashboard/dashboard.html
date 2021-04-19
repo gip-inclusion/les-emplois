@@ -30,8 +30,18 @@
                 La DGEFP nous indique que votre structure n'est plus conventionnée.
                 Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
                 A compter du {{ grace_period_end_date }}, l'accès à ce tableau de bord ne sera plus possible.
-                Pour toute question, veuillez contacter notre support.
             {% endblocktranslate %}
+            {% if user_is_siae_admin %}
+                {% trans "Veuillez dès que possible régulariser votre situation" %}
+                <a href="{% url 'siaes_views:show_financial_annexes' %}">{% translate "en sélectionnant une annexe financière valide" %}</a>.
+            {% else %}
+                {% with current_siae.active_admin_members.first as admin %}
+                    {% blocktranslate with first_name=admin.first_name|title last_name=admin.last_name|title %}
+                        Veuillez contacter un de vos administrateurs (par exemple {{ first_name }} {{ last_name }}) pour qu'il ou elle régularise la situation de votre structure.
+                    {% endblocktranslate %}
+                {% endwith %}
+            {% endif %}
+            {% trans "Pour toute question, veuillez contacter notre support." %}
         </div>
     {% endif %}
 
@@ -136,7 +146,7 @@
                 {% endif %}
             {% endwith %}
 
-        {% endif %}
+        {% endif %}{# end of if user.is_job_seeker #}
 
         {% if user.is_prescriber %}
 
@@ -202,9 +212,10 @@
                 </div>
             </div>
 
-        {% endif %}
+        {% endif %}{# end of if user.is_prescriber #}
 
         {% if user.is_siae_staff %}
+
             <div class="card">
                 <h5 class="card-header">
                     {% translate "Ma structure" %}
@@ -235,6 +246,25 @@
                             {% translate "Publier/gérer les fiches de postes" %}
                         </a>
                     </p>
+                    {% if can_show_financial_annexes %}
+                        {# step 1 : (April 19th 2021) : show dashboard link only to inactive siaes #}
+                        {# step 2 : (April 22th 2021 most likely) : show dashboard link to everyone #}
+                        {# these 2 steps are designed to prevent potential support overload #}
+                        {% if not current_siae.is_active %}
+                            <p class="card-text">
+                                {% include "includes/icon.html" with icon="check-circle" %}
+                                <a href="{% url 'siaes_views:show_financial_annexes' %}">
+                                    {% translate "Mes annexes financières" %}
+                                </a>
+                                <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                                {% if not current_siae.is_active %}
+                                    <span class="badge badge-danger">
+                                        {% translate "Action requise" %}
+                                    </span>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                    {% endif %}
                     {% if current_siae.is_active and user_is_siae_admin %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
@@ -243,6 +273,7 @@
                     {% endif %}
                 </div>
             </div>
+
             <div class="card">
                 <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
                 <div class="card-body">
@@ -287,9 +318,11 @@
                     {% endif %}
                 </div>
             </div>
-        {% endif %}
+
+        {% endif %}{# end of if user.is_siae_staff #}
 
         {% if user.is_stats_vip or user.is_superuser %}
+
             <div class="card">
                 <h5 class="card-header">{% translate "Statistiques et pilotage" %}</h5>
                 <div class="card-body">
@@ -307,6 +340,7 @@
                     </p>
                 </div>
             </div>
+
         {% endif %}
 
     </div>

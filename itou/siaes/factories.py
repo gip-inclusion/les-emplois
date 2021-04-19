@@ -15,6 +15,20 @@ NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
 NOW = timezone.now()
 GRACE_PERIOD = timezone.timedelta(days=models.SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
 ONE_DAY = timezone.timedelta(days=1)
+ONE_MONTH = timezone.timedelta(days=30)
+
+
+class SiaeFinancialAnnexFactory(factory.django.DjangoModelFactory):
+    """Generate an SiaeFinancialAnnex() object for unit tests."""
+
+    class Meta:
+        model = models.SiaeFinancialAnnex
+
+    # e.g. EI59V182019A1M1
+    number = factory.fuzzy.FuzzyText(length=6, chars=string.digits, prefix="EI59V", suffix="A1M1")
+    state = models.SiaeFinancialAnnex.STATE_VALID
+    start_at = NOW - ONE_MONTH
+    end_at = NOW + ONE_MONTH
 
 
 class SiaeConventionFactory(factory.django.DjangoModelFactory):
@@ -28,6 +42,7 @@ class SiaeConventionFactory(factory.django.DjangoModelFactory):
     kind = models.Siae.KIND_EI
     asp_id = factory.Sequence(int)
     is_active = True
+    financial_annex = factory.RelatedFactory(SiaeFinancialAnnexFactory, "convention")
 
 
 class SiaeFactory(factory.django.DjangoModelFactory):

@@ -27,9 +27,13 @@ class ItouCurrentOrganizationMiddleware:
                 siae_set = user.siae_set.filter(siaemembership__is_active=True).active_or_in_grace_period()
 
                 if not siae_set.filter(pk=current_siae_pk).exists():
-                    first_active_siae = siae_set.first()
-                    if first_active_siae:
-                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_active_siae.pk
+                    # User is no longer an active member of siae stored in session,
+                    # or siae stored in session no longer exists.
+                    # Let's automatically switch to another siae when possible,
+                    # preferably an active one.
+                    first_siae = siae_set.active().first() or siae_set.first()
+                    if first_siae:
+                        request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = first_siae.pk
                     elif (
                         request.path
                         not in [

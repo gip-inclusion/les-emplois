@@ -19,26 +19,38 @@ from itou.utils.validators import validate_af_number, validate_naf, validate_sir
 
 
 class SiaeQuerySet(models.QuerySet):
-    def active(self):
-        # `~` means NOT, similarly to dataframes.
-        return self.select_related("convention").filter(
+    @property
+    def active_lookup(self):
+        return (
             # GEIQ, EA, ACIPHC... have no convention logic and thus are always active.
+            # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=Siae.ASP_MANAGED_KINDS)
-            # User created siaes and staff created siaes do not yet
-            # have convention logic and thus are always active.
-            | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
-            # A siae of ASP source is active if and only if it has an active convention.
+            # Staff created siaes are always active until eventually
+            # converted to ASP source siaes by import_siae script.
+            # Such siaes are created by our staff when ASP data is lacking
+            # the most recent data about them.
+            | Q(source=Siae.SOURCE_STAFF_CREATED)
+            # ASP source siaes and user created siaes are active if and only
+            # if they have an active convention.
             | Q(convention__is_active=True)
         )
+
+    def active(self):
+        return self.select_related("convention").filter(self.active_lookup)
 
     def active_or_in_grace_period(self):
         now = timezone.now()
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
-            ~Q(kind__in=Siae.ASP_MANAGED_KINDS)
-            | Q(source__in=[Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED])
-            | Q(convention__is_active=True)
-            # Here we include siaes experiencing their grace period as well.
+            self.active_lookup
+            # All user created siaes should have a convention but a small
+            # number of them (79 as of April 2021) don't because they
+            # were created before convention assignment was automated.
+            # This number will only decrease over time as siae admin users
+            # select their convention.
+            # We consider them as experiencing their grace period.
+            | Q(source=Siae.SOURCE_USER_CREATED, convention__isnull=True)
+            # Include siaes experiencing their grace period.
             | Q(convention__deactivated_at__gte=now - grace_period)
         )
 
@@ -243,9 +255,14 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if not self.is_asp_managed:
             # GEIQ, EA, ACIPHC... have no convention logic and thus are always active.
             return True
-        if self.source in [Siae.SOURCE_USER_CREATED, Siae.SOURCE_STAFF_CREATED]:
-            # User created siaes and staff created siaes do not yet have convention logic.
+        if self.source == Siae.SOURCE_STAFF_CREATED:
+            # Staff created siaes are always active until eventually
+            # converted to ASP source siaes by import_siae script.
+            # Such siaes are created by our staff when ASP data is lacking
+            # the most recent data about them.
             return True
+        # ASP source siaes and user created siaes are active if and only
+        # if they have an active convention.
         return self.convention and self.convention.is_active
 
     @property
@@ -399,13 +416,62 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     @property
     def grace_period_end_date(self):
-        return self.convention.deactivated_at + timezone.timedelta(
-            days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS
-        )
+        """
+        This method is only called for inactive siaes,
+        in other words siaes during or after their grace period,
+        to figure out the exact end date of their grace period.
+        """
+        # This should never happen but let's be defensive in this case.
+        if self.is_active:
+            return timezone.now() + timezone.timedelta(days=365)
+
+        if self.source == self.SOURCE_USER_CREATED and not self.convention:
+            # All user created siaes should have a convention but a small
+            # number of them (79 as of April 2021) don't because they
+            # were created before convention assignment was automated.
+            # This number will only decrease over time as siae admin users
+            # select their convention.
+            # We consider them as experiencing their grace period.
+            return timezone.now() + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+
+        grace_period_start_date = self.convention.deactivated_at
+        return grace_period_start_date + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
 
     @property
     def grace_period_has_expired(self):
         return not self.is_active and timezone.now() > self.grace_period_end_date
+
+    def convention_can_be_accessed_by(self, user):
+        """
+        Decides whether the user can show the siae convention or not.
+        In other words, whether the user can access the "My AFs" interface.
+        Note that the convention itself does not necessarily exist yet
+        e.g. in the case of old user created siaes without convention yet.
+        """
+        if not self.has_admin(user):
+            return False
+        if not self.is_asp_managed:
+            # AF interfaces only makes sense for SIAE, not for GEIQ EA ACIPHC etc.
+            return False
+        if self.source not in [self.SOURCE_ASP, self.SOURCE_USER_CREATED]:
+            # AF interfaces do not make sense for staff created siaes, which
+            # have no convention yet, and will eventually be converted into
+            # siaes of ASP source by `import_siae.py` script.
+            return False
+        return True
+
+    def convention_can_be_changed_by(self, user):
+        """
+        Decides whether the user can change the siae convention or not.
+        In other words, whether the user can not only access the "My AFs" interface
+        but also use it to select a different convention for the siae.
+        """
+        if not self.convention_can_be_accessed_by(user):
+            return False
+        # The link between an ASP source siae and its convention
+        # is immutable. Only user created siaes can have their
+        # convention changed by the user.
+        return self.source == self.SOURCE_USER_CREATED
 
 
 class SiaeMembershipQuerySet(models.QuerySet):
@@ -761,6 +827,37 @@ class SiaeFinancialAnnex(models.Model):
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def number_prefix(self):
+        return self.number[:-4]  # all but last 4 characters
+
+    @property
+    def number_prefix_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        prefix = self.number_prefix
+        return f"{prefix[:-9]} {prefix[-9:-6]} {prefix[-6:-4]} {prefix[-4:]}"
+
+    @property
+    def number_suffix(self):
+        return self.number[-4:]  # last 4 characters
+
+    @property
+    def number_suffix_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        suffix = self.number_suffix
+        return f"{suffix[:-2]} {suffix[-2:]}"
+
+    @property
+    def number_with_spaces(self):
+        """
+        Insert spaces to format the number.
+        """
+        return f"{self.number_prefix_with_spaces} {self.number_suffix_with_spaces}"
 
     @property
     def is_active(self):
