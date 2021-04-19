@@ -242,6 +242,7 @@ def prescriber_choose_org(request, template_name="signup/prescriber_choose_org.h
                 "safir_code": None,
             }
         )
+        request.session.modified = True
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -289,6 +290,7 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
                 "safir_code": None,
             }
         )
+        request.session.modified = True
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -322,6 +324,7 @@ def prescriber_confirm_authorization(request, template_name="signup/prescriber_c
                 "safir_code": None,
             }
         )
+        request.session.modified = True
         next_url = reverse("signup:prescriber_siret")
         return HttpResponseRedirect(next_url)
 
@@ -353,6 +356,7 @@ def prescriber_pole_emploi_safir_code(request, template_name="signup/prescriber_
                 "safir_code": form.cleaned_data["safir_code"],
             }
         )
+        request.session.modified = True
         next_url = reverse("signup:prescriber_pole_emploi_user")
         return HttpResponseRedirect(next_url)
 
@@ -381,6 +385,7 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data
+        request.session.modified = True
         next_url = reverse("signup:prescriber_user")
         return HttpResponseRedirect(next_url)
 
