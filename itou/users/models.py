@@ -480,11 +480,11 @@ class JobSeekerProfile(models.Model):
         default="",
         choices=LaneExtension.choices,
     )
+    # No need to set blank=True, this field is never used with a text choice
     hexa_non_std_extension = models.CharField(
         max_length=10,
         verbose_name="Extension de voie (non-repertoriée)",
-        blank=True,
-        default="",
+        null=True,
     )
     hexa_lane_type = models.CharField(
         max_length=4,
@@ -589,7 +589,6 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(error)
 
         # Fill matching fields
-        # Must override None value with empty string# (field not null)
         self.hexa_lane_type = result.get("lane_type")
         self.hexa_lane_number = result.get("number")
         self.hexa_std_extension = result.get("std_extension")
@@ -603,6 +602,8 @@ class JobSeekerProfile(models.Model):
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
+
+        self.save()
 
         return self
 
