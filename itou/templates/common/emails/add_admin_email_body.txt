@@ -1,22 +1,19 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
-{% translate "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" %}
+Vous êtes administrateur d'une structure sur les emplois de l'inclusion
 
-{% blocktranslate %}
 Un administrateur peut ajouter ou retirer :
 - des collaborateurs 
 - des administrateurs
-{% endblocktranslate %}
 
-{% translate "Structure :" %}
+Structure :
 
-- {% translate "Nom" %} : {{ structure.display_name }}
-- {% translate "Type" %} : {{ structure.kind }}
-- {% translate "Email de contact" %} : {{ structure.email }}
+- Nom : {{ structure.display_name }}
+- Type : {{ structure.kind }}
+- Email de contact : {{ structure.email }}
 
-{% translate "Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs de cette structure sur les emplois de l'inclusion." %}
+Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs de cette structure sur les emplois de l'inclusion.
 
 {% endblock body %}
