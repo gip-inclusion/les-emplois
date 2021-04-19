@@ -132,13 +132,13 @@ class EmployeeRecordModelTest(TestCase):
         filename = "RIAE_FS_20210410130000.json"
         employee_record = EmployeeRecordFactory(asp_batch_file=filename, asp_batch_line_number=2)
 
-        self.assertEquals(EmployeeRecord.objects.find_by_batch("X", 3).count(), 0)
-        self.assertEquals(EmployeeRecord.objects.find_by_batch(filename, 3).count(), 0)
-        self.assertEquals(EmployeeRecord.objects.find_by_batch("X", 2).count(), 0)
+        self.assertEqual(EmployeeRecord.objects.find_by_batch("X", 3).count(), 0)
+        self.assertEqual(EmployeeRecord.objects.find_by_batch(filename, 3).count(), 0)
+        self.assertEqual(EmployeeRecord.objects.find_by_batch("X", 2).count(), 0)
 
         result = EmployeeRecord.objects.find_by_batch(filename, 2).first()
 
-        self.assertEquals(result.id, employee_record.id)
+        self.assertEqual(result.id, employee_record.id)
 
 
 class EmployeeRecordBatchTest(TestCase):
@@ -159,7 +159,7 @@ class EmployeeRecordBatchTest(TestCase):
         with self.assertRaises(ValidationError):
             EmployeeRecordBatch.batch_filename_from_feedback("test.json")
 
-        self.assertEquals(
+        self.assertEqual(
             "RIAE_FS_20210410130000.json",
             EmployeeRecordBatch.batch_filename_from_feedback("RIAE_FS_20210410130000_FichierRetour.json"),
         )
@@ -183,7 +183,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
     )
     def test_state_ready(self, _mock):
         self.employee_record.prepare()
-        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.READY)
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
@@ -192,10 +192,10 @@ class EmployeeRecordLifeCycleTest(TestCase):
     def test_state_sent(self, _mock):
         self.employee_record.prepare()
         filename = "RIAE_FS_20210410130000.json"
-        self.employee_record.sent_in_asp_batch_file(filename)
+        self.employee_record.sent_in_asp_batch_file(filename, 1)
 
-        self.assertEquals(filename, self.employee_record.asp_batch_file)
-        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.SENT)
+        self.assertEqual(filename, self.employee_record.asp_batch_file)
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.SENT)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
@@ -204,14 +204,14 @@ class EmployeeRecordLifeCycleTest(TestCase):
     def test_state_rejected(self, _mock):
         self.employee_record.prepare()
         filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.sent_in_asp_batch_file(filename)
+        self.employee_record.sent_in_asp_batch_file(filename, 1)
 
         err_code, err_message = "12", "JSON Invalide"
 
         self.employee_record.rejected_by_asp(err_code, err_message)
-        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.REJECTED)
-        self.assertEquals(self.employee_record.asp_processing_code, err_code)
-        self.assertEquals(self.employee_record.asp_processing_label, err_message)
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.REJECTED)
+        self.assertEqual(self.employee_record.asp_processing_code, err_code)
+        self.assertEqual(self.employee_record.asp_processing_label, err_message)
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
@@ -225,12 +225,11 @@ class EmployeeRecordLifeCycleTest(TestCase):
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
         self.employee_record.accepted_by_asp(process_code, process_message)
 
-        self.assertEquals(self.employee_record.status, EmployeeRecord.Status.PROCESSED)
-        self.assertEquals(self.employee_record.asp_processing_code, process_code)
-        self.assertEquals(self.employee_record.asp_processing_label, process_message)
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.PROCESSED)
+        self.assertEqual(self.employee_record.asp_processing_code, process_code)
+        self.assertEqual(self.employee_record.asp_processing_label, process_message)
 
 
-@mock.patch("pysftp.Connection", SFTPConnectionMock)
 class EmployeeRecordManagementCommandTest(TestCase):
     """
     Employee record management command, testing:
@@ -241,15 +240,18 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     fixtures = ["test_INSEE_communes.json", "asp_countries.json"]
 
-    def test_smoke_download(self):
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def _test_smoke_download(self):
         command = Command()
         command.handle(download=True)
 
-    def test_smoke_upload(self):
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def _test_smoke_upload(self):
         command = Command()
         command.handle(upload=True)
 
-    def test_smoke_download_and_upload(self):
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def _test_smoke_download_and_upload(self):
         command = Command()
         command.handle()
 
@@ -258,7 +260,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def test_upload_and_download(self, _mock):
+    def test_upload_and_download_success(self, _mock):
         """
         - Create an employee record
         - Send it to ASP
@@ -269,14 +271,20 @@ class EmployeeRecordManagementCommandTest(TestCase):
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.prepare()
 
+        self.assertEqual(job_application.job_seeker.title, "M")
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
         command = Command()
-        command.handle(upload=True)
-
+        command.handle(upload=True, download=False)
         employee_record.refresh_from_db()
-        self.assertEquals(employee_record.status, EmployeeRecord.Status.SENT)
 
-        # TODO
-        # command = Command()
-        # command.handle(download=True)
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.SENT)
+        self.assertEqual(employee_record.batch_line_number, 1)
+        self.assertIsNotNone(employee_record.asp_batch_file)
 
-        # employee_record.refresh_from_db()
+        command.handle(upload=False, download=True)
+        employee_record.refresh_from_db()
+
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.PROCESSED)
+        self.assertEqual(employee_record.asp_processing_code, "0000")
+        self.assertIsNotNone(employee_record.archived_json)

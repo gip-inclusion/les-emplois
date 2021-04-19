@@ -153,14 +153,6 @@ class EmployeeRecord(models.Model):
         unique_together = ["asp_batch_file", "asp_batch_line_number"]
         ordering = ["-created_at"]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Needed for serialization
-        self.asp_processing_code = None
-        self.asp_processing_label = None
-        self.batch_line = 1
-
     def __str__(self):
         return f"{self.asp_id} - {self.approval_number} - {self.job_seeker}"
 
@@ -229,7 +221,7 @@ class EmployeeRecord(models.Model):
         self.status = self.Status.READY
         self.save()
 
-    def sent_in_asp_batch_file(self, asp_filename):
+    def sent_in_asp_batch_file(self, asp_filename, line_number):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
@@ -242,6 +234,7 @@ class EmployeeRecord(models.Model):
         self.clean()
 
         self.asp_batch_file = asp_filename
+        self.asp_batch_line_number = line_number
         self.status = EmployeeRecord.Status.SENT
         self.save()
 
@@ -255,21 +248,20 @@ class EmployeeRecord(models.Model):
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
-
         self.status = EmployeeRecord.Status.REJECTED
         self.asp_processing_code = code
         self.asp_processing_label = label
         self.save()
 
-    def accepted_by_asp(self, code, label):
+    def accepted_by_asp(self, code, label, archive):
         if not self.status == EmployeeRecord.Status.SENT:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
         self.clean()
-
         self.status = EmployeeRecord.Status.PROCESSED
         self.asp_processing_code = code
         self.asp_processing_label = label
+        self.archived_json = archive
         self.save()
 
     @property
