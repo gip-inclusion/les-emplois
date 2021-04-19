@@ -174,4 +174,5 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
             # Simple build, do nothing.
             return
         self.job_seeker.title = User.Title.M
+
         JobSeekerProfileFactory(user=self.job_seeker).save()
