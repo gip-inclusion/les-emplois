@@ -54,9 +54,9 @@
                         <td>{{ financial_annex.start_at|date:"d/m/Y" }}</td>
                         <td>{{ financial_annex.end_at|date:"d/m/Y" }}</td>
                         {% if financial_annex.is_active %}
-                            <td><span class="badge badge-success">{% translate "Valide" %}</span></td>
+                            <td><span class="badge badge-success">Valide</span></td>
                         {% else %}
-                            <td><span class="badge badge-danger">{% translate "Invalide" %}</span></td>
+                            <td><span class="badge badge-secondary">Inactive</span></td>
                         {% endif %}
                     </tr>
                 {% endfor %}
