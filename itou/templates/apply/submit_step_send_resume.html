@@ -9,7 +9,7 @@
 
     <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        {% bootstrap_form form alert_error_type="all" %}
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
