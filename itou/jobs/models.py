@@ -4,7 +4,6 @@ import string
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 
 class Rome(models.Model):
@@ -21,27 +20,27 @@ class Rome(models.Model):
     RIASEC_CONVENTIONAL = "C"
 
     RIASEC_CHOICES = (
-        (RIASEC_REALISTIC, _("Réaliste")),
-        (RIASEC_INVESTIGATIVE, _("Investigateur")),
-        (RIASEC_ARTISTIC, _("Artistique")),
-        (RIASEC_SOCIAL, _("Social")),
-        (RIASEC_ENTERPRISING, _("Entreprenant")),
-        (RIASEC_CONVENTIONAL, _("Conventionnel")),
+        (RIASEC_REALISTIC, "Réaliste"),
+        (RIASEC_INVESTIGATIVE, "Investigateur"),
+        (RIASEC_ARTISTIC, "Artistique"),
+        (RIASEC_SOCIAL, "Social"),
+        (RIASEC_ENTERPRISING, "Entreprenant"),
+        (RIASEC_CONVENTIONAL, "Conventionnel"),
     )
 
-    code = models.CharField(verbose_name=_("Code ROME"), max_length=5, primary_key=True)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
+    code = models.CharField(verbose_name="Code ROME", max_length=5, primary_key=True)
+    name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
     riasec_major = models.CharField(
-        verbose_name=_("RIASEC Majeur"), max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
+        verbose_name="RIASEC Majeur", max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
     )
     riasec_minor = models.CharField(
-        verbose_name=_("RIASEC Mineur"), max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
+        verbose_name="RIASEC Mineur", max_length=1, choices=RIASEC_CHOICES, default=RIASEC_REALISTIC
     )
-    code_isco = models.CharField(verbose_name=_("Code ROME"), max_length=4)
+    code_isco = models.CharField(verbose_name="Code ROME", max_length=4)
 
     class Meta:
-        verbose_name = _("ROME")
-        verbose_name_plural = _("ROMEs")
+        verbose_name = "ROME"
+        verbose_name_plural = "ROMEs"
 
     def __str__(self):
         return f"{self.name} ({self.code})"
@@ -85,8 +84,8 @@ class Appellation(models.Model):
     - etc.
     """
 
-    code = models.CharField(verbose_name=_("Code"), max_length=6, primary_key=True)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255, db_index=True)
+    code = models.CharField(verbose_name="Code", max_length=6, primary_key=True)
+    name = models.CharField(verbose_name="Nom", max_length=255, db_index=True)
     rome = models.ForeignKey(Rome, on_delete=models.CASCADE, null=True, related_name="appellations")
     # A PostgreSQL trigger (defined in migrations) updates this field automatically.
     full_text = SearchVectorField(null=True)
@@ -94,8 +93,8 @@ class Appellation(models.Model):
     objects = models.Manager.from_queryset(AppellationQuerySet)()
 
     class Meta:
-        verbose_name = _("Appellation")
-        verbose_name_plural = _("Appellations")
+        verbose_name = "Appellation"
+        verbose_name_plural = "Appellations"
         ordering = ["name"]
         indexes = [GinIndex(fields=["full_text"])]
 

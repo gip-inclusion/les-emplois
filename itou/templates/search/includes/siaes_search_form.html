@@ -1,4 +1,3 @@
-{% load i18n %}
 <div class="row no-gutters my-3">
     {# Apply bottom margins only on `sm` sizes: https://stackoverflow.com/a/50879258 #}
     <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
@@ -12,12 +11,11 @@
                 {# Loading #}
                 <span class="input-group-text js-city-autocomplete-loading d-none">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span class="sr-only">{% translate "Chargement..." %}</span>
+                    <span class="sr-only">Chargement...</span>
                 </span>
                 {# No loading #}
                 <span class="input-group-text js-city-autocomplete-no-loading">
-                    {% translate "Logo du moteur de recherche" as map_pin_label %}
-                    {% include "includes/icon.html" with icon="map-pin" title=map_pin_label %}
+                    {% include "includes/icon.html" with icon="map-pin" title="Logo du moteur de recherche" %}
                 </span>
             </div>
             <label for="{{ form.city_name.id_for_label }}" class="sr-only">{{ form.city_name.label }}</label>
@@ -29,8 +27,8 @@
         {{ form.kind }}
     </div>
     <div class="col-sm-2">
-        <button type="submit" class="btn btn-danger form-control js-search-button" title="{% translate 'Rechercher' %}">
-            {% translate "Rechercher" %}
+        <button type="submit" class="btn btn-danger form-control js-search-button" title="Rechercher">
+            Rechercher
         </button>
     </div>
 </div>

@@ -1,11 +1,10 @@
-{% load i18n %}
 {% autoescape off %}
 
 {% block body %}{% endblock %}
 
 ---
-{% if itou_environment == "DEMO"%}{% blocktranslate %}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endblocktranslate %}{% endif %}
-{% blocktranslate %}Les emplois de l'inclusion{% endblocktranslate %}
+{% if itou_environment == "DEMO"%}[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]{% endif %}
+Les emplois de l'inclusion
 {{ itou_protocol }}://{{ itou_fqdn }}
 
 {% endautoescape %}

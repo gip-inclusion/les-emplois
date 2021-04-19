@@ -12,7 +12,7 @@ Unidecode==1.2.0  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.1.8  # pyup: < 4.0  # https://www.djangoproject.com/
+django==3.2  # pyup: < 4.0  # https://www.djangoproject.com/
 
 # django-allauth
 django-allauth==0.43.0  # https://github.com/pennersr/django-allauth

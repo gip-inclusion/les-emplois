@@ -71,10 +71,10 @@ LOCAL_APPS = [
     "itou.approvals",
     "itou.eligibility",
     "itou.invitations",
-    "itou.external_data.apps.ExternalDataConfig",
+    "itou.external_data",
     "itou.metabase",
     "itou.asp",
-    "itou.employee_record.apps.EmployeeRecordConfig",
+    "itou.employee_record",
     # www.
     "itou.www.apply",
     "itou.www.approvals_views",
@@ -176,6 +176,9 @@ DATABASES = {
 
 ATOMIC_REQUESTS = True
 
+# https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # Password validation.
 # ------------------------------------------------------------------------------
 
@@ -194,7 +197,7 @@ LANGUAGE_CODE = "fr-FR"
 
 TIME_ZONE = "Europe/Paris"
 
-USE_I18N = True
+USE_I18N = False
 
 USE_L10N = True
 

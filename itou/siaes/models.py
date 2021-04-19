@@ -10,7 +10,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
-from django.utils.translation import gettext_lazy as _
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
@@ -133,15 +132,15 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     KIND_EATT = "EATT"
 
     KIND_CHOICES = (
-        (KIND_EI, _("Entreprise d'insertion")),  # Regroupées au sein de la fédération des entreprises d'insertion.
-        (KIND_AI, _("Association intermédiaire")),
-        (KIND_ACI, _("Atelier chantier d'insertion")),
-        (KIND_ACIPHC, _("Atelier chantier d'insertion premières heures en chantier")),
-        (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
-        (KIND_EITI, _("Entreprise d'insertion par le travail indépendant")),
-        (KIND_GEIQ, _("Groupement d'employeurs pour l'insertion et la qualification")),
-        (KIND_EA, _("Entreprise adaptée")),
-        (KIND_EATT, _("Entreprise adaptée de travail temporaire")),
+        (KIND_EI, "Entreprise d'insertion"),  # Regroupées au sein de la fédération des entreprises d'insertion.
+        (KIND_AI, "Association intermédiaire"),
+        (KIND_ACI, "Atelier chantier d'insertion"),
+        (KIND_ACIPHC, "Atelier chantier d'insertion premières heures en chantier"),
+        (KIND_ETTI, "Entreprise de travail temporaire d'insertion"),
+        (KIND_EITI, "Entreprise d'insertion par le travail indépendant"),
+        (KIND_GEIQ, "Groupement d'employeurs pour l'insertion et la qualification"),
+        (KIND_EA, "Entreprise adaptée"),
+        (KIND_EATT, "Entreprise adaptée de travail temporaire"),
     )
 
     SOURCE_ASP = "ASP"
@@ -151,11 +150,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     SOURCE_STAFF_CREATED = "STAFF_CREATED"
 
     SOURCE_CHOICES = (
-        (SOURCE_ASP, _("Export ASP")),
-        (SOURCE_GEIQ, _("Export GEIQ")),
-        (SOURCE_EA_EATT, _("Export EA+EATT")),
-        (SOURCE_USER_CREATED, _("Utilisateur (Antenne)")),
-        (SOURCE_STAFF_CREATED, _("Staff Itou")),
+        (SOURCE_ASP, "Export ASP"),
+        (SOURCE_GEIQ, "Export GEIQ"),
+        (SOURCE_EA_EATT, "Export EA+EATT"),
+        (SOURCE_USER_CREATED, "Utilisateur (Antenne)"),
+        (SOURCE_STAFF_CREATED, "Staff Itou"),
     )
 
     # ASP data is used to keep the siae data of these kinds in sync.
@@ -166,31 +165,29 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
     ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [KIND_ACIPHC]
 
-    siret = models.CharField(verbose_name=_("Siret"), max_length=14, validators=[validate_siret], db_index=True)
-    naf = models.CharField(verbose_name=_("Naf"), max_length=5, validators=[validate_naf], blank=True)
-    kind = models.CharField(verbose_name=_("Type"), max_length=6, choices=KIND_CHOICES, default=KIND_EI)
-    name = models.CharField(verbose_name=_("Nom"), max_length=255)
+    siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], db_index=True)
+    naf = models.CharField(verbose_name="Naf", max_length=5, validators=[validate_naf], blank=True)
+    kind = models.CharField(verbose_name="Type", max_length=6, choices=KIND_CHOICES, default=KIND_EI)
+    name = models.CharField(verbose_name="Nom", max_length=255)
     # `brand` (or `enseigne` in French) is used to override `name` if needed.
-    brand = models.CharField(verbose_name=_("Enseigne"), max_length=255, blank=True)
-    phone = models.CharField(verbose_name=_("Téléphone"), max_length=20, blank=True)
-    email = models.EmailField(verbose_name=_("E-mail"), blank=True)
+    brand = models.CharField(verbose_name="Enseigne", max_length=255, blank=True)
+    phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
+    email = models.EmailField(verbose_name="E-mail", blank=True)
     # All siaes without any existing user require this auth_email
     # for the siae secure signup process to be possible.
     # Comes from external exports (ASP, GEIQ...)
-    auth_email = models.EmailField(verbose_name=_("E-mail d'authentification"), blank=True)
-    website = models.URLField(verbose_name=_("Site web"), blank=True)
-    description = models.TextField(verbose_name=_("Description"), blank=True)
+    auth_email = models.EmailField(verbose_name="E-mail d'authentification", blank=True)
+    website = models.URLField(verbose_name="Site web", blank=True)
+    description = models.TextField(verbose_name="Description", blank=True)
 
     source = models.CharField(
-        verbose_name=_("Source de données"), max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
+        verbose_name="Source de données", max_length=20, choices=SOURCE_CHOICES, default=SOURCE_ASP
     )
 
-    jobs = models.ManyToManyField(
-        "jobs.Appellation", verbose_name=_("Métiers"), through="SiaeJobDescription", blank=True
-    )
+    jobs = models.ManyToManyField("jobs.Appellation", verbose_name="Métiers", through="SiaeJobDescription", blank=True)
     members = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Membres"),
+        verbose_name="Membres",
         through="SiaeMembership",
         through_fields=("siae", "user"),
         blank=True,
@@ -198,19 +195,19 @@ class Siae(AddressMixin):  # Do not forget the mixin!
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Créé par"),
+        verbose_name="Créé par",
         related_name="created_siae_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     # Ability to block new job applications
-    block_job_applications = models.BooleanField(verbose_name=_("Blocage des candidatures"), default=False)
+    block_job_applications = models.BooleanField(verbose_name="Blocage des candidatures", default=False)
     job_applications_blocked_at = models.DateTimeField(
-        verbose_name=_("Date du dernier blocage de candidatures"), blank=True, null=True
+        verbose_name="Date du dernier blocage de candidatures", blank=True, null=True
     )
 
     # A convention can only be deleted if it is no longer linked to any siae.
@@ -225,8 +222,8 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     objects = models.Manager.from_queryset(SiaeQuerySet)()
 
     class Meta:
-        verbose_name = _("Structure d'insertion par l'activité économique")
-        verbose_name_plural = _("Structures d'insertion par l'activité économique")
+        verbose_name = "Structure d'insertion par l'activité économique"
+        verbose_name_plural = "Structures d'insertion par l'activité économique"
         unique_together = ("siret", "kind")
 
     def __init__(self, *args, **kwargs):
@@ -484,17 +481,17 @@ class SiaeMembership(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE)
-    joined_at = models.DateTimeField(verbose_name=_("Date d'adhésion"), default=timezone.now)
-    is_siae_admin = models.BooleanField(verbose_name=_("Administrateur de la SIAE"), default=False)
-    is_active = models.BooleanField(_("Rattachement actif"), default=True)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), null=True)
+    joined_at = models.DateTimeField(verbose_name="Date d'adhésion", default=timezone.now)
+    is_siae_admin = models.BooleanField(verbose_name="Administrateur de la SIAE", default=False)
+    is_active = models.BooleanField("Rattachement actif", default=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", null=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_siaemembership_set",
         null=True,
         on_delete=models.CASCADE,
-        verbose_name=_("Mis à jour par"),
+        verbose_name="Mis à jour par",
     )
     notifications = models.JSONField(verbose_name=("Notifications"), default=dict, blank=True)
 
@@ -508,14 +505,14 @@ class SiaeMembership(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
-    def toggle_user_membership(self, user):
+    def deactivate_membership_by_user(self, user):
         """
-        Toggles the SIAE membership of a member (reference held by self)
+        Deactivates the SIAE membership of a member (reference held by self)
         `user` is the admin updating this user (`updated_by` field)
         """
-        self.is_active = not self.is_active
+        self.is_active = False
         self.updated_by = user
-        return self.is_active
+        return False
 
     def set_admin_role(self, active, user):
         """
@@ -565,19 +562,19 @@ class SiaeJobDescription(models.Model):
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
     siae = models.ForeignKey(Siae, on_delete=models.CASCADE, related_name="job_description_through")
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
-    is_active = models.BooleanField(verbose_name=_("Recrutement ouvert"), default=True)
-    custom_name = models.CharField(verbose_name=_("Nom personnalisé"), blank=True, max_length=255)
-    description = models.TextField(verbose_name=_("Description"), blank=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
+    is_active = models.BooleanField(verbose_name="Recrutement ouvert", default=True)
+    custom_name = models.CharField(verbose_name="Nom personnalisé", blank=True, max_length=255)
+    description = models.TextField(verbose_name="Description", blank=True)
     # TODO: this will be used to order job description in UI.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
 
     objects = models.Manager.from_queryset(SiaeJobDescriptionQuerySet)()
 
     class Meta:
-        verbose_name = _("Fiche de poste")
-        verbose_name_plural = _("Fiches de postes")
+        verbose_name = "Fiche de poste"
+        verbose_name_plural = "Fiches de postes"
         unique_together = ("appellation", "siae")
         ordering = ["appellation__name", "ui_rank"]
 
@@ -657,14 +654,14 @@ class SiaeConvention(models.Model):
     KIND_EITI = "EITI"
 
     KIND_CHOICES = (
-        (KIND_EI, _("Entreprise d'insertion")),
-        (KIND_AI, _("Association intermédiaire")),
-        (KIND_ACI, _("Atelier chantier d'insertion")),
-        (KIND_ETTI, _("Entreprise de travail temporaire d'insertion")),
-        (KIND_EITI, _("Entreprise d'insertion par le travail indépendant")),
+        (KIND_EI, "Entreprise d'insertion"),
+        (KIND_AI, "Association intermédiaire"),
+        (KIND_ACI, "Atelier chantier d'insertion"),
+        (KIND_ETTI, "Entreprise de travail temporaire d'insertion"),
+        (KIND_EITI, "Entreprise d'insertion par le travail indépendant"),
     )
 
-    kind = models.CharField(verbose_name=_("Type"), max_length=4, choices=KIND_CHOICES, default=KIND_EI)
+    kind = models.CharField(verbose_name="Type", max_length=4, choices=KIND_CHOICES, default=KIND_EI)
 
     # This field is stored for reference but never actually used.
     # Siaes in ASP's "Vue Structure" not only have a "SIRET actualisé",
@@ -674,7 +671,7 @@ class SiaeConvention(models.Model):
     # This field is almost unique (one exception, see unique_together clause below)
     # and is almost constant over time, at least much more than the "SIRET actualisé".
     siret_signature = models.CharField(
-        verbose_name=_("Siret à la signature"),
+        verbose_name="Siret à la signature",
         max_length=14,
         validators=[validate_siret],
         db_index=True,
@@ -690,16 +687,16 @@ class SiaeConvention(models.Model):
     # 1) our staff
     # 2) the `import_siae.py` script
     is_active = models.BooleanField(
-        verbose_name=_("Active"),
+        verbose_name="Active",
         default=True,
-        help_text=_(
+        help_text=(
             "Précise si la convention est active c.a.d. si elle a au moins une annexe financière valide à ce jour."
         ),
         db_index=True,
     )
     # Grace period starts from this date.
     deactivated_at = models.DateTimeField(
-        verbose_name=_("Date de  désactivation et début de délai de grâce"),
+        verbose_name="Date de  désactivation et début de délai de grâce",
         blank=True,
         null=True,
         db_index=True,
@@ -707,13 +704,13 @@ class SiaeConvention(models.Model):
     # When itou staff manually reactivates an inactive convention, store who did it and when.
     reactivated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Réactivée manuellement par"),
+        verbose_name="Réactivée manuellement par",
         related_name="reactivated_siae_convention_set",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
     )
-    reactivated_at = models.DateTimeField(verbose_name=_("Date de réactivation manuelle"), blank=True, null=True)
+    reactivated_at = models.DateTimeField(verbose_name="Date de réactivation manuelle", blank=True, null=True)
 
     # Internal ID of siaes à la ASP. This ID is supposed to never change,
     # so as long as the ASP keeps including this field in all their exports,
@@ -723,16 +720,16 @@ class SiaeConvention(models.Model):
     # share the same asp_id in ASP's own database.
     # In this example a single siae à la ASP corresponds to two siaes à la Itou.
     asp_id = models.IntegerField(
-        verbose_name=_("ID ASP de la SIAE"),
+        verbose_name="ID ASP de la SIAE",
         db_index=True,
     )
 
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     class Meta:
-        verbose_name = _("Convention")
-        verbose_name_plural = _("Conventions")
+        verbose_name = "Convention"
+        verbose_name_plural = "Conventions"
         unique_together = (
             ("asp_id", "kind"),
             # Unfortunately the (siret_signature, kind) couple is not unique,
@@ -770,14 +767,14 @@ class SiaeFinancialAnnex(models.Model):
     STATE_REJECTED = "REJETE"
 
     STATE_CHOICES = (
-        (STATE_VALID, _("Validée")),
-        (STATE_PROVISIONAL, _("Provisoire (valide)")),
-        (STATE_ARCHIVED, _("Archivée (invalide)")),
-        (STATE_CANCELLED, _("Annulée")),
-        (STATE_ENTERED, _("Saisie (invalide)")),
-        (STATE_DRAFT, _("Brouillon (invalide)")),
-        (STATE_CLOSED, _("Cloturée (invalide)")),
-        (STATE_REJECTED, _("Rejetée")),
+        (STATE_VALID, "Validée"),
+        (STATE_PROVISIONAL, "Provisoire (valide)"),
+        (STATE_ARCHIVED, "Archivée (invalide)"),
+        (STATE_CANCELLED, "Annulée"),
+        (STATE_ENTERED, "Saisie (invalide)"),
+        (STATE_DRAFT, "Brouillon (invalide)"),
+        (STATE_CLOSED, "Cloturée (invalide)"),
+        (STATE_REJECTED, "Rejetée"),
     )
 
     STATES_ACTIVE = [STATE_VALID, STATE_PROVISIONAL]
@@ -794,22 +791,22 @@ class SiaeFinancialAnnex(models.Model):
     # - A0, A1, A2… is the "numéro d'avenant".
     # - M0, M1, M2… is the "numéro de modification de l'avenant".
     number = models.CharField(
-        verbose_name=_("Numéro d'annexe financière"),
+        verbose_name="Numéro d'annexe financière",
         max_length=17,
         validators=[validate_af_number],
         unique=True,
         db_index=True,
     )
     state = models.CharField(
-        verbose_name=_("Etat"),
+        verbose_name="Etat",
         max_length=20,
         choices=STATE_CHOICES,
     )
-    start_at = models.DateTimeField(verbose_name=_("Date de début d'effet"))
-    end_at = models.DateTimeField(verbose_name=_("Date de fin d'effet"))
+    start_at = models.DateTimeField(verbose_name="Date de début d'effet")
+    end_at = models.DateTimeField(verbose_name="Date de fin d'effet")
 
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True)
 
     # A financial annex cannot exist without a convention, and
     # deleting a convention will delete all its financial annexes.
@@ -820,8 +817,8 @@ class SiaeFinancialAnnex(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Annexe financière")
-        verbose_name_plural = _("Annexes financières")
+        verbose_name = "Annexe financière"
+        verbose_name_plural = "Annexes financières"
 
     def save(self, *args, **kwargs):
         if self.pk:

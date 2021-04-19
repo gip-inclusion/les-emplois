@@ -1,29 +1,26 @@
 {% extends 'admin/change_form.html' %}
-{% load i18n %}
 
 {% block submit_buttons_bottom %}
-
-    {% translate "Êtes vous certain ?" as confirm %}
 
     {# Whatever the state, the super user has access to refuse and validate actions #}
     {% if original.has_pending_authorization or user.is_superuser %}
 
         <div class="submit-row">
-            <input class="danger" type="submit" value="{% translate "Refuser l'habilitation" %}"
+            <input class="danger" type="submit" value="Refuser l'habilitation"
                    name="_authorization_action_refuse"
-                   onclick="return confirm('{{ confirm }}')">
-            <input class="default" type="submit" value="{% translate "Valider l'habilitation" %}"
+                   onclick="return confirm('Êtes vous certain ?')">
+            <input class="default" type="submit" value="Valider l'habilitation"
                    name="_authorization_action_validate"
-                   onclick="return confirm('{{ confirm }}')">
+                   onclick="return confirm('Êtes vous certain ?')">
         </div>
 
     {% elif original.has_refused_authorization and not user.is_superuser %}
         {# Allow to validate an authorization after an error in a refusal. #}
 
         <div class="submit-row">
-            <input class="default" type="submit" value="{% translate "Annuler le refus et valider l'habilitation" %}"
+            <input class="default" type="submit" value="Annuler le refus et valider l'habilitation"
                    name="_authorization_action_validate"
-                   onclick="return confirm('{{ confirm }}')">
+                   onclick="return confirm('Êtes vous certain ?')">
         </div>
 
     {% endif %}

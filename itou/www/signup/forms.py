@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.utils.http import urlsafe_base64_decode
-from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
@@ -21,14 +20,14 @@ BLANK_CHOICE = (("", "---------"),)
 
 class FullnameFormMixin(forms.Form):
     first_name = forms.CharField(
-        label=gettext_lazy("Prénom"),
+        label="Prénom",
         max_length=User._meta.get_field("first_name").max_length,
         required=True,
         strip=True,
     )
 
     last_name = forms.CharField(
-        label=gettext_lazy("Nom"),
+        label="Nom",
         max_length=User._meta.get_field("last_name").max_length,
         required=True,
         strip=True,
@@ -43,7 +42,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
     def clean_email(self):
         email = super().clean_email()
         if email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError(gettext_lazy("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat."))
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
         return email
 
     def save(self, request):
@@ -70,11 +69,11 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 class SiaeSearchBySirenForm(forms.Form):
 
     siren = forms.CharField(
-        label=gettext_lazy("Numéro SIREN de votre structure"),
+        label="Numéro SIREN de votre structure",
         min_length=9,
         max_length=9,
         validators=[validate_siren],
-        help_text=gettext_lazy("Le numéro SIREN contient 9 chiffres."),
+        help_text="Le numéro SIREN contient 9 chiffres.",
     )
 
 
@@ -96,8 +95,8 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["email"].widget.attrs["placeholder"] = _("Adresse e-mail professionnelle")
-        self.fields["email"].help_text = _(
+        self.fields["email"].widget.attrs["placeholder"] = "Adresse e-mail professionnelle"
+        self.fields["email"].help_text = (
             "Utilisez plutôt votre adresse e-mail professionnelle, "
             "cela nous permettra de vous identifier plus facilement comme membre de cette structure."
         )
@@ -107,20 +106,20 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
         self.fields["siae_name"].widget.attrs["readonly"] = True
 
     kind = forms.CharField(
-        label=gettext_lazy("Type de votre structure"),
-        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
+        label="Type de votre structure",
+        help_text="Ce champ n'est pas modifiable.",
         required=True,
     )
 
     siret = forms.CharField(
-        label=gettext_lazy("Numéro SIRET de votre structure"),
-        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
+        label="Numéro SIRET de votre structure",
+        help_text="Ce champ n'est pas modifiable.",
         required=True,
     )
 
     siae_name = forms.CharField(
-        label=gettext_lazy("Nom de votre structure"),
-        help_text=gettext_lazy("Ce champ n'est pas modifiable."),
+        label="Nom de votre structure",
+        help_text="Ce champ n'est pas modifiable.",
         required=True,
     )
 
@@ -191,12 +190,12 @@ class SiaeSignupForm(FullnameFormMixin, SignupForm):
 class PrescriberIsPoleEmploiForm(forms.Form):
 
     IS_POLE_EMPLOI_CHOICES = (
-        (1, gettext_lazy("Oui")),
-        (0, gettext_lazy("Non")),
+        (1, "Oui"),
+        (0, "Non"),
     )
 
     is_pole_emploi = forms.TypedChoiceField(
-        label=gettext_lazy("Travaillez-vous pour Pôle emploi ?"),
+        label="Travaillez-vous pour Pôle emploi ?",
         choices=IS_POLE_EMPLOI_CHOICES,
         widget=forms.RadioSelect,
         coerce=int,
@@ -206,7 +205,7 @@ class PrescriberIsPoleEmploiForm(forms.Form):
 class PrescriberChooseOrgKindForm(forms.Form):
 
     kind = forms.ChoiceField(
-        label=gettext_lazy("Pour qui travaillez-vous ?"),
+        label="Pour qui travaillez-vous ?",
         widget=forms.RadioSelect,
         # Do not show Kind.DEPT_BRSA in the public user interface as
         # these organizations are created manually by the support until
@@ -222,13 +221,13 @@ class PrescriberChooseKindForm(forms.Form):
     KIND_SOLO = "solo"
 
     KIND_CHOICES = (
-        (KIND_AUTHORIZED_ORG, gettext_lazy("Pour une organisation habilitée par le Préfet")),
-        (KIND_UNAUTHORIZED_ORG, gettext_lazy("Pour une organisation non-habilitée")),
-        (KIND_SOLO, gettext_lazy("Seul (sans organisation)")),
+        (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
+        (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
+        (KIND_SOLO, "Seul (sans organisation)"),
     )
 
     kind = forms.ChoiceField(
-        label=gettext_lazy("Pour qui travaillez-vous ?"),
+        label="Pour qui travaillez-vous ?",
         choices=KIND_CHOICES,
         widget=forms.RadioSelect,
     )
@@ -237,12 +236,12 @@ class PrescriberChooseKindForm(forms.Form):
 class PrescriberConfirmAuthorizationForm(forms.Form):
 
     CONFIRM_AUTHORIZATION_CHOICES = (
-        (1, gettext_lazy("Oui, je confirme que mon organisation est habilitée par le Préfet")),
-        (0, gettext_lazy("Non, mon organisation n’est pas habilitée par le Préfet")),
+        (1, "Oui, je confirme que mon organisation est habilitée par le Préfet"),
+        (0, "Non, mon organisation n’est pas habilitée par le Préfet"),
     )
 
     confirm_authorization = forms.TypedChoiceField(
-        label=gettext_lazy("Votre habilitation est-elle officialisée par arrêté préfectoral ?"),
+        label="Votre habilitation est-elle officialisée par arrêté préfectoral ?",
         choices=CONFIRM_AUTHORIZATION_CHOICES,
         widget=forms.RadioSelect,
         coerce=int,
@@ -262,9 +261,9 @@ class PrescriberSiretForm(forms.Form):
         self.org_data = None
 
     siret = forms.CharField(
-        label=gettext_lazy("Numéro SIRET de votre organisation"),
+        label="Numéro SIRET de votre organisation",
         min_length=14,
-        help_text=gettext_lazy("Le numéro SIRET contient 14 chiffres."),
+        help_text="Le numéro SIRET contient 14 chiffres.",
     )
 
     def clean_siret(self):
@@ -277,10 +276,10 @@ class PrescriberSiretForm(forms.Form):
         # Does an org with this SIRET already exist?
         org = PrescriberOrganization.objects.filter(siret=siret, kind=self.kind).first()
         if org:
-            error = _(f'"{org.display_name}" utilise déjà ce SIRET.')
+            error = f'"{org.display_name}" utilise déjà ce SIRET.'
             admin = org.get_admins().first()
             if admin:
-                error += _(
+                error += (
                     f" "
                     f"Pour rejoindre cette organisation, vous devez obtenir une invitation de son administrateur : "
                     f"{admin.first_name.title()} {admin.last_name[0].upper()}."
@@ -334,16 +333,16 @@ class PrescriberPoleEmploiSafirCodeForm(forms.Form):
 
     safir_code = forms.CharField(
         max_length=5,
-        label=gettext_lazy("Code SAFIR"),
+        label="Code SAFIR",
         validators=[validate_code_safir],
-        help_text=gettext_lazy("Le code SAFIR contient 5 chiffres."),
+        help_text="Le code SAFIR contient 5 chiffres.",
     )
 
     def clean_safir_code(self):
         safir_code = self.cleaned_data["safir_code"]
         self.pole_emploi_org = PrescriberOrganization.objects.by_safir_code(safir_code)
         if not self.pole_emploi_org:
-            error = _("Ce code SAFIR est inconnu.")
+            error = "Ce code SAFIR est inconnu."
             raise forms.ValidationError(error)
         return safir_code
 
@@ -357,12 +356,12 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         self.pole_emploi_org = kwargs.pop("pole_emploi_org")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = _(f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}")
+        self.fields["email"].help_text = f"Exemple : nom.prenom{settings.POLE_EMPLOI_EMAIL_SUFFIX}"
 
     def clean_email(self):
         email = super().clean_email()
         if not email.endswith(settings.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError(gettext_lazy("L'adresse e-mail doit être une adresse Pôle emploi."))
+            raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
         return email
 
     def save(self, request):
@@ -399,7 +398,7 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
         self.prescriber_org_data = kwargs.pop("prescriber_org_data")
         super().__init__(*args, **kwargs)
         self.fields["password1"].help_text = CnilCompositionPasswordValidator().get_help_text()
-        self.fields["email"].help_text = _("Utilisez une adresse e-mail professionnelle.")
+        self.fields["email"].help_text = "Utilisez une adresse e-mail professionnelle."
 
     def save(self, request):
 

@@ -1,7 +1,6 @@
 {# django-allauth template override. #}
 
-{% load i18n %}
 {% load account %}
 
 {% user_display user as user_display %}
-<p><b>{% translate "Remarque :" %}</b> {% blocktranslate %}vous êtes déjà connecté en tant que <b>{{ user_display }}</b>.{% endblocktranslate %}</p>
+<p><b>Remarque :</b> vous êtes déjà connecté en tant que <b>{{ user_display }}</b>.</p>

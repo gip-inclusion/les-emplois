@@ -1,5 +1,4 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 {% load format_filters %}
 
 {% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
@@ -7,7 +6,7 @@
 {% block content %}
 
     <p>
-        <b>{% translate "Prescripteur habilité" %}</b>
+        <b>Prescripteur habilité</b>
         -
         <i>{{ prescriber_org.get_kind_display }}</i>
     </p>
@@ -31,24 +30,21 @@
 
     {% if user.is_authenticated and prescriber_org.email %}
         <p>
-            {% translate "E-mail" as email_label %}
-            {% include "includes/icon.html" with icon="mail" title=email_label %}
+            {% include "includes/icon.html" with icon="mail" title="E-mail" %}
             <a href="mailto:{{ prescriber_org.email }}">{{ prescriber_org.email }}</a>
         </p>
     {% endif %}
 
     {% if user.is_authenticated and prescriber_org.phone %}
         <p>
-            {% translate "Téléphone" as phone_label %}
-            {% include "includes/icon.html" with icon="phone" title=phone_label %}
+            {% include "includes/icon.html" with icon="phone" title="Téléphone" %}
             <a href="tel:{{ prescriber_org.phone }}">{{ prescriber_org.phone|format_phone }}</a>
         </p>
     {% endif %}
 
     {% if prescriber_org.website %}
         <p>
-            {% translate "Site Internet" as website_label %}
-            {% include "includes/icon.html" with icon="external-link" title=website_label %}
+            {% include "includes/icon.html" with icon="external-link" title="Site Internet" %}
             <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank">{{ prescriber_org.website }}</a>
         </p>
     {% endif %}
@@ -56,7 +52,7 @@
     {% if back_url %}
         <hr>
         <p>
-            <a href="{{ back_url }}">{% translate "Retour" %}</a>
+            <a href="{{ back_url }}">Retour</a>
         </p>
     {% endif %}
 

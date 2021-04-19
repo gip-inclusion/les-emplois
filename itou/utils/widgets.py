@@ -4,7 +4,6 @@ Specific widgets used in forms.
 
 from bootstrap_datepicker_plus import DatePickerInput
 from django import forms
-from django.utils.translation import gettext_lazy
 
 from itou.utils.validators import get_max_birthdate, get_min_birthdate
 
@@ -30,20 +29,20 @@ class DatePickerField(DatePickerInput):
         "showTodayButton": True,
         "locale": "fr",
         "tooltips": {
-            "today": str(gettext_lazy("Aujourd'hui")),
-            "clear": str(gettext_lazy("Effacer")),
-            "close": str(gettext_lazy("Fermer")),
-            "selectMonth": str(gettext_lazy("Sélectionner un mois")),
-            "prevMonth": str(gettext_lazy("Mois précédent")),
-            "nextMonth": str(gettext_lazy("Mois suivant")),
-            "selectYear": str(gettext_lazy("Sélectionner une année")),
-            "prevYear": str(gettext_lazy("Année précédente")),
-            "nextYear": str(gettext_lazy("Année suivante")),
-            "selectDecade": str(gettext_lazy("Sélectionner une décennie")),
-            "prevDecade": str(gettext_lazy("Décennie précédente")),
-            "nextDecade": str(gettext_lazy("Décennie suivante")),
-            "prevCentury": str(gettext_lazy("Centenaire précédent")),
-            "nextCentury": str(gettext_lazy("Centenaire suivant")),
+            "today": "Aujourd'hui",
+            "clear": "Effacer",
+            "close": "Fermer",
+            "selectMonth": "Sélectionner un mois",
+            "prevMonth": "Mois précédent",
+            "nextMonth": "Mois suivant",
+            "selectYear": "Sélectionner une année",
+            "prevYear": "Année précédente",
+            "nextYear": "Année suivante",
+            "selectDecade": "Sélectionner une décennie",
+            "prevDecade": "Décennie précédente",
+            "nextDecade": "Décennie suivante",
+            "prevCentury": "Centenaire précédent",
+            "nextCentury": "Centenaire suivant",
         },
     }
 

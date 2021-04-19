@@ -2,57 +2,12 @@ from allauth.account.adapter import get_adapter
 from allauth.account.forms import SignupForm
 from django import forms
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.forms.models import modelformset_factory
-from django.utils.translation import gettext as _, gettext_lazy
 
-from itou.invitations.models import InvitationAbstract, PrescriberWithOrgInvitation, SiaeStaffInvitation
+from itou.invitations.models import PrescriberWithOrgInvitation, SiaeStaffInvitation
 from itou.prescribers.models import PrescriberOrganization
-
-
-class NewInvitationMixinForm(forms.ModelForm):
-    """
-    ModelForm based on an abstract class. It should not be used alone!
-    Inherit from it when you need a new kind of invitation.
-    """
-
-    class Meta:
-        model = InvitationAbstract
-        fields = ["first_name", "last_name", "email"]
-
-    def __init__(self, sender, *args, **kwargs):
-        self.sender = sender
-        super().__init__(*args, **kwargs)
-
-    def clean_email(self):
-        email = self.cleaned_data["email"]
-        self._invited_user_exists_error(email)
-        self._extend_expiration_date_or_error(email)
-        return email
-
-    def save(self, commit=True, *args, **kwargs):
-        invitation = super().save(commit=False)
-        invitation.sender = self.sender
-        if commit:
-            invitation.save()
-            invitation.send()
-        return invitation
-
-    def _invited_user_exists_error(self, email):
-        user = get_user_model().objects.filter(email__iexact=email).first()
-        if user:
-            error = forms.ValidationError(_("Cet utilisateur existe déjà."))
-            self.add_error("email", error)
-
-    def _extend_expiration_date_or_error(self, email):
-        invitation_model = self.Meta.model
-        invitation = invitation_model.objects.filter(email__iexact=email).first()
-        if invitation:
-            if invitation.has_expired:
-                invitation.extend_expiration_date()
-            else:
-                error = forms.ValidationError(_("Cette personne a déjà été invitée."))
-                self.add_error("email", error)
+from itou.users.models import User
 
 
 ########################################################################
@@ -60,62 +15,79 @@ class NewInvitationMixinForm(forms.ModelForm):
 ########################################################################
 
 
-class NewPrescriberWithOrgInvitationForm(NewInvitationMixinForm):
+class PrescriberWithOrgInvitationForm(forms.ModelForm):
     class Meta:
-        fields = NewInvitationMixinForm.Meta.fields
         model = PrescriberWithOrgInvitation
+        fields = ["first_name", "last_name", "email"]
 
     def __init__(self, sender, organization, *args, **kwargs):
+        self.sender = sender
         self.organization = organization
-        super().__init__(sender=sender, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _invited_user_exists_error(self, email):
         """
-        If the guest is already a user, he should be a prescriber
-        whether he belongs to another organization or not
+        If the guest is already a user, he should be a prescriber whether he
+        belongs to another organization or not
         """
-        self.user = get_user_model().objects.filter(email__iexact=email).first()
-        if self.user:
-            if not self.user.is_prescriber:
-                error = forms.ValidationError(_("Cet utilisateur n'est pas un prescripteur."))
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            if not user.is_prescriber:
+                error = forms.ValidationError("Cet utilisateur n'est pas un prescripteur.")
                 self.add_error("email", error)
             else:
-                user_is_member = self.organization.active_members.filter(email=self.user.email).exists()
+                user_is_member = self.organization.active_members.filter(email=user.email).exists()
                 if user_is_member:
-                    error = forms.ValidationError(_("Cette personne fait déjà partie de votre organisation."))
+                    error = forms.ValidationError("Cette personne fait déjà partie de votre organisation.")
                     self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
-        invitation = invitation_model.objects.filter(email__iexact=email, organization=self.organization).first()
-        # We can re-invite *deactivated* members,
-        # even if they already received an invitation
-        user_is_member = self.organization.active_members.filter(email=email).exists()
-        if invitation:
-            if invitation.accepted and user_is_member:
-                error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
-                self.add_error("email", error)
-            else:
-                invitation.extend_expiration_date()
+        existing_invitation = invitation_model.objects.filter(
+            email__iexact=email, organization=self.organization
+        ).first()
+        if existing_invitation:
+            #
+            # WARNING The form is now bound to this instance
+            #
+            self.instance = existing_invitation
+            self.instance.extend_expiration_date()
 
     def clean_email(self):
-        email = super().clean_email()
+        email = self.cleaned_data["email"]
+
+        self._invited_user_exists_error(email)
+        self._extend_expiration_date_or_error(email)
         if self.organization.kind == PrescriberOrganization.Kind.PE and not email.endswith(
             settings.POLE_EMPLOI_EMAIL_SUFFIX
         ):
-            error = forms.ValidationError(_("L'adresse e-mail doit être une adresse Pôle emploi"))
+            error = forms.ValidationError("L'adresse e-mail doit être une adresse Pôle emploi")
             self.add_error("email", error)
         return email
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         invitation = super().save(commit=False)
+        invitation.sender = self.sender
         invitation.organization = self.organization
         invitation.save()
-        invitation.send()
         return invitation
 
 
-class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
+class BaseInvitationFormSet(forms.BaseModelFormSet):
+    def clean(self):
+        """Checks that no two invitations have the same email."""
+        if any(self.errors):
+            return
+
+        emails = []
+        for form in self.forms:
+            email = form.cleaned_data.get("email")
+            if email in emails:
+                raise ValidationError("Les invitations doivent avoir des adresses e-mail différentes.")
+            emails.append(email)
+
+
+class BasePrescriberWithOrgInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
@@ -129,13 +101,13 @@ class PrescriberWithOrgInvitationFormSet(forms.BaseModelFormSet):
         self.forms[0].empty_permitted = False
 
 
-"""
-Formset used when a prescriber invites a person to join his structure.
-"""
-NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
+#
+# Formset used when a prescriber invites a person to join his structure.
+#
+PrescriberWithOrgInvitationFormSet = modelformset_factory(
     PrescriberWithOrgInvitation,
-    form=NewPrescriberWithOrgInvitationForm,
-    formset=PrescriberWithOrgInvitationFormSet,
+    form=PrescriberWithOrgInvitationForm,
+    formset=BasePrescriberWithOrgInvitationFormSet,
     extra=1,
     max_num=30,
 )
@@ -146,52 +118,56 @@ NewPrescriberWithOrgInvitationFormSet = modelformset_factory(
 #############################################################
 
 
-class NewSiaeStaffInvitationForm(NewInvitationMixinForm):
+class SiaeStaffInvitationForm(forms.ModelForm):
     class Meta:
-        fields = NewInvitationMixinForm.Meta.fields
+        fields = ["first_name", "last_name", "email"]
         model = SiaeStaffInvitation
 
     def __init__(self, sender, siae, *args, **kwargs):
+        self.sender = sender
         self.siae = siae
-        super().__init__(sender=sender, *args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _invited_user_exists_error(self, email):
         """
         An employer can only invite another employer to join his structure.
         """
-        self.user = get_user_model().objects.filter(email__iexact=email).first()
-        if self.user:
-            if not self.user.is_siae_staff:
-                error = forms.ValidationError(_("Cet utilisateur n'est pas un employeur."))
+        user = User.objects.filter(email__iexact=email).first()
+        if user:
+            if not user.is_siae_staff:
+                error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
                 self.add_error("email", error)
             else:
-                user_is_member = self.siae.active_members.filter(email=self.user.email).exists()
+                user_is_member = self.siae.active_members.filter(email=user.email).exists()
                 if user_is_member:
-                    error = forms.ValidationError(_("Cette personne fait déjà partie de votre structure."))
+                    error = forms.ValidationError("Cette personne fait déjà partie de votre structure.")
                     self.add_error("email", error)
 
     def _extend_expiration_date_or_error(self, email):
         invitation_model = self.Meta.model
-        invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
-        # We can re-invite *deactivated* members,
-        # even if they already received an invitation
-        user_is_member = self.siae.active_members.filter(email=email).exists()
-        if invitation:
-            if invitation.accepted and user_is_member:
-                error = forms.ValidationError(_("Cette personne a déjà accepté votre précédente invitation."))
-                self.add_error("email", error)
-            else:
-                invitation.extend_expiration_date()
+        existing_invitation = invitation_model.objects.filter(email__iexact=email, siae=self.siae).first()
+        if existing_invitation:
+            #
+            # WARNING The form is now bound to this instance
+            #
+            self.instance = existing_invitation
+            self.instance.extend_expiration_date()
 
-    def save(self, *args, **kwargs):
+    def clean_email(self):
+        email = self.cleaned_data["email"]
+        self._invited_user_exists_error(email)
+        self._extend_expiration_date_or_error(email)
+        return email
+
+    def save(self, *args, **kwargs):  # pylint: disable=unused-argument
         invitation = super().save(commit=False)
+        invitation.sender = self.sender
         invitation.siae = self.siae
         invitation.save()
-        invitation.send()
         return invitation
 
 
-class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
+class BaseSiaeStaffInvitationFormSet(BaseInvitationFormSet):
     def __init__(self, *args, **kwargs):
         """
         By default, BaseModelFormSet show the objects stored in the DB.
@@ -205,11 +181,11 @@ class SiaeStaffInvitationFormSet(forms.BaseModelFormSet):
         self.forms[0].empty_permitted = False
 
 
-"""
-Formset used when an employer invites other employers to join his structure.
-"""
-NewSiaeStaffInvitationFormSet = modelformset_factory(
-    SiaeStaffInvitation, form=NewSiaeStaffInvitationForm, formset=SiaeStaffInvitationFormSet, extra=1, max_num=30
+#
+# Formset used when an employer invites other employers to join his structure.
+#
+SiaeStaffInvitationFormSet = modelformset_factory(
+    SiaeStaffInvitation, form=SiaeStaffInvitationForm, formset=BaseSiaeStaffInvitationFormSet, extra=1, max_num=30
 )
 
 
@@ -218,21 +194,21 @@ NewSiaeStaffInvitationFormSet = modelformset_factory(
 ###############################################################
 
 
-class NewUserForm(SignupForm):
+class NewUserInvitationForm(SignupForm):
     """
     Signup form shown when a user accepts an invitation.
     """
 
     first_name = forms.CharField(
-        label=gettext_lazy("Prénom"),
-        max_length=get_user_model()._meta.get_field("first_name").max_length,
+        label="Prénom",
+        max_length=User._meta.get_field("first_name").max_length,
         required=True,
         strip=True,
     )
 
     last_name = forms.CharField(
-        label=gettext_lazy("Nom"),
-        max_length=get_user_model()._meta.get_field("last_name").max_length,
+        label="Nom",
+        max_length=User._meta.get_field("last_name").max_length,
         required=True,
         strip=True,
     )
@@ -251,7 +227,7 @@ class NewUserForm(SignupForm):
 
     def clean(self):
         if isinstance(self.invitation, SiaeStaffInvitation) and not self.invitation.siae.is_active:
-            raise forms.ValidationError(_("Cette structure n'est plus active."))
+            raise forms.ValidationError("La structure que vous souhaitez rejoindre n'est plus active.")
         super().clean()
 
     def save(self, request):

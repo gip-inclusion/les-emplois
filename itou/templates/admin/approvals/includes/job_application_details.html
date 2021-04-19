@@ -1,56 +1,55 @@
-{% load i18n %}
 {% load format_filters %}
 
 {% with job_application.job_seeker as job_seeker %}
 
     <h2>
         <a href="{% url "admin:users_user_change" job_seeker.id %}" target="_blank">
-            {% translate "Candidat" %}
+            Candidat
         </a>
     </h2>
 
     <ul>
         <li>
-            <b>{% translate "Nom : " %}</b>
+            <b>Nom : </b>
             {{ job_seeker.last_name }}
             <small>
                 (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.last_name|urlencode }}" target="_blank">
-                {% translate "rechercher dans les agréments Pôle emploi" %}
+                rechercher dans les agréments Pôle emploi
                 </a>)
             </small>
         </li>
         <li>
-            <b>{% translate "Prénom : " %}</b>
+            <b>Prénom : </b>
             {{ job_seeker.first_name }}
         </li>
         <li>
-            <b>{% translate "Date de naissance : " %}</b>
+            <b>Date de naissance : </b>
             {{ job_seeker.birthdate|date:"d/m/Y" }}
         </li>
         <li>
-            <b>{% translate "Email : " %}</b>
+            <b>Email : </b>
             {{ job_seeker.email }}
         </li>
         {% if job_seeker.phone %}
             <li>
-                <b>{% translate "Téléphone : " %}</b>
+                <b>Téléphone : </b>
                 {{ job_seeker.phone|format_phone }}
             </li>
         {% endif %}
         {% if job_seeker.pole_emploi_id %}
             <li>
-                <b>{% translate "Identifiant Pôle emploi : " %}</b>
+                <b>Identifiant Pôle emploi : </b>
                 {{ job_seeker.pole_emploi_id }}
                 <small>
                     (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.pole_emploi_id|urlencode }}" target="_blank">
-                    {% translate "rechercher dans les agréments Pôle emploi" %}
+                    rechercher dans les agréments Pôle emploi
                     </a>)
                 </small>
             </li>
         {% endif %}
         {% if job_seeker.lack_of_pole_emploi_id_reason %}
             <li>
-                <b>{% translate "Raison de l'absence d'identifiant Pôle emploi : " %}</b>
+                <b>Raison de l'absence d'identifiant Pôle emploi : </b>
                 {{ job_seeker.get_lack_of_pole_emploi_id_reason_display }}
             </li>
         {% endif %}
@@ -62,25 +61,25 @@
 
     <h2>
         <a href="{% url "admin:siaes_siae_change" siae.id %}" target="_blank">
-            {% translate "Employeur solidaire" %}
+            Employeur solidaire
         </a>
     </h2>
 
     <ul>
         <li>
-            <b>{% translate "Siret : " %}</b>
+            <b>Siret : </b>
             {{ siae.siret }}
         </li>
         <li>
-            <b>{% translate "Nom : " %}</b>
+            <b>Nom : </b>
             {{ siae.display_name }}
         </li>
         <li>
-            <b>{% translate "Type : " %}</b>
+            <b>Type : </b>
             {{ siae.kind }} ({{ siae.get_kind_display }})
         </li>
         <li>
-            <b>{% translate "Département : " %}</b>
+            <b>Département : </b>
             {{ siae.get_department_display }}
         </li>
     </ul>
@@ -89,22 +88,22 @@
 
 <h2>
     <a href="{% url "admin:job_applications_jobapplication_change" job_application.id %}" target="_blank">
-        {% translate "Candidature" %}
+        Candidature
     </a>
 </h2>
 
 <ul>
     <li>
-        <b>{% translate "Statut : " %}</b>
+        <b>Statut : </b>
         {{ job_application.get_state_display }}
     </li>
     <li>
-        <b>{% translate "Date de début du contrat : " %}</b>
+        <b>Date de début du contrat : </b>
         {{ job_application.hiring_start_at|date:"d/m/Y" }}
     </li>
     {% if job_application.hiring_end_at %}
         <li>
-            <b>{% translate "Date de fin du contrat : " %}</b>
+            <b>Date de fin du contrat : </b>
             {{ job_application.hiring_end_at|date:"d/m/Y" }}
         </li>
     {% endif %}

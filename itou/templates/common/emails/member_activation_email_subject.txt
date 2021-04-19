@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
 {% block subject %}
-{% blocktranslate %}[Réactivation] Vous êtes désormais membre de {{ structure.display_name }}{% endblocktranslate %}
+[Réactivation] Vous êtes désormais membre de {{ structure.display_name }}
 {% endblock %}

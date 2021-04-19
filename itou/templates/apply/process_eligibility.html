@@ -1,5 +1,4 @@
 {% extends "apply/process_base.html" %}
-{% load i18n %}
 
 {% block content %}
 
@@ -9,51 +8,47 @@
 
     <hr>
 
-    <h2>{% translate "Valider l'éligibilité IAE" %}</h2>
+    <h2>Valider l'éligibilité IAE</h2>
 
-    <p>{% translate "Pour valider l'éligibilité IAE du candidat il faut :" %}</p>
+    <p>Pour valider l'éligibilité IAE du candidat il faut :</p>
 
     <ol>
         <li>
-            {% blocktranslate %}
-                Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
-            {% endblocktranslate %}
+            Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
         </li>
         <li>
-            {% translate "Sélectionner le ou les critères administratifs" %}
+            Sélectionner le ou les critères administratifs
             <ul>
                 <li>
-                    {% translate "un critère administratif de niveau 1" %}
+                    un critère administratif de niveau 1
                 </li>
                 <li>
-                    {% translate "trois critères de niveau 2 (seulement deux critères de niveau 2 pour les ETTI)" %}
+                    trois critères de niveau 2 (seulement deux critères de niveau 2 pour les ETTI)
                 </li>
         </li>
     </ol>
 
     <p>
-        {% blocktranslate %}
-            Si le candidat ne remplit pas les conditions administratives, <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite/derogation-criteres" target="_blank" rel="noreferrer noopener">orientez-le vers un prescripteur habilité</a>.
-        {% endblocktranslate %}
+        Si le candidat ne remplit pas les conditions administratives, <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite/derogation-criteres" target="_blank" rel="noreferrer noopener">orientez-le vers un prescripteur habilité</a>.
     </p>
 
     <div class="alert alert-warning" role="alert">
-        <i>{% translate "Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge." %}</i>
+        <i>Dans le cadre de l'expérimentation actuelle, nous vous informons que la liste des critères d'éligibilité à l'IAE est susceptible d'évoluer à la marge.</i>
     </div>
 
     <hr>
 
-    <h2>{% translate "Critères d'éligibilité" %}</h2>
+    <h2>Critères d'éligibilité</h2>
 
     {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
     {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
     <div class="alert alert-secondary" role="alert">
         <p>
-            {% translate "Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :" %}
+            Si le candidat n'est pas éligible à l'insertion par l'activité économique, vous pouvez décliner sa candidature :
         </p>
         <a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-outline-danger btn-block">
-            {% translate "Décliner la candidature" %}
+            Décliner la candidature
             {% include "includes/icon.html" with icon="arrow-right" %}
         </a>
     </div>

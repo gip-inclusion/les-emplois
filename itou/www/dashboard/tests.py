@@ -1,10 +1,8 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import gettext as _
 
 from itou.job_applications.factories import (
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -23,6 +21,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipFactory,
 )
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
+from itou.users.models import User
 from itou.www.dashboard.forms import EditUserEmailForm
 
 
@@ -58,7 +57,7 @@ class DashboardViewTest(TestCase):
         last_url = response.redirect_chain[-1][0]
         self.assertEqual(last_url, reverse("account_logout"))
 
-        expected_message = _("votre compte n'est malheureusement plus actif")
+        expected_message = "votre compte n'est malheureusement plus actif"
         self.assertContains(response, expected_message)
 
 
@@ -80,7 +79,7 @@ class EditUserInfoViewTest(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
 
-        user = get_user_model().objects.get(id=user.id)
+        user = User.objects.get(id=user.id)
         self.assertEqual(user.first_name, post_data["first_name"])
         self.assertEqual(user.last_name, post_data["last_name"])
         self.assertEqual(user.phone, post_data["phone"])
@@ -118,7 +117,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, back_url)
 
-        job_seeker = get_user_model().objects.get(id=job_application.job_seeker.id)
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
         self.assertEqual(job_seeker.first_name, post_data["first_name"])
         self.assertEqual(job_seeker.last_name, post_data["last_name"])
         self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])

@@ -1,6 +1,5 @@
 {% extends "apply/submit_base.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 
 {% block content %}
 
@@ -19,9 +18,9 @@
         {% buttons %}
             <button type="submit" class="btn btn-primary">
                 {% if request.user.is_siae_staff %}
-                    {% translate "Enregistrer la candidature" %}
+                    Enregistrer la candidature
                 {% else %}
-                    {% translate "Envoyer la candidature" %}
+                    Envoyer la candidature
                 {% endif %}
             </button>
         {% endbuttons %}

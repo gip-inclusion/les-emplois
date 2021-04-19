@@ -1,19 +1,18 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Modifier votre organisation" %}{{ block.super }}{% endblock %}
+{% block title %}Modifier votre organisation{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Modifier votre organisation" %}</h1>
+<h1>Modifier votre organisation</h1>
 
 <h2 class="text-muted">
     {{ organization.display_name }}
 </h2>
 
 <div class="alert alert-info" role="alert">
-    {% translate "Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés." %}
+    Les coordonnées de contact de votre organisation sont visibles par tous les utilisateurs connectés.
 </div>
 
 <form method="post" action="" class="js-prevent-multiple-submit">
@@ -23,8 +22,8 @@
     {% bootstrap_form form %}
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% translate "Annuler" %}</a>
-        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
+        <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">Annuler</a>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% endbuttons %}
 
 </form>

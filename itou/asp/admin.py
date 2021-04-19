@@ -1,15 +1,14 @@
 from django.contrib import admin
-from django.utils.translation import gettext as _
 
 from itou.asp import models
 
 
 class PeriodFilter(admin.SimpleListFilter):
-    title = _("période de validité")
+    title = "période de validité"
     parameter_name = "end_date"
 
     def lookups(self, request, model_admin):
-        return (("current", _("En cours")), ("old", _("Historique")))
+        return (("current", "En cours"), ("old", "Historique"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -21,7 +20,7 @@ class PeriodFilter(admin.SimpleListFilter):
 
 
 class CountryFilter(admin.SimpleListFilter):
-    title = _("Groupe de pays")
+    title = "Groupe de pays"
     parameter_name = "group"
 
     def lookups(self, request, model_admin):

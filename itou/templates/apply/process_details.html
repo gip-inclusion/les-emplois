@@ -1,6 +1,5 @@
 {% extends "apply/process_base.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 {% load format_filters %}
 
 {% block content %}
@@ -9,20 +8,20 @@
 
     {# Job seeker info ------------------------------------------------------------------------- #}
 
-    <h3 class="font-weight-normal text-muted">{% translate "Candidat" %}</h3>
+    <h3 class="font-weight-normal text-muted">Candidat</h3>
     {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
 
     {# Job application info ------------------------------------------------------------------------- #}
 
     <hr>
-    <h3 class="font-weight-normal text-muted">{% translate "Candidature" %}</h3>
+    <h3 class="font-weight-normal text-muted">Candidature</h3>
 
     <ul>
-        <li>{% translate "Date de la candidature :" %} <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
+        <li>Date de la candidature : <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
 
         {% if job_application.selected_jobs.exists %}
             <li>
-                {% translate "Métier(s) recherché(s) :" %}
+                Métier(s) recherché(s) :
                 <ul>
                     {% for job in job_application.selected_jobs.all %}
                         <li><b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})</li>
@@ -30,12 +29,12 @@
                 </ul>
             </li>
         {% else %}
-            <li>{% translate "Candidature spontanée" %}</li>
+            <li>Candidature spontanée</li>
         {% endif %}
     </ul>
 
     <div class="alert alert-secondary">
-        <p><b>{% translate "Message :" %}</b></p>
+        <p><b>Message :</b></p>
         {{ job_application.message|linebreaks }}
     </div>
 
@@ -52,7 +51,7 @@
                     #}
                     <hr>
                     <h3 class="font-weight-normal text-muted">
-                        {% translate "Éligibilité IAE" %}
+                        Éligibilité IAE
                     </h3>
                     <p>
                         Confirmée par
@@ -93,10 +92,10 @@
                 {% else %}
                     <hr>
                     <h3 class="font-weight-normal text-muted">
-                        {% translate "Critères d'éligibilité" %}
+                        Critères d'éligibilité
                     </h3>
                     <p>
-                        {% translate "Validés par" %}
+                        Validés par
                         <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
                         {% if eligibility_diagnosis.author_siae %}
                             ({{ eligibility_diagnosis.author_siae.display_name }})
@@ -104,7 +103,7 @@
                         {% if eligibility_diagnosis.author_prescriber_organization %}
                             ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
                         {% endif %}
-                        {% translate "le" %}
+                        le
                         <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>.
                     </p>
 
@@ -112,7 +111,7 @@
                         {% if administrative_criteria %}
                             <p>
                                 <span class="badge badge-secondary">
-                                    {% translate "Critères administratifs" %}
+                                    Critères administratifs
                                 </span>
                             </p>
                             {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
@@ -134,7 +133,7 @@
 
                     <p>
                         <i>
-                            {% translate "Ce diagnostic expire le " %}
+                            Ce diagnostic expire le 
                             {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
                         </i>
                     </p>
@@ -143,9 +142,9 @@
             {% elif approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis %}
 
                 <hr>
-                <h3 class="font-weight-normal text-muted">{% translate "Critères d'éligibilité" %}</h3>
+                <h3 class="font-weight-normal text-muted">Critères d'éligibilité</h3>
                 <p>
-                    {% translate "Validés par" %} <b>{% translate "Pôle emploi" %}</b>.
+                    Validés par <b>Pôle emploi</b>.
                 </p>
 
             {% endif %}
@@ -156,39 +155,39 @@
 
     <hr>
 
-    <h3 class="font-weight-normal text-muted">{% translate "Candidature envoyée par" %}</h3>
+    <h3 class="font-weight-normal text-muted">Candidature envoyée par</h3>
 
     <ul>
 
-        <li>{% translate "Prénom :" %} <b>{{ job_application.sender.first_name }}</b></li>
+        <li>Prénom : <b>{{ job_application.sender.first_name }}</b></li>
 
-        <li>{% translate "Nom :" %} <b>{{ job_application.sender.last_name }}</b></li>
+        <li>Nom : <b>{{ job_application.sender.last_name }}</b></li>
 
-        <li>{% translate "Type :" %} <b>{{ job_application.get_sender_kind_display }}</b></li>
+        <li>Type : <b>{{ job_application.get_sender_kind_display }}</b></li>
 
-        <li>{% translate "E-mail :" %} <a
+        <li>E-mail : <a
                 href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
 
         {% if job_application.sender_prescriber_organization %}
             <li>
-                {% translate "Structure :" %}
+                Structure :
                 <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
                 {% if job_application.is_sent_by_authorized_prescriber %}
-                    <span class="badge badge-warning">{% translate "Prescripteur habilité" %}</span>
+                    <span class="badge badge-warning">Prescripteur habilité</span>
                 {% endif %}
             </li>
         {% endif %}
 
         {% if job_application.sender_siae %}
             <li>
-                {% translate "Employeur solidaire :" %}
+                Employeur solidaire :
                 <b>{{ job_application.sender_siae.display_name }}</b>
             </li>
         {% endif %}
 
         {% if job_application.sender.phone %}
             <li>
-                {% translate "Téléphone :" %}
+                Téléphone :
                 <a href="tel:{{ job_application.sender.phone }}">{{ job_application.sender.phone|format_phone }}</a>
             </li>
         {% endif %}
@@ -205,7 +204,7 @@
               class="js-prevent-multiple-submit">
             {% csrf_token %}
             {% buttons %}
-                <button type="submit" class="btn btn-warning">{% translate "J'étudie cette candidature" %}</button>
+                <button type="submit" class="btn btn-warning">J'étudie cette candidature</button>
             {% endbuttons %}
         </form>
 
@@ -217,18 +216,18 @@
 
         <hr>
 
-        <h3 class="font-weight-normal text-muted">{% translate "Réponse" %}</h3>
+        <h3 class="font-weight-normal text-muted">Réponse</h3>
 
         {% if job_application.refusal_reason %}
             <p>
-                <b>{% translate "Motif du refus :" %}</b><br>
+                <b>Motif du refus :</b><br>
                 {{ job_application.get_refusal_reason_display }}
             </p>
         {% endif %}
 
         {% if job_application.answer %}
             <div class="alert alert-secondary">
-                <p><b>{% translate "Message :" %}</b></p>
+                <p><b>Message :</b></p>
                 {{ job_application.answer|linebreaks }}
             </div>
         {% endif %}
@@ -249,7 +248,7 @@
             <p>
                 <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
-                    {% translate "Je l'embauche" %}
+                    Je l'embauche
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
@@ -257,7 +256,7 @@
             <p>
                 <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
-                    {% translate "Mettre en liste d'attente" %}
+                    Mettre en liste d'attente
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
@@ -267,7 +266,7 @@
         <p>
             <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
                class="btn btn-outline-danger btn-block">
-                {% translate "Décliner la candidature" %}
+                Décliner la candidature
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>
@@ -288,7 +287,7 @@
             <p>
                 <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
-                    {% translate "Je l'embauche" %}
+                    Je l'embauche
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
@@ -297,7 +296,7 @@
         <p>
             <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
                class="btn btn-outline-danger btn-block">
-                {% translate "Décliner la candidature" %}
+                Décliner la candidature
                 {% include "includes/icon.html" with icon="arrow-right" %}
             </a>
         </p>
@@ -319,7 +318,7 @@
             <p>
                 <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
                    class="btn btn-outline-success btn-block">
-                    {% translate "Je l'embauche" %}
+                    Je l'embauche
                     {% include "includes/icon.html" with icon="arrow-right" %}
                 </a>
             </p>
@@ -332,11 +331,11 @@
     {% if job_application.state.is_accepted %}
         <hr>
 
-        <h3 class="font-weight-normal text-muted">{% translate "Détails du contrat de travail" %}</h3>
+        <h3 class="font-weight-normal text-muted">Détails du contrat de travail</h3>
         <p>
         <ul>
-            <li>{% translate "Début" %} : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
-            <li>{% translate "Fin" %} : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
+            <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
+            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
         </ul>
         </p>
 
@@ -344,7 +343,7 @@
             <p>
                 <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}"
                    class="btn btn-outline-primary btn-block">
-                    {% translate "Modifier la période du contrat de travail" %}
+                    Modifier la période du contrat de travail
                 </a>
             </p>
         {% endif %}
@@ -353,27 +352,21 @@
         {% if job_application.can_be_cancelled %}
             <hr>
 
-            <h3 class="font-weight-normal text-muted">{% translate "Rétractation" %}</h3>
+            <h3 class="font-weight-normal text-muted">Rétractation</h3>
             <p>
-                {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" cancellation_days=cancellation_days %}
-                    Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ cancellation_date }} inclus.
-                {% endblocktranslate %}
+                Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ job_application.cancellation_delay_end|date:"d/m/Y" }} inclus.
             </p>
             {% if job_application.to_siae.is_subject_to_eligibility_rules %}
                 <p>
-                    {% blocktranslate %}
-                        Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
-                    {% endblocktranslate %}
+                    Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
                 </p>
                 <p>
-                    {% blocktranslate with user_name=job_application.job_seeker.get_full_name|title %}
-                        {{ user_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
-                    {% endblocktranslate %}
+                    {{ job_application.job_seeker.get_full_name|title }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
                 </p>
             {% endif %}
             <p>
                 <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">
-                    <button class="btn btn-danger btn-block">{% translate "Annuler l'embauche" %}</button>
+                    <button class="btn btn-danger btn-block">Annuler l'embauche</button>
                 </a>
             </p>
         {% endif %}
@@ -387,19 +380,17 @@
 
         <hr>
 
-        <h3 class="font-weight-normal text-muted">{% translate "Historique des modifications" %}</h3>
+        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
 
         <ul>
             {% for log in transition_logs %}
                 <li>
-                    {% blocktranslate with pretty_to_state=log.pretty_to_state %}
-                        Passé en "<b>{{ pretty_to_state }}</b>"
-                    {% endblocktranslate %}
+                    Passé en "<b>{{ log.pretty_to_state }}</b>"
                     <ul>
                         {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
-                            <li>{% translate "Par" %} {{ log.user.get_full_name }}</li>
+                            <li>Par {{ log.user.get_full_name }}</li>
                         {% endif %}
-                        <li>{% translate "Le" %} {{ log.timestamp|date:"d F Y à H:i" }}</li>
+                        <li>Le {{ log.timestamp|date:"d F Y à H:i" }}</li>
                     </ul>
                 </li>
             {% endfor %}
@@ -409,7 +400,7 @@
 
     <hr>
     <p>
-        <a href="{% url 'apply:list_for_siae' %}">{% translate "Retour" %}</a>
+        <a href="{% url 'apply:list_for_siae' %}">Retour</a>
     </p>
 
 {% endblock %}

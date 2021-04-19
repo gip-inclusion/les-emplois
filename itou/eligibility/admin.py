@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.template.defaultfilters import date as date_filter
-from django.utils.translation import gettext as _
 
 from itou.eligibility import models
 
@@ -13,11 +12,11 @@ class AdministrativeCriteriaInline(admin.TabularInline):
 
 
 class IsValidFilter(admin.SimpleListFilter):
-    title = _("En cours de validité")
+    title = "En cours de validité"
     parameter_name = "is_valid"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -29,11 +28,11 @@ class IsValidFilter(admin.SimpleListFilter):
 
 
 class HasApprovalFilter(admin.SimpleListFilter):
-    title = _("PASS IAE en cours")
+    title = "PASS IAE en cours"
     parameter_name = "has_approval"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -73,12 +72,12 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         return obj.is_valid
 
     is_valid.boolean = True
-    is_valid.short_description = _("En cours de validité")
+    is_valid.short_description = "En cours de validité"
 
     def expires_at(self, obj):
         return date_filter(obj.expires_at, "d F Y H:i")
 
-    expires_at.short_description = _("Date d'expiration")
+    expires_at.short_description = "Date d'expiration"
 
     def is_considered_valid(self, obj):
         """
@@ -88,7 +87,7 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         return obj.is_considered_valid
 
     is_considered_valid.boolean = True
-    is_considered_valid.short_description = _("Valide ou PASS IAE en cours")
+    is_considered_valid.short_description = "Valide ou PASS IAE en cours"
 
     def has_approval(self, obj):
         """
@@ -97,7 +96,7 @@ class EligibilityDiagnosisAdmin(admin.ModelAdmin):
         return obj._has_approval
 
     has_approval.boolean = True
-    has_approval.short_description = _("PASS IAE en cours")
+    has_approval.short_description = "PASS IAE en cours"
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

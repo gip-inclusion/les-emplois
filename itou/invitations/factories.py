@@ -1,49 +1,35 @@
+from datetime import timedelta
+
 import factory
-from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.invitations import models
 from itou.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from itou.siaes.factories import SiaeWith2MembershipsFactory
+from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.users.factories import UserFactory
 
 
-class InvitationFactory(factory.django.DjangoModelFactory):
-    """Generate an Invitation() object for unit tests."""
-
+class SiaeStaffInvitationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.SiaeStaffInvitation
 
-    email = factory.Sequence("email{0}@domain.com".format)
+    email = factory.Sequence("email{0}@siaestaff.com".format)
     first_name = factory.Sequence("first_name{0}".format)
     last_name = factory.Sequence("last_name{0}".format)
     sender = factory.SubFactory(UserFactory)
-    siae = factory.SubFactory(SiaeWith2MembershipsFactory)
+    siae = factory.SubFactory(SiaeWithMembershipFactory)
 
 
-class SentInvitationFactory(InvitationFactory):
+class SentSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
     sent = True
     sent_at = factory.LazyFunction(timezone.now)
 
 
-class ExpiredInvitationFactory(SentInvitationFactory):
+class ExpiredSiaeStaffInvitationFactory(SiaeStaffInvitationFactory):
+    sent = True
     sent_at = factory.LazyAttribute(
-        lambda self: timezone.now()
-        - relativedelta(days=models.InvitationAbstract.EXPIRATION_DAYS)
-        - relativedelta(days=1)
+        lambda self: timezone.now() - timedelta(days=models.InvitationAbstract.EXPIRATION_DAYS)
     )
-
-
-class SiaeSentInvitationFactory(SentInvitationFactory):
-    """
-    Same as InvitationFactory but lets us test
-    Siae invitations specific use cases.
-    """
-
-    class Meta:
-        model = models.SiaeStaffInvitation
-
-    siae = factory.SubFactory(SiaeWith2MembershipsFactory)
 
 
 class PrescriberWithOrgSentInvitationFactory(factory.django.DjangoModelFactory):

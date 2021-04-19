@@ -1,20 +1,15 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
 {% if job_application.is_sent_by_proxy %}
 
-{% blocktranslate with siae_name=job_application.to_siae.display_name sender=job_application.sender.get_full_name %}
-{{ sender }} a envoyé votre candidature chez {{ siae_name }}.
+{{ job_application.sender.get_full_name }} a envoyé votre candidature chez {{ job_application.to_siae.display_name }}.
 Vous et {{ sender }} serez tous les deux informés de l'avancement de cette candidature.
-{% endblocktranslate %}
 
 {% else %}
-{% blocktranslate with siae_name=job_application.to_siae.display_name %}
-Candidature chez {{ siae_name }} envoyée avec succès !
+Candidature chez {{ job_application.to_siae.display_name }} envoyée avec succès !
 Vous et votre candidat serez tous les deux informés de l'avancement de cette candidature.
-{% endblocktranslate %}
 
 {% endif %}
 
@@ -22,7 +17,7 @@ Vous et votre candidat serez tous les deux informés de l'avancement de cette ca
 
 {% if job_application.message %}
 
-{% translate "*Message de candidature* :" %}
+*Message de candidature* :
 
 {{ job_application.message }}
 
@@ -30,14 +25,14 @@ Vous et votre candidat serez tous les deux informés de l'avancement de cette ca
 
 {% if job_application.selected_jobs.exists %}
 
-{% translate "*Métier(s) recherché(s)* :" %}
+*Métier(s) recherché(s)* :
 
 {% for job in job_application.selected_jobs.all %}
 - {{ job.display_name }}{% endfor %}
 
 {% endif %}
 
-{% translate "*Informations transmises à la structure* :" %}
+*Informations transmises à la structure* :
 
 - Nom : {{ job_application.job_seeker.last_name }}
 - Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
@@ -51,7 +46,7 @@ Vous et votre candidat serez tous les deux informés de l'avancement de cette ca
 {% if job_application.is_sent_by_proxy %}
 --------
 
-{% translate "*Candidature envoyée par* :" %}
+*Candidature envoyée par* :
 
 - {{ job_application.sender.get_full_name }}{% if job_application.sender_prescriber_organization %}
 - {{ job_application.sender_prescriber_organization.display_name }}{% endif %}
@@ -59,7 +54,7 @@ Vous et votre candidat serez tous les deux informés de l'avancement de cette ca
 {% endif %}
 
 ---
-{% translate "Pour vous connecter avec votre adresse e-mail, cliquez ici" %} : {{ base_url }}{% url 'account_login' %}?account_type=job_seeker
-{% translate "Mot de passe oublié ? Cliquez ici" %} : {{ base_url }}{% url 'account_reset_password' %}
+Pour vous connecter avec votre adresse e-mail, cliquez ici : {{ base_url }}{% url 'account_login' %}?account_type=job_seeker
+Mot de passe oublié ? Cliquez ici : {{ base_url }}{% url 'account_reset_password' %}
 
 {% endblock body %}

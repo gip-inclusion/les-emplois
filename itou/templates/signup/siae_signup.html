@@ -1,14 +1,13 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 
-{% block title %}{% translate "Employeur solidaire - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Employeur solidaire - Inscription{{ block.super }}{% endblock %}
 
 
 {% block content %}
 <h1>
-    {% translate "Inscription" %}
-    <small class="text-muted">{% translate "Employeur solidaire" %}</small>
+    Inscription
+    <small class="text-muted">Employeur solidaire</small>
 </h1>
 
 <form method="post" action="" role="form" class="js-prevent-multiple-submit">
@@ -40,6 +39,6 @@
 <hr>
 
 <p>
-    <a href="{% url 'account_login' %}">{% translate "Vous avez déjà un compte ?" %}</a>
+    <a href="{% url 'account_login' %}">Vous avez déjà un compte ?</a>
 </p>
 {% endblock %}

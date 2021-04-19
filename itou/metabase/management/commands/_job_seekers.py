@@ -3,7 +3,6 @@ from functools import partial
 from operator import attrgetter
 
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.job_applications.models import JobApplicationWorkflow
@@ -17,8 +16,8 @@ from itou.metabase.management.commands._utils import (
 
 # Reword the original EligibilityDiagnosis.AUTHOR_KIND_CHOICES
 AUTHOR_KIND_CHOICES = (
-    (EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER, _("Prescripteur")),
-    (EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF, _("Employeur")),
+    (EligibilityDiagnosis.AUTHOR_KIND_PRESCRIBER, "Prescripteur"),
+    (EligibilityDiagnosis.AUTHOR_KIND_SIAE_STAFF, "Employeur"),
 )
 
 

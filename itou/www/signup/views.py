@@ -12,7 +12,6 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_GET
 
 from itou.prescribers.models import PrescriberOrganization
@@ -96,7 +95,7 @@ def siae_select(request, template_name="signup/siae_select.html"):
     if request.method == "POST" and siae_select_form and siae_select_form.is_valid():
         siae_selected = siae_select_form.cleaned_data["siaes"]
         siae_selected.new_signup_activation_email_to_official_contact(request).send()
-        message = _(
+        message = (
             f"Nous venons d'envoyer un e-mail à l'adresse {siae_selected.obfuscated_auth_email} "
             f"pour continuer votre inscription. Veuillez consulter votre boite "
             f"de réception."
@@ -121,7 +120,7 @@ class SiaeSignupView(SignupView):
 
     def warn_and_redirect(self, request):
         messages.warning(
-            request, _("Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.")
+            request, "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
         )
         return HttpResponseRedirect(reverse("signup:siae_select"))
 

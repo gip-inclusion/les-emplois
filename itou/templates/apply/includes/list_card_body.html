@@ -1,11 +1,10 @@
-{% load i18n %}
 <div class="row no-gutters">
 
     <div class="col-md-5">
         <div class="card-body">
-            <h6 class="card-subtitle text-muted">{% translate "Métier(s) recherché(s) :" %}</h6>
+            <h6 class="card-subtitle text-muted">Métier(s) recherché(s) :</h6>
             {% if not job_application.selected_jobs.exists %}
-                <p class="card-text">{% translate "Candidature spontanée" %}</p>
+                <p class="card-text">Candidature spontanée</p>
             {% else %}
                 <ul class="card-text">
                     {% for job in job_application.selected_jobs.all %}
@@ -18,13 +17,13 @@
 
     <div class="col-md-4">
         <div class="card-body">
-            <h6 class="card-subtitle text-muted">{% translate "Envoyée par :" %}</h6>
+            <h6 class="card-subtitle text-muted">Envoyée par :</h6>
             <p class="card-text">
 
                 {% if request.user == job_application.sender %}
-                    {% translate "Vous" %}
+                    Vous
                 {% elif job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
-                    {% translate "Le candidat lui même" %}
+                    Le candidat lui même
                 {% else %}
                     {{ job_application.sender.get_full_name }}
                 {% endif %}
@@ -35,7 +34,7 @@
                         <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
                         {% if job_application.is_sent_by_authorized_prescriber %}
                             <br>
-                            <span class="badge badge-warning">{% translate "Prescripteur habilité" %}</span>
+                            <span class="badge badge-warning">Prescripteur habilité</span>
                         {% endif %}
                     {% endif %}
                 {% endif %}
@@ -45,7 +44,7 @@
                     <b>{{ job_application.sender_siae.display_name }}</b>
                     {% if request.user.is_siae_staff %}
                         <br>
-                        <span class="badge badge-info">{% translate "Auto-prescription" %}</span>
+                        <span class="badge badge-info">Auto-prescription</span>
                     {% endif %}
                 {% endif %}
 
@@ -55,12 +54,12 @@
 
     <div class="col-md-3">
         <div class="card-body">
-            <h6 class="card-subtitle text-muted">{% translate "Statut :" %}</h6>
+            <h6 class="card-subtitle text-muted">Statut :</h6>
             <p class="card-text">
                 {% include "apply/includes/state_badge.html" with job_application=job_application %}
                 {% if job_application.has_suspended_approval %}
                     <br>
-                    <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
+                    <span class="badge badge-warning">PASS IAE suspendu</span>
                 {% endif %}
             </p>
         </div>

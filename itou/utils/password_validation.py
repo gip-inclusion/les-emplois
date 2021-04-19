@@ -1,7 +1,6 @@
 import string
 
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy
 
 
 class CnilCompositionPasswordValidator:
@@ -24,7 +23,7 @@ class CnilCompositionPasswordValidator:
 
     SPECIAL_CHARS = string.punctuation
 
-    HELP_MSG = gettext_lazy(
+    HELP_MSG = (
         "Le mot de passe doit contenir au moins 3 des 4 types suivants : "
         "majuscules, minuscules, chiffres, caractères spéciaux."
     )

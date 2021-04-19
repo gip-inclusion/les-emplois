@@ -1,11 +1,10 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% load format_filters %}
-{% load i18n %}
 {% block body %}
 
-{% translate "Vous avez reçu une nouvelle candidature !" %}
+Vous avez reçu une nouvelle candidature !
 
-{% translate "*Candidat* :" %}
+*Candidat* :
 
 - Nom : {{ job_application.job_seeker.last_name }}
 - Prénom : {{ job_application.job_seeker.first_name }}{% if job_application.job_seeker.email %}
@@ -18,7 +17,7 @@
 
 {% if job_application.message %}
 
-{% translate "*Message du candidat* :" %}
+*Message du candidat* :
 
 {{ job_application.message }}
 
@@ -26,17 +25,17 @@
 
 {% if job_application.selected_jobs.exists %}
 
-{% translate "*Métier(s) recherché(s)* :" %}
+*Métier(s) recherché(s)* :
 
 {% for job in job_application.selected_jobs.all %}
 - {{ job.display_name }}{% endfor %}
 
 {% endif %}
 
-{% translate "*Candidature envoyée par :*" %}
+*Candidature envoyée par :*
 
 {% if job_application.sender_kind == job_application.SENDER_KIND_JOB_SEEKER %}
-{% translate "Le candidat lui même." %}
+Le candidat lui même.
 {% endif %}
 
 {% if job_application.sender_kind == job_application.SENDER_KIND_PRESCRIBER %}
@@ -48,16 +47,12 @@
 
 {% endif %}
 
-{% translate "Candidature envoyée à l'entreprise" %} {{ job_application.to_siae.display_name }}, {{ job_application.to_siae.city }}. Identifiant sur les emplois de l'inclusion : {{ job_application.to_siae.pk }}.
+Candidature envoyée à l'entreprise {{ job_application.to_siae.display_name }}, {{ job_application.to_siae.city }}. Identifiant sur les emplois de l'inclusion : {{ job_application.to_siae.pk }}.
 
 --------------------
 
-{% blocktranslate %}
 Toute demande de PASS IAE doit être effectuée au plus tard le jour de l'embauche. Les demandes rétroactives ne sont pas autorisées.
-{% endblocktranslate %}
 
-{% blocktranslate %}
 Vous pouvez désactiver les notifications depuis votre espace utilisateur (rubrique "Mon espace" > "Préférences" ).
-{% endblocktranslate %}
 
 {% endblock body %}

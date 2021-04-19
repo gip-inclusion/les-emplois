@@ -1,38 +1,31 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load i18n %}
 {% block body %}
 
 {% if job_application.is_sent_by_proxy %}
 
-{% blocktranslate with sender_full_name=job_application.sender.get_full_name job_seeker_full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
-Nous sommes ravis de vous annoncer que la candidature de {{ job_seeker_full_name }}, adressée par {{ sender_full_name }}, a été acceptée par {{ to_siae }}.
-{% endblocktranslate %}
+Nous sommes ravis de vous annoncer que la candidature de {{ job_application.job_seeker.get_full_name }}, adressée par {{ job_application.sender.get_full_name }}, a été acceptée par {{ job_application.to_siae.display_name }}.
 
-- {% translate "Date de début du contrat :" %} {{ job_application.hiring_start_at|date:"d/m/Y" }}
-- {% translate "Date de fin du contrat :" %} {{ job_application.hiring_end_at|date:"d/m/Y" }}
+- Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}
+- Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y" }}
 
-{% translate "Ces dates sont uniquement pour information. Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi." %} 
+Ces dates sont uniquement pour information. Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi. 
 
 {% else %}
 
-{% blocktranslate with to_siae=job_application.to_siae.display_name %}
-Votre candidature a été acceptée par {{ to_siae }}.
-{% endblocktranslate %}
+Votre candidature a été acceptée par {{ job_application.to_siae.display_name }}.
 
 {% endif %}
 
 {% if job_application.answer %}
-{% translate "*Message de l'entreprise* :" %}
+*Message de l'entreprise* :
 
 {{ job_application.answer }}
 {% endif %}
 
-{% blocktranslate %}
 Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
 
 Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ survey_link }}
 
 Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
-{% endblocktranslate %}
 
 {% endblock body %}

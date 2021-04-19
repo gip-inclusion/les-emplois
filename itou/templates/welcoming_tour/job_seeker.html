@@ -1,9 +1,8 @@
 {% extends "layout/content.html" %}
 {% load static %}
 {% load bootstrap4 %}
-{% load i18n %}
 
-{% block title %}{% translate "Bienvenue sur les emplois de l'inclusion !" %}{{ block.super }}{% endblock %}
+{% block title %}Bienvenue sur les emplois de l'inclusion !{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -15,47 +14,41 @@
     <div class="carousel-inner">
         <div class="carousel-item active">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Bienvenue sur les emplois de l'inclusion !" %}</h1>
+                <h1 class="text-center">Bienvenue sur les emplois de l'inclusion !</h1>
 
                 <img src="{% static 'img/welcoming_tour/candidat_1.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
                 <p class="w-sm-50 m-auto lead text-center pb-5">
-                    {% blocktranslate %}
-                        Les emplois de l'inclusion m’aident dans ma recherche d’emploi en insertion.<br>
-                        Je trouve les offres proches de chez moi, et je contacte directement les employeurs. C’est plus facile et rapide !
-                    {% endblocktranslate %}
+                    Les emplois de l'inclusion m’aident dans ma recherche d’emploi en insertion.<br>
+                    Je trouve les offres proches de chez moi, et je contacte directement les employeurs. C’est plus facile et rapide !
                 </p>
                 <p class="pt-3 text-center">
                     <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="next" >
-                      <button type="button" class="btn btn-primary">{% translate "Suivant" %}</button>
+                      <button type="button" class="btn btn-primary">Suivant</button>
                     </a>
                 </p>
             </div>
         </div>
         <div class="carousel-item">
             <div class="d-block w-100">
-                <h1 class="text-center">{% translate "Je suis informé de l’avancement de mes candidatures !" %}</h1>
+                <h1 class="text-center">Je suis informé de l’avancement de mes candidatures !</h1>
 
                 <img src="{% static 'img/welcoming_tour/candidat_2.svg' %}" class="d-block mx-auto my-4 w-sm-25">
 
                 <p class="w-sm-50 m-auto lead text-center">
-                    {% blocktranslate %}
-                        Une fois inscrit, je trouve les offres d’insertion proches de moi, et j’envoie mes candidatures aux employeurs.<br>
-                        Les emplois de l'inclusion m’informent par mail quand ma candidature est acceptée.
-                    {% endblocktranslate %}
+                    Une fois inscrit, je trouve les offres d’insertion proches de moi, et j’envoie mes candidatures aux employeurs.<br>
+                    Les emplois de l'inclusion m’informent par mail quand ma candidature est acceptée.
                 </p>
                 <p class="w-sm-50 m-auto lead text-center pt-2 pb-5">
-                    {% blocktranslate %}
-                        Maintenant, à moi de jouer !<br>
-                        J’ai toutes les chances dans mes recherches.
-                    {% endblocktranslate %}
+                    Maintenant, à moi de jouer !<br>
+                    J’ai toutes les chances dans mes recherches.
                 </p>
                 <p class="pt-3 text-center">
                     <a class="text-decoration-none" href="#welcoming_tour" role="button" data-slide="prev" >
-                      <button type="button" class="btn btn-secondary">{% translate "Précédent" %}</button>
+                      <button type="button" class="btn btn-secondary">Précédent</button>
                     </a>
                     <a class="text-decoration-none" href="{% url 'dashboard:index' %}" role="button" data-slide="next" >
-                      <button type="button" class="btn btn-primary">{% translate "Terminer" %}</button>
+                      <button type="button" class="btn btn-primary">Terminer</button>
                     </a>
                 </p>
             </div>
@@ -64,7 +57,7 @@
 </div>
 <p class="text-center pt-5 mb-0">
     <a href="{% url 'dashboard:index' %}">
-        <button type="button" class="btn btn-link">{% translate 'Ignorer la présentation' %}</button>
+        <button type="button" class="btn btn-link">Ignorer la présentation</button>
     </a>
 </p>
 

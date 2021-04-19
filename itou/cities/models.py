@@ -3,7 +3,6 @@ from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.template.defaultfilters import slugify
-from django.utils.translation import gettext_lazy as _
 
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENTS, REGIONS
@@ -18,13 +17,11 @@ class City(models.Model):
 
     DEPARTMENT_CHOICES = DEPARTMENTS.items()
 
-    name = models.CharField(verbose_name=_("Ville"), max_length=255, db_index=True)
-    slug = models.SlugField(verbose_name=_("Slug"), max_length=255, unique=True)
-    department = models.CharField(
-        verbose_name=_("Département"), choices=DEPARTMENT_CHOICES, max_length=3, db_index=True
-    )
-    post_codes = ArrayField(models.CharField(max_length=5), verbose_name=_("Codes postaux"), blank=True)
-    code_insee = models.CharField(verbose_name=_("Code INSEE"), max_length=5, unique=True)
+    name = models.CharField(verbose_name="Ville", max_length=255, db_index=True)
+    slug = models.SlugField(verbose_name="Slug", max_length=255, unique=True)
+    department = models.CharField(verbose_name="Département", choices=DEPARTMENT_CHOICES, max_length=3, db_index=True)
+    post_codes = ArrayField(models.CharField(max_length=5), verbose_name="Codes postaux", blank=True)
+    code_insee = models.CharField(verbose_name="Code INSEE", max_length=5, unique=True)
     # Latitude and longitude coordinates.
     # https://docs.djangoproject.com/en/2.2/ref/contrib/gis/model-api/#pointfield
     coords = gis_models.PointField(geography=True, blank=True, null=True)
@@ -32,8 +29,8 @@ class City(models.Model):
     objects = models.Manager()  # The default manager.
 
     class Meta:
-        verbose_name = _("Ville française")
-        verbose_name_plural = _("Villes françaises")
+        verbose_name = "Ville française"
+        verbose_name_plural = "Villes françaises"
         indexes = [
             # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/search/#trigram-similarity
             # https://docs.djangoproject.com/en/dev/ref/contrib/postgres/indexes/#ginindex

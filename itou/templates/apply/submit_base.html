@@ -1,19 +1,14 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 
-{% block title %}{% translate "Postuler" %}{{ block.super }}{% endblock %}
+{% block title %}Postuler{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
         {% if request.user.is_siae_staff %}
-            {% blocktranslate with siae_name=siae.display_name %}
-                <span class="text-muted">{{ siae_name }}</span>
-            {% endblocktranslate %}
+            <span class="text-muted">{{ siae.display_name }}</span>
         {% else %}
-            {% blocktranslate with full_name=job_seeker.get_full_name|title siae_name=siae.display_name %}
-                Postuler pour <span class="text-muted">{{ full_name }}</span> chez <span class="text-muted">{{ siae_name }}</span>
-            {% endblocktranslate %}
+            Postuler pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span> chez <span class="text-muted">{{ siae.display_name }}</span>
         {% endif %}
     </h1>
 

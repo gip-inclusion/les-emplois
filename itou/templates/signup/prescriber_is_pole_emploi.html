@@ -1,15 +1,14 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Prescripteur/Orienteur - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Prescripteur/Orienteur - Inscription{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur/Orienteur" %}</small>
+        Inscription
+        <small class="text-muted">Prescripteur/Orienteur</small>
     </h1>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -19,7 +18,7 @@
         {% bootstrap_form form %}
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
 
     </form>

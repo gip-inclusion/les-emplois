@@ -1,23 +1,16 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load i18n %}
 {% block body %}
 
-{% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst org_name=org.display_name %}
-Bonjour {{ first_name }} {{ last_name }} !
+Bonjour {{ first_name|capfirst }} {{ last_name|capfirst }} !
 
-Vous avez été invité(e) à vous rattacher au compte de la structure {{ org_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur les emplois de l'inclusion !
-{% endblocktranslate %}
+Vous avez été invité(e) à vous rattacher au compte de la structure {{ org.display_name }} sur les emplois de l'inclusion. Cliquez sur le lien ci-dessous pour vous inscrire en quelques clics. Nous sommes ravis de vous accueillir sur les emplois de l'inclusion !
 
 {{ acceptance_link }}
 
 {# Don't specify datetime format as it depends on the language. #}
 {# Better relying on the global DATE_FORMAT configuration variable. #}
-{% blocktranslate with date=expiration_date|date %}
-Cette invitation restera valide jusqu'au {{ date }}.
-{% endblocktranslate %}
+Cette invitation restera valide jusqu'au {{ expiration_date|date }}.
 
-{% blocktranslate %}
 Ignorez cet e-mail si vous ne souhaitez pas rejoindre cette organisation.
-{% endblocktranslate %}
 
 {% endblock %}

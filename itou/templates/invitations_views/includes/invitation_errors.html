@@ -1,13 +1,8 @@
-{% load i18n %}
 
 {% if invitation.has_expired %}
-    <h1>{% translate "Invitation expirée" %}</h1>
-    {% blocktranslate %}
-        <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
-    {% endblocktranslate %}
+    <h1>Invitation expirée</h1>
+    <p>Cette invitation est expirée. Merci de contacter la personne qui vous a invité(e) afin d'en recevoir une nouvelle.</p>
 {% elif invitation.accepted %}
-    <h1>{% translate "Invitation acceptée" %}</h1>
-    {% blocktranslate %}
-        <p>Cette invitation a déjà été acceptée.</p>
-    {% endblocktranslate %}
+    <h1>Invitation acceptée</h1>
+    <p>Cette invitation a déjà été acceptée.</p>
 {% endif %}

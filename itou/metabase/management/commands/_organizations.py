@@ -1,5 +1,3 @@
-from django.contrib.auth import get_user_model
-
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import (
     get_address_columns,
@@ -9,6 +7,7 @@ from itou.metabase.management.commands._utils import (
     get_first_membership_join_date,
 )
 from itou.prescribers.models import PrescriberOrganization
+from itou.users.models import User
 
 
 # Special fake adhoc organization designed to gather stats
@@ -30,7 +29,7 @@ def get_org_first_join_date(org):
 def get_org_members_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of prescriber users without org.
-        return get_user_model().objects.filter(is_prescriber=True, prescribermembership=None).count()
+        return User.objects.filter(is_prescriber=True, prescribermembership=None).count()
     return org.members.count()
 
 

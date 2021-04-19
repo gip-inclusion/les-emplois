@@ -1,15 +1,14 @@
 from django.contrib import admin
-from django.utils.translation import gettext as _
 
 from .models import PrescriberWithOrgInvitation, SiaeStaffInvitation
 
 
 class IsValidFilter(admin.SimpleListFilter):
-    title = _("En cours de validité")
+    title = "En cours de validité"
     parameter_name = "is_valid"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -40,8 +39,8 @@ class BaseInvitationAdmin(admin.ModelAdmin):
         return obj.acceptance_link
 
     is_valid.boolean = True
-    is_valid.short_description = _("En cours de validité")
-    acceptance_link.short_description = _("Lien")
+    is_valid.short_description = "En cours de validité"
+    acceptance_link.short_description = "Lien"
 
 
 @admin.register(SiaeStaffInvitation)

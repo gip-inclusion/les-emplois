@@ -1,6 +1,5 @@
 {% extends "apply/submit_base.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 
 {% block content %}
 
@@ -12,11 +11,10 @@
 
         {% bootstrap_form form %}
 
-        {% translate "Le candidat n'a pas d'email ?" as link_text %}
-        <p>{% include "signup/includes/no_email_link.html" with link_text=link_text %}</p>
+        <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'email ?" %}</p>
 
         {% buttons %}
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
 
     </form>

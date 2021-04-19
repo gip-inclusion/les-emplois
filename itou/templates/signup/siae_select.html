@@ -1,15 +1,14 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 
-{% block title %}{% translate "Employeur solidaire - Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Employeur solidaire - Inscription{{ block.super }}{% endblock %}
 
 
 {% block content %}
 
 <h1>
-    {% translate "Inscription" %}
-    <small class="text-muted">{% translate "Employeur solidaire" %}</small>
+    Inscription
+    <small class="text-muted">Employeur solidaire</small>
 </h1>
 
 <form method="get" action="" role="form">
@@ -19,7 +18,7 @@
     {% bootstrap_form siren_form %}
 
     {% buttons %}
-        <button type="submit" class="btn btn-primary">{% translate "Rechercher" %}</button>
+        <button type="submit" class="btn btn-primary">Rechercher</button>
     {% endbuttons %}
 
 </form>
@@ -27,25 +26,21 @@
 
 {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
     <div class="alert alert-secondary mt-5" role="info">
-        {% blocktranslate with siren=siren_form.cleaned_data.siren %}
-            Aucun résultat pour <b>{{ siren }}</b>.
-        {% endblocktranslate %}
+        Aucun résultat pour <b>{{ siren_form.cleaned_data.siren }}</b>.
     </div>
 
     <div class="alert alert-danger mt-2" role="info">
-        {% blocktranslate %}
-            <p>
-                <b>Si votre conventionnement est récent</b>, nous vous invitons à renouveler votre inscription dans une semaine.
-            </p>
-            <p>
-                <b>Si votre conventionnement a plus d’un mois</b>, prenez contact avec votre DIRECCTE en lui demandant de nous envoyer la confirmation de votre conventionnement via <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>.
-                <br>
-                La DIRECCTE doit nous indiquer si le conventionnement de votre structure est en cours en précisant le numéro de SIRET, le type de structure, l’adresse postale et l’adresse e-mail du correspondant technique ASP.<br>
-            </p>
-            <p>
-                <b>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</b>, merci d'utiliser <a href="https://itou.typeform.com/to/RYfNLR79" target="_blank" rel="noopener">ce formulaire</a>.
-            </p>
-        {% endblocktranslate %}
+        <p>
+            <b>Si votre conventionnement est récent</b>, nous vous invitons à renouveler votre inscription dans une semaine.
+        </p>
+        <p>
+            <b>Si votre conventionnement a plus d’un mois</b>, prenez contact avec votre DIRECCTE en lui demandant de nous envoyer la confirmation de votre conventionnement via <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>.
+            <br>
+            La DIRECCTE doit nous indiquer si le conventionnement de votre structure est en cours en précisant le numéro de SIRET, le type de structure, l’adresse postale et l’adresse e-mail du correspondant technique ASP.<br>
+        </p>
+        <p>
+            <b>Si vous tentez d'inscrire une Entreprise Adaptée ou un GEIQ</b>, merci d'utiliser <a href="https://itou.typeform.com/to/RYfNLR79" target="_blank" rel="noopener">ce formulaire</a>.
+        </p>
     </div>
 {% endif %}
 
@@ -53,10 +48,10 @@
 {% if siaes_without_members and siae_select_form %}
     <div class="mt-5">
 
-        <h3>{% translate "Entreprises disponibles" %}</h3>
+        <h3>Entreprises disponibles</h3>
 
         <div class="alert alert-secondary" role="info">
-            <i>{% translate "Les données sont fournies par l'extranet IAE 2.0 de l'ASP." %}</i>
+            <i>Les données sont fournies par l'extranet IAE 2.0 de l'ASP.</i>
         </div>
 
         <form method="post" action="" class="js-prevent-multiple-submit">
@@ -98,10 +93,10 @@
 
             <div class="alert alert-warning pb-0" role="alert">
                 <p>
-                    {% translate "Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé au correspondant technique référencé dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure." %}
+                    Pour sécuriser l'inscription, un e-mail de confirmation sera envoyé au correspondant technique référencé dans l'extranet IAE 2.0 de l'ASP. Il permettra de poursuivre la procédure.
                 </p>
                 {% buttons %}
-                    <button type="submit" class="btn btn-primary">{% translate "Continuer l'inscription" %}</button>
+                    <button type="submit" class="btn btn-primary">Continuer l'inscription</button>
                 {% endbuttons %}
             </div>
 
@@ -114,10 +109,10 @@
 {% if siaes_with_members %}
     <div class="mt-5">
 
-        <h3>{% translate "Entreprises déjà inscrites" %}</h3>
+        <h3>Entreprises déjà inscrites</h3>
 
         <div class="alert alert-secondary" role="info">
-            <i>{% translate "Par sécurité vous devez obtenir une invitation pour rejoindre ces structures." %}</i>
+            <i>Par sécurité vous devez obtenir une invitation pour rejoindre ces structures.</i>
         </div>
 
         <ul>
@@ -135,9 +130,7 @@
                         {% if siae.active_admin_members %}
                             {% with siae.active_admin_members.first as admin %}
                                 {# For security, display only the first char of the last name. #}
-                                {% blocktranslate with first_name=admin.first_name|title last_name_first_char=admin.last_name|slice:1 %}
-                                    <i>Pour obtenir une invitation, contactez {{ first_name }} {{ last_name_first_char }}.</i>
-                                {% endblocktranslate %}
+                                <i>Pour obtenir une invitation, contactez {{ admin.first_name|title }} {{ admin.last_name|slice:1 }}.</i>
                             {% endwith %}
                         {% endif %}
                     </p>
@@ -152,7 +145,7 @@
 {% if siaes_without_members or siaes_with_members %}
     <div class="mt-5">
         <p>
-            {% blocktranslate %}En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>{% endblocktranslate %}
+            En cas de problème contactez-nous : <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>
         </p>
     </div>
 {% endif %}

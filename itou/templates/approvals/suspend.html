@@ -1,17 +1,14 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Suspendre le PASS IAE" %}{{ block.super }}{% endblock %}
+{% block title %}Suspendre le PASS IAE{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% blocktranslate with full_name=approval.user.get_full_name|title %}
-            Suspendre le PASS IAE
-            <br>
-            <span class="text-muted">{{ full_name }}</span>
-        {% endblocktranslate %}
+        Suspendre le PASS IAE
+        <br>
+        <span class="text-muted">{{ approval.user.get_full_name|title }}</span>
     </h1>
 
     {% if not preview %}{# Edit mode. #}
@@ -41,11 +38,11 @@
 
             {% buttons %}
                 <a class="btn btn-secondary" href="{{ back_url }}">
-                    {% translate "Retour" %}
+                    Retour
                 </a>
                 {# Enable preview mode: preview=1. #}
                 <button type="submit" name="preview" value="1" class="btn btn-primary">
-                    {% translate "Valider la suspension" %}
+                    Valider la suspension
                 </button>
             {% endbuttons %}
 
@@ -66,36 +63,34 @@
             <div class="card my-3 text-center">
                 <div class="card-body">
                     <h5 class="card-title">
-                        {% translate "Vous êtes sur le point de suspendre ce PASS IAE" %}
+                        Vous êtes sur le point de suspendre ce PASS IAE
                         <br>
-                        {% translate "pour la raison suivante :" %}
+                        pour la raison suivante :
                     </h5>
                     <p class="card-text">
                         {{ form.instance.get_reason_display }}
                     </p>
                     <p class="card-text text-success">
-                        {% blocktranslate with start=form.instance.start_at|date:"d/m/Y" end=form.instance.end_at|date:"d/m/Y" %}
-                            À partir du
-                            <span class="badge badge-success">{{ start }}</span>
-                            jusqu'au
-                            <span class="badge badge-success">{{ end }}</span>
-                        {% endblocktranslate %}
+                        À partir du
+                        <span class="badge badge-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                        jusqu'au
+                        <span class="badge badge-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
                     </p>
                 </div>
             </div>
 
             <div class="alert alert-warning" role="alert">
                 <p>
-                    {% translate "En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié." %}
+                    En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
                 </p>
                 {% buttons %}
                     {# Allow the user to modify the suspension: edit=1. #}
                     <button type="submit" name="edit" value="1" class="btn btn-secondary">
-                        {% translate "Annuler" %}
+                        Annuler
                     </button>
                     {# Create a suspension: save=1. #}
                     <button type="submit" name="save" value="1" class="btn btn-primary">
-                        {% translate "Confirmer la suspension" %}
+                        Confirmer la suspension
                     </button>
                 {% endbuttons %}
             </div>

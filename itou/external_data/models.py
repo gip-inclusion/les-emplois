@@ -1,8 +1,6 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.timezone import now
-from django.utils.translation import gettext_lazy as _
 
 
 class ExternalDataImportQuerySet(models.QuerySet):
@@ -27,8 +25,8 @@ class ExternalDataImport(models.Model):
     DATA_SOURCE_PE_CONNECT = "PE_CONNECT"
     DATA_SOURCE_UNKNOWN = "UNKNOWN"
     DATA_SOURCE_CHOICES = (
-        (DATA_SOURCE_PE_CONNECT, _("API PE Connect")),
-        (DATA_SOURCE_UNKNOWN, _("Autre")),
+        (DATA_SOURCE_PE_CONNECT, "API PE Connect"),
+        (DATA_SOURCE_UNKNOWN, "Autre"),
     )
 
     STATUS_OK = "OK"
@@ -36,25 +34,25 @@ class ExternalDataImport(models.Model):
     STATUS_PENDING = "PENDING"
     STATUS_FAILED = "FAILED"
     STATUS_CHOICES = (
-        (STATUS_OK, _("Import de données réalisé sans erreur")),
-        (STATUS_PARTIAL, _("Import de données réalisé partiellement")),
-        (STATUS_PENDING, _("Import de données en cours")),
-        (STATUS_FAILED, _("Import de données en erreur")),
+        (STATUS_OK, "Import de données réalisé sans erreur"),
+        (STATUS_PARTIAL, "Import de données réalisé partiellement"),
+        (STATUS_PENDING, "Import de données en cours"),
+        (STATUS_FAILED, "Import de données en erreur"),
     )
 
     status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=now)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=now)
     source = models.CharField(
-        max_length=20, verbose_name=_("Origine des données"), choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
+        max_length=20, verbose_name="Origine des données", choices=DATA_SOURCE_CHOICES, default=DATA_SOURCE_UNKNOWN
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Utilisateur"), on_delete=models.CASCADE)
-    report = models.JSONField(verbose_name=_("Rapport technique"), default=dict)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name="Utilisateur", on_delete=models.CASCADE)
+    report = models.JSONField(verbose_name="Rapport technique", default=dict)
 
     objects = models.Manager.from_queryset(ExternalDataImportQuerySet)()
 
     class Meta:
-        verbose_name = _("Import de données externes")
-        verbose_name_plural = _("Imports de données externes")
+        verbose_name = "Import de données externes"
+        verbose_name_plural = "Imports de données externes"
         unique_together = ["user", "source"]
 
     def __repr__(self):
@@ -69,22 +67,22 @@ class ExternalDataImport(models.Model):
 
 class JobSeekerExternalData(models.Model):
     class Meta:
-        verbose_name = _("Données externes pour un chercheur d'emploi")
-        verbose_name_plural = _("Données externes pour un chercheur d'emploi")
+        verbose_name = "Données externes pour un chercheur d'emploi"
+        verbose_name_plural = "Données externes pour un chercheur d'emploi"
 
-    created_at = models.DateTimeField(default=now, verbose_name=_("Date de création"))
+    created_at = models.DateTimeField(default=now, verbose_name="Date de création")
 
     data_import = models.ForeignKey(ExternalDataImport, on_delete=models.CASCADE)
 
     user = models.OneToOneField(
-        get_user_model(), verbose_name=_("Demandeur d'emploi"), on_delete=models.CASCADE, primary_key=True
+        settings.AUTH_USER_MODEL, verbose_name="Demandeur d'emploi", on_delete=models.CASCADE, primary_key=True
     )
 
     # Is the user a job seeker ? (from PE perspective)
     # --
     # original field: PE / codeStatutIndividu
     is_pe_jobseeker = models.BooleanField(
-        null=True, verbose_name=_("L'utilisateur est inscrit comme demandeur d'emploi PE")
+        null=True, verbose_name="L'utilisateur est inscrit comme demandeur d'emploi PE"
     )
 
     # The user has open rights to **at least one** the following social helps;
@@ -97,7 +95,7 @@ class JobSeekerExternalData(models.Model):
     # --
     # original field: PE / beneficiairePrestationSolidarite
     has_minimal_social_allowance = models.BooleanField(
-        null=True, verbose_name=_("L'utilisateur dispose d'une prestation de minima sociaux")
+        null=True, verbose_name="L'utilisateur dispose d'une prestation de minima sociaux"
     )
 
     def __repr__(self):

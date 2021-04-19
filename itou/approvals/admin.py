@@ -4,7 +4,6 @@ from tempfile import NamedTemporaryFile
 from django.contrib import admin
 from django.http import FileResponse
 from django.urls import path
-from django.utils.translation import gettext_lazy as _
 
 from itou.approvals import models
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
@@ -68,11 +67,11 @@ class ProlongationInline(admin.TabularInline):
 
 
 class IsValidFilter(admin.SimpleListFilter):
-    title = _("En cours de validité")
+    title = "En cours de validité"
     parameter_name = "is_valid"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -108,7 +107,7 @@ class ApprovalAdmin(admin.ModelAdmin):
         return obj.is_valid()
 
     is_valid.boolean = True
-    is_valid.short_description = _("En cours de validité")
+    is_valid.short_description = "En cours de validité"
 
     def manually_add_approval(self, request, job_application_id):
         """
@@ -157,11 +156,11 @@ class ApprovalAdmin(admin.ModelAdmin):
 
 
 class IsInProgressFilter(admin.SimpleListFilter):
-    title = _("En cours")
+    title = "En cours"
     parameter_name = "is_progress"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -188,7 +187,7 @@ class SuspensionAdmin(admin.ModelAdmin):
         return obj.is_in_progress
 
     is_in_progress.boolean = True
-    is_in_progress.short_description = _("En cours")
+    is_in_progress.short_description = "En cours"
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -233,7 +232,7 @@ class ProlongationAdmin(admin.ModelAdmin):
         return obj.is_in_progress
 
     is_in_progress.boolean = True
-    is_in_progress.short_description = _("En cours")
+    is_in_progress.short_description = "En cours"
 
     def save_model(self, request, obj, form, change):
         if change:
@@ -266,4 +265,4 @@ class PoleEmploiApprovalAdmin(admin.ModelAdmin):
         return obj.is_valid()
 
     is_valid.boolean = True
-    is_valid.short_description = _("En cours de validité")
+    is_valid.short_description = "En cours de validité"

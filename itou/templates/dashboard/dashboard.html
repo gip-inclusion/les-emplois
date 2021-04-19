@@ -1,60 +1,56 @@
 {% extends "layout/content.html" %}
-{% load i18n %}
 
-{% block title %}{% translate "Tableau de bord" %}{{ block.super }}{% endblock %}
+{% block title %}Tableau de bord{{ block.super }}{% endblock %}
 
 {% block messages %}
     {{ block.super }}
 
     {% if current_siae and not current_siae.jobs.exists %}
         <div class="alert alert-warning" role="alert">
-            {% translate "Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis." %}
+            Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
         </div>
     {% endif %}
 
     {% if current_siae and not current_siae.has_reliable_coords %}
         <div class="alert alert-warning" role="alert">
             {% url 'siaes_views:edit_siae' as edit_siae_url %}
-            {% blocktranslate with address=current_siae.address_on_one_line %}
-                Nous n'avons pu géolocaliser votre établissement avec l'adresse <b>{{ address }}</b> :
-                cela pourrait affecter votre position dans les résultats de recherche.
-                Vous pouvez nous <a href="{{ edit_siae_url }}">indiquer une autre adresse</a> ou
-                <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">nous contacter</a> en cas de problème.
-            {% endblocktranslate %}
+            Nous n'avons pu géolocaliser votre établissement avec l'adresse <b>{{ current_siae.address_on_one_line }}</b> :
+            cela pourrait affecter votre position dans les résultats de recherche.
+            Vous pouvez nous <a href="{{ edit_siae_url }}">indiquer une autre adresse</a> ou
+            <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">nous contacter</a> en cas de problème.
         </div>
     {% endif %}
 
     {% if current_siae and not current_siae.is_active %}
         <div class="alert alert-warning" role="alert">
-            {% blocktranslate with grace_period_end_date=current_siae.grace_period_end_date|date:"d F Y" %}
-                La DGEFP nous indique que votre structure n'est plus conventionnée.
-                Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
-                A compter du {{ grace_period_end_date }}, l'accès à ce tableau de bord ne sera plus possible.
-            {% endblocktranslate %}
+
+            La DGEFP nous indique que votre structure n'est plus conventionnée.
+            Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
+            A compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.
+
             {% if user_is_siae_admin %}
-                {% trans "Veuillez dès que possible régulariser votre situation" %}
-                <a href="{% url 'siaes_views:show_financial_annexes' %}">{% translate "en sélectionnant une annexe financière valide" %}</a>.
+                Veuillez dès que possible régulariser votre situation
+                <a href="{% url 'siaes_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide}</a>.
             {% else %}
                 {% with current_siae.active_admin_members.first as admin %}
-                    {% blocktranslate with first_name=admin.first_name|title last_name=admin.last_name|title %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ first_name }} {{ last_name }}) pour qu'il ou elle régularise la situation de votre structure.
-                    {% endblocktranslate %}
+                    Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle régularise la situation de votre structure.
                 {% endwith %}
             {% endif %}
-            {% trans "Pour toute question, veuillez contacter notre support." %}
+            Pour toute question, veuillez contacter notre support.
+
         </div>
     {% endif %}
 
     {% if current_prescriber_organization and current_prescriber_organization.has_pending_authorization %}
         <div class="alert alert-warning pb-0" role="alert">
             <p>
-                {% trans "Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des candidats." %}
+                Votre habilitation à valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique est en cours de vérification par nos équipes. Vous ne pouvez pas encore réaliser le diagnostic d'éligibilité des candidats.
             </p>
             {% if current_prescriber_organization.has_pending_authorization_proof %}
                 <p>
-                    {% trans "Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :" %}
+                    Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
                     <a href="https://itou.typeform.com/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank">
-                        {% trans "cliquez ici pour l'envoyer" %}
+                        cliquez ici pour l'envoyer
                         {% include "includes/icon.html" with icon="external-link" %}
                     </a>
                 </p>
@@ -70,7 +66,7 @@
 {% block content %}
 
     <h1>
-        {% translate "Tableau de bord" %}
+        Tableau de bord
         {% if current_siae %} - <span class="text-muted">{{ current_siae.display_name }}</span>{% endif %}
         {% if current_prescriber_organization %} -
         <span class="text-muted">{{ current_prescriber_organization.display_name }}</span>
@@ -82,12 +78,10 @@
 
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized %}
         <p class="text-muted">
-            <span class="badge badge-warning">{% translate "Prescripteur habilité" %}</span>
+            <span class="badge badge-warning">Prescripteur habilité</span>
             {% if current_prescriber_organization.code_safir_pole_emploi %}
                 <span class="badge badge-light">
-                    {% blocktranslate with code_safir=current_prescriber_organization.code_safir_pole_emploi %}
-                        Code SAFIR {{ code_safir }}
-                    {% endblocktranslate %}
+                    Code SAFIR {{ current_prescriber_organization.code_safir_pole_emploi }}
                 </span>
             {% endif %}
         </p>
@@ -97,12 +91,12 @@
 
         {% if user.is_staff %}
             <div class="card">
-                <h5 class="card-header">{% translate "Admin" %}</h5>
+                <h5 class="card-header">Admin</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="key" %}
                         <a href="{% url 'admin:index' %}">
-                            {% translate "Admin" %}
+                            Admin
                         </a>
                     </p>
                 </div>
@@ -112,15 +106,15 @@
         {% if user.is_job_seeker %}
 
             <div class="card">
-                <h5 class="card-header">{% translate "Candidatures" %}</h5>
+                <h5 class="card-header">Candidatures</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_job_seeker' %}">{% translate "Vos candidatures" %}</a>
+                        <a href="{% url 'apply:list_for_job_seeker' %}">Vos candidatures</a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="/">{% translate "Rechercher une entreprise" %}</a>
+                        <a href="/">Rechercher une entreprise</a>
                     </p>
                 </div>
             </div>
@@ -128,7 +122,7 @@
             {% with user.approvals_wrapper as approvals_wrapper %}
                 {% if approvals_wrapper.latest_approval %}
                     <div class="card">
-                        <h5 class="card-header">{% translate "Numéro d'agrément" %}</h5>
+                        <h5 class="card-header">Numéro d'agrément</h5>
                         <div class="card-body">
                             {# Approval status. #}
                             <div class="card-text">
@@ -153,34 +147,34 @@
             {% if current_prescriber_organization %}
                 <div class="card">
                     <h5 class="card-header">
-                        {% translate "Organisation" %} <span class="ml-1 badge badge-secondary">{{ current_prescriber_organization.kind }} - ID {{ current_prescriber_organization.id }}</span>
+                        Organisation <span class="ml-1 badge badge-secondary">{{ current_prescriber_organization.kind }} - ID {{ current_prescriber_organization.id }}</span>
                     </h5>
                     <div class="card-body">
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
                             <a href="{% url 'prescribers_views:edit_organization' %}">
-                                {% translate "Modifier les informations" %}
+                                Modifier les informations
                             </a>
                             {% if current_prescriber_organization.get_card_url %}
                                 /
                                 <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                                    {% translate "Voir la fiche" %}
+                                    Voir la fiche
                                 </a>
                             {% endif %}
                         </p>
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
                             <a href="{% url 'prescribers_views:members' %}">
-                                {% translate "Gérer vos collaborateurs" %}
+                                Gérer vos collaborateurs
                             </a>
                         </p>
                         {% if current_prescriber_organization.kind == current_prescriber_organization.Kind.DEPT and user_is_prescriber_org_admin %}
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="list" %}
                                 <a href="{% url 'prescribers_views:list_accredited_organizations' %}">
-                                    {% translate "Voir la liste des organisations conventionnées" %}
+                                    Voir la liste des organisations conventionnées
                                 </a>
-                                <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                                <span class="badge badge-info">Nouveau</span>
                             </p>
                         {% endif %}
                         {% if current_prescriber_organization.is_authorized %}
@@ -188,9 +182,7 @@
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="award" %}
                                 <span>
-                                    {% blocktranslate with name=current_prescriber_organization.display_name %}
-                                        {{ name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
-                                    {% endblocktranslate %}
+                                    {{ current_prescriber_organization.display_name }} est une organisation habilitée. Vous pouvez réaliser le <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique#diagnostic_de_reference" target="_blank">diagnostic socio-professionnel</a> des candidats que vous accompagnez.
                                 </span>
                             </p>
                         {% endif %}
@@ -199,15 +191,15 @@
             {% endif %}
 
             <div class="card">
-                <h5 class="card-header">{% translate "Candidatures" %}</h5>
+                <h5 class="card-header">Candidatures</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="message-square" %}
-                        <a href="{% url 'apply:list_for_prescriber' %}">{% translate "Suivi des candidatures" %}</a>
+                        <a href="{% url 'apply:list_for_prescriber' %}">Suivi des candidatures</a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="user-check" %}
-                        <a href="/">{% translate "Postuler pour un candidat" %}</a>
+                        <a href="/">Postuler pour un candidat</a>
                     </p>
                 </div>
             </div>
@@ -218,32 +210,32 @@
 
             <div class="card">
                 <h5 class="card-header">
-                    {% translate "Ma structure" %}
+                    Ma structure
                     <span class="ml-1 badge badge-secondary">{{ current_siae.kind }} - ID {{ current_siae.id }}</span>
                 </h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
                         <a href="{% url 'siaes_views:edit_siae' %}">
-                            {% translate "Modifier les informations de l'établissement" %}
+                            Modifier les informations de l'établissement
                         </a>
                         /
                         <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            {% translate "Voir la fiche publique" %}
+                            Voir la fiche publique
                         </a>
                     </p>
                     {% if current_siae.is_active %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="users" %}
                             <a href="{% url 'siaes_views:members' %}">
-                                {% translate "Gérer des collaborateurs" %}
+                                Gérer des collaborateurs
                             </a>
                         </p>
                     {% endif %}
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
                         <a href="{% url 'siaes_views:configure_jobs' %}">
-                            {% translate "Publier/gérer les fiches de postes" %}
+                            Publier/gérer les fiches de postes
                         </a>
                     </p>
                     {% if can_show_financial_annexes %}
@@ -254,12 +246,12 @@
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="check-circle" %}
                                 <a href="{% url 'siaes_views:show_financial_annexes' %}">
-                                    {% translate "Mes annexes financières" %}
+                                    Mes annexes financières
                                 </a>
-                                <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                                <span class="badge badge-info">Nouveau</span>
                                 {% if not current_siae.is_active %}
                                     <span class="badge badge-danger">
-                                        {% translate "Action requise" %}
+                                        Action requise
                                     </span>
                                 {% endif %}
                             </p>
@@ -268,14 +260,14 @@
                     {% if current_siae.is_active and user_is_siae_admin %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="plus-square" %}
-                            <a href="{% url 'siaes_views:create_siae' %}">{% translate "Créer/rejoindre une autre structure" %}</a>
+                            <a href="{% url 'siaes_views:create_siae' %}">Créer/rejoindre une autre structure</a>
                         </p>
                     {% endif %}
                 </div>
             </div>
 
             <div class="card">
-                <h5 class="card-header">{% translate "Mes candidatures" %}</h5>
+                <h5 class="card-header">Mes candidatures</h5>
                 <div class="card-body">
                     {% for category in job_applications_categories %}
                         {% if category.counter %}
@@ -290,9 +282,9 @@
                         {% include "includes/icon.html" with icon="log-in" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
                             {% if current_siae.is_subject_to_eligibility_rules %}
-                                {% translate "Obtenir un PASS IAE (candidature spontanée)" %}
+                                Obtenir un PASS IAE (candidature spontanée)
                             {% else %}
-                                {% translate "Candidature spontanée" %}
+                                Candidature spontanée
                             {% endif %}
                         </a>
                     </p>
@@ -300,9 +292,9 @@
                         {% include "includes/icon.html" with icon="settings" %}
                         <a href="{% url 'siaes_views:block_job_applications' %}">
                             {% if current_siae.block_job_applications %}
-                                {% translate "Recevoir de nouvelles candidatures "%}
+                                Recevoir de nouvelles candidatures 
                             {% else %}
-                                {% translate "Bloquer les nouvelles candidatures "%}
+                                Bloquer les nouvelles candidatures 
                             {% endif%}
                         </a>
                     </p>
@@ -312,7 +304,7 @@
                             <a
                                 href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#criteres-administratifs-de-niveau-1"
                                 target="_blank">
-                                    {% translate "Liste des critères d'éligibilité" %}
+                                    Liste des critères d'éligibilité
                             </a>
                         </p>
                     {% endif %}
@@ -324,19 +316,19 @@
         {% if user.is_stats_vip or user.is_superuser %}
 
             <div class="card">
-                <h5 class="card-header">{% translate "Statistiques et pilotage" %}</h5>
+                <h5 class="card-header">Statistiques et pilotage</h5>
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{% url 'stats:public_stats' %}">{% translate "Voir les statistiques"%}</a>
+                        <a href="{% url 'stats:public_stats' %}">Voir les statistiques</a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{% url 'stats:advanced_stats' %}">{% translate "Voir les statistiques avancées"%}</a>
+                        <a href="{% url 'stats:advanced_stats' %}">Voir les statistiques avancées</a>
                     </p>
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="activity" %}
-                        <a href="{% url 'stats:stats_vip' %}">{% translate "Voir les données sur mon territoire"%}</a>
+                        <a href="{% url 'stats:stats_vip' %}">Voir les données sur mon territoire</a>
                     </p>
                 </div>
             </div>
@@ -347,10 +339,10 @@
 
     {% if current_siae and current_siae.region in lemarche_regions %}
         <div class="layout layout-column-full border-top bg-light text-center p-4 mt-5 card">
-            <p class="h5 mb-3">{% translate "Développez votre clientèle avec le marché de l'inclusion" %}</p>
+            <p class="h5 mb-3">Développez votre clientèle avec le marché de l'inclusion</p>
             <p class="mb-1">
                 <a href="https://lemarche.inclusion.beta.gouv.fr" rel="noopener" target="_blank" class="btn btn-primary">
-                    {% translate "C'est parti !" %}
+                    C'est parti !
                     {% include "includes/icon.html" with icon="external-link" %}
                 </a>
             </p>

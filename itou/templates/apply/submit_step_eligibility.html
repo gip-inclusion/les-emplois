@@ -1,5 +1,4 @@
 {% extends "apply/submit_base.html" %}
-{% load i18n %}
 
 {% block content %}
 
@@ -9,24 +8,22 @@
 
     <hr>
 
-    <h2>{% translate "Valider l'éligibilité IAE" %}</h2>
+    <h2>Valider l'éligibilité IAE</h2>
 
-    <p>{% translate "Pour valider l'éligibilité IAE du candidat il faut :" %}</p>
+    <p>Pour valider l'éligibilité IAE du candidat il faut :</p>
 
     <ol>
         <li>
-            {% blocktranslate %}
-                Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
-            {% endblocktranslate %}
+            Avoir réalisé un diagnostic socio-professionnel (dans le cadre d'un entretien, vous pouvez vous appuyer sur le <a href="{{ ITOU_DOC_URL }}/qui-est-eligible-iae-criteres-eligibilite#diagnostic_de_reference" target="_blank" rel="noreferrer noopener">document diagnostic socio-professionnel de référence</a>)
         </li>
         <li>
-            {% translate "Préciser la situation administrative du candidat (facultatif)" %}
+            Préciser la situation administrative du candidat (facultatif)
         </li>
     </ol>
 
     <hr>
 
-    <h2>{% translate "Situation administrative du candidat" %}</h2>
+    <h2>Situation administrative du candidat</h2>
 
     {% include "eligibility/includes/form.html" %}
 

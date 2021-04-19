@@ -1,18 +1,13 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load i18n %}
 {% block body %}
 
 {% if job_application.is_sent_by_proxy %}
 
-{% blocktranslate with sender_full_name=job_application.sender.get_full_name job_seeker_full_name=job_application.job_seeker.get_full_name to_siae=job_application.to_siae.display_name %}
-La candidature de {{ job_seeker_full_name }} envoyée par {{ sender_full_name }} chez {{ to_siae }} n'a malheureusement pas pu aboutir.
-{% endblocktranslate %}
+La candidature de {{ job_application.job_seeker.get_full_name }} envoyée par {{ job_application.sender.get_full_name }} chez {{ job_application.to_siae.display_name }} n'a malheureusement pas pu aboutir.
 
 {% else %}
 
-{% blocktranslate with to_siae=job_application.to_siae.display_name %}
-Votre candidature chez {{ to_siae }} n'a malheureusement pas pu aboutir.
-{% endblocktranslate %}
+Votre candidature chez {{ job_application.to_siae.display_name }} n'a malheureusement pas pu aboutir.
 
 {% endif %}
 
@@ -29,7 +24,7 @@ Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que v
 {% endif %}
 
 {% if job_application.answer %}
-{% translate "*Message de l'entreprise* :" %}
+*Message de l'entreprise* :
 
 {{ job_application.answer }}
 {% endif %}

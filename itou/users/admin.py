@@ -5,7 +5,6 @@ from django.contrib.auth.admin import UserAdmin
 from django.db.models import Exists, OuterRef
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _
 
 from itou.prescribers.models import PrescriberMembership
 from itou.siaes.models import SiaeMembership
@@ -74,15 +73,15 @@ class PrescriberMembershipInline(admin.TabularInline):
 
 
 class KindFilter(admin.SimpleListFilter):
-    title = _("Type")
+    title = "Type"
     parameter_name = "kind"
 
     def lookups(self, request, model_admin):
         return (
-            ("is_job_seeker", _("Demandeur d'emploi")),
-            ("is_prescriber", _("Prescripteur")),
-            ("is_siae_staff", _("SIAE")),
-            ("is_stats_vip", _("Pilotage")),
+            ("is_job_seeker", "Demandeur d'emploi"),
+            ("is_prescriber", "Prescripteur"),
+            ("is_siae_staff", "SIAE"),
+            ("is_stats_vip", "Pilotage"),
         )
 
     def queryset(self, request, queryset):
@@ -99,11 +98,11 @@ class KindFilter(admin.SimpleListFilter):
 
 
 class CreatedByProxyFilter(admin.SimpleListFilter):
-    title = _("Créé par un tiers")
+    title = "Créé par un tiers"
     parameter_name = "created_by"
 
     def lookups(self, request, model_admin):
-        return (("yes", _("Oui")), ("no", _("Non")))
+        return (("yes", "Oui"), ("no", "Non"))
 
     def queryset(self, request, queryset):
         value = self.value()
@@ -145,7 +144,7 @@ class ItouUserAdmin(UserAdmin):
 
     fieldsets = UserAdmin.fieldsets + (
         (
-            _("Informations"),
+            "Informations",
             {
                 "fields": (
                     "pk",
@@ -237,7 +236,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (
-            _("Informations"),
+            "Informations",
             {
                 "fields": (
                     "user",
@@ -251,7 +250,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Aides et prestations sociales"),
+            "Aides et prestations sociales",
             {
                 "fields": (
                     "rsa_allocation_since",
@@ -262,7 +261,7 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
             },
         ),
         (
-            _("Adresse salarié au format Hexa"),
+            "Adresse salarié au format Hexa",
             {
                 "fields": (
                     "hexa_lane_number",
@@ -280,4 +279,4 @@ class JobSeekerProfileAdmin(admin.ModelAdmin):
     def username(self, obj):
         return f"{obj.user.first_name} {obj.user.last_name}"
 
-    username.short_description = _("Nom complet")
+    username.short_description = "Nom complet"

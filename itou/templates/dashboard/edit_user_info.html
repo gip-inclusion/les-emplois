@@ -1,20 +1,17 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Modifier votre profil" %}{{ block.super }}{% endblock %}
+{% block title %}Modifier votre profil{{ block.super }}{% endblock %}
 
 {% block content %}
-<h1>{% translate "Modifier votre profil" %}</h1>
+<h1>Modifier votre profil</h1>
 
 {% if extra_data %}
 
 <div class="alert alert-info">
 
-    {% blocktrans with dt_creation=extra_data.created_at|date:"d F Y" %}
     Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte Pôle emploi 
-    (récupérés lors de votre connexion du {{dt_creation}}).
-    {% endblocktrans %}
+    (récupérés lors de votre connexion du {{extra_data.created_at|date:"d F Y"}}).
 
 </div>
 
@@ -30,7 +27,7 @@
     {% if ITOU_ENVIRONMENT == "PROD" %}
         {% if request.user.is_job_seeker %}
             {% include "utils/resume/typeform_form.html" %}
-            <p class="lines-on-sides">{% translate "ou" %}</p>
+            <p class="lines-on-sides">ou</p>
             {% bootstrap_label content="Lien vers un CV public" %}
             {% bootstrap_field form.resume_link show_label=False %}
         {% endif %}
@@ -38,8 +35,8 @@
 
 
     {% buttons %}
-        <a class="btn btn-secondary" href="{{ prev_url }}">{% translate "Annuler" %}</a>
-        <button type="submit" class="btn btn-primary">{% translate "Enregistrer" %}</button>
+        <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% endbuttons %}
 
 </form>

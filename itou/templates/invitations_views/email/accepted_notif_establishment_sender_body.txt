@@ -1,15 +1,12 @@
 {% extends "layout/base_email_text_body.txt" %}
-{% load i18n %}
 {% block body %}
 
-{% blocktranslate with first_name=first_name|capfirst last_name=last_name|capfirst establishment_name=establishment_name %}
-{{ first_name }} {{ last_name }} est désormais membre de la structure {{ establishment_name }}.
-{% endblocktranslate %}
+{{ first_name|capfirst }} {{ last_name|capfirst }} est désormais membre de la structure {{ establishment_name }}.
 
-{% translate "Détails" %}
+Détails
 -------------------
-- {% translate "Prénom" %} : {{ first_name }}
-- {% translate "Nom" %} : {{ last_name }}
-- {% translate "E-mail" %} : {{ email }}
+- Prénom : {{ first_name }}
+- Nom : {{ last_name }}
+- E-mail : {{ email }}
 
 {% endblock %}

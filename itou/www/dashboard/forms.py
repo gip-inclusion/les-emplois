@@ -1,12 +1,11 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy
 
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
     NewSpontaneousJobAppEmployersNotification,
 )
+from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
@@ -39,7 +38,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
-        model = get_user_model()
+        model = User
         fields = [
             "first_name",
             "last_name",
@@ -54,8 +53,8 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "lack_of_pole_emploi_id_reason",
         ] + ResumeFormMixin.Meta.fields
         help_texts = {
-            "birthdate": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978"),
-            "phone": gettext_lazy("Par exemple 0610203040"),
+            "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
+            "phone": "Par exemple 0610203040",
         }
 
     def clean(self):
@@ -69,11 +68,11 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 class EditUserEmailForm(forms.Form):
 
     email = forms.EmailField(
-        label=gettext_lazy("Nouvelle adresse e-mail"),
+        label="Nouvelle adresse e-mail",
         required=True,
     )
     email_confirmation = forms.EmailField(
-        label=gettext_lazy("Confirmation"),
+        label="Confirmation",
         required=True,
     )
 
@@ -86,22 +85,20 @@ class EditUserEmailForm(forms.Form):
         email = self.cleaned_data.get("email")
         email_confirmation = self.cleaned_data.get("email_confirmation")
         if email != email_confirmation:
-            raise ValidationError(gettext_lazy("Les deux adresses sont différentes."))
+            raise ValidationError("Les deux adresses sont différentes.")
         return self.cleaned_data
 
     def clean_email(self):
         email = self.cleaned_data["email"]
         if email == self.user_email:
-            raise ValidationError(gettext_lazy("Veuillez indiquer une adresse différente de l'actuelle."))
-        if get_user_model().objects.filter(email=email):
-            raise ValidationError(gettext_lazy("Cette adresse est déjà utilisée par un autre utilisateur."))
+            raise ValidationError("Veuillez indiquer une adresse différente de l'actuelle.")
+        if User.objects.filter(email=email):
+            raise ValidationError("Cette adresse est déjà utilisée par un autre utilisateur.")
         return email
 
 
 class EditNewJobAppEmployersNotificationForm(forms.Form):
-    spontaneous = forms.BooleanField(
-        label=gettext_lazy("Candidatures spontanées"), required=False, widget=SwitchCheckboxWidget()
-    )
+    spontaneous = forms.BooleanField(label="Candidatures spontanées", required=False, widget=SwitchCheckboxWidget())
 
     def __init__(self, *args, **kwargs):
         self.recipient = kwargs.pop("recipient")
@@ -119,7 +116,7 @@ class EditNewJobAppEmployersNotificationForm(forms.Form):
                 for job_description in self.siae.job_description_through.all()
             ]
             self.fields["qualified"] = forms.MultipleChoiceField(
-                label=gettext_lazy("Fiches de poste"),
+                label="Fiches de poste",
                 required=False,
                 widget=MultipleSwitchCheckboxWidget(),
                 choices=choices,

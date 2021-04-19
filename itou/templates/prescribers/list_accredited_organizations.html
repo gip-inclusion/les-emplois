@@ -1,12 +1,11 @@
 {% extends "layout/content.html" %}
-{% load i18n %}
 
-{% block title %}{% translate "Liste des organisations conventionnées" %}{{ block.super }}{% endblock %}
+{% block title %}Liste des organisations conventionnées{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% translate "Liste des organisations conventionnées" %}
+        Liste des organisations conventionnées
     </h1>
 
     <h2>
@@ -14,7 +13,7 @@
     </h2>
 
     <div class="alert alert-info" role="alert">
-        {% translate "Seuls les administrateurs peuvent voir cette liste." %}
+        Seuls les administrateurs peuvent voir cette liste.
     </div>
 
     <hr>
@@ -22,7 +21,7 @@
     {% if not accredited_orgs %}
 
         <div class="alert alert-secondary" role="info">
-            {% translate "Aucun résultat." %}
+            Aucun résultat.
         </div>
 
     {% else %}
@@ -45,7 +44,7 @@
                             aria-expanded="false"
                             aria-controls="collapse_membership_{{ org.pk }}"
                         >
-                            {% translate "Voir les membres" %}
+                            Voir les membres
                         </a>
                     </p>
 
@@ -56,10 +55,10 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">{% translate "Nom" %}</th>
-                                        <th scope="col">{% translate "Prénom" %}</th>
-                                        <th scope="col">{% translate "Email" %}</th>
-                                        <th scope="col">{% translate "Administrateur" %}</th>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col">Prénom</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Administrateur</th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -8,7 +8,6 @@
         {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
 {% endcomment %}
-{% load i18n %}
 {% load bootstrap4 %}
 
 <form method="post" action="" role="form" class="js-prevent-multiple-submit">
@@ -23,7 +22,7 @@
 
     {% if request.user.is_siae_staff %}
         <h3>
-            {% translate "Critères administratifs de niveau 1" %}
+            Critères administratifs de niveau 1
         </h3>
     {% endif %}
 
@@ -35,7 +34,7 @@
 
     {% if request.user.is_siae_staff %}
         <h3>
-            {% translate "Critères administratifs de niveau 2" %}
+            Critères administratifs de niveau 2
         </h3>
     {% endif %}
 
@@ -51,13 +50,13 @@
 
     <div class="alert alert-warning" role="alert">
         <p>
-            {% blocktranslate %}En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.{% endblocktranslate %}
+            En cliquant sur "Valider" vous confirmez que le candidat est éligible à l'insertion par l'activité économique.
         </p>
         {% buttons %}
             {% if cancel_url %}
-                <a class="btn btn-secondary" href="{{ cancel_url }}">{% translate "Annuler" %}</a>
+                <a class="btn btn-secondary" href="{{ cancel_url }}">Annuler</a>
             {% endif %}
-            <button type="submit" class="btn btn-primary">{% translate "Valider" %}</button>
+            <button type="submit" class="btn btn-primary">Valider</button>
         {% endbuttons %}
     </div>
 

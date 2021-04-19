@@ -1,7 +1,6 @@
 import re
 
 import django.forms as forms
-from django.utils.translation import gettext as _, gettext_lazy
 
 
 class ResumeFormMixin(forms.Form):
@@ -10,10 +9,10 @@ class ResumeFormMixin(forms.Form):
     """
 
     resume_link = forms.URLField(
-        label=gettext_lazy("Indiquer le lien d'un CV existant"),
-        help_text=gettext_lazy("Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)"),
+        label="Indiquer le lien d'un CV existant",
+        help_text="Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)",
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": gettext_lazy("https://www.mon_cv.fr/dfROS")}),
+        widget=forms.TextInput(attrs={"placeholder": "https://www.mon_cv.fr/dfROS"}),
     )
 
     class Meta:
@@ -33,7 +32,7 @@ class ResumeFormMixin(forms.Form):
         match = re.search(pole_emploi_pattern, resume_link)
         if match:
             error = forms.ValidationError(
-                _(
+                (
                     "Les CV hébergés par l'intranet de Pôle emploi ne sont pas publics. "
                     "Indiquez une autre adresse ou laissez ce champ vide pour continuer."
                 )

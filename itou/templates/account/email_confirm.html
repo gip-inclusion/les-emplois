@@ -1,19 +1,18 @@
 {# django-allauth template override. #}
 {% extends "layout/content_small.html" %}
 
-{% load i18n %}
 {% load account %}
 {% load bootstrap4 %}
 
-{% block title %}{% translate "Confirmer l'adresse e-mail" %}{{ block.super }}{% endblock %}
+{% block title %}Confirmer l'adresse e-mail{{ block.super }}{% endblock %}
 
 {% block content %}
 
-<h1>{% translate "Confirmer l'adresse e-mail" %}</h1>
+<h1>Confirmer l'adresse e-mail</h1>
 
 {% if confirmation %}
 
-    <p>{% blocktranslate with email=confirmation.email_address.email %}Confirmez que <a href="mailto:{{ email }}">{{ email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous :{% endblocktranslate %}</p>
+    <p>Confirmez que <a href="mailto:{{ confirmation.email_address.email }}">{{ confirmation.email_address.email }}</a> est bien votre adresse e-mail en cliquant sur le bouton ci-dessous :</p>
 
     <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
 
@@ -26,7 +25,7 @@
         {% endif %}
 
         {% buttons %}
-                <button type="submit" class="btn btn-primary">{% translate "Confirmer" %}</button>
+                <button type="submit" class="btn btn-primary">Confirmer</button>
         {% endbuttons %}
 
     </form>
@@ -36,11 +35,9 @@
     {% url 'account_email' as email_url %}
 
     <div class="alert alert-danger" role="alert">
-        {% blocktranslate %}
-            Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.
-            <br>
-            Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
-        {% endblocktranslate %}
+        Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.
+        <br>
+        Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
     </div>
 
 {% endif %}

@@ -5,7 +5,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
-from django.utils.translation import gettext as _
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
@@ -92,7 +91,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                     job_through.is_active = new_is_active
                     job_through.save()
 
-            messages.success(request, _("Mise à jour effectuée !"))
+            messages.success(request, "Mise à jour effectuée !")
             return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae}
@@ -171,7 +170,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
         financial_annex = select_form.cleaned_data["financial_annexes"]
         current_siae.convention = financial_annex.convention
         current_siae.save()
-        message = _(
+        message = (
             f"Nous avons bien attaché votre structure à l'annexe financière"
             f" {financial_annex.number_prefix_with_spaces}."
         )
@@ -217,7 +216,7 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Mise à jour effectuée !"))
+        messages.success(request, "Mise à jour effectuée !")
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"form": form, "siae": siae}
@@ -262,11 +261,11 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
     if request.method == "POST":
         if user != target_member and user_is_admin:
             if membership.is_active:
-                membership.toggle_user_membership(user)
+                membership.deactivate_membership_by_user(user)
                 membership.save()
                 messages.success(
                     request,
-                    _("%(name)s a été retiré(e) des membres actifs de cette structure.")
+                    "%(name)s a été retiré(e) des membres actifs de cette structure."
                     % {"name": target_member.get_full_name()},
                 )
                 siae.member_deactivation_email(membership.user).send()
@@ -303,7 +302,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
                 membership.set_admin_role(True, user)
                 messages.success(
                     request,
-                    _("%(name)s a été ajouté(e) aux administrateurs de cette structure.")
+                    "%(name)s a été ajouté(e) aux administrateurs de cette structure."
                     % {"name": target_member.get_full_name()},
                 )
                 siae.add_admin_email(target_member).send()
@@ -311,7 +310,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
                 membership.set_admin_role(False, user)
                 messages.success(
                     request,
-                    _("%(name)s a été retiré(e) des administrateurs de cette structure.")
+                    "%(name)s a été retiré(e) des administrateurs de cette structure."
                     % {"name": target_member.get_full_name()},
                 )
                 siae.remove_admin_email(target_member).send()
@@ -340,7 +339,7 @@ def block_job_applications(request, template_name="siaes/block_job_applications.
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        messages.success(request, _("Mise à jour du blocage des candidatures effectuée !"))
+        messages.success(request, "Mise à jour du blocage des candidatures effectuée !")
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
     context = {"siae": siae, "form": form}

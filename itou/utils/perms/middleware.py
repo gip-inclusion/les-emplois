@@ -3,7 +3,6 @@ from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import safestring
-from django.utils.translation import gettext as _
 
 
 class ItouCurrentOrganizationMiddleware:
@@ -65,7 +64,7 @@ class ItouCurrentOrganizationMiddleware:
                                 "nouveau."
                             )
                         message = safestring.mark_safe(message)
-                        messages.warning(request, _(message))
+                        messages.warning(request, message)
                         return redirect("account_logout")
 
             elif user.is_prescriber:

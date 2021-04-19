@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load static %}
 {% load bootstrap4 %}
 <!DOCTYPE HTML>
@@ -6,22 +5,22 @@
 <head>
     <meta charset="utf-8">
     <title>{% block title %} - Les emplois de l'inclusion{% endblock %}</title>
-    {% block meta_description %}<meta name="description" content="{% translate "Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">{% endblock %}
+    {% block meta_description %}<meta name="description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     {# https://metatags.io #}
-    <meta name="title" content="{% translate "Les emplois de l'inclusion" %}">
+    <meta name="title" content="Les emplois de l'inclusion">
     {# https://metatags.io Open Graph / Facebook #}
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}">
-    <meta property="og:title" content="{% translate "Les emplois de l'inclusion" %}">
-    <meta property="og:description" content="{% translate "Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
+    <meta property="og:title" content="Les emplois de l'inclusion">
+    <meta property="og:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
     <meta property="og:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
     {# https://metatags.io Twitter #}
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}/">
-    <meta property="twitter:title" content="{% translate "Les emplois de l'inclusion" %}">
-    <meta property="twitter:description" content="{% translate "Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)" %}">
+    <meta property="twitter:title" content="Les emplois de l'inclusion">
+    <meta property="twitter:description" content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs solidaires (structures de l'insertion par l'activité économique et du secteur adapté)">
     <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
     {# Use this to get the value of the CSRF token in JavaScript. #}
@@ -35,8 +34,6 @@
 <body>
 
     {% include "includes/test_accounts.html" %}
-
-    {% translate "Logo de lien vers un nouvel onglet" as external_link_title %}
 
     <div class="layout">
 
@@ -58,7 +55,7 @@
                                         data-toggle="dropdown"
                                         aria-haspopup="true"
                                         aria-expanded="false" data-display="static" >
-                                        {% translate "Mon espace" %}
+                                        Mon espace
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-sm-right">
                                         <div class="dropdown-item media">
@@ -72,33 +69,33 @@
                                         </div>
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:index' %}">
-                                            {% translate "Tableau de bord" %}
+                                            Tableau de bord
                                         </a>
 
                                         {% if user.is_siae_staff %}
                                             <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_preferences' %}">
-                                                {% translate "Préférences" %}
+                                                Préférences
                                             </a>
                                         {% endif %}
 
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_info' %}">
-                                            {% translate "Modifier mon profil" %}
+                                            Modifier mon profil
                                         </a>
 
                                         {% if not user.is_peamu %}
                                             <a class="dropdown-item text-primary" href="{% url 'account_change_password' %}">
-                                                {% translate "Modifier mon mot de passe" %}
+                                                Modifier mon mot de passe
                                             </a>
                                             <a class="dropdown-item text-primary" href="{% url 'dashboard:edit_user_email' %}">
-                                                {% translate "Modifier mon adresse e-mail" %}
+                                                Modifier mon adresse e-mail
                                             </a>
                                         {% endif %}
 
                                         <div class="dropdown-divider"></div>
 
                                         <a class="dropdown-item text-dark" id="js-logout" href="{% url 'account_logout' %}">
-                                            <i>{% translate "Déconnexion" %}</i>
+                                            <i>Déconnexion</i>
                                         </a>
                                     </div>
                                 </div>
@@ -106,7 +103,7 @@
                             {% if user.is_siae_staff and user_siaes|length > 1 %}
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                        {% translate "Changer de structure" %}
+                                        Changer de structure
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
                                         <form action="{% url 'dashboard:switch_siae' %}" method="post">
@@ -127,7 +124,7 @@
                             {% if user.is_prescriber and user_prescriberorganizations|length > 1 %}
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-outline-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-display="static">
-                                        {% translate "Changer de structure" %}
+                                        Changer de structure
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
                                         <form action="{% url 'dashboard:switch_prescriber_organization' %}" method="post">
@@ -150,17 +147,17 @@
                         {% else %}
                             <div class="btn-group">
                                 <button type="button" class="btn btn-primary w-100 w-sm-auto my-1 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {% translate "S'inscrire | Se connecter" %}
+                                    S'inscrire | Se connecter
                                 </button>
                                 <div class="dropdown-menu">
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=job_seeker{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        {% translate "Candidat" %}
+                                        Candidat
                                     </a>
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=prescriber{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        {% translate "Prescripteur" %}
+                                        Prescripteur
                                     </a>
                                     <a class="dropdown-item" href="{% url 'account_login' %}?account_type=siae{% if redirect_field_value %}&{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
-                                        {% translate "Employeur solidaire" %}
+                                        Employeur solidaire
                                     </a>
                                 </div>
                             </div>
@@ -175,16 +172,16 @@
             <nav class="nav itou-main-nav">
 
                 {% if user.is_authenticated %}
-                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">{% translate "Tableau de bord" %}</a>
+                    <a class="nav-link{% if request.path == '/dashboard/' %} active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                 {% endif %}
 
-                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">{% translate "Rechercher des employeurs" %}</a>
+                <a class="nav-link{% if request.path == '/' or '/search/employers' in request.path %} active{% endif %}" href="/">Rechercher des employeurs</a>
 
-                <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">{% translate "Rechercher des prescripteurs" %}</a>
+                <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs</a>
 
-                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="{% translate "Accéder au Forum de l'inclusion (nouvel onglet)" %}">{% translate "Forum" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
+                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Forum {% include "includes/icon.html" with icon="external-link" %}</a>
 
-                <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="{% translate "Accéder à l'espace de documentation (nouvel onglet)" %}">{% translate "Documentation" %} {% include "includes/icon.html" with icon="external-link" title=external_link_title %}</a>
+                <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation {% include "includes/icon.html" with icon="external-link" %}</a>
 
             </nav>
         </div>
@@ -197,7 +194,7 @@
 
                     {# Display an alert for old browsers #}
                     <div class="alert alert-secondary alert-old-browser" role="alert">
-                        {% translate "La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site." %}
+                        La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
                     </div>
 
                 {% endblock %}
@@ -219,12 +216,10 @@
                         <div class="col-sm-4">
                             <h5><b>inclusion</b>.beta.gouv.fr</h5>
                             <p>
-                                {% blocktranslate %}
-                                    Les emplois de l'inclusion <i>en expérimentation</i>
-                                {% endblocktranslate %}
+                                Les emplois de l'inclusion <i>en expérimentation</i>
                             </p>
                             <p class="mb-0">
-                                {% translate "Nous suivre" %}
+                                Nous suivre
                             </p>
                             <ul class="list-unstyled">
                                 <li>
@@ -245,43 +240,43 @@
                         <div class="col-sm-6">
                             <ul class="list-unstyled">
                                 <li>
-                                    <a href="{{ ITOU_DOC_URL }}/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                                        {% translate "Besoin d'aide ?" %}
-                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    <a href="{{ ITOU_DOC_URL }}/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Besoin d'aide ?
+                                        {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 <li>
-                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                                        {% translate "Inscription Newsletter" %}
-                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Inscription Newsletter
+                                        {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
                                 <li>
                                     <a href="{% url 'stats:public_stats' %}">
-                                        {% translate "Statistiques, lexiques et indicateurs" %}
+                                        Statistiques, lexiques et indicateurs
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                                        {% translate "Qui peut bénéficier des contrats d'IAE ?" %}
-                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    <a href="{{ ITOU_DOC_URL }}/qui-peut-beneficier-des-contrats-dinsertion-par-lactivite-economique" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Qui peut bénéficier des contrats d'IAE ?
+                                        {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                                        {% translate "Questions à la communauté" %}
-                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Questions à la communauté
+                                        {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                                        {% translate "Mentions légales" %}
-                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    <a href="{{ ITOU_DOC_URL }}/mentions/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Mentions légales
+                                        {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://beta.gouv.fr/accessibilite/" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                                        {% translate "Accessibilité : non conforme" %}
-                                        {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+                                    <a href="https://beta.gouv.fr/accessibilite/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Accessibilité : non conforme
+                                        {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
                             </ul>
@@ -388,9 +383,9 @@
     {% else %}
         {# Sticky FAQ link is not displayed on HP and on small devices #}
         <div class="rounded-pill bg-white shadow fixed-sm-bottom d-none d-sm-block m-4 py-2 px-3 text-center text-sm-right">
-            <a href="{{ ITOU_DOC_URL }}/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="{% translate "Ouverture dans un nouvel onglet" %}">
-                {% translate "Besoin d'aide ?" %}
-                {% include "includes/icon.html" with icon="external-link" title=external_link_title %}
+            <a href="{{ ITOU_DOC_URL }}/reponses-a-mes-questions-faq?q=" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                Besoin d'aide ?
+                {% include "includes/icon.html" with icon="external-link" %}
             </a>
         </div>
     {% endif %}

@@ -1,9 +1,6 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
 {% block subject %}
 
-{% blocktranslate with first_name=sender.first_name|capfirst last_name=sender.last_name|capfirst org_name=org.display_name %}
-{{ first_name }} {{ last_name }} vous a invité(e) à rejoindre l'organisation {{ org_name }} sur les emplois de l'inclusion.
-{% endblocktranslate %}
+{{ sender.first_name|capfirst }} {{ sender.last_name|capfirst }} vous a invité(e) à rejoindre l'organisation {{ org.display_name }} sur les emplois de l'inclusion.
 
 {% endblock %}

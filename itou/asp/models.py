@@ -2,7 +2,6 @@ import re
 
 from django.db import models
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 
@@ -13,99 +12,99 @@ class LaneType(models.TextChoices):
     Import/translation of ASP ref file: ref_type_voie_v3.csv
     """
 
-    AER = "AER", _("Aérodrome")
-    AGL = "AGL", _("Agglomération")
-    AIRE = "AIRE", _("Aire")
-    ALL = "ALL", _("Allée")
-    ACH = "ACH", _("Ancien chemin")
-    ART = "ART", _("Ancienne route")
-    AV = "AV", _("Avenue")
-    BEGI = "BEGI", _("Beguinage")
-    BD = "BD", _("Boulevard")
-    BRG = "BRG", _("Bourg")
-    CPG = "CPG", _("Camping")
-    CAR = "CAR", _("Carrefour")
-    CTRE = "CTRE", _("Centre")
-    CCAL = "CCAL", _("Centre commercial")
-    CHT = "CHT", _("Chateau")
-    CHS = "CHS", _("Chaussee")
-    CHEM = "CHEM", _("Chemin")
-    CHV = "CHV", _("Chemin vicinal")
-    CITE = "CITE", _("Cité")
-    CLOS = "CLOS", _("Clos")
-    CTR = "CTR", _("Contour")
-    COR = "COR", _("Corniche")
-    COTE = "COTE", _("Coteaux")
-    COUR = "COUR", _("Cour")
-    CRS = "CRS", _("Cours")
-    DSC = "DSC", _("Descente")
-    DOM = "DOM", _("Domaine")
-    ECL = "ECL", _("Ecluse")
-    ESC = "ESC", _("Escalier")
-    ESPA = "ESPA", _("Espace")
-    ESP = "ESP", _("Esplanade")
-    FG = "FG", _("Faubourg")
-    FRM = "FRM", _("Ferme")
-    FON = "FON", _("Fontaine")
-    GAL = "GAL", _("Galerie")
-    GARE = "GARE", _("Gare")
-    GBD = "GBD", _("Grand boulevard")
-    GPL = "GPL", _("Grande place")
-    GR = "GR", _("Grande rue")
-    GRI = "GRI", _("Grille")
-    HAM = "HAM", _("Hameau")
-    IMM = "IMM", _("Immeuble(s)")
-    IMP = "IMP", _("Impasse")
-    JARD = "JARD", _("Jardin")
-    LD = "LD", _("Lieu-dit")
-    LOT = "LOT", _("Lotissement")
-    MAIL = "MAIL", _("Mail")
-    MAIS = "MAIS", _("Maison")
-    MAS = "MAS", _("Mas")
-    MTE = "MTE", _("Montee")
-    PARC = "PARC", _("Parc")
-    PRV = "PRV", _("Parvis")
-    PAS = "PAS", _("Passage")
-    PLE = "PLE", _("Passerelle")
-    PCH = "PCH", _("Petit chemin")
-    PRT = "PRT", _("Petite route")
-    PTR = "PTR", _("Petite rue")
-    PL = "PL", _("Place")
-    PTTE = "PTTE", _("Placette")
-    PLN = "PLN", _("Plaine")
-    PLAN = "PLAN", _("Plan")
-    PLT = "PLT", _("Plateau")
-    PONT = "PONT", _("Pont")
-    PORT = "PORT", _("Port")
-    PROM = "PROM", _("Promenade")
-    QUAI = "QUAI", _("Quai")
-    QUAR = "QUAR", _("Quartier")
-    RPE = "RPE", _("Rampe")
-    REMP = "REMP", _("Rempart")
-    RES = "RES", _("Residence")
-    ROC = "ROC", _("Rocade")
-    RPT = "RPT", _("Rond-point")
-    RTD = "RTD", _("Rotonde")
-    RTE = "RTE", _("Route")
-    RUE = "RUE", _("Rue")
-    RLE = "RLE", _("Ruelle")
-    SEN = "SEN", _("Sente")
-    SENT = "SENT", _("Sentier")
-    SQ = "SQ", _("Square")
-    TPL = "TPL", _("Terre plein")
-    TRAV = "TRAV", _("Traverse")
-    VEN = "VEN", _("Venelle")
-    VTE = "VTE", _("Vieille route")
-    VCHE = "VCHE", _("Vieux chemin")
-    VILL = "VILL", _("Villa")
-    VLGE = "VLGE", _("Village")
-    VOIE = "VOIE", _("Voie")
-    ZONE = "ZONE", _("Zone")
-    ZA = "ZA", _("Zone d'activite")
-    ZAC = "ZAC", _("Zone d'amenagement concerte")
-    ZAD = "ZAD", _("Zone d'amenagement differe")
-    ZI = "ZI", _("Zone industrielle")
-    ZUP = "ZUP", _("Zone urbanisation prio")
+    AER = "AER", "Aérodrome"
+    AGL = "AGL", "Agglomération"
+    AIRE = "AIRE", "Aire"
+    ALL = "ALL", "Allée"
+    ACH = "ACH", "Ancien chemin"
+    ART = "ART", "Ancienne route"
+    AV = "AV", "Avenue"
+    BEGI = "BEGI", "Beguinage"
+    BD = "BD", "Boulevard"
+    BRG = "BRG", "Bourg"
+    CPG = "CPG", "Camping"
+    CAR = "CAR", "Carrefour"
+    CTRE = "CTRE", "Centre"
+    CCAL = "CCAL", "Centre commercial"
+    CHT = "CHT", "Chateau"
+    CHS = "CHS", "Chaussee"
+    CHEM = "CHEM", "Chemin"
+    CHV = "CHV", "Chemin vicinal"
+    CITE = "CITE", "Cité"
+    CLOS = "CLOS", "Clos"
+    CTR = "CTR", "Contour"
+    COR = "COR", "Corniche"
+    COTE = "COTE", "Coteaux"
+    COUR = "COUR", "Cour"
+    CRS = "CRS", "Cours"
+    DSC = "DSC", "Descente"
+    DOM = "DOM", "Domaine"
+    ECL = "ECL", "Ecluse"
+    ESC = "ESC", "Escalier"
+    ESPA = "ESPA", "Espace"
+    ESP = "ESP", "Esplanade"
+    FG = "FG", "Faubourg"
+    FRM = "FRM", "Ferme"
+    FON = "FON", "Fontaine"
+    GAL = "GAL", "Galerie"
+    GARE = "GARE", "Gare"
+    GBD = "GBD", "Grand boulevard"
+    GPL = "GPL", "Grande place"
+    GR = "GR", "Grande rue"
+    GRI = "GRI", "Grille"
+    HAM = "HAM", "Hameau"
+    IMM = "IMM", "Immeuble(s)"
+    IMP = "IMP", "Impasse"
+    JARD = "JARD", "Jardin"
+    LD = "LD", "Lieu-dit"
+    LOT = "LOT", "Lotissement"
+    MAIL = "MAIL", "Mail"
+    MAIS = "MAIS", "Maison"
+    MAS = "MAS", "Mas"
+    MTE = "MTE", "Montee"
+    PARC = "PARC", "Parc"
+    PRV = "PRV", "Parvis"
+    PAS = "PAS", "Passage"
+    PLE = "PLE", "Passerelle"
+    PCH = "PCH", "Petit chemin"
+    PRT = "PRT", "Petite route"
+    PTR = "PTR", "Petite rue"
+    PL = "PL", "Place"
+    PTTE = "PTTE", "Placette"
+    PLN = "PLN", "Plaine"
+    PLAN = "PLAN", "Plan"
+    PLT = "PLT", "Plateau"
+    PONT = "PONT", "Pont"
+    PORT = "PORT", "Port"
+    PROM = "PROM", "Promenade"
+    QUAI = "QUAI", "Quai"
+    QUAR = "QUAR", "Quartier"
+    RPE = "RPE", "Rampe"
+    REMP = "REMP", "Rempart"
+    RES = "RES", "Residence"
+    ROC = "ROC", "Rocade"
+    RPT = "RPT", "Rond-point"
+    RTD = "RTD", "Rotonde"
+    RTE = "RTE", "Route"
+    RUE = "RUE", "Rue"
+    RLE = "RLE", "Ruelle"
+    SEN = "SEN", "Sente"
+    SENT = "SENT", "Sentier"
+    SQ = "SQ", "Square"
+    TPL = "TPL", "Terre plein"
+    TRAV = "TRAV", "Traverse"
+    VEN = "VEN", "Venelle"
+    VTE = "VTE", "Vieille route"
+    VCHE = "VCHE", "Vieux chemin"
+    VILL = "VILL", "Villa"
+    VLGE = "VLGE", "Village"
+    VOIE = "VOIE", "Voie"
+    ZONE = "ZONE", "Zone"
+    ZA = "ZA", "Zone d'activite"
+    ZAC = "ZAC", "Zone d'amenagement concerte"
+    ZAD = "ZAD", "Zone d'amenagement differe"
+    ZI = "ZI", "Zone industrielle"
+    ZUP = "ZUP", "Zone urbanisation prio"
 
     @classmethod
     def with_similar_name(cls, name):
@@ -153,10 +152,10 @@ class LaneExtension(models.TextChoices):
     Import/translation of ASP ref file: ref_extension_voie_v1.csv
     """
 
-    B = "B", _("Bis")
-    T = "T", _("Ter")
-    Q = "Q", _("Quater")
-    C = "C", _("Quinquies")
+    B = "B", "Bis"
+    T = "T", "Ter"
+    Q = "Q", "Quater"
+    C = "C", "Quinquies"
 
     @classmethod
     def with_similar_name_or_value(cls, s, fmt=str.lower):
@@ -199,8 +198,8 @@ class AbstractPeriod(models.Model):
     => Use 'old' when you have to deal with history or previous version of a record
     """
 
-    start_date = models.DateField(verbose_name=_("Début de validité"))
-    end_date = models.DateField(verbose_name=_("Fin de validité"), null=True)
+    start_date = models.DateField(verbose_name="Début de validité")
+    end_date = models.DateField(verbose_name="Fin de validité", null=True)
 
     objects = models.Manager.from_queryset(PeriodQuerySet)()
 
@@ -223,10 +222,10 @@ class AllocationDuration(models.TextChoices):
     Note: effect periods are not handled
     """
 
-    LESS_THAN_6_MONTHS = "01", _("Moins de 6 mois")
-    FROM_6_TO_11_MONTHS = "02", _("De 6 à 11 mois")
-    FROM_12_TO_23_MONTHS = "03", _("De 12 à 23 mois")
-    MORE_THAN_24_MONTHS = "04", _("24 mois et plus")
+    LESS_THAN_6_MONTHS = "01", "Moins de 6 mois"
+    FROM_6_TO_11_MONTHS = "02", "De 6 à 11 mois"
+    FROM_12_TO_23_MONTHS = "03", "De 12 à 23 mois"
+    MORE_THAN_24_MONTHS = "04", "24 mois et plus"
 
 
 class EducationLevel(models.TextChoices):
@@ -241,17 +240,17 @@ class EducationLevel(models.TextChoices):
     Translation of ASP ref file: ref_niveau_formation_v3.csv
     """
 
-    NON_CERTIFYING_QUALICATIONS = "00", _("Personne avec qualifications non-certifiantes")
-    NO_SCHOOLING = "01", _("Jamais scolarisé")
-    THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", _("Troisième cycle ou école d'ingénieur")
-    LICENCE_LEVEL = "20", _("Formation de niveau licence")
-    BTS_OR_DUT_LEVEL = "30", _("Formation de niveau BTS ou DUT")
-    BAC_LEVEL = "40", _("Formation de niveau BAC")
-    BT_OR_BACPRO_LEVEL = "41", _("Brevet de technicien ou baccalauréat professionnel")
-    BEP_OR_CAP_LEVEL = "50", _("Formation de niveau BEP ou CAP")
-    BEP_OR_CAP_DIPLOMA = "51", _("Diplôme obtenu CAP ou BEP")
-    TRAINING_1_YEAR = "60", _("Formation courte d'une durée d'un an")
-    NO_SCHOOLING_BEYOND_MANDATORY = "70", _("Pas de formation au-delà de la scolarité obligatoire")
+    NON_CERTIFYING_QUALICATIONS = "00", "Personne avec qualifications non-certifiantes"
+    NO_SCHOOLING = "01", "Jamais scolarisé"
+    THIRD_CYCLE_OR_ENGINEERING_SCHOOL = "10", "Troisième cycle ou école d'ingénieur"
+    LICENCE_LEVEL = "20", "Formation de niveau licence"
+    BTS_OR_DUT_LEVEL = "30", "Formation de niveau BTS ou DUT"
+    BAC_LEVEL = "40", "Formation de niveau BAC"
+    BT_OR_BACPRO_LEVEL = "41", "Brevet de technicien ou baccalauréat professionnel"
+    BEP_OR_CAP_LEVEL = "50", "Formation de niveau BEP ou CAP"
+    BEP_OR_CAP_DIPLOMA = "51", "Diplôme obtenu CAP ou BEP"
+    TRAINING_1_YEAR = "60", "Formation courte d'une durée d'un an"
+    NO_SCHOOLING_BEYOND_MANDATORY = "70", "Pas de formation au-delà de la scolarité obligatoire"
 
 
 class EmployerType(models.TextChoices):
@@ -264,13 +263,13 @@ class EmployerType(models.TextChoices):
     Translation of ASP ref file: ref_type_employeur_v3.csv
     """
 
-    EI = "01", _("Entreprise d'insertion")
-    ETTI = "02", _("Entreprise de travail temporaire d'insertion")
-    AI = "03", _("Association intermédiaire")
-    ACI = "04", _("Atelier chantier d'insertion")
-    ESAT = "05", _("Etablissement et service d'aide par le travail")
-    EA = "06", _("Entreprise adaptée")
-    OTHER = "07", _("Autre")
+    EI = "01", "Entreprise d'insertion"
+    ETTI = "02", "Entreprise de travail temporaire d'insertion"
+    AI = "03", "Association intermédiaire"
+    ACI = "04", "Atelier chantier d'insertion"
+    ESAT = "05", "Etablissement et service d'aide par le travail"
+    EA = "06", "Entreprise adaptée"
+    OTHER = "07", "Autre"
 
     @classmethod
     def from_itou_siae_kind(cls, siae_kind):
@@ -311,14 +310,14 @@ class PrescriberType(models.TextChoices):
     Similar to EmployerType above, and with the same padding issue
     """
 
-    ML = "01", _("Mission locale")
-    CAP_EMPLOI = "02", _("CAP emploi")
-    PE = "03", _("Pôle emploi")
-    PLIE = "04", _("Plan local pour l'insertion et l'emploi")
-    DEPT = "05", _("Service départementaux")
-    AUTHORIZED_PRESCRIBERS = "06", _("Prescripteurs habilités")
-    SPONTANEOUS_APPLICATION = "07", _("Candidature spontanée")
-    UNKNOWN = "99", _("Non connu")
+    ML = "01", "Mission locale"
+    CAP_EMPLOI = "02", "CAP emploi"
+    PE = "03", "Pôle emploi"
+    PLIE = "04", "Plan local pour l'insertion et l'emploi"
+    DEPT = "05", "Service départementaux"
+    AUTHORIZED_PRESCRIBERS = "06", "Prescripteurs habilités"
+    SPONTANEOUS_APPLICATION = "07", "Candidature spontanée"
+    UNKNOWN = "99", "Non connu"
 
     @classmethod
     def from_itou_prescriber_kind(cls, prescriber_kind):
@@ -359,13 +358,13 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     reference file is currently not up-to-date (2018)
     """
 
-    code = models.CharField(max_length=5, verbose_name=_("Code commune INSEE"))
-    name = models.CharField(max_length=50, verbose_name=_("Nom de la commune"))
+    code = models.CharField(max_length=5, verbose_name="Code commune INSEE")
+    name = models.CharField(max_length=50, verbose_name="Nom de la commune")
 
     objects = CommuneManager()
 
     class Meta:
-        verbose_name = _("Commune")
+        verbose_name = "Commune"
 
     @cached_property
     def department_code(self):
@@ -387,11 +386,11 @@ class Department(PrettyPrintMixin, AbstractPeriod):
     Imported from ASP reference file: ref_insee_dpt_v2.csv
     """
 
-    code = models.CharField(max_length=3, verbose_name=_("Code département INSEE"))
-    name = models.CharField(max_length=50, verbose_name=_("Nom du département"))
+    code = models.CharField(max_length=3, verbose_name="Code département INSEE")
+    name = models.CharField(max_length=50, verbose_name="Nom du département")
 
     class Meta:
-        verbose_name = _("Département")
+        verbose_name = "Département"
 
 
 class CountryQuerySet(models.QuerySet):
@@ -417,23 +416,23 @@ class Country(PrettyPrintMixin, models.Model):
     _CODE_FRANCE = "100"
 
     class Group(models.TextChoices):
-        FRANCE = "1", _("France")
+        FRANCE = "1", "France"
         # FTR CEE = "Communauté Economique Européenne" and is not used since 1993...
-        CEE = "2", _("CEE")
-        OUTSIDE_CEE = "3", _("Hors CEE")
+        CEE = "2", "CEE"
+        OUTSIDE_CEE = "3", "Hors CEE"
 
     objects = models.Manager.from_queryset(CountryQuerySet)()
 
-    code = models.CharField(max_length=3, verbose_name=_("Code pays INSEE"))
-    name = models.CharField(max_length=50, verbose_name=_("Nom du pays"))
-    group = models.CharField(max_length=15, verbose_name=_("Groupe"), choices=Group.choices)
+    code = models.CharField(max_length=3, verbose_name="Code pays INSEE")
+    name = models.CharField(max_length=50, verbose_name="Nom du pays")
+    group = models.CharField(max_length=15, verbose_name="Groupe", choices=Group.choices)
 
     # For compatibility, no usage yet
-    department = models.CharField(max_length=3, verbose_name=_("Code département"), default="098")
+    department = models.CharField(max_length=3, verbose_name="Code département", default="098")
 
     class Meta:
-        verbose_name = _("Pays")
-        verbose_name_plural = _("Pays")
+        verbose_name = "Pays"
+        verbose_name_plural = "Pays"
 
     @property
     def is_france(self):
@@ -454,16 +453,16 @@ class SiaeKind(models.TextChoices):
     We only need a subset of the available codes.
     """
 
-    AI = "AI_DC", _("Droit Commun - Association Intermédiaire")
-    ACI = "ACI_DC", _("Droit Commun - Atelier et Chantier d'Insertion")
-    EI = "EI_DC", _("Droit Commun -  Entreprise d'Insertion")
-    ETTI = "ETTI_DC", _("Droit Commun - Entreprise de Travail Temporaire d'Insertion")
-    EITI = "EITI_DC", _("Droit Commun - Entreprise d'Insertion par le Travail Indépendant")
+    AI = "AI_DC", "Droit Commun - Association Intermédiaire"
+    ACI = "ACI_DC", "Droit Commun - Atelier et Chantier d'Insertion"
+    EI = "EI_DC", "Droit Commun -  Entreprise d'Insertion"
+    ETTI = "ETTI_DC", "Droit Commun - Entreprise de Travail Temporaire d'Insertion"
+    EITI = "EITI_DC", "Droit Commun - Entreprise d'Insertion par le Travail Indépendant"
 
     # These codes are currently not used at Itou
-    FDI = "FDI_DC", _("Droit Commun -  Fonds Départemental pour l'Insertion")
-    EI_MP = "EI_MP", _("Milieu Pénitentiaire - Entreprise d'Insertion")
-    ACI_MP = "ACI_MP", _("Milieu Pénitentiaire - Atelier et Chantier d'Insertion")
+    FDI = "FDI_DC", "Droit Commun -  Fonds Départemental pour l'Insertion"
+    EI_MP = "EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"
+    ACI_MP = "ACI_MP", "Milieu Pénitentiaire - Atelier et Chantier d'Insertion"
 
     @property
     def valid_kind_for_employee_record(self):

@@ -1,21 +1,20 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 {% load static %}
 
-{% block title %}{% translate "Inscription" %}{{ block.super }}{% endblock %}
+{% block title %}Inscription{{ block.super }}{% endblock %}
 
 {% block content %}
 
     <h1>
-        {% translate "Inscription" %}
-        <small class="text-muted">{% translate "Prescripteur Pôle emploi" %}</small>
+        Inscription
+        <small class="text-muted">Prescripteur Pôle emploi</small>
     </h1>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li>{% translate "Type de prescripteur" %}</li>
-        <li class="is-active">{% translate "Code SAFIR" %}</li>
-        <li>{% translate "Vos informations" %}</li>
+        <li>Type de prescripteur</li>
+        <li class="is-active">Code SAFIR</li>
+        <li>Vos informations</li>
     </ul>
 
     <form method="post" action="" class="js-prevent-multiple-submit">
@@ -26,9 +25,9 @@
 
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">
-                {% translate "Retour" %}
+                Retour
             </a>
-            <button type="submit" class="btn btn-primary">{% translate "Continuer" %}</button>
+            <button type="submit" class="btn btn-primary">Continuer</button>
         {% endbuttons %}
 
     </form>

@@ -1,28 +1,27 @@
 {% load bootstrap4 %}
-{% load i18n %}
 
 <div class="alert alert-warning" role="alert">
 
     <p>
         <small>
-            {% translate "Le Ministère du Travail (DGEFP) et Pôle emploi traitent vos données personnelles. Ce site est ouvert aux acteurs de l'inclusion et permet de simplifier le recrutement des personnes éligibles aux structures de l'Insertion par l'Activité Économique (IAE). Il est une composante du Pacte ambition IAE." %}
+            Le Ministère du Travail (DGEFP) et Pôle emploi traitent vos données personnelles. Ce site est ouvert aux acteurs de l'inclusion et permet de simplifier le recrutement des personnes éligibles aux structures de l'Insertion par l'Activité Économique (IAE). Il est une composante du Pacte ambition IAE.
         </small>
     </p>
 
     <p>
         <small>
 
-            {% translate "Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez" %}
+            Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez
 
             <a href="{{ ITOU_DOC_URL }}/mentions/protection-des-donnees" rel="noopener" target="_blank">
-                {% translate "la section Protection des données" %}
+                la section Protection des données
                 {% include "includes/icon.html" with icon="external-link" %}
             </a>.
 
-            {% translate 'En cliquant sur le bouton "Inscription", vous acceptez' %}
+            En cliquant sur le bouton "Inscription", vous acceptez
 
             <a href="{{ ITOU_DOC_URL }}/mentions/cgu" rel="noopener" target="_blank">
-                {% translate "les conditions générales d'utilisation" %}
+                les conditions générales d'utilisation
                 {% include "includes/icon.html" with icon="external-link" %}
             </a>.
 
@@ -30,7 +29,7 @@
     </p>
 
     {% buttons %}
-        <button type="submit" class="btn btn-primary">{% translate "Inscription" %}</button>
+        <button type="submit" class="btn btn-primary">Inscription</button>
     {% endbuttons %}
 
 </div>

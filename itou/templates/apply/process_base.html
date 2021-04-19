@@ -1,8 +1,7 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 
 {% block title %}
-    {% translate "Candidature" %}
+    Candidature
     -
     {{ job_application.job_seeker.get_full_name }}
     {{ block.super }}
@@ -11,7 +10,7 @@
 {% block content %}
 
     <h1>
-        {% translate "Candidature de" %}
+        Candidature de
         <span class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</span>
         <div class="row">
             <div class="col-sm">
@@ -32,11 +31,11 @@
                         {% if job_application.approval %}
                             {% include "approvals/includes/status.html" with approval=job_application.approval %}
                         {% elif job_application.hiring_without_approval %}
-                            {% translate "Vous n'avez pas demandé de PASS IAE (agrément)." %}
+                            Vous n'avez pas demandé de PASS IAE (agrément).
                         {% elif job_application.approval_manually_refused_at %}
-                            {% translate "PASS IAE (agrément) refusé." %}
+                            PASS IAE (agrément) refusé.
                         {% else %}
-                            {% translate "PASS IAE (agrément) en cours de délivrance." %}
+                            PASS IAE (agrément) en cours de délivrance.
                         {% endif %}
                     </div>
 
@@ -46,14 +45,14 @@
                             <a
                                 href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                 class="btn btn btn-link">
-                                    {% translate "Suspendre" %}
+                                    Suspendre
                             </a>
                         {% endif %}
                         {% if approval_can_be_prolonged_by_siae %}
                             <a
                                 href="{% url 'approvals:declare_prolongation' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                                 class="btn btn btn-link">
-                                    {% translate "Prolonger" %}
+                                    Prolonger
                             </a>
                         {% endif %}
                         {% if job_application.can_download_approval_as_pdf %}
@@ -63,14 +62,12 @@
                                 data-matomo-category="agrement"
                                 data-matomo-action="telechargement-pdf"
                                 data-matomo-option="details-candidature">
-                                    {% translate "Télécharger le PASS IAE" %}
+                                    Télécharger le PASS IAE
                             </a>
                         {% endif %}
                         {% if job_application.can_be_cancelled %}
                             <a class="btn btn-outline-secondary disabled w-100">
-                                    {% blocktranslate with cancellation_date=job_application.cancellation_delay_end|date:"d/m/Y" %}
-                                        Disponible au téléchargement après le {{ cancellation_date }}
-                                    {% endblocktranslate %}
+                                Disponible au téléchargement après le {{ job_application.cancellation_delay_end|date:"d/m/Y" }}
                             </a>
                         {% endif %}
                     {% endif %}

@@ -97,7 +97,7 @@ class ExternalDataImportTest(TestCase):
         _status_ok(m)
 
         result = import_user_pe_data(user, FOO_TOKEN)
-        self.assertEquals(result.status, ExternalDataImport.STATUS_OK)
+        self.assertEqual(result.status, ExternalDataImport.STATUS_OK)
 
         report = result.report
 
@@ -113,7 +113,7 @@ class ExternalDataImportTest(TestCase):
         _status_partial(m)
 
         result = import_user_pe_data(user, FOO_TOKEN)
-        self.assertEquals(result.status, ExternalDataImport.STATUS_PARTIAL)
+        self.assertEqual(result.status, ExternalDataImport.STATUS_PARTIAL)
 
         report = result.report
         self.assertTrue(user.has_external_data)
@@ -131,7 +131,7 @@ class ExternalDataImportTest(TestCase):
         _status_failed(m)
 
         result = import_user_pe_data(user, FOO_TOKEN)
-        self.assertEquals(result.status, ExternalDataImport.STATUS_FAILED)
+        self.assertEqual(result.status, ExternalDataImport.STATUS_FAILED)
 
         report = result.report
         self.assertEqual(0, len(report.get("fields_updated")))
@@ -195,7 +195,7 @@ class JobSeekerExternalDataTest(TestCase):
 
         self.assertEqual(user.address_line_1, "4, Privet Drive")
         self.assertEqual(user.address_line_2, "The cupboard under the stairs")
-        self.assertNotEquals(str(user.birthdate), "1970-01-01")
+        self.assertNotEqual(str(user.birthdate), "1970-01-01")
 
     @requests_mock.Mocker()
     def test_import_failed(self, m):

@@ -1,5 +1,4 @@
 {% extends "layout/content_small.html" %}
-{% load i18n %}
 {% load format_filters %}
 
 {% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
@@ -37,24 +36,21 @@
 
         {% if siae.email %}
             <p>
-                {% translate "E-mail" as email_label %}
-                {% include "includes/icon.html" with icon="mail" title=email_label %}
+                {% include "includes/icon.html" with icon="mail" title="E-mail" %}
                 <a href="mailto:{{ siae.email }}">{{ siae.email }}</a>
             </p>
         {% endif %}
 
         {% if siae.phone %}
             <p>
-                {% translate "Téléphone" as phone_label %}
-                {% include "includes/icon.html" with icon="phone" title=phone_label %}
+                {% include "includes/icon.html" with icon="phone" title="Téléphone" %}
                 <a href="tel:{{ siae.phone }}">{{ siae.phone|format_phone }}</a>
             </p>
         {% endif %}
 
         {% if siae.website %}
             <p>
-                {% translate "Site Internet" as website_label %}
-                {% include "includes/icon.html" with icon="external-link" title=website_label %}
+                {% include "includes/icon.html" with icon="external-link" title="Site Internet" %}
                 <a href="{{ siae.website }}" rel="noopener" target="_blank">{{ siae.website }}</a>
             </p>
         {% endif %}
@@ -64,7 +60,7 @@
     {% if siae.block_job_applications %}
 
         <div class="alert alert-warning">
-            {% translate "Cet employeur ne traite plus de nouvelles candidatures pour le moment" %}
+            Cet employeur ne traite plus de nouvelles candidatures pour le moment
         </div>
 
     {% else %}
@@ -73,12 +69,12 @@
             <hr>
             <p class="mb-2">
                 {% include "includes/icon.html" with icon="briefcase" %}
-                {% translate "Métiers proposés" %}
+                Métiers proposés
             </p>
             <ul>
             {% for job in siae.job_description_through.all %}
                 <li>
-                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{% translate job.display_name %}</a>
+                    <a href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">{{ job.display_name }}</a>
                 </li>
             {% endfor %}
             </ul>
@@ -87,8 +83,8 @@
         {% if siae.has_members %}
             <hr>
             <p>
-                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="{% blocktranslate with siae.display_name as display_name %}Postuler auprès de l'employeur solidaire {{ display_name }}{% endblocktranslate %}">
-                    {% include "includes/icon.html" with icon="message-square" %} {% translate "Postuler" %}
+                <a class="btn btn-outline-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                    {% include "includes/icon.html" with icon="message-square" %} Postuler
                 </a>
             </p>
         {% endif %}
@@ -98,7 +94,7 @@
     {% if back_url %}
         <hr>
         <p>
-            <a href="{{ back_url }}">{% translate "Retour" %}</a>
+            <a href="{{ back_url }}">Retour</a>
         </p>
     {% endif %}
 

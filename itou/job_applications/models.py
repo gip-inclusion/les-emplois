@@ -10,7 +10,6 @@ from django.db.models import BooleanField, Case, Exists, Max, OuterRef, When
 from django.db.models.functions import Greatest
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Suspension
@@ -38,13 +37,13 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_OBSOLETE = "obsolete"
 
     STATE_CHOICES = (
-        (STATE_NEW, _("Nouvelle candidature")),
-        (STATE_PROCESSING, _("Candidature à l'étude")),
-        (STATE_POSTPONED, _("Candidature en liste d'attente")),
-        (STATE_ACCEPTED, _("Candidature acceptée")),
-        (STATE_REFUSED, _("Candidature déclinée")),
-        (STATE_CANCELLED, _("Embauche annulée")),
-        (STATE_OBSOLETE, _("Embauché ailleurs")),
+        (STATE_NEW, "Nouvelle candidature"),
+        (STATE_PROCESSING, "Candidature à l'étude"),
+        (STATE_POSTPONED, "Candidature en liste d'attente"),
+        (STATE_ACCEPTED, "Candidature acceptée"),
+        (STATE_REFUSED, "Candidature déclinée"),
+        (STATE_CANCELLED, "Embauche annulée"),
+        (STATE_OBSOLETE, "Embauché ailleurs"),
     )
 
     states = STATE_CHOICES
@@ -57,12 +56,12 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
 
     TRANSITION_CHOICES = (
-        (TRANSITION_PROCESS, _("Étudier la candidature")),
-        (TRANSITION_POSTPONE, _("Reporter la candidature")),
-        (TRANSITION_ACCEPT, _("Accepter la candidature")),
-        (TRANSITION_REFUSE, _("Décliner la candidature")),
-        (TRANSITION_CANCEL, _("Annuler la candidature")),
-        (TRANSITION_RENDER_OBSOLETE, _("Rendre obsolete la candidature")),
+        (TRANSITION_PROCESS, "Étudier la candidature"),
+        (TRANSITION_POSTPONE, "Reporter la candidature"),
+        (TRANSITION_ACCEPT, "Accepter la candidature"),
+        (TRANSITION_REFUSE, "Décliner la candidature"),
+        (TRANSITION_CANCEL, "Annuler la candidature"),
+        (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
     )
 
     transitions = (
@@ -173,9 +172,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     SENDER_KIND_SIAE_STAFF = KIND_SIAE_STAFF
 
     SENDER_KIND_CHOICES = (
-        (SENDER_KIND_JOB_SEEKER, _("Demandeur d'emploi")),
-        (SENDER_KIND_PRESCRIBER, _("Prescripteur")),
-        (SENDER_KIND_SIAE_STAFF, _("Employeur (SIAE)")),
+        (SENDER_KIND_JOB_SEEKER, "Demandeur d'emploi"),
+        (SENDER_KIND_PRESCRIBER, "Prescripteur"),
+        (SENDER_KIND_SIAE_STAFF, "Employeur (SIAE)"),
     )
 
     REFUSAL_REASON_DID_NOT_COME = "did_not_come"
@@ -189,25 +188,25 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     REFUSAL_REASON_DEACTIVATION = "deactivation"
     REFUSAL_REASON_OTHER = "other"
     REFUSAL_REASON_CHOICES = (
-        (REFUSAL_REASON_DID_NOT_COME, _("Candidat non venu ou non joignable")),
-        (REFUSAL_REASON_UNAVAILABLE, _("Candidat indisponible ou non intéressé par le poste")),
-        (REFUSAL_REASON_NON_ELIGIBLE, _("Candidat non éligible")),
+        (REFUSAL_REASON_DID_NOT_COME, "Candidat non venu ou non joignable"),
+        (REFUSAL_REASON_UNAVAILABLE, "Candidat indisponible ou non intéressé par le poste"),
+        (REFUSAL_REASON_NON_ELIGIBLE, "Candidat non éligible"),
         (
             REFUSAL_REASON_ELIGIBILITY_DOUBT,
-            _("Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)"),
+            "Doute sur l'éligibilité du candidat (penser à renvoyer la personne vers un prescripteur)",
         ),
         (
             REFUSAL_REASON_INCOMPATIBLE,
-            _("Un des freins à l'emploi du candidat est incompatible avec le poste proposé"),
+            "Un des freins à l'emploi du candidat est incompatible avec le poste proposé",
         ),
         (
             REFUSAL_REASON_PREVENT_OBJECTIVES,
-            _("L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion"),
+            "L'embauche du candidat empêche la réalisation des objectifs du dialogue de gestion",
         ),
-        (REFUSAL_REASON_NO_POSITION, _("Pas de poste ouvert en ce moment")),
-        (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, _("La date de fin du PASS IAE / agrément est trop proche")),
-        (REFUSAL_REASON_DEACTIVATION, _("La structure n'est plus conventionnée")),
-        (REFUSAL_REASON_OTHER, _("Autre")),
+        (REFUSAL_REASON_NO_POSITION, "Pas de poste ouvert en ce moment"),
+        (REFUSAL_REASON_APPROVAL_EXPIRATION_TOO_CLOSE, "La date de fin du PASS IAE / agrément est trop proche"),
+        (REFUSAL_REASON_DEACTIVATION, "La structure n'est plus conventionnée"),
+        (REFUSAL_REASON_OTHER, "Autre"),
     )
 
     # SIAE have the possibility to update the hiring date if:
@@ -215,13 +214,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # - it is in the future, max. MAX_CONTRACT_POSTPONE_IN_DAYS days from today.
     MAX_CONTRACT_POSTPONE_IN_DAYS = 30
 
-    ERROR_START_IN_PAST = _("Il n'est pas possible d'antidater un contrat. Indiquez une date dans le futur.")
-    ERROR_END_IS_BEFORE_START = _("La date de fin du contrat doit être postérieure à la date de début.")
-    ERROR_DURATION_TOO_LONG = _(f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans.")
-    ERROR_START_AFTER_APPROVAL_END = _(
+    ERROR_START_IN_PAST = "Il n'est pas possible d'antidater un contrat. Indiquez une date dans le futur."
+    ERROR_END_IS_BEFORE_START = "La date de fin du contrat doit être postérieure à la date de début."
+    ERROR_DURATION_TOO_LONG = f"La durée du contrat ne peut dépasser {Approval.DEFAULT_APPROVAL_YEARS} ans."
+    ERROR_START_AFTER_APPROVAL_END = (
         "Attention, le PASS IAE sera expiré lors du début du contrat. Veuillez modifier la date de début."
     )
-    ERROR_POSTPONE_TOO_FAR = _(
+    ERROR_POSTPONE_TOO_FAR = (
         f"La date de début du contrat ne peut être repoussée de plus de {MAX_CONTRACT_POSTPONE_IN_DAYS} jours."
     )
 
@@ -229,8 +228,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     APPROVAL_DELIVERY_MODE_MANUAL = "manual"
 
     APPROVAL_DELIVERY_MODE_CHOICES = (
-        (APPROVAL_DELIVERY_MODE_AUTOMATIC, _("Automatique")),
-        (APPROVAL_DELIVERY_MODE_MANUAL, _("Manuel")),
+        (APPROVAL_DELIVERY_MODE_AUTOMATIC, "Automatique"),
+        (APPROVAL_DELIVERY_MODE_MANUAL, "Manuel"),
     )
 
     CANCELLATION_DAYS_AFTER_HIRING_STARTED = 4
@@ -240,7 +239,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Demandeur d'emploi"),
+        verbose_name="Demandeur d'emploi",
         on_delete=models.CASCADE,
         related_name="job_applications",
     )
@@ -248,7 +247,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Who send the job application. It can be the same user as `job_seeker`
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Émetteur"),
+        verbose_name="Émetteur",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -256,7 +255,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     sender_kind = models.CharField(
-        verbose_name=_("Type de l'émetteur"),
+        verbose_name="Type de l'émetteur",
         max_length=10,
         choices=SENDER_KIND_CHOICES,
         default=SENDER_KIND_PRESCRIBER,
@@ -264,13 +263,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     # When the sender is an SIAE staff member, keep a track of his current SIAE.
     sender_siae = models.ForeignKey(
-        "siaes.Siae", verbose_name=_("SIAE émettrice"), null=True, blank=True, on_delete=models.CASCADE
+        "siaes.Siae", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
     )
 
     # When the sender is a prescriber, keep a track of his current organization (if any).
     sender_prescriber_organization = models.ForeignKey(
         "prescribers.PrescriberOrganization",
-        verbose_name=_("Organisation du prescripteur émettrice"),
+        verbose_name="Organisation du prescripteur émettrice",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -278,51 +277,49 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     to_siae = models.ForeignKey(
         "siaes.Siae",
-        verbose_name=_("SIAE destinataire"),
+        verbose_name="SIAE destinataire",
         on_delete=models.CASCADE,
         related_name="job_applications_received",
     )
 
-    state = xwf_models.StateField(JobApplicationWorkflow, verbose_name=_("État"), db_index=True)
+    state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="État", db_index=True)
 
     # Jobs in which the job seeker is interested (optional).
-    selected_jobs = models.ManyToManyField(
-        "siaes.SiaeJobDescription", verbose_name=_("Métiers recherchés"), blank=True
-    )
+    selected_jobs = models.ManyToManyField("siaes.SiaeJobDescription", verbose_name="Métiers recherchés", blank=True)
 
-    message = models.TextField(verbose_name=_("Message de candidature"), blank=True)
-    answer = models.TextField(verbose_name=_("Message de réponse"), blank=True)
+    message = models.TextField(verbose_name="Message de candidature", blank=True)
+    answer = models.TextField(verbose_name="Message de réponse", blank=True)
     refusal_reason = models.CharField(
-        verbose_name=_("Motifs de refus"), max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
+        verbose_name="Motifs de refus", max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
     )
 
-    hiring_start_at = models.DateField(verbose_name=_("Date de début du contrat"), blank=True, null=True)
-    hiring_end_at = models.DateField(verbose_name=_("Date prévisionnelle de fin du contrat"), blank=True, null=True)
+    hiring_start_at = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True)
+    hiring_end_at = models.DateField(verbose_name="Date prévisionnelle de fin du contrat", blank=True, null=True)
 
     hiring_without_approval = models.BooleanField(
-        default=False, verbose_name=_("L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche")
+        default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
     )
 
     # Job applications sent to SIAEs subject to eligibility rules can obtain an
     # Approval after being accepted.
     approval = models.ForeignKey(
-        "approvals.Approval", verbose_name=_("PASS IAE"), null=True, blank=True, on_delete=models.SET_NULL
+        "approvals.Approval", verbose_name="PASS IAE", null=True, blank=True, on_delete=models.SET_NULL
     )
     approval_delivery_mode = models.CharField(
-        verbose_name=_("Mode d'attribution du PASS IAE"),
+        verbose_name="Mode d'attribution du PASS IAE",
         max_length=30,
         choices=APPROVAL_DELIVERY_MODE_CHOICES,
         blank=True,
     )
     # Fields used for approvals processed both manually or automatically.
-    approval_number_sent_by_email = models.BooleanField(verbose_name=_("PASS IAE envoyé par email"), default=False)
+    approval_number_sent_by_email = models.BooleanField(verbose_name="PASS IAE envoyé par email", default=False)
     approval_number_sent_at = models.DateTimeField(
-        verbose_name=_("Date d'envoi du PASS IAE"), blank=True, null=True, db_index=True
+        verbose_name="Date d'envoi du PASS IAE", blank=True, null=True, db_index=True
     )
     # Fields used only for manual processing.
     approval_manually_delivered_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("PASS IAE délivré manuellement par"),
+        verbose_name="PASS IAE délivré manuellement par",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -330,24 +327,24 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     approval_manually_refused_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("PASS IAE refusé manuellement par"),
+        verbose_name="PASS IAE refusé manuellement par",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="approval_manually_refused",
     )
     approval_manually_refused_at = models.DateTimeField(
-        verbose_name=_("Date de refus manuel du PASS IAE"), blank=True, null=True
+        verbose_name="Date de refus manuel du PASS IAE", blank=True, null=True
     )
 
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
-    updated_at = models.DateTimeField(verbose_name=_("Date de modification"), blank=True, null=True, db_index=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
 
     objects = models.Manager.from_queryset(JobApplicationQuerySet)()
 
     class Meta:
-        verbose_name = _("Candidature")
-        verbose_name_plural = _("Candidatures")
+        verbose_name = "Candidature"
+        verbose_name_plural = "Candidatures"
         ordering = ["-created_at"]
 
     def __init__(self, *args, **kwargs):
@@ -532,7 +529,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @xwf_models.transition()
     def cancel(self, *args, **kwargs):
         if not self.can_be_cancelled:
-            raise xwf_models.AbortTransition(_("Cette candidature n'a pu être annulée."))
+            raise xwf_models.AbortTransition("Cette candidature n'a pu être annulée.")
 
         if self.approval and self.approval.can_be_deleted:
             self.approval.delete()
@@ -598,9 +595,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def email_deliver_approval(self, accepted_by):
         if not accepted_by:
-            raise RuntimeError(_("Unable to determine the recipient email address."))
+            raise RuntimeError("Unable to determine the recipient email address.")
         if not self.approval:
-            raise RuntimeError(_("No approval found for this job application."))
+            raise RuntimeError("No approval found for this job application.")
         to = [accepted_by.email]
         context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}
         subject = "approvals/email/deliver_subject.txt"
@@ -624,7 +621,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def email_manually_refuse_approval(self):
         if not self.accepted_by:
-            raise RuntimeError(_("Unable to determine the recipient email address."))
+            raise RuntimeError("Unable to determine the recipient email address.")
         to = [self.accepted_by.email]
         context = {"job_application": self}
         subject = "approvals/email/refuse_manually_subject.txt"
@@ -665,8 +662,8 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
-        verbose_name = _("Log des transitions de la candidature")
-        verbose_name_plural = _("Log des transitions des candidatures")
+        verbose_name = "Log des transitions de la candidature"
+        verbose_name_plural = "Log des transitions des candidatures"
         ordering = ["-timestamp"]
 
     def __str__(self):

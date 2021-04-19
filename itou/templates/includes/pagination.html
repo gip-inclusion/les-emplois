@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load url_add_query %}
 {% comment %}
 
@@ -8,18 +7,18 @@
 {% endcomment %}
 {% if page.display_pager %}
     {% with request.get_full_path as url %}
-        <nav aria-label="{% translate "Pagination" %}">
+        <nav aria-label="Pagination">
             {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}
             <ul class="pagination flex-wrap">
 
                 {# First page. #}
                 {% if page.number == 1 %}
                     <li class="page-item disabled">
-                        <span class="page-link">{% translate "Premier" %}</span>
+                        <span class="page-link">Premier</span>
                     </li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="{% url_add_query url page=1 %}">{% translate "Premier" %}</a>
+                        <a class="page-link" href="{% url_add_query url page=1 %}">Premier</a>
                     </li>
                 {% endif %}
 
@@ -29,7 +28,7 @@
                         <li class="page-item active" aria-current="page">
                             <span class="page-link">
                                 {{ page.number }}
-                                <span class="sr-only">{% translate "(actuel)" %}</span>
+                                <span class="sr-only">(actuel)</span>
                             </span>
                         </li>
                     {% else %}
@@ -42,11 +41,11 @@
                 {# Last page. #}
                 {% if page.number == page.paginator.num_pages %}
                     <li class="page-item disabled">
-                        <span class="page-link">{% translate "Dernier" %}</span>
+                        <span class="page-link">Dernier</span>
                     </li>
                 {% else %}
                     <li class="page-item">
-                        <a class="page-link" href="{% url_add_query url page=page.paginator.num_pages %}">{% translate "Dernier" %}</a>
+                        <a class="page-link" href="{% url_add_query url page=page.paginator.num_pages %}">Dernier</a>
                     </li>
                 {% endif %}
 

@@ -14,7 +14,6 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils.translation import gettext as _
 
 from itou.approvals.admin_forms import ManuallyAddApprovalForm
 from itou.approvals.models import Approval
@@ -68,9 +67,7 @@ def manually_add_approval(
         job_application.approval = approval
         job_application.save()
         job_application.manually_deliver_approval(delivered_by=request.user)
-        messages.success(
-            request, _(f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
-        )
+        messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     context = {
@@ -82,7 +79,7 @@ def manually_add_approval(
         "form": form,
         "job_application": job_application,
         "opts": opts,
-        "title": _("Ajout manuel d'un numéro d'agrément"),
+        "title": "Ajout manuel d'un numéro d'agrément",
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)
@@ -119,7 +116,7 @@ def manually_refuse_approval(
 
     if request.method == "POST" and request.POST.get("confirm") == "yes":
         job_application.manually_refuse_approval(refused_by=request.user)
-        messages.success(request, _("Délivrance du PASS IAE refusée."))
+        messages.success(request, "Délivrance du PASS IAE refusée.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
     # Display a preview of the email that will be send.
@@ -138,7 +135,7 @@ def manually_refuse_approval(
         "email_subject_template": email_subject_template,
         "job_application": job_application,
         "opts": opts,
-        "title": _("Confirmer le refus manuel d'un numéro d'agrément"),
+        "title": "Confirmer le refus manuel d'un numéro d'agrément",
         **admin_site.each_context(request),
     }
     return render(request, template_name, context)

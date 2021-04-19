@@ -1,10 +1,9 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.approvals.models import Prolongation, Suspension
+from itou.users.models import User
 from itou.utils.widgets import DatePickerField
 
 
@@ -42,21 +41,21 @@ class DeclareProlongationForm(forms.ModelForm):
         max_end_at_str = Prolongation.get_max_end_at(self.instance.start_at).strftime("%Y/%m/%d")
         self.fields["end_at"].widget = DatePickerField({"minDate": min_end_at_str, "maxDate": max_end_at_str})
         self.fields["end_at"].input_formats = [DatePickerField.DATE_FORMAT]
-        self.fields["end_at"].label = _(f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au')
+        self.fields["end_at"].label = f'Du {self.instance.start_at.strftime("%d/%m/%Y")} au'
 
     email = forms.EmailField(
         required=True,
-        label=gettext_lazy("E-mail du prescripteur habilité qui a autorisé cette prolongation"),
-        help_text=gettext_lazy(
+        label="E-mail du prescripteur habilité qui a autorisé cette prolongation",
+        help_text=(
             "Attention : l'adresse e-mail doit correspondre à un compte utilisateur de type prescripteur habilité"
         ),
     )
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        self.validated_by = get_user_model().objects.filter(email=email).first()
+        self.validated_by = User.objects.filter(email=email).first()
         if not self.validated_by or not self.validated_by.is_prescriber_with_authorized_org:
-            error = _("Cet utilisateur n'est pas un prescripteur habilité.")
+            error = "Cet utilisateur n'est pas un prescripteur habilité."
             raise forms.ValidationError(error)
         return email
 
@@ -75,7 +74,7 @@ class DeclareProlongationForm(forms.ModelForm):
         }
         help_texts = {
             "end_at": mark_safe(
-                gettext_lazy(
+                (
                     "Date jusqu'à laquelle le PASS IAE doit être prolongé."
                     "<br>"
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
@@ -128,12 +127,12 @@ class SuspensionForm(forms.ModelForm):
         }
         help_texts = {
             "start_at": mark_safe(
-                gettext_lazy(
+                (
                     "Au format JJ/MM/AAAA, par exemple 20/12/1978."
                     "<br>"
                     "La suspension ne peut pas commencer dans le futur."
                 )
             ),
-            "end_at": gettext_lazy("Au format JJ/MM/AAAA, par exemple 20/12/1978."),
-            "reason_explanation": gettext_lazy("Obligatoire seulement en cas de force majeure."),
+            "end_at": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
+            "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }

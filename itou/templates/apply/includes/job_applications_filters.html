@@ -1,10 +1,9 @@
-{% load i18n %}
 {% load bootstrap4 %}
 
 <ul class="list-group list-group-horizontal mt-sm-5 mb-sm-0">
     <li class="list-group-item border-0 pl-0">
         <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#filtersModal">
-          {% translate "Rechercher dans vos candidatures" %}
+          Rechercher dans vos candidatures
         </button>
     </li>
     {% for filter in filters %}
@@ -19,17 +18,17 @@
         <div class="modal-content">
             <form method="get" action="">
                 <div class="modal-header">
-                    <h4 class="modal-title">{% translate "Filtres" %}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{% translate 'Fermer' %}">
+                    <h4 class="modal-title">Filtres</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <h5 class="mt-4">{% translate "Date de candidature" %}</h5>
+                    <h5 class="mt-4">Date de candidature</h5>
                     {% bootstrap_field filters_form.start_date form_group_class="form_group m-3" %}
                     {% bootstrap_field filters_form.end_date form_group_class="form_group m-3" %}
 
-                    <h5 class="mt-4">{% translate "Statut" %}</h5>
+                    <h5 class="mt-4">Statut</h5>
                     {% for choice in filters_form.states %}
                         <div class="form-check form-check-inline dropdown-item">
                             <input
@@ -46,12 +45,12 @@
                     {% endfor %}
 
                     {% if filters_form.pass_iae_suspended %}
-                        <h5 class="mt-4">{% translate "PASS IAE" %}</h5>
+                        <h5 class="mt-4">PASS IAE</h5>
                         {% bootstrap_field filters_form.pass_iae_suspended form_group_class="form_group m-3" %}
                     {% endif %}
 
                     {% if filters_form.senders or filters_form.sender_organizations %}
-                        <h5 class="mt-4">{% translate "Emetteur" %}</h5>
+                        <h5 class="mt-4">Emetteur</h5>
                     {% endif %}
 
                     {% if filters_form.senders %}
@@ -63,7 +62,7 @@
                     {% endif %}
 
                     {% if filters_form.to_siaes %}
-                        <h5 class="mt-4">{% translate "Structures destinataires" %}</h5>
+                        <h5 class="mt-4">Structures destinataires</h5>
                         {% bootstrap_field filters_form.to_siaes form_group_class="form_group m-3" show_label=False %}
                     {% endif %}
 
@@ -74,8 +73,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{% translate "Fermer" %}</button>
-                    <button type="submit" class="btn btn-primary">{% translate "Appliquer" %}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Appliquer</button>
                 </div>
             </form>
         </div> <!-- .modal-content -->

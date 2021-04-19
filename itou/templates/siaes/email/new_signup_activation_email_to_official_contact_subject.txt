@@ -1,5 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
-{% load i18n %}
 {% block subject %}
-{% blocktranslate %}[Action requise] Un nouvel utilisateur souhaite rejoindre votre structure !{% endblocktranslate %}
+[Action requise] Un nouvel utilisateur souhaite rejoindre votre structure !
 {% endblock %}

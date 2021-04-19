@@ -3,13 +3,12 @@ import uuid
 
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.shortcuts import get_object_or_404, reverse
 from django.utils import timezone
 from django.utils.http import urlencode
-from django.utils.translation import gettext_lazy as _
 
+from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF
 from itou.utils.urls import get_absolute_url
@@ -37,29 +36,29 @@ class InvitationQuerySet(models.QuerySet):
 class InvitationAbstract(models.Model):
     # String representing the account type to use when logging in.
     # f"reverse("account_login")?account_type={account_type}"
-    SIGNIN_ACCOUNT_TYPE = None
+    SIGNIN_ACCOUNT_TYPE = ""
     EXPIRATION_DAYS = 14
     GUEST_TYPE_JOB_SEEKER = KIND_JOB_SEEKER
     GUEST_TYPE_PRESCRIBER = KIND_PRESCRIBER
     GUEST_TYPE_PRESCRIBER_WITH_ORG = KIND_PRESCRIBER
     GUEST_TYPE_SIAE_STAFF = KIND_SIAE_STAFF
     GUEST_TYPES = [
-        (GUEST_TYPE_JOB_SEEKER, _("Candidat")),
-        (GUEST_TYPE_PRESCRIBER, _("Prescripteur sans organisation")),
-        (GUEST_TYPE_PRESCRIBER_WITH_ORG, _("Prescripteur membre d'une organisation")),
-        (GUEST_TYPE_SIAE_STAFF, _("Employeur")),
+        (GUEST_TYPE_JOB_SEEKER, "Candidat"),
+        (GUEST_TYPE_PRESCRIBER, "Prescripteur sans organisation"),
+        (GUEST_TYPE_PRESCRIBER_WITH_ORG, "Prescripteur membre d'une organisation"),
+        (GUEST_TYPE_SIAE_STAFF, "Employeur"),
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    email = models.EmailField(verbose_name=_("E-mail"))
-    first_name = models.CharField(verbose_name=_("Prénom"), max_length=255)
-    last_name = models.CharField(verbose_name=_("Nom"), max_length=255)
-    sent = models.BooleanField(verbose_name=_("Envoyée"), default=False)
+    email = models.EmailField(verbose_name="E-mail")
+    first_name = models.CharField(verbose_name="Prénom", max_length=255)
+    last_name = models.CharField(verbose_name="Nom", max_length=255)
+    sent = models.BooleanField(verbose_name="Envoyée", default=False)
 
-    accepted = models.BooleanField(verbose_name=_("Acceptée"), default=False)
-    accepted_at = models.DateTimeField(verbose_name=_("Date d'acceptation"), blank=True, null=True, db_index=True)
-    created_at = models.DateTimeField(verbose_name=_("Date de création"), default=timezone.now, db_index=True)
-    sent_at = models.DateTimeField(verbose_name=_("Date d'envoi"), blank=True, null=True, db_index=True)
+    accepted = models.BooleanField(verbose_name="Acceptée", default=False)
+    accepted_at = models.DateTimeField(verbose_name="Date d'acceptation", blank=True, null=True, db_index=True)
+    created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
+    sent_at = models.DateTimeField(verbose_name="Date d'envoi", blank=True, null=True, db_index=True)
 
     objects = models.Manager.from_queryset(InvitationQuerySet)()
 
@@ -106,8 +105,8 @@ class InvitationAbstract(models.Model):
     def accept(self):
         self.accepted = True
         self.accepted_at = timezone.now()
-        self.accepted_notif_sender()
         self.save()
+        self.accepted_notif_sender()
 
     def extend_expiration_date(self):
         self.sent_at = timezone.now()
@@ -116,8 +115,8 @@ class InvitationAbstract(models.Model):
     def send(self):
         self.sent = True
         self.sent_at = timezone.now()
-        self.send_invitation()
         self.save()
+        self.send_invitation()
 
     def set_guest_type(self, user):
         user.is_job_seeker = True
@@ -149,7 +148,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
     SIGNIN_ACCOUNT_TYPE = "prescriber"
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Parrain ou marraine"),
+        verbose_name="Parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="prescriber_org_invitations",
     )
@@ -172,7 +171,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         return get_absolute_url(acceptance_path)
 
     def add_invited_user_to_organization(self):
-        user = get_user_model().objects.get(email=self.email)
+        user = User.objects.get(email=self.email)
         self.organization.members.add(user)
         user.save()
         # We must be able to invite a former member of this prescriber organization
@@ -183,7 +182,7 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
             membership.save()
 
     def guest_can_join_organization(self, request):
-        user = get_object_or_404(get_user_model(), email=self.email)
+        user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_prescriber
 
     def set_guest_type(self, user):
@@ -225,7 +224,7 @@ class SiaeStaffInvitation(InvitationAbstract):
     SIGNIN_ACCOUNT_TYPE = "siae"
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name=_("Parrain ou marraine"),
+        verbose_name="Parrain ou marraine",
         on_delete=models.CASCADE,
         related_name="siae_invitations",
     )
@@ -246,10 +245,10 @@ class SiaeStaffInvitation(InvitationAbstract):
         return get_absolute_url(acceptance_path)
 
     def add_invited_user_to_siae(self):
-        user = get_user_model().objects.get(email=self.email)
+        user = User.objects.get(email=self.email)
         self.siae.members.add(user)
         user.save()
-        # We must be able to invite a former member of this  SIAE
+        # We must be able to invite a former member of this SIAE
         # however `members.add()` does not update membership status if it already exists
         if user not in self.siae.active_members:
             membership = user.siaemembership_set.get(is_active=False, siae=self.siae)
@@ -257,7 +256,7 @@ class SiaeStaffInvitation(InvitationAbstract):
             membership.save()
 
     def guest_can_join_siae(self, request):
-        user = get_object_or_404(get_user_model(), email=self.email)
+        user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_siae_staff
 
     def set_guest_type(self, user):

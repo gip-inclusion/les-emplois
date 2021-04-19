@@ -2,7 +2,6 @@ from django import forms
 from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext as _, gettext_lazy
 
 from itou.siaes.models import Siae, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
@@ -44,14 +43,12 @@ class CreateSiaeForm(forms.ModelForm):
             "description",
         ]
         help_texts = {
-            "siret": gettext_lazy(
-                "Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."
-            ),
-            "kind": gettext_lazy("Votre nouvelle structure doit avoir le même type que votre structure actuelle."),
-            "brand": gettext_lazy("Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche."),
-            "phone": gettext_lazy("Par exemple 0610203040"),
-            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
-            "description": gettext_lazy("Texte de présentation de votre structure."),
+            "siret": ("Saisissez 14 chiffres. Doit être un SIRET avec le même SIREN que votre structure actuelle."),
+            "kind": "Votre nouvelle structure doit avoir le même type que votre structure actuelle.",
+            "brand": "Si ce champ est renseigné, il sera utilisé en tant que nom sur la fiche.",
+            "phone": "Par exemple 0610203040",
+            "website": "Votre site web doit commencer par http:// ou https://",
+            "description": "Texte de présentation de votre structure.",
         }
 
     def clean_kind(self):
@@ -63,19 +60,17 @@ class CreateSiaeForm(forms.ModelForm):
         existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
 
         if existing_siae_query.exists():
-            error_message = _(
-                """
+            error_message = """
                 La structure à laquelle vous souhaitez vous rattacher est déjà
                 connue de nos services. Merci de nous contacter à l'adresse
                 """
-            )
 
             assistance_url = settings.ITOU_ASSISTANCE_URL
             assistance_html = (
                 f'<a href="{assistance_url}" target="_blank" rel="noopener" class="alert-link">{assistance_url}</a>'
             )
 
-            error_message_siret = _(
+            error_message_siret = (
                 "en précisant votre numéro de SIRET (si existant),"
                 " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
                 " pour être contacté(e) si nécessaire."
@@ -84,7 +79,7 @@ class CreateSiaeForm(forms.ModelForm):
             raise forms.ValidationError(error_message)
 
         if not siret.startswith(self.current_siae.siren):
-            raise forms.ValidationError(_(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}"))
+            raise forms.ValidationError(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}")
 
         return self.cleaned_data
 
@@ -120,7 +115,7 @@ class EditSiaeForm(forms.ModelForm):
         # COVID-19 "Operation ETTI".
         # The "description" field is made required for ETTIs during this time.
         if self.instance and (self.instance.kind == self.instance.KIND_ETTI):
-            desc_example = _(
+            desc_example = (
                 "<p><b>Exemple de description :</b></p>"
                 "<p>L'ETTi XXXXX, intervient sur le territoire XXXXX et met à disposition "
                 "des intérimaires et notamment pour 5 missions récurrentes :</p>"
@@ -153,13 +148,13 @@ class EditSiaeForm(forms.ModelForm):
             "department",
         ]
         help_texts = {
-            "brand": gettext_lazy(
+            "brand": (
                 "Si ce champ est renseigné, il sera utilisé en tant que nom "
                 "sur la fiche et dans les résultats de recherche."
             ),
-            "description": gettext_lazy("Texte de présentation de votre structure."),
-            "phone": gettext_lazy("Par exemple 0610203040"),
-            "website": gettext_lazy("Votre site web doit commencer par http:// ou https://"),
+            "description": "Texte de présentation de votre structure.",
+            "phone": "Par exemple 0610203040",
+            "website": "Votre site web doit commencer par http:// ou https://",
         }
 
     def save(self, commit=True):
@@ -178,7 +173,7 @@ class BlockJobApplicationsForm(forms.ModelForm):
     class Meta:
         model = Siae
         fields = ["block_job_applications"]
-        labels = {"block_job_applications": gettext_lazy("Ne plus recevoir de nouvelles candidatures")}
+        labels = {"block_job_applications": "Ne plus recevoir de nouvelles candidatures"}
 
     def save(self, commit=True):
         siae = super().save(commit=commit)
@@ -213,8 +208,8 @@ class FinancialAnnexSelectForm(forms.Form):
         return self.number_prefix_with_spaces
 
     financial_annexes = forms.ModelChoiceField(
-        label=gettext_lazy("Numéro d'annexe financière sans son suffixe de type 'A1M1'"),
+        label="Numéro d'annexe financière sans son suffixe de type 'A1M1'",
         queryset=None,
         widget=forms.Select,
-        help_text=gettext_lazy("Veuillez sélectionner un numéro existant."),
+        help_text="Veuillez sélectionner un numéro existant.",
     )

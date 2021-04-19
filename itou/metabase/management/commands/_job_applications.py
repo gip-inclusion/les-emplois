@@ -1,14 +1,12 @@
-from django.utils.translation import gettext_lazy as _
-
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import anonymize, get_choice, get_department_and_region_columns
 
 
 # Reword the original JobApplication.SENDER_KIND_CHOICES
 SENDER_KIND_CHOICES = (
-    (JobApplication.SENDER_KIND_JOB_SEEKER, _("Candidat")),
-    (JobApplication.SENDER_KIND_PRESCRIBER, _("Prescripteur")),
-    (JobApplication.SENDER_KIND_SIAE_STAFF, _("Employeur")),
+    (JobApplication.SENDER_KIND_JOB_SEEKER, "Candidat"),
+    (JobApplication.SENDER_KIND_PRESCRIBER, "Prescripteur"),
+    (JobApplication.SENDER_KIND_SIAE_STAFF, "Employeur"),
 )
 
 

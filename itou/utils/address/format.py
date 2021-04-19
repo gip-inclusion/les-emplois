@@ -1,4 +1,3 @@
-from django.utils.translation import gettext_lazy as _
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
@@ -35,17 +34,17 @@ def format_address(obj):
     - KO => (None, error_message)
     """
     if not obj:
-        return None, _("Impossible de transformer cet objet en adresse HEXA")
+        return None, "Impossible de transformer cet objet en adresse HEXA"
 
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
-        return None, _("Données d'adresse incomplètes")
+        return None, "Données d'adresse incomplètes"
 
     # first we use geo API to get a 'lane' and a number
     address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
 
     if not address:
-        return None, _("Erreur de geocoding, impossible d'obtenir un résultat")
+        return None, "Erreur de geocoding, impossible d'obtenir un résultat"
 
     result = {}
 

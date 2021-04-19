@@ -1,5 +1,4 @@
 {% extends "admin/change_form.html" %}
-{% load i18n %}
 
 {% block content %}
 <form action="" method="post" id="{{ opts.model_name }}_form" novalidate>
@@ -7,9 +6,9 @@
     {% if errors %}
         <p class="errornote">
             {% if errors|length == 1 %}
-                {% translate "Please correct the error below." %}
+                Please correct the error below.
             {% else %}
-                {% translate "Please correct the errors below." %}
+                Please correct the errors below.
             {% endif %}
         </p>
         {{ adminform.form.non_field_errors }}
@@ -29,11 +28,11 @@
 
             <p class="deletelink-box">
                 <a class="deletelink" href="{% url "admin:approvals_approval_manually_refuse_approval" job_application.id %}">
-                    {% translate "Refuser" %}
+                    Refuser
                 </a>
             </p>
 
-            <input type="submit" value="{% translate 'Enregistrer et envoyer par email' %}" class="default">
+            <input type="submit" value="Enregistrer et envoyer par email" class="default">
 
         </div>
 

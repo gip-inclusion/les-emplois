@@ -1,12 +1,11 @@
 {% extends "layout/content.html" %}
 {% load bootstrap4 %}
-{% load i18n %}
 
-{% block title %}{% translate "Configurer vos fiches de postes" %}{{ block.super }}{% endblock %}
+{% block title %}Configurer vos fiches de postes{{ block.super }}{% endblock %}
 
 {% block content %}
 
-    <h1>{% translate "Publier/gérer les fiches de postes" %}</h1>
+    <h1>Publier/gérer les fiches de postes</h1>
 
     <h2 class="text-muted">{{ siae.display_name }}</h2>
 
@@ -17,9 +16,9 @@
         <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not siae.job_description_through.exists %} d-none{% endif %}">
             <thead>
                 <tr>
-                    <th scope="col">{% translate "ROME" %}</th>
-                    <th scope="col" class="text-left">{% translate "Poste" %}</th>
-                    <th scope="col">{% translate "Publier la<br>fiche de poste" %}</th>
+                    <th scope="col">ROME</th>
+                    <th scope="col" class="text-left">Poste</th>
+                    <th scope="col">Publier la<br>fiche de poste</th>
                     <th scope="col">{% include "includes/icon.html" with icon="trash-2" %}</th>
                 </tr>
             </thead>
@@ -34,7 +33,7 @@
                         </p>
                         <div class="form-group">
                             <label for="custom-name-{{ job.appellation.code }}">
-                                <small>{% translate "Nom personnalisé" %}</small>
+                                <small>Nom personnalisé</small>
                             </label>
                             <input
                                 type="text"
@@ -43,12 +42,12 @@
                                 name="custom-name-{{ job.appellation.code }}"
                                 value="{{ job.custom_name }}">
                             <small class="form-text text-muted">
-                                {% translate "Si ce champ est renseigné, il sera utilisé à la place du nom ci-dessus." %}
+                                Si ce champ est renseigné, il sera utilisé à la place du nom ci-dessus.
                             </small>
                         </div>
                         <div class="form-group">
                             <label for="description-{{ job.appellation.code }}">
-                                <small>{% translate "Description" %}</small>
+                                <small>Description</small>
                             </label>
                             <textarea
                                 class="form-control form-control-sm"
@@ -56,7 +55,7 @@
                                 name="description-{{ job.appellation.code }}"
                                 rows="3">{{ job.description }}</textarea>
                             <small class="form-text text-muted">
-                                {% translate "Renseignez ici le détail des missions, les compétences/habilitations nécessaires, les conditions de travail, les éventuelles adaptations ou restrictions du poste." %}
+                                Renseignez ici le détail des missions, les compétences/habilitations nécessaires, les conditions de travail, les éventuelles adaptations ou restrictions du poste.
                             </small>
                         </div>
                     </td>
@@ -67,19 +66,19 @@
                             name="is_active-{{ job.appellation.code }}"
                             {% if job.is_active %}checked{% endif %}>
                     </td>
-                    <td><a href="#" role="button" class="js-job-delete">{% translate "Supprimer" %}</a></td>
+                    <td><a href="#" role="button" class="js-job-delete">Supprimer</a></td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <label for="job-autocomplete-input">{% translate "Ajouter un métier :" %}</label>
+        <label for="job-autocomplete-input">Ajouter un métier :</label>
         <div class="input-group mb-4">
             <div class="input-group-prepend">
                 {# Loading #}
                 <span class="input-group-text js-job-autocomplete-loading d-none">
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span class="sr-only">{% translate "Chargement..." %}</span>
+                    <span class="sr-only">Chargement...</span>
                 </span>
                 {# No loading #}
                 <span class="input-group-text js-job-autocomplete-no-loading">
@@ -89,16 +88,16 @@
             <input
                 type="text"
                 autocomplete="off"
-                placeholder="{% translate "Saisissez un nom de métier ici pour voir les suggestions" %}"
+                placeholder="Saisissez un nom de métier ici pour voir les suggestions"
                 id="job-autocomplete-input"
                 class="form-control js-job-autocomplete-input"
-                aria-label="{% translate "Ajouter un métier" %}"
+                aria-label="Ajouter un métier"
                 data-autocomplete-source-url="{% url 'autocomplete:jobs' %}">
         </div>
 
         {% buttons %}
-            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">{% translate "Annuler" %}</a>
-            <button type="submit" class="btn btn-primary">{% translate "Enregistrer les modifications" %}</button>
+            <a class="btn btn-secondary" href="{% url 'dashboard:index' %}">Annuler</a>
+            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
         {% endbuttons %}
 
     </form>

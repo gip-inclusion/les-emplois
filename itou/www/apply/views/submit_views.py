@@ -6,7 +6,6 @@ from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils.translation import gettext as _
 
 from itou.approvals.models import Approval
 from itou.eligibility.models import EligibilityDiagnosis
@@ -72,11 +71,11 @@ def start(request, siae_pk):
     siae = get_object_or_404(Siae, pk=siae_pk)
 
     if request.user.is_siae_staff and not siae.has_member(request.user):
-        raise PermissionDenied(_("Vous ne pouvez postuler pour un candidat que dans votre structure."))
+        raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
     # Refuse all applications except those issued by the SIAE
     if siae.block_job_applications and not siae.has_member(request.user):
-        raise Http404(_("Cette organisation n'accepte plus de candidatures pour le moment."))
+        raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
     # Start a fresh session.
     request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY] = {
@@ -247,9 +246,9 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     # Limit the possibility of applying to the same SIAE for 24 hours.
     if not request.user.is_siae_staff and prev_applications.created_in_past(hours=24).exists():
         if request.user == job_seeker:
-            msg = _("Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.")
+            msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
         else:
-            msg = _("Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.")
+            msg = "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures."
         raise PermissionDenied(msg)
 
     next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
@@ -307,7 +306,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
         EligibilityDiagnosis.create_diagnosis(
             job_seeker, user_info, administrative_criteria=form_administrative_criteria.cleaned_data
         )
-        messages.success(request, _("Éligibilité confirmée !"))
+        messages.success(request, "Éligibilité confirmée !")
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -376,7 +375,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         if job_application.is_sent_by_proxy:
             job_application.email_new_for_prescriber.send()
 
-        messages.success(request, _("Candidature bien envoyée !"))
+        messages.success(request, "Candidature bien envoyée !")
 
         return HttpResponseRedirect(next_url)
 

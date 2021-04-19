@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load static %}
 {% load call_method %}
 {% comment %}
@@ -14,7 +13,7 @@
         {% if approval.is_pass_iae and approval.is_suspended %}
             <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo PASS IAE">
             <br>
-            <span class="badge badge-warning">{% translate "PASS IAE suspendu" %}</span>
+            <span class="badge badge-warning">PASS IAE suspendu</span>
         {% else %}
             <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo PASS IAE">
         {% endif %}
@@ -23,9 +22,9 @@
 
 <p>
     {% if approval.is_pass_iae %}
-        {% translate "Numéro de PASS IAE (agrément) :" %}
+        Numéro de PASS IAE (agrément) :
     {% else %}
-        {% translate "Agrément existant :" %}
+        Agrément existant :
     {% endif %}
     <b>{{ approval.number_with_spaces }}</b>
 </p>
@@ -36,41 +35,35 @@
 
         {# Validity. #}
         <li{% if not approval.is_suspended %} class="text-success"{% endif %}>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" end=approval.display_end_at|date:"d/m/Y" %}
-                Valide du {{ start }} au {{ end }}
-            {% endblocktranslate %}
+            Valide du {{ approval.start_at|date:"d/m/Y" }} au {{ approval.display_end_at|date:"d/m/Y" }}
         </li>
 
         {# Delivery date. #}
         <li>
-            {% blocktranslate with start=approval.start_at|date:"d/m/Y" %}
-                Délivrance : le {{ start }}
-            {% endblocktranslate %}
+            Délivrance : le {{ approval.start_at|date:"d/m/Y" }}
         </li>
 
         {# Suspensions history. #}
         {% with approval.suspensions_by_start_date_asc as suspensions %}
             {% if suspensions %}
-                {% translate "Suspensions :" %}
+                Suspensions :
                 <ul>
                     {% for s in suspensions %}
                         <li>
                             <span{% if s.is_in_progress %} class="text-danger"{% endif %}>
-                                {% blocktranslate with start=s.start_at|date:"d/m/Y" end=s.end_at|date:"d/m/Y" %}
-                                    du {{ start }} au {{ end }}
-                                {% endblocktranslate %}
+                                du {{ s.start_at|date:"d/m/Y" }} au {{ s.end_at|date:"d/m/Y" }}
                             </span>
                             {% if s.is_in_progress %}
                                 <small>
-                                    <b>{% translate "En cours" %}</b>
+                                    <b>En cours</b>
                                 </small>
                             {% endif %}
                             {% if current_siae %}
                                 {% call_method s "can_be_handled_by_siae" current_siae as can_be_handled %}
                                 {% if can_be_handled %}
                                     <small>
-                                        <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Modifier" %}</a>
-                                        <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">{% translate "Annuler" %}</a>
+                                        <a href="{% url 'approvals:suspension_update' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier</a>
+                                        <a href="{% url 'approvals:suspension_delete' suspension_id=s.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler</a>
                                     </small>
                                 {% endif %}
                             {% endif %}
@@ -85,18 +78,16 @@
         {# Prolongations history. #}
         {% with approval.prolongations_by_start_date_asc as prolongations %}
             {% if prolongations %}
-                {% translate "Prolongations :" %}
+                Prolongations :
                 <ul>
                     {% for p in prolongations %}
                         <li{% if p.is_in_progress %} class="font-weight-bold"{% endif %}>
-                            {% blocktranslate with start=p.start_at|date:"d/m/Y" end=p.end_at|date:"d/m/Y" %}
-                                du {{ start }} au {{ end }}
-                            {% endblocktranslate %}
+                            du {{ p.start_at|date:"d/m/Y" }} au {{ p.end_at|date:"d/m/Y" }}
                             <br>
                             <small>{{ p.get_reason_display }}</small>
                             <br>
                             <small>
-                                {% blocktranslate with full_name=p.validated_by.get_full_name|title email=p.validated_by.email %}Autorisation par <i>{{ full_name }}</i> ({{ email }}){% endblocktranslate %}
+                                Autorisation par <i>{{ p.validated_by.get_full_name|title }}</i> ({{ p.validated_by.email }})
                             </small>
                         </li>
                     {% endfor %}
@@ -128,9 +119,7 @@
     {% else %}
 
         <p class="text-danger">
-            {% blocktranslate with end=approval.display_end_at|date:"d/m/Y" since=approval.display_end_at|timesince %}
-                <b>Expiré</b> le {{ end }} (depuis {{ since }})
-            {% endblocktranslate %}
+            <b>Expiré</b> le {{ approval.display_end_at|date:"d/m/Y" }} (depuis {{ approval.display_end_at|timesince }})
         </p>
 
     {% endif %}
