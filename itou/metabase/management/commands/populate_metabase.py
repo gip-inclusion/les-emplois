@@ -22,10 +22,10 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 import gc
 import logging
 
-import psycopg2
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from psycopg2 import extras, sql
 from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -106,8 +106,8 @@ class Command(BaseCommand):
         self.conn.commit()
 
     def cleanup_tables(self, table_name):
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_new;")
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
         self.commit()
 
     def inject_chunk(self, table_columns, chunk, insert_query):
@@ -115,7 +115,8 @@ class Command(BaseCommand):
         Insert chunk of objects into table.
         """
         data = [[c["lambda"](o) for c in table_columns] for o in chunk]
-        psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
+        # FIXME prevent SQL injections.
+        extras.execute_values(self.cur, insert_query, data, template=None)
         self.commit()
 
     def populate_table(self, table_name, table_columns, queryset=None, querysets=None, extra_object=None):
@@ -160,6 +161,7 @@ class Command(BaseCommand):
 
         # Create table.
         statement = ", ".join([f'{c["name"]} {c["type"]}' for c in table_columns])
+        # FIXME prevent SQL injections.
         self.cur.execute(f"CREATE TABLE {table_name}_new ({statement});")
         self.commit()
 
@@ -168,6 +170,7 @@ class Command(BaseCommand):
             assert set(c.keys()) == set(["name", "type", "comment", "lambda"])
             column_name = c["name"]
             column_comment = c["comment"]
+            # FIXME prevent SQL injections.
             self.cur.execute(f"comment on column {table_name}_new.{column_name} is '{column_comment}';")
         self.commit()
 
@@ -199,10 +202,18 @@ class Command(BaseCommand):
                 gc.collect()
 
         # Swap new and old table nicely to minimize downtime.
-        self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
-        self.cur.execute(f"ALTER TABLE {table_name}_new RENAME TO {table_name};")
+        self.cur.execute(
+            sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
+                sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
+            )
+        )
+        self.cur.execute(
+            sql.SQL("ALTER TABLE {} RENAME TO {}").format(
+                sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
+            )
+        )
         self.commit()
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
         self.commit()
 
     def populate_siaes(self):

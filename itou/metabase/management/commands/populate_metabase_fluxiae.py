@@ -69,6 +69,7 @@ from collections import OrderedDict
 import pandas as pd
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from psycopg2 import sql
 from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
@@ -336,10 +337,18 @@ class Command(BaseCommand):
 
     def switch_table_atomically(self, table_name):
         with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
-            cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
+            cur.execute(
+                sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
+                    sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
+                )
+            )
+            cur.execute(
+                sql.SQL("ALTER TABLE {} RENAME TO {}").format(
+                    sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
+                )
+            )
             conn.commit()
-            cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
+            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
             conn.commit()
 
     def build_custom_table(self, table_name, sql_request):
@@ -353,9 +362,11 @@ class Command(BaseCommand):
             table_name += "_dry_run"
 
         with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
+            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
             conn.commit()
-            cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
+            cur.execute(
+                sql.SQL("CREATE TABLE {} AS {}").format(sql.Identifier(f"{table_name}_new"), sql.SQL(sql_request))
+            )
             conn.commit()
 
         self.switch_table_atomically(table_name=table_name)
