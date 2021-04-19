@@ -13,7 +13,7 @@
         <form method="post" action="{{ invitation.acceptance_link }}" role="form" class="js-prevent-multiple-submit">
             {% csrf_token %}
 
-            {% bootstrap_form form %}
+            {% bootstrap_form form alert_error_type="all" %}
 
             <div class="small pb-4 text-secondary">
                 {% translate "Vous pourrez modifier ces informations après votre inscription à partir de votre tableau de bord." %}
