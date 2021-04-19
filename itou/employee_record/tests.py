@@ -5,7 +5,11 @@ from django.test import TestCase
 
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.management.commands.transfer_employee_records import Command
-from itou.employee_record.mocks.transfer_employee_records import SFTPConnectionMock, SFTPGoodConnectionMock
+from itou.employee_record.mocks.transfer_employee_records import (
+    SFTPConnectionMock,
+    SFTPEvilConnectionMock,
+    SFTPGoodConnectionMock,
+)
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
@@ -167,7 +171,7 @@ class EmployeeRecordBatchTest(TestCase):
 
 class EmployeeRecordLifeCycleTest(TestCase):
     """
-    Employee record status is never changed manually
+    Note: employee records status is never changed manually
     """
 
     fixtures = ["test_INSEE_communes.json"]
@@ -241,19 +245,27 @@ class EmployeeRecordManagementCommandTest(TestCase):
     fixtures = ["test_INSEE_communes.json", "asp_countries.json"]
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_smoke_download(self):
+    def test_smoke_download(self):
         command = Command()
         command.handle(download=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_smoke_upload(self):
+    def test_smoke_upload(self):
         command = Command()
         command.handle(upload=True)
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_smoke_download_and_upload(self):
+    def test_smoke_download_and_upload(self):
         command = Command()
         command.handle()
+
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def _test_upload_failure(self):
+        pass
+
+    @mock.patch("pysftp.Connection", SFTPConnectionMock)
+    def _test_download_failure(self):
+        pass
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -288,3 +300,31 @@ class EmployeeRecordManagementCommandTest(TestCase):
         self.assertEqual(employee_record.status, EmployeeRecord.Status.PROCESSED)
         self.assertEqual(employee_record.asp_processing_code, "0000")
         self.assertIsNotNone(employee_record.archived_json)
+
+    @mock.patch("pysftp.Connection", SFTPEvilConnectionMock)
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_random_connection_failure(self, _mock):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.prepare()
+
+        # Randowm upload failure
+        for _ in range(10):
+            command = Command()
+            with self.assertRaises(Exception):
+                command.handle(upload=True, download=False)
+
+        # Employee record must be in the same status
+        employee_record.refresh_from_db()
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
+        for _ in range(10):
+            command = Command()
+            with self.assertRaises(Exception):
+                command.handle(upload=False, download=True)
+
+        employee_record.refresh_from_db()
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)

@@ -1,4 +1,5 @@
 import json
+import random
 from contextlib import contextmanager
 
 from itou.employee_record.models import EmployeeRecordBatch
@@ -82,9 +83,43 @@ class SFTPGoodConnectionMock(SFTPConnectionMock):
         return stream
 
 
-class SFTPConnectionEvil(SFTPConnectionMock):
-    pass
+class SFTPEvilConnectionMock(SFTPGoodConnectionMock):
+    """
+    Behaves just like a good connection,
+    except that at one random point,
+    the connection will fail...
+    """
 
+    will_crash = random.randint(1, 6)
 
-class SFTPConnectionChaoticEvil(SFTPConnectionMock):
-    pass
+    @property
+    def pwd(self):
+        if self.will_crash == 1:
+            raise Exception("SFTP/PWD did crash!")
+        super.pwd()
+
+    @contextmanager
+    def cd(self, remotepath):
+        if self.will_crash == 2:
+            raise Exception("SFTP/CD did crash!")
+        super.cd(remotepath)
+
+    def putfo(self, content, remote_path, **kwargs):
+        if self.will_crash == 3:
+            raise Exception("SFTP/CD did crash!")
+        super.putfo(content, remote_path, **kwargs)
+
+    def getfo(self, remote_path, stream, **kwargs):
+        if self.will_crash == 4:
+            raise Exception("SFTP/GETFO did crash!")
+        super.getfo(remote_path, stream, **kwargs)
+
+    def listdir(self):
+        if self.will_crash == 5:
+            raise Exception("SFTP/LISTDIR did crash!")
+        super.listdir()
+
+    def process_incoming_file(self, filename, content):
+        if self.will_crash == 6:
+            raise Exception("procesing_file did crash!")
+        super.process_incoming_file(filename, content)
