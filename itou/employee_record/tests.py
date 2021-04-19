@@ -239,7 +239,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
     - ...
     """
 
-    fixtures = ["test_INSEE_communes.json"]
+    fixtures = ["test_INSEE_communes.json", "asp_countries.json"]
 
     def test_smoke_download(self):
         command = Command()
@@ -272,7 +272,11 @@ class EmployeeRecordManagementCommandTest(TestCase):
         command = Command()
         command.handle(upload=True)
 
-        command = Command()
-        command.handle(download=True)
-
         employee_record.refresh_from_db()
+        self.assertEquals(employee_record.status, EmployeeRecord.Status.SENT)
+
+        # TODO
+        # command = Command()
+        # command.handle(download=True)
+
+        # employee_record.refresh_from_db()

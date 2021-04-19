@@ -50,7 +50,6 @@ class SFTPConnectionMock:
         return stream.write(self.feedback_file_stream)
 
     def listdir(self):
-        print(self.FILES)
         return self.FILES.keys()
 
     def process_incoming_file(self, filename, content):
@@ -76,7 +75,6 @@ class SFTPGoodConnectionMock(SFTPConnectionMock):
             employee_record["codeTraitement"] = _GOOD_CODE
             employee_record["libelleTraitement"] = _GOOD_MSG
         content.seek(0)
-        print(batch)
         json.dump(batch, content)
         content.flush()
 

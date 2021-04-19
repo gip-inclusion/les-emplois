@@ -4,6 +4,7 @@ from io import BytesIO
 import pysftp
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
@@ -110,6 +111,7 @@ class Command(BaseCommand):
         """
         return chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS)
 
+    @transaction.atomic
     def _put_batch_file(self, conn, employee_records, dry_run=False):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
@@ -117,7 +119,6 @@ class Command(BaseCommand):
         batch = EmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
 
         # JSONRenderer produces byte arrays
-        print(batch.data)
         json_b = JSONRenderer().render(batch.data)
 
         # Using FileIO objects allows to use them as files
@@ -146,6 +147,12 @@ class Command(BaseCommand):
                 self.logger.info("Succesfully uploaded '%s'", remote_path)
             except Exception as ex:
                 self.logger.error("Could not upload file: '%s', reason: %s", remote_path, ex)
+                return
+
+            # Now that file is transfered, update employee records satus (SENT)
+            for employee_record in employee_records:
+                employee_record.status = EmployeeRecord.Status.SENT
+                employee_record.save()
 
     def _update_employee_records_status(self, feedback_file_name, employee_records_batch):
         """
