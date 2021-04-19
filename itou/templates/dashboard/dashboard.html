@@ -246,12 +246,12 @@
                             <p class="card-text">
                                 {% include "includes/icon.html" with icon="check-circle" %}
                                 <a href="{% url 'siaes_views:show_financial_annexes' %}">
-                                    {% translate "Mes annexes financières" %}
+                                    Mes annexes financières
                                 </a>
-                                <span class="badge badge-info">{% translate "Nouveau" %}</span>
+                                <span class="badge badge-info">Nouveau</span>
                                 {% if not current_siae.is_active %}
                                     <span class="badge badge-danger">
-                                        {% translate "Action requise" %}
+                                        Action requise
                                     </span>
                                 {% endif %}
                             </p>

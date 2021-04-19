@@ -56,7 +56,7 @@ def new_user(request, invitation_type, invitation_id, template_name="invitations
                 get_adapter().login(request, user)
                 next_step = redirect(get_safe_url(request, "redirect_to"))
     else:
-        messages.error(request, _("Cette invitation n'est plus valide."))
+        messages.error(request, "Cette invitation n'est plus valide.")
 
     return next_step or render(request, template_name, context=context)
 

@@ -1,29 +1,28 @@
 {% extends "layout/content.html" %}
-{% load i18n %}
 
-{% block title %}{% translate "Mes annexes financières" %}{{ block.super }}{% endblock %}
+{% block title %}Mes annexes financières{{ block.super }}{% endblock %}
 
 {% block messages %}
     {{ block.super }}
 
     <div class="alert alert-success" role="alert">
-        {% translate "Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières. La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP." %}
+        Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières. La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
     </div>
 
     {% if current_siae.is_active %}
         <div class="alert alert-success" role="alert">
-            {% translate "Votre structure est active car elle est associée à au moins une annexe financière valide listée ci-dessous ou bien elle a été manuellement activée par notre support. Vous n'avez rien à faire." %}
+            Votre structure est active car elle est associée à au moins une annexe financière valide listée ci-dessous ou bien elle a été manuellement activée par notre support. Vous n'avez rien à faire.
         </div>
     {% elif current_siae_is_asp %}
         <div class="alert alert-danger" role="alert">
             {# Inactive siaes of ASP source cannot be fixed by user. #}
-            {% translate "Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez nous via la rubrique votre structure sur " %}
+            Votre structure est inactive car elle n'est associée à aucune annexe financière valide. Contactez nous via la rubrique votre structure sur
             <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">{{ ITOU_ASSISTANCE_URL }}</a>
         </div>
     {% elif current_siae_is_user_created %}
         <div class="alert alert-danger" role="alert">
             {# Inactive user created siaes can be fixed by the user. #}
-            {% translate "Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous." %}
+            Votre structure sera prochainement désactivée car elle n'est associée à aucune annexe financière valide. Veuillez dès que possible procéder à la sélection d'une annexe financière valide ci-dessous.
         </div>
     {% endif %}
 
@@ -32,7 +31,7 @@
 {% block content %}
 
 <div class="d-sm-inline-flex mb-3 align-items-sm-baseline">
-    <h1>{% translate "Mes annexes financières" %}</h1>
+    <h1>Mes annexes financières</h1>
     <h2 class="text-muted ml-sm-4">{{ siae.display_name }}</h2>
 </div>
 
@@ -40,10 +39,10 @@
     <table class="table table-striped table-bordered">
         <thead>
             <tr>
-                <th scope="col">{% translate "Numéro d'annexe financière" %}</th>
-                <th scope="col">{% translate "Date de début d'effet" %}</th>
-                <th scope="col">{% translate "Date de fin d'effet" %}</th>
-                <th scope="col">{% translate "Validité à ce jour" %}</th>
+                <th scope="col">Numéro d'annexe financière</th>
+                <th scope="col">Date de début d'effet</th>
+                <th scope="col">Date de fin d'effet</th>
+                <th scope="col">Validité à ce jour</th>
             </tr>
         </thead>
         <tbody>
@@ -63,7 +62,7 @@
             {% else %}
                 <tr>
                     <td>
-                        {% translate "Aucune annexe financière associée à cette structure." %}
+                        Aucune annexe financière associée à cette structure.
                     </td>
                     <td></td>
                     <td></td>
@@ -76,7 +75,7 @@
 
 {% if can_select_af %}
     <a href="{% url 'siaes_views:select_financial_annex' %}" class="align-self-center">
-        <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">{% translate "Sélectionner une autre annexe financière" %}</button>
+        <button class="btn btn-primary mb-1 w-100 w-sm-auto mt-2">Sélectionner une autre annexe financière</button>
     </a>
 {% endif %}
 

@@ -208,8 +208,8 @@ class FinancialAnnexSelectForm(forms.Form):
         return self.number_prefix_with_spaces
 
     financial_annexes = forms.ModelChoiceField(
-        label=gettext_lazy("Numéro d'annexe financière sans son suffixe de type 'A1M1'"),
+        label="Numéro d'annexe financière sans son suffixe de type 'A1M1'",
         queryset=None,
         widget=forms.Select,
-        help_text=gettext_lazy("Veuillez sélectionner un numéro existant."),
+        help_text="Veuillez sélectionner un numéro existant.",
     )
