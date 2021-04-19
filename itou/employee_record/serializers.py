@@ -14,8 +14,9 @@ class _EmployeeSerializer(serializers.ModelSerializer):
     prenom = serializers.CharField(source="first_name")
 
     dateNaissance = serializers.DateField(format="%d/%m/%Y", source="birthdate")
-    codeComInsee = serializers.CharField(source="birth_place.code")
-    codeDpt = serializers.CharField(source="birth_place.department_code")
+    # codeComInsee is only mandatory if birth country is France
+    codeComInsee = serializers.CharField(source="birth_place.code", required=False)
+    codeDpt = serializers.CharField(source="birth_place.department_code", required=False)
     codeInseePays = serializers.CharField(source="birth_country.code")
     codeGroupePays = serializers.CharField(source="birth_country.group")
 
@@ -38,10 +39,12 @@ class _EmployeeSerializer(serializers.ModelSerializer):
         result = super().to_representation(instance)
 
         # Another ASP subtlety, making top-level and children with the same name
-        result["codeComInsee"] = {
-            "codeComInsee": result.pop("codeComInsee"),
-            "codeDpt": result.pop("codeDpt"),
-        }
+        # The commune can be empty if the job seeker is not born in France
+        if result.get("codeComInsee"):
+            result["codeComInsee"] = {
+                "codeComInsee": result.pop("codeComInsee"),
+                "codeDpt": result.pop("codeDpt"),
+            }
 
         # Fields not mapped / ignored
         result["sufPassIae"] = None
