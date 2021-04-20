@@ -177,17 +177,22 @@ class EmployeeRecordLifeCycleTest(TestCase):
 
     fixtures = ["test_INSEE_communes.json"]
 
-    def setUp(self):
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def setUp(self, mock):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record = employee_record
+        self.employee_record.prepare()
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_ready(self, _mock):
-        self.employee_record.prepare()
+        # self.employee_record.prepare()
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch(
@@ -195,7 +200,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_sent(self, _mock):
-        self.employee_record.prepare()
+        # self.employee_record.prepare()
         filename = "RIAE_FS_20210410130000.json"
         self.employee_record.sent_in_asp_batch_file(filename, 1)
 
@@ -207,7 +212,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_rejected(self, _mock):
-        self.employee_record.prepare()
+        # self.employee_record.prepare()
         filename = "RIAE_FS_20210410130001.json"
         self.employee_record.sent_in_asp_batch_file(filename, 1)
 
@@ -222,13 +227,13 @@ class EmployeeRecordLifeCycleTest(TestCase):
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
-    def _test_state_accepted(self, _mock):
-        self.employee_record.prepare()
+    def test_state_accepted(self, _mock):
+        # self.employee_record.prepare()
         filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.sent_in_asp_batch_file(filename)
+        self.employee_record.sent_in_asp_batch_file(filename, 1)
 
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.accepted_by_asp(process_code, process_message)
+        self.employee_record.accepted_by_asp(process_code, process_message, "{}")
 
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.PROCESSED)
         self.assertEqual(self.employee_record.asp_processing_code, process_code)
