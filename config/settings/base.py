@@ -120,11 +120,6 @@ ROOT_URLCONF = "config.urls"
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# Session.
-# ------------------------------------------------------------------------------
-
-SESSION_SAVE_EVERY_REQUEST = True
-
 # Templates.
 # ------------------------------------------------------------------------------
 

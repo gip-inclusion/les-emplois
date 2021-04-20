@@ -110,6 +110,8 @@ def step_sender(request, siae_pk):
     if user_info.siae:
         session_data["sender_siae_pk"] = user_info.siae.pk
 
+    request.session.modified = True
+
     next_url = reverse("apply:step_job_seeker", kwargs={"siae_pk": siae_pk})
     return HttpResponseRedirect(next_url)
 
@@ -126,6 +128,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
     # The user submit an application for himself.
     if request.user.is_job_seeker:
         session_data["job_seeker_pk"] = request.user.pk
+        request.session.modified = True
         return HttpResponseRedirect(next_url)
 
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
@@ -138,6 +141,7 @@ def step_job_seeker(request, siae_pk, template_name="apply/submit_step_job_seeke
 
         if job_seeker:
             session_data["job_seeker_pk"] = job_seeker.pk
+            request.session.modified = True
             return HttpResponseRedirect(next_url)
 
         args = urlencode({"email": form.cleaned_data["email"]})
@@ -195,6 +199,7 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
     if request.method == "POST" and form.is_valid():
         job_seeker = form.save()
         session_data["job_seeker_pk"] = job_seeker.pk
+        request.session.modified = True
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         if request.GET.get("resume"):
             next_url = reverse("apply:step_send_resume", kwargs={"siae_pk": siae.pk})

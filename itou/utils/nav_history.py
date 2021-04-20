@@ -37,6 +37,7 @@ def push_url_in_history(session_key):
                 url_history = url_history[: current_url_index + 1]
 
             session_data["url_history"] = url_history
+            request.session.modified = True
 
             return view(request, *args, **kwargs)
 
