@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
                 conn.putfo(BytesIO(content), remote_path, confirm=False)
 
-                self.logger.info(f"Sent test file: {remote_path}"result_file, )
+                self.logger.info("Sent test file: %s", remote_path)
 
     def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_DOWNLOAD_DIR):
         """
@@ -154,7 +154,7 @@ class Command(BaseCommand):
             for idx, employee_record in enumerate(employee_records, 1):
                 employee_record.sent_in_asp_batch_file(remote_path, idx)
 
-    def _parse_feedback_file(self, feedback_file, employee_records_batch, dry_run):
+    def _parse_feedback_file(self, feedback_file, batch, dry_run):
         """
         - Parse ASP response file,
         - Update status of employee records,
@@ -165,55 +165,55 @@ class Command(BaseCommand):
         success_code = "0000"
         record_errors = 0
 
-        for batch in employee_records_batch:
-            batch_employee_records = batch.get("lignesTelechargement")
+        print(batch)
 
-            if not batch_employee_records:
-                self.logger.error("Could not get any employee record from file: %s", feedback_file)
+        records = batch.get("lignesTelechargement")
+        if not records:
+            self.logger.error("Could not get any employee record from file: %s", feedback_file)
+            return 1
+
+        for idx, employee_record in enumerate(records, 1):
+            line_number = employee_record.get("numLigne")
+            processing_code = employee_record.get("codeTraitement")
+            processing_label = employee_record.get("libelleTraitement")
+
+            self.logger.debug("Line number: %s", line_number)
+            self.logger.debug("Processing code: %s", processing_code)
+            self.logger.debug("Processing label: %s", processing_label)
+
+            if not line_number:
+                self.logger.warning("No line number for employee record (index: %s, file: %s)", idx, feedback_file)
                 continue
 
-            for idx, batch_employee_record in enumerate(batch_employee_records, 1):
-                line_number = batch_employee_record.get("numLigne")
-                processing_code = batch_employee_record.get("codeTraitement")
-                processing_label = batch_employee_record.get("libelleTraitement")
+            # Now we must find the matching FS
+            employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
 
-                self.logger.debug("Line number: %s", line_number)
-                self.logger.debug("Processing code: %s", processing_code)
-                self.logger.debug("Processing label: %s", processing_label)
+            if not employee_record:
+                self.logger.error(
+                    "Could not get existing employee record data: BATCH_FILE=%s, LINE_NUMBER=%s",
+                    batch_filename,
+                    line_number,
+                )
+                record_errors += 1
+                continue
 
-                if not line_number:
-                    self.logger.warning("No line number for employee record (index: %s, file: %s)", idx, feedback_file)
-                    continue
-
-                # Now we must find the matching FS
-                employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
-
-                if not employee_record:
-                    self.logger.error(
-                        "Could not get existing employee record data: BATCH_FILE=%s, LINE_NUMBER=%s",
-                        batch_filename,
-                        line_number,
-                    )
-                    record_errors += 1
-                    continue
-
-                if processing_code == success_code:
-                    # Archive JSON copy of employee record (with processing code and label)
-                    serializer = EmployeeRecordSerializer(employee_record)
-                    if not dry_run:
-                        employee_record.accepted_by_asp(
-                            processing_code, processing_label, renderer.render(serializer.data).decode()
-                        )
-                    else:
-                        self.logger.info("DRY-RUN: accepted %s", employee_record)
-                    continue
-
+            if processing_code == success_code:
+                # Archive JSON copy of employee record (with processing code and label)
+                serializer = EmployeeRecordSerializer(employee_record)
                 if not dry_run:
-                    employee_record.rejected_by_asp(processing_code, processing_label)
-                else:
-                    self.logger.info(
-                        "DRY-RUN: rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
+                    employee_record.accepted_by_asp(
+                        processing_code, processing_label, renderer.render(serializer.data).decode()
                     )
+                else:
+                    self.logger.info("DRY-RUN: accepted %s", employee_record)
+                continue
+
+            if not dry_run:
+                employee_record.rejected_by_asp(processing_code, processing_label)
+            else:
+                self.logger.info(
+                    "DRY-RUN: rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
+                )
 
             return record_errors
 
