@@ -34,11 +34,11 @@
                         <td>{{ month.c }}</td>
                         <td>
                         {% if export_for == "siae" %}
-                            <a href="{% url 'apply:list_for_siae_exports_download' export_month=month.month|date:"Y-m" %}">
+                            <a href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                 {% include "includes/icon.html" with icon="download" %} Télécharger
                             </a>
                         {% else %}
-                            <a href="{% url 'apply:list_for_prescriber_exports_download' export_month=month.month|date:"Y-m" %}">
+                            <a href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                 {% include "includes/icon.html" with icon="download" %} Télécharger
                             </a>
                         {% endif %}

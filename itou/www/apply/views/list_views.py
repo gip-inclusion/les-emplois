@@ -27,15 +27,14 @@ def generate_csv_export_for_download(job_applications, filename="candidatures.cs
 
     return response
 
-
-def get_job_applications_for_export(job_applications, month_identifier):
-    """
-    Filters a list of job application in order only to return those created during the
-    requested export_month (whose format is YYYY-mm)
-    """
-    year, month = month_identifier.split("-")
-    job_applications = job_applications.created_on_given_year_and_month(year, month)
-    return job_applications.with_list_related_data()
+    # try:
+    #     tmp_file = NamedTemporaryFile(delete=False)
+    #     filename = export_approvals(tmp_file=tmp_file)
+    #     response = FileResponse(open(tmp_file.name, "rb"))
+    #     response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    #     return response
+    # finally:
+    #     os.remove(tmp_file.name)
 
 
 @login_required
@@ -119,9 +118,10 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
 
 @login_required
 @user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
-def list_for_prescriber_exports_download(request, export_month):
+def list_for_prescriber_exports_download(request, month_identifier):
     """
-    List of applications for a prescriber for a given month (YYYY-mm), exported as a CSV file with immediate download
+    List of applications for a prescriber for a given month identifier (YYYY-mm),
+    exported as a CSV file with immediate download
     """
     if request.user.is_prescriber_with_org:
         prescriber_organization = get_current_org_or_404(request)
@@ -135,9 +135,10 @@ def list_for_prescriber_exports_download(request, export_month):
     else:
         job_applications = request.user.job_applications_sent
 
-    job_applications = get_job_applications_for_export(job_applications, export_month)
+    year, month = month_identifier.split("-")
+    job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
 
-    return generate_csv_export_for_download(job_applications, f"candidatures-{export_month}.csv")
+    return generate_csv_export_for_download(job_applications, f"candidatures-{month_identifier}.csv")
 
 
 @login_required
@@ -184,14 +185,16 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
 
 
 @login_required
-def list_for_siae_exports_download(request, export_month):
+def list_for_siae_exports_download(request, month_identifier):
     """
-    List of applications for a SIAE for a given month (YYYY-mm), exported as a CSV file with immediate download
+    List of applications for a SIAE for a given month identifier (YYYY-mm),
+    exported as a CSV file with immediate download
     """
     siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received
-    job_applications = get_job_applications_for_export(job_applications, export_month)
+    year, month = month_identifier.split("-")
+    job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
 
     return generate_csv_export_for_download(
-        job_applications, f"candidatures-{slugify(siae.display_name)}-{export_month}.csv"
+        job_applications, f"candidatures-{slugify(siae.display_name)}-{month_identifier}.csv"
     )
