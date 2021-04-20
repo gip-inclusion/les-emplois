@@ -25,7 +25,12 @@ if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
 
 class Command(BaseCommand):
     """
-    TODO doc
+    Employee record management command
+    ---
+    Allow to manually or automatically:
+    - upload ready to be processed employee records
+    - download feedback files of previous upload operations
+    - perform dry-run operations
     """
 
     def add_arguments(self, parser):
@@ -35,15 +40,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--dry-run", dest="dry_run", action="store_true", help="Do not perform real SFTP transfer operations"
         )
-
         parser.add_argument(
             "--download", dest="download", action="store_true", help="Download employee record processing feedback"
         )
         parser.add_argument(
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
-
-        parser.add_argument("--test", dest="test", action="store_true", help="Send sample file")
 
     def set_logger(self, verbosity):
         """
@@ -87,7 +89,7 @@ class Command(BaseCommand):
             f.write(content)
         self.logger.info("Wrote '%s' to local path '%s'", remote_path, local_path)
 
-    def _upload_batch_file(self, conn, employee_records, dry_run=False):
+    def _upload_batch_file(self, conn, employee_records, dry_run):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
@@ -147,6 +149,7 @@ class Command(BaseCommand):
 
         if not records:
             self.logger.error("Could not get any employee record from file: %s", feedback_file)
+
             return 1
 
         for idx, employee_record in enumerate(records, 1):
