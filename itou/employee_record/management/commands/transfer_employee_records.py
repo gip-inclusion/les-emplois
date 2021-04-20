@@ -89,7 +89,7 @@ class Command(BaseCommand):
                 remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
                 conn.putfo(BytesIO(content), remote_path, confirm=False)
 
-                self.logger.info(f"Sent test file: {remote_path}")
+                self.logger.info(f"Sent test file: {remote_path}"result_file, )
 
     def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_DOWNLOAD_DIR):
         """
@@ -154,38 +154,35 @@ class Command(BaseCommand):
             for idx, employee_record in enumerate(employee_records, 1):
                 employee_record.sent_in_asp_batch_file(remote_path, idx)
 
-    def _update_employee_records_status(self, feedback_file_name, employee_records_batch):
+    def _parse_feedback_file(self, feedback_file, employee_records_batch, dry_run):
         """
         - Parse ASP response file,
         - Update status of employee records,
         - Update metadata for processed employee records.
         """
-        batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file_name)
-        success_code = "0000"
+        batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
         renderer = JSONRenderer()
+        success_code = "0000"
+        record_errors = 0
 
         for batch in employee_records_batch:
-            self.logger.info("Processing ASP feedback file: %s", feedback_file_name)
-
             batch_employee_records = batch.get("lignesTelechargement")
 
             if not batch_employee_records:
-                self.logger.error("Could not get any employee record from file: %s", feedback_file_name)
+                self.logger.error("Could not get any employee record from file: %s", feedback_file)
                 continue
 
-            for idx, batch_employee_record in enumerate(batch_employee_records):
+            for idx, batch_employee_record in enumerate(batch_employee_records, 1):
+                line_number = batch_employee_record.get("numLigne")
                 processing_code = batch_employee_record.get("codeTraitement")
                 processing_label = batch_employee_record.get("libelleTraitement")
 
-                self.logger.info("Processing code: %s", processing_code)
-                self.logger.info("Processing label: %s", processing_label)
-
-                line_number = batch_employee_record.get("numLigne")
+                self.logger.debug("Line number: %s", line_number)
+                self.logger.debug("Processing code: %s", processing_code)
+                self.logger.debug("Processing label: %s", processing_label)
 
                 if not line_number:
-                    self.logger.warning(
-                        "No line number for employee record (index: %s, file: )", idx, feedback_file_name
-                    )
+                    self.logger.warning("No line number for employee record (index: %s, file: %s)", idx, feedback_file)
                     continue
 
                 # Now we must find the matching FS
@@ -197,53 +194,80 @@ class Command(BaseCommand):
                         batch_filename,
                         line_number,
                     )
+                    record_errors += 1
                     continue
 
                 if processing_code == success_code:
-
-                    # Archive JSON copy of employee record
+                    # Archive JSON copy of employee record (with processing code and label)
                     serializer = EmployeeRecordSerializer(employee_record)
-                    employee_record.accepted_by_asp(
-                        processing_code, processing_label, renderer.render(serializer.data).decode()
-                    )
-
+                    if not dry_run:
+                        employee_record.accepted_by_asp(
+                            processing_code, processing_label, renderer.render(serializer.data).decode()
+                        )
+                    else:
+                        self.logger.info("DRY-RUN: accepted %s", employee_record)
                     continue
 
-                employee_record.rejected_by_asp(processing_code, processing_label)
+                if not dry_run:
+                    employee_record.rejected_by_asp(processing_code, processing_label)
+                else:
+                    self.logger.info(
+                        "DRY-RUN: rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
+                    )
 
-    def _get_feedback_file(self, conn):
-        """
-        Fetch ASP processing results
-        """
-        self.logger.info("Downloading result files...")
+            return record_errors
 
+    def download(self, conn, dry_run):
+        """
+        Fetch remote ASP file containing the results of the processing
+        of a batch of employee records
+        """
+        parser = JSONParser()
+        count = 0
+        errors = 0
+
+        # Get into the download folder
         with conn.cd(settings.ASP_FS_DOWNLOAD_DIR):
+            self.logger.info("Downloading result files...")
             result_files = conn.listdir()
-            results = []
-
-            for result_file in result_files:
-                self.logger.info("Fetching: %s", result_file)
-
-                with BytesIO() as result_stream:
-                    conn.getfo(result_file, result_stream)
-                    result_stream.seek(0)
-                    results.append(self._process_result_stream(result_stream))
 
             if len(result_files) == 0:
-                self.logger.info("No result files found")
-            else:
-                self.logger.info("Processed %s files", len(result_files))
+                self.logger.info("No feedback files found")
+                return
 
-                # Post process file
-                self._update_employee_records_status(result_file, results)
+            for result_file in result_files:
+                try:
+                    with BytesIO() as result_stream:
+                        self.logger.info("Fetching file '%s'", result_file)
 
-                self.logger.info("Removing %s from SFTP server", result_file)
-                # TODO: conn.remove(result_file)
-                # Once all ok
+                        conn.getfo(result_file, result_stream)
+                        # Rewind stream
+                        result_stream.seek(0)
 
-    def _process_result_stream(self, result_stream):
-        result = JSONParser().parse(result_stream)
-        return result
+                        # Parse and update employee records with feedback
+                        errors += self._parse_feedback_file(result_file, parser.parse(result_stream), dry_run)
+
+                        count += 1
+                except Exception as ex:
+                    errors += 1
+                    self.logger.error("Error while parsing file '%s': %s", result_file, ex)
+
+                self.logger.info("Parsed %s/%s files", count, len(result_files))
+
+            # There were errors do not delete file
+            if errors > 0:
+                self.logger.warning(
+                    "Did not delete file '%s' because of errors. Leaving it in place for another pass...", result_file
+                )
+                return
+
+            # All employee records processed, we can delete feedback file from server
+            self.logger.info("Deleting %s from SFTP server", result_file)
+            conn.remove(result_file)
+
+    def upload(self, sftp, dry_run):
+        for batch in self._get_ready_employee_records():
+            self._put_batch_file(sftp, batch, dry_run)
 
     def handle(self, dry_run=False, upload=True, download=True, test=True, verbosity=1, **options):
         self.set_logger(verbosity)
@@ -261,9 +285,9 @@ class Command(BaseCommand):
                 for batch in self._get_ready_employee_records():
                     self._put_batch_file(sftp, batch, dry_run)
 
-            # Fetch result files
+            # Fetch results from ASP
             if both or download:
-                self._get_feedback_file(sftp)
+                self.download(sftp, dry_run)
 
             # Send test file (debug)
             if test:
