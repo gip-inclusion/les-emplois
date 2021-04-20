@@ -1,5 +1,6 @@
 import logging
 from io import BytesIO
+from os import path
 
 import pysftp
 from django.conf import settings
@@ -15,9 +16,10 @@ from itou.utils.iterators import chunks
 
 # Global SFTP connection options
 
-cnopts = pysftp.CnOpts()
+cnopts = None
 
-if settings.ASP_FS_KNOWN_HOSTS:
+if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
+    cnopts = pysftp.CnOpts()
     cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
 
 
@@ -47,6 +49,9 @@ class Command(BaseCommand):
         """
         Set logger level based on the verbosity option.
         """
+        if hasattr(self, "logger"):
+            return
+
         handler = logging.StreamHandler(self.stdout)
 
         self.logger = logging.getLogger(__name__)
@@ -71,24 +76,6 @@ class Command(BaseCommand):
             private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
             cnopts=cnopts,
         )
-
-    def _put_sample_file(self, conn):
-        """
-        Send a test file
-
-        Will be removed ...
-        """
-        sample_file = "samples/RIAE_FS_20201113151303.json"
-
-        with conn.cd(settings.ASP_FS_UPLOAD_DIR):
-            content = None
-
-            with open(sample_file, "rb") as f:
-                content = f.read()
-                remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
-                conn.putfo(BytesIO(content), remote_path, confirm=False)
-
-                self.logger.info("Sent test file: %s", remote_path)
 
     def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_DOWNLOAD_DIR):
         """
@@ -130,11 +117,12 @@ class Command(BaseCommand):
             # we must assert that there is no verification of the remote file existence
             # This is the meaning of `confirm=False`
             try:
-                self.logger.info(json_b)
                 conn.putfo(json_bytes, remote_path, file_size=len(json_b), confirm=False)
+
                 self.logger.info("Succesfully uploaded '%s'", remote_path)
             except Exception as ex:
                 self.logger.error("Could not upload file: '%s', reason: %s", remote_path, ex)
+
                 return
 
             # Now that file is transfered, update employee records status (SENT)
@@ -147,6 +135,8 @@ class Command(BaseCommand):
         - Parse ASP response file,
         - Update status of employee records,
         - Update metadata for processed employee records.
+
+        Returns the number of errors encountered
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
         renderer = JSONRenderer()
@@ -202,7 +192,7 @@ class Command(BaseCommand):
                     "DRY-RUN: rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
                 )
 
-            return record_errors
+        return record_errors
 
     def download(self, conn, dry_run):
         """
@@ -215,7 +205,6 @@ class Command(BaseCommand):
 
         # Get into the download folder
         with conn.cd(settings.ASP_FS_DOWNLOAD_DIR):
-            self.logger.info("Downloading result files...")
             result_files = conn.listdir()
 
             if len(result_files) == 0:
@@ -249,7 +238,7 @@ class Command(BaseCommand):
                 return
 
             # All employee records processed, we can delete feedback file from server
-            self.logger.info("Deleting %s from SFTP server", result_file)
+            self.logger.info("Deleting '%s' from SFTP server", result_file)
             conn.remove(result_file)
 
     def upload(self, sftp, dry_run):
@@ -259,19 +248,17 @@ class Command(BaseCommand):
         for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, dry_run=False, upload=True, download=True, test=True, verbosity=1, **options):
+    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, **options):
         """
         Employee Record Management Command
         """
 
         self.set_logger(verbosity)
-        self.logger.info(
-            f"Connecting to {settings.ASP_FS_SFTP_USER}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}"
-        )
-
-        both = not (download or upload) and not test
+        both = not (download or upload)
 
         with self._get_sftp_connection() as sftp:
+            user = settings.ASP_FS_SFTP_USER or "django_tests"
+            self.logger.info(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
             self.logger.info(f"Current dir: {sftp.pwd}")
 
             # Send files
@@ -281,9 +268,5 @@ class Command(BaseCommand):
             # Fetch results from ASP
             if both or download:
                 self.download(sftp, dry_run)
-
-            # Send test file (debug)
-            if test:
-                self._put_sample_file(sftp)
 
         self.logger.info("Employee records processing done!")
