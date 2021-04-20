@@ -437,7 +437,7 @@ class JobSeekerProfile(models.Model):
     # See asp.models.RSAAllocation for details
     has_rsa_allocation = models.CharField(
         max_length=6,
-        verbose_name=_("Salarié bénéficiaire du RSA"),
+        verbose_name="Salarié bénéficiaire du RSA",
         choices=RSAAllocation.choices,
         default=RSAAllocation.NO,
     )
