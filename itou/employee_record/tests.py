@@ -245,6 +245,18 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
     fixtures = ["test_INSEE_communes.json", "test_asp_INSEE_countries.json"]
 
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def setUp(self, _mock):
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.prepare()
+
+        self.employee_record = employee_record
+        self.job_application = job_application
+
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
     def test_smoke_download(self):
         command = Command()
@@ -260,12 +272,48 @@ class EmployeeRecordManagementCommandTest(TestCase):
         command = Command()
         command.handle()
 
+    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_dryrun_upload(self, _mock):
+        employee_record = self.employee_record
+
+        # Upload with dry run
+        command = Command()
+        command.handle(upload=True, dryrun=True)
+
+        # Then download "for real", should work but leave
+        # employee record untouched
+        command.handle(upload=False, download=True)
+
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
+    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_dryrun_download(self, _mock):
+        employee_record = self.employee_record
+
+        # Upload "for real"
+        command = Command()
+        command.handle(upload=True)
+
+        # Then download dry run, should work but leave
+        # employee record untouched
+        command.handle(upload=False, download=True, dryrun=True)
+
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_upload_failure(self):
+    def _test_upload_failure(self, _mock):
         pass
 
     @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_download_failure(self):
+    def _test_download_failure(self, _mock):
         pass
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
@@ -280,9 +328,8 @@ class EmployeeRecordManagementCommandTest(TestCase):
         - Get feedback
         - Update employee record
         """
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-        employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.prepare()
+        employee_record = self.employee_record
+        job_application = self.job_application
 
         self.assertEqual(job_application.job_seeker.title, "M")
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
@@ -308,9 +355,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_random_connection_failure(self, _mock):
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-        employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.prepare()
+        employee_record = self.employee_record
 
         # Randowm upload failure
         for _ in range(10):
