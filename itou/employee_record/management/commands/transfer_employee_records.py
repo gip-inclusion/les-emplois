@@ -4,7 +4,6 @@ from io import BytesIO
 import pysftp
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from django.db import transaction
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
@@ -101,18 +100,7 @@ class Command(BaseCommand):
             f.write(content)
         self.logger.info("Wrote '%s' to local path '%s'", remote_path, local_path)
 
-    def _get_ready_employee_records(self):
-        """
-        Get a list of employee records in 'ready' state (ready to be sent)
-
-        Returns a list of list to send several files in batch if needed
-
-        ASP currently accept EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS FS per batch file
-        """
-        return chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS)
-
-    @transaction.atomic
-    def _put_batch_file(self, conn, employee_records, dry_run=False):
+    def _upload_batch_file(self, conn, employee_records, dry_run=False):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
@@ -165,9 +153,8 @@ class Command(BaseCommand):
         success_code = "0000"
         record_errors = 0
 
-        print(batch)
-
         records = batch.get("lignesTelechargement")
+
         if not records:
             self.logger.error("Could not get any employee record from file: %s", feedback_file)
             return 1
@@ -266,10 +253,17 @@ class Command(BaseCommand):
             conn.remove(result_file)
 
     def upload(self, sftp, dry_run):
-        for batch in self._get_ready_employee_records():
-            self._put_batch_file(sftp, batch, dry_run)
+        """
+        Upload a file composed of all ready employee records
+        """
+        for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
+            self._upload_batch_file(sftp, batch, dry_run)
 
     def handle(self, dry_run=False, upload=True, download=True, test=True, verbosity=1, **options):
+        """
+        Employee Record Management Command
+        """
+
         self.set_logger(verbosity)
         self.logger.info(
             f"Connecting to {settings.ASP_FS_SFTP_USER}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}"
@@ -282,8 +276,7 @@ class Command(BaseCommand):
 
             # Send files
             if both or upload:
-                for batch in self._get_ready_employee_records():
-                    self._put_batch_file(sftp, batch, dry_run)
+                self.upload(sftp, dry_run)
 
             # Fetch results from ASP
             if both or download:
