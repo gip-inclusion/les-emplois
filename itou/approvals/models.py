@@ -296,29 +296,23 @@ class Approval(CommonApprovalMixin):
         """
         Find next "PASS IAE" number.
 
-        Structure of a 12 chars "PASS IAE" number:
-            ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
+        Numbering scheme for a 12 chars "PASS IAE" number:
+            - ASP_ITOU_PREFIX (5 chars) + NUMBER (7 chars)
 
-        Rule:
-            The "PASS IAE"'s year is equal to the start year of the `JobApplication.hiring_start_at`.
+        Old numbering scheme:
+            - ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
+            - YEAR WITHOUT CENTURY is equal to the start year of the `JobApplication.hiring_start_at`
+            - A max of 99999 approvals could be issued by year
+            - We would have gone beyond, we would never have thought we could go that far
         """
-        hiring_start_at = hiring_start_at or timezone.now().date()
-        year = hiring_start_at.strftime("%Y")
         last_itou_approval = (
-            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX, start_at__year=year)
-            .order_by("created_at")
-            .last()
+            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX).order_by("created_at").last()
         )
         if last_itou_approval:
-            if Approval.ASP_ITOU_PREFIX.isdigit():
-                next_number = int(last_itou_approval.number) + 1
-            else:
-                # For some environment, the prefix is a string (ie. XXXXX or YYYYY).
-                numeric_part = int(last_itou_approval.number.replace(Approval.ASP_ITOU_PREFIX, "")) + 1
-                next_number = Approval.ASP_ITOU_PREFIX + str(numeric_part)
-            return str(next_number)
-        year_2_chars = hiring_start_at.strftime("%y")
-        return f"{Approval.ASP_ITOU_PREFIX}{year_2_chars}00001"
+            raw_number = last_itou_approval.number.removeprefix(Approval.ASP_ITOU_PREFIX)
+            next_number = int(raw_number) + 1
+            return f"{Approval.ASP_ITOU_PREFIX}{next_number:07d}"
+        return f"{Approval.ASP_ITOU_PREFIX}0000001"
 
     @staticmethod
     def get_default_end_date(start_at):

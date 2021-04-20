@@ -217,51 +217,35 @@ class ApprovalModelTest(TestCase):
 
     def test_get_next_number(self):
 
-        PREFIX = Approval.ASP_ITOU_PREFIX
-
-        now = timezone.now().date()
-        current_year = now.strftime("%y")
-
         # No pre-existing objects.
-        expected_number = f"{PREFIX}{current_year}00001"
+        expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         self.assertEqual(Approval.get_next_number(), expected_number)
 
         # With pre-existing objects.
-        ApprovalFactory(number=f"{PREFIX}{current_year}00038", start_at=now)
-        ApprovalFactory(number=f"{PREFIX}{current_year}00039", start_at=now)
-        ApprovalFactory(number=f"{PREFIX}{current_year}00040", start_at=now)
-        expected_number = f"{PREFIX}{current_year}00041"
+        ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}0000040")
+        expected_number = f"{Approval.ASP_ITOU_PREFIX}0000041"
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
 
-        # Date of hiring in the past.
-        hiring_start_at = now - relativedelta(years=3)
-        year = hiring_start_at.strftime("%y")
-        ApprovalFactory(number=f"{PREFIX}{year}99998", start_at=hiring_start_at)
-        expected_number = f"{PREFIX}{year}99999"
-        self.assertEqual(Approval.get_next_number(hiring_start_at), expected_number)
-        Approval.objects.all().delete()
-
-        # Date of hiring in the future.
-        hiring_start_at = now + relativedelta(years=3)
-        year = hiring_start_at.strftime("%y")
-        ApprovalFactory(number=f"{PREFIX}{year}00020", start_at=hiring_start_at)
-        expected_number = f"{PREFIX}{year}00021"
-        self.assertEqual(Approval.get_next_number(hiring_start_at), expected_number)
-        Approval.objects.all().delete()
-
         # With pre-existing Pôle emploi approval.
-        ApprovalFactory(number="625741810182", start_at=now)
-        expected_number = f"{PREFIX}{current_year}00001"
+        ApprovalFactory(number="625741810182")
+        expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
 
         # With various pre-existing objects.
-        ApprovalFactory(number=f"{PREFIX}{current_year}00222", start_at=now)
-        ApprovalFactory(number="625741810182", start_at=now)
-        expected_number = f"{PREFIX}{current_year}00223"
+        ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}8888882")
+        ApprovalFactory(number="625741810182")
+        expected_number = f"{Approval.ASP_ITOU_PREFIX}8888883"
         self.assertEqual(Approval.get_next_number(), expected_number)
         Approval.objects.all().delete()
+
+        demo_prefix = "XXXXX"
+        with mock.patch.object(Approval, "ASP_ITOU_PREFIX", demo_prefix):
+            ApprovalFactory(number=f"{demo_prefix}0044440")
+            expected_number = f"{demo_prefix}0044441"
+            self.assertEqual(Approval.get_next_number(), expected_number)
+            Approval.objects.all().delete()
 
     def test_is_valid(self):
 
