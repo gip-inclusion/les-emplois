@@ -1,4 +1,3 @@
-import logging
 from unittest import mock
 
 from django.core.exceptions import ValidationError
@@ -7,6 +6,7 @@ from django.test import TestCase
 from itou.employee_record.factories import EmployeeRecordFactory
 from itou.employee_record.management.commands.transfer_employee_records import Command
 from itou.employee_record.mocks.transfer_employee_records import (
+    SFTPBadConnectionMock,
     SFTPConnectionMock,
     SFTPEvilConnectionMock,
     SFTPGoodConnectionMock,
@@ -308,13 +308,23 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
-    @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_upload_failure(self, _mock):
-        pass
+    @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
+    def test_upload_failure(self):
+        employee_record = self.employee_record
+        command = Command()
+        with self.assertRaises(Exception):
+            command.handle(upload=True)
 
-    @mock.patch("pysftp.Connection", SFTPConnectionMock)
-    def _test_download_failure(self, _mock):
-        pass
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
+    @mock.patch("pysftp.Connection", SFTPBadConnectionMock)
+    def test_download_failure(self):
+        employee_record = self.employee_record
+        command = Command()
+        with self.assertRaises(Exception):
+            command.handle(download=True)
+
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
     @mock.patch(
@@ -329,10 +339,6 @@ class EmployeeRecordManagementCommandTest(TestCase):
         - Update employee record
         """
         employee_record = self.employee_record
-        job_application = self.job_application
-
-        self.assertEqual(job_application.job_seeker.title, "M")
-        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
         command = Command()
         command.handle(upload=True, download=False)
