@@ -69,6 +69,7 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "email": "bob@saintclar.net",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -104,6 +105,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "email": "bob@saintclar.net",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
