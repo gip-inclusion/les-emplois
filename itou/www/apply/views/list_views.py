@@ -16,27 +16,6 @@ from itou.www.apply.forms import (
 )
 
 
-def generate_csv_export_for_download(job_applications, filename="candidatures.csv"):
-    """
-    Converts a list of job application to CSV and return an HTTP response for download
-    """
-    response = HttpResponse(content_type="text/csv", charset="utf-8")
-    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
-
-    generate_csv_export(job_applications, response)
-
-    return response
-
-    # try:
-    #     tmp_file = NamedTemporaryFile(delete=False)
-    #     filename = export_approvals(tmp_file=tmp_file)
-    #     response = FileResponse(open(tmp_file.name, "rb"))
-    #     response["Content-Disposition"] = f'attachment; filename="{filename}"'
-    #     return response
-    # finally:
-    #     os.remove(tmp_file.name)
-
-
 @login_required
 @user_passes_test(lambda u: u.is_job_seeker, login_url="/", redirect_field_name=None)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
@@ -138,7 +117,14 @@ def list_for_prescriber_exports_download(request, month_identifier):
     year, month = month_identifier.split("-")
     job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
 
-    return generate_csv_export_for_download(job_applications, f"candidatures-{month_identifier}.csv")
+    filename = f"candidatures-{month_identifier}.csv"
+
+    response = HttpResponse(content_type="text/csv", charset="utf-8")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
+
+    generate_csv_export(job_applications, response)
+
+    return response
 
 
 @login_required
@@ -190,11 +176,15 @@ def list_for_siae_exports_download(request, month_identifier):
     List of applications for a SIAE for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
+    year, month = month_identifier.split("-")
     siae = get_current_siae_or_404(request)
     job_applications = siae.job_applications_received
-    year, month = month_identifier.split("-")
     job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
+    filename = f"candidatures-{slugify(siae.display_name)}-{month_identifier}.csv"
 
-    return generate_csv_export_for_download(
-        job_applications, f"candidatures-{slugify(siae.display_name)}-{month_identifier}.csv"
-    )
+    response = HttpResponse(content_type="text/csv", charset="utf-8")
+    response["Content-Disposition"] = 'attachment; filename="{}"'.format(filename)
+
+    generate_csv_export(job_applications, response)
+
+    return response
