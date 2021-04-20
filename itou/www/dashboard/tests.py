@@ -1,5 +1,4 @@
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
-from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
@@ -70,6 +69,7 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "email": "bob@saintclar.net",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -96,7 +96,6 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-        self.client.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = job_application.to_siae.pk
 
         back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
@@ -106,6 +105,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(response.status_code, 200)
 
         post_data = {
+            "email": "bob@saintclar.net",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -176,6 +176,81 @@ class EditJobSeekerInfo(TestCase):
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 403)
+
+    def test_edit_email_when_unconfirmed(self):
+        """
+        The SIAE can edit the email of a jobseeker it works with, provided he did not confirm its email.
+        """
+        new_email = "bidou@yopmail.com"
+        siae = SiaeWithMembershipFactory()
+        job_application = JobApplicationSentByPrescriberFactory(
+            to_siae=siae, job_seeker__created_by=siae.members.first()
+        )
+
+        user = job_application.to_siae.members.first()
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
+
+        response = self.client.get(url)
+        self.assertContains(response, "Adresse électronique")
+
+        post_data = {
+            "email": new_email,
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, back_url)
+
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
+        self.assertEqual(job_seeker.email, new_email)
+
+    def test_edit_email_when_confirmed(self):
+        new_email = "bidou@yopmail.com"
+        job_application = JobApplicationSentByPrescriberFactory()
+        user = job_application.to_siae.members.first()
+
+        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
+        job_application.job_seeker.created_by = user
+        job_application.job_seeker.save()
+
+        # Confirm job seeker email
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
+        EmailAddress.objects.create(user=job_seeker, email=job_seeker.email, verified=True)
+
+        # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
+        url = f"{url}?back_url={back_url}"
+
+        response = self.client.get(url)
+        self.assertNotContains(response, "Adresse électronique")
+
+        post_data = {
+            "email": new_email,
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": user.REASON_NOT_REGISTERED,
+        }
+        response = self.client.post(url, data=post_data)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, back_url)
+
+        job_seeker = User.objects.get(id=job_application.job_seeker.id)
+        # The email is not changed, but other fields are taken into account
+        self.assertNotEqual(job_seeker.email, new_email)
+        self.assertEqual(job_seeker.phone, post_data["phone"])
+        self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 
 
 class ChangeEmailViewTest(TestCase):

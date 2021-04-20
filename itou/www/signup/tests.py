@@ -115,7 +115,7 @@ class SiaeSignupTest(TestCase):
             self.assertTrue(user.is_active)
             self.assertTrue(siae.has_admin(user))
             self.assertEqual(1, siae.members.count())
-            # Check that `username` is not overriden by django-allauth.
+            # `username` should be a valid UUID, see `User.generate_unique_username()`.
             self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
             self.assertEqual(user.first_name, user_first_name)
             self.assertEqual(user.last_name, post_data["last_name"])
@@ -198,7 +198,7 @@ class JobSeekerSignupTest(TestCase):
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # Check that `username` is not overriden by django-allauth.
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertTrue(user.is_job_seeker)
         self.assertFalse(user.is_prescriber)
@@ -402,7 +402,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # Check that `username` is not overriden by django-allauth.
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
@@ -538,7 +538,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # Check that `username` is not overriden by django-allauth.
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
@@ -640,7 +640,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # Check that `username` is not overriden by django-allauth.
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)
@@ -721,7 +721,7 @@ class PrescriberSignupTest(TestCase):
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
-        # Check that `username` is not overriden by django-allauth.
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
         self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assertFalse(user.is_job_seeker)
         self.assertTrue(user.is_prescriber)

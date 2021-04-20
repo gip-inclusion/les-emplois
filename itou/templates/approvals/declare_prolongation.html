@@ -26,9 +26,7 @@
 
             {% csrf_token %}
 
-            {% bootstrap_form_errors form %}
-
-            {% bootstrap_form form %}
+            {% bootstrap_form form alert_error_type="all" %}
 
             <p>
                 <a href="{% url 'search:prescribers_home' %}" rel="noopener" target="_blank">

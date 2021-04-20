@@ -232,6 +232,9 @@ class NewUserInvitationForm(SignupForm):
 
     def save(self, request):
         self.cleaned_data["email"] = self.email
+        # Avoid django-allauth to call its own often failing `generate_unique_username`
+        # function by forcing a username.
+        self.cleaned_data["username"] = User.generate_unique_username()
         get_adapter().stash_verified_email(request, self.email)
         # Possible problem: this causes the user to be saved twice.
         # If we want to save it once, we should override the Allauth method.

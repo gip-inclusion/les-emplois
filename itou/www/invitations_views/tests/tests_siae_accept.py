@@ -1,3 +1,5 @@
+import uuid
+
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import TestCase
@@ -51,6 +53,8 @@ class TestAcceptInvitation(TestCase):
 
         user = User.objects.get(email=invitation.email)
         self.assertTrue(user.emailaddress_set.first().verified)
+        # `username` should be a valid UUID, see `User.generate_unique_username()`.
+        self.assertEqual(user.username, uuid.UUID(user.username, version=4).hex)
         self.assert_accepted_invitation(invitation, user)
 
     def test_accept_invitation_logged_in_user(self):

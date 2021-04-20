@@ -15,6 +15,7 @@ from itou.job_applications.factories import JobApplicationFactory, JobApplicatio
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
 from itou.users.factories import DEFAULT_PASSWORD
+from itou.www.approvals_views.forms import DeclareProlongationForm
 
 from .pdfshift_mock import BITES_FILE
 
@@ -242,14 +243,14 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertEqual(0, approval.suspension_set.count())
 
 
-class ApprovalProlongViewTest(TestCase):
-    def test_prolong_approval(self):
+class ApprovalProlongationTest(TestCase):
+    def setUp(self):
         """
-        Test the creation of a prolongation.
+        Create test objects.
         """
 
-        prescriber_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
-        prescriber = prescriber_organization.members.first()
+        self.prescriber_organization = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        self.prescriber = self.prescriber_organization.members.first()
 
         today = timezone.now().date()
 
@@ -259,7 +260,7 @@ class ApprovalProlongViewTest(TestCase):
             + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
             - relativedelta(days=1)
         )
-        job_application = JobApplicationWithApprovalFactory(
+        self.job_application = JobApplicationWithApprovalFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             # Ensure that the job_application cannot be canceled.
             hiring_start_at=today
@@ -267,16 +268,35 @@ class ApprovalProlongViewTest(TestCase):
             - relativedelta(days=1),
             approval__end_at=approval_end_at,
         )
+        self.siae = self.job_application.to_siae
+        self.siae_user = self.job_application.to_siae.members.first()
+        self.approval = self.job_application.approval
+        self.assertEqual(0, self.approval.prolongation_set.count())
 
-        approval = job_application.approval
-        self.assertEqual(0, approval.prolongation_set.count())
+    def test_form_without_pre_existing_instance(self):
+        """
+        Test the default state of `DeclareProlongationForm`.
+        """
+        form = DeclareProlongationForm(approval=self.approval, siae=self.siae, data={})
 
-        siae_user = job_application.to_siae.members.first()
-        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+        self.assertIsNone(form.fields["reason"].initial)
+
+        # Ensure that `form.instance` is populated so that `Prolongation.clean()`
+        # is triggered from within the form validation step with the right data.
+        self.assertEqual(form.instance.declared_by_siae, self.siae)
+        self.assertEqual(form.instance.approval, self.approval)
+        self.assertEqual(form.instance.start_at, Prolongation.get_start_at(self.approval))
+
+    def test_prolong_approval_view(self):
+        """
+        Test the creation of a prolongation.
+        """
+
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
         back_url = "/"
         params = urlencode({"back_url": back_url})
-        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.pk})
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"
 
         response = self.client.get(url)
@@ -284,13 +304,13 @@ class ApprovalProlongViewTest(TestCase):
         self.assertEqual(response.context["preview"], False)
 
         reason = Prolongation.Reason.SENIOR
-        end_at = Prolongation.get_max_end_at(approval.end_at, reason=reason)
+        end_at = Prolongation.get_max_end_at(self.approval.end_at, reason=reason)
 
         post_data = {
             "end_at": end_at.strftime("%d/%m/%Y"),
             "reason": reason,
             "reason_explanation": "Reason explanation is required.",
-            "email": prescriber.email,
+            "email": self.prescriber.email,
             # Preview.
             "preview": "1",
         }
@@ -308,13 +328,13 @@ class ApprovalProlongViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, back_url)
 
-        self.assertEqual(1, approval.prolongation_set.count())
+        self.assertEqual(1, self.approval.prolongation_set.count())
 
-        prolongation = approval.prolongation_set.first()
-        self.assertEqual(prolongation.created_by, siae_user)
-        self.assertEqual(prolongation.declared_by, siae_user)
-        self.assertEqual(prolongation.declared_by_siae, job_application.to_siae)
-        self.assertEqual(prolongation.validated_by, prescriber)
+        prolongation = self.approval.prolongation_set.first()
+        self.assertEqual(prolongation.created_by, self.siae_user)
+        self.assertEqual(prolongation.declared_by, self.siae_user)
+        self.assertEqual(prolongation.declared_by_siae, self.job_application.to_siae)
+        self.assertEqual(prolongation.validated_by, self.prescriber)
         self.assertEqual(prolongation.reason, post_data["reason"])
 
         # An email should have been sent to the chosen authorized prescriber.
