@@ -22,6 +22,12 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
+import logging
+logger = logging.getLogger(__name__)
+logging.disable(logging.NOTSET)
+logger.setLevel(logging.DEBUG)
+
+
 class EmployeeRecordModelTest(TestCase):
 
     fixtures = ["test_INSEE_communes.json"]
