@@ -17,6 +17,8 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     Edit a user profile.
     """
 
+    email = forms.EmailField(label="Adresse électronique", widget=forms.TextInput(attrs={"autocomplete": "off"}))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         has_verified_email = EmailAddress.objects.filter(email=self.instance.email, verified=True)
