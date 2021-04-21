@@ -202,6 +202,8 @@ class Command(BaseCommand):
         Fetch remote ASP file containing the results of the processing
         of a batch of employee records
         """
+        self.logger.info("Starting DOWNLOAD")
+
         parser = JSONParser()
         count = 0
         errors = 0
@@ -248,6 +250,8 @@ class Command(BaseCommand):
         """
         Upload a file composed of all ready employee records
         """
+        self.logger.info("Starting UPLOAD")
+
         for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
