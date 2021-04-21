@@ -67,7 +67,7 @@ def format_address(obj):
             extension = extension[0]
             ext = LaneExtension.with_similar_name_or_value(extension)
             if ext:
-                result["std_extension"] = ext.name
+                result["std_extension"] = ext.name or ""
             else:
                 result["non_std_extension"] = extension.upper()
 
