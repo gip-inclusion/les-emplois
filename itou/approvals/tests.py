@@ -219,32 +219,37 @@ class ApprovalModelTest(TestCase):
 
         # No pre-existing objects.
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
-        self.assertEqual(Approval.get_next_number(), expected_number)
+        next_number = Approval.get_next_number()
+        self.assertEqual(next_number, expected_number)
 
         # With pre-existing objects.
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}0000040")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000041"
-        self.assertEqual(Approval.get_next_number(), expected_number)
+        next_number = Approval.get_next_number()
+        self.assertEqual(next_number, expected_number)
         Approval.objects.all().delete()
 
         # With pre-existing Pôle emploi approval.
         ApprovalFactory(number="625741810182")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}0000001"
-        self.assertEqual(Approval.get_next_number(), expected_number)
+        next_number = Approval.get_next_number()
+        self.assertEqual(next_number, expected_number)
         Approval.objects.all().delete()
 
         # With various pre-existing objects.
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}8888882")
         ApprovalFactory(number="625741810182")
         expected_number = f"{Approval.ASP_ITOU_PREFIX}8888883"
-        self.assertEqual(Approval.get_next_number(), expected_number)
+        next_number = Approval.get_next_number()
+        self.assertEqual(next_number, expected_number)
         Approval.objects.all().delete()
 
         demo_prefix = "XXXXX"
         with mock.patch.object(Approval, "ASP_ITOU_PREFIX", demo_prefix):
             ApprovalFactory(number=f"{demo_prefix}0044440")
             expected_number = f"{demo_prefix}0044441"
-            self.assertEqual(Approval.get_next_number(), expected_number)
+            next_number = Approval.get_next_number()
+            self.assertEqual(next_number, expected_number)
             Approval.objects.all().delete()
 
     def test_is_valid(self):

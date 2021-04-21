@@ -176,10 +176,9 @@ class Approval(CommonApprovalMixin):
 
         if not already_exists and hasattr(self, "number") and hasattr(self, "start_at"):
 
-            # Prevent a database integrity error during automatic creation.
-            # TODO: investigate UPSERT with ON CONFLICT to speed this up.
             if self.originates_from_itou:
-                while Approval.objects.filter(number=self.number).exists():
+                if Approval.objects.filter(number=self.number).exists():
+                    # `get_next_number` will lock rows until the end of the transaction.
                     self.number = self.get_next_number(self.start_at)
 
             # Handle COVID extensions for approvals originally issued by Pôle emploi.
@@ -306,7 +305,13 @@ class Approval(CommonApprovalMixin):
             - We would have gone beyond, we would never have thought we could go that far
         """
         last_itou_approval = (
-            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX).order_by("number").last()
+            Approval.objects
+            # select_for_update() returns a queryset that will lock rows until the end of the transaction.
+            # The lock is active for the duration of the transaction (see settings.ATOMIC_REQUESTS).
+            .select_for_update()
+            .filter(number__startswith=Approval.ASP_ITOU_PREFIX)
+            .order_by("number")
+            .last()
         )
         if last_itou_approval:
             raw_number = last_itou_approval.number.removeprefix(Approval.ASP_ITOU_PREFIX)
