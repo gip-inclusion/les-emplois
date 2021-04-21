@@ -1,5 +1,5 @@
-from unittest import mock
 import json
+from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -372,7 +372,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
         employee_record = self.employee_record
 
         command = Command()
-        command.handle(upload=True, download=True)
+        command.handle()
         employee_record.refresh_from_db()
 
         self.assertIsNotNone(employee_record.archived_json)

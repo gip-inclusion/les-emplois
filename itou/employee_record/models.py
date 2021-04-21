@@ -166,15 +166,14 @@ class EmployeeRecord(models.Model):
         """
         Check if job application is valid for FS
         """
-        job_application = self.job_application
 
-        if not job_application.state.is_accepted:
+        if not self.job_application.state.is_accepted:
             raise ValidationError(self.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED)
 
-        if not job_application.approval:
+        if not self.job_application.approval:
             raise ValidationError(self.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL)
 
-        if job_application.can_be_cancelled:
+        if self.job_application.can_be_cancelled:
             raise ValidationError(self.ERROR_JOB_APPLICATION_TOO_RECENT)
 
     def _clean_job_seeker(self):
