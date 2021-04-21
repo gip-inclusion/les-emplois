@@ -16,11 +16,11 @@ from itou.utils.iterators import chunks
 
 # Global SFTP connection options
 
-cnopts = None
+connection_options = None
 
 if settings.ASP_FS_KNOWN_HOSTS and path.exists(settings.ASP_FS_KNOWN_HOSTS):
-    cnopts = pysftp.CnOpts()
-    cnopts.hostkeys = cnopts.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
+    connection_options = pysftp.CnOpts()
+    connection_options.hostkeys = connection_options.hostkeys.load(settings.ASP_FS_KNOWN_HOSTS)
 
 
 class Command(BaseCommand):
@@ -32,6 +32,17 @@ class Command(BaseCommand):
     - download feedback files of previous upload operations
     - perform dry-run operations
     """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        handler = logging.StreamHandler(self.stdout)
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.propagate = False
+        self.logger.addHandler(handler)
+
+        self.logger.setLevel(logging.INFO)
 
     def add_arguments(self, parser):
         """
@@ -47,26 +58,6 @@ class Command(BaseCommand):
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
 
-    def set_logger(self, verbosity):
-        """
-        Set logger level based on the verbosity option.
-        """
-        if hasattr(self, "logger"):
-            return
-
-        handler = logging.StreamHandler(self.stdout)
-
-        self.logger = logging.getLogger(__name__)
-        self.logger.propagate = False
-        self.logger.addHandler(handler)
-
-        self.logger.setLevel(logging.INFO)
-        if verbosity > 1:
-            self.logger.setLevel(logging.DEBUG)
-
-    def log(self, message):
-        self.logger.debug(message)
-
     def _get_sftp_connection(self):
         """
         Get a new SFTP connection to remote server
@@ -76,7 +67,7 @@ class Command(BaseCommand):
             port=settings.ASP_FS_SFTP_PORT,
             username=settings.ASP_FS_SFTP_USER,
             private_key=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
-            cnopts=cnopts,
+            cnopts=connection_options,
         )
 
     def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_DOWNLOAD_DIR):
@@ -96,30 +87,30 @@ class Command(BaseCommand):
         batch = EmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
 
         # JSONRenderer produces byte arrays
-        json_b = JSONRenderer().render(batch.data)
+        json_bytes = JSONRenderer().render(batch.data)
 
         # Using FileIO objects allows to use them as files
         # Cool side effect: no temporary file needed
-        json_bytes = BytesIO(json_b)
+        json_stream = BytesIO(json_bytes)
         remote_path = f"RIAE_FS_{timezone.now().strftime('%Y%m%d%H%M%S')}.json"
 
         if dry_run:
-            self.logger.info("DRY-RUN: (not) sending '%s' (%d bytes)", remote_path, len(json_b))
-            self.logger.info("Content: \n%s", json_b)
+            self.logger.info("DRY-RUN: (not) sending '%s' (%d bytes)", remote_path, len(json_bytes))
+            self.logger.info("Content: \n%s", json_bytes)
             return
 
         # There are specific folders for upload and download on the SFTP server
         with conn.cd(settings.ASP_FS_UPLOAD_DIR):
             # After creating a FileIO object, internal pointer is at the end of the buffer
             # It must be set back to 0 (rewind) otherwise an empty file is sent
-            json_bytes.seek(0)
+            json_stream.seek(0)
 
             # ASP SFTP server does not return a proper list of transmitted files
             # Whether it's a bug or a paranoid security parameter
             # we must assert that there is no verification of the remote file existence
             # This is the meaning of `confirm=False`
             try:
-                conn.putfo(json_bytes, remote_path, file_size=len(json_b), confirm=False)
+                conn.putfo(json_stream, remote_path, file_size=len(json_bytes), confirm=False)
 
                 self.logger.info("Succesfully uploaded '%s'", remote_path)
             except Exception as ex:
@@ -162,7 +153,7 @@ class Command(BaseCommand):
             self.logger.debug("Processing label: %s", processing_label)
 
             if not line_number:
-                self.logger.warning("No line number for employee record (index: %s, file: %s)", idx, feedback_file)
+                self.logger.warning("No line number for employee record (index: %s, file: '%s')", idx, feedback_file)
                 continue
 
             # Now we must find the matching FS
@@ -183,7 +174,7 @@ class Command(BaseCommand):
                 employee_record.asp_processing_label = processing_label
 
                 serializer = EmployeeRecordSerializer(employee_record)
-                
+
                 if not dry_run:
                     employee_record.accepted_by_asp(
                         processing_code, processing_label, renderer.render(serializer.data).decode()
@@ -263,8 +254,9 @@ class Command(BaseCommand):
         """
         Employee Record Management Command
         """
+        if verbosity > 1:
+            self.logger.setLevel(logging.DEBUG)
 
-        self.set_logger(verbosity)
         both = not (download or upload)
 
         with self._get_sftp_connection() as sftp:
