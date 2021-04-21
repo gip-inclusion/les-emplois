@@ -306,7 +306,7 @@ class Approval(CommonApprovalMixin):
             - We would have gone beyond, we would never have thought we could go that far
         """
         last_itou_approval = (
-            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX).order_by("created_at").last()
+            Approval.objects.filter(number__startswith=Approval.ASP_ITOU_PREFIX).order_by("number").last()
         )
         if last_itou_approval:
             raw_number = last_itou_approval.number.removeprefix(Approval.ASP_ITOU_PREFIX)
