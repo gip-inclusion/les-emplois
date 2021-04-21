@@ -54,7 +54,6 @@ def manually_add_approval(
     initial = {
         "start_at": job_application.hiring_start_at,
         "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
-        "number": Approval.get_next_number(job_application.hiring_start_at),
         "user": job_application.job_seeker.pk,
         "created_by": request.user.pk,
     }

@@ -174,12 +174,11 @@ class Approval(CommonApprovalMixin):
 
         already_exists = bool(self.pk)
 
-        if not already_exists and hasattr(self, "number") and hasattr(self, "start_at"):
+        if not self.number:
+            # `get_next_number` will lock rows until the end of the transaction.
+            self.number = self.get_next_number()
 
-            if self.originates_from_itou:
-                if Approval.objects.filter(number=self.number).exists():
-                    # `get_next_number` will lock rows until the end of the transaction.
-                    self.number = self.get_next_number(self.start_at)
+        if not already_exists:
 
             # Handle COVID extensions for approvals originally issued by Pôle emploi.
             # Approvals issued by Itou have already been extended through SQL.
@@ -291,7 +290,7 @@ class Approval(CommonApprovalMixin):
         return self.user.last_hire_was_made_by_siae(siae) and self.can_be_prolonged
 
     @staticmethod
-    def get_next_number(hiring_start_at=None):
+    def get_next_number():
         """
         Find next "PASS IAE" number.
 

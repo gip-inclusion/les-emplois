@@ -5,7 +5,7 @@ import uuid
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
-from django.db import models
+from django.db import models, transaction
 from django.db.models import BooleanField, Case, Count, Exists, Max, OuterRef, When
 from django.db.models.functions import Greatest, TruncMonth
 from django.urls import reverse
@@ -492,6 +492,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         pass
 
     @xwf_models.transition()
+    # Saving an Approval can trigger Approval.get_next_number() which
+    # requires an explicit atomic transaction to avoid the error
+    # "select_for_update cannot be used outside of a transaction".
+    @transaction.atomic()
     def accept(self, *args, **kwargs):
 
         accepted_by = kwargs.get("user")
@@ -528,7 +532,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval = Approval(
                     start_at=self.hiring_start_at,
                     end_at=Approval.get_default_end_date(self.hiring_start_at),
-                    number=Approval.get_next_number(self.hiring_start_at),
                     user=self.job_seeker,
                 )
                 new_approval.save()

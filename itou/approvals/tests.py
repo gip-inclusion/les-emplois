@@ -657,7 +657,6 @@ class CustomApprovalAdminViewsTest(TestCase):
         post_data = {
             "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
-            "number": "400121910144",
             "user": job_application.job_seeker.pk,
             "created_by": user.pk,
         }
@@ -674,7 +673,6 @@ class CustomApprovalAdminViewsTest(TestCase):
 
         approval = job_application.approval
         self.assertEqual(approval.created_by, user)
-        self.assertEqual(approval.number, post_data["number"])
         self.assertEqual(approval.user, job_application.job_seeker)
 
         self.assertEqual(len(mail.outbox), 1)
