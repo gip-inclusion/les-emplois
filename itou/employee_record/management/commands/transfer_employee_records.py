@@ -179,7 +179,11 @@ class Command(BaseCommand):
 
             if processing_code == success_code:
                 # Archive JSON copy of employee record (with processing code and label)
+                employee_record.asp_processing_code = processing_code
+                employee_record.asp_processing_label = processing_label
+
                 serializer = EmployeeRecordSerializer(employee_record)
+                
                 if not dry_run:
                     employee_record.accepted_by_asp(
                         processing_code, processing_label, renderer.render(serializer.data).decode()
