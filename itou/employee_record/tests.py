@@ -1,4 +1,5 @@
 from unittest import mock
+import json
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -358,7 +359,28 @@ class EmployeeRecordManagementCommandTest(TestCase):
 
         self.assertEqual(employee_record.status, EmployeeRecord.Status.PROCESSED)
         self.assertEqual(employee_record.asp_processing_code, "0000")
+
+    @mock.patch("pysftp.Connection", SFTPGoodConnectionMock)
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_employee_record_archive(self, _mock):
+        """
+        Check that "proof" of validated employee record is OK
+        """
+        employee_record = self.employee_record
+
+        command = Command()
+        command.handle(upload=True, download=True)
+        employee_record.refresh_from_db()
+
         self.assertIsNotNone(employee_record.archived_json)
+
+        employee_record_json = json.loads(employee_record.archived_json)
+
+        self.assertEqual("0000", employee_record_json.get("codeTraitement"))
+        self.assertIsNotNone(employee_record_json.get("libelleTraitement"))
 
     @mock.patch("pysftp.Connection", SFTPEvilConnectionMock)
     @mock.patch(

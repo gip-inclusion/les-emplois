@@ -591,7 +591,7 @@ class JobSeekerProfile(models.Model):
         # Fill matching fields
         self.hexa_lane_type = result.get("lane_type")
         self.hexa_lane_number = result.get("number")
-        self.hexa_std_extension = result.get("std_extension")
+        self.hexa_std_extension = result.get("std_extension", "")
         self.hexa_non_std_extension = result.get("non_std_extension")
         self.hexa_lane_name = result.get("lane")
         self.hexa_post_code = result.get("post_code")
