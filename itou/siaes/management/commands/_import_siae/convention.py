@@ -158,15 +158,12 @@ def check_convention_data_consistency(dry_run):
     for convention in SiaeConvention.objects.prefetch_related("siaes").all():
         # Check that each convention has exactly one siae of ASP source.
         asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Siae.SOURCE_ASP]
-        if dry_run:
-            # During a dry run we might have some zero-siae conventions
-            # which have not been deleted for real.
-            assert len(asp_siaes) in [0, 1]
-        else:
+
+        if not dry_run:
             assert len(asp_siaes) == 1
 
-        # Check that each inactive convention has a grace period start date.
         if not convention.is_active:
+            # Check that each inactive convention has a grace period start date.
             assert convention.deactivated_at is not None
 
         # Additional data consistency checks.
@@ -177,7 +174,7 @@ def check_convention_data_consistency(dry_run):
     asp_siaes_without_convention = Siae.objects.filter(
         kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True
     ).count()
-    print(f"{asp_siaes_without_convention} siaes of ASP source have no convention (no solution)")
+    assert asp_siaes_without_convention == 0
 
     user_created_siaes_without_convention = Siae.objects.filter(
         kind__in=Siae.ASP_MANAGED_KINDS,
