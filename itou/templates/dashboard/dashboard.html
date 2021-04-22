@@ -329,6 +329,18 @@
 
     </div>
 
+    {% if user.is_siae_staff %}
+    <div class="layout layout-column-full border-top bg-light text-center p-4 mt-5 card">
+        <p class="h5 mb-3"><span class="badge badge-warning">Nouveau</span>&nbsp;Améliorez la visibilité de votre structure en précisant les secteurs d'activités sur lesquels vous intervenez</p>
+        <p class="mb-1">
+            <a href="https://itou.typeform.com/to/xGF5FMel#structure=xxxxx&type=xxxxx&ville=xxxxx&siret=xxxxx" rel="noopener" target="_blank" class="btn btn-primary">
+                C'est parti !
+                {% include "includes/icon.html" with icon="external-link" %}
+            </a>
+        </p>
+    </div>
+    {% endif %}
+
     {% if current_siae and current_siae.region in lemarche_regions %}
         <div class="layout layout-column-full border-top bg-light text-center p-4 mt-5 card">
             <p class="h5 mb-3">Développez votre clientèle avec le marché de l'inclusion</p>
