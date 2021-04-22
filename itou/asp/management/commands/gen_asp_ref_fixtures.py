@@ -275,7 +275,7 @@ class Command(BaseCommand):
         ]
 
         if len(partial) > 1:
-            self.logger.error(f"ERROR: Only one file import argument is allowed, {len(partial)} provided")
+            self.logger.error("ERROR: Only one file import argument is allowed, %s provided.", len(partial))
             return
 
         if partial:
