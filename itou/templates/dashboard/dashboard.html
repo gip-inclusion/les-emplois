@@ -236,23 +236,18 @@
                         </a>
                     </p>
                     {% if can_show_financial_annexes %}
-                        {# step 1 : (April 19th 2021) : show dashboard link only to inactive siaes #}
-                        {# step 2 : (April 22th 2021 most likely) : show dashboard link to everyone #}
-                        {# these 2 steps are designed to prevent potential support overload #}
-                        {% if not current_siae.is_active %}
-                            <p class="card-text">
-                                {% include "includes/icon.html" with icon="check-circle" %}
-                                <a href="{% url 'siaes_views:show_financial_annexes' %}">
-                                    Mes annexes financières
-                                </a>
-                                <span class="badge badge-info">Nouveau</span>
-                                {% if not current_siae.is_active %}
-                                    <span class="badge badge-danger">
-                                        Action requise
-                                    </span>
-                                {% endif %}
-                            </p>
-                        {% endif %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="check-circle" %}
+                            <a href="{% url 'siaes_views:show_financial_annexes' %}">
+                                Mes annexes financières
+                            </a>
+                            <span class="badge badge-info">Nouveau</span>
+                            {% if not current_siae.is_active %}
+                                <span class="badge badge-danger">
+                                    Action requise
+                                </span>
+                            {% endif %}
+                        </p>
                     {% endif %}
                     {% if current_siae.is_active and user_is_siae_admin %}
                         <p class="card-text">
