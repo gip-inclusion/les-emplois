@@ -180,14 +180,16 @@ class Command(BaseCommand):
                         processing_code, processing_label, renderer.render(serializer.data).decode()
                     )
                 else:
-                    self.logger.info("DRY-RUN: accepted %s", employee_record)
+                    self.logger.info(
+                        "DRY-RUN: Accepted %s, code: %s, label: %s", employee_record, processing_code, processing_label
+                    )
                 continue
 
             if not dry_run:
                 employee_record.rejected_by_asp(processing_code, processing_label)
             else:
                 self.logger.info(
-                    "DRY-RUN: rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
+                    "DRY-RUN: Rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label
                 )
 
         return record_errors
@@ -238,7 +240,12 @@ class Command(BaseCommand):
                 return
 
             # All employee records processed, we can delete feedback file from server
+            if dry_run:
+                self.logger.info("DRY-RUN: Removing file '%s'", result_file)
+                return
+
             self.logger.info("Deleting '%s' from SFTP server", result_file)
+
             conn.remove(result_file)
 
     def upload(self, sftp, dry_run):
