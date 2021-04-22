@@ -320,8 +320,10 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         response = self.client.get(self.prescriber_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
-        export_month = sample_date.strftime("%Y-%d")
-        download_url = reverse("apply:list_for_prescriber_exports_download", kwargs={"export_month": export_month})
+        month_identifier = sample_date.strftime("%Y-%d")
+        download_url = reverse(
+            "apply:list_for_prescriber_exports_download", kwargs={"month_identifier": month_identifier}
+        )
 
         response = self.client.get(download_url)
 
@@ -459,8 +461,10 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
 
         response = self.client.get(self.prescriber_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
-        export_month = sample_date.strftime("%Y-%d")
-        download_url = reverse("apply:list_for_prescriber_exports_download", kwargs={"export_month": export_month})
+        month_identifier = sample_date.strftime("%Y-%d")
+        download_url = reverse(
+            "apply:list_for_prescriber_exports_download", kwargs={"month_identifier": month_identifier}
+        )
 
         response = self.client.get(download_url)
 
@@ -475,8 +479,8 @@ class ProcessListExportsDownloadPrescriberTest(ProcessListTest):
 
         response = self.client.get(self.prescriber_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
-        export_month = sample_date.strftime("%Y-%d")
-        download_url = reverse("apply:list_for_siae_exports_download", kwargs={"export_month": export_month})
+        month_identifier = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_siae_exports_download", kwargs={"month_identifier": month_identifier})
 
         response = self.client.get(download_url)
 
@@ -497,8 +501,8 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
 
         response = self.client.get(self.siae_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
-        export_month = sample_date.strftime("%Y-%d")
-        download_url = reverse("apply:list_for_siae_exports_download", kwargs={"export_month": export_month})
+        month_identifier = sample_date.strftime("%Y-%d")
+        download_url = reverse("apply:list_for_siae_exports_download", kwargs={"month_identifier": month_identifier})
 
         response = self.client.get(download_url)
 
@@ -513,8 +517,10 @@ class ProcessListExportsDownloadSiaeTest(ProcessListTest):
 
         response = self.client.get(self.siae_exports_url)
         sample_date = response.context["job_applications_by_month"][0]["month"]
-        export_month = sample_date.strftime("%Y-%d")
-        download_url = reverse("apply:list_for_prescriber_exports_download", kwargs={"export_month": export_month})
+        month_identifier = sample_date.strftime("%Y-%d")
+        download_url = reverse(
+            "apply:list_for_prescriber_exports_download", kwargs={"month_identifier": month_identifier}
+        )
 
         response = self.client.get(download_url)
 
