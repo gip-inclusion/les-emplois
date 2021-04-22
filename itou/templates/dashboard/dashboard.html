@@ -1,5 +1,5 @@
 {% extends "layout/content.html" %}
-
+{% load url_add_query %}
 {% block title %}Tableau de bord{{ block.super }}{% endblock %}
 
 {% block messages %}
@@ -333,7 +333,7 @@
     <div class="layout layout-column-full border-top bg-light text-center p-4 mt-5 card">
         <p class="h5 mb-3"><span class="badge badge-warning">Nouveau</span>&nbsp;Améliorez la visibilité de votre structure en précisant les secteurs d'activités sur lesquels vous intervenez</p>
         <p class="mb-1">
-            <a href="https://itou.typeform.com/to/xGF5FMel#structure={{ current_siae.name|urlencode }}&type={{ current_siae.kind|urlencode }}&ville={{ current_siae.city|urlencode }}&siret={{ current_siae.siret|urlencode }}" rel="noopener" target="_blank" class="btn btn-primary">
+            <a href="{% url_add_query 'https://itou.typeform.com/to/xGF5FMel' structure=current_siae.name type=current_siae.kind ville=current_siae.city siret=current_siae.siret %}" rel="noopener" target="_blank" class="btn btn-primary">
                 C'est parti !
                 {% include "includes/icon.html" with icon="external-link" %}
             </a>
