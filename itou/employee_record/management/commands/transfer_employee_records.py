@@ -70,7 +70,7 @@ class Command(BaseCommand):
             cnopts=connection_options,
         )
 
-    def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_DOWNLOAD_DIR):
+    def _store_processing_report(self, conn, remote_path, content, local_path=settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
         """
         Store ASP processing results in a local file
 
@@ -100,7 +100,7 @@ class Command(BaseCommand):
             return
 
         # There are specific folders for upload and download on the SFTP server
-        with conn.cd(settings.ASP_FS_UPLOAD_DIR):
+        with conn.cd(settings.ASP_FS_REMOTE_UPLOAD_DIR):
             # After creating a FileIO object, internal pointer is at the end of the buffer
             # It must be set back to 0 (rewind) otherwise an empty file is sent
             json_stream.seek(0)
@@ -204,9 +204,10 @@ class Command(BaseCommand):
         parser = JSONParser()
         count = 0
         errors = 0
+        files_to_delete = []
 
         # Get into the download folder
-        with conn.cd(settings.ASP_FS_DOWNLOAD_DIR):
+        with conn.cd(settings.ASP_FS_REMOTE_DOWNLOAD_DIR):
             result_files = conn.listdir()
 
             if len(result_files) == 0:
@@ -232,21 +233,25 @@ class Command(BaseCommand):
 
                 self.logger.info("Parsed %s/%s files", count, len(result_files))
 
-            # There were errors do not delete file
-            if errors > 0:
-                self.logger.warning(
-                    "Did not delete file '%s' because of errors. Leaving it in place for another pass...", result_file
-                )
-                return
+                # There were errors do not delete file
+                if errors > 0:
+                    self.logger.warning(
+                        "Will not delete file '%s' because of errors. Leaving it in place for another pass...", result_file
+                    )
+                    continue
 
-            # All employee records processed, we can delete feedback file from server
-            if dry_run:
-                self.logger.info("DRY-RUN: Removing file '%s'", result_file)
-                return
+                # Everything was fine, will remove file after main loop
+                files_to_delete.append(result_file)
 
-            self.logger.info("Deleting '%s' from SFTP server", result_file)
+            for file in files_to_delete: 
+                # All employee records processed, we can delete feedback file from server
+                if dry_run:
+                    self.logger.info("DRY-RUN: Removing file '%s'", file)
+                    continue
 
-            conn.remove(result_file)
+                self.logger.info("Deleting '%s' from SFTP server", file)
+
+                conn.remove(file)
 
     def upload(self, sftp, dry_run):
         """

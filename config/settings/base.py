@@ -543,6 +543,6 @@ ASP_FS_SFTP_USER = os.getenv("API_FS_SFTP_USER")
 ASP_FS_SFTP_PRIVATE_KEY_PATH = os.getenv("ASP_FS_SFTP_PRIVATE_KEY_PATH")
 ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
 # SFTP path: Where to put new employee records for ASP validation
-ASP_FS_UPLOAD_DIR = "depot"
+ASP_FS_REMOTE_UPLOAD_DIR = "depot"
 # SFTP path: Where to get submitted employee records validation
-ASP_FS_DOWNLOAD_DIR = "retrait"
+ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
