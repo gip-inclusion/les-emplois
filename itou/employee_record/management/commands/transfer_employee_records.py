@@ -236,14 +236,15 @@ class Command(BaseCommand):
                 # There were errors do not delete file
                 if errors > 0:
                     self.logger.warning(
-                        "Will not delete file '%s' because of errors. Leaving it in place for another pass...", result_file
+                        "Will not delete file '%s' because of errors. Leaving it in place for another pass...",
+                        result_file,
                     )
                     continue
 
                 # Everything was fine, will remove file after main loop
                 files_to_delete.append(result_file)
 
-            for file in files_to_delete: 
+            for file in files_to_delete:
                 # All employee records processed, we can delete feedback file from server
                 if dry_run:
                     self.logger.info("DRY-RUN: Removing file '%s'", file)
