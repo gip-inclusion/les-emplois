@@ -65,4 +65,4 @@ PyJWT==2.0.1  # https://github.com/jpadilla/pyjwt
 httpx==0.17.1  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
-pysftp==0.2.9
+pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
