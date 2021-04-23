@@ -1,4 +1,11 @@
+import base64
+import datetime
+import hashlib
+import hmac
+import json
+
 from allauth.account.views import LogoutView, PasswordChangeView
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
@@ -7,6 +14,7 @@ from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 
@@ -121,6 +129,49 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     return render(request, template_name, context)
 
 
+######################################################################
+def sign_raw(key, msg):
+    return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+
+
+######################################################################
+
+
+def policy_to_string(policy):
+    json_dump = json.dumps(policy).encode("utf-8")
+    return base64.b64encode(json_dump).decode("utf-8")
+
+
+def sign_policy(date, string_to_sign):
+    """
+    $dateKey = hash_hmac('sha256', $date->format('Ymd'), 'AWS4'.config('filesystems.disks.s3.secret'), true);
+    $dateRegionKey = hash_hmac('sha256', config('filesystems.disks.s3.region'), $dateKey, true);
+    $dateRegionServiceKey = hash_hmac('sha256', 's3', $dateRegionKey, true);
+    $signingKey = hash_hmac('sha256', 'aws4_request', $dateRegionServiceKey, true);
+    return hash_hmac('sha256', $policy, $signingKey);
+
+    kDate = sign(('AWS4' + key).encode('utf-8'), date_stamp)
+    kRegion = sign(kDate, regionName)
+    kService = sign(kRegion, serviceName)
+    kSigning = sign(kService, 'aws4_request')
+    return kSigning
+    """
+    date_stamp = date.strftime("%Y%m%d")
+
+    date_key = sign_raw(("AWS4" + settings.AWS_SECRET_ACCESS_KEY).encode("utf-8"), date_stamp)
+    # date_key = sign('AWS4' + settings.AWS_SECRET_ACCESS_KEY, date_stamp)
+    date_region_key = sign_raw(date_key, settings.AWS_S3_REGION_NAME)
+    date_region_service_key = sign_raw(date_region_key, "s3")
+    signing_key = sign_raw(date_region_service_key, "aws4_request")
+    return hmac.new(signing_key, string_to_sign.encode("utf-8"), hashlib.sha256).hexdigest()
+    # return hmac.new(key, message.encode("utf-8"), hashlib.sha256).digest()
+    # policy = policy.decode("utf-8")
+    # .digest => bytes // .hexdigest => string
+    # sign = hmac.new(b"{settings.AWS_SECRET_ACCESS_KEY}", policy.encode("utf-8"), hashlib.sha256).hexdigest()
+
+    # return base64.b64encode(sign)
+
+
 @login_required
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
@@ -138,11 +189,57 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
+    now = timezone.now()
+
+    # Creds
+    creds_date = now.strftime("%Y%m%d")
+    credential = f"{settings.AWS_ACCESS_KEY_ID}/{creds_date}/{settings.AWS_S3_REGION_NAME}/s3/aws4_request"
+    # end creds
+
+    # policy
+    """
+    'expiration' => now()->addHour()->format('Y-m-d\TG:i:s\Z'),
+    'conditions' => [
+        ['bucket' => config('filesystems.disks.s3.bucket')],
+        ['acl' => 'private'],
+        ['starts-with', '$key', ''],
+        ['eq', '$success_action_redirect', url('/s3-upload')],
+        ['x-amz-algorithm' => 'AWS4-HMAC-SHA256'],
+        ['x-amz-credential' => $credential],
+        ['x-amz-date' => now()->format('Ymd\THis\Z')],
+    ],
+    """
+    expiration_date = now + relativedelta(hours=1)
+    # expiration.strftime('%Y%m%dT%H%M%SZ')
+    x_amz_date = now.strftime("%Y%m%dT%H%M%SZ")
+    policy = {
+        "expiration": expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),  # format date OK
+        "conditions": [
+            ["starts-with", "$key", ""],
+            {"bucket": settings.AWS_STORAGE_BUCKET_NAME},
+            {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
+            {"x-amz-credential": credential},
+            {"x-amz-date": x_amz_date},
+        ],
+    }
+    policy_as_string = policy_to_string(policy)
+    # end policy
+
+    signature = sign_policy(date=now, string_to_sign=policy_as_string)
+    # t = datetime.datetime.utcnow()
+    # s3date = t.strftime('%Y%m%dT%H%M%SZ')
+    # s3date = t.isoformat()
+
     context = {
         "extra_data": extra_data,
         "form": form,
         "job_seeker_signed_pk": job_seeker_signed_pk,
         "prev_url": prev_url,
+        "policy": policy_as_string,
+        "signature": signature,
+        "s3_date": x_amz_date,
+        "s3_form_action": settings.AWS_S3_ENDPOINT_URL,
+        "credential": credential,
     }
 
     return render(request, template_name, context)

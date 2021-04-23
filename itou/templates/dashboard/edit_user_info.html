@@ -1,7 +1,15 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
+{% load static %}
 
 {% block title %}Modifier votre profil{{ block.super }}{% endblock %}
+
+{% block extra_head %}
+<!-- <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/min/basic.min.css" %}'> -->
+<link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/min/dropzone.min.css" %}'>
+<!-- <script src='{% static "vendor/dropzone/min/dropzone-amd-module.min.js" %}'></script> -->
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+{% endblock extra_head %}
 
 {% block content %}
 <h1>Modifier votre profil</h1>
@@ -23,14 +31,16 @@
 
     {% bootstrap_form form alert_error_type="all" %}
 
-    {% if ITOU_ENVIRONMENT == "PROD" %}
+<!--     <input type="file" name="aaa" id="input_dropzone"> -->
+
+    {# if ITOU_ENVIRONMENT == "PROD" #}
         {% if request.user.is_job_seeker %}
             {% include "utils/resume/typeform_form.html" %}
             <p class="lines-on-sides">ou</p>
             {% bootstrap_label content="Lien vers un CV public" %}
-            {% bootstrap_field form.resume_link show_label=False %}
+            {# bootstrap_field form.resume_link show_label=False #}
         {% endif %}
-    {% endif %}
+    {# endif #}
 
 
     {% buttons %}
@@ -39,6 +49,17 @@
     {% endbuttons %}
 
 </form>
+
+    <form method="post" action="{{ s3_form_action }}" enctype="multipart/form-data" class="dropzone">
+        <input type="hidden" name="policy" value="{{ policy }}">
+        <input type="hidden" name="x-amz-algorithm" value="AWS4-HMAC-SHA256">
+        <input type="hidden" name="x-amz-credential" value="{{ credential }}">
+        <input type="hidden" name="x-amz-date" value="{{ s3_date }}">
+        <input type="hidden" name="x-amz-signature" value="{{ signature }}">
+
+        <input type="hidden" name="key" value="essai2.pdf">
+    </form>
+
 {% endblock %}
 
 {% block script %}
@@ -46,6 +67,49 @@
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
     {% if request.user.is_job_seeker %}
-        {% include "utils/resume/typeform_scripts.html" with author_kind="candidat" %}
+        {# include "utils/resume/typeform_scripts.html" with author_kind="candidat" #}
     {% endif %}
+    <script src='{% static "vendor/dropzone/min/dropzone.min.js" %}'></script>
+
+    <script type="text/javascript">
+        // $(".file-input").trigger("change");
+        // Dropzone.autoDiscover = false;
+        // $("div.s3direct .file-input").addClass("dropzone");
+        // $("div.s3direct .file-input").attr("id", "file_input");
+        // $("#file_input").css("display", "none");
+        // const html = "<label for='file_input' class='dropzone' id='label_file_input'></label>";
+        // $(html).insertBefore("#file_input");
+        // const params = {
+        //     url: "/",
+        //     maxFilesize: 5, // MB
+        //     timeout: 3000, // default 3000
+        //     paramName: "essai",
+        //     maxFiles: 1,
+        //     acceptedFiles: "application/pdf", // string separated by commas
+        //     addRemoveLinks: true,
+        //     dictDefaultMessage: "Cliquez ou autre",
+        //     dictFallbackMessage: "Ce navigateur n'est pas compatible",
+        //     dictFileTooBig: "Fichier trop volumineux",
+        //     dictInvalidFileType: "Type de fichier non pris en charge",
+        //     dictResponseError: "Erreur \{\{ statusCode \}\}",
+        //     dictCancelUpload: "Annuler",
+        //     dictUploadCanceled: "Annulé",
+        //     dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
+        //     dictRemoveFile: "Supprimer",
+        //     dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
+        //     dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
+        //     dictFileSizeUnits: "Mo",
+        //     // autoProcessQueue: false
+        // };
+        // $("#label_file_input").dropzone(params);
+        // var upload_dropzone = new Dropzone("#label_file_input", params)
+        // upload_dropzone.on("complete", function(file){
+        //     var input = $(".file-input")[0];
+        //     input.files.append(file);
+        //     console.log(file);
+        //     console.log(input)
+        //     input.trigger("change");
+        //     console.log((input.files));
+        // });
+    </script>
 {% endblock %}
