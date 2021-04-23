@@ -6,6 +6,34 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [17] - 2021-04-23
+
+### Ajouté
+
+ - Ajout de l’interface "Mes annexes financières"
+ - Ajout d’un formulaire pour connaitre le secteur d’activité des employeurs
+ - Ajout d’une redirection de `inclusion.beta.gouv.fr/dashboard` vers `emplois.inclusion.beta.gouv.fr/dashboard` pour ne pas induire en erreur les usagers suite au changement de nom de domaine.
+ - Ajout de la colonne "date de création" pour permettre au support de voir les structures créés lors des imports.
+
+### Modifié
+    
+ - Nouvelle version majeure de Django v3.2
+ - Changement du code de tracking Hotjar
+ - Amélioration des performances de l'enregistrement de la session utilisateur
+ - Correction du bug qui empeche la prolongation d’une ACI pour "difficultés particulières"
+ - Possibilité de modifier l’email d’un demandeur tant que celui ci n’a pas confirmé son compte
+ - Simplification des invitations:
+   - Les invitations ne partent plus en plusieurs exemplaires quand l'utilisateur clique à répétition sur le bouton d'envoi
+   - Si une invitation est renouvelée pour un utilisateur, il n'y a plus de nouvelle invitation créée en base (moins d'entrées dans le tableau de bord)
+   - Environ 4500 invitations en doublon ont été supprimées de la base de données
+ - Correction de l’affichage des emails où des éléments sur les structures manquaient.
+ - Amélioration de l’affichage des critères d’éligibilité pour les candidatures envoyées par des prescripteurs habilités
+ - Utilisation d’une compte dédié pour les emails de la plateforme, afin de réduire le risque de classification en spam des emails applicatifs.
+
+### Supprimé
+
+ - Suppression du mécanisme de traduction. Ce système était une contrainte pour le développement et les chaines n'ont jamais été traduites dans une autre langue (et quid des annonces, des commentaires utilisateur, etc.)
+
 ## [16] - 2021-04-08
 
 ### Ajouté
