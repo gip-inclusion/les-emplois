@@ -542,3 +542,14 @@ ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
 ASP_FS_REMOTE_UPLOAD_DIR = "depot"
 # SFTP path: Where to get submitted employee records validation feedback
 ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
+
+# S3 uploads
+# ------------------------------------------------------------------------------
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", None)
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", None)
+AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", None)
+AWS_S3_REGION_NAME = os.environ.get("AWS_STORAGE_BUCKET_REGION", None)
+
+# The endpoint of your bucket, more info:
+# http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL", None)

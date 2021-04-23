@@ -69,3 +69,6 @@ httpx==0.17.1  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
+
+# S3 management
+boto3==1.17.53  # https://github.com/boto/boto3
