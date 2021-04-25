@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -57,7 +56,6 @@ class JobSeekerSignupView(SignupView):
     form_class = forms.JobSeekerSignupForm
     template_name = "signup/job_seeker_signup.html"
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
         return super().post(request, *args, **kwargs)
@@ -133,7 +131,6 @@ class SiaeSignupView(SignupView):
             return super().get(request, *args, **kwargs)
         return self.warn_and_redirect(request)
 
-    @transaction.atomic
     def post(self, request, *args, **kwargs):
         """Enforce atomicity."""
         form = forms.SiaeSignupForm(data=request.POST or None)
@@ -404,7 +401,6 @@ class PrescriberPoleEmploiUserSignupView(SignupView):
     form_class = forms.PrescriberPoleEmploiUserSignupForm
     template_name = "signup/prescriber_pole_emploi_user.html"
 
-    @transaction.atomic
     @method_decorator(valid_prescriber_signup_session_required)
     @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
     def dispatch(self, request, *args, **kwargs):
@@ -462,7 +458,6 @@ class PrescriberUserSignupView(SignupView):
     form_class = forms.PrescriberUserSignupForm
     template_name = "signup/prescriber_signup.html"
 
-    @transaction.atomic
     @method_decorator(valid_prescriber_signup_session_required)
     @method_decorator(push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY))
     def dispatch(self, request, *args, **kwargs):
