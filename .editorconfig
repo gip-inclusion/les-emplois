@@ -1,0 +1,28 @@
+# EditorConfig settles the display settings for all the files in the project.
+# Depending on you IDE or text editor, you may need to use a plugin in order to
+# enforce these settings.
+#
+# https://EditorConfig.org
+
+# This is the root .editorconfig file, configuration could be overriden in subdirectories
+# but (for now at least) this is not used.
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{js,py,css,html}]
+charset = utf-8
+
+[*.{py,css,sh,html}]
+indent_style = space
+indent_size = 4
+
+[*.js]
+indent_style = space
+indent_size = 2
+
+[Makefile]
+indent_style = tab
