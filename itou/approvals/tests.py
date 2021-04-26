@@ -252,6 +252,11 @@ class ApprovalModelTest(TestCase):
             self.assertEqual(next_number, expected_number)
             Approval.objects.all().delete()
 
+        ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}9999999")
+        with self.assertRaises(RuntimeError):
+            next_number = Approval.get_next_number()
+        Approval.objects.all().delete()
+
     def test_is_valid(self):
 
         # Start today, end in 2 years.

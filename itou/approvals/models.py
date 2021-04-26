@@ -315,6 +315,8 @@ class Approval(CommonApprovalMixin):
         if last_itou_approval:
             raw_number = last_itou_approval.number.removeprefix(Approval.ASP_ITOU_PREFIX)
             next_number = int(raw_number) + 1
+            if next_number > 9999999:
+                raise RuntimeError("The maximum number of PASS IAE has been reached.")
             return f"{Approval.ASP_ITOU_PREFIX}{next_number:07d}"
         return f"{Approval.ASP_ITOU_PREFIX}0000001"
 
