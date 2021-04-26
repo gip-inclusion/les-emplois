@@ -393,7 +393,7 @@ class Command(BaseCommand):
             table_name = "_".join(filename.split(".")[0].split("_")[1:])
             with open(os.path.join(path, filename), "r") as file:
                 sql_request = file.read()
-        self.build_custom_table(table_name=table_name, sql_request=sql_request)
+            self.build_custom_table(table_name=table_name, sql_request=sql_request)
 
     @timeit
     def populate_metabase_fluxiae(self):
