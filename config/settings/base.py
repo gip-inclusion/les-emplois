@@ -160,7 +160,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 DATABASES = {
     "default": {
-        "ATOMIC_REQUESTS": True,
+        "ATOMIC_REQUESTS": False,  # We handle transactions manually in the code.
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
