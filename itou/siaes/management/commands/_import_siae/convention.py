@@ -45,20 +45,19 @@ def update_existing_conventions(dry_run):
         assert asp_id in ASP_ID_TO_SIRET_SIGNATURE
         assert convention.siren_signature == siae.siren
 
-        # Sometimes the same siret is attached to one asp_id in one export
-        # and is attached to another asp_id in the next export.
-        # In other words, the siae has to be detached from its current
-        # convention and be attached to a new convention.
+        # Sometimes the same siret is attached to one asp_id in one export and to another asp_id in the next export.
+        # In other words, the siae convention asp_id has changed and should be updated.
+        # Ideally this should never happen because the asp_id is supposed to be an immutable id of the structure
+        # in ASP data, but one can only hope.
         if convention.asp_id != asp_id:
             print(
-                f"siae.id={siae.id} has changed convention from "
-                f"asp_id={convention.asp_id} to asp_id={asp_id} (will be fixed)"
+                f"convention.id={convention.id} has changed asp_id from "
+                f"{convention.asp_id} to {asp_id} (will be updated)"
             )
+            assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
             if not dry_run:
-                # New convention will be created later by get_creatable_conventions()
-                # and then attached to siae.
-                siae.convention = None
-                siae.save()
+                convention.asp_id = asp_id
+                convention.save()
             continue
 
         # Siret_signature can change from one export to the next!
@@ -66,7 +65,7 @@ def update_existing_conventions(dry_run):
         if convention.siret_signature != siret_signature:
             print(
                 f"convention.id={convention.id} has changed siret_signature from "
-                f"{convention.siret_signature} to {siret_signature} (will be fixed)"
+                f"{convention.siret_signature} to {siret_signature} (will be updated)"
             )
             if not dry_run:
                 convention.siret_signature = siret_signature
@@ -117,7 +116,7 @@ def get_creatable_conventions():
     """
     creatable_conventions = []
 
-    for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=True).select_related("convention"):
+    for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=True):
 
         asp_id = SIRET_TO_ASP_ID.get(siae.siret)
         if asp_id not in ASP_ID_TO_SIRET_SIGNATURE:
@@ -135,6 +134,8 @@ def get_creatable_conventions():
             # At the beginning of each year, when AFs of the new year are not there yet, we temporarily
             # consider all new conventions as active by default even though they do not have a valid AF yet.
             is_active = True
+
+        assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
 
         convention = SiaeConvention(
             siret_signature=siret_signature,

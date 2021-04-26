@@ -135,6 +135,8 @@ class Command(BaseCommand):
                 continue
 
             def fmt(siae):
+                if siae.convention is None:
+                    return f"{siae.source} {siae.siret} convention=None"
                 return f"{siae.source} {siae.siret} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
 
             self.log(
@@ -219,6 +221,8 @@ class Command(BaseCommand):
                     existing_siae.save()
                 continue
 
+            assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
+
             siae = build_siae(row=row, kind=kind)
 
             if should_siae_be_created(siae):
@@ -240,31 +244,28 @@ class Command(BaseCommand):
     def check_whether_signup_is_possible_for_all_siaes(self):
         for siae in Siae.objects.all():
             if not siae.has_members and not siae.auth_email:
-                msg = (
-                    f"Signup is impossible for siae id={siae.id} siret={siae.siret} "
+                self.log(
+                    f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
                     f"kind={siae.kind} dpt={siae.department} source={siae.source} "
-                    f"created_by={siae.created_by} siae_email={siae.email}"
+                    f"created_by={siae.created_by} siae.email={siae.email}"
                 )
-                self.log(msg)
+                self.fatal_errors += 1
 
     @timeit
-    def manage_conventions(self):
-        update_existing_conventions(dry_run=self.dry_run)
-
+    def create_conventions(self):
         creatable_conventions = get_creatable_conventions()
         self.log(f"will create {len(creatable_conventions)} conventions")
         for (convention, siae) in creatable_conventions:
             if not self.dry_run:
-                convention_query = SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind)
-                if convention_query.exists():
-                    convention = convention_query.get()
-                else:
-                    convention.save()
-                assert convention.siaes.filter(source=Siae.SOURCE_ASP).count() == 0
+                assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
+                convention.save()
+                assert convention.siaes.count() == 0
                 siae.convention = convention
                 siae.save()
                 assert convention.siaes.filter(source=Siae.SOURCE_ASP).count() == 1
 
+    @timeit
+    def delete_conventions(self):
         deletable_conventions = get_deletable_conventions()
         self.log(f"will delete {len(deletable_conventions)} conventions")
         for convention in deletable_conventions:
@@ -272,15 +273,6 @@ class Command(BaseCommand):
                 assert convention.siaes.count() == 0
                 # This will delete the related financial annexes as well.
                 convention.delete()
-
-        if not self.dry_run:
-            # Cleanup ghost siaes one more time before checking that
-            # only one asp siae is attached to each convention.
-            # Otherwise some convention might have 2 asp siaes,
-            # but one of them would be deleted by the next script run.
-            self.update_siret_and_auth_email_of_existing_siaes()
-
-        check_convention_data_consistency(dry_run=self.dry_run)
 
     @timeit
     def manage_financial_annexes(self):
@@ -304,11 +296,20 @@ class Command(BaseCommand):
         self.fatal_errors = 0
 
         self.delete_user_created_siaes_without_members()
+        update_existing_conventions(dry_run=self.dry_run)
         self.update_siret_and_auth_email_of_existing_siaes()
         self.create_new_siaes()
-        self.manage_conventions()
+        self.create_conventions()
+        self.delete_conventions()
         self.manage_financial_annexes()
         self.cleanup_siaes_after_grace_period()
+
+        # Run some updates a second time.
+        update_existing_conventions(dry_run=self.dry_run)
+        self.update_siret_and_auth_email_of_existing_siaes()
+
+        # Final checks.
+        check_convention_data_consistency(dry_run=self.dry_run)
         self.check_whether_signup_is_possible_for_all_siaes()
 
         if self.fatal_errors >= 1:
