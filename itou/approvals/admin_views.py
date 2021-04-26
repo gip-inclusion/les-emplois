@@ -10,6 +10,7 @@ https://github.com/django/django/blob/master/django/contrib/admin/templates/admi
 from django.contrib import admin, messages
 from django.contrib.auth import get_permission_codename
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -20,6 +21,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
 
 
+@transaction.atomic
 def manually_add_approval(
     request, model_admin, job_application_id, template_name="admin/approvals/manually_add_approval.html"
 ):
@@ -82,6 +84,7 @@ def manually_add_approval(
     return render(request, template_name, context)
 
 
+@transaction.atomic
 def manually_refuse_approval(
     request, model_admin, job_application_id, template_name="admin/approvals/manually_refuse_approval.html"
 ):

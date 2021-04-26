@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -327,6 +327,7 @@ class User(AbstractUser, AddressMixin):
         ):
             raise ValidationError("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence.")
 
+    @transaction.atomic
     def get_or_create_job_seeker_profile(self):
         if hasattr(self, "jobseeker_profile"):
             return self.jobseeker_profile
