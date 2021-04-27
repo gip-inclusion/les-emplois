@@ -95,7 +95,7 @@ class EmployeeRecordModelTest(TestCase):
         """
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.prepare()
+        employee_record.update_as_ready()
 
         job_seeker = job_application.job_seeker
         self.assertIsNotNone(job_seeker.jobseeker_profile)
@@ -116,7 +116,7 @@ class EmployeeRecordModelTest(TestCase):
 
         with self.assertRaises(ValidationError):
             employee_record = EmployeeRecord.from_job_application(job_application)
-            employee_record.prepare()
+            employee_record.update_as_ready()
 
     def test_batch_filename_validator(self):
         """
@@ -188,14 +188,13 @@ class EmployeeRecordLifeCycleTest(TestCase):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record = employee_record
-        self.employee_record.prepare()
+        self.employee_record.update_as_ready()
 
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
     )
     def test_state_ready(self, _mock):
-        # self.employee_record.prepare()
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
 
     @mock.patch(
@@ -203,9 +202,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_sent(self, _mock):
-        # self.employee_record.prepare()
         filename = "RIAE_FS_20210410130000.json"
-        self.employee_record.sent_in_asp_batch_file(filename, 1)
+        self.employee_record.update_as_sent(filename, 1)
 
         self.assertEqual(filename, self.employee_record.asp_batch_file)
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.SENT)
@@ -215,13 +213,12 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_rejected(self, _mock):
-        # self.employee_record.prepare()
         filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.sent_in_asp_batch_file(filename, 1)
+        self.employee_record.update_as_sent(filename, 1)
 
         err_code, err_message = "12", "JSON Invalide"
 
-        self.employee_record.rejected_by_asp(err_code, err_message)
+        self.employee_record.update_as_rejected(err_code, err_message)
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.REJECTED)
         self.assertEqual(self.employee_record.asp_processing_code, err_code)
         self.assertEqual(self.employee_record.asp_processing_label, err_message)
@@ -231,12 +228,11 @@ class EmployeeRecordLifeCycleTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_state_accepted(self, _mock):
-        # self.employee_record.prepare()
         filename = "RIAE_FS_20210410130001.json"
-        self.employee_record.sent_in_asp_batch_file(filename, 1)
+        self.employee_record.update_as_sent(filename, 1)
 
         process_code, process_message = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-        self.employee_record.accepted_by_asp(process_code, process_message, "{}")
+        self.employee_record.update_as_accepted(process_code, process_message, "{}")
 
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.PROCESSED)
         self.assertEqual(self.employee_record.asp_processing_code, process_code)
@@ -260,7 +256,7 @@ class EmployeeRecordManagementCommandTest(TestCase):
     def setUp(self, _mock):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.prepare()
+        employee_record.update_as_ready()
 
         self.employee_record = employee_record
         self.job_application = job_application
