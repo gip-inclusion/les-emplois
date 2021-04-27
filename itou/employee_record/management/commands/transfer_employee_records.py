@@ -270,19 +270,17 @@ class Command(BaseCommand):
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
 
-        both = not (download or upload)
-
         with self._get_sftp_connection() as sftp:
             user = settings.ASP_FS_SFTP_USER or "django_tests"
             self.logger.info(f"Connected to {user}@{settings.ASP_FS_SFTP_HOST}:{settings.ASP_FS_SFTP_PORT}")
             self.logger.info(f"Current dir: {sftp.pwd}")
 
             # Send files
-            if both or upload:
+            if upload:
                 self.upload(sftp, dry_run)
 
             # Fetch results from ASP
-            if both or download:
+            if download:
                 self.download(sftp, dry_run)
 
         self.logger.info("Employee records processing done!")
