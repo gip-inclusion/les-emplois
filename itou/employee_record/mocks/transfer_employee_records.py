@@ -6,9 +6,8 @@ from itou.employee_record.models import EmployeeRecordBatch
 
 
 # _SAMPLE_FILE = "itou/employee_record/mocks/sample_asp_feedback_file.json"
-_GOOD_CODE, _GOOD_MSG = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
-_EVIL_CODE, _EVIL_MSG = "6667", "Fiche salarié en erreur"
-
+SUCCESS_CODE, SUCCESS_MSG = "0000", "La ligne de la fiche salarié a été enregistrée avec succès."
+ERROR_CODE, ERROR_MSG = "6667", "Fiche salarié en erreur"
 FILES = {}
 
 
@@ -20,7 +19,7 @@ class SFTPConnectionMock:
     # Contains pairs filename->str: content->BytesIO
 
     def __init__(self, *args, **kwargs):
-        self.FILES = {}
+        self.feedback_file_stream = None
 
     def __enter__(self):
         return self
@@ -41,7 +40,7 @@ class SFTPConnectionMock:
         FILES[filename] = self.process_incoming_file(filename, content)
 
     def getfo(self, remote_path, stream, **kwargs):
-        if content := self.FILES.get(remote_path):
+        if content := FILES.get(remote_path):
             content.seek(0)
             return stream.write(content.read())
 
@@ -77,8 +76,8 @@ class SFTPGoodConnectionMock(SFTPConnectionMock):
             batch = json.load(content)
 
             for employee_record in batch.get("lignesTelechargement", []):
-                employee_record["codeTraitement"] = _GOOD_CODE
-                employee_record["libelleTraitement"] = _GOOD_MSG
+                employee_record["codeTraitement"] = SUCCESS_CODE
+                employee_record["libelleTraitement"] = SUCCESS_MSG
 
             return stream.write(json.dumps(batch).encode())
 

@@ -40,7 +40,7 @@ class EmployeeRecordModelTest(TestCase):
 
         Creation is defensive, expect ValidationError if out of the lane
         """
-        # Creation with invalid job application sate
+        # Creation with invalid job application state
         with self.assertRaises(AssertionError):
             employee_record = EmployeeRecord.from_job_application(None)
 
@@ -60,10 +60,12 @@ class EmployeeRecordModelTest(TestCase):
             employee_record = EmployeeRecord.from_job_application(job_application)
 
         # Job application is duplicated (already existing with same approval and SIAE)
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
+
+        # Must be ok
+        EmployeeRecord.from_job_application(job_application).save()
+
         with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE):
-            job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
-            # Must be ok
-            EmployeeRecord.from_job_application(job_application).save()
             # Must not
             employee_record = EmployeeRecord.from_job_application(job_application)
 

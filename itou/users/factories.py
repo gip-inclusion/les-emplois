@@ -47,7 +47,6 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
 
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
-    # birth_place = factory.Faker("asp_insee_commune")
     birth_country = factory.Faker("asp_country")
     title = random.choice(models.User.Title.values)
 
