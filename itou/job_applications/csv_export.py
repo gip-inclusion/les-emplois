@@ -68,10 +68,11 @@ def _job_application_as_dict(job_application):
     numero_pass_iae = ""
     approval_start_date = None
     approval_end_date = None
-    if job_application.approval is not None:
-        numero_pass_iae = job_application.approval.number
-        approval_start_date = job_application.approval.start_at
-        approval_end_date = job_application.approval.end_at
+    if seeker.approvals_wrapper.has_valid and seeker.approvals_wrapper.latest_approval is not None:
+        approval = seeker.approvals_wrapper.latest_approval
+        numero_pass_iae = approval.number
+        approval_start_date = approval.start_at
+        approval_end_date = approval.end_at
 
     return {
         "Nom candidat": seeker.last_name,
