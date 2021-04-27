@@ -121,7 +121,7 @@ class Command(BaseCommand):
             # Now that file is transfered, update employee records status (SENT)
             # and store in which file they have been sent
             for idx, employee_record in enumerate(employee_records, 1):
-                employee_record.sent_in_asp_batch_file(remote_path, idx)
+                employee_record.update_as_sent(remote_path, idx)
 
     def _parse_feedback_file(self, feedback_file, batch, dry_run):
         """
@@ -176,7 +176,7 @@ class Command(BaseCommand):
                 serializer = EmployeeRecordSerializer(employee_record)
 
                 if not dry_run:
-                    employee_record.accepted_by_asp(
+                    employee_record.update_as_accepted(
                         processing_code, processing_label, renderer.render(serializer.data).decode()
                     )
                 else:
@@ -186,7 +186,7 @@ class Command(BaseCommand):
                 continue
 
             if not dry_run:
-                employee_record.rejected_by_asp(processing_code, processing_label)
+                employee_record.updated_as_rejected(processing_code, processing_label)
             else:
                 self.logger.info(
                     "DRY-RUN: Rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label

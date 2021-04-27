@@ -198,7 +198,7 @@ class EmployeeRecord(models.Model):
 
     # Business methods
 
-    def prepare(self):
+    def update_as_ready(self):
         """
         Prepare the employee record for transmission
 
@@ -220,7 +220,7 @@ class EmployeeRecord(models.Model):
         self.status = self.Status.READY
         self.save()
 
-    def sent_in_asp_batch_file(self, asp_filename, line_number):
+    def update_as_sent(self, asp_filename, line_number):
         """
         An employee record is sent to ASP via a JSON file,
         The file name is stored for further feedback processing (also done via a file)
@@ -237,7 +237,7 @@ class EmployeeRecord(models.Model):
         self.status = EmployeeRecord.Status.SENT
         self.save()
 
-    def rejected_by_asp(self, code, label):
+    def update_as_rejected(self, code, label):
         """
         Update status after an ASP rejection of the employee record
 
@@ -252,7 +252,7 @@ class EmployeeRecord(models.Model):
         self.asp_processing_label = label
         self.save()
 
-    def accepted_by_asp(self, code, label, archive):
+    def update_as_accepted(self, code, label, archive):
         if not self.status == EmployeeRecord.Status.SENT:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
