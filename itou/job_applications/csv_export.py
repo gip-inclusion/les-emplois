@@ -62,26 +62,26 @@ def _job_application_as_dict(job_application):
     """
     The main CSV export mthod: it converts a JobApplication into a CSV array data
     """
-    seeker = job_application.job_seeker
+    job_seeker = job_application.job_seeker
     siae = job_application.to_siae
 
     numero_pass_iae = ""
     approval_start_date = None
     approval_end_date = None
-    if seeker.approvals_wrapper.has_valid and seeker.approvals_wrapper.latest_approval is not None:
-        approval = seeker.approvals_wrapper.latest_approval
+    if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval is not None:
+        approval = job_seeker.approvals_wrapper.latest_approval
         numero_pass_iae = approval.number
         approval_start_date = approval.start_at
         approval_end_date = approval.end_at
 
     return {
-        "Nom candidat": seeker.last_name,
-        "Prénom candidat": seeker.first_name,
-        "Email candidat": seeker.email,
-        "Téléphone candidat": seeker.phone,
-        "Date de naissance candidat": _format_date(seeker.birthdate),
-        "Ville candidat": seeker.city,
-        "Département candidat": seeker.post_code,
+        "Nom candidat": job_seeker.last_name,
+        "Prénom candidat": job_seeker.first_name,
+        "Email candidat": job_seeker.email,
+        "Téléphone candidat": job_seeker.phone,
+        "Date de naissance candidat": _format_date(job_seeker.birthdate),
+        "Ville candidat": job_seeker.city,
+        "Département candidat": job_seeker.post_code,
         "Nom structure employeur": siae.display_name,
         "Type employeur": siae.kind,
         "Métiers": _get_selected_jobs(job_application),
