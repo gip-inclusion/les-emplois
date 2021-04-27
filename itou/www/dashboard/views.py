@@ -22,7 +22,6 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.utils.tokens import resume_signer
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditNewJobAppEmployersNotificationForm, EditUserEmailForm, EditUserInfoForm
 
@@ -181,7 +180,6 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
     form = EditUserInfoForm(instance=request.user, data=request.POST or None)
     extra_data = request.user.externaldataimport_set.pe_sources().first()
-    job_seeker_signed_pk = resume_signer.sign(request.user.pk)
 
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -233,7 +231,6 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     context = {
         "extra_data": extra_data,
         "form": form,
-        "job_seeker_signed_pk": job_seeker_signed_pk,
         "prev_url": prev_url,
         "policy": policy_as_string,
         "signature": signature,

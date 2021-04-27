@@ -84,5 +84,3 @@ class SiaeSignupTokenGenerator:
 
 
 siae_signup_token_generator = SiaeSignupTokenGenerator()
-
-resume_signer = Signer(salt="resume")

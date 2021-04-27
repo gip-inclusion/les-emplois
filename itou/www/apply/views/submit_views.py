@@ -18,7 +18,6 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.resume.forms import ResumeFormMixin
-from itou.utils.tokens import resume_signer
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -220,7 +219,6 @@ def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_res
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    job_seeker_signed_pk = resume_signer.sign(job_seeker.pk)
 
     form = ResumeFormMixin(data=request.POST or None)
 
@@ -231,7 +229,7 @@ def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_res
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "job_seeker_signed_pk": job_seeker_signed_pk, "form": form}
+    context = {"siae": siae, "form": form}
     return render(request, template_name, context)
 
 
