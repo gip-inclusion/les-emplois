@@ -63,6 +63,20 @@ ITOU_FQDN = "localhost:8080"
 
 ALLOW_POPULATING_METABASE = True
 
+# LOGGING.
+# ------------------------------------------------------------------------------
+
+# Log raw SQL to the console in Django.
+# https://www.neilwithdata.com/django-sql-logging
+LOGGING.setdefault("filters", {}).setdefault("require_debug_true", {})["()"] = "django.utils.log.RequireDebugTrue"
+LOGGING.setdefault("loggers", {})["django.db.backends"] = {
+    "level": "DEBUG",
+    "handlers": ["console"],
+}
+
+# ITOU.
+# ------------------------------------------------------------------------------
+
 # Le marché de l'inclusion
 # Match open regions with SIAE created by our fixtures.
 LEMARCHE_OPEN_REGIONS = ["Occitanie"]
