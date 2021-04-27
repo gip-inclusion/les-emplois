@@ -7,20 +7,23 @@ from itou.users.models import User
 class _EmployeeSerializer(serializers.ModelSerializer):
 
     idItou = serializers.CharField(source="jobseeker_hash_id")
+    sufPassIae = serializers.CharField(required=False)
 
     civilite = serializers.ChoiceField(choices=User.Title.choices, source="title")
     nomUsage = serializers.CharField(source="last_name")
     prenom = serializers.CharField(source="first_name")
 
     dateNaissance = serializers.DateField(format="%d/%m/%Y", source="birthdate")
-    codeComInsee = serializers.IntegerField(source="birth_place.code")
-    codeDpt = serializers.CharField(source="birth_place.department_code")
-    codeInseePays = serializers.IntegerField(source="birth_country.code")
-    codeGroupePays = serializers.IntegerField(source="birth_country.group")
+    # codeComInsee is only mandatory if birth country is France
+    codeComInsee = serializers.CharField(source="birth_place.code", required=False)
+    codeDpt = serializers.CharField(source="birth_place.department_code", required=False)
+    codeInseePays = serializers.CharField(source="birth_country.code")
+    codeGroupePays = serializers.CharField(source="birth_country.group")
 
     class Meta:
         model = User
         fields = [
+            "sufPassIae",
             "idItou",
             "civilite",
             "nomUsage",
@@ -36,41 +39,62 @@ class _EmployeeSerializer(serializers.ModelSerializer):
         result = super().to_representation(instance)
 
         # Another ASP subtlety, making top-level and children with the same name
-        result["codeComInsee"] = {
-            "codeComInsee": result.pop("codeComInsee"),
-            "codeDpt": result.pop("codeDpt"),
-        }
+        # The commune can be empty if the job seeker is not born in France
+        if result.get("codeComInsee"):
+            result["codeComInsee"] = {
+                "codeComInsee": result.pop("codeComInsee"),
+                "codeDpt": result.pop("codeDpt"),
+            }
+
+        # Fields not mapped / ignored
+        result["sufPassIae"] = None
+        result["nomNaissance"] = None
 
         return result
 
 
 class _EmployeeAddress(serializers.ModelSerializer):
 
-    adrTelephone = serializers.CharField(source="phone")
-    adrEmail = serializers.CharField(source="email")
+    adrTelephone = serializers.CharField(source="phone", allow_blank=True)
+    adrMail = serializers.CharField(source="email", allow_blank=True)
 
-    adrNumeroVoie = serializers.IntegerField(source="jobseeker_profile.hexa_lane_number")
-    codeextensionVoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension")
-    codetypeVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
+    adrNumeroVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_number")
+    codeextensionvoie = serializers.CharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
+    codetypevoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
     adrLibelleVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_name")
-    adrCpltDistribution = serializers.CharField(source="address_line_2")
+    adrCpltDistribution = serializers.CharField(source="address_line_2", allow_blank=True)
 
-    codeinseecom = serializers.IntegerField(source="jobseeker_profile.hexa_commune.code")
+    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")
     codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
 
     class Meta:
         model = User
         fields = [
             "adrTelephone",
-            "adrEmail",
+            "adrMail",
             "adrNumeroVoie",
-            "codeextensionVoie",
-            "codetypeVoie",
+            "codeextensionvoie",
+            "codetypevoie",
             "adrLibelleVoie",
             "adrCpltDistribution",
             "codeinseecom",
             "codepostalcedex",
         ]
+
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+
+        # Replace these empty strings by JSON null values
+        empty_as_null_fields = [
+            "codeextensionVoie",
+            "adrCpltDistribution",
+        ]
+
+        for field in empty_as_null_fields:
+            if result.get(field) == "":
+                result[field] = None
+
+        return result
 
 
 class _EmployeeSituation(serializers.ModelSerializer):
@@ -78,14 +102,14 @@ class _EmployeeSituation(serializers.ModelSerializer):
     # Placeholder: updated at top-level serialization
     orienteur = serializers.CharField(required=False)
 
-    niveauFormation = serializers.IntegerField(source="jobseeker_profile.education_level")
+    niveauFormation = serializers.CharField(source="jobseeker_profile.education_level")
     salarieEnEmploi = serializers.BooleanField(source="jobseeker_profile.is_employed")
 
     # Placeholder: updated at top-level serialization
     salarieTypeEmployeur = serializers.CharField(required=False)
 
     salarieSansEmploiDepuis = serializers.CharField(source="jobseeker_profile.unemployed_since")
-    salarieSansRessource = serializers.CharField(source="jobseeker_profile.resourceless")
+    salarieSansRessource = serializers.BooleanField(source="jobseeker_profile.resourceless")
 
     inscritPoleEmploi = serializers.BooleanField(source="pole_emploi_id")
     inscritPoleEmploiDepuis = serializers.CharField(source="jobseeker_profile.pole_emploi_since")
@@ -95,17 +119,17 @@ class _EmployeeSituation(serializers.ModelSerializer):
     salarieOETH = serializers.BooleanField(source="jobseeker_profile.oeth_employee")
     salarieAideSociale = serializers.BooleanField(source="jobseeker_profile.has_social_allowance")
 
-    salarieBenefRSA = serializers.BooleanField(source="jobseeker_profile.has_rsa_allocation")
-    salarieBenefRSADepuis = serializers.CharField(source="jobseeker_profile.rsa_allocation_since")
+    salarieBenefRSA = serializers.CharField(source="jobseeker_profile.has_rsa_allocation")
+    salarieBenefRSADepuis = serializers.CharField(source="jobseeker_profile.rsa_allocation_since", allow_blank=True)
 
     salarieBenefASS = serializers.BooleanField(source="jobseeker_profile.has_ass_allocation")
-    salarieBenefASSDepuis = serializers.CharField(source="jobseeker_profile.ass_allocation_since")
+    salarieBenefASSDepuis = serializers.CharField(source="jobseeker_profile.ass_allocation_since", allow_blank=True)
 
     salarieBenefAAH = serializers.BooleanField(source="jobseeker_profile.has_aah_allocation")
-    salarieBenefAAHDepuis = serializers.CharField(source="jobseeker_profile.aah_allocation_since")
+    salarieBenefAAHDepuis = serializers.CharField(source="jobseeker_profile.aah_allocation_since", allow_blank=True)
 
     salarieBenefATA = serializers.BooleanField(source="jobseeker_profile.has_ata_allocation")
-    salarieBenefATADepuis = serializers.CharField(source="jobseeker_profile.ata_allocation_since")
+    salarieBenefATADepuis = serializers.CharField(source="jobseeker_profile.ata_allocation_since", allow_blank=True)
 
     class Meta:
         model = User
@@ -132,6 +156,24 @@ class _EmployeeSituation(serializers.ModelSerializer):
             "salarieBenefATADepuis",
         ]
 
+    def to_representation(self, instance):
+        result = super().to_representation(instance)
+
+        # Replace these empty strings by JSON null values
+        empty_as_null_fields = [
+            "salarieSansEmploiDepuis",
+            "salarieBenefRSADepuis",
+            "salarieBenefASSDepuis",
+            "salarieBenefAAHDepuis",
+            "salarieBenefATADepuis",
+        ]
+
+        for field in empty_as_null_fields:
+            if result.get(field) == "":
+                result[field] = None
+
+        return result
+
 
 class EmployeeRecordSerializer(serializers.ModelSerializer):
 
@@ -140,6 +182,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
 
     numLigne = serializers.IntegerField(source="batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
+
+    numeroAnnexe = serializers.CharField(source="financial_annex_number")
     mesure = serializers.CharField(source="asp_siae_type")
     siret = serializers.CharField(source="job_application.to_siae.siret")
 
@@ -148,8 +192,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     situationSalarie = _EmployeeSituation(source="job_application.job_seeker")
 
     # These fields are null at the beginning of the ASP processing
-    codeTraitement = serializers.CharField(source="asp_processing_code")
-    libelleTraitement = serializers.CharField(source="asp_processing_label")
+    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
+    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
 
     class Meta:
         model = EmployeeRecord
@@ -157,6 +201,7 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
             "passIae",
             "numLigne",
             "typeMouvement",
+            "numeroAnnexe",
             "mesure",
             "siret",
             "personnePhysique",
@@ -192,4 +237,20 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         # same workaroud for prescriber type (orienteur)
         employee_situation["orienteur"] = instance.asp_prescriber_type
 
+        # FIXME test override
+        # Remove 3 lines below after manual testing
+        result["mesure"] = "EI_DC"
+        result["siret"] = "33055039301440"
+        result["numeroAnnexe"] = "ACI023201111A0M0"
+
         return result
+
+
+class EmployeeRecordBatchSerializer(serializers.Serializer):
+    """
+    This serializer is a wrapper for a list of employee records
+    """
+
+    msgInformatif = serializers.CharField(source="message")
+    telId = serializers.CharField(source="id", allow_blank=True)
+    lignesTelechargement = EmployeeRecordSerializer(many=True, source="employee_records")

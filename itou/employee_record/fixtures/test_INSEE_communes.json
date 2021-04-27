@@ -1,0 +1,512 @@
+[
+  {
+    "model": "asp.Commune",
+    "pk": 69716,
+    "fields": {
+      "code": "81093",
+      "name": "FLORENTIN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 58339,
+    "fields": {
+      "code": "68238",
+      "name": "NIFFER",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 67152,
+    "fields": {
+      "code": "67152",
+      "name": "GEISPOLSHEIM",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 34862,
+    "fields": {
+      "code": "43142",
+      "name": "MONTREGARD",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 45301,
+    "fields": {
+      "code": "56136",
+      "name": "MONTENEUF",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 202,
+    "fields": {
+      "code": "01107",
+      "name": "CLEYZIEU",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 22868,
+    "fields": {
+      "code": "28138",
+      "name": "ECUBLE/TREMBLAY-LES-VILLAG",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 50898,
+    "fields": {
+      "code": "61238",
+      "name": "LOUVIERES-EN-AUGE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 3478,
+    "fields": {
+      "code": "04194",
+      "name": "SAINT-PIERRE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 53709,
+    "fields": {
+      "code": "63219",
+      "name": "MAZAYE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 8971,
+    "fields": {
+      "code": "12306",
+      "name": "VORS/BARAQUEVILLE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 4682,
+    "fields": {
+      "code": "07221",
+      "name": "SAINT-CIERGE-LA-SERRE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 57230,
+    "fields": {
+      "code": "67229",
+      "name": "JETTERSWILLER",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 46324,
+    "fields": {
+      "code": "57393",
+      "name": "LENGELSHEIM",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 56607,
+    "fields": {
+      "code": "66141",
+      "name": "PIA",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 26011,
+    "fields": {
+      "code": "32049",
+      "name": "BETOUS",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 51761,
+    "fields": {
+      "code": "62152",
+      "name": "BOISLEUX-SAINT-MARC",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 51066,
+    "fields": {
+      "code": "61322",
+      "name": "PARFONDEVAL",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 2062,
+    "fields": {
+      "code": "02607",
+      "name": "PLOISY",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 73988,
+    "fields": {
+      "code": "89071",
+      "name": "CHAMOUX",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 34495,
+    "fields": {
+      "code": "42298",
+      "name": "SAUVAIN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 33612,
+    "fields": {
+      "code": "41153",
+      "name": "MONTROUVEAU",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 23585,
+    "fields": {
+      "code": "29081",
+      "name": "HUELGOAT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 72550,
+    "fields": {
+      "code": "87080",
+      "name": "JOUAC",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 31347,
+    "fields": {
+      "code": "38467",
+      "name": "SALAGNON",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 29607,
+    "fields": {
+      "code": "36126",
+      "name": "MONTCHEVRIER",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 64388,
+    "fields": {
+      "code": "76363",
+      "name": "HODENG-AU-BOSC",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 28069,
+    "fields": {
+      "code": "34061",
+      "name": "CAUSSES-ET-VEYRAN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 34019,
+    "fields": {
+      "code": "42059",
+      "name": "CHAZELLES-SUR-LYON",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 5929,
+    "fields": {
+      "code": "09009",
+      "name": "ALZEN",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 31129,
+    "fields": {
+      "code": "38360",
+      "name": "SAINT-APPOLINARD",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 26538,
+    "fields": {
+      "code": "32314",
+      "name": "PEYRECAVE",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 68121,
+    "fields": {
+      "code": "80105",
+      "name": "BILLANCOURT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 73099,
+    "fields": {
+      "code": "88148",
+      "name": "DOMMARTIN-LES-REMIREMONT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 73466,
+    "fields": {
+      "code": "88334",
+      "name": "OELLEVILLE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 24905,
+    "fields": {
+      "code": "31090",
+      "name": "BRIGNEMONT",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 51877,
+    "fields": {
+      "code": "62210",
+      "name": "CANTELEUX",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 61108,
+    "fields": {
+      "code": "71364",
+      "name": "RACINEUSE",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 3798,
+    "fields": {
+      "code": "05123",
+      "name": "ROCHE-DES-ARNAUDS",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 1825,
+    "fields": {
+      "code": "02488",
+      "name": "MOLAIN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 4762,
+    "fields": {
+      "code": "07260",
+      "name": "SAINT-LAGER-BRESSAC",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 17871,
+    "fields": {
+      "code": "23147",
+      "name": "NOUZEROLLES",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 73099,
+    "fields": {
+      "code": "88148",
+      "name": "DOMMARTIN-LES-REMIREMONT",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 13967,
+    "fields": {
+      "code": "19148",
+      "name": "NEUVIC",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 61110,
+    "fields": {
+      "code": "71365",
+      "name": "RANCY",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 1727,
+    "fields": {
+      "code": "02440",
+      "name": "LOR",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 17153,
+    "fields": {
+      "code": "22178",
+      "name": "PLEHEDEL",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 62086,
+    "fields": {
+      "code": "72270",
+      "name": "SAINT-CALEZ-EN-SAOSNOIS",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 24010,
+    "fields": {
+      "code": "29297",
+      "name": "TREMEVEN",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 15669,
+    "fields": {
+      "code": "21154",
+      "name": "CHATILLON-SUR-SEINE",
+      "start_date": "2000-01-01",
+      "end_date": "2000-01-01"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 67473,
+    "fields": {
+      "code": "79129",
+      "name": "FRESSINES",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  }
+]

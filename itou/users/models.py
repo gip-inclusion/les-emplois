@@ -12,7 +12,7 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import ApprovalsWrapper
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType
+from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType, RSAAllocation
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.format import format_address
 from itou.utils.address.models import AddressMixin
@@ -432,6 +432,16 @@ class JobSeekerProfile(models.Model):
         choices=AllocationDuration.choices,
     )
 
+    # Despite the name of this field in the ASP model (salarieBenefRSA),
+    # this field is not a boolean, but has 3 different options
+    # See asp.models.RSAAllocation for details
+    has_rsa_allocation = models.CharField(
+        max_length=6,
+        verbose_name="Salarié bénéficiaire du RSA",
+        choices=RSAAllocation.choices,
+        default=RSAAllocation.NO,
+    )
+
     rsa_allocation_since = models.CharField(
         max_length=20,
         verbose_name="Allocataire du RSA depuis",
@@ -470,11 +480,11 @@ class JobSeekerProfile(models.Model):
         default="",
         choices=LaneExtension.choices,
     )
+    # No need to set blank=True, this field is never used with a text choice
     hexa_non_std_extension = models.CharField(
         max_length=10,
         verbose_name="Extension de voie (non-repertoriée)",
-        blank=True,
-        default="",
+        null=True,
     )
     hexa_lane_type = models.CharField(
         max_length=4,
@@ -579,12 +589,10 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(error)
 
         # Fill matching fields
-        # Must override None value with empty string# (field not null)
-        _empty = ""
         self.hexa_lane_type = result.get("lane_type")
-        self.hexa_lane_number = result.get("number", _empty)
-        self.hexa_std_extension = result.get("std_extension", _empty)
-        self.hexa_non_std_extension = result.get("non_std_extension", _empty)
+        self.hexa_lane_number = result.get("number")
+        self.hexa_std_extension = result.get("std_extension", "")
+        self.hexa_non_std_extension = result.get("non_std_extension")
         self.hexa_lane_name = result.get("lane")
         self.hexa_post_code = result.get("post_code")
 
@@ -595,15 +603,13 @@ class JobSeekerProfile(models.Model):
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
 
+        self.save()
+
         return self
 
     @property
     def is_employed(self):
         return bool(self.rqth_employee or self.oeth_employee or not self.unemployed_since)
-
-    @property
-    def has_rsa_allocation(self):
-        return bool(self.rsa_allocation_since)
 
     @property
     def has_ass_allocation(self):
@@ -620,7 +626,10 @@ class JobSeekerProfile(models.Model):
     @property
     def has_social_allowance(self):
         return bool(
-            self.has_rsa_allocation or self.has_ass_allocation or self.has_aah_allocation or self.has_ata_allocation
+            self.has_rsa_allocation != RSAAllocation.NO
+            or self.has_ass_allocation
+            or self.has_aah_allocation
+            or self.has_ata_allocation
         )
 
     @property

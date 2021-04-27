@@ -5,12 +5,18 @@ import string
 import factory
 import factory.fuzzy
 
+from itou.asp.mocks.providers import INSEECommuneProvider, INSEECountryProvider
 from itou.asp.models import AllocationDuration, EducationLevel
 from itou.users import models
 from itou.utils.address.departments import DEPARTMENTS
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK
 
 
 DEFAULT_PASSWORD = "p4ssw0rd"
+
+# Register ASP fakers
+factory.Faker.add_provider(INSEECommuneProvider)
+factory.Faker.add_provider(INSEECountryProvider)
 
 
 class UserFactory(factory.django.DjangoModelFactory):
@@ -38,6 +44,23 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
     department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
     post_code = factory.Faker("postalcode")
     city = factory.Faker("city", locale="fr_FR")
+
+
+class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
+    birth_country = factory.Faker("asp_country")
+    title = random.choice(models.User.Title.values)
+
+    @factory.post_generation
+    def set_approval_user(self, create, extracted, **kwargs):
+        if not create:
+            # Simple build, do nothing.
+            return
+        # We did not create test fixtures for this
+        address = BAN_GEOCODING_API_RESULTS_MOCK[0]
+        self.address_line_1 = address.get("address_line_1")
+        self.post_code = address.get("post_code")
+        self.insee_code = address.get("insee_code")
+        self.city = address.get("city")
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):

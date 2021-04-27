@@ -4,6 +4,12 @@ from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
+ERROR_HEXA_CONVERSION = "Impossible de transformer cet objet en adresse HEXA"
+ERROR_GEOCODING_API = "Erreur de geocoding, impossible d'obtenir un résultat"
+ERROR_INCOMPLETE_ADDRESS_DATA = "Données d'adresse incomplètes"
+ERROR_UNKNOWN_ADDRESS_LANE = "Impossible d'obtenir le nom de la voie"
+
+
 def format_address(obj):
     """
     Formats the address contained in obj into a valid address "structure" for ASP ER exports.
@@ -34,17 +40,17 @@ def format_address(obj):
     - KO => (None, error_message)
     """
     if not obj:
-        return None, "Impossible de transformer cet objet en adresse HEXA"
+        return None, ERROR_HEXA_CONVERSION
 
     # Do we have enough data to make an extraction?
     if not obj.post_code or not obj.address_line_1:
-        return None, "Données d'adresse incomplètes"
+        return None, ERROR_INCOMPLETE_ADDRESS_DATA
 
     # first we use geo API to get a 'lane' and a number
     address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
 
     if not address:
-        return None, "Erreur de geocoding, impossible d'obtenir un résultat"
+        return None, ERROR_GEOCODING_API
 
     result = {}
 
@@ -61,13 +67,13 @@ def format_address(obj):
             extension = extension[0]
             ext = LaneExtension.with_similar_name_or_value(extension)
             if ext:
-                result["std_extension"] = ext.name
+                result["std_extension"] = ext.name or ""
             else:
                 result["non_std_extension"] = extension.upper()
 
     lane = None
     if not address.get("lane") and not address.get("address"):
-        return None, "Unable to get address lane"
+        return None, ERROR_UNKNOWN_ADDRESS_LANE
 
     lane = address.get("lane") or address.get("address")
     lane = unidecode(lane)
@@ -92,8 +98,7 @@ def format_address(obj):
     if lt:
         result["lane_type"] = lt.name
     else:
-        print(unidecode(lane_type.lower()))
-        return None, f"Can't find lane type: {lane_type} for address: {address}"
+        return None, f"Impossible de trouver le type de voie : {lane_type} pour l'adresse : {address}"
 
     # INSEE code: must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")

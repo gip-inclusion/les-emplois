@@ -520,6 +520,11 @@ REST_FRAMEWORK = {
     # https://www.django-rest-framework.org/api-guide/pagination/#pagenumberpagination
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    # Renderer
+    # https://www.django-rest-framework.org/api-guide/renderers/#custom-renderers
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
 }
 
 # Requests
@@ -529,3 +534,15 @@ REST_FRAMEWORK = {
 # Otherwise, set a timeout like this:
 # requests.get(timeout=settings.REQUESTS_TIMEOUT)
 REQUESTS_TIMEOUT = 5  # in seconds
+
+# ASP SFTP connection
+# ------------------------------------------------------------------------------
+ASP_FS_SFTP_HOST = os.getenv("ASP_FS_SFTP_HOST", "localhost")
+ASP_FS_SFTP_PORT = os.getenv("ASP_FS_SFTP_PORT", 22)
+ASP_FS_SFTP_USER = os.getenv("API_FS_SFTP_USER")
+ASP_FS_SFTP_PRIVATE_KEY_PATH = os.getenv("ASP_FS_SFTP_PRIVATE_KEY_PATH")
+ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
+# SFTP path: Where to put new employee records for ASP validation
+ASP_FS_REMOTE_UPLOAD_DIR = "depot"
+# SFTP path: Where to get submitted employee records validation
+ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"

@@ -486,3 +486,17 @@ class SiaeKind(models.TextChoices):
         }
         # No fallback (None)
         return kinds.get(kind)
+
+
+class RSAAllocation(models.TextChoices):
+    """
+    An employee can benefit from RSA allowance:
+    = with or without ("Majoré" and "Non-Majoré")
+    - or not at all
+
+    => There are 3 distinct cases for an answer.
+    """
+
+    YES_WITH_MARKUP = "OUI-M", "Bénéficiaire du RSA et majoré"
+    YES_WITHOUT_MARKUP = "OUI-NM", "Bénéficiaire du RSA et non-majoré"
+    NO = "NON", "Non bénéficiaire du RSA"
