@@ -139,6 +139,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], null=True, blank=True)
     kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
+    is_brsa = models.BooleanField(
+        verbose_name="Conventionné pour le suivi des BRSA",
+        default=False,
+        help_text="Organisme conventionné par le conseil départemental pour le suivi des BRSA.",
+    )
     name = models.CharField(verbose_name="Nom", max_length=255)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="E-mail", blank=True)
