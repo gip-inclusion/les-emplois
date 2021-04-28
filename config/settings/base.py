@@ -549,7 +549,44 @@ AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", None)
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", None)
 AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", None)
 AWS_S3_REGION_NAME = os.environ.get("AWS_STORAGE_BUCKET_REGION", None)
+AWS_S3_ENDPOINT_DOMAIN = os.environ.get("AWS_S3_ENDPOINT_DOMAIN", None)
 
 # The endpoint of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
-AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL", None)
+AWS_S3_BASE_ENDPOINT_URL = "https://%s" % AWS_S3_ENDPOINT_DOMAIN
+AWS_S3_BUCKET_ENDPOINT_URL = "https://%s.%s" % (AWS_STORAGE_BUCKET_NAME, AWS_S3_ENDPOINT_DOMAIN)
+
+
+def s3_filekey(filename, key_args):
+    path = key_args[0]
+    extension = filename.split(".")[-1]
+    new_filename = uuid.uuid4().hex
+    key = f"{new_filename}.{extension}"
+    return os.path.join(path, key)
+
+
+S3DIRECT_DESTINATIONS = {
+    "resume": {
+        # A key is a file name and its path in S3 vocabulary.
+        # Example: "folder/name.png"
+        "key": s3_filekey,
+        # Undocumented way to pass optional params to the "key" function.
+        # See https://github.com/bradleyg/django-s3direct/blob/master/s3direct/utils.py#L50
+        "key_args": ["resume"],
+        "auth": lambda u: u.is_authenticated,
+        "allowed": ["application/pdf"],
+        # "acl" [optional] Custom ACL for object, default is 'public-read'.
+        #       String: ACL.
+        # "acl": "private", # Works with Clever but not with AWS where ACL is controlled via the website interface.
+        "cache_control": "max-age=2592000",
+        "content_disposition": lambda x: 'attachment; filename="{}"'.format(x),
+        # "content_length_range" [optional] Limit file size
+        #                        Tuple: (from, to) in bytes
+        "content_length_range": (0, 5000000),
+        # "server_side_encryption" [optional] Use serverside encryption
+        #                          String: encrytion standard
+        # "server_side_encryption": "AES256", # NOT WORKING WITH CLEVER CLOUD'S CELLAR
+        "allow_existence_optimization": False,
+    },
+}
+>>>>>>> f6271ac9 (Rename environment variables)
