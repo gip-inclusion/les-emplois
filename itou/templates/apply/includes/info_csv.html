@@ -1,0 +1,13 @@
+<div class="card my-4">
+    <div class="card-body">
+        <p class="card-text">
+                {% include "includes/icon.html" with icon="info" %}
+                Les exports sont au <a href="https://fr.wikipedia.org/wiki/Comma-separated_values" target="_blank" rel="noreferrer noopener">format CSV</a>: il s’agit d’un format texte lisible dans Excel et LibreOffice, où chaque valeur est séparée par une virgule. Lorsque vous ouvrez un fichier d’export, pour qu’il s’affiche correctement merci de choisir&nbsp;:
+                <ul>
+                    <li>Type de séparateur&nbsp;: Virgule (Comma en anglais)</li>
+                    <li>Jeu de caractères&nbsp;: Unicode (UTF-8)</li>
+                    <li>S’il manque le zéro initial des numéros de téléphone : indiquer que cette colonne est de type « texte » avant l’import.</li>
+                </ul>
+        </p>
+    </div>
+</div>

@@ -1,0 +1,63 @@
+{% extends "layout/content.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Export des suivis de candidatures" %}{{ block.super }}{% endblock %}
+
+{% block content %}
+    {% if export_for == "siae" %}
+    <h1>Export des candidatures reçues chez {{ siae.display_name }}</h1>
+    {% else %}
+    <h1>Export des candidatures</h1>
+    {% endif %}
+
+    {% if not job_applications_by_month %}
+        <h2 class="font-weight-normal text-muted">
+            {% translate "Aucune candidature pour le moment." %}
+        </h2>
+    {% else %}
+
+        {% include "apply/includes/info_csv.html" %}
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Mois</th>
+                        <th scope="col">Nombre de candidatures</th>
+                        <th scope="col">Télécharger (.csv)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for month in job_applications_by_month %}
+                    <tr>
+                        <td>{{ month.month|date:"M Y" }}</td>
+                        <td>{{ month.c }}</td>
+                        <td>
+                        {% if export_for == "siae" %}
+                            <a
+                                class="matomo-event"
+                                data-matomo-category="candidatures"
+                                data-matomo-action="exports"
+                                data-matomo-option="export-siae"
+                                href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                {% include "includes/icon.html" with icon="download" %} Télécharger
+                            </a>
+                        {% else %}
+                            <a
+                                class="matomo-event"
+                                data-matomo-category="candidatures"
+                                data-matomo-action="exports"
+                                data-matomo-option="export-prescripteur"
+                                href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                {% include "includes/icon.html" with icon="download" %} Télécharger
+                            </a>
+                        {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% endblock %}

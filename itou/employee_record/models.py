@@ -357,7 +357,7 @@ class EmployeeRecord(models.Model):
             # an SIAE applied
             return PrescriberType.UNKNOWN
 
-        return PrescriberType.from_itou_prescriber_kind(self.job_application.sender_kind)
+        return PrescriberType.from_itou_prescriber_kind(sender_kind)
 
     @property
     def asp_siae_type(self):

@@ -1,4 +1,5 @@
 import datetime
+import io
 from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
@@ -11,6 +12,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByAuthorizedPrescriberOrganizationFactory,
@@ -901,3 +903,59 @@ class JobApplicationWorkflowTest(TestCase):
         cancellation_user = job_application.to_siae.active_members.first()
         with self.assertRaises(xwf_models.AbortTransition):
             job_application.cancel(user=cancellation_user)
+
+
+class JobApplicationCsvExportTest(TestCase):
+    """Test csv export of a list of job applications."""
+
+    def test_csv_export_contains_the_necessary_info(self):
+        create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
+        job_seeker = JobSeekerFactory()
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker=job_seeker,
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            selected_jobs=Appellation.objects.all(),
+        )
+        job_application.accept(user=job_application.to_siae.members.first())
+
+        csv_output = io.StringIO()
+        generate_csv_export(JobApplication.objects, csv_output)
+        self.maxDiff = None
+        self.assertIn(job_seeker.first_name, csv_output.getvalue())
+        self.assertIn(job_seeker.last_name, csv_output.getvalue())
+        self.assertIn(job_seeker.first_name, csv_output.getvalue())
+        self.assertIn(job_seeker.last_name, csv_output.getvalue())
+        self.assertIn(job_seeker.email, csv_output.getvalue())
+        self.assertIn(job_seeker.phone, csv_output.getvalue())
+        self.assertIn(job_seeker.birthdate.strftime("%d/%m/%Y"), csv_output.getvalue())
+        self.assertIn(job_seeker.city, csv_output.getvalue())
+        self.assertIn(job_seeker.post_code, csv_output.getvalue())
+        self.assertIn(job_application.to_siae.display_name, csv_output.getvalue())
+        self.assertIn(job_application.to_siae.kind, csv_output.getvalue())
+        self.assertIn(job_application.selected_jobs.first().display_name, csv_output.getvalue())
+        self.assertIn("Candidature spontanée", csv_output.getvalue())
+        self.assertIn(job_application.created_at.strftime("%d/%m/%Y"), csv_output.getvalue())
+        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), csv_output.getvalue())
+        self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), csv_output.getvalue())
+        self.assertIn("non", csv_output.getvalue())
+        self.assertIn(job_application.approval.number, csv_output.getvalue())
+        self.assertIn(job_application.approval.start_at.strftime("%d/%m/%Y"), csv_output.getvalue())
+        self.assertIn(job_application.approval.end_at.strftime("%d/%m/%Y"), csv_output.getvalue())
+
+    def test_refused_job_application_has_reason_in_csv_export(self):
+        user = JobSeekerFactory()
+        kwargs = {
+            "job_seeker": user,
+            "sender": user,
+            "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER,
+            "refusal_reason": JobApplication.REFUSAL_REASON_DID_NOT_COME,
+        }
+
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
+        job_application.refuse()
+
+        csv_output = io.StringIO()
+        generate_csv_export(JobApplication.objects, csv_output)
+
+        self.assertIn("Candidature déclinée", csv_output.getvalue())
+        self.assertIn("Candidat non venu ou non joignable", csv_output.getvalue())

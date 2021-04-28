@@ -198,6 +198,12 @@
                         {% include "includes/icon.html" with icon="user-check" %}
                         <a href="/">Postuler pour un candidat</a>
                     </p>
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="download" %}
+                        <a href="{% url 'apply:list_for_prescriber_exports' %}">
+                            Export des candidatures
+                        </a>
+                    </p>
                 </div>
             </div>
 
@@ -300,6 +306,12 @@
                             </a>
                         </p>
                     {% endif %}
+                    <p class="card-text">
+                        {% include "includes/icon.html" with icon="download" %}
+                        <a href="{% url 'apply:list_for_siae_exports' %}">
+                            Export des candidatures
+                        </a>
+                    </p>
                 </div>
             </div>
 
