@@ -198,7 +198,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         "policy": policy_as_string,
         "signature": signature,
         "s3_date": x_amz_date,
-        "s3_form_action": settings.AWS_S3_ENDPOINT_URL,
+        "s3_form_action": settings.AWS_S3_BUCKET_ENDPOINT_URL,
         "credential": credential,
     }
 
