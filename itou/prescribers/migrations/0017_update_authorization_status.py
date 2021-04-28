@@ -2,8 +2,6 @@
 
 from django.db import migrations
 
-from itou.prescribers.models import PrescriberOrganization
-
 
 # Custom migration:
 # Update the new `authorization_status` field for prescribers organizations already in the DB
@@ -14,6 +12,7 @@ from itou.prescribers.models import PrescriberOrganization
 
 
 def update_authorization_status(apps, schema_editor):
+    PrescriberOrganization = apps.get_model("prescribers", "PrescriberOrganization")
     for org in PrescriberOrganization.objects.filter(is_authorized=False):
         # Orgs that are not PE and with no habilitation
         org.authorization_status = PrescriberOrganization.AuthorizationStatus.NOT_REQUIRED
