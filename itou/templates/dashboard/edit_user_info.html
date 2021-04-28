@@ -5,7 +5,7 @@
 {% block title %}Modifier votre profil{{ block.super }}{% endblock %}
 
 {% block extra_head %}
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/min/dropzone.min.css" %}'>
+    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'>
 {% endblock extra_head %}
 
 {% block content %}
@@ -62,7 +62,7 @@
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
 
-    <script src='{% static "vendor/dropzone/min/dropzone.min.js" %}'></script>
+    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
 
     <script type="text/javascript">
         // Camelized version of the HTML element's ID
