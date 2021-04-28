@@ -528,7 +528,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval = Approval(
                     start_at=self.hiring_start_at,
                     end_at=Approval.get_default_end_date(self.hiring_start_at),
-                    number=Approval.get_next_number(self.hiring_start_at),
                     user=self.job_seeker,
                 )
                 new_approval.save()

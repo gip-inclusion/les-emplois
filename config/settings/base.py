@@ -160,6 +160,7 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 DATABASES = {
     "default": {
+        "ATOMIC_REQUESTS": False,  # We handle transactions manually in the code.
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "HOST": os.environ.get("POSTGRES_HOST", "127.0.0.1"),
         "PORT": os.environ.get("POSTGRES_PORT", "5432"),
@@ -168,8 +169,6 @@ DATABASES = {
         "PASSWORD": os.environ.get("ITOU_POSTGRES_PASSWORD", "mdp"),
     }
 }
-
-ATOMIC_REQUESTS = True
 
 # https://docs.djangoproject.com/en/3.2/releases/3.2/#customizing-type-of-auto-created-primary-keys
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
