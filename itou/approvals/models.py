@@ -297,7 +297,7 @@ class Approval(CommonApprovalMixin):
         Numbering scheme for a 12 chars "PASS IAE" number:
             - ASP_ITOU_PREFIX (5 chars) + NUMBER (7 chars)
 
-        Old numbering scheme:
+        Old numbering scheme for PASS IAE <= `99999.21.35866`:
             - ASP_ITOU_PREFIX (5 chars) + YEAR WITHOUT CENTURY (2 chars) + NUMBER (5 chars)
             - YEAR WITHOUT CENTURY is equal to the start year of the `JobApplication.hiring_start_at`
             - A max of 99999 approvals could be issued by year
