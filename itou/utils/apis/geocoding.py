@@ -25,13 +25,13 @@ def call_ban_geocoding_api(address, post_code=None, limit=1):
     try:
         r = httpx.get(url)
     except httpx.RequestError as e:
-        logger.error("Error while fetching `%s`: %s", url, e)
+        logger.info("Error while fetching `%s`: %s", url, e)
         return None
 
     try:
         return r.json()["features"][0]
     except IndexError:
-        logger.error("Geocoding error, no result found for `%s`", url)
+        logger.info("Geocoding error, no result found for `%s`", url)
         return None
 
 
