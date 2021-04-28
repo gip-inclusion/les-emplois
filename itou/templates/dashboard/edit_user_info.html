@@ -50,7 +50,8 @@
     <input type="hidden" name="x-amz-date" value="{{ s3_date }}">
     <input type="hidden" name="x-amz-signature" value="{{ signature }}">
 
-    <!-- See Dropzone code -->
+    <!-- Don't move me: I must be the last form item! -->
+    <!-- Set on file sending success -->
     <input type="hidden" name="key" value="" id="file_key">
 </form>
 
@@ -60,16 +61,14 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
-    {% if request.user.is_job_seeker %}
-        {# include "utils/resume/typeform_scripts.html" with author_kind="candidat" #}
-    {% endif %}
+
     <script src='{% static "vendor/dropzone/min/dropzone.min.js" %}'></script>
 
     <script type="text/javascript">
-        // camelized version of the HTML element's ID
+        // Camelized version of the HTML element's ID
         Dropzone.options.resumeForm = {
             maxFilesize: 5, // MB
-            timeout: 3000, // default 3000
+            timeout: 20000, // default 3000, in ms
             maxFiles: 1,
             acceptedFiles: "application/pdf", // string separated by commas
             addRemoveLinks: true,
@@ -84,16 +83,19 @@
             dictRemoveFile: "Supprimer",
             dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
             dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
-            renameFilename: function (file) {
-                const extension = file.split('.').pop();
+            renameFile: function (file) {
+                const extension = file.name.split('.').pop();
                 const filename = Dropzone.uuidv4();
                 const file_key = `${filename}.${extension}`;
+                // Set the filekey before sending the form!
                 $("input#file_key").val(file_key);
-                return file.renameFilename = file_key;
+                return file_key;
             },
-            // Don't forget to add "Location" to CORS' exposed headers!
             success: function(file) {
-                const location = file.xhr.getResponseHeader("Location");
+                // Sadly, our S3 provider does not return the "Location" header.
+                // Don't forget to add "Location" to CORS' exposed headers!
+                // const location = file.xhr.getResponseHeader("Location");
+                const location = `{{ s3_form_action }}/${file.upload.filename}`;
                 $("input#id_resume_link").val(location);
             },
         };
