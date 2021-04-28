@@ -68,6 +68,9 @@ def process_geocoding_data(data):
 
 
 def get_geocoding_data(address, post_code=None, limit=1):
+    """
+    Return a dict containing info about the given `address` or None if no result found.
+    """
 
     geocoding_data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
