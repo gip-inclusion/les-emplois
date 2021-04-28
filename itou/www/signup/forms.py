@@ -205,10 +205,7 @@ class PrescriberChooseOrgKindForm(forms.Form):
     kind = forms.ChoiceField(
         label="Pour qui travaillez-vous ?",
         widget=forms.RadioSelect,
-        # Do not show Kind.DEPT_BRSA in the public user interface as
-        # these organizations are created manually by the support until
-        # the existing lists are preloaded into the database.
-        choices=[(k, v) for k, v in PrescriberOrganization.Kind.choices if k != PrescriberOrganization.Kind.DEPT_BRSA],
+        choices=PrescriberOrganization.Kind.choices,
     )
 
 
