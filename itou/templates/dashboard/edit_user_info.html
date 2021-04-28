@@ -43,7 +43,7 @@
 </form>
 
 <div class="mt-5"></div>
-<form method="post" action="{{ s3_form_action }}" enctype="multipart/form-data" class="dropzone" id="resume_form">
+<form method="post" action="{{ storage_endpoint }}" enctype="multipart/form-data" class="dropzone" id="resume_form">
     <input type="hidden" name="policy" value="{{ policy }}">
     <input type="hidden" name="x-amz-algorithm" value="AWS4-HMAC-SHA256">
     <input type="hidden" name="x-amz-credential" value="{{ credential }}">
@@ -95,7 +95,7 @@
                 // Sadly, our S3 provider does not return the "Location" header.
                 // Don't forget to add "Location" to CORS' exposed headers!
                 // const location = file.xhr.getResponseHeader("Location");
-                const location = `{{ s3_form_action }}/${file.upload.filename}`;
+                const location = `{{ storage_endpoint }}/${file.upload.filename}`;
                 $("input#id_resume_link").val(location);
             },
         };
