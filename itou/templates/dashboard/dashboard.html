@@ -321,6 +321,12 @@
                             </p>
                         {% endif %}
                     {% endfor %}
+                    {% if can_show_employee_records %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="file" %}
+                            <a href="{% url 'employee_record_views:list' %}">Gérer mes fiches salarié (ASP)</a>
+                        </p>
+                    {% endif %}
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="log-in" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
