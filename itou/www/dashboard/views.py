@@ -141,7 +141,7 @@ def policy_to_string(policy):
 
 def sign_policy(date, string_to_sign):
     date_stamp = date.strftime("%Y%m%d")
-    date_key = sign_raw(("AWS4" + settings.AWS_SECRET_ACCESS_KEY).encode("utf-8"), date_stamp)
+    date_key = sign_raw(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY).encode("utf-8"), date_stamp)
     date_region_key = sign_raw(date_key, settings.AWS_S3_REGION_NAME)
     date_region_service_key = sign_raw(date_region_key, "s3")
     signing_key = sign_raw(date_region_service_key, "aws4_request")
@@ -171,7 +171,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
     # Creds
     creds_date = now.strftime("%Y%m%d")
-    credential = f"{settings.AWS_ACCESS_KEY_ID}/{creds_date}/{settings.AWS_S3_REGION_NAME}/s3/aws4_request"
+    credential = f"{settings.STORAGE_ACCESS_KEY_ID}/{creds_date}/{settings.AWS_S3_REGION_NAME}/s3/aws4_request"
     # end creds
 
     expiration_date = now + relativedelta(hours=1)
@@ -181,7 +181,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         "expiration": expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),  # format date OK
         "conditions": [
             ["starts-with", "$key", ""],
-            {"bucket": settings.AWS_STORAGE_BUCKET_NAME},
+            {"bucket": settings.STORAGE_BUCKET_NAME},
             {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
             {"x-amz-credential": credential},
             {"x-amz-date": x_amz_date},
@@ -198,7 +198,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         "policy": policy_as_string,
         "signature": signature,
         "s3_date": x_amz_date,
-        "s3_form_action": settings.AWS_S3_BUCKET_ENDPOINT_URL,
+        "storage_endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
         "credential": credential,
     }
 
