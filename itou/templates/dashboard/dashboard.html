@@ -14,8 +14,8 @@
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if current_siae and not current_siae.has_reliable_coords %}
         <div class="alert alert-warning mb-0" role="alert">
-            Nous n'avons pu géolocaliser votre établissement.<br>
-            Cela pourrait affecter votre présence ou votre position dans les résultats de recherche.<br>
+            Nous n'avons pas pu géolocaliser votre établissement.<br>
+            Cela peut affecter sa position dans les résultats de recherche.<br>
             <a href="{% url 'siaes_views:edit_siae' %}">Indiquez une autre adresse</a> ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">contactez-nous</a> en cas de problème.
         </div>
     {% endif %}
@@ -24,8 +24,8 @@
     {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
     {% if current_prescriber_organization and current_prescriber_organization.is_authorized and not current_prescriber_organization.has_reliable_coords %}
         <div class="alert alert-warning mb-0" role="alert">
-            Nous n'avons pu géolocaliser votre établissement.<br>
-            Cela pourrait affecter votre présence ou votre position dans les résultats de recherche.<br>
+            Nous n'avons pas pu géolocaliser votre établissement.<br>
+            Cela peut affecter sa position dans les résultats de recherche.<br>
             <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a> ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">contactez-nous</a> en cas de problème.
         </div>
     {% endif %}
@@ -34,7 +34,7 @@
         <div class="alert alert-warning mb-0" role="alert">
             La DGEFP nous indique que votre structure n'est plus conventionnée.<br>
             Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.<br>
-            A compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
+            À compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
 
             {% if user_is_siae_admin %}
                 Veuillez dès que possible régulariser votre situation
