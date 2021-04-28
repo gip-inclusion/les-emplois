@@ -11,25 +11,34 @@
         </div>
     {% endif %}
 
+    {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if current_siae and not current_siae.has_reliable_coords %}
-        <div class="alert alert-warning" role="alert">
-            {% url 'siaes_views:edit_siae' as edit_siae_url %}
-            Nous n'avons pu géolocaliser votre établissement avec l'adresse <b>{{ current_siae.address_on_one_line }}</b> :
-            cela pourrait affecter votre position dans les résultats de recherche.
-            Vous pouvez nous <a href="{{ edit_siae_url }}">indiquer une autre adresse</a> ou
-            <a href="mailto:{{ ITOU_EMAIL_CONTACT }}">nous contacter</a> en cas de problème.
+        <div class="alert alert-warning mb-0" role="alert">
+            Nous n'avons pu géolocaliser votre établissement.<br>
+            Cela pourrait affecter votre présence ou votre position dans les résultats de recherche.<br>
+            <a href="{% url 'siaes_views:edit_siae' %}">Indiquez une autre adresse</a> ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">contactez-nous</a> en cas de problème.
+        </div>
+    {% endif %}
+
+    {# Alerte pour les prescripteurs en cas d'absence ou de mauvais score de geocoding. #}
+    {# Seuls les prescripteurs habilités apparaissent dans le moteur de recherche. #}
+    {% if current_prescriber_organization and current_prescriber_organization.is_authorized and not current_prescriber_organization.has_reliable_coords %}
+        <div class="alert alert-warning mb-0" role="alert">
+            Nous n'avons pu géolocaliser votre établissement.<br>
+            Cela pourrait affecter votre présence ou votre position dans les résultats de recherche.<br>
+            <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a> ou <a href="{{ ITOU_ASSISTANCE_URL }}" target="_blank" rel="noopener">contactez-nous</a> en cas de problème.
         </div>
     {% endif %}
 
     {% if current_siae and not current_siae.is_active %}
-        <div class="alert alert-warning" role="alert">
-            La DGEFP nous indique que votre structure n'est plus conventionnée.
-            Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.
-            A compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.
+        <div class="alert alert-warning mb-0" role="alert">
+            La DGEFP nous indique que votre structure n'est plus conventionnée.<br>
+            Par conséquent, elle n'apparaît plus dans les résultats de recherche et plus aucun collaborateur ne peut la rejoindre.<br>
+            A compter du {{ current_siae.grace_period_end_date|date:"d F Y" }}, l'accès à ce tableau de bord ne sera plus possible.<br>
 
             {% if user_is_siae_admin %}
                 Veuillez dès que possible régulariser votre situation
-                <a href="{% url 'siaes_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide}</a>.
+                <a href="{% url 'siaes_views:show_financial_annexes' %}">en sélectionnant une annexe financière valide}</a>.<br>
             {% else %}
                 {% with current_siae.active_admin_members.first as admin %}
                     Veuillez contacter un de vos administrateurs (par exemple {{ admin.first_name|title }} {{ admin.last_name|title }}) pour qu'il ou elle régularise la situation de votre structure.
