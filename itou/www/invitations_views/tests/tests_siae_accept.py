@@ -89,20 +89,6 @@ class TestAcceptInvitation(TestCase):
         user = User.objects.get(email=invitation.email)
         self.assertEqual(invitation.email, user.email)
 
-    def test_accept_invitation_signup_weak_password(self):
-        invitation = SentSiaeStaffInvitationFactory()
-        form_data = {"first_name": invitation.first_name, "last_name": invitation.last_name, "email": invitation.email}
-
-        # Fill in the password and send
-        response = self.client.post(
-            invitation.acceptance_link,
-            data={**form_data, "password1": "password", "password2": "password"},
-            follow=True,
-        )
-        self.assertFalse(response.context["form"].is_valid())
-        self.assertTrue(response.context["form"].errors.get("password1"))
-        self.assertTrue(response.wsgi_request.path, invitation.acceptance_link)
-
     def test_expired_invitation(self):
         invitation = ExpiredSiaeStaffInvitationFactory()
         self.assertTrue(invitation.has_expired)
