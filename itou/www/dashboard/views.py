@@ -1,11 +1,4 @@
-import base64
-import datetime
-import hashlib
-import hmac
-import json
-
 from allauth.account.views import LogoutView, PasswordChangeView
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
@@ -22,6 +15,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.storage import s3
 from itou.utils.urls import get_safe_url
 from itou.www.dashboard.forms import EditNewJobAppEmployersNotificationForm, EditUserEmailForm, EditUserInfoForm
 
@@ -128,29 +122,6 @@ def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     return render(request, template_name, context)
 
 
-######################################################################
-# MOVE ME!!!!!
-def sign_raw(key, msg):
-    return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
-
-
-def policy_to_string(policy):
-    json_dump = json.dumps(policy).encode("utf-8")
-    return base64.b64encode(json_dump).decode("utf-8")
-
-
-def sign_policy(date, string_to_sign):
-    date_stamp = date.strftime("%Y%m%d")
-    date_key = sign_raw(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY).encode("utf-8"), date_stamp)
-    date_region_key = sign_raw(date_key, settings.AWS_S3_REGION_NAME)
-    date_region_service_key = sign_raw(date_region_key, "s3")
-    signing_key = sign_raw(date_region_service_key, "aws4_request")
-    return hmac.new(signing_key, string_to_sign.encode("utf-8"), hashlib.sha256).hexdigest()
-
-
-######################################################################
-
-
 @login_required
 def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
@@ -167,39 +138,17 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
-    now = timezone.now()
-
-    # Creds
-    creds_date = now.strftime("%Y%m%d")
-    credential = f"{settings.STORAGE_ACCESS_KEY_ID}/{creds_date}/{settings.AWS_S3_REGION_NAME}/s3/aws4_request"
-    # end creds
-
-    expiration_date = now + relativedelta(hours=1)
-
-    x_amz_date = now.strftime("%Y%m%dT%H%M%SZ")
-    policy = {
-        "expiration": expiration_date.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),  # format date OK
-        "conditions": [
-            ["starts-with", "$key", ""],
-            {"bucket": settings.STORAGE_BUCKET_NAME},
-            {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
-            {"x-amz-credential": credential},
-            {"x-amz-date": x_amz_date},
-        ],
-    }
-    policy_as_string = policy_to_string(policy)
-
-    signature = sign_policy(date=now, string_to_sign=policy_as_string)
+    s3_form_values = s3.generate_form_values(date=timezone.now())
 
     context = {
         "extra_data": extra_data,
         "form": form,
         "prev_url": prev_url,
-        "policy": policy_as_string,
-        "signature": signature,
-        "s3_date": x_amz_date,
-        "storage_endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
-        "credential": credential,
+        "s3_form_policy": s3_form_values["encoded_policy"],
+        "s3_form_signature": s3_form_values["signature"],
+        "s3_form_date": s3_form_values["form_date"],
+        "s3_form_endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
+        "s3_form_credential": s3_form_values["form_credential_url"],
     }
 
     return render(request, template_name, context)
