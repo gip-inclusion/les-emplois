@@ -22,11 +22,13 @@ from itou.www.dashboard.forms import EditNewJobAppEmployersNotificationForm, Edi
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
     can_show_financial_annexes = False
+    can_show_employee_records = False
     job_applications_categories = []
 
     if request.user.is_siae_staff:
         siae = get_current_siae_or_404(request)
         can_show_financial_annexes = siae.convention_can_be_accessed_by(request.user)
+        can_show_employee_records = siae.can_use_employee_record
         job_applications_categories = [
             {
                 "name": "Candidatures à traiter",
@@ -62,6 +64,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "lemarche_regions": settings.LEMARCHE_OPEN_REGIONS,
         "job_applications_categories": job_applications_categories,
         "can_show_financial_annexes": can_show_financial_annexes,
+        "can_show_employee_records": can_show_employee_records,
     }
 
     return render(request, template_name, context)
