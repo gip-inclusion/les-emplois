@@ -19,16 +19,15 @@ class PrescriberOrganizationManagerTest(TestCase):
         """
         Test `get_accredited_orgs_for`.
         """
-
-        expected_num = 3
-
         departmental_council_org = AuthorizedPrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.DEPT)
 
         # An org accredited by a departmental council:
         # - is in the same department
-        # - is of kind `DEPT_BRSA`
-        AuthorizedPrescriberOrganizationFactory.create_batch(
-            expected_num, department=departmental_council_org.department, kind=PrescriberOrganization.Kind.DEPT_BRSA
+        # - is accredited BRSA
+        accredited_org = AuthorizedPrescriberOrganizationFactory(
+            department=departmental_council_org.department,
+            kind=PrescriberOrganization.Kind.OTHER,
+            is_brsa=True,
         )
 
         other_org = AuthorizedPrescriberOrganizationFactory(
@@ -37,7 +36,7 @@ class PrescriberOrganizationManagerTest(TestCase):
 
         # `expected_num` orgs should be accredited by the departmental council.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(departmental_council_org)
-        self.assertEqual(accredited_orgs.count(), expected_num)
+        self.assertEqual(accredited_org, accredited_orgs.first())
 
         # No orgs should be accredited by the other org.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
