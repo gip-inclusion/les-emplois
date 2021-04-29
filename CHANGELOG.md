@@ -16,7 +16,7 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
  - Ajout de la colonne "date de création" pour permettre au support de voir les structures créés lors des imports.
 
 ### Modifié
-    
+
  - Nouvelle version majeure de Django v3.2
  - Changement du code de tracking Hotjar
  - Amélioration des performances de l'enregistrement de la session utilisateur
@@ -623,7 +623,6 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 - Correction d'un bug de code postal lors de l'ajout d'une structure en Corse
 - Correction d'un bug de lien non cliquable à cause du widget "Je donne mon avis"
 
-### Supprimé
 
 ## [1.0.0] - 2020-04-13
 
@@ -647,5 +646,3 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 - Restriction d'embauche temporaire pour les ETTI hors 62-67-93 (jusqu'au 10/04/2020)
 - Les fiches des employeurs solidaires sont publiques ("Opération ETTI")
 - Fix page stats erreur 403 à cause du token CSRF
-
-### Supprimé
