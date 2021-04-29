@@ -11,10 +11,14 @@ from django.conf import settings
 
 
 def sign(key, msg):
+    if isinstance(key, str):
+        key = key.encode("utf-8")
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
 
 def sign_to_str(key, msg):
+    if isinstance(key, str):
+        key = key.encode("utf-8")
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
@@ -57,7 +61,7 @@ def generate_signature(date, string_to_sign):
     Use credential's URL directories to sign a string.
     """
     date_str = format_date_short(date)
-    date_key = sign(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY).encode("utf-8"), date_str)
+    date_key = sign(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY), date_str)
     date_region_key = sign(date_key, settings.AWS_S3_REGION_NAME)
     date_region_service_key = sign(date_region_key, "s3")
     signing_key = sign(date_region_service_key, "aws4_request")
@@ -68,6 +72,7 @@ def policy_as_dict(date):
     """
     Set uploading file policy. Different from the bucket policy.
     """
+    # TODO: move me to resume settings.
     expiration_date = date + relativedelta(hours=1)
     form_credential_url = generate_credential_url(date=date)
     form_date = format_date_long(date)
