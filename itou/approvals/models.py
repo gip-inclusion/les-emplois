@@ -756,6 +756,12 @@ class Prolongation(models.Model):
 
         if hasattr(self, "approval"):
 
+            if self.start_at != self.get_start_at(self.approval):
+                raise ValidationError(
+                    "La date de début ne peut pas être différente de la date de fin du PASS IAE : "
+                    f"{self.approval.end_at.strftime('%d/%m/%Y')}."
+                )
+
             # A prolongation cannot overlap another one for the same SIAE.
             # This check is enforced by a constraint at the database level but
             # still required here to avoid a 500 server error "IntegrityError"
