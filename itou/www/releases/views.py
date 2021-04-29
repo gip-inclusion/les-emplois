@@ -4,8 +4,10 @@ import markdown
 from django.conf import settings
 from django.shortcuts import render
 from django.utils.html import mark_safe
+from django.views.decorators.cache import cache_page
 
 
+@cache_page(60 * 60)  # 1 hour
 def releases(request, template_name="releases/list.html"):
     """
     Render our CHANGELOG.md file in HTML

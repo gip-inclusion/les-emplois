@@ -7,5 +7,5 @@ app_name = "releases"
 
 
 urlpatterns = [
-    path("", views.releases, name="releases"),
+    path("", views.releases, name="list"),
 ]
