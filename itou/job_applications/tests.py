@@ -132,6 +132,29 @@ class JobApplicationModelTest(TestCase):
         )
         self.assertFalse(job_application_future_not_ok.can_be_cancelled)
 
+    def test_can_be_archived(self):
+        """
+        Only cancelled job_applications can be archived.
+        """
+        states_transition_not_possible = [
+            JobApplicationWorkflow.STATE_NEW,
+            JobApplicationWorkflow.STATE_PROCESSING,
+            JobApplicationWorkflow.STATE_POSTPONED,
+            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+            JobApplicationWorkflow.STATE_ARCHIVED,
+        ]
+        states_transition_possible = [JobApplicationWorkflow.STATE_CANCELLED]
+
+        for state in states_transition_not_possible:
+            job_application = JobApplicationFactory(state=state)
+            self.assertFalse(job_application.can_be_archived)
+
+        for state in states_transition_possible:
+            job_application = JobApplicationFactory(state=state)
+            self.assertTrue(job_application.can_be_archived)
+
 
 class JobApplicationQuerySetTest(TestCase):
     def test_created_in_past(self):
@@ -903,6 +926,23 @@ class JobApplicationWorkflowTest(TestCase):
         cancellation_user = job_application.to_siae.active_members.first()
         with self.assertRaises(xwf_models.AbortTransition):
             job_application.cancel(user=cancellation_user)
+
+    def test_archive(self):
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_CANCELLED)
+        archive_user = job_application.to_siae.active_members.first()
+
+        job_application.archive(user=archive_user)
+
+        self.assertEqual(job_application.state, JobApplicationWorkflow.STATE_ARCHIVED)
+
+    def test_archive_not_allowed(self):
+        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
+        #  This is already tested elsewhere but if things change, we want this test to break
+        self.assertFalse(job_application.can_be_archived)
+        archive_user = job_application.to_siae.active_members.first()
+
+        with self.assertRaises(xwf_models.AbortTransition):
+            job_application.archive(user=archive_user)
 
 
 class JobApplicationCsvExportTest(TestCase):
