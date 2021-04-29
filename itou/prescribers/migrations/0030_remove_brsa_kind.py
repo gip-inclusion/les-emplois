@@ -36,7 +36,10 @@ class Migration(migrations.Migration):
                     ("CHU", "CHU - Centre d'hébergement d'urgence"),
                     (
                         "OACAS",
-                        "OACAS - Structure porteuse d'un agrément national organisme d'accueil communautaire et d'activité solidaire",
+                        (
+                            "OACAS - Structure porteuse d'un agrément national organisme "
+                            "d'accueil communautaire et d'activité solidaire"
+                        ),
                     ),
                     ("OTHER", "Autre"),
                 ],
