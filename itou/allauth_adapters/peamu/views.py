@@ -1,3 +1,5 @@
+import logging
+
 from allauth.socialaccount.helpers import complete_social_login, render_authentication_error
 from allauth.socialaccount.models import SocialLogin
 from allauth.socialaccount.providers.base import AuthError, ProviderException
@@ -9,6 +11,9 @@ from requests import RequestException
 
 from itou.allauth_adapters.peamu.adapter import PEAMUOAuth2Adapter
 from itou.allauth_adapters.peamu.client import PEAMUOAuth2Client
+
+
+logger = logging.getLogger(__name__)
 
 
 class PEAMUOAuth2CallbackView(OAuth2CallbackView):
@@ -59,6 +64,7 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
                 error = AuthError.CANCELLED
             else:
                 error = AuthError.UNKNOWN
+                logger.error("Unknown error in PEAMU dispatch.")
             return render_authentication_error(request, self.adapter.provider_id, error=error)
         app = self.adapter.get_provider().get_app(self.request)
         client = self.get_client(request, app)
@@ -74,6 +80,7 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
                 login.state = SocialLogin.unstash_state(request)
             return complete_social_login(request, login)
         except (PermissionDenied, OAuth2Error, RequestException, ProviderException) as e:
+            logger.error("Unknown error in PEAMU dispatch with exception '%s'.", e)
             return render_authentication_error(request, self.adapter.provider_id, exception=e)
 
 

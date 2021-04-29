@@ -14,7 +14,6 @@
     prompts the user to enter his email manually on this form to complete the signup process.
 {% endcomment %}
 
-
 {% block title %}Votre compte Pôle emploi doit être validé{{ block.super }}{% endblock %}
 
 {% block content %}
@@ -22,16 +21,15 @@
 <h1>Votre compte Pôle emploi doit être validé</h1>
 
 <p>
-    Vous devez valider votre compte Pôle emploi pour pouvoir vous connecter ici.
+    Vous devez valider votre compte Pôle emploi pour vous connecter.
 </p>
 <p>
-    Veuillez retrouver l'email &laquo; <i>Confirmation de votre adresse électronique</i> &raquo; que Pôle emploi vous a envoyé le jour de la création de votre compte et y cliquer sur le lien &laquo; <i>Je confirme mon adresse électronique</i> &raquo;.
+    Cliquez sur le lien « <i>Je confirme mon adresse électronique</i> » dans le courriel
+    « <i>Confirmation de votre adresse électronique</i> » que Pôle emploi vous a envoyé.
 </p>
 <p>
     <a href="{% url 'account_login' %}?account_type=job_seeker">
-        <button class="btn btn-secondary">
-            Retour
-        </button>
+        <button class="btn btn-secondary">Retour</button>
     </a>
 </p>
 
