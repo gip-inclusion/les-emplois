@@ -138,7 +138,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     filters_form = SiaeFilterJobApplicationsForm(job_applications, request.GET or None)
     filters = None
 
-    job_applications = job_applications.with_list_related_data()
+    job_applications = job_applications.not_archived().with_list_related_data()
 
     if filters_form.is_valid():
         job_applications = job_applications.filter(*filters_form.get_qs_filters())
@@ -163,7 +163,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
     """
 
     siae = get_current_siae_or_404(request)
-    job_applications = siae.job_applications_received
+    job_applications = siae.job_applications_received.not_archived()
     job_applications_by_month = job_applications.with_monthly_counts()
 
     context = {"job_applications_by_month": job_applications_by_month, "siae": siae, "export_for": "siae"}
@@ -178,7 +178,7 @@ def list_for_siae_exports_download(request, month_identifier):
     """
     year, month = month_identifier.split("-")
     siae = get_current_siae_or_404(request)
-    job_applications = siae.job_applications_received
+    job_applications = siae.job_applications_received.not_archived()
     job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
     filename = f"candidatures-{slugify(siae.display_name)}-{month_identifier}.csv"
 
