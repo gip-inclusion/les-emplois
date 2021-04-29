@@ -12,6 +12,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
+from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
 from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Prolongation, Suspension
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
@@ -657,6 +658,19 @@ class CustomApprovalAdminViewsTest(TestCase):
         # With good perms.
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        # Les numéros avec le préfixe `ASP_ITOU_PREFIX` ne doivent pas pouvoir
+        # être délivrés à la main dans l'admin.
+        post_data = {
+            "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
+            "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
+            "user": job_application.job_seeker.pk,
+            "created_by": user.pk,
+            "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("number", response.context["form"].errors, ApprovalAdminForm.ERROR_NUMBER)
 
         # Create an approval.
         post_data = {
