@@ -483,6 +483,32 @@ class ProcessViewsTest(TestCase):
         job_application.refresh_from_db()
         self.assertFalse(job_application.state.is_cancelled)
 
+    def test_archive(self):
+        """Ensure that the `archive` transition is triggered."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_CANCELLED
+        )
+        self.assertTrue(job_application.state.is_cancelled)
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:archive", kwargs={"job_application_id": job_application.pk})
+
+        cancelled_states = [
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_CANCELLED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]
+
+        next_url = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in cancelled_states])}"
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, next_url)
+
+        job_application.refresh_from_db()
+        self.assertTrue(job_application.state.is_archived)
+
 
 class ProcessTemplatesTest(TestCase):
     """
