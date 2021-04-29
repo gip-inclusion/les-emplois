@@ -155,6 +155,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         HasMembersFilter,
         "is_authorized",
         "kind",
+        "is_brsa",
         "department",
     )
     raw_id_fields = ("created_by",)
