@@ -38,6 +38,9 @@ django-bootstrap-datepicker-plus==3.0.5  # https://github.com/monim67/django-boo
 # Enhance select fields in forms with jQuery Select plugin
 django_select2==7.6.2  # https://github.com/codingjoe/django-select2
 
+# Render Markdown in HTML
+markdown==3.3.4  # https://github.com/Python-Markdown/markdown
+
 # Data management
 # ------------------------------------------------------------------------------
 
