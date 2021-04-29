@@ -292,6 +292,41 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     return render(request, template_name, context)
 
 
+@require_http_methods(["POST"])
+@login_required
+def archive(request, job_application_id):
+    """
+    Trigger the `archive` transition then redirects to the list of job_applications
+    """
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    cancelled_states = [
+        JobApplicationWorkflow.STATE_REFUSED,
+        JobApplicationWorkflow.STATE_CANCELLED,
+        JobApplicationWorkflow.STATE_OBSOLETE,
+    ]
+
+    next_url = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in cancelled_states])}"
+
+    if not job_application.can_be_archived:
+        messages.error(request, "Vous ne pouvez pas supprimer cette candidature.")
+        return HttpResponseRedirect(next_url)
+
+    if request.method == "POST":
+        try:
+            username = f"{job_application.job_seeker.first_name} {job_application.job_seeker.last_name}"
+            siae_name = job_application.to_siae.display_name
+
+            job_application.archive(user=request.user)
+            success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."
+            messages.success(request, success_message)
+        except xwf_models.InvalidTransitionError:
+            messages.error(request, "Vous ne pouvez pas supprimer cette candidature.")
+
+    return HttpResponseRedirect(next_url)
+
+
 @login_required
 def eligibility(request, job_application_id, template_name="apply/process_eligibility.html"):
     """
