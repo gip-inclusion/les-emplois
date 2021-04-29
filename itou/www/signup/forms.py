@@ -425,7 +425,8 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
             prescriber_org.department = self.prescriber_org_data["department"]
             longitude = self.prescriber_org_data["longitude"]
             latitude = self.prescriber_org_data["latitude"]
-            prescriber_org.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
+            if longitude and latitude:
+                prescriber_org.coords = GEOSGeometry(f"POINT({longitude} {latitude})")
             prescriber_org.geocoding_score = self.prescriber_org_data["geocoding_score"]
             prescriber_org.kind = self.kind
             prescriber_org.authorization_status = self.authorization_status

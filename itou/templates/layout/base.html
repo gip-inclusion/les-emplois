@@ -179,7 +179,7 @@
 
                 <a class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs</a>
 
-                <a class="nav-link" href="https://forum.inclusion.beta.gouv.fr" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Forum {% include "includes/icon.html" with icon="external-link" %}</a>
+                <a class="nav-link" href="{{ ITOU_COMMUNITY_URL }}" rel="noopener" target="_blank" aria-label="Accéder au Forum de l'inclusion (nouvel onglet)">Communauté {% include "includes/icon.html" with icon="external-link" %}</a>
 
                 <a class="nav-link" href="{{ ITOU_DOC_URL }}/" rel="noopener" target="_blank" aria-label="Accéder à l'espace de documentation (nouvel onglet)">Documentation {% include "includes/icon.html" with icon="external-link" %}</a>
 
@@ -262,7 +262,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://forum.inclusion.beta.gouv.fr/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                    <a href="{{ ITOU_COMMUNITY_URL }}/c/retours-sur-le-site/2" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
                                         Questions à la communauté
                                         {% include "includes/icon.html" with icon="external-link" %}
                                     </a>

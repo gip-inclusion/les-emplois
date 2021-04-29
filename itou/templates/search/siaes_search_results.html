@@ -15,6 +15,24 @@
         {% include "search/includes/siaes_search_form.html" with form=form %}
     </form>
 
+    {# Lien temporaire vers le forum pour un sondage à propos du moteur de recherche. #}
+    {% if siaes_page %}
+        <div class="card mb-5 bg-light text-center">
+            <div class="card-body">
+                <p class="h5 mb-3">
+                    <span class="badge badge-warning">Nouveau</span>
+                    Vous souhaitez améliorer le moteur de recherche des entreprises ?
+                </p>
+                <p class="mb-0">
+                    <a href="{{ ITOU_COMMUNITY_URL }}/t/un-nouveau-moteur-de-recherche-de-siae/3807" rel="noopener" target="_blank" class="btn btn-primary">
+                        Répondez à nos 3 questions !
+                        {% include "includes/icon.html" with icon="external-link" %}
+                    </a>
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
     <h3>
         {% with request.GET.city_name as city and request.GET.distance as distance %}
             Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>

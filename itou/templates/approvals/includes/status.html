@@ -99,28 +99,22 @@
 
 {% elif approval.is_in_waiting_period %}
 
+    <p class="text-danger">
+        <b>Expiré</b> le {{ approval.display_end_at|date:"d/m/Y" }} (depuis {{ approval.display_end_at|timesince }})
+    </p>
+
     {% if job_application.is_pending and job_application.is_sent_by_authorized_prescriber %}
 
         {% comment %}
-        Display nothing about the status.
-
         When an authorized prescriber bypasses the waiting period and sends a candidate
         with an "expired" approval, the employer receives the application with the mention
         "expired". He thinks that the hiring is impossible when he just has to validate
         the job application to get a new PASS IAE.
 
-        The mention "expired" is removed if the job application is sent by an authorized
-        prescriber and is still waiting to be processed.
-
-        Otherwise the employer could decline the job application thinking that the hiring
-        is impossible.
+        Show a message explaining that.
         {% endcomment %}
 
-    {% else %}
-
-        <p class="text-danger">
-            <b>Expiré</b> le {{ approval.display_end_at|date:"d/m/Y" }} (depuis {{ approval.display_end_at|timesince }})
-        </p>
+        <p><b>Le prescripteur a dérogé au délai de carence, vous pouvez obtenir un PASS IAE.</b></p>
 
     {% endif %}
 
