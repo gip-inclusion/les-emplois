@@ -35,6 +35,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     STATE_CANCELLED = "cancelled"
     # When a job application is accepted, all other job seeker's pending applications become obsolete.
     STATE_OBSOLETE = "obsolete"
+    STATE_ARCHIVED = "archived"
 
     STATE_CHOICES = (
         (STATE_NEW, "Nouvelle candidature"),
@@ -44,6 +45,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (STATE_REFUSED, "Candidature déclinée"),
         (STATE_CANCELLED, "Embauche annulée"),
         (STATE_OBSOLETE, "Embauché ailleurs"),
+        (STATE_ARCHIVED, "Candidature archivée"),
     )
 
     states = STATE_CHOICES
@@ -54,6 +56,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_REFUSE = "refuse"
     TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
+    TRANSITION_ARCHIVE = "archive"
 
     TRANSITION_CHOICES = (
         (TRANSITION_PROCESS, "Étudier la candidature"),
@@ -71,6 +74,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
+        (TRANSITION_ARCHIVE, STATE_CANCELLED, STATE_ARCHIVED),
     )
 
     PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
@@ -90,6 +94,12 @@ class JobApplicationQuerySet(models.QuerySet):
 
     def accepted(self):
         return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
+
+    def not_archived(self):
+        """
+        Filters out the archived job_applications
+        """
+        return self.exclude(state=JobApplicationWorkflow.STATE_ARCHIVED)
 
     def created_on_given_year_and_month(self, year, month):
         return self.filter(created_at__year=year, created_at__month=month)
@@ -440,6 +450,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             delay_ends_at = self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
             return today <= delay_ends_at
         return False
+
+    @property
+    def can_be_archived(self):
+        return self.state.is_cancelled
 
     @property
     def cancellation_delay_end(self):
