@@ -13,4 +13,6 @@
         badge-dark
     {% elif job_application.state.is_obsolete %}
         badge-dark
+    {% elif job_application.state.is_archived %}
+        badge-dark
     {% endif %}">{{ job_application.get_state_display }}</span>
