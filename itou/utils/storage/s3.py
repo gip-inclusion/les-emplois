@@ -105,7 +105,7 @@ def generate_form_values(date, key_path, expiration_period):
     }
 
 
-def get_upload_options(kind):
+def get_upload_config(kind):
     options = settings.STORAGE_UPLOAD_KINDS[kind]
     default_options = settings.STORAGE_UPLOAD_KINDS["default"]
     options = default_options | options

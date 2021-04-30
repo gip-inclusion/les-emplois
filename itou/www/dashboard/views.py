@@ -138,7 +138,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
-    s3_upload_options = s3.get_upload_options(kind="resume")
+    s3_upload_options = s3.get_upload_config(kind="resume")
     s3_key_path = s3_upload_options["key_path"]
     upload_expiration = s3_upload_options["upload_expiration"]
     s3_form_values = s3.generate_form_values(

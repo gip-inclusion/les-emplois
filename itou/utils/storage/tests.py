@@ -99,8 +99,8 @@ class S3Tests(SimpleTestCase):
         self.assertEqual(sorted(form_values.keys()), sorted(expected_keys))
         self.assertEqual(form_values["form_date"], "20210429T121314Z")
 
-    def test_get_upload_options(self):
-        result = s3.get_upload_options(kind="resume")
+    def test_get_upload_config(self):
+        result = s3.get_upload_config(kind="resume")
         expected_keys = [
             "allowed_mime_types",
             "upload_expiration",
@@ -120,7 +120,7 @@ class S3Tests(SimpleTestCase):
         default_settings = settings.STORAGE_UPLOAD_KINDS
         test_resume_settings = default_settings | {"resume": {}}
         with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
-            result = s3.get_upload_options(kind="resume")
+            result = s3.get_upload_config(kind="resume")
             self.assertEqual(result["allowed_mime_types"], "*")
             self.assertEqual(result["key_path"], "")
             self.assertEqual(result["upload_expiration"], 1)
@@ -129,13 +129,13 @@ class S3Tests(SimpleTestCase):
 
         test_resume_settings = default_settings | {"resume": {"allowed_mime_types": ["application/pdf", "image/jpeg"]}}
         with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
-            result = s3.get_upload_options(kind="resume")
+            result = s3.get_upload_config(kind="resume")
             self.assertEqual(result["allowed_mime_types"], "application/pdf,image/jpeg")  # for Dropzone
 
         test_resume_settings = default_settings | {"resume": {"key_path": "/resume/"}}
         with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
             with self.assertRaises(ValueError):
-                s3.get_upload_options("resume")
+                s3.get_upload_config("resume")
 
         with self.assertRaises(KeyError):
-            s3.get_upload_options("teapot")
+            s3.get_upload_config("teapot")
