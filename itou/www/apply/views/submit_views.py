@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.approvals.models import Approval
@@ -18,6 +19,7 @@ from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
 from itou.utils.resume.forms import ResumeFormMixin
+from itou.utils.storage import s3
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -199,34 +201,6 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
         session_data["job_seeker_pk"] = job_seeker.pk
         request.session.modified = True
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
-        if request.GET.get("resume"):
-            next_url = reverse("apply:step_send_resume", kwargs={"siae_pk": siae.pk})
-        return HttpResponseRedirect(next_url)
-
-    context = {"siae": siae, "form": form}
-    return render(request, template_name, context)
-
-
-@login_required
-@valid_session_required
-def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_resume.html"):
-    """
-    Updates user's resume following the next steps:
-    - Prescriber uploads a file using Typeform's embed form.
-    - When Typeform receives a new entry, it performs a POST on `/update-resume-link`
-    - This view updates job seeker's `resume_link` attribute.
-    """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-
-    form = ResumeFormMixin(data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        if form.cleaned_data.get("resume_link"):
-            job_seeker.resume_link = form.cleaned_data.get("resume_link")
-            job_seeker.save()
-        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form}
@@ -381,5 +355,28 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "form": form, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
+    s3_upload_options = s3.get_upload_config(kind="resume")
+    s3_key_path = s3_upload_options["key_path"]
+    upload_expiration = s3_upload_options["upload_expiration"]
+    s3_form_values = s3.generate_form_values(
+        date=timezone.now(), key_path=s3_key_path, expiration_period=upload_expiration
+    )
+    s3_form_context = {
+        "s3_form_policy": s3_form_values["encoded_policy"],
+        "s3_form_signature": s3_form_values["signature"],
+        "s3_form_date": s3_form_values["form_date"],
+        "s3_form_endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
+        "s3_form_credential": s3_form_values["form_credential_url"],
+        "s3_allowed_mime_types": s3_upload_options["allowed_mime_types"],
+        "s3_key_path": s3_key_path,
+        "s3_max_files": s3_upload_options["max_files"],
+        "s3_max_file_size": s3_upload_options["max_file_size"],
+        "s3_upload_timeout": s3_upload_options["timeout"],
+    }
+    context = s3_form_context | {
+        "siae": siae,
+        "form": form,
+        "job_seeker": job_seeker,
+        "approvals_wrapper": approvals_wrapper,
+    }
     return render(request, template_name, context)

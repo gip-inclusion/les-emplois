@@ -67,7 +67,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
+class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
@@ -104,7 +104,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
-        ] + ResumeFormMixin.Meta.fields
+        ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
             "phone": "Par exemple 0610203040.",
@@ -130,7 +130,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
         return super().save(commit=False)
 
 
-class SubmitJobApplicationForm(forms.ModelForm):
+class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
     """
     Submit a job application to an SIAE.
     """
@@ -143,7 +143,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ["selected_jobs", "message"]
+        fields = ["selected_jobs", "message"] + ResumeFormMixin.Meta.fields
         widgets = {
             "selected_jobs": forms.CheckboxSelectMultiple(),
             "message": forms.Textarea(
