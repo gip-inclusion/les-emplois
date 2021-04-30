@@ -25,7 +25,7 @@ import logging
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from psycopg2 import extras, sql
+from psycopg2 import extras as psycopg2_extras, sql
 from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
@@ -116,7 +116,7 @@ class Command(BaseCommand):
         """
         data = [[c["fn"](o) for c in table_columns] for o in chunk]
         # FIXME prevent SQL injections.
-        extras.execute_values(self.cur, insert_query, data, template=None)
+        psycopg2_extras.execute_values(self.cur, insert_query, data, template=None)
         self.commit()
 
     def populate_table(self, table_name, table_columns, queryset=None, querysets=None, extra_object=None):
