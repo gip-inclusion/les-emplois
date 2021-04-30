@@ -125,7 +125,7 @@ TABLE_COLUMNS = [
         "name": "origine_détaillée",
         "type": "varchar",
         "comment": (
-            "Origine détaillée de la candidature (employeur EI, ACI..." " candidat, orienteur, prescripteur PE, ML...)"
+            "Origine détaillée de la candidature (employeur EI, ACI... candidat, orienteur, prescripteur PE, ML...)"
         ),
         "fn": get_job_application_detailed_origin,
     },
