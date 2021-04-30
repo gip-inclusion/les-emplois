@@ -555,3 +555,19 @@ STORAGE_ENDPOINT_DOMAIN = os.environ.get("STORAGE_ENDPOINT_DOMAIN", None)
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
 AWS_S3_BASE_ENDPOINT_URL = "https://%s" % STORAGE_ENDPOINT_DOMAIN
 AWS_S3_BUCKET_ENDPOINT_URL = "https://%s.%s" % (STORAGE_BUCKET_NAME, STORAGE_ENDPOINT_DOMAIN)
+
+STORAGE_UPLOAD_KINDS = {
+    "default": {
+        "allowed_mime_types": ["*"],
+        "upload_expiration": 1,  # in hours
+        "key_path": "",  # appended before the file key. No backslash!
+        "max_files": 3,
+        "max_file_size": 5,  # in mb
+        "timeout": 20000,  # in ms
+    },
+    "resume": {
+        "allowed_mime_types": ["application/pdf"],
+        "key_path": "resume",
+        "max_files": 1,
+    },
+}

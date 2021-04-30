@@ -138,7 +138,12 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
-    s3_form_values = s3.generate_form_values(date=timezone.now())
+    s3_upload_options = s3.get_upload_options(kind="resume")
+    s3_key_path = s3_upload_options["key_path"]
+    upload_expiration = s3_upload_options["upload_expiration"]
+    s3_form_values = s3.generate_form_values(
+        date=timezone.now(), key_path=s3_key_path, expiration_period=upload_expiration
+    )
 
     context = {
         "extra_data": extra_data,
@@ -149,6 +154,11 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
         "s3_form_date": s3_form_values["form_date"],
         "s3_form_endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
         "s3_form_credential": s3_form_values["form_credential_url"],
+        "s3_allowed_mime_types": s3_upload_options["allowed_mime_types"],
+        "s3_key_path": s3_key_path,
+        "s3_max_files": s3_upload_options["max_files"],
+        "s3_max_file_size": s3_upload_options["max_file_size"],
+        "s3_upload_timeout": s3_upload_options["timeout"],
     }
 
     return render(request, template_name, context)

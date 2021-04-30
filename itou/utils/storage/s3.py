@@ -45,7 +45,7 @@ def format_expiration_date(date):
     """
     Used in the policy.
     """
-    return date.strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+    return date.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
 def generate_credential_url(date):
@@ -68,19 +68,19 @@ def generate_signature(date, string_to_sign):
     return sign_to_str(key=signing_key, msg=string_to_sign)
 
 
-def policy_as_dict(date):
+def policy_as_dict(date, key_path="/", expiration_period=1):
     """
     Set uploading file policy. Different from the bucket policy.
     """
     # TODO: move me to resume settings.
-    expiration_date = date + relativedelta(hours=1)
+    expiration_date = date + relativedelta(hours=expiration_period)
     form_credential_url = generate_credential_url(date=date)
     form_date = format_date_long(date)
 
     policy = {
         "expiration": format_expiration_date(expiration_date),
         "conditions": [
-            ["starts-with", "$key", ""],
+            ["starts-with", "$key", key_path],
             {"bucket": settings.STORAGE_BUCKET_NAME},
             {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
             {"x-amz-credential": form_credential_url},
@@ -90,9 +90,9 @@ def policy_as_dict(date):
     return policy
 
 
-def generate_form_values(date):
+def generate_form_values(date, key_path, expiration_period):
     form_date = format_date_long(date)
-    policy = policy_as_dict(date)
+    policy = policy_as_dict(date, key_path, expiration_period)
     encoded_policy = encode_dict(policy)
     form_credential_url = generate_credential_url(date)
     signature = generate_signature(date=date, string_to_sign=encoded_policy)
@@ -103,3 +103,17 @@ def generate_form_values(date):
         "encoded_policy": encoded_policy,
         "signature": signature,
     }
+
+
+def get_upload_options(kind):
+    options = settings.STORAGE_UPLOAD_KINDS[kind]
+    default_options = settings.STORAGE_UPLOAD_KINDS["default"]
+    options = default_options | options
+
+    key_path = options["key_path"]
+    if key_path.startswith("/") or key_path.endswith("/"):
+        raise ValueError("key_path should not begin or end with a slash")
+
+    options["allowed_mime_types"] = ",".join(options["allowed_mime_types"])
+
+    return options
