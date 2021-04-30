@@ -17,7 +17,6 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 import logging
 
 from django.core.management.base import BaseCommand
-from django.db.models import Q
 
 from itou.siaes.management.commands._import_siae.convention import (
     check_convention_data_consistency,
@@ -87,9 +86,10 @@ class Command(BaseCommand):
                     self.delete_siae(siae)
                 else:
                     self.log(
-                        f"siae.id={siae.id} is user created and "
+                        f"FATAL ERROR: siae.id={siae.id} is user created and "
                         f"has no member but has job applications thus cannot be deleted"
                     )
+                    self.fatal_errors += 1
 
     def update_siae_auth_email(self, siae, new_auth_email):
         assert siae.auth_email != new_auth_email
@@ -134,42 +134,38 @@ class Command(BaseCommand):
                 self.update_siae_siret(siae, new_siret)
                 continue
 
-            # A siae already exists with the new siret.
-            # Let's see if one of the two siaes can be safely deleted.
-            if could_siae_be_deleted(siae):
-                self.log(f"siae.id={siae.id} ghost will be deleted")
-                self.delete_siae(siae)
-            elif could_siae_be_deleted(existing_siae):
-                self.log(f"siae.id={existing_siae.id} ghost will be deleted")
-                self.delete_siae(existing_siae)
-                self.update_siae_siret(siae, new_siret)
-            else:
-                self.log(
-                    f"siae.id={siae.id} has changed siret from "
-                    f"{siae.siret} to {new_siret} but siret "
-                    f"already exists (siae.id={existing_siae.id}) "
-                    f"and both siaes have data (will *not* be fixed)"
-                )
+            def fmt(siae):
+                if siae.convention is None:
+                    return f"{siae.source} {siae.siret} convention=None"
+                return f"{siae.source} {siae.siret} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
+
+            self.log(
+                f"FATAL ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
+                f"{siae.siret} to {new_siret} but new siret is already used by "
+                f"siae.id={existing_siae.id} ({fmt(existing_siae)}) "
+            )
+            self.fatal_errors += 1
 
         self.log(f"{auth_email_updates} siae.auth_email fields will be updated")
 
     @timeit
-    def delete_inactive_siaes_when_possible(self):
+    def cleanup_siaes_after_grace_period(self):
         blocked_deletions = 0
         deletions = 0
-        for siae in Siae.objects.filter(source=Siae.SOURCE_ASP).filter(
-            Q(convention__isnull=True) | Q(convention__is_active=False)
-        ):
+
+        for siae in Siae.objects.select_related("convention").all():
+            if not siae.grace_period_has_expired:
+                continue
             if could_siae_be_deleted(siae):
-                self.log(f"siae.id={siae.id} is inactive and without data thus will be deleted")
+                self.log(f"siae.id={siae.id} is past grace period thus will be deleted")
                 self.delete_siae(siae)
                 deletions += 1
                 continue
-
+            self.log(f"siae.id={siae.id} is past grace period but cannot be deleted")
             blocked_deletions += 1
 
-        self.log(f"{deletions} siaes will be deleted as inactive and without data")
-        self.log(f"{blocked_deletions} siaes are inactive but cannot be deleted")
+        self.log(f"{deletions} siaes past their grace period will be deleted")
+        self.log(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
     @timeit
     def create_new_siaes(self):
@@ -187,19 +183,22 @@ class Command(BaseCommand):
             )
             if existing_siae_query.exists():
                 # Siaes with this asp_id already exist, no need to create one more.
-                total_existing_siae_with_asp_source = 0
+                total_existing_siaes_with_asp_source = 0
                 for existing_siae in existing_siae_query.all():
                     assert existing_siae.is_asp_managed
                     if existing_siae.source == Siae.SOURCE_ASP:
-                        total_existing_siae_with_asp_source += 1
+                        total_existing_siaes_with_asp_source += 1
                         if not self.dry_run:
                             # Siret should have been fixed by
                             # update_siret_and_auth_email_of_existing_siaes()
-                            # except in a dry-run.
+                            # except in a dry run.
                             assert existing_siae.siret == siret
                     else:
                         assert existing_siae.source == Siae.SOURCE_USER_CREATED
-                assert total_existing_siae_with_asp_source == 1
+
+                if not self.dry_run:
+                    # Duplicate siaes should have been deleted except in a dry run.
+                    assert total_existing_siaes_with_asp_source == 1
                 continue
 
             existing_siae_query = Siae.objects.filter(siret=siret, kind=kind)
@@ -222,6 +221,8 @@ class Command(BaseCommand):
                     existing_siae.save()
                 continue
 
+            assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
+
             siae = build_siae(row=row, kind=kind)
 
             if should_siae_be_created(siae):
@@ -243,44 +244,35 @@ class Command(BaseCommand):
     def check_whether_signup_is_possible_for_all_siaes(self):
         for siae in Siae.objects.all():
             if not siae.has_members and not siae.auth_email:
-                msg = (
-                    f"Signup is impossible for siae id={siae.id} siret={siae.siret} "
+                self.log(
+                    f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
                     f"kind={siae.kind} dpt={siae.department} source={siae.source} "
-                    f"created_by={siae.created_by} siae_email={siae.email}"
+                    f"created_by={siae.created_by} siae.email={siae.email}"
                 )
-                self.log(msg)
+                self.fatal_errors += 1
 
     @timeit
-    def manage_conventions(self):
-        update_existing_conventions(dry_run=self.dry_run)
-
+    def create_conventions(self):
         creatable_conventions = get_creatable_conventions()
         self.log(f"will create {len(creatable_conventions)} conventions")
         for (convention, siae) in creatable_conventions:
             if not self.dry_run:
-                convention_query = SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind)
-                if convention_query.exists():
-                    convention = convention_query.get()
-                else:
-                    convention.save()
+                assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
+                convention.save()
+                assert convention.siaes.count() == 0
                 siae.convention = convention
                 siae.save()
+                assert convention.siaes.filter(source=Siae.SOURCE_ASP).count() == 1
 
+    @timeit
+    def delete_conventions(self):
         deletable_conventions = get_deletable_conventions()
         self.log(f"will delete {len(deletable_conventions)} conventions")
         for convention in deletable_conventions:
             if not self.dry_run:
+                assert convention.siaes.count() == 0
                 # This will delete the related financial annexes as well.
                 convention.delete()
-
-        if not self.dry_run:
-            # Cleanup ghost siaes one more time before checking that
-            # only one asp siae is attached to each convention.
-            # Otherwise some convention might have 2 asp siaes,
-            # but one of them would be deleted by the next script run.
-            self.update_siret_and_auth_email_of_existing_siaes()
-
-        check_convention_data_consistency(dry_run=self.dry_run)
 
     @timeit
     def manage_financial_annexes(self):
@@ -301,10 +293,24 @@ class Command(BaseCommand):
         self.dry_run = dry_run
         self.set_logger(options.get("verbosity"))
 
+        self.fatal_errors = 0
+
         self.delete_user_created_siaes_without_members()
+        update_existing_conventions(dry_run=self.dry_run)
         self.update_siret_and_auth_email_of_existing_siaes()
         self.create_new_siaes()
-        self.manage_conventions()
+        self.create_conventions()
+        self.delete_conventions()
         self.manage_financial_annexes()
-        self.delete_inactive_siaes_when_possible()
+        self.cleanup_siaes_after_grace_period()
+
+        # Run some updates a second time.
+        update_existing_conventions(dry_run=self.dry_run)
+        self.update_siret_and_auth_email_of_existing_siaes()
+
+        # Final checks.
+        check_convention_data_consistency(dry_run=self.dry_run)
         self.check_whether_signup_is_possible_for_all_siaes()
+
+        if self.fatal_errors >= 1:
+            raise RuntimeError("At least one fatal error above needs manual resolution")
