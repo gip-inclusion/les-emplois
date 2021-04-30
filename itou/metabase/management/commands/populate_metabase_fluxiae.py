@@ -63,19 +63,23 @@ An EMI does not necessarily have a mission.
 import csv
 import gzip
 import logging
+import os
 from collections import OrderedDict
 
 import pandas as pd
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from psycopg2 import sql
 from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
-from itou.metabase.management.commands._missions_ai_ehpad import MISSIONS_AI_EPHAD_SQL_REQUEST
 from itou.siaes.management.commands._import_siae.utils import get_filename, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+
+
+CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -333,13 +337,21 @@ class Command(BaseCommand):
 
     def switch_table_atomically(self, table_name):
         with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(f'ALTER TABLE IF EXISTS "{table_name}" RENAME TO "{table_name}_old";')
-            cur.execute(f'ALTER TABLE "{table_name}_new" RENAME TO "{table_name}";')
+            cur.execute(
+                sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
+                    sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
+                )
+            )
+            cur.execute(
+                sql.SQL("ALTER TABLE {} RENAME TO {}").format(
+                    sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
+                )
+            )
             conn.commit()
-            cur.execute(f'DROP TABLE IF EXISTS "{table_name}_old";')
+            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
             conn.commit()
 
-    def build_table(self, table_name, sql_request):
+    def build_custom_table(self, table_name, sql_request):
         """
         Build a new table with given sql_request.
         Minimize downtime by building a temporary table first then swap the two tables atomically.
@@ -349,39 +361,39 @@ class Command(BaseCommand):
             # from the wet run version of the underlying tables.
             table_name += "_dry_run"
 
-        self.log(f"Building {table_name} table using given sql_request...")
-
         with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(f'DROP TABLE IF EXISTS "{table_name}_new";')
+            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
             conn.commit()
-            cur.execute(f'CREATE TABLE "{table_name}_new" AS {sql_request};')
+            cur.execute(
+                sql.SQL("CREATE TABLE {} AS {}").format(sql.Identifier(f"{table_name}_new"), sql.SQL(sql_request))
+            )
             conn.commit()
 
         self.switch_table_atomically(table_name=table_name)
         self.log("Done.")
 
     @timeit
-    def build_update_date_table(self):
+    def build_custom_tables(self):
         """
-        Store fluxIAE latest update date in dedicated table for convenience.
-        This way we can show on metabase dashboards how fresh our data is.
-        """
-        table_name = "fluxIAE_DateDerniereMiseAJour"
-        sql_request = """
-            select
-                max(TO_DATE(emi_date_creation, 'DD/MM/YYYY')) as date_derniere_mise_a_jour
-            from "fluxIAE_EtatMensuelIndiv"
-        """
-        self.build_table(table_name=table_name, sql_request=sql_request)
+        Build custom tables one by one by playing SQL requests in `sql` folder.
 
-    @timeit
-    def build_missions_ai_ehpad_table(self):
+        Typically:
+        - 001_fluxIAE_DateDerniereMiseAJour.sql
+        - 002_missions_ai_ehpad.sql
+        - ...
+
+        The numerical prefixes ensure the order of execution is deterministic.
+
+        The name of the table being created with the query is derived from the filename,
+        # e.g. '002_missions_ai_ehpad.sql' => 'missions_ai_ehpad'
         """
-        Build custom missions_ai_ehpad table by joining all relevant raw tables.
-        """
-        table_name = "missions_ai_ehpad"
-        sql_request = MISSIONS_AI_EPHAD_SQL_REQUEST
-        self.build_table(table_name=table_name, sql_request=sql_request)
+        path = f"{CURRENT_DIR}/sql"
+        for filename in [f for f in os.listdir(path) if f.endswith(".sql")]:
+            self.log(f"Running {filename} ...")
+            table_name = "_".join(filename.split(".")[0].split("_")[1:])
+            with open(os.path.join(path, filename), "r") as file:
+                sql_request = file.read()
+            self.build_custom_table(table_name=table_name, sql_request=sql_request)
 
     @timeit
     def populate_metabase_fluxiae(self):
@@ -406,8 +418,7 @@ class Command(BaseCommand):
         self.populate_departments()
 
         # Build custom tables by running raw SQL queries on existing tables.
-        self.build_update_date_table()
-        self.build_missions_ai_ehpad_table()
+        self.build_custom_tables()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))

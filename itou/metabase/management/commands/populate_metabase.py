@@ -22,21 +22,24 @@ Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for 
 import gc
 import logging
 
-import psycopg2
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from psycopg2 import extras as psycopg2_extras, sql
 from tqdm import tqdm
 
 from itou.approvals.models import Approval, PoleEmploiApproval
+from itou.cities.models import City
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.management.commands import (
     _approvals,
+    _insee_codes,
     _job_applications,
     _job_descriptions,
     _job_seekers,
     _organizations,
+    _rome_codes,
     _siaes,
 )
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
@@ -103,16 +106,17 @@ class Command(BaseCommand):
         self.conn.commit()
 
     def cleanup_tables(self, table_name):
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_new;")
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_new")))
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
         self.commit()
 
     def inject_chunk(self, table_columns, chunk, insert_query):
         """
         Insert chunk of objects into table.
         """
-        data = [[c["lambda"](o) for c in table_columns] for o in chunk]
-        psycopg2.extras.execute_values(self.cur, insert_query, data, template=None)
+        data = [[c["fn"](o) for c in table_columns] for o in chunk]
+        # FIXME prevent SQL injections.
+        psycopg2_extras.execute_values(self.cur, insert_query, data, template=None)
         self.commit()
 
     def populate_table(self, table_name, table_columns, queryset=None, querysets=None, extra_object=None):
@@ -142,7 +146,7 @@ class Command(BaseCommand):
                 "name": "date_mise_à_jour_metabase",
                 "type": "date",
                 "comment": "Date de dernière mise à jour de Metabase",
-                "lambda": lambda o: timezone.now(),
+                "fn": lambda o: timezone.now(),
             },
         ]
 
@@ -151,20 +155,22 @@ class Command(BaseCommand):
         for c in table_columns:
             if c["type"] == "boolean":
                 c["type"] = "integer"
-                c["lambda"] = compose(convert_boolean_to_int, c["lambda"])
+                c["fn"] = compose(convert_boolean_to_int, c["fn"])
 
         self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
         # Create table.
         statement = ", ".join([f'{c["name"]} {c["type"]}' for c in table_columns])
+        # FIXME prevent SQL injections.
         self.cur.execute(f"CREATE TABLE {table_name}_new ({statement});")
         self.commit()
 
         # Add comments on table columns.
         for c in table_columns:
-            assert set(c.keys()) == set(["name", "type", "comment", "lambda"])
+            assert set(c.keys()) == set(["name", "type", "comment", "fn"])
             column_name = c["name"]
             column_comment = c["comment"]
+            # FIXME prevent SQL injections.
             self.cur.execute(f"comment on column {table_name}_new.{column_name} is '{column_comment}';")
         self.commit()
 
@@ -196,10 +202,18 @@ class Command(BaseCommand):
                 gc.collect()
 
         # Swap new and old table nicely to minimize downtime.
-        self.cur.execute(f"ALTER TABLE IF EXISTS {table_name} RENAME TO {table_name}_old;")
-        self.cur.execute(f"ALTER TABLE {table_name}_new RENAME TO {table_name};")
+        self.cur.execute(
+            sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
+                sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
+            )
+        )
+        self.cur.execute(
+            sql.SQL("ALTER TABLE {} RENAME TO {}").format(
+                sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
+            )
+        )
         self.commit()
-        self.cur.execute(f"DROP TABLE IF EXISTS {table_name}_old;")
+        self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
         self.commit()
 
     def populate_siaes(self):
@@ -312,27 +326,14 @@ class Command(BaseCommand):
         self.populate_table(table_name="candidats", table_columns=_job_seekers.TABLE_COLUMNS, queryset=queryset)
 
     def populate_rome_codes(self):
-        """
-        Populate rome codes.
-        """
         queryset = Rome.objects.all()
 
-        table_columns = [
-            {
-                "name": "code_rome",
-                "type": "varchar",
-                "comment": "Code ROME",
-                "lambda": lambda o: o.code,
-            },
-            {
-                "name": "description_code_rome",
-                "type": "varchar",
-                "comment": "Description du code ROME",
-                "lambda": lambda o: o.name,
-            },
-        ]
+        self.populate_table(table_name="codes_rome", table_columns=_rome_codes.TABLE_COLUMNS, queryset=queryset)
 
-        self.populate_table(table_name="codes_rome", table_columns=table_columns, queryset=queryset)
+    def populate_insee_codes(self):
+        queryset = City.objects.all()
+
+        self.populate_table(table_name="communes", table_columns=_insee_codes.TABLE_COLUMNS, queryset=queryset)
 
     def populate_metabase(self):
         if not settings.ALLOW_POPULATING_METABASE:
@@ -348,6 +349,7 @@ class Command(BaseCommand):
             self.populate_job_applications()
             self.populate_approvals()
             self.populate_rome_codes()
+            self.populate_insee_codes()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
