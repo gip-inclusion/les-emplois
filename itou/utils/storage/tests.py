@@ -3,6 +3,7 @@ import datetime
 import hmac
 import json
 
+from django.conf import settings
 from django.test import SimpleTestCase, override_settings
 
 from itou.utils.storage import s3
@@ -59,9 +60,8 @@ class S3Tests(SimpleTestCase):
         }
         with self.settings(**test_settings):
             form_credential_url = s3.generate_credential_url(date)
-            # TODO: test dynamic expiration date
             expected_policy = {
-                "expiration": "2021-04-29T13:13:14.155Z",
+                "expiration": "2021-04-29T13:13:14.000Z",
                 "conditions": [
                     {"bucket": test_settings["STORAGE_BUCKET_NAME"]},
                     {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
@@ -69,14 +69,73 @@ class S3Tests(SimpleTestCase):
                     {"x-amz-date": "20210429T121314Z"},
                 ],
             }
-            policy = s3.policy_as_dict(date)
-            self.assertTrue(policy.keys() == expected_policy.keys())
+            result = s3.policy_as_dict(date)
             for item in expected_policy["conditions"]:
-                self.assertTrue(item in policy["conditions"])
+                self.assertIn(item, result["conditions"])
+
+        # test expiration period. Default is 1 hour.
+        result = s3.policy_as_dict(date)
+        expected = {"expiration": "2021-04-29T13:13:14.000Z"}
+        self.assertEqual(expected["expiration"], result["expiration"])
+
+        result = s3.policy_as_dict(date, expiration_period=2)
+        expected = {"expiration": "2021-04-29T14:13:14.000Z"}
+        self.assertEqual(expected["expiration"], result["expiration"])
+
+        # test optional key path condition
+        result = s3.policy_as_dict(date)
+        expected = {"conditions": ["starts-with", "$key", "/"]}
+        self.assertEqual(result["conditions"][0], expected["conditions"])
+
+        key_path = "/resume/"
+        result = s3.policy_as_dict(date, key_path=key_path)
+        expected = {"conditions": ["starts-with", "$key", key_path]}
+        self.assertEqual(result["conditions"][0], expected["conditions"])
 
     def test_generate_form_values(self):
         date = datetime.datetime(2021, 4, 29, 12, 13, 14, 155)
-        form_values = s3.generate_form_values(date)
+        form_values = s3.generate_form_values(date=date, key_path="/", expiration_period=1)
         expected_keys = ["form_credential_url", "form_date", "encoded_policy", "signature"]
         self.assertEqual(sorted(form_values.keys()), sorted(expected_keys))
         self.assertEqual(form_values["form_date"], "20210429T121314Z")
+
+    def test_get_upload_options(self):
+        result = s3.get_upload_options(kind="resume")
+        expected_keys = [
+            "allowed_mime_types",
+            "upload_expiration",
+            "key_path",
+            "max_files",
+            "max_file_size",
+            "timeout",
+        ]
+        self.assertEqual(sorted(expected_keys), sorted(result.keys()))
+        for _, value in result.items():
+            self.assertIsNot(value, None)
+
+        file_type = "application/pdf"
+        self.assertEqual(result["allowed_mime_types"], file_type)
+
+        # # test default values
+        default_settings = settings.STORAGE_UPLOAD_KINDS
+        test_resume_settings = default_settings | {"resume": {}}
+        with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
+            result = s3.get_upload_options(kind="resume")
+            self.assertEqual(result["allowed_mime_types"], "*")
+            self.assertEqual(result["key_path"], "")
+            self.assertEqual(result["upload_expiration"], 1)
+            self.assertEqual(result["max_file_size"], 5)
+            self.assertEqual(result["max_files"], 3)
+
+        test_resume_settings = default_settings | {"resume": {"allowed_mime_types": ["application/pdf", "image/jpeg"]}}
+        with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
+            result = s3.get_upload_options(kind="resume")
+            self.assertEqual(result["allowed_mime_types"], "application/pdf,image/jpeg")  # for Dropzone
+
+        test_resume_settings = default_settings | {"resume": {"key_path": "/resume/"}}
+        with self.settings(STORAGE_UPLOAD_KINDS=test_resume_settings):
+            with self.assertRaises(ValueError):
+                s3.get_upload_options("resume")
+
+        with self.assertRaises(KeyError):
+            s3.get_upload_options("teapot")
