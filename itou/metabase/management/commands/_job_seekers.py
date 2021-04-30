@@ -119,32 +119,32 @@ TABLE_COLUMNS = [
         "name": "id_anonymisé",
         "type": "varchar",
         "comment": "ID anonymisé du candidat",
-        "lambda": lambda o: anonymize(o.id, salt="job_seeker.id"),
+        "fn": lambda o: anonymize(o.id, salt="job_seeker.id"),
     },
-    {"name": "age", "type": "integer", "comment": "Age du candidat en années", "lambda": get_user_age_in_years},
+    {"name": "age", "type": "integer", "comment": "Age du candidat en années", "fn": get_user_age_in_years},
     {
         "name": "date_inscription",
         "type": "date",
         "comment": "Date inscription du candidat",
-        "lambda": lambda o: o.date_joined,
+        "fn": lambda o: o.date_joined,
     },
     {
         "name": "pe_connect",
         "type": "boolean",
         "comment": "Le candidat utilise PE Connect",
-        "lambda": lambda o: o.is_peamu,
+        "fn": lambda o: o.is_peamu,
     },
     {
         "name": "date_dernière_connexion",
         "type": "date",
         "comment": "Date de dernière connexion au service du candidat",
-        "lambda": lambda o: o.last_login,
+        "fn": lambda o: o.last_login,
     },
     {
         "name": "actif",
         "type": "boolean",
         "comment": "Dernière connexion dans les 7 jours",
-        "lambda": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else None,
+        "fn": lambda o: o.last_login > timezone.now() + timedelta(days=-7) if o.last_login else None,
     },
 ]
 
@@ -155,14 +155,14 @@ TABLE_COLUMNS += [
         "name": "total_candidatures",
         "type": "integer",
         "comment": "Nombre de candidatures",
-        "lambda": lambda o: o.job_applications.count(),
+        "fn": lambda o: o.job_applications.count(),
     },
     {
         "name": "total_embauches",
         "type": "integer",
         "comment": "Nombre de candidatures de type accepté",
         # We have to do all this in python to benefit from prefetch_related.
-        "lambda": lambda o: len(
+        "fn": lambda o: len(
             [ja for ja in o.job_applications.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
         ),
     },
@@ -170,19 +170,19 @@ TABLE_COLUMNS += [
         "name": "total_diagnostics",
         "type": "integer",
         "comment": "Nombre de diagnostics",
-        "lambda": lambda o: o.eligibility_diagnoses.count(),
+        "fn": lambda o: o.eligibility_diagnoses.count(),
     },
     {
         "name": "date_diagnostic",
         "type": "date",
         "comment": "Date du dernier diagnostic",
-        "lambda": lambda o: getattr(get_latest_diagnosis(o), "created_at", None),
+        "fn": lambda o: getattr(get_latest_diagnosis(o), "created_at", None),
     },
     {
         "name": "type_auteur_diagnostic",
         "type": "varchar",
         "comment": "Type auteur du dernier diagnostic",
-        "lambda": lambda o: get_choice(choices=AUTHOR_KIND_CHOICES, key=get_latest_diagnosis(o).author_kind)
+        "fn": lambda o: get_choice(choices=AUTHOR_KIND_CHOICES, key=get_latest_diagnosis(o).author_kind)
         if get_latest_diagnosis(o)
         else None,
     },
@@ -190,25 +190,25 @@ TABLE_COLUMNS += [
         "name": "sous_type_auteur_diagnostic",
         "type": "varchar",
         "comment": "Sous type auteur du dernier diagnostic",
-        "lambda": get_latest_diagnosis_author_sub_kind,
+        "fn": get_latest_diagnosis_author_sub_kind,
     },
     {
         "name": "type_structure_dernière_embauche",
         "type": "varchar",
         "comment": "Type de la structure destinataire de la dernière embauche du candidat",
-        "lambda": lambda o: get_hiring_siae(o).kind if get_hiring_siae(o) else None,
+        "fn": lambda o: get_hiring_siae(o).kind if get_hiring_siae(o) else None,
     },
     {
         "name": "total_critères_niveau_1",
         "type": "integer",
         "comment": "Total critères de niveau 1 du dernier diagnostic",
-        "lambda": get_latest_diagnosis_level1_criteria,
+        "fn": get_latest_diagnosis_level1_criteria,
     },
     {
         "name": "total_critères_niveau_2",
         "type": "integer",
         "comment": "Total critères de niveau 2 du dernier diagnostic",
-        "lambda": get_latest_diagnosis_level2_criteria,
+        "fn": get_latest_diagnosis_level2_criteria,
     },
 ]
 
@@ -223,6 +223,6 @@ for criteria in AdministrativeCriteria.objects.order_by("id").all():
             "name": column_name,
             "type": "boolean",
             "comment": f"Critère {column_comment} (niveau {criteria.level})",
-            "lambda": partial(get_latest_diagnosis_criteria, criteria_id=criteria.id),
+            "fn": partial(get_latest_diagnosis_criteria, criteria_id=criteria.id),
         }
     ]

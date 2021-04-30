@@ -101,25 +101,25 @@ TABLE_COLUMNS = [
         "name": "id_anonymisé",
         "type": "varchar",
         "comment": "ID anonymisé de la candidature",
-        "lambda": lambda o: anonymize(o.id, salt="job_application.id"),
+        "fn": lambda o: anonymize(o.id, salt="job_application.id"),
     },
     {
         "name": "date_candidature",
         "type": "date",
         "comment": "Date de la candidature",
-        "lambda": lambda o: o.created_at,
+        "fn": lambda o: o.created_at,
     },
     {
         "name": "état",
         "type": "varchar",
         "comment": "Etat de la candidature",
-        "lambda": lambda o: get_choice(choices=JobApplicationWorkflow.STATE_CHOICES, key=o.state),
+        "fn": lambda o: get_choice(choices=JobApplicationWorkflow.STATE_CHOICES, key=o.state),
     },
     {
         "name": "origine",
         "type": "varchar",
         "comment": ("Origine de la candidature (employeur, candidat, prescripteur habilité, orienteur)"),
-        "lambda": get_job_application_origin,
+        "fn": get_job_application_origin,
     },
     {
         "name": "origine_détaillée",
@@ -127,7 +127,7 @@ TABLE_COLUMNS = [
         "comment": (
             "Origine détaillée de la candidature (employeur EI, ACI..." " candidat, orienteur, prescripteur PE, ML...)"
         ),
-        "lambda": get_job_application_detailed_origin,
+        "fn": get_job_application_detailed_origin,
     },
     {
         "name": "délai_prise_en_compte",
@@ -135,7 +135,7 @@ TABLE_COLUMNS = [
         "comment": (
             "Temps écoulé rétroactivement de état nouveau à état étude" " si la candidature est passée par ces états"
         ),
-        "lambda": get_ja_time_spent_from_new_to_processing,
+        "fn": get_ja_time_spent_from_new_to_processing,
     },
     {
         "name": "délai_de_réponse",
@@ -144,56 +144,56 @@ TABLE_COLUMNS = [
             "Temps écoulé rétroactivement de état nouveau à état accepté"
             " ou refusé si la candidature est passée par ces états"
         ),
-        "lambda": get_ja_time_spent_from_new_to_accepted_or_refused,
+        "fn": get_ja_time_spent_from_new_to_accepted_or_refused,
     },
     {
         "name": "motif_de_refus",
         "type": "varchar",
         "comment": "Motif de refus de la candidature",
-        "lambda": lambda o: get_choice(choices=JobApplication.REFUSAL_REASON_CHOICES, key=o.refusal_reason),
+        "fn": lambda o: get_choice(choices=JobApplication.REFUSAL_REASON_CHOICES, key=o.refusal_reason),
     },
     {
         "name": "id_candidat_anonymisé",
         "type": "varchar",
         "comment": "ID anonymisé du candidat",
-        "lambda": lambda o: anonymize(o.job_seeker_id, salt="job_seeker.id"),
+        "fn": lambda o: anonymize(o.job_seeker_id, salt="job_seeker.id"),
     },
     {
         "name": "id_structure",
         "type": "integer",
         "comment": "ID de la structure destinaire de la candidature",
-        "lambda": lambda o: o.to_siae_id,
+        "fn": lambda o: o.to_siae_id,
     },
     {
         "name": "type_structure",
         "type": "varchar",
         "comment": "Type de la structure destinaire de la candidature",
-        "lambda": lambda o: o.to_siae.kind,
+        "fn": lambda o: o.to_siae.kind,
     },
     {
         "name": "nom_structure",
         "type": "varchar",
         "comment": "Nom de la structure destinaire de la candidature",
-        "lambda": lambda o: o.to_siae.display_name,
+        "fn": lambda o: o.to_siae.display_name,
     },
     {
         "name": "nom_org_prescripteur",
         "type": "varchar",
         "comment": "Nom de l''organisation prescriptrice",
-        "lambda": get_ja_sender_organization_name,
+        "fn": get_ja_sender_organization_name,
     },
     {
         "name": "safir_org_prescripteur",
         "type": "varchar",
         "comment": "SAFIR de l''organisation prescriptrice",
-        "lambda": get_ja_sender_organization_safir,
+        "fn": get_ja_sender_organization_safir,
     },
 ]
 
 TABLE_COLUMNS += get_department_and_region_columns(
     name_suffix="_structure",
     comment_suffix=" de la structure destinaire de la candidature",
-    custom_lambda=lambda o: o.to_siae,
+    custom_fn=lambda o: o.to_siae,
 )
 
 TABLE_COLUMNS += [
@@ -201,6 +201,6 @@ TABLE_COLUMNS += [
         "name": "date_embauche",
         "type": "date",
         "comment": "Date embauche le cas échéant",
-        "lambda": get_ja_hiring_date,
+        "fn": get_ja_hiring_date,
     },
 ]

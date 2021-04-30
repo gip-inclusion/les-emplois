@@ -114,7 +114,7 @@ class Command(BaseCommand):
         """
         Insert chunk of objects into table.
         """
-        data = [[c["lambda"](o) for c in table_columns] for o in chunk]
+        data = [[c["fn"](o) for c in table_columns] for o in chunk]
         # FIXME prevent SQL injections.
         extras.execute_values(self.cur, insert_query, data, template=None)
         self.commit()
@@ -146,7 +146,7 @@ class Command(BaseCommand):
                 "name": "date_mise_à_jour_metabase",
                 "type": "date",
                 "comment": "Date de dernière mise à jour de Metabase",
-                "lambda": lambda o: timezone.now(),
+                "fn": lambda o: timezone.now(),
             },
         ]
 
@@ -155,7 +155,7 @@ class Command(BaseCommand):
         for c in table_columns:
             if c["type"] == "boolean":
                 c["type"] = "integer"
-                c["lambda"] = compose(convert_boolean_to_int, c["lambda"])
+                c["fn"] = compose(convert_boolean_to_int, c["fn"])
 
         self.log(f"Injecting {total_rows} rows with {len(table_columns)} columns into table {table_name}:")
 
@@ -167,7 +167,7 @@ class Command(BaseCommand):
 
         # Add comments on table columns.
         for c in table_columns:
-            assert set(c.keys()) == set(["name", "type", "comment", "lambda"])
+            assert set(c.keys()) == set(["name", "type", "comment", "fn"])
             column_name = c["name"]
             column_comment = c["comment"]
             # FIXME prevent SQL injections.

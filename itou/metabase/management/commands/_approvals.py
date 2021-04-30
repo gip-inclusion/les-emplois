@@ -55,38 +55,38 @@ def get_approval_type(approval):
 
 
 TABLE_COLUMNS = [
-    {"name": "type", "type": "varchar", "comment": "FIXME", "lambda": get_approval_type},
-    {"name": "date_début", "type": "date", "comment": "Date de début", "lambda": lambda o: o.start_at},
-    {"name": "date_fin", "type": "date", "comment": "Date de fin", "lambda": lambda o: o.end_at},
-    {"name": "durée", "type": "interval", "comment": "Durée", "lambda": lambda o: o.end_at - o.start_at},
+    {"name": "type", "type": "varchar", "comment": "Type", "fn": get_approval_type},
+    {"name": "date_début", "type": "date", "comment": "Date de début", "fn": lambda o: o.start_at},
+    {"name": "date_fin", "type": "date", "comment": "Date de fin", "fn": lambda o: o.end_at},
+    {"name": "durée", "type": "interval", "comment": "Durée", "fn": lambda o: o.end_at - o.start_at},
     {
         "name": "id_structure",
         "type": "integer",
         "comment": "ID structure qui a embauché si PASS IAE",
-        "lambda": lambda o: getattr(get_siae_from_approval(o), "id", None),
+        "fn": lambda o: getattr(get_siae_from_approval(o), "id", None),
     },
     {
         "name": "type_structure",
         "type": "varchar",
         "comment": "Type de la structure qui a embauché si PASS IAE",
-        "lambda": lambda o: getattr(get_siae_from_approval(o), "kind", None),
+        "fn": lambda o: getattr(get_siae_from_approval(o), "kind", None),
     },
     {
         "name": "siret_structure",
         "type": "varchar",
         "comment": "SIRET de la structure qui a embauché si PASS IAE",
-        "lambda": lambda o: getattr(get_siae_from_approval(o), "siret", None),
+        "fn": lambda o: getattr(get_siae_from_approval(o), "siret", None),
     },
     {
         "name": "nom_structure",
         "type": "varchar",
         "comment": "Nom de la structure qui a embauché si PASS IAE",
-        "lambda": lambda o: getattr(get_siae_from_approval(o), "display_name", None),
+        "fn": lambda o: getattr(get_siae_from_approval(o), "display_name", None),
     },
 ]
 
 TABLE_COLUMNS += get_department_and_region_columns(
     name_suffix="_structure_ou_org_pe",
     comment_suffix=(" de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"),
-    custom_lambda=get_siae_or_pe_org_from_approval,
+    custom_fn=get_siae_or_pe_org_from_approval,
 )
