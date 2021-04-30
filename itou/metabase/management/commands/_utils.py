@@ -18,7 +18,7 @@ def compose(f, g):
     # https://stackoverflow.com/questions/16739290/composing-functions-in-python
     # I had to use this to solve a cryptic
     # `RecursionError: maximum recursion depth exceeded` error
-    # when composing convert_boolean_to_int and c["lambda"].
+    # when composing convert_boolean_to_int and c["fn"].
     return lambda *a, **kw: f(g(*a, **kw))
 
 
@@ -77,25 +77,25 @@ def get_hiring_siae(job_seeker):
     return None
 
 
-def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_lambda=lambda o: o):
+def get_department_and_region_columns(name_suffix="", comment_suffix="", custom_fn=lambda o: o):
     return [
         {
             "name": f"département{name_suffix}",
             "type": "varchar",
             "comment": f"Département{comment_suffix}",
-            "lambda": lambda o: getattr(custom_lambda(o), "department", None),
+            "fn": lambda o: getattr(custom_fn(o), "department", None),
         },
         {
             "name": f"nom_département{name_suffix}",
             "type": "varchar",
             "comment": f"Nom complet du département{comment_suffix}",
-            "lambda": lambda o: DEPARTMENTS.get(getattr(custom_lambda(o), "department", None)),
+            "fn": lambda o: DEPARTMENTS.get(getattr(custom_fn(o), "department", None)),
         },
         {
             "name": f"région{name_suffix}",
             "type": "varchar",
             "comment": f"Région{comment_suffix}",
-            "lambda": lambda o: DEPARTMENT_TO_REGION.get(getattr(custom_lambda(o), "department", None)),
+            "fn": lambda o: DEPARTMENT_TO_REGION.get(getattr(custom_fn(o), "department", None)),
         },
     ]
 
@@ -106,25 +106,25 @@ def get_address_columns(name_suffix="", comment_suffix=""):
             "name": f"adresse_ligne_1{name_suffix}",
             "type": "varchar",
             "comment": f"Première ligne adresse{comment_suffix}",
-            "lambda": lambda o: o.address_line_1,
+            "fn": lambda o: o.address_line_1,
         },
         {
             "name": f"adresse_ligne_2{name_suffix}",
             "type": "varchar",
             "comment": f"Seconde ligne adresse{comment_suffix}",
-            "lambda": lambda o: o.address_line_2,
+            "fn": lambda o: o.address_line_2,
         },
         {
             "name": f"code_postal{name_suffix}",
             "type": "varchar",
             "comment": f"Code postal{comment_suffix}",
-            "lambda": lambda o: o.post_code,
+            "fn": lambda o: o.post_code,
         },
         {
             "name": f"ville{name_suffix}",
             "type": "varchar",
             "comment": f"Ville{comment_suffix}",
-            "lambda": lambda o: o.city,
+            "fn": lambda o: o.city,
         },
     ] + get_department_and_region_columns(name_suffix, comment_suffix)
 
@@ -135,7 +135,7 @@ def get_establishment_last_login_date_column():
             "name": "date_dernière_connexion",
             "type": "date",
             "comment": "Date de dernière connexion utilisateur",
-            "lambda": lambda o: max([u.last_login for u in o.members.all() if u.last_login], default=None)
+            "fn": lambda o: max([u.last_login for u in o.members.all() if u.last_login], default=None)
             if o.members.exists()
             else None,
         },
@@ -148,7 +148,7 @@ def get_establishment_is_active_column():
             "name": "active",
             "type": "boolean",
             "comment": "Dernière connexion dans les 7 jours",
-            "lambda": lambda o: any(
+            "fn": lambda o: any(
                 [u.last_login > timezone.now() - timezone.timedelta(days=7) for u in o.members.all() if u.last_login]
             )
             if o.members.exists()
