@@ -109,7 +109,7 @@ TABLE_COLUMNS += [
     {
         "name": "code_safir",
         "type": "varchar",
-        "comment": "Code SAFIR Pôle Emploi",
+        "comment": "Code SAFIR Pôle emploi",
         "fn": lambda o: o.code_safir_pole_emploi,
     },
     {
