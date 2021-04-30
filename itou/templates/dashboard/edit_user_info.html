@@ -1,12 +1,7 @@
 {% extends "layout/content_small.html" %}
 {% load bootstrap4 %}
-{% load static %}
 
 {% block title %}Modifier votre profil{{ block.super }}{% endblock %}
-
-{% block extra_head %}
-    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'>
-{% endblock extra_head %}
 
 {% block content %}
 <h1>Modifier votre profil</h1>
@@ -28,30 +23,11 @@
 
     {% bootstrap_form form alert_error_type="all" %}
 
-    {# if ITOU_ENVIRONMENT == "PROD" #}
-        {% if request.user.is_job_seeker %}
-            {{ form.resume_link.as_hidden }}
-        {% endif %}
-    {# endif #}
-
-
     {% buttons %}
         <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
         <button type="submit" class="btn btn-primary">Enregistrer</button>
     {% endbuttons %}
 
-</form>
-
-<div class="mt-5"></div>
-<form method="post" action="{{ s3_form_endpoint }}" enctype="multipart/form-data" class="dropzone" id="resume_form">
-    <input type="hidden" name="policy" value="{{ s3_form_policy }}">
-    <input type="hidden" name="x-amz-algorithm" value="AWS4-HMAC-SHA256">
-    <input type="hidden" name="x-amz-credential" value="{{ s3_form_credential }}">
-    <input type="hidden" name="x-amz-date" value="{{ s3_form_date }}">
-    <input type="hidden" name="x-amz-signature" value="{{ s3_form_signature }}">
-
-    <!-- Don't move me: I must be the last form item! -->
-    <input type="hidden" name="key" value="" id="file_key">
 </form>
 
 {% endblock %}
@@ -60,43 +36,4 @@
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
-
-    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
-
-    <script type="text/javascript">
-        // Camelized version of the HTML element's ID
-         Dropzone.options.resumeForm = {
-            maxFilesize: {{ s3_max_file_size }}, // MB
-            timeout: {{ s3_upload_timeout }}, // default 3000, in ms
-            maxFiles: {{ s3_max_files }},
-            acceptedFiles: "{{ s3_allowed_mime_types }}",
-            addRemoveLinks: true,
-            dictDefaultMessage: "Glissez-déposez un fichier ou cliquez ici",
-            dictFallbackMessage: "Ce navigateur n'est pas compatible",
-            dictFileTooBig: "Fichier trop volumineux",
-            dictInvalidFileType: "Type de fichier non pris en charge",
-            dictResponseError: "Erreur \{\{ statusCode \}\}",
-            dictCancelUpload: "Annuler",
-            dictUploadCanceled: "Annulé",
-            dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
-            dictRemoveFile: "Supprimer",
-            dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
-            dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
-            renameFile: function (file) {
-                const extension = file.name.split('.').pop();
-                const filename = Dropzone.uuidv4();
-                const file_key = `{{ s3_key_path }}/${filename}.${extension}`;
-                // Set the filekey before sending the form!
-                $("input#file_key").val(file_key);
-                return file_key;
-            },
-            success: function(file) {
-                // Sadly, our S3 provider does not return the "Location" header.
-                // Don't forget to add "Location" to CORS' exposed headers!
-                // const location = file.xhr.getResponseHeader("Location");
-                const location = `{{ s3_form_endpoint }}/${file.upload.filename}`;
-                $("input#id_resume_link").val(location);
-            },
-        };
-    </script>
 {% endblock %}
