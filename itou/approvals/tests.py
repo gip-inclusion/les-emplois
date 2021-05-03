@@ -1109,6 +1109,22 @@ class ProlongationModelTest(TestCase):
     Test Prolongation model.
     """
 
+    def test_clean_with_wrong_start_at(self):
+        """
+        Given an existing prolongation, when setting a wrong `start_at`
+        then a call to `clean()` is rejected.
+        """
+        start_at = datetime.date.today()
+        end_at = start_at + relativedelta(months=1)
+        prolongation = ProlongationFactory(start_at=start_at, end_at=end_at)
+        # Set a `prolongation.start_at` different from `prolongation.approval.start_at`.
+        prolongation.start_at -= relativedelta(days=2)
+        with self.assertRaises(ValidationError) as error:
+            prolongation.clean()
+        self.assertIn(
+            "La date de début ne peut pas être différente de la date de fin du PASS IAE", error.exception.message
+        )
+
     def test_get_start_at(self):
 
         end_at = datetime.date(2021, 2, 1)
