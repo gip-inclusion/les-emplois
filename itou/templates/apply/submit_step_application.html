@@ -38,17 +38,6 @@
 
     </form>
 
-<!--     <form method="post" action="{{ s3_form_endpoint }}" enctype="multipart/form-data" class="dropzone" id="resume_form">
-        <input type="hidden" name="policy" value="{{ s3_form_policy }}">
-        <input type="hidden" name="x-amz-algorithm" value="AWS4-HMAC-SHA256">
-        <input type="hidden" name="x-amz-credential" value="{{ s3_form_credential }}">
-        <input type="hidden" name="x-amz-date" value="{{ s3_form_date }}">
-        <input type="hidden" name="x-amz-signature" value="{{ s3_form_signature }}">
-
-        <!-- Don't move me: I must be the last form item! -->
-        <!-- <input type="hidden" name="key" value="" id="file_key"> -->
-    <!-- </form> -->
-
 {% endblock %}
 
 {% block script %}
@@ -59,7 +48,16 @@
     <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
 
     <script type="text/javascript">
-        // Camelized version of the HTML element's ID
+        // Input field where the location URL will be provided after success.
+        const callback_location_selector = "input#id_resume_link";
+
+        // Transform this element into a drag and drop zone.
+        const dropzone_selector = "#resume_form";
+
+        // When a file is added to the drop zone, send a POST request to this URL.
+        const form_url = "{{ s3_form_endpoint }}";
+
+        // S3 form params sent when a new file is added to the drop zone.
         const form_params = {
             "policy": "{{ s3_form_policy }}",
             "x-amz-algorithm": "AWS4-HMAC-SHA256",
@@ -67,13 +65,20 @@
             "x-amz-date": "{{ s3_form_date }}",
             "x-amz-signature": "{{ s3_form_signature }}"
         };
-        const resume_config = {
-            url: "{{ s3_form_endpoint }}",
-            maxFilesize: {{ s3_max_file_size }}, // MB
-            timeout: {{ s3_upload_timeout }}, // default 3000, in ms
-            maxFiles: {{ s3_max_files }},
+
+        // Appended before the file name. The final slash is added later.
+        const key_path = "{{ s3_key_path }}";
+
+        // Dropzone configuration
+        const dropzone_config = {
+            url: form_url,
+            params: form_params,
+            maxFilesize: "{{ s3_max_file_size }}", // in MB
+            timeout: "{{ s3_upload_timeout }}", // default 3000, in ms
+            maxFiles: "{{ s3_max_files }}",
             acceptedFiles: "{{ s3_allowed_mime_types }}",
             addRemoveLinks: true,
+            // translations
             dictDefaultMessage: "Glissez-déposez un fichier ou cliquez ici",
             dictFallbackMessage: "Ce navigateur n'est pas compatible",
             dictFileTooBig: "Fichier trop volumineux",
@@ -85,75 +90,31 @@
             dictRemoveFile: "Supprimer",
             dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
             dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
-            params: form_params,
+            // functions
             renameFile: function (file) {
                 const extension = file.name.split('.').pop();
                 const filename = Dropzone.uuidv4();
-                const file_key = `{{ s3_key_path }}/${filename}.${extension}`;
-                // Set the filekey before sending the form!
-                // window.essai = this;
-                this.params.append("key", file_key);
-                // file.formData.append("key", filekey);
-                // $("input#file_key").val(file_key);
+                const file_key = `${key_path}/${filename}.${extension}`;
+                // Add file key to options params so that it's send
+                // as an input field on POST.
+                this.params["key"] = file_key;
                 return file_key;
             },
             success: function(file) {
-                // Sadly, our S3 provider does not return the "Location" header.
-                // Don't forget to add "Location" to CORS' exposed headers!
+                // Sadly, our S3 provider does not return the "Location" header for the moment.
+                // When it does, don't forget to add "Location" to CORS' exposed headers!
                 // const location = file.xhr.getResponseHeader("Location");
-                const location = `{{ s3_form_endpoint }}/${file.upload.filename}`;
+                const location = `${form_url}/${file.upload.filename}`;
                 {% if ITOU_ENVIRONMENT == "DEV" %}
                     console.log(location);
                 {% endif %}
-                $("input#id_resume_link").val(location);
+                $(callback_location_selector).val(location);
             },
         };
-        Dropzone.autoDiscover = false;
-        $("#resume_form").dropzone(resume_config);
 
-        //  Dropzone.options.resumeForm = {
-        //     url: "{{ s3_form_endpoint }},"
-        //     maxFilesize: {{ s3_max_file_size }}, // MB
-        //     timeout: {{ s3_upload_timeout }}, // default 3000, in ms
-        //     maxFiles: {{ s3_max_files }},
-        //     acceptedFiles: "{{ s3_allowed_mime_types }}",
-        //     addRemoveLinks: true,
-        //     dictDefaultMessage: "Glissez-déposez un fichier ou cliquez ici",
-        //     dictFallbackMessage: "Ce navigateur n'est pas compatible",
-        //     dictFileTooBig: "Fichier trop volumineux",
-        //     dictInvalidFileType: "Type de fichier non pris en charge",
-        //     dictResponseError: "Erreur \{\{ statusCode \}\}",
-        //     dictCancelUpload: "Annuler",
-        //     dictUploadCanceled: "Annulé",
-        //     dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
-        //     dictRemoveFile: "Supprimer",
-        //     dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
-        //     dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
-        //     params: {
-        //         "policy": "{{ s3_form_policy }}",
-        //         "x-amz-algorithm": "AWS4-HMAC-SHA256",
-        //         "x-amz-credential": "{{ s3_form_credential }}",
-        //         "x-amz-date": "{{ s3_form_date }}",
-        //         "x-amz-signature": {{ s3_form_signature }}
-        //     },
-        //     renameFile: function (file) {
-        //         const extension = file.name.split('.').pop();
-        //         const filename = Dropzone.uuidv4();
-        //         const file_key = `{{ s3_key_path }}/${filename}.${extension}`;
-        //         // Set the filekey before sending the form!
-        //         $("input#file_key").val(file_key);
-        //         return file_key;
-        //     },
-        //     success: function(file) {
-        //         // Sadly, our S3 provider does not return the "Location" header.
-        //         // Don't forget to add "Location" to CORS' exposed headers!
-        //         // const location = file.xhr.getResponseHeader("Location");
-        //         const location = `{{ s3_form_endpoint }}/${file.upload.filename}`;
-        //         {% if ITOU_ENVIRONMENT == "DEV" %}
-        //             console.log(location);
-        //         {% endif %}
-        //         $("input#id_resume_link").val(location);
-        //     },
-        // };
+        // By default, Dropzone attaches to any component having the "dropzone" class.
+        // Turn off this behavior to control all the aspects "manually".
+        Dropzone.autoDiscover = false;
+        $(dropzone_selector).dropzone(dropzone_config);
     </script>
 {% endblock %}
