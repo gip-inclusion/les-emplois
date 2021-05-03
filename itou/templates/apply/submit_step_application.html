@@ -17,14 +17,23 @@
         {% csrf_token %}
 
         {% if siae.jobs.exists %}
-            {% bootstrap_field form.selected_jobs %}
+            {% bootstrap_field form.selected_jobs label_class="h5" %}
         {% endif %}
 
-        {% bootstrap_field form.message %}
-        {% bootstrap_field form.resume_link %}
+        {% bootstrap_field form.message label_class="h5" %}
+
+        <h5>{{ form.resume_link.label }}</h5>
+        <div id="resume_form" class="dropzone border-dashed text-center text-secondary mb-4">
+            <div class="dz-message my-1">
+                <div class="h5">{% include "includes/icon.html" with icon="upload" size="30" %}</div>
+                <div class="h6"><a href="#;">Choisissez un fichier</a> ou <b>glissez ici</b>.</div>
+                <div class="small">Taille maximale : {{ s3_max_file_size }} Mo</div>
+                <div class="small">Type de fichier : PDF</div>
+            </div>
+        </div>
 
         {{ form.resume_link.as_hidden }}
-        <div id="resume_form" class="dropzone"></div>
+
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">
@@ -79,7 +88,6 @@
             acceptedFiles: "{{ s3_allowed_mime_types }}",
             addRemoveLinks: true,
             // translations
-            dictDefaultMessage: "Glissez-déposez un fichier ou cliquez ici",
             dictFallbackMessage: "Ce navigateur n'est pas compatible",
             dictFileTooBig: "Fichier trop volumineux",
             dictInvalidFileType: "Type de fichier non pris en charge",

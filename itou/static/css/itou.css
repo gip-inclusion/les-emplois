@@ -324,6 +324,10 @@ a.disabled button:hover, button.disabled:hover {
     border-color: inherit;
 }
 
+.border-dashed {
+    border-style: dashed !important;
+}
+
 /* Overrides opacity for disabled button (search cities) */
 .js-search-button {
     opacity: 100% !important;
@@ -366,7 +370,7 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
 .lines-on-sides:before, .lines-on-sides:after{
     content: "";
     flex: 1 1;
-    border-bottom: 1px solid #000;
+    border-bottom: 1px solid; /* Don't specify the color to "inherit" from the current one */
     margin: auto;
 }
 .lines-on-sides:before {
