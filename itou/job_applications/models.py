@@ -662,12 +662,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         Manually deliver an approval.
         """
-        email = self.email_deliver_approval(self.accepted_by)
-        email.send()
         self.approval_number_sent_by_email = True
         self.approval_number_sent_at = timezone.now()
         self.approval_manually_delivered_by = delivered_by
         self.save()
+        # Send email at the end because we can't rollback this operation
+        email = self.email_deliver_approval(self.accepted_by)
+        email.send()
 
     def manually_refuse_approval(self, refused_by):
         """
@@ -676,6 +677,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.approval_manually_refused_by = refused_by
         self.approval_manually_refused_at = timezone.now()
         self.save()
+        # Send email at the end because we can't rollback this operation
         email = self.email_manually_refuse_approval
         email.send()
 
