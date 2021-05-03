@@ -734,8 +734,8 @@ class Prolongation(models.Model):
             raise ValidationError(
                 {
                     "end_at": (
-                        f'La durée totale est trop longue pour le motif "{self.get_reason_display()}". '
-                        f"Date de fin maximum: {max_end_at.strftime('%d/%m/%Y')}."
+                        f"La durée totale est trop longue pour le motif « {self.get_reason_display()} ». "
+                        f"Date de fin maximum : {max_end_at.strftime('%d/%m/%Y')}."
                     )
                 }
             )
@@ -745,7 +745,7 @@ class Prolongation(models.Model):
                 self.declared_by_siae.KIND_AI,
                 self.declared_by_siae.KIND_ACI,
             ]:
-                raise ValidationError(f'Le motif "{self.get_reason_display()}" est réservé aux AI et ACI.')
+                raise ValidationError(f"Le motif « {self.get_reason_display()} » est réservé aux AI et ACI.")
 
         if (
             hasattr(self, "validated_by")
@@ -755,6 +755,12 @@ class Prolongation(models.Model):
             raise ValidationError("Cet utilisateur n'est pas un prescripteur habilité.")
 
         if hasattr(self, "approval"):
+
+            if self.start_at != self.get_start_at(self.approval):
+                raise ValidationError(
+                    "La date de début ne peut pas être différente de la date de fin du PASS IAE "
+                    f"« {self.approval.end_at.strftime('%d/%m/%Y')} »."
+                )
 
             # A prolongation cannot overlap another one for the same SIAE.
             # This check is enforced by a constraint at the database level but

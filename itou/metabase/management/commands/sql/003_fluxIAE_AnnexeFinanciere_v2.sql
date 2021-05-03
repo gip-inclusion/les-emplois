@@ -1,3 +1,5 @@
+/* reformattage de la colonne type de structure */
+
 select 
     * , 
     substr(

@@ -618,9 +618,49 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 
+class AutomaticApprovalAdminViewsTest(TestCase):
+    """
+    Test Approval automatic admin views.
+    """
+
+    def test_edit_approval_with_a_wrong_number(self):
+        """
+        Given an existing approval, when setting a different number,
+        then the save is rejected.
+        """
+        user = UserFactory()
+        user.is_staff = True
+        user.save()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="change_approval")
+        user.user_permissions.add(permission)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        approval = job_app.approval
+
+        url = reverse("admin:approvals_approval_change", args=[approval.pk])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "start_at": approval.start_at.strftime("%d/%m/%Y"),
+            "end_at": approval.end_at.strftime("%d/%m/%Y"),
+            "user": job_app.job_seeker.pk,
+            "number": "999991234567",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "adminform", "number", [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number]
+        )
+
+
 class CustomApprovalAdminViewsTest(TestCase):
     """
-    Test custom Approval admin views.
+    Test Approval custom admin views.
     """
 
     def test_manually_add_approval(self):
@@ -1068,6 +1108,22 @@ class ProlongationModelTest(TestCase):
     """
     Test Prolongation model.
     """
+
+    def test_clean_with_wrong_start_at(self):
+        """
+        Given an existing prolongation, when setting a wrong `start_at`
+        then a call to `clean()` is rejected.
+        """
+        start_at = datetime.date.today()
+        end_at = start_at + relativedelta(months=1)
+        prolongation = ProlongationFactory(start_at=start_at, end_at=end_at)
+        # Set a `prolongation.start_at` different from `prolongation.approval.start_at`.
+        prolongation.start_at -= relativedelta(days=2)
+        with self.assertRaises(ValidationError) as error:
+            prolongation.clean()
+        self.assertIn(
+            "La date de début ne peut pas être différente de la date de fin du PASS IAE", error.exception.message
+        )
 
     def test_get_start_at(self):
 
