@@ -242,7 +242,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         messages.warning(
             request,
             mark_safe(
-                "Etes-vous satisfait des emplois de l'inclusion ? "
+                "Êtes-vous satisfait des emplois de l'inclusion ? "
                 + f"<a href='{settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}' rel='noopener' target='_blank'>"
                 + "Je donne mon avis"
                 + "</a>"
