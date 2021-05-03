@@ -9,8 +9,7 @@ class ResumeFormMixin(forms.Form):
     """
 
     resume_link = forms.URLField(
-        label="Indiquer le lien d'un CV existant",
-        help_text="Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)",
+        label=gettext_lazy("CV (optionnel)"),
         required=False,
         widget=forms.TextInput(attrs={"placeholder": "https://www.mon_cv.fr/dfROS"}),
     )
