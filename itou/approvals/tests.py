@@ -623,7 +623,11 @@ class AutomaticApprovalAdminViewsTest(TestCase):
     Test Approval automatic admin views.
     """
 
-    def test_edit_approval(self):
+    def test_edit_approval_with_a_wrong_number(self):
+        """
+        Given an existing approval, when setting a different number,
+        then the save is rejected.
+        """
         user = UserFactory()
         user.is_staff = True
         user.save()
