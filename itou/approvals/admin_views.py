@@ -21,7 +21,6 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.emails import get_email_text_template
 
 
-@transaction.atomic
 def manually_add_approval(
     request, model_admin, job_application_id, template_name="admin/approvals/manually_add_approval.html"
 ):
@@ -62,10 +61,10 @@ def manually_add_approval(
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
     if request.method == "POST" and form.is_valid():
-        approval = form.save()
-        job_application.approval = approval
-        job_application.save()
-        job_application.manually_deliver_approval(delivered_by=request.user)
+        with transaction.atomic():
+            approval = form.save()
+            job_application.approval = approval
+            job_application.manually_deliver_approval(delivered_by=request.user)
         messages.success(request, f"Le PASS IAE {approval.number_with_spaces} a bien été créé et envoyé par e-mail.")
         return HttpResponseRedirect(reverse("admin:approvals_approval_changelist"))
 
