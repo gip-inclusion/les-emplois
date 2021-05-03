@@ -618,9 +618,45 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
 
+class AutomaticApprovalAdminViewsTest(TestCase):
+    """
+    Test Approval automatic admin views.
+    """
+
+    def test_edit_approval(self):
+        user = UserFactory()
+        user.is_staff = True
+        user.save()
+        content_type = ContentType.objects.get_for_model(Approval)
+        permission = Permission.objects.get(content_type=content_type, codename="change_approval")
+        user.user_permissions.add(permission)
+
+        self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+
+        job_app = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        approval = job_app.approval
+
+        url = reverse("admin:approvals_approval_change", args=[approval.pk])
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "start_at": approval.start_at.strftime("%d/%m/%Y"),
+            "end_at": approval.end_at.strftime("%d/%m/%Y"),
+            "user": job_app.job_seeker.pk,
+            "number": "999991234567",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(
+            response, "adminform", "number", [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number]
+        )
+
+
 class CustomApprovalAdminViewsTest(TestCase):
     """
-    Test custom Approval admin views.
+    Test Approval custom admin views.
     """
 
     def test_manually_add_approval(self):
