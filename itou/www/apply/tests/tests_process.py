@@ -26,7 +26,7 @@ class ProcessViewsTest(TestCase):
     def test_details_for_siae(self):
         """Display the details of a job application."""
 
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(job_seeker__is_job_seeker=True)
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         siae_user = job_application.to_siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
