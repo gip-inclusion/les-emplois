@@ -27,7 +27,8 @@ class ProcessViewsTest(TestCase):
         """Display the details of a job application."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
-        siae_user = job_application.to_siae.members.first()
+        siae = job_application.to_siae
+        siae_user = siae.members.first()
         self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -42,6 +43,21 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertTrue(job_application.has_editable_job_seeker)
         self.assertContains(response, "Modifier les informations")
+
+        # Test resume presence:
+        # 1/ Job seeker has a personal resume (technical debt).
+        resume_link = "https://server.com/rockie-balboa.pdf"
+        job_application = JobApplicationSentByJobSeekerFactory(job_seeker__resume_link=resume_link, to_siae=siae)
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, resume_link)
+
+        # 2/ Job application was sent with an attached resume
+        resume_link = "https://server.com/rockie-balboa.pdf"
+        job_application = JobApplicationSentByJobSeekerFactory(resume_link=resume_link, to_siae=siae)
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, resume_link)
 
     def test_details_for_siae_hidden(self):
         """An hiden job_application is not displayed."""
