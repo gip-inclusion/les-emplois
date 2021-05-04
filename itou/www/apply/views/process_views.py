@@ -322,7 +322,7 @@ def archive(request, job_application_id):
             success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."
             messages.success(request, success_message)
         except xwf_models.InvalidTransitionError:
-            messages.error(request, "Vous ne pouvez pas supprimer cette candidature.")
+            messages.error(request, "Action déjà effectuée.")
 
     return HttpResponseRedirect(next_url)
 
