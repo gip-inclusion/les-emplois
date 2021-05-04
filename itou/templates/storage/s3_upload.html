@@ -1,0 +1,73 @@
+{% load static %}
+
+<script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
+
+<script type="text/javascript">
+    // Input field where the location URL will be provided after success.
+    const callback_location_selector = "{{ callback_location_selector }}";
+
+    // Transform this element into a drag and drop zone.
+    const dropzone_selector = "{{ dropzone_selector }}";
+
+    // When a file is added to the drop zone, send a POST request to this URL.
+    const form_url = "{{ s3_form_values.endpoint }}";
+
+    // S3 form params sent when a new file is added to the drop zone.
+    const form_params = {
+        "policy": "{{ s3_form_values.encoded_policy }}",
+        "x-amz-algorithm": "AWS4-HMAC-SHA256",
+        "x-amz-credential": "{{ s3_form_values.credential_url }}",
+        "x-amz-date": "{{ s3_form_values.date }}",
+        "x-amz-signature": "{{ s3_form_values.signature }}"
+    };
+
+    // Appended before the file name. The final slash is added later.
+    const key_path = "{{ s3_upload_config.key_path }}";
+
+    // Dropzone configuration
+    const dropzone_config = {
+        url: form_url,
+        params: form_params,
+        maxFilesize: "{{ s3_upload_config.max_file_size }}", // in MB
+        timeout: "{{ s3_upload_config.timeout }}", // default 3000, in ms
+        maxFiles: "{{ s3_upload_config.max_files }}",
+        acceptedFiles: "{{ s3_upload_config.allowed_mime_types }}",
+        addRemoveLinks: true,
+        // translations
+        dictFallbackMessage: "Ce navigateur n'est pas compatible",
+        dictFileTooBig: "Fichier trop volumineux",
+        dictInvalidFileType: "Type de fichier non pris en charge",
+        dictResponseError: "Erreur \{\{ statusCode \}\}",
+        dictCancelUpload: "Annuler",
+        dictUploadCanceled: "Annulé",
+        dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
+        dictRemoveFile: "Supprimer",
+        dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
+        dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
+        // functions
+        renameFile: function (file) {
+            const extension = file.name.split('.').pop();
+            const filename = Dropzone.uuidv4();
+            const file_key = `${key_path}/${filename}.${extension}`;
+            // Add file key to options params so that it's send
+            // as an input field on POST.
+            this.params["key"] = file_key;
+            return file_key;
+        },
+        success: function(file) {
+            // Sadly, our S3 provider does not return the "Location" header for the moment.
+            // When it does, don't forget to add "Location" to CORS' exposed headers!
+            // const location = file.xhr.getResponseHeader("Location");
+            const location = `${form_url}/${file.upload.filename}`;
+            {% if ITOU_ENVIRONMENT == "DEV" %}
+                console.log(location);
+            {% endif %}
+            $(callback_location_selector).val(location);
+        },
+    };
+
+    // By default, Dropzone attaches to any component having the "dropzone" class.
+    // Turn off this behavior to control all the aspects "manually".
+    Dropzone.autoDiscover = false;
+    $(dropzone_selector).dropzone(dropzone_config);
+</script>

@@ -72,7 +72,6 @@ def policy_as_dict(date, key_path="/", expiration_period=1):
     """
     Set uploading file policy. Different from the bucket policy.
     """
-    # TODO: move me to resume settings.
     expiration_date = date + relativedelta(hours=expiration_period)
     form_credential_url = generate_credential_url(date=date)
     form_date = format_date_long(date)
@@ -98,22 +97,23 @@ def generate_form_values(date, key_path, expiration_period):
     signature = generate_signature(date=date, string_to_sign=encoded_policy)
 
     return {
-        "form_credential_url": form_credential_url,
-        "form_date": form_date,
+        "credential_url": form_credential_url,
+        "date": form_date,
         "encoded_policy": encoded_policy,
         "signature": signature,
+        "endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
     }
 
 
 def get_upload_config(kind):
-    options = settings.STORAGE_UPLOAD_KINDS[kind]
+    config = settings.STORAGE_UPLOAD_KINDS[kind]
     default_options = settings.STORAGE_UPLOAD_KINDS["default"]
-    options = default_options | options
+    config = default_options | config
 
-    key_path = options["key_path"]
+    key_path = config["key_path"]
     if key_path.startswith("/") or key_path.endswith("/"):
         raise ValueError("key_path should not begin or end with a slash")
 
-    options["allowed_mime_types"] = ",".join(options["allowed_mime_types"])
+    config["allowed_mime_types"] = ",".join(config["allowed_mime_types"])
 
-    return options
+    return config
