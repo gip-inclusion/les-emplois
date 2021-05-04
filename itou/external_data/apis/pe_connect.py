@@ -253,7 +253,9 @@ def import_user_pe_data(
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
     """
     if not pe_data_import:
-        pe_data_import = ExternalDataImport.objects.create(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user)
+        pe_data_import = ExternalDataImport.objects.create(
+            source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user, status=ExternalDataImport.STATUS_PENDING
+        )
 
     # Save pending status if updating record (transitive state)
     if pe_data_import != ExternalDataImport.STATUS_PENDING:
