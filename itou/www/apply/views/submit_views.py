@@ -5,7 +5,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.http import urlencode
 
 from itou.approvals.models import Approval
@@ -18,8 +17,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
-from itou.utils.resume.forms import ResumeFormMixin
-from itou.utils.storage import s3
+from itou.utils.storage.s3 import S3Upload
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -355,17 +353,9 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
         return HttpResponseRedirect(next_url)
 
-    # Talk with other devs: I wonder if this should be a class instead.
-    # Example:
-    # s3_upload = S3Upload(kind="resume")
-    # s3_upload_config = s3_upload.config
-    # s3_form_values = s3_upload.form_values
-    s3_upload_config = s3.get_upload_config(kind="resume")
-    s3_key_path = s3_upload_config["key_path"]
-    upload_expiration = s3_upload_config["upload_expiration"]
-    s3_form_values = s3.generate_form_values(
-        date=timezone.now(), key_path=s3_key_path, expiration_period=upload_expiration
-    )
+    s3_upload = S3Upload(kind="resume")
+    s3_upload_config = s3_upload.config
+    s3_form_values = s3_upload.form_values
 
     context = {
         "siae": siae,

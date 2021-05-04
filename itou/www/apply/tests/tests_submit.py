@@ -19,7 +19,7 @@ from itou.siaes.factories import SiaeWithMembershipAndJobsFactory, SiaeWithMembe
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
-from itou.utils.storage import s3
+from itou.utils.storage.s3 import S3Upload
 
 
 class ApplyAsJobSeekerTest(TestCase):
@@ -142,15 +142,15 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         self.assertEqual(response.status_code, 200)
 
-        # Test s3 mandatory fields
-        date = timezone.now()
-        resume_config = s3.get_upload_config("resume")
-        s3_form_values = s3.generate_form_values(
-            date=date, key_path=resume_config["key_path"], expiration_period=resume_config["upload_expiration"]
-        )
+        # Test fields mandatory to upload to S3
+        s3_upload = S3Upload(kind="resume")
+        resume_config = s3_upload.config
+        s3_form_values = s3_upload.form_values
+
         # Form fields
         for _, value in s3_form_values.items():
             self.assertContains(response, value)
+
         # Config variables
         for _, value in resume_config.items():
             self.assertContains(response, value)
