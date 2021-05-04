@@ -34,6 +34,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = datetime.date.today()
     hiring_end_at = datetime.date.today() + relativedelta(years=2)
+    resume_link = "https://server.com/rockie-balboa.pdf"
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):
