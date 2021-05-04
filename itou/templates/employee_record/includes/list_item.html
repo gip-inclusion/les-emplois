@@ -1,0 +1,18 @@
+<div class="card mb-3">
+    <div class="card-header">
+    <b>{{ item.job_seeker.get_full_name }}</b>
+    </div>
+    <div class="card-body pb-0">
+        <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at }}</b></p>
+        <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at }}</b></p>
+        <p class="m-0">Numéro de PASS IAE : <b>{{ item.approval.number }}</b></p>
+    </div>
+    <div class="p-2">
+        <form method="POST" action="{% url 'employee_record_views:create' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-primary float-right">
+                Créer la fiche salarié
+            </button>
+        </form>
+    </div>
+</div>
