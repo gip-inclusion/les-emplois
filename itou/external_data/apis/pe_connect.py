@@ -257,11 +257,6 @@ def import_user_pe_data(
             source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user, status=ExternalDataImport.STATUS_PENDING
         )
 
-    # Save pending status if updating record (transitive state)
-    if pe_data_import != ExternalDataImport.STATUS_PENDING:
-        pe_data_import.status = ExternalDataImport.STATUS_PENDING
-        pe_data_import.save()
-
     try:
         status, user_data = _get_aggregated_user_data(token)
         set_pe_data_import_from_user_data(pe_data_import, user, status, user_data)
