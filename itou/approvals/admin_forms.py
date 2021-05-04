@@ -15,14 +15,17 @@ class ApprovalFormMixin:
     def clean_number(self):
         number = self.cleaned_data["number"]
         is_new = self.instance.pk is None
+
         if is_new and number and number.startswith(Approval.ASP_ITOU_PREFIX):
             # On ne laisse pas saisir un numéro qui commencerait par `ASP_ITOU_PREFIX`
             # car ça risquerait de créer des trous dans la séquence des numéros.
             raise forms.ValidationError(self.ERROR_NUMBER)
-        elif number != self.instance.number:
+
+        if not is_new and number != self.instance.number:
             # On laisse la possibilité de modifier un PASS IAE existant afin
             # de pouvoir modifier ses dates, mais pas son numéro.
             raise forms.ValidationError(self.ERROR_NUMBER_CANNOT_BE_CHANGED % self.instance.number)
+
         return number
 
 
