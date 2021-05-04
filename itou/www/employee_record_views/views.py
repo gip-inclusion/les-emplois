@@ -45,9 +45,9 @@ def list(request, template_name="employee_record/list.html"):
             JobApplication.objects.eligible_as_employee_record(siae).count(),
             "info",
         ),
-        (EmployeeRecord.objects.sent(siae).count(), "warning"),
-        (0, "danger"),
-        (0, "success"),
+        (EmployeeRecord.objects.sent_for_siae(siae).count(), "warning"),
+        (EmployeeRecord.objects.rejected_for_siae(siae).count(), "danger"),
+        (EmployeeRecord.objects.processed_for_siae(siae).count(), "success"),
     ]
 
     if request.method == "POST" and form.is_valid():
@@ -64,6 +64,8 @@ def list(request, template_name="employee_record/list.html"):
 
         if status == EmployeeRecord.Status.NEW:
             job_applications = JobApplication.objects.eligible_as_employee_record(siae)
+        elif status == EmployeeRecord.Status.SENT:
+            employee_records = EmployeeRecord.objects.sent_for_siae(siae)
 
     context = {
         "form": form,

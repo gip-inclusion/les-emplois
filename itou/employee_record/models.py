@@ -27,14 +27,23 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(status=EmployeeRecord.Status.READY)
 
-    def sent(self, siae):
-        return self.filter(status=EmployeeRecord.Status.SENT, job_application__to_siae=siae)
+    def sent(self):
+        return self.filter(status=EmployeeRecord.Status.SENT)
+
+    def sent_for_siae(self, siae):
+        return self.sent().filter(job_application__to_siae=siae).select_related("job_application")
 
     def rejected(self):
         return self.filter(status=EmployeeRecord.Status.REJECTED)
 
+    def rejected_for_siae(self, siae):
+        return self.rejected().filter(job_application__to_siae=siae).select_related("job_application")
+
     def processed(self):
         return self.filter(status=EmployeeRecord.Status.PROCESSED)
+
+    def processed_for_siae(self, siae):
+        return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
 
     def archived(self):
         """
