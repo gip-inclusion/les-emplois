@@ -95,9 +95,9 @@ class S3Tests(SimpleTestCase):
     def test_generate_form_values(self):
         date = datetime.datetime(2021, 4, 29, 12, 13, 14, 155)
         form_values = s3.generate_form_values(date=date, key_path="/", expiration_period=1)
-        expected_keys = ["form_credential_url", "form_date", "encoded_policy", "signature"]
+        expected_keys = ["credential_url", "date", "encoded_policy", "signature", "endpoint"]
         self.assertEqual(sorted(form_values.keys()), sorted(expected_keys))
-        self.assertEqual(form_values["form_date"], "20210429T121314Z")
+        self.assertEqual(form_values["date"], "20210429T121314Z")
 
     def test_get_upload_config(self):
         result = s3.get_upload_config(kind="resume")

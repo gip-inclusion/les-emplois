@@ -355,28 +355,24 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
         return HttpResponseRedirect(next_url)
 
-    s3_upload_options = s3.get_upload_config(kind="resume")
-    s3_key_path = s3_upload_options["key_path"]
-    upload_expiration = s3_upload_options["upload_expiration"]
+    # Talk with other devs: I wonder if this should be a class instead.
+    # Example:
+    # s3_upload = S3Upload(kind="resume")
+    # s3_upload_config = s3_upload.config
+    # s3_form_values = s3_upload.form_values
+    s3_upload_config = s3.get_upload_config(kind="resume")
+    s3_key_path = s3_upload_config["key_path"]
+    upload_expiration = s3_upload_config["upload_expiration"]
     s3_form_values = s3.generate_form_values(
         date=timezone.now(), key_path=s3_key_path, expiration_period=upload_expiration
     )
-    s3_form_context = {
-        "s3_form_policy": s3_form_values["encoded_policy"],
-        "s3_form_signature": s3_form_values["signature"],
-        "s3_form_date": s3_form_values["form_date"],
-        "s3_form_endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
-        "s3_form_credential": s3_form_values["form_credential_url"],
-        "s3_allowed_mime_types": s3_upload_options["allowed_mime_types"],
-        "s3_key_path": s3_key_path,
-        "s3_max_files": s3_upload_options["max_files"],
-        "s3_max_file_size": s3_upload_options["max_file_size"],
-        "s3_upload_timeout": s3_upload_options["timeout"],
-    }
-    context = s3_form_context | {
+
+    context = {
         "siae": siae,
         "form": form,
         "job_seeker": job_seeker,
         "approvals_wrapper": approvals_wrapper,
+        "s3_form_values": s3_form_values,
+        "s3_upload_config": s3_upload_config,
     }
     return render(request, template_name, context)
