@@ -175,17 +175,6 @@ class ModelTest(TestCase):
         with self.assertRaises(ValidationError):
             job_seeker.clean()
 
-    def test_create_job_seeker_profile(self):
-        """
-        User title is not needed for validation of a User objects
-
-        It is mandatory for validation of JobSeekerProfile objects
-        """
-        job_seeker = JobSeekerFactory()
-        job_seeker.get_or_create_job_seeker_profile()
-
-        self.assertIsNotNone(job_seeker.jobseeker_profile)
-
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
     return RESULTS_BY_ADDRESS.get(address)
