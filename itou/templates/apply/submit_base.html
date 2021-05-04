@@ -8,7 +8,9 @@
         {% if request.user.is_siae_staff %}
             <span class="text-muted">{{ siae.display_name }}</span>
         {% else %}
-            Postuler pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span> chez <span class="text-muted">{{ siae.display_name }}</span>
+            Postuler
+            {% if job_seeker %}pour <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>{% endif %}
+            chez <span class="text-muted">{{ siae.display_name }}</span>
         {% endif %}
     </h1>
 
