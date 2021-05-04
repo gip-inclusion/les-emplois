@@ -41,6 +41,19 @@ class ProcessViewsTest(TestCase):
         self.assertTrue(job_application.has_editable_job_seeker)
         self.assertContains(response, "Modifier les informations")
 
+    def test_details_for_siae_hidden(self):
+        """An hiden job_application is not displayed."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker__is_job_seeker=True, hidden_for_siae=True
+        )
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
+
     def test_process(self):
         """Ensure that the `process` transition is triggered."""
 
@@ -484,7 +497,7 @@ class ProcessViewsTest(TestCase):
         self.assertFalse(job_application.state.is_cancelled)
 
     def test_archive(self):
-        """Ensure that the `archive` transition is triggered."""
+        """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_CANCELLED
@@ -507,7 +520,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.url, next_url)
 
         job_application.refresh_from_db()
-        self.assertTrue(job_application.state.is_archived)
+        self.assertTrue(job_application.hidden_for_siae)
 
 
 class ProcessTemplatesTest(TestCase):

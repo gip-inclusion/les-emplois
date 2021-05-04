@@ -141,7 +141,6 @@ class JobApplicationModelTest(TestCase):
             JobApplicationWorkflow.STATE_PROCESSING,
             JobApplicationWorkflow.STATE_POSTPONED,
             JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_ARCHIVED,
         ]
         states_transition_possible = [
             JobApplicationWorkflow.STATE_CANCELLED,
