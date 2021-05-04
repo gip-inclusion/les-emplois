@@ -46,3 +46,8 @@ sqlalchemy==1.3.20  # https://github.com/sqlalchemy/sqlalchemy
 # xlwt is required for pandas.to_excel used in dgefp_control.py script (see private repo)
 # very convenient to store a dataframe as an excel file
 xlwt==1.3.0
+
+# S3
+# ------------------------------------------------------------------------------
+# Our S3 provider does not provide a UI to manage the S3 bucket. Use this CLI instead.
+boto3==1.17.53  # https://github.com/boto/boto3
