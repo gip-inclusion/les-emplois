@@ -28,22 +28,22 @@
                             <p>Souhaitez-vous continuer ?</p>
                             <form method="POST" action="{% url 'apply:archive' job_application_id=job_application.pk %}">
                                 {% csrf_token %}
+                                <a
+                                    href="#"
+                                    class="btn btn-secondary"
+                                    data-dismiss="modal"
+                                    aria-label="Non">
+                                    Non
+                                </a>
                                 <input type="submit"
-                                    class="btn btn-primary matomo-event"
+                                    class="btn btn-danger matomo-event"
                                     data-matomo-category="employeurs"
                                     data-matomo-action="clic"
                                     data-matomo-option="suppression-candidature"
                                     rel="noopener"
-                                    aria-label="Oui, je souhait supprimer cette candidature"
-                                    value="Oui, je souhait supprimer cette candidature">
+                                    aria-label="Oui, je souhaite supprimer cette candidature"
+                                    value="Oui, je souhaite supprimer cette candidature">
                                 </input>
-                            <a
-                                href="#"
-                                class="btn btn-secondary"
-                                data-dismiss="modal"
-                                aria-label="Non">
-                                Non
-                            </a>
                             </form>
                         </div>
                     </div>
