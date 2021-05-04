@@ -144,6 +144,7 @@ class ApplyAsJobSeekerTest(TestCase):
         post_data = {
             "selected_jobs": [siae.job_description_through.first().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -160,6 +161,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(job_application.answer, "")
         self.assertEqual(job_application.selected_jobs.count(), 1)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
+        self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
     def test_apply_as_jobseeker_to_siae_with_approval_in_waiting_period(self):
         """
@@ -322,6 +324,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         post_data = {
             "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -339,6 +342,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 2)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
+        self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
     def test_apply_as_authorized_prescriber_to_siae_for_approval_in_waiting_period(self):
         """
@@ -501,6 +505,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         post_data = {
             "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -518,6 +523,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 2)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
+        self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
 
 class ApplyAsPrescriberTest(TestCase):
@@ -650,6 +656,7 @@ class ApplyAsPrescriberTest(TestCase):
         post_data = {
             "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -667,6 +674,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 2)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
+        self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
     def test_apply_as_prescriber_for_approval_in_waiting_period(self):
         """Apply as prescriber for a job seeker with an approval in waiting period."""
@@ -837,6 +845,7 @@ class ApplyAsSiaeTest(TestCase):
         post_data = {
             "selected_jobs": [siae.job_description_through.first().pk, siae.job_description_through.last().pk],
             "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "resume_link": "https://server.com/rockie-balboa.pdf",
         }
         response = self.client.post(next_url, data=post_data)
         self.assertEqual(response.status_code, 302)
@@ -854,6 +863,7 @@ class ApplyAsSiaeTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 2)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
+        self.assertEqual(job_application.resume_link, post_data["resume_link"])
 
     def test_apply_as_siae_for_approval_in_waiting_period(self):
         """Apply as SIAE for a job seeker with an approval in waiting period."""
