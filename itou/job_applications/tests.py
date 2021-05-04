@@ -134,18 +134,20 @@ class JobApplicationModelTest(TestCase):
 
     def test_can_be_archived(self):
         """
-        Only cancelled job_applications can be archived.
+        Only cancelled, refused and obsolete job_applications can be archived.
         """
         states_transition_not_possible = [
             JobApplicationWorkflow.STATE_NEW,
             JobApplicationWorkflow.STATE_PROCESSING,
             JobApplicationWorkflow.STATE_POSTPONED,
             JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
             JobApplicationWorkflow.STATE_ARCHIVED,
         ]
-        states_transition_possible = [JobApplicationWorkflow.STATE_CANCELLED]
+        states_transition_possible = [
+            JobApplicationWorkflow.STATE_CANCELLED,
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]
 
         for state in states_transition_not_possible:
             job_application = JobApplicationFactory(state=state)

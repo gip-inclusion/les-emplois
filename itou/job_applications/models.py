@@ -74,7 +74,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_REFUSE, [STATE_PROCESSING, STATE_POSTPONED], STATE_REFUSED),
         (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
         (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
-        (TRANSITION_ARCHIVE, STATE_CANCELLED, STATE_ARCHIVED),
+        (TRANSITION_ARCHIVE, [STATE_REFUSED, STATE_CANCELLED, STATE_OBSOLETE], STATE_ARCHIVED),
     )
 
     PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
@@ -453,7 +453,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_be_archived(self):
-        return self.state.is_cancelled
+        return self.state in [
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_CANCELLED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]
 
     @property
     def cancellation_delay_end(self):
