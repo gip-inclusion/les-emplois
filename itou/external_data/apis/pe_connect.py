@@ -138,7 +138,7 @@ def _get_compensations(token):
     return _fields_or_failed(_call_api(ESD_COMPENSATION_API, token), keys)
 
 
-def _get_aggregated_user_data(token):
+def get_aggregated_user_data(token):
     """
     Aggregates all needed user data before formatting and storage.
     Returns a pair status and a "flat" dict.
@@ -258,11 +258,10 @@ def import_user_pe_data(
         )
 
     try:
-        status, user_data = _get_aggregated_user_data(token)
+        status, user_data = get_aggregated_user_data(token)
         set_pe_data_import_from_user_data(pe_data_import, user, status, user_data)
         pe_data_import.save()
 
-        # At the moment, results are stored only if OK
         if status == ExternalDataImport.STATUS_OK:
             logger.info("Stored external data for user %s", user)
         elif status == ExternalDataImport.STATUS_PARTIAL:
