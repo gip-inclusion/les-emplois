@@ -68,6 +68,12 @@
         {% if ITOU_ENVIRONMENT == "DEV" %}
             console.log(location);
         {% endif %}
+
+        // Prevent a selector mistake from being silent.
+        if ($(callback_location_selector).length == 0) {
+            alert("Ce document n'a pas pu être envoyé à cause d'un problème technique. Nous vous invitons à contacter notre support.");
+            return false;
+        }
         $(callback_location_selector).val(location);
     });
 
