@@ -81,6 +81,7 @@ def deactivate_member(request, user_id, template_name="prescribers/deactivate_me
     if request.method == "POST":
         if user != target_member and user_is_admin:
             if membership.is_active:
+                # Only membership is modified
                 membership.deactivate_membership_by_user(user)
                 membership.save()
                 messages.success(
