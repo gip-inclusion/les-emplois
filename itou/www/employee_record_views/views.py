@@ -36,6 +36,7 @@ def list(request, template_name="employee_record/list.html"):
     """
     form = SelectEmployeeRecordStatusForm(data=request.POST or None)
     job_applications = None
+    employee_records = None
     siae = get_current_siae_or_404(request)
 
     # Fetch count of each status for badge display
@@ -44,9 +45,9 @@ def list(request, template_name="employee_record/list.html"):
             JobApplication.objects.eligible_as_employee_record(siae).count(),
             "info",
         ),
-        (1, "warning"),
-        (2, "danger"),
-        (3, "success"),
+        (EmployeeRecord.objects.sent(siae).count(), "warning"),
+        (0, "danger"),
+        (0, "success"),
     ]
 
     if request.method == "POST" and form.is_valid():
@@ -67,6 +68,7 @@ def list(request, template_name="employee_record/list.html"):
     context = {
         "form": form,
         "job_applications": job_applications,
+        "employee_records": employee_records,
         "badges": status_badges,
     }
 

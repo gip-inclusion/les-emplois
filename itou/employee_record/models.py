@@ -27,8 +27,8 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(status=EmployeeRecord.Status.READY)
 
-    def sent(self):
-        return self.filter(status=EmployeeRecord.Status.SENT)
+    def sent(self, siae):
+        return self.filter(status=EmployeeRecord.Status.SENT, job_application__to_siae=siae)
 
     def rejected(self):
         return self.filter(status=EmployeeRecord.Status.REJECTED)
