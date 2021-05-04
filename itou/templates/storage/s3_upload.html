@@ -49,8 +49,9 @@
             const extension = file.name.split('.').pop();
             const filename = Dropzone.uuidv4();
             const file_key = `${key_path}/${filename}.${extension}`;
-            // Add file key to options params so that it's send
+            // Add a file key to options params so that it's send
             // as an input field on POST.
+            // Careful: it should be the last form item to comply with S3 rules!
             this.params["key"] = file_key;
             return file_key;
         },
