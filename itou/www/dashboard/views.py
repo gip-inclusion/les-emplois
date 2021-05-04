@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -103,9 +104,10 @@ logout = login_required(ItouLogoutView.as_view())
 def edit_user_email(request, template_name="dashboard/edit_user_email.html"):
     form = EditUserEmailForm(data=request.POST or None, user_email=request.user.email)
     if request.method == "POST" and form.is_valid():
-        request.user.email = form.cleaned_data["email"]
-        request.user.save()
-        request.user.emailaddress_set.first().delete()
+        with transaction.atomic():
+            request.user.email = form.cleaned_data["email"]
+            request.user.save()
+            request.user.emailaddress_set.first().delete()
         auth.logout(request)
         return HttpResponseRedirect("/")
 
