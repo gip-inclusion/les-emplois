@@ -47,14 +47,16 @@ class ProcessViewsTest(TestCase):
         # Test resume presence:
         # 1/ Job seeker has a personal resume (technical debt).
         resume_link = "https://server.com/rockie-balboa.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(job_seeker__resume_link=resume_link, to_siae=siae)
+        job_application = JobApplicationSentByJobSeekerFactory(
+            job_seeker__resume_link=resume_link, resume_link="", to_siae=siae
+        )
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, resume_link)
 
         # 2/ Job application was sent with an attached resume
         resume_link = "https://server.com/rockie-balboa.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(resume_link=resume_link, to_siae=siae)
+        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, resume_link)
