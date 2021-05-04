@@ -11,7 +11,9 @@ La candidature suivante a été envoyée avec succès !
 - Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
 - Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.birthdate %}
 - Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}{% endif %}
-{% if job_application.job_seeker.resume_link %}
+{% if job_application.resume_link %}
+- CV en ligne : {{ job_application.resume_link }}
+{% elif job_application.job_seeker.resume_link %}
 - CV en ligne : {{ job_application.job_seeker.resume_link }}
 {% endif%}
 
