@@ -154,11 +154,10 @@ class EditSiaeForm(forms.ModelForm):
             "website": "Votre site web doit commencer par http:// ou https://",
         }
 
-    def save(self, commit=True):
-        siae = super().save(commit=commit)
-        if commit:
-            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-            siae.save()
+    def save(self):
+        siae = super().save(commit=False)
+        siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
+        siae.save()
         return siae
 
 
