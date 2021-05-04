@@ -9,7 +9,8 @@
 <form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
 
     {% csrf_token %}
-    {% bootstrap_form form exclude="resume_link" alert_error_type="all" %}
+
+    {% bootstrap_form_errors form %}
 
     {% buttons %}
         <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
