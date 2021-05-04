@@ -84,7 +84,7 @@ class EmployeeRecord(models.Model):
         NEW = "NEW", "Nouvelle fiche salarié"
         READY = "READY", "Données complètes, prêtes à l'envoi ASP"
         SENT = "SENT", "Envoyée ASP"
-        REJECTED = "REJECTED", "Rejet ASP"
+        REJECTED = "REJECTED", "Rejetée ASP"
         PROCESSED = "PROCESSED", "Traitée ASP"
         ARCHIVED = "ARCHIVED", "Archivée"
 
