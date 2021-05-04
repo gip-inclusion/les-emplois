@@ -44,7 +44,7 @@
         dictRemoveFile: "Supprimer",
         dictRemoveFileConfirmation: "Voulez-vous vraiment supprimer le fichier ?",
         dictMaxFilesExceeded: "Un seul fichier autorisé à la fois",
-        // functions
+        // the function will be used to rename the file.name before appending it to the formData
         renameFile: function (file) {
             const extension = file.name.split('.').pop();
             const filename = Dropzone.uuidv4();
@@ -54,20 +54,24 @@
             this.params["key"] = file_key;
             return file_key;
         },
-        success: function(file) {
-            // Sadly, our S3 provider does not return the "Location" header for the moment.
-            // When it does, don't forget to add "Location" to CORS' exposed headers!
-            // const location = file.xhr.getResponseHeader("Location");
-            const location = `${form_url}/${file.upload.filename}`;
-            {% if ITOU_ENVIRONMENT == "DEV" %}
-                console.log(location);
-            {% endif %}
-            $(callback_location_selector).val(location);
-        },
     };
 
     // By default, Dropzone attaches to any component having the "dropzone" class.
     // Turn off this behavior to control all the aspects "manually".
     Dropzone.autoDiscover = false;
-    $(dropzone_selector).dropzone(dropzone_config);
+
+    const dropzone = new Dropzone(dropzone_selector, dropzone_config);
+
+    // Events
+    dropzone.on("success", function(file, xhr, formData) {
+        const location = `${form_url}/${file.upload.filename}`;
+        {% if ITOU_ENVIRONMENT == "DEV" %}
+            console.log(location);
+        {% endif %}
+        $(callback_location_selector).val(location);
+    });
+
+    dropzone.on("removedfile", function(file) {
+        $(callback_location_selector).val("");
+    });
 </script>
