@@ -22,9 +22,13 @@
     {% endif %}
 
     {% if job_application.resume_link %}
-        <li><a href="{{ job_application.resume_link }}" target="_blank" rel="noopener">Voir le CV</a></li>
+        <li>
+            <a href="{{ job_application.resume_link }}">{% translate "Lien vers CV" %}</a>
+        </li>
     {% elif job_application.job_seeker.resume_link %}
-        <li><a href="{{ job_application.job_seeker.resume_link }}" target="_blank" rel="noopener">Voir le CV</a></li>
+        <li>
+            <a href="{{ job_application.job_seeker.resume_link }}">Lien vers CV</a>
+        </li>
     {% endif %}
 </ul>
 <p>

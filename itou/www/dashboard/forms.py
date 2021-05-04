@@ -8,11 +8,10 @@ from itou.job_applications.notifications import (
 )
 from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
-from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
-class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
+class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
     """
     Edit a user profile.
     """
@@ -30,7 +29,6 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             del self.fields["birthdate"]
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
-            del self.fields["resume_link"]
         else:
             self.fields["phone"].required = True
             self.fields["birthdate"].required = True
@@ -60,7 +58,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "city_slug",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
-        ] + ResumeFormMixin.Meta.fields
+        ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
             "phone": "Par exemple 0610203040",

@@ -5,7 +5,7 @@ import django.forms as forms
 
 class ResumeFormMixin(forms.Form):
     """
-    Handles resume fields for apply and signup jobseeker forms
+    Handles resume field for job applications
     """
 
     resume_link = forms.URLField(
