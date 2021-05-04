@@ -38,6 +38,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     """
     queryset = (
         JobApplication.objects.siae_member_required(request.user)
+        .not_archived()
         .select_related("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
         .prefetch_related("selected_jobs__appellation")
     )
@@ -296,7 +297,8 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
 @login_required
 def archive(request, job_application_id):
     """
-    Trigger the `archive` transition then redirects to the list of job_applications
+    Archive the job_application for an SIAE (ie. sets the hidden_for_siae flag to True)
+    then redirects to the list of job_applications
     """
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -318,7 +320,9 @@ def archive(request, job_application_id):
             username = f"{job_application.job_seeker.first_name} {job_application.job_seeker.last_name}"
             siae_name = job_application.to_siae.display_name
 
-            job_application.archive(user=request.user)
+            job_application.hidden_for_siae = True
+            job_application.save()
+
             success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."
             messages.success(request, success_message)
         except xwf_models.InvalidTransitionError:
