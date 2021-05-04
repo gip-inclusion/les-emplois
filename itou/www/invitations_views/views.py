@@ -69,6 +69,7 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
     formset = PrescriberWithOrgInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
+            # We don't need atomicity here (invitations are independent)
             invitations = formset.save()
 
             for invitation in invitations:
@@ -129,6 +130,7 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
     formset = SiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
+            # We don't need atomicity here (invitations are independent)
             invitations = formset.save()
 
             for invitation in invitations:
