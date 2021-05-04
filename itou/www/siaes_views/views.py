@@ -198,7 +198,10 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     )
 
     if request.method == "POST" and form.is_valid():
-        siae = form.save(request)
+        with transaction.atomic():
+            # The form creates multiple objects
+            siae = form.save(request)
+
         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
         return HttpResponseRedirect(reverse_lazy("dashboard:index"))
 
