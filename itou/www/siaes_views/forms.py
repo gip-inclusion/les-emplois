@@ -83,19 +83,16 @@ class CreateSiaeForm(forms.ModelForm):
 
         return self.cleaned_data
 
-    def save(self, request, commit=True):
-        siae = super().save(commit=commit)
-        if commit:
-            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-            siae.created_by = request.user
-            siae.source = Siae.SOURCE_USER_CREATED
-            siae.convention = self.current_siae.convention
-            siae.save()
-            membership = SiaeMembership()
-            membership.user = request.user
-            membership.siae = siae
-            membership.is_siae_admin = True
-            membership.save()
+    def save(self, request):
+        siae = super().save(commit=False)
+        siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
+        siae.created_by = request.user
+        siae.source = Siae.SOURCE_USER_CREATED
+        siae.convention = self.current_siae.convention
+        siae.save()
+
+        SiaeMembership.objects.create(siae=siae, is_siae_admin=True, user=request.user)
+
         return siae
 
 
