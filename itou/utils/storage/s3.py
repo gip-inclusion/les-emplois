@@ -10,13 +10,13 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 
 
-def sign(key, msg):
+def sign_to_bytes(key, msg):
     if isinstance(key, str):
         key = key.encode("utf-8")
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
 
-def sign_to_str(key, msg):
+def sign_to_string(key, msg):
     if isinstance(key, str):
         key = key.encode("utf-8")
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).hexdigest()
@@ -61,11 +61,11 @@ def generate_signature(date, string_to_sign):
     Use credential's URL directories to sign a string.
     """
     date_str = format_date_short(date)
-    date_key = sign(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY), date_str)
-    date_region_key = sign(date_key, settings.AWS_S3_REGION_NAME)
-    date_region_service_key = sign(date_region_key, "s3")
-    signing_key = sign(date_region_service_key, "aws4_request")
-    return sign_to_str(key=signing_key, msg=string_to_sign)
+    date_key = sign_to_bytes(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY), date_str)
+    date_region_key = sign_to_bytes(date_key, settings.AWS_S3_REGION_NAME)
+    date_region_service_key = sign_to_bytes(date_region_key, "s3")
+    signing_key = sign_to_bytes(date_region_service_key, "aws4_request")
+    return sign_to_string(key=signing_key, msg=string_to_sign)
 
 
 def policy_as_dict(date, key_path="/", expiration_period=1):

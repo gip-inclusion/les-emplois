@@ -10,17 +10,17 @@ from itou.utils.storage import s3
 
 
 class S3Tests(SimpleTestCase):
-    def test_sign(self):
+    def test_sign_to_bytes(self):
         # Amazon V4 signature.
         # See https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-authentication-HTTPPOST.html
-        result = s3.sign(key="key", msg="Les carottes sont cuites.")
+        result = s3.sign_to_bytes(key="key", msg="Les carottes sont cuites.")
         expected = b"\xf7\x12\xcd\x1b\x91xN\xb5\x9e\xde\xf4\x9d\xf3G\x98)"
         expected += b"^\xecq\x03\x99\x15\xc01>\x12\xa4\xeeTy\x07\x9b"
         self.assertTrue(isinstance(result, bytes))
         self.assertEqual(result, expected)
 
-    def test_sign_to_str(self):
-        result = s3.sign_to_str(key="key", msg="Le loup est dans la charette.")
+    def test_sign_to_string(self):
+        result = s3.sign_to_string(key="key", msg="Le loup est dans la charette.")
         expected = "bdcbaf90073d958b4b8b98cdbd22ccbbecf72eebd5c7633855d0b058ffd4c1a8"
         self.assertTrue(isinstance(result, str))
         self.assertEqual(result, expected)
