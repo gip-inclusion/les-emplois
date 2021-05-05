@@ -280,12 +280,12 @@
                             </a>
                         </p>
                     {% endif %}
+
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="briefcase" %}
-                        <a href="{% url 'siaes_views:configure_jobs' %}">
-                            Publier/gérer les fiches de postes
-                        </a>
+                        <a href="{% url 'siaes_views:configure_jobs' %}">Publier/gérer les fiches de postes</a>
                     </p>
+
                     {% if can_show_financial_annexes %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="check-circle" %}
@@ -321,6 +321,7 @@
                             </p>
                         {% endif %}
                     {% endfor %}
+                    {# Will be commented until UI part 2 is finished #}
                     {% if can_show_employee_records %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
