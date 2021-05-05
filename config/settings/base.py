@@ -545,16 +545,16 @@ ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
 
 # S3 uploads
 # ------------------------------------------------------------------------------
-STORAGE_ACCESS_KEY_ID = os.environ.get("STORAGE_ACCESS_KEY_ID", "")
-STORAGE_SECRET_ACCESS_KEY = os.environ.get("STORAGE_SECRET_ACCESS_KEY", "")
-STORAGE_BUCKET_NAME = os.environ.get("STORAGE_BUCKET_NAME", "")
-AWS_S3_REGION_NAME = os.environ.get("STORAGE_BUCKET_REGION", "")
-STORAGE_ENDPOINT_DOMAIN = os.environ.get("STORAGE_ENDPOINT_DOMAIN", "")
+S3_STORAGE_ACCESS_KEY_ID = os.environ.get("S3_STORAGE_ACCESS_KEY_ID", "")
+S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("S3_STORAGE_SECRET_ACCESS_KEY", "")
+S3_STORAGE_BUCKET_NAME = os.environ.get("S3_STORAGE_BUCKET_NAME", "")
+S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
+S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("S3_STORAGE_ENDPOINT_DOMAIN", "")
 
 # The endpoint of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
-AWS_S3_BASE_ENDPOINT_URL = "https://%s" % STORAGE_ENDPOINT_DOMAIN
-AWS_S3_BUCKET_ENDPOINT_URL = "https://%s.%s" % (STORAGE_BUCKET_NAME, STORAGE_ENDPOINT_DOMAIN)
+S3_STORAGE_BASE_ENDPOINT_URL = "https://%s" % S3_STORAGE_ENDPOINT_DOMAIN
+S3_STORAGE_BUCKET_ENDPOINT_URL = "https://%s.%s" % (S3_STORAGE_BUCKET_NAME, S3_STORAGE_ENDPOINT_DOMAIN)
 
 STORAGE_UPLOAD_KINDS = {
     "default": {
