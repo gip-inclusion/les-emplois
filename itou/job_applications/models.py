@@ -525,6 +525,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 kind = "Prescripteur habilité"
         return kind
 
+    def get_resume_link(self):
+        if self.resume_link:
+            return self.resume_link
+        elif self.job_seeker.resume_link:
+            return self.job_seeker.resume_link
+        return None
+
     # Workflow transitions.
 
     @xwf_models.transition()
