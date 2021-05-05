@@ -36,7 +36,16 @@ def list(request, template_name="employee_record/list.html"):
     """
     siae = get_current_siae_or_404(request)
     form = SelectEmployeeRecordStatusForm(data=request.GET or None)
+    status = EmployeeRecord.Status.NEW
+
+    # Employee records are created with a job application object
+    # At this stage, new job applications / hirings do not have
+    # an associated employee record object
+    # Objects in this list can be either:
+    # - employee records: iterate on their job application object
+    # - basic job applications: iterate as-is
     employee_records_list = True
+
     navigation_pages = None
     data = None
 
@@ -51,24 +60,27 @@ def list(request, template_name="employee_record/list.html"):
         (EmployeeRecord.objects.processed_for_siae(siae).count(), "success"),
     ]
 
+    # Override defaut value (NEW status)
     if form.is_valid():
         status = form.cleaned_data["status"]
-        print(f"Status: {status}")
-        message = {
-            EmployeeRecord.Status.NEW: INFO_MSG_NEW,
-            EmployeeRecord.Status.SENT: INFO_MSG_SENT,
-            EmployeeRecord.Status.REJECTED: INFO_MSG_REJECTED,
-            EmployeeRecord.Status.PROCESSED: INFO_MSG_ACCEPTED,
-        }.get(status)
 
-        if message:
-            messages.info(request, message)
+    # Add some information on what to do next for the user
+    message = {
+        EmployeeRecord.Status.NEW: INFO_MSG_NEW,
+        EmployeeRecord.Status.SENT: INFO_MSG_SENT,
+        EmployeeRecord.Status.REJECTED: INFO_MSG_REJECTED,
+        EmployeeRecord.Status.PROCESSED: INFO_MSG_ACCEPTED,
+    }.get(status)
 
-        if status == EmployeeRecord.Status.NEW:
-            data = JobApplication.objects.eligible_as_employee_record(siae)
-            employee_records_list = False
-        elif status == EmployeeRecord.Status.SENT:
-            data = EmployeeRecord.objects.sent_for_siae(siae)
+    if message:
+        messages.info(request, message)
+
+    # See comment above on `employee_records_list` var
+    if status == EmployeeRecord.Status.NEW:
+        data = JobApplication.objects.eligible_as_employee_record(siae)
+        employee_records_list = False
+    elif status == EmployeeRecord.Status.SENT:
+        data = EmployeeRecord.objects.sent_for_siae(siae)
 
     if data:
         navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
@@ -81,8 +93,3 @@ def list(request, template_name="employee_record/list.html"):
     }
 
     return render(request, template_name, context)
-
-
-@login_required
-def create_employee_record(request):
-    pass
