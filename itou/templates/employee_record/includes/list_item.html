@@ -1,30 +1,46 @@
 <div class="card mb-3">
     <div class="card-header">
-    <b>{{ item.job_seeker.get_full_name }}</b>
+    <b>{{ item.job_seeker.get_full_name|title }}</b>
     </div>
     <div class="card-body">
-        <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at }}</b></p>
-        <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at }}</b></p>
-        <p class="m-0">Numéro de PASS IAE : <b>{{ item.approval.number }}</b></p>
-        {% if form.status.value == "NEW" %}
+        <div class="row">
+            <div class="col-md-6">
+                <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at }}</b></p>
+                <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at }}</b></p>
+                <p class="m-0">Numéro de PASS IAE (agrément) : <b>{{ item.approval.number }}</b></p>
+            </div>
+       
+    {% if form.status.value == "NEW" %}
+        </div>
         <div class="p-2">
             <a href="#" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
         </div>
-        {% elif form.status.value == "SENT" %}
-        <p class="m-0 pt-1">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p> 
+            
+    {% elif form.status.value == "SENT" %}
+            <div class="col-md-6 text-right">
+                <p class="m-0 pt-1 badge badge-warning">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p> 
+            </div>
+        </div>
         <div class="p-2">
             <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
         </div>
-        {% elif form.status.value == "REJECTED" %}
-        <p class="m-0 pt-1">Refusée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+    {% elif form.status.value == "REJECTED" %}
+            <div class="col-md-6"
+                <p class="m-0 pt-1 badge badge-danger">Rejetée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+            </div>
+        </div>
         <div class="p-2">
             <a href="#" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
         </div>
-        {% elif form.status.value == "PROCESSED" %}
-        <p class="m-0 pt-1">Validée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+    {% elif form.status.value == "PROCESSED" %}
+            <div class="col-md-6">
+                <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+            </div>
+        </div>
         <div class="p-2">
             <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
         </div>
         {% endif %}
+
     </div>
 </div>
