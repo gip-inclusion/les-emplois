@@ -37,7 +37,7 @@ class S3Tests(SimpleTestCase):
         date = datetime.datetime(2021, 4, 29)
         access_key_id = "A1234567890"
         region_name = "eu-west-4"
-        with self.settings(STORAGE_ACCESS_KEY_ID=access_key_id, AWS_S3_REGION_NAME=region_name):
+        with self.settings(S3_STORAGE_ACCESS_KEY_ID=access_key_id, S3_STORAGE_BUCKET_REGION=region_name):
             s3_upload = S3Upload(date=date)
             self.assertEqual(s3_upload.credential_url, f"{access_key_id}/20210429/{region_name}/s3/aws4_request")
 
@@ -52,9 +52,9 @@ class S3Tests(SimpleTestCase):
         """
         date = datetime.datetime(2021, 4, 29, 12, 13, 14, 155)
         test_settings = {
-            "STORAGE_ACCESS_KEY_ID": "A1234567890",
-            "STORAGE_BUCKET_NAME": "nemos-bucket",
-            "AWS_S3_REGION_NAME": "eu-west-4",
+            "S3_STORAGE_ACCESS_KEY_ID": "A1234567890",
+            "S3_STORAGE_BUCKET_NAME": "nemos-bucket",
+            "S3_STORAGE_BUCKET_REGION": "eu-west-4",
         }
         with self.settings(**test_settings):
             s3_upload = S3Upload(date=date)
@@ -63,7 +63,7 @@ class S3Tests(SimpleTestCase):
             expected = {
                 "expiration": "2021-04-29T13:13:14.000Z",
                 "conditions": [
-                    {"bucket": test_settings["STORAGE_BUCKET_NAME"]},
+                    {"bucket": test_settings["S3_STORAGE_BUCKET_NAME"]},
                     {"x-amz-algorithm": "AWS4-HMAC-SHA256"},
                     {"x-amz-credential": credential_url},
                     {"x-amz-date": "20210429T121314Z"},

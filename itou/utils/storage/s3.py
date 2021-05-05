@@ -21,8 +21,8 @@ class S3Upload:
         Use credential's URL directories to sign a string.
         """
         date_str = self.format_date_short(self.date)
-        date_key = self.sign_to_bytes(("AWS4" + settings.STORAGE_SECRET_ACCESS_KEY), date_str)
-        date_region_key = self.sign_to_bytes(date_key, settings.AWS_S3_REGION_NAME)
+        date_key = self.sign_to_bytes(("AWS4" + settings.S3_STORAGE_SECRET_ACCESS_KEY), date_str)
+        date_region_key = self.sign_to_bytes(date_key, settings.S3_STORAGE_BUCKET_REGION)
         date_region_service_key = self.sign_to_bytes(date_region_key, "s3")
         signing_key = self.sign_to_bytes(date_region_service_key, "aws4_request")
         return self.sign_to_string(key=signing_key, msg=string_to_sign)
@@ -33,7 +33,7 @@ class S3Upload:
         """
         form_date = self.format_date_long(self.date)
         expiration_date = self.format_expiration_date(self.form_expires_at)
-        bucket_name = settings.STORAGE_BUCKET_NAME
+        bucket_name = settings.S3_STORAGE_BUCKET_NAME
         key_path = self.config["key_path"]
 
         policy = {
@@ -54,7 +54,7 @@ class S3Upload:
         Each directory is a key used when generating the signature.
         """
         date_str = self.format_date_short(self.date)
-        return f"{settings.STORAGE_ACCESS_KEY_ID}/{date_str}/{settings.AWS_S3_REGION_NAME}/s3/aws4_request"
+        return f"{settings.S3_STORAGE_ACCESS_KEY_ID}/{date_str}/{settings.S3_STORAGE_BUCKET_REGION}/s3/aws4_request"
 
     @property
     def form_expires_at(self):
@@ -73,7 +73,7 @@ class S3Upload:
             "date": form_date,
             "encoded_policy": encoded_policy,
             "signature": signature,
-            "endpoint": settings.AWS_S3_BUCKET_ENDPOINT_URL,
+            "endpoint": settings.S3_STORAGE_BUCKET_ENDPOINT_URL,
         }
 
     @staticmethod
