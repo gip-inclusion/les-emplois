@@ -370,7 +370,7 @@ https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-
 .lines-on-sides:before, .lines-on-sides:after{
     content: "";
     flex: 1 1;
-    border-bottom: 1px solid; /* Don't specify the color to "inherit" from the current one */
+    border-bottom: 1px solid inherit;
     margin: auto;
 }
 .lines-on-sides:before {
