@@ -289,7 +289,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_applications",
     )
 
-    resume_link = models.URLField(max_length=500, verbose_name=_("Lien vers un CV"), blank=True)
+    resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
 
     # Who send the job application. It can be the same user as `job_seeker`
     sender = models.ForeignKey(

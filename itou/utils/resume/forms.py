@@ -9,7 +9,7 @@ class ResumeFormMixin(forms.Form):
     """
 
     resume_link = forms.URLField(
-        label=gettext_lazy("CV (optionnel)"),
+        label="CV (optionnel)",
         required=False,
         widget=forms.TextInput(attrs={"placeholder": "https://www.mon_cv.fr/dfROS"}),
     )
