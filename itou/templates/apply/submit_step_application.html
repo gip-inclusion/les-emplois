@@ -17,12 +17,12 @@
         {% csrf_token %}
 
         {% if siae.jobs.exists %}
-            {% bootstrap_field form.selected_jobs label_class="h5" %}
+            {% bootstrap_field form.selected_jobs %}
         {% endif %}
 
-        {% bootstrap_field form.message label_class="h5" %}
+        {% bootstrap_field form.message %}
 
-        <h5>{{ form.resume_link.label }}</h5>
+        <label for="resume_form">{{ form.resume_link.label }}</label>
         <div id="resume_form" class="dropzone border-dashed text-center text-secondary mb-4">
             <div class="dz-message my-1">
                 <div class="h5">{% include "includes/icon.html" with icon="upload" size="30" %}</div>
