@@ -19,9 +19,7 @@
                     <div class="card-body p-2">
                         <p class="text-muted"><b>Par statut</b></p>
 
-                        <form method="POST" class="form">
-                            {% csrf_token %}
-
+                        <form method="GET" class="form">
                             <div class="container">
                                 {% for status, badge in form.status|zip:badges %}
                                 <div class="row">
@@ -56,22 +54,23 @@
                 </div>
 
                 <div>
-                    {# New employee records i.e. job applications #}
-                    {% if job_applications %}
-                        {% for item in job_applications %}
-                            {% include "employee_record/includes/list_item.html" %}
-                        {% endfor %}
-                    {% endif %}
-
                     {# "Real" employee records objects #}
-                    {% if employee_records %}
-                        {% for employee_record in employee_records %}
+                    {% if employee_records_list %}
+                        {% for employee_record in navigation_pages %}
                             {% with item=employee_record.job_application %}
                                 {% include "employee_record/includes/list_item.html" %}
                             {% endwith %}
                         {% endfor %}
+                    {# New employee records i.e. job applications #}
+                    {% else %}
+                        {% for item in navigation_pages %}
+                            {% include "employee_record/includes/list_item.html" %}
+                        {% endfor %}
                     {% endif %}
                 </div>
+
+                {% include "includes/pagination.html" with page=navigation_pages %}
+
             </div>
         </div>
 
