@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
 from itou.employee_record.models import EmployeeRecord
@@ -34,6 +35,10 @@ def list(request, template_name="employee_record/list.html"):
     Displays a list of employee records for the SIAE
     """
     siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
     form = SelectEmployeeRecordStatusForm(data=request.GET or None)
     status = EmployeeRecord.Status.NEW
 
