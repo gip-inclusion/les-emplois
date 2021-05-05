@@ -70,14 +70,15 @@ class ItouCurrentOrganizationMiddleware:
             elif user.is_prescriber:
                 # Prescriber users can now select an organization
                 # (if they are member of several prescriber organizations)
+                current_prescriber_org_key = request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
                 if user.is_prescriber_with_org:
-                    # Choose first prescriber organization for user if none is selected yet
-                    # (f.i. after login)
-                    request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
-                        request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY)
-                        or user.prescribermembership_set.filter(is_active=True).first().organization.pk
-                    )
-                elif request.session.get(settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY):
+                    if not current_prescriber_org_key:
+                        # Choose first prescriber organization for user if none is selected yet
+                        # (f.i. after login)
+                        request.session[settings.ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY] = (
+                            user.prescribermembership_set.filter(is_active=True).first().organization.pk
+                        )
+                elif current_prescriber_org_key:
                     # If the user is an "orienteur"
                     # => No need to track the current org in session (none)
                     # => Remove any old session entry if needed
