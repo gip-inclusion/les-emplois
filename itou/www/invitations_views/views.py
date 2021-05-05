@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 
@@ -68,6 +69,7 @@ def invite_prescriber_with_org(request, template_name="invitations_views/create.
     formset = PrescriberWithOrgInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
+            # We don't need atomicity here (invitations are independent)
             invitations = formset.save()
 
             for invitation in invitations:
@@ -108,8 +110,10 @@ def join_prescriber_organization(request, invitation_id):
         raise PermissionDenied()
 
     if invitation.can_be_accepted:
-        invitation.add_invited_user_to_organization()
-        invitation.accept()
+        with transaction.atomic():
+            invitation.add_invited_user_to_organization()
+            # Send an email after the model changes
+            invitation.accept()
         messages.success(
             request, f"Vous êtes désormais membre de l'organisation {invitation.organization.display_name}."
         )
@@ -126,6 +130,7 @@ def invite_siae_staff(request, template_name="invitations_views/create.html"):
     formset = SiaeStaffInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
+            # We don't need atomicity here (invitations are independent)
             invitations = formset.save()
 
             for invitation in invitations:
@@ -168,8 +173,9 @@ def join_siae(request, invitation_id):
     if not invitation.siae.is_active:
         messages.error(request, "Cette structure n'est plus active.")
     elif invitation.can_be_accepted:
-        invitation.add_invited_user_to_siae()
-        invitation.accept()
+        with transaction.atomic():
+            invitation.add_invited_user_to_siae()
+            invitation.accept()
         messages.success(request, f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
     else:
         messages.error(request, "Cette invitation n'est plus valide.")

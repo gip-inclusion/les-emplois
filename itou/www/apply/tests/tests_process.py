@@ -139,9 +139,11 @@ class ProcessViewsTest(TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-            # Wrong dates: force `hiring_start_at` in past.
-            hiring_start_at = datetime.date.today() - relativedelta(days=1)
-            hiring_end_at = hiring_start_at + relativedelta(years=2)
+            # Wrong dates.
+            hiring_start_at = datetime.date.today()
+            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+            # Force `hiring_start_at` in past.
+            hiring_start_at = hiring_start_at - relativedelta(days=1)
             post_data = {
                 "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
                 "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
@@ -165,7 +167,8 @@ class ProcessViewsTest(TestCase):
 
             # Duration too long.
             hiring_start_at = datetime.date.today()
-            hiring_end_at = hiring_start_at + relativedelta(years=2, days=1)
+            max_end_at = Approval.get_default_end_date(hiring_start_at)
+            hiring_end_at = max_end_at + relativedelta(days=1)
             post_data = {
                 "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
                 "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
@@ -173,11 +176,13 @@ class ProcessViewsTest(TestCase):
                 **address,
             }
             response = self.client.post(url, data=post_data)
-            self.assertFormError(response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG)
+            self.assertFormError(
+                response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG % max_end_at.strftime("%d/%m/%Y")
+            )
 
             # Good duration.
             hiring_start_at = datetime.date.today()
-            hiring_end_at = hiring_start_at + relativedelta(years=2)
+            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
             post_data = {
                 # Data for `JobSeekerPoleEmploiStatusForm`.
                 "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
@@ -203,7 +208,7 @@ class ProcessViewsTest(TestCase):
                 state=JobApplicationWorkflow.STATE_PROCESSING
             )
             hiring_start_at = datetime.date.today()
-            hiring_end_at = hiring_start_at + relativedelta(years=2)
+            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
             post_data = {
                 # Data for `JobSeekerPoleEmploiStatusForm`.
                 "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
@@ -214,6 +219,38 @@ class ProcessViewsTest(TestCase):
             }
             with self.assertRaises(KeyError):
                 response = self.client.post(url, data=post_data)
+
+    def test_accept_with_hiring_end_at_after_existing_approval_end_at(self):
+        """
+        Given a job application with an existing approval, when setting an hiring_end
+        greater than the existing approval end date, then an error is raised.
+        """
+        job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        max_end_at = job_application.approval.end_at
+
+        hiring_start_at = max_end_at - relativedelta(months=6)
+        hiring_end_at = max_end_at + relativedelta(days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+            "address_line_1": job_application.job_seeker.address_line_1,
+            "post_code": job_application.job_seeker.post_code,
+            "city_name": "Metz",
+            "city": "metz",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(
+            response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG % max_end_at.strftime("%d/%m/%Y")
+        )
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self):
         create_test_cities(["54", "57"], num_per_department=2)

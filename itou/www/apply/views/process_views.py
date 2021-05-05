@@ -156,7 +156,6 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
 
 
 @login_required
-@transaction.atomic
 def accept(request, job_application_id, template_name="apply/process_accept.html"):
     """
     Trigger the `accept` transition.
@@ -186,17 +185,17 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     forms.append(form_accept)
 
     if request.method == "POST" and all([form.is_valid() for form in forms]):
-
-        if form_pe_status:
-            form_pe_status.save()
-
-        if form_user_address:
-            form_user_address.save()
-
         try:
-            # After each successful transition, a save() is performed by django-xworkflows.
-            job_application = form_accept.save(commit=False)
-            job_application.accept(user=request.user)
+            with transaction.atomic():
+                if form_pe_status:
+                    form_pe_status.save()
+
+                if form_user_address:
+                    form_user_address.save()
+
+                # After each successful transition, a save() is performed by django-xworkflows.
+                job_application = form_accept.save(commit=False)
+                job_application.accept(user=request.user)
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
             return HttpResponseRedirect(next_url)
@@ -243,7 +242,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
         messages.warning(
             request,
             mark_safe(
-                "Etes-vous satisfait des emplois de l'inclusion ? "
+                "Êtes-vous satisfait des emplois de l'inclusion ? "
                 + f"<a href='{settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}' rel='noopener' target='_blank'>"
                 + "Je donne mon avis"
                 + "</a>"

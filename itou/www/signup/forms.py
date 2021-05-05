@@ -46,16 +46,14 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         return email
 
     def save(self, request):
-
         # Avoid django-allauth to call its own often failing `generate_unique_username`
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
         # Create the user.
-        user = super().save(request)
 
+        user = super().save(request)
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
-
         user.is_job_seeker = True
         user.save()
 
@@ -365,7 +363,6 @@ class PrescriberPoleEmploiUserSignupForm(FullnameFormMixin, SignupForm):
         return email
 
     def save(self, request):
-
         # Avoid django-allauth to call its own often failing `generate_unique_username`
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()
@@ -401,7 +398,6 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
         self.fields["email"].help_text = "Utilisez une adresse e-mail professionnelle."
 
     def save(self, request):
-
         # Avoid django-allauth to call its own often failing `generate_unique_username`
         # function by forcing a username.
         self.cleaned_data["username"] = User.generate_unique_username()

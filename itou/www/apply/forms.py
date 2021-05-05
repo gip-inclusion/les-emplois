@@ -256,11 +256,17 @@ class AcceptForm(forms.ModelForm):
         if hiring_end_at < hiring_start_at:
             raise forms.ValidationError(JobApplication.ERROR_END_IS_BEFORE_START)
 
+        # Ensure that hiring end does not exceed a PASS IAE end date.
         if self.instance.to_siae.is_subject_to_eligibility_rules:
-            duration = relativedelta(hiring_end_at, hiring_start_at)
-            benchmark = Approval.DEFAULT_APPROVAL_YEARS
-            if duration.years > benchmark or (duration.years == benchmark and duration.days > 0):
-                raise forms.ValidationError(JobApplication.ERROR_DURATION_TOO_LONG)
+
+            max_end_at = Approval.get_default_end_date(hiring_start_at)
+
+            if self.instance.job_seeker.approvals_wrapper.has_valid:
+                in_progress_approval_end_at = self.instance.job_seeker.approvals_wrapper.latest_approval.end_at
+                max_end_at = min(max_end_at, in_progress_approval_end_at)
+
+            if hiring_end_at > max_end_at:
+                raise forms.ValidationError(JobApplication.ERROR_DURATION_TOO_LONG % max_end_at.strftime("%d/%m/%Y"))
 
         return cleaned_data
 

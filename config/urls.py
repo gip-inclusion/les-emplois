@@ -5,8 +5,9 @@ from django.views.generic import TemplateView
 
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
-from itou.www.signup import views as signup_views
 from itou.www.login import views as login_views
+from itou.www.signup import views as signup_views
+
 
 register_converter(SiretConverter, "siret")
 
@@ -59,6 +60,7 @@ urlpatterns = [
     path("search/", include("itou.www.search.urls")),
     path("siae/", include("itou.www.siaes_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
+    path("releases/", include("itou.www.releases.urls")),
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),

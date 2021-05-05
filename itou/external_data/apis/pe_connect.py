@@ -2,6 +2,7 @@ import logging
 
 import requests
 from django.conf import settings
+from django.db import transaction
 from django.forms.models import model_to_dict
 from django.utils.dateparse import parse_datetime
 
@@ -138,7 +139,7 @@ def _get_compensations(token):
     return _fields_or_failed(_call_api(ESD_COMPENSATION_API, token), keys)
 
 
-def _get_aggregated_user_data(token):
+def get_aggregated_user_data(token):
     """
     Aggregates all needed user data before formatting and storage.
     Returns a pair status and a "flat" dict.
@@ -231,6 +232,7 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
         initial_job_seekeer_data, job_seeker_data
     )
 
+    # Atomicity in outer call
     user.save()
     job_seeker_data.save()
 
@@ -253,28 +255,29 @@ def import_user_pe_data(
     Returns a valid ExternalDataImport object when result is PARTIAL or OK.
     """
     if not pe_data_import:
-        pe_data_import = ExternalDataImport.objects.create(source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user)
+        pe_data_import = ExternalDataImport.objects.create(
+            source=ExternalDataImport.DATA_SOURCE_PE_CONNECT, user=user, status=ExternalDataImport.STATUS_PENDING
+        )
 
-    # Save pending status if updating record (transitive state)
-    if pe_data_import != ExternalDataImport.STATUS_PENDING:
-        pe_data_import.status = ExternalDataImport.STATUS_PENDING
-        pe_data_import.save()
+        try:
+            # External requests
+            status, user_data = get_aggregated_user_data(token)
+            with transaction.atomic():
+                # A refactoring would be helpful to split user/job seeker saving
+                # and to use the status before calling save()
+                # Save user and job seeker data
+                set_pe_data_import_from_user_data(pe_data_import, user, status, user_data)
+                pe_data_import.save()
 
-    try:
-        status, user_data = _get_aggregated_user_data(token)
-        set_pe_data_import_from_user_data(pe_data_import, user, status, user_data)
-        pe_data_import.save()
-
-        # At the moment, results are stored only if OK
-        if status == ExternalDataImport.STATUS_OK:
-            logger.info("Stored external data for user %s", user)
-        elif status == ExternalDataImport.STATUS_PARTIAL:
-            logger.warning("Could only fetch partial results for %s", user)
-        else:
-            logger.error("Could not fetch any data for %s: not data stored", user)
-    except Exception as e:
-        logger.error("Data import for %s failed: %s", user, e)
-        pe_data_import.status = ExternalDataImport.STATUS_FAILED
-        pe_data_import.save()
+            if status == ExternalDataImport.STATUS_OK:
+                logger.info("Stored external data for user %s", user)
+            elif status == ExternalDataImport.STATUS_PARTIAL:
+                logger.warning("Could only fetch partial results for %s", user)
+            else:
+                logger.error("Could not fetch any data for %s: not data stored", user)
+        except Exception as e:
+            logger.error("Data import for %s failed: %s", user, e)
+            pe_data_import.status = ExternalDataImport.STATUS_FAILED
+            pe_data_import.save()
 
     return pe_data_import
