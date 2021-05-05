@@ -547,9 +547,9 @@ ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
 # ------------------------------------------------------------------------------
 S3_STORAGE_ACCESS_KEY_ID = os.environ.get("S3_STORAGE_ACCESS_KEY_ID", "")
 S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("S3_STORAGE_SECRET_ACCESS_KEY", "")
+S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("S3_STORAGE_ENDPOINT_DOMAIN", "")
 S3_STORAGE_BUCKET_NAME = os.environ.get("S3_STORAGE_BUCKET_NAME", "")
 S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
-S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("S3_STORAGE_ENDPOINT_DOMAIN", "")
 
 # The endpoint of your bucket, more info:
 # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
