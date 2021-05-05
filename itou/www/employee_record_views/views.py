@@ -1,12 +1,12 @@
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.utils import formats, safestring
 
+from itou import employee_record
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
+from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import SelectEmployeeRecordStatusForm
 
@@ -34,10 +34,11 @@ def list(request, template_name="employee_record/list.html"):
     """
     Displays a list of employee records for the SIAE
     """
-    form = SelectEmployeeRecordStatusForm(data=request.POST or None)
-    job_applications = None
-    employee_records = None
     siae = get_current_siae_or_404(request)
+    form = SelectEmployeeRecordStatusForm(data=request.GET or None)
+    employee_records_list = True
+    navigation_pages = None
+    data = None
 
     # Fetch count of each status for badge display
     status_badges = [
@@ -50,8 +51,9 @@ def list(request, template_name="employee_record/list.html"):
         (EmployeeRecord.objects.processed_for_siae(siae).count(), "success"),
     ]
 
-    if request.method == "POST" and form.is_valid():
+    if form.is_valid():
         status = form.cleaned_data["status"]
+        print(f"Status: {status}")
         message = {
             EmployeeRecord.Status.NEW: INFO_MSG_NEW,
             EmployeeRecord.Status.SENT: INFO_MSG_SENT,
@@ -63,15 +65,19 @@ def list(request, template_name="employee_record/list.html"):
             messages.info(request, message)
 
         if status == EmployeeRecord.Status.NEW:
-            job_applications = JobApplication.objects.eligible_as_employee_record(siae)
+            data = JobApplication.objects.eligible_as_employee_record(siae)
+            employee_records_list = False
         elif status == EmployeeRecord.Status.SENT:
-            employee_records = EmployeeRecord.objects.sent_for_siae(siae)
+            data = EmployeeRecord.objects.sent_for_siae(siae)
+
+    if data:
+        navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
 
     context = {
         "form": form,
-        "job_applications": job_applications,
-        "employee_records": employee_records,
+        "employee_records_list": employee_records_list,
         "badges": status_badges,
+        "navigation_pages": navigation_pages,
     }
 
     return render(request, template_name, context)
