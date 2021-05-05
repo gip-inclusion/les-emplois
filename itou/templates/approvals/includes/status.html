@@ -20,14 +20,27 @@
     </p>
 {% endif %}
 
-<p>
+<p class="mb-0">
     {% if approval.is_pass_iae %}
-        Numéro de PASS IAE (agrément) :
+        PASS IAE (agrément) disponible :
     {% else %}
         Agrément existant :
     {% endif %}
-    <b>{{ approval.number_with_spaces }}</b>
 </p>
+
+{% if job_application.is_pending %}
+    {% comment %}
+    Si on affiche le numéro du PASS IAE à ce moment là, certains employeurs pensent qu'il
+    n'y a pas besoin de valider la candidature car un numéro est déjà attribué.
+    {% endcomment %}
+    <p>
+        <b>Pour obtenir son numéro, vous devez valider l'embauche et demander l'obtention d'un PASS IAE.</b>
+    </p>
+{% else %}
+    <p>
+        <b>{{ approval.number_with_spaces }}</b>
+    </p>
+{% endif %}
 
 {% if approval.is_valid %}
 

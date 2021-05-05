@@ -27,7 +27,7 @@
         <div class="alert alert-secondary pb-0" role="alert">
             <p>
                 <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret }}<br>
-                {{ prescriber_org_data.address_line_1 }}<br>
+                {% if prescriber_org_data.address_line_1 %}{{ prescriber_org_data.address_line_1 }}<br>{% endif %}
                 {% if prescriber_org_data.address_line_2 %}{{ prescriber_org_data.address_line_2 }}<br>{% endif %}
                 {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
             </p>

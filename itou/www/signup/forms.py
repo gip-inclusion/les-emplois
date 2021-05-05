@@ -414,7 +414,7 @@ class PrescriberUserSignupForm(FullnameFormMixin, SignupForm):
             prescriber_org = PrescriberOrganization()
             prescriber_org.siret = self.prescriber_org_data["siret"]
             prescriber_org.name = self.prescriber_org_data["name"]
-            prescriber_org.address_line_1 = self.prescriber_org_data["address_line_1"]
+            prescriber_org.address_line_1 = self.prescriber_org_data["address_line_1"] or ""
             prescriber_org.address_line_2 = self.prescriber_org_data["address_line_2"] or ""
             prescriber_org.post_code = self.prescriber_org_data["post_code"]
             prescriber_org.city = self.prescriber_org_data["city"]
