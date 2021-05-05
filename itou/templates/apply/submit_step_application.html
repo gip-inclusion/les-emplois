@@ -23,16 +23,25 @@
         {% bootstrap_field form.message %}
 
         <label for="resume_form">{{ form.resume_link.label }}</label>
-        <div id="resume_form" class="dropzone border-dashed text-center text-secondary mb-4">
+        <div id="resume_form" class="dropzone border-dashed text-center text-secondary mb-2">
             <div class="dz-message my-1">
                 <div class="h5">{% include "includes/icon.html" with icon="upload" size="30" %}</div>
                 <div class="h6"><a href="#;">Choisissez un fichier</a> ou <b>glissez ici</b>.</div>
-                <div class="small">Taille maximale : {{ s3_max_file_size }} Mo</div>
+                <div class="small">Taille maximale : {{ s3_upload_config.max_file_size }} Mo</div>
                 <div class="small">Type de fichier : PDF</div>
+            </a>
             </div>
         </div>
 
         {{ form.resume_link.as_hidden }}
+
+        <p class="small mt-0">
+            {% include "includes/icon.html" with icon="help-circle" size="16" class="mr-1" %}
+            Ce CV n'est pas un PDF ?
+            <a href="https://doc.inclusion.beta.gouv.fr/mon-mode-demploi-prescripteur/postuler-pour-un-candidat#ajouter-un-cv-a-la-candidature" target="_blank" rel="noopener">
+                Découvrez comment le convertir.
+            </a>
+        </p>
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">
