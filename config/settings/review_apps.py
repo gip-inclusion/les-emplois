@@ -34,7 +34,5 @@ S3_STORAGE_ACCESS_KEY_ID = os.environ.get("CELLAR_ADDON_KEY_ID", "")
 S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("CELLAR_ADDON_KEY_SECRET", "")
 S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("CELLAR_ADDON_HOST", "")
 
-# The endpoint of your bucket, more info:
-# http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
 S3_STORAGE_BASE_ENDPOINT_URL = "https://%s" % S3_STORAGE_ENDPOINT_DOMAIN
 S3_STORAGE_BUCKET_ENDPOINT_URL = "https://%s.%s" % (S3_STORAGE_BUCKET_NAME, S3_STORAGE_ENDPOINT_DOMAIN)
