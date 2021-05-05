@@ -23,7 +23,8 @@ INFO_MSG_REJECTED = (
 )
 INFO_MSG_ACCEPTED = (
     "Vous trouverez ici les fiches salarié envoyées et validées par l'ASP. "
-    "Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter les informations validées par l'ASP"
+    "Aucune action ultérieure n'est possible à ce stade, "
+    "mais vous pouvez consulter les informations validées par l'ASP"
 )
 
 

@@ -8,43 +8,23 @@
         <p class="m-0">Numéro de PASS IAE : <b>{{ item.approval.number }}</b></p>
         {% if form.status.value == "NEW" %}
         <div class="p-2">
-            <form method="POST" action="">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-outline-primary float-right">
-                    Créer la fiche salarié
-                </button>
-            </form>
+            <a href="#" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
         </div>
         {% elif form.status.value == "SENT" %}
         <p class="m-0 pt-1">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p> 
-            <div class="p-2">
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-primary float-right">
-                        Voir le détail de la fiche salarié
-                    </button>
-                </form>
-            </div>
+        <div class="p-2">
+            <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+        </div>
         {% elif form.status.value == "REJECTED" %}
-        <p class="m-0 pt-1">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p> 
-            <div class="p-2">
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-primary float-right">
-                        Modifier la fiche salarié
-                    </button>
-                </form>
-            </div>
+        <p class="m-0 pt-1">Refusée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+        <div class="p-2">
+            <a href="#" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
+        </div>
         {% elif form.status.value == "PROCESSED" %}
         <p class="m-0 pt-1">Validée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
-            <div class="p-2">
-                <form method="POST" action="">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-primary float-right">
-                        Voir le détail de la fiche salarié
-                    </button>
-                </form>
-            </div>
+        <div class="p-2">
+            <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+        </div>
         {% endif %}
     </div>
 </div>
