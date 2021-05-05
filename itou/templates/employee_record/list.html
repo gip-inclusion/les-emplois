@@ -9,17 +9,17 @@
 <h1>Fiches salarié ASP</h1>
 
 <div class="container ml-0 mt-3">
-    <div class="row">
-        <div class="col-sm-3">
-            <div class="card-deck">
-                <div class="card ml-0">
-                    <div class="card-header">
+    <form method="GET" class="form">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card-deck">
+                    <div class="card ml-0">
+                        <div class="card-header">
                         <b>Filtrer les fiches</b>
-                    </div>
-                    <div class="card-body p-2">
-                        <p class="text-muted"><b>Par statut</b></p>
+                        </div>
+                        <div class="card-body p-2">
+                            <p class="text-muted"><b>Par statut</b></p>
 
-                        <form method="GET" class="form">
                             <div class="container">
                                 {% for status, badge in form.status|zip:badges %}
                                 <div class="row">
@@ -33,16 +33,16 @@
                                 {% endfor %}
                             </div>
 
-                            <div class="float-right mt-2">
+                        </div>
+                        <div class="card-footer pb-0 text-center">
                             {% buttons %}
-                                <button type="submit" class="btn btn-primary">Valider</button>
+                            <button type="submit" class="btn btn-primary">Appliquer</button>
                             {% endbuttons %}
-                            </div>
-                        </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+    </form>
 
         <div class="col-sm-8">
             <div class="container">
@@ -69,6 +69,13 @@
                     {% endif %}
                 </div>
 
+                {% if not navigation_pages %}
+                    <div class="text-muted text-center mt-4">
+                        {% include "includes/icon.html" with icon="slash" %}
+                        <p>Aucune fiche salarié avec le status selectionné ...</p>
+                    </div>
+                {% endif %}
+                
                 {% include "includes/pagination.html" with page=navigation_pages %}
 
             </div>
