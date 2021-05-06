@@ -1,4 +1,3 @@
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
@@ -8,25 +7,6 @@ from itou.job_applications.models import JobApplication
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import SelectEmployeeRecordStatusForm
-
-
-# Information message after selecting an employee record status
-INFO_MSG_NEW = (
-    "Vous trouverez ici les candidatures validées à partir desquelles vous devez créér de nouvelles fiches salarié"
-)
-INFO_MSG_SENT = (
-    "Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP. "
-    "A ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de la fiche est possible"
-)
-INFO_MSG_REJECTED = (
-    "Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une erreur. "
-    "Vous pouvez modifier les fiches en erreur et les envoyer à nouveau"
-)
-INFO_MSG_ACCEPTED = (
-    "Vous trouverez ici les fiches salarié envoyées et validées par l'ASP. "
-    "Aucune action ultérieure n'est possible à ce stade, "
-    "mais vous pouvez consulter les informations validées par l'ASP"
-)
 
 
 @login_required
@@ -67,17 +47,6 @@ def list(request, template_name="employee_record/list.html"):
     # Override defaut value (NEW status)
     if form.is_valid():
         status = form.cleaned_data["status"]
-
-    # Add some information on what to do next for the user
-    message = {
-        EmployeeRecord.Status.NEW: INFO_MSG_NEW,
-        EmployeeRecord.Status.SENT: INFO_MSG_SENT,
-        EmployeeRecord.Status.REJECTED: INFO_MSG_REJECTED,
-        EmployeeRecord.Status.PROCESSED: INFO_MSG_ACCEPTED,
-    }.get(status)
-
-    if message:
-        messages.info(request, message)
 
     # See comment above on `employee_records_list` var
     if status == EmployeeRecord.Status.NEW:

@@ -3,7 +3,7 @@
 {% load list_filters %}
 {% load bootstrap4 %}
 
-{% block title %}{{ siae.display_name }}{{ block.super }}{% endblock %}
+{% block title %}Fiches salarié ASP - {{ current_siae.display_name }}{{ block.super }}{% endblock %}
 
 {% block content %}
 
@@ -36,9 +36,9 @@
 
                         </div>
                         <div class="card-footer pb-0 text-center">
-                        {% buttons %}
-                            <button type="submit" class="btn btn-primary">Appliquer</button>
-                        {% endbuttons %}
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">Appliquer</button>
+                            {% endbuttons %}
                         </div>
                     </div>
                 </div>
@@ -51,6 +51,22 @@
             <p class="mt-3">
             Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.
             </p>
+        </div>
+
+        {# Messages #}
+        <div class="alert alert-info mb-4">
+            {% if form.status.value == "NEW" %}
+                Vous trouverez ici les candidatures validées à partir desquelles vous devez créér de nouvelles fiches salarié.
+            {% elif form.status.value == "SENT" %}
+                <p>Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
+                <p>A ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de la fiche est possible.</p>
+            {% elif form.status.value == "REJECTED" %}
+                <p>Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une erreur.</p>
+                <p>Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
+            {% elif form.status.value == "PROCESSED" %}
+                <p>Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
+                <p>Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de la fiche salarié.</p>
+            {% endif%}
         </div>
 
         <div>

@@ -1,13 +1,15 @@
 <div class="card mb-3">
+    
     <div class="card-header">
-    <b>{{ item.job_seeker.get_full_name|title }}</b>
+        <b>{{ item.job_seeker.get_full_name|title }}</b>
     </div>
+
     <div class="card-body">
         <div class="row">
             <div class="col-md-6">
                 <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at }}</b></p>
                 <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at }}</b></p>
-                <p class="m-0">Numéro de PASS IAE (agrément) : <b>{{ item.approval.number }}</b></p>
+                <p class="m-0">Numéro de PASS IAE (agrément) : <b>{{ item.approval.number_with_spaces }}</b></p>
             </div>
        
     {% if form.status.value == "NEW" %}
@@ -40,7 +42,6 @@
         <div class="p-2">
             <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
         </div>
-        {% endif %}
-
+    {% endif %}
     </div>
 </div>
