@@ -3,6 +3,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.http import urlencode
 
 from itou.approvals.models import Approval
 from itou.cities.factories import create_test_cities
@@ -514,8 +515,13 @@ class ProcessViewsTest(TestCase):
             JobApplicationWorkflow.STATE_OBSOLETE,
         ]
 
-        next_url = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in cancelled_states])}"
         response = self.client.post(url)
+
+        args = {"states": [c for c in cancelled_states]}
+        qs = urlencode(args, doseq=True)
+        url = reverse("apply:list_for_siae")
+        next_url = f"{url}?{qs}"
+
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, next_url)
 
