@@ -6,6 +6,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django_xworkflows import models as xwf_models
@@ -309,7 +310,10 @@ def archive(request, job_application_id):
         JobApplicationWorkflow.STATE_OBSOLETE,
     ]
 
-    next_url = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in cancelled_states])}"
+    args = {"states": [c for c in cancelled_states]}
+    qs = urlencode(args, doseq=True)
+    url = reverse("apply:list_for_siae")
+    next_url = f"{url}?{qs}"
 
     if not job_application.can_be_archived:
         messages.error(request, "Vous ne pouvez pas supprimer cette candidature.")
