@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="jobapplication",
             name="hidden_for_siae",
-            field=models.BooleanField(default=False),
+            field=models.BooleanField(default=False, verbose_name="Masqué coté employeur"),
         ),
     ]

@@ -360,7 +360,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="Date de refus manuel du PASS IAE", blank=True, null=True
     )
 
-    hidden_for_siae = models.BooleanField(default=False)
+    hidden_for_siae = models.BooleanField(default=False, verbose_name="Masqué coté employeur")
 
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
