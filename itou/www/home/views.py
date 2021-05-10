@@ -14,4 +14,7 @@ def home(request, template_name="home/home.html"):
 
 
 def trigger_error(request):
+    if request.POST:
+        raise Exception("%s error: %s" % (request.POST.get("status_code"), request.POST.get("error_message")))
+
     print(1 / 0)  # Should raise a ZeroDivisionError.
