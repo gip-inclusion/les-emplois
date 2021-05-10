@@ -1,10 +1,4 @@
-# Journal des modifications (*Changelog*)
-
-Toutes les modifications notables apportées au projet seront documentées dans ce fichier.
-
-Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0/).
-
-*Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
+# Journal des modifications
 
 ## [18] - 2021-05-06
 
