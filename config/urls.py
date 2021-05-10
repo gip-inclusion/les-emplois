@@ -60,7 +60,7 @@ urlpatterns = [
     path("search/", include("itou.www.search.urls")),
     path("siae/", include("itou.www.siaes_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
-    path("releases/", include("itou.www.releases.urls")),
+    path("versions/", include("itou.www.releases.urls")),
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
