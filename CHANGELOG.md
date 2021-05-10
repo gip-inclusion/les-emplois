@@ -6,6 +6,34 @@ Le format est basé sur [Tenez un Changelog](https://keepachangelog.com/en/1.0.0
 
 *Ce projet n'adhère plus au [*Semantic Versioning*](https://semver.org/spec/v2.0.0.html) depuis la version 2*.
 
+## [18] - 2021-05-06
+
+### Ajouté
+
+ - Ajout d'un [journal des modifications](https://emplois.inclusion.beta.gouv.fr/releases/)
+ - Ajout d'un export CSV des candidatures pour les employeurs et prescripteurs
+ - Ajout d'un contrôle qui assure que la date de fin de contrat n'est pas postérieure à la date de fin du PASS IAE
+ - Mise en avant du forum sur le tableau de bord
+ - Ajout d'un contrôle de la date de début d'une prolongation dans l'admin
+ - Ajout de la possibilité de créer des PASS IAE ex nihilo dans l'admin
+ - Sondage pour améliorer l'UX du moteur de recherche
+ - Ajout d'une mention "Le prescripteur a dérogé au délai de carence, vous pouvez obtenir un PASS IAE." pour les PASS IAE expirés
+ - Ajout de composants techniques en préparation de l'envoi des fiches salarié à l'ASP
+ - Activation des transactions au niveau de chaque appel à la base de données
+
+### Modifié
+
+ - Nouvelle numérotation des PASS IAE : les 2 chiffres après 99999 ne correspondent plus à l'année et continuent de s'incrémenter
+ - Modification d'une mention confusante pour les employeurs ne demandant pas de PASS IAE
+ - Correction d'un titre incorrect lorsqu'un prescripteur postule pour un candidat
+ - Les boutons "besoin d'aide" renvoient maintenant vers le portail assistance
+ - Un nouveau prescripteur peut maintenant créer son compte même quand les coordonnées GPS de API entreprise ne sont pas valides
+ - Mise à jour technique vers Django 3.2.2
+
+### Supprimé
+
+ - Le numéro de PASS IAE n'est plus visible sur les candidatures en attente
+
 ## [17] - 2021-04-23
 
 ### Ajouté
