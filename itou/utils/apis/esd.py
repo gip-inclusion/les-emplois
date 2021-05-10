@@ -27,19 +27,15 @@ def get_access_token(scope):
             return token.value
 
     auth_request = httpx.post(
-        f"{settings.API_ESD_AUTH_BASE_URL}/connexion/oauth2/access_token?",
-        params={
-            "realm": "/partenaire"
-        },
+        f"{settings.API_ESD_AUTH_BASE_URL}/connexion/oauth2/access_token",
+        params={"realm": "/partenaire"},
         data={
             "grant_type": "client_credentials",
             "client_id": settings.API_ESD_KEY,
             "client_secret": settings.API_ESD_SECRET,
             "scope": f"application_{settings.API_ESD_KEY} {scope}",
         },
-        headers={
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     auth_request.raise_for_status()
 
