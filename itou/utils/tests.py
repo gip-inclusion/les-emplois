@@ -19,9 +19,14 @@ from itou.users.factories import JobSeekerFactory, PrescriberFactory
 from itou.users.models import User
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import process_geocoding_data
+from itou.utils.apis.pole_emploi import PoleEmploiRechercheIndividuCertifieAPI
 from itou.utils.emails import sanitize_mailjet_recipients
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.mocks.pole_emploi import (
+    POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK,
+    POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK,
+)
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.context_processors import get_current_organization_and_perms
 from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_STAFF, get_user_info
@@ -595,6 +600,28 @@ class ApiEntrepriseTest(SimpleTestCase):
         self.assertEqual(etablissement.post_code, "57000")
         self.assertEqual(etablissement.city, "METZ")
         self.assertFalse(etablissement.is_closed)
+
+
+class PoleEmploiTest(SimpleTestCase):
+    @mock.patch(
+        "itou.utils.apis.pole_emploi.PoleEmploiRechercheIndividuCertifieAPI.post",
+        return_value=(POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_KNOWN_MOCK, None),
+    )
+    def test_recherche_individu_certifie_api_nominal(self, mock_api_entreprise):
+        individu = PoleEmploiRechercheIndividuCertifieAPI({}, "")
+
+        self.assertTrue(individu.is_valid)
+        self.assertEqual(individu.id_national_demandeur, "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ")
+        self.assertEqual(individu.code_sortie, "S001")
+
+    @mock.patch(
+        "itou.utils.apis.pole_emploi.PoleEmploiRechercheIndividuCertifieAPI.post",
+        return_value=(POLE_EMPLOI_RECHERCHE_INDIVIDU_CERTIFIE_API_RESULT_ERROR_MOCK, "Unable to fetch user data."),
+    )
+    def test_recherche_individu_certifie_api_error(self, mock_api_entreprise):
+        individu = PoleEmploiRechercheIndividuCertifieAPI({}, "")
+
+        self.assertFalse(individu.is_valid)
 
 
 class UtilsEmailsSplitRecipientTest(TestCase):
