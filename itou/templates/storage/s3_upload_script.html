@@ -7,7 +7,7 @@
     const callback_location_selector = "#{{ callback_location_selector_id }}";
 
     // Transform this element into a drag and drop zone.
-    const dropzone_selector = "#{{ dropzone_selector }}";
+    const dropzone_selector = "#{{ dropzone_selector_id }}";
 
     // When a file is added to the drop zone, send a POST request to this URL.
     const form_url = "{{ s3_form_values.endpoint }}";
@@ -37,7 +37,7 @@
         dictFallbackMessage: "Ce navigateur n'est pas compatible",
         dictFileTooBig: "Fichier trop volumineux",
         dictInvalidFileType: "Type de fichier non pris en charge",
-        dictResponseError: "Erreur \{\{ statusCode \}\}",
+        dictResponseError: "Erreur technique",
         dictCancelUpload: "Annuler",
         dictUploadCanceled: "Annulé",
         dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
@@ -80,5 +80,16 @@
 
     dropzone.on("removedfile", function(file) {
         $(callback_location_selector).val("");
+    });
+
+    dropzone.on("error", function(file, errorMessage, xhr) {
+        if (xhr != null) {
+            // An error occurred with the request.
+            // Send it to Sentry to avoid silent bugs.
+            const errorMessage = `Upload failed for Dropzone selector ${dropzone_selector} to S3 bucket ${form_url}`;
+            $.post("{% url 'home:sentry_debug' %}", {
+                "status_code": 500 , "error_message": errorMessage, "csrfmiddlewaretoken": '{{ csrf_token }}'
+            });
+        };
     });
 </script>
