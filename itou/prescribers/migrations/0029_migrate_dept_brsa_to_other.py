@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-from itou.prescribers.management.commands.merge_organizations import OrganizationMerger
+from itou.prescribers.management.commands.merge_organizations import organization_delete, organization_merge_into
 
 
 def cleanup_brsa_organizations(apps, schema_editor):
@@ -59,14 +59,15 @@ def cleanup_brsa_organizations(apps, schema_editor):
         (4781, 1113),
     ]
     for from_id, to_id in merge_list:
-        OrganizationMerger(from_id=from_id, to_id=to_id).run()
+        if to_id:
+            organization_merge_into(from_id, to_id)
+        else:
+            organization_delete(from_id)
 
 
 def remove_dept_brsa(apps, schema_editor):
     PrescriberOrganization = apps.get_model("prescribers", "PrescriberOrganization")
-    PrescriberOrganization.objects.filter(kind=PrescriberOrganization.Kind.DEPT_BRSA).update(
-        kind=PrescriberOrganization.Kind.OTHER, is_brsa=True
-    )
+    PrescriberOrganization.objects.filter(kind="DEPT_BRSA").update(kind="OTHER", is_brsa=True)
 
 
 class Migration(migrations.Migration):
