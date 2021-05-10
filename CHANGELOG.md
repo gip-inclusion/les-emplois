@@ -4,7 +4,7 @@
 
 ### Ajouté
 
-- Ajout d'un [journal des modifications](https://emplois.inclusion.beta.gouv.fr/releases/)
+- Ajout d'un [journal des modifications](https://emplois.inclusion.beta.gouv.fr/versions/)
 - Ajout d'un export CSV des candidatures pour les employeurs et prescripteurs
 - Ajout d'un contrôle qui assure que la date de fin de contrat n'est pas postérieure à la date de fin du PASS IAE
 - Mise en avant du forum sur le tableau de bord
