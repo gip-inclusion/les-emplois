@@ -59,8 +59,6 @@
 
 {% block script %}
     {{ block.super }}
-    <!-- Needed to use the Datepicker JS widget. -->
-    {{ form.media }}
 
     {% include "storage/s3_upload.html" with callback_location_selector_id=form.resume_link.id_for_label dropzone_selector="#resume_form" s3_form_values=s3_form_values s3_upload_config=s3_upload_config %}
 {% endblock %}
