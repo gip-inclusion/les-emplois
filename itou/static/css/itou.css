@@ -487,6 +487,6 @@ Usage:
 .dropzone .dz-preview .dz-error-message::after {
     border-top: 6px solid var(--red);
     border-bottom: 0 solid #be2626 !important;
-    bottom: -6px !important;
+    bottom: -5px !important;
     top: auto !important;
 }
