@@ -16,6 +16,7 @@ API_ESD_SECRET = None
 # https://docs.python.org/3/library/logging.html#logging.disable
 logging.disable(logging.CRITICAL)
 
+ITOU_ENVIRONMENT = "TEST"
 ITOU_PROTOCOL = "http"
 ITOU_FQDN = "testserver"
 
