@@ -1,6 +1,7 @@
 import logging
 
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from itou.eligibility import models as eligibility_models
 from itou.invitations import models as invitations_models
@@ -31,17 +32,18 @@ def organization_merge_into(from_id, to_id):
         to_organization.siret,
         to_organization.name,
     )
-    job_applications_models.JobApplication.objects.filter(sender_prescriber_organization_id=from_id).update(
-        sender_prescriber_organization_id=to_id
-    )
-    prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).update(organization_id=to_id)
-    eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id).update(
-        author_prescriber_organization_id=to_id
-    )
-    invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).update(
-        organization_id=to_id
-    )
-    from_organization.delete()
+    with transaction.atomic():
+        job_applications_models.JobApplication.objects.filter(sender_prescriber_organization_id=from_id).update(
+            sender_prescriber_organization_id=to_id
+        )
+        prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).update(organization_id=to_id)
+        eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id).update(
+            author_prescriber_organization_id=to_id
+        )
+        invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).update(
+            organization_id=to_id
+        )
+        from_organization.delete()
 
 
 class Command(BaseCommand):
