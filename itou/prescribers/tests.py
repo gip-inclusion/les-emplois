@@ -1,12 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from itou.job_applications import factories as job_applications_factories, models as job_applications_models
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -111,3 +113,17 @@ class PrescriberOrganizationModelTest(TestCase):
         self.assertEqual(organization1.active_members.count(), 1)
         self.assertEqual(organization2.members.count(), 3)
         self.assertEqual(organization2.active_members.count(), 3)
+
+    def test_merge_two_organizations(self):
+        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        organization_1 = job_application_1.sender_prescriber_organization
+
+        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        organization_2 = job_application_2.sender_prescriber_organization
+
+        count_job_applications = job_applications_models.JobApplication.objects.count()
+        self.assertEqual(PrescriberOrganization.objects.count(), 2)
+        self.assertEqual(count_job_applications, 2)
+        organization_merge_into(organization_1.id, organization_2.id)
+        self.assertEqual(count_job_applications, job_applications_models.JobApplication.objects.count())
+        self.assertEqual(PrescriberOrganization.objects.count(), 1)
