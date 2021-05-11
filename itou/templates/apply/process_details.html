@@ -371,8 +371,12 @@
             </p>
         {% endif %}
 
+
     {% endif %}
 
+    {% if job_application.can_be_archived %}
+        {% include "apply/includes/archive_button.html" with job_application=job_application %}
+    {% endif %}
 
     {# History ------------------------------------------------------ #}
 

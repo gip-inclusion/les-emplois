@@ -30,7 +30,7 @@
                 <tbody>
                     {% for month in job_applications_by_month %}
                     <tr>
-                        <td>{{ month.month|date:"M Y" }}</td>
+                        <td>{{ month.month|date:"F Y"|capfirst }}</td>
                         <td>{{ month.c }}</td>
                         <td>
                         {% if export_for == "siae" %}

@@ -143,7 +143,7 @@ class ProcessListSiaeTest(ProcessListTest):
         total_applications = len(response.context["job_applications_page"].object_list)
 
         # Result page should contain all SIAE's job applications.
-        self.assertEqual(total_applications, self.hit_pit.job_applications_received.count())
+        self.assertEqual(total_applications, self.hit_pit.job_applications_received.not_archived().count())
 
     def test_list_for_siae_view__filtered_by_one_state(self):
         """
@@ -185,7 +185,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.login(username=self.eddie_hit_pit.email, password=DEFAULT_PASSWORD)
         date_format = DatePickerField().DATE_FORMAT
-        job_applications = self.hit_pit.job_applications_received.order_by("created_at")
+        job_applications = self.hit_pit.job_applications_received.not_archived().order_by("created_at")
         jobs_in_range = job_applications[3:]
         start_date = jobs_in_range[0].created_at
 
@@ -213,7 +213,7 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(url)
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        self.assertEqual(total_applications, self.hit_pit.job_applications_received.count())
+        self.assertEqual(total_applications, self.hit_pit.job_applications_received.not_archived().count())
 
     def test_view__filtered_by_sender_organization_name(self):
         """

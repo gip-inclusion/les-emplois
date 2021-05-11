@@ -132,6 +132,30 @@ class JobApplicationModelTest(TestCase):
         )
         self.assertFalse(job_application_future_not_ok.can_be_cancelled)
 
+    def test_can_be_archived(self):
+        """
+        Only cancelled, refused and obsolete job_applications can be archived.
+        """
+        states_transition_not_possible = [
+            JobApplicationWorkflow.STATE_NEW,
+            JobApplicationWorkflow.STATE_PROCESSING,
+            JobApplicationWorkflow.STATE_POSTPONED,
+            JobApplicationWorkflow.STATE_ACCEPTED,
+        ]
+        states_transition_possible = [
+            JobApplicationWorkflow.STATE_CANCELLED,
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]
+
+        for state in states_transition_not_possible:
+            job_application = JobApplicationFactory(state=state)
+            self.assertFalse(job_application.can_be_archived)
+
+        for state in states_transition_possible:
+            job_application = JobApplicationFactory(state=state)
+            self.assertTrue(job_application.can_be_archived)
+
 
 class JobApplicationQuerySetTest(TestCase):
     def test_created_in_past(self):

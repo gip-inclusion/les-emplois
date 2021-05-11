@@ -1,0 +1,54 @@
+<button data-toggle="modal" data-target="#delete-job-application" class="btn btn-danger btn-block">
+    {% include "includes/icon.html" with icon="trash-2" %}
+    Supprimer cette candidature
+</button>
+
+<div
+    class="modal fade text-left"
+    id="delete-job-application"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="no-email-modal-label"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                            <h5 class="modal-title" id="no-email-modal-label">
+                                {% include "includes/icon.html" with icon="trash-2" %}
+                                Supprimer cette candidature de mon tableau de bord
+                            </h5>
+                            <br>
+                            <p>Vous vous apprêtez à supprimer définitivement cette candidature de votre tableau de bord.</p>
+                            <p>Souhaitez-vous continuer ?</p>
+                            <form method="POST" action="{% url 'apply:archive' job_application_id=job_application.pk %}">
+                                {% csrf_token %}
+                                <a
+                                    href="#"
+                                    class="btn btn-secondary"
+                                    data-dismiss="modal"
+                                    aria-label="Non">
+                                    Non
+                                </a>
+                                <input type="submit"
+                                    class="btn btn-danger matomo-event"
+                                    data-matomo-category="employeurs"
+                                    data-matomo-action="clic"
+                                    data-matomo-option="suppression-candidature"
+                                    rel="noopener"
+                                    aria-label="Oui, je souhaite supprimer cette candidature"
+                                    value="Oui, je souhaite supprimer cette candidature">
+                                </input>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

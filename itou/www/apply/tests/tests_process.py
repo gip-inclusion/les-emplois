@@ -3,6 +3,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.http import urlencode
 
 from itou.approvals.models import Approval
 from itou.cities.factories import create_test_cities
@@ -40,6 +41,19 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertTrue(job_application.has_editable_job_seeker)
         self.assertContains(response, "Modifier les informations")
+
+    def test_details_for_siae_hidden(self):
+        """An hiden job_application is not displayed."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            job_seeker__is_job_seeker=True, hidden_for_siae=True
+        )
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(404, response.status_code)
 
     def test_process(self):
         """Ensure that the `process` transition is triggered."""
@@ -482,6 +496,37 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.url, next_url)
         job_application.refresh_from_db()
         self.assertFalse(job_application.state.is_cancelled)
+
+    def test_archive(self):
+        """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+            state=JobApplicationWorkflow.STATE_CANCELLED
+        )
+        self.assertTrue(job_application.state.is_cancelled)
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:archive", kwargs={"job_application_id": job_application.pk})
+
+        cancelled_states = [
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_CANCELLED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]
+
+        response = self.client.post(url)
+
+        args = {"states": [c for c in cancelled_states]}
+        qs = urlencode(args, doseq=True)
+        url = reverse("apply:list_for_siae")
+        next_url = f"{url}?{qs}"
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, next_url)
+
+        job_application.refresh_from_db()
+        self.assertTrue(job_application.hidden_for_siae)
 
 
 class ProcessTemplatesTest(TestCase):

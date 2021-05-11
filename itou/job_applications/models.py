@@ -91,6 +91,12 @@ class JobApplicationQuerySet(models.QuerySet):
     def accepted(self):
         return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
 
+    def not_archived(self):
+        """
+        Filters out the archived job_applications
+        """
+        return self.exclude(hidden_for_siae=True)
+
     def created_on_given_year_and_month(self, year, month):
         return self.filter(created_at__year=year, created_at__month=month)
 
@@ -354,6 +360,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="Date de refus manuel du PASS IAE", blank=True, null=True
     )
 
+    hidden_for_siae = models.BooleanField(default=False, verbose_name="Masqué coté employeur")
+
     created_at = models.DateTimeField(verbose_name="Date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="Date de modification", blank=True, null=True, db_index=True)
 
@@ -440,6 +448,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             delay_ends_at = self.hiring_start_at + relativedelta(days=self.CANCELLATION_DAYS_AFTER_HIRING_STARTED)
             return today <= delay_ends_at
         return False
+
+    @property
+    def can_be_archived(self):
+        return self.state in [
+            JobApplicationWorkflow.STATE_REFUSED,
+            JobApplicationWorkflow.STATE_CANCELLED,
+            JobApplicationWorkflow.STATE_OBSOLETE,
+        ]
 
     @property
     def cancellation_delay_end(self):

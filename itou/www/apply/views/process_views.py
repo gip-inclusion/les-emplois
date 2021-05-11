@@ -6,6 +6,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
 from django_xworkflows import models as xwf_models
@@ -38,6 +39,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     """
     queryset = (
         JobApplication.objects.siae_member_required(request.user)
+        .not_archived()
         .select_related("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
         .prefetch_related("selected_jobs__appellation")
     )
@@ -290,6 +292,47 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
         "job_application": job_application,
     }
     return render(request, template_name, context)
+
+
+@require_http_methods(["POST"])
+@login_required
+def archive(request, job_application_id):
+    """
+    Archive the job_application for an SIAE (ie. sets the hidden_for_siae flag to True)
+    then redirects to the list of job_applications
+    """
+    queryset = JobApplication.objects.siae_member_required(request.user)
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    cancelled_states = [
+        JobApplicationWorkflow.STATE_REFUSED,
+        JobApplicationWorkflow.STATE_CANCELLED,
+        JobApplicationWorkflow.STATE_OBSOLETE,
+    ]
+
+    args = {"states": [c for c in cancelled_states]}
+    qs = urlencode(args, doseq=True)
+    url = reverse("apply:list_for_siae")
+    next_url = f"{url}?{qs}"
+
+    if not job_application.can_be_archived:
+        messages.error(request, "Vous ne pouvez pas supprimer cette candidature.")
+        return HttpResponseRedirect(next_url)
+
+    if request.method == "POST":
+        try:
+            username = f"{job_application.job_seeker.first_name} {job_application.job_seeker.last_name}"
+            siae_name = job_application.to_siae.display_name
+
+            job_application.hidden_for_siae = True
+            job_application.save()
+
+            success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."
+            messages.success(request, success_message)
+        except xwf_models.InvalidTransitionError:
+            messages.error(request, "Action déjà effectuée.")
+
+    return HttpResponseRedirect(next_url)
 
 
 @login_required
