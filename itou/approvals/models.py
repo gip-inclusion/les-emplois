@@ -13,6 +13,7 @@ from django.db.models import Count, Q
 from django.db.models.functions import TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
@@ -1036,17 +1037,29 @@ class ApprovalsWrapper:
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
 
     # Error messages.
-    ERROR_CANNOT_OBTAIN_NEW_FOR_USER = (
-        "Vous avez terminé un parcours il y a moins de deux ans. "
-        "Pour prétendre à nouveau à un parcours en structure d'insertion "
-        "par l'activité économique vous devez rencontrer un prescripteur "
-        "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
+    WAITING_PERIOD_DOC_URL = (
+        f"{settings.ITOU_DOC_URL}/qui-est-eligible-iae-criteres-eligibilite/derogation-au-delai-de-carence"
     )
-    ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = (
-        "Le candidat a terminé un parcours il y a moins de deux ans. "
-        "Pour prétendre à nouveau à un parcours en structure d'insertion "
-        "par l'activité économique il doit rencontrer un prescripteur "
-        "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
+    WAITING_PERIOD_DOC_LINK = (
+        f'<a href="{WAITING_PERIOD_DOC_URL}" rel="noopener" target="_blank">'
+        "En savoir plus sur la dérogation du délai de carence (ouverture dans un nouvel onglet)</a>."
+    )
+    ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
+        (
+            "Vous avez terminé un parcours il y a moins de deux ans.<br>"
+            "Pour prétendre à nouveau à un parcours en structure d'insertion "
+            "par l'activité économique vous devez rencontrer un prescripteur "
+            "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
+        )
+    )
+    ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY = mark_safe(
+        (
+            "Le candidat a terminé un parcours il y a moins de deux ans.<br>"
+            "Pour prétendre à nouveau à un parcours en structure d'insertion "
+            "par l'activité économique il doit rencontrer un prescripteur "
+            "habilité : Pôle emploi, Mission Locale, CAP Emploi, etc."
+            f"<br>{WAITING_PERIOD_DOC_LINK}"  # Display doc link only for proxies.
+        )
     )
 
     def __init__(self, user):
