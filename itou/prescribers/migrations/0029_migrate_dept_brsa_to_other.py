@@ -10,27 +10,6 @@ from itou.prescribers.management.commands.merge_organizations import organizatio
 logger = logging.getLogger(__name__)
 
 
-def organization_delete(apps, from_id):
-    PrescriberOrganization = apps.get_model("prescribers", "PrescriberOrganization")
-    JobApplication = apps.get_model("job_applications", "JobApplication")
-    PrescriberMembership = apps.get_model("prescribers", "PrescriberMembership")
-    EligibilityDiagnosis = apps.get_model("eligibility", "EligibilityDiagnosis")
-    PrescriberWithOrgInvitation = apps.get_model("invitations", "PrescriberWithOrgInvitation")
-
-    from_organization = PrescriberOrganization.objects.get(pk=from_id)
-    logger.info(
-        "Delete organization 'ID %s - SIRET %s - %s'.",
-        from_id,
-        from_organization.siret,
-        from_organization.name,
-    )
-    JobApplication.objects.filter(sender_prescriber_organization_id=from_id).delete()
-    PrescriberMembership.objects.filter(organization_id=from_id).delete()
-    EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id).delete()
-    PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).delete()
-    from_organization.delete()
-
-
 def cleanup_brsa_organizations(apps, schema_editor):
     # This calls could break in the future because the called function doesn't
     # use the existing SQL schema (as provided in argument) so we will have to
@@ -42,10 +21,6 @@ def cleanup_brsa_organizations(apps, schema_editor):
         (4325, 1705),
         (3855, 1705),
         (3442, 4544),
-        (2167, None),
-        (2489, None),
-        (2895, None),
-        (3724, None),
         (1105, 3036),
         (4575, 3632),
         (4208, 2954),
@@ -84,10 +59,7 @@ def cleanup_brsa_organizations(apps, schema_editor):
         (4781, 1113),
     ]
     for from_id, to_id in merge_list:
-        if to_id:
-            organization_merge_into(from_id, to_id)
-        else:
-            organization_delete(apps, from_id)
+        organization_merge_into(from_id, to_id)
 
 
 def remove_dept_brsa(apps, schema_editor):
