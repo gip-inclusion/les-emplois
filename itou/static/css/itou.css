@@ -467,3 +467,26 @@ Usage:
     background-color: #ededed;
     border-color: #ededed;
 }
+
+/* Dropzone component used to upload files to an S3 bucket
+--------------------------------------------------------------------------- */
+
+/* By default, an error message is displayed only on hover */
+.dropzone .dz-preview.dz-error .dz-error-message {
+    opacity: 1;
+    pointer-events: auto;
+    top: -15px;
+    background: var(--red);
+}
+
+.dz-error-mark {
+    background: var(--red);
+    border-radius: 50%;
+}
+
+.dropzone .dz-preview .dz-error-message::after {
+    border-top: 6px solid var(--red);
+    border-bottom: 0 solid #be2626 !important;
+    bottom: -6px !important;
+    top: auto !important;
+}
