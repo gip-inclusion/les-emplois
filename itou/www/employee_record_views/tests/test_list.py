@@ -9,7 +9,10 @@ from itou.users.factories import DEFAULT_PASSWORD
 
 class ListEmployeeRecordsTest(TestCase):
     def setUp(self):
-        self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
+        # User must be super user for UI first part (tmp)
+        self.siae = SiaeWithMembershipAndJobsFactory(
+            name="Evil Corp.", membership__user__first_name="Elliot", membership__user__is_superuser=True
+        )
         self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
             kind="EITI", name="A-Team", membership__user__first_name="Hannibal"
         )
@@ -18,6 +21,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.job_application = JobApplicationWithApprovalFactory(
             to_siae=self.siae,
         )
+        self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:list")
 
     def test_permissions(self):
@@ -39,7 +43,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, self.job_seeker.get_full_name().title())
 
     def test_status_filter(self):
         """
@@ -49,16 +53,18 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         response = self.client.get(self.url)
 
-        self.assertContains(response, self.user.get_full_name())
+        job_seeker_name = self.job_seeker.get_full_name().title()
+
+        self.assertContains(response, job_seeker_name)
 
         # Or NEW
         response = self.client.get(self.url + "?status=NEW")
-        self.assertContains(response, self.user.get_full_name())
+        self.assertContains(response, job_seeker_name)
 
         # More complete tests to come with fixtures files
         for status in [EmployeeRecord.Status.SENT, EmployeeRecord.Status.REJECTED, EmployeeRecord.Status.PROCESSED]:
-            response = self.client.get(self.url + f"?status={status.value}", {"status": status.value})
-            self.assertNotContains(response, self.user.get_full_name())
+            response = self.client.get(self.url + f"?status={status.value}")
+            self.assertNotContains(response, job_seeker_name)
 
     # To be completed with other status during UI part 2
     # when connected to employee record backend with sample employee records...

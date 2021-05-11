@@ -11,6 +11,7 @@ from itou.www.employee_record_views.forms import SelectEmployeeRecordStatusForm
 
 
 @login_required
+# @user_passes_test(lambda u: u.is_superuser)
 def list(request, template_name="employee_record/list.html"):
     """
     Displays a list of employee records for the SIAE
@@ -56,8 +57,6 @@ def list(request, template_name="employee_record/list.html"):
     # Override defaut value (NEW status)
     if form.is_valid():
         status = form.cleaned_data["status"]
-
-    print(status)
 
     # See comment above on `employee_records_list` var
     if status == EmployeeRecord.Status.NEW:
