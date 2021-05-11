@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD
@@ -38,7 +39,26 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.user.get_full_name())
+
+    def test_status_filter(self):
+        """
+        Check status filter
+        """
+        # No status defined
+        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
 
         self.assertContains(response, self.user.get_full_name())
 
-    # To be completed with other status during UI part 2 ...
+        # Or NEW
+        response = self.client.get(self.url + "?status=NEW")
+        self.assertContains(response, self.user.get_full_name())
+
+        # More complete tests to come with fixtures files
+        for status in [EmployeeRecord.Status.SENT, EmployeeRecord.Status.REJECTED, EmployeeRecord.Status.PROCESSED]:
+            response = self.client.get(self.url + f"?status={status.value}", {"status": status.value})
+            self.assertNotContains(response, self.user.get_full_name())
+
+    # To be completed with other status during UI part 2
+    # when connected to employee record backend with sample employee records...

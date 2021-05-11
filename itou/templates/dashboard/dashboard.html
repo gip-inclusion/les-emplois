@@ -321,7 +321,9 @@
                             </p>
                         {% endif %}
                     {% endfor %}
-                    {# Will be commented until UI part 2 is finished #}
+
+                    {% comment "Will be commented until UI part 2 is finished" %}
+                    
                     {% if can_show_employee_records %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
@@ -329,6 +331,9 @@
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
+
+                    {% endcomment %}
+
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="log-in" %}
                         <a href="{% url 'apply:start' siae_pk=current_siae.pk %}">
