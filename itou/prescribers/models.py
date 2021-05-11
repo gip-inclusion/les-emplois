@@ -141,7 +141,7 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     is_brsa = models.BooleanField(
         verbose_name="Conventionné pour le suivi des BRSA",
         default=False,
-        help_text="Organisme conventionné par le conseil départemental pour le suivi des BRSA.",
+        help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
     )
     name = models.CharField(verbose_name="Nom", max_length=255)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)

@@ -15,7 +15,9 @@ class Migration(migrations.Migration):
             name="is_brsa",
             field=models.BooleanField(
                 default=False,
-                help_text="Organisme conventionné par le conseil départemental pour le suivi des BRSA.",
+                help_text=(
+                    "Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA."
+                ),
                 verbose_name="Conventionné pour le suivi des BRSA",
             ),
         ),
