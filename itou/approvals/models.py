@@ -18,6 +18,7 @@ from unidecode import unidecode
 
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.utils.models import DateRange
+from itou.utils.urls import get_external_link_markup
 from itou.utils.validators import alphanumeric
 
 
@@ -1037,12 +1038,9 @@ class ApprovalsWrapper:
     IN_WAITING_PERIOD = "IN_WAITING_PERIOD"
 
     # Error messages.
-    WAITING_PERIOD_DOC_URL = (
-        f"{settings.ITOU_DOC_URL}/qui-est-eligible-iae-criteres-eligibilite/derogation-au-delai-de-carence"
-    )
-    WAITING_PERIOD_DOC_LINK = (
-        f'<a href="{WAITING_PERIOD_DOC_URL}" rel="noopener" target="_blank">'
-        "En savoir plus sur la dérogation du délai de carence (ouverture dans un nouvel onglet)</a>."
+    WAITING_PERIOD_DOC_LINK = get_external_link_markup(
+        url=f"{settings.ITOU_DOC_URL}/qui-est-eligible-iae-criteres-eligibilite/derogation-au-delai-de-carence",
+        text="En savoir plus sur la dérogation du délai de carence",
     )
     ERROR_CANNOT_OBTAIN_NEW_FOR_USER = mark_safe(
         (

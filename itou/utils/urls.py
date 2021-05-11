@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.safestring import mark_safe
 
 
 def get_safe_url(request, param_name, fallback_url=None):
@@ -42,6 +43,12 @@ def get_absolute_url(path=""):
     if path.startswith("/"):
         path = path[1:]
     return f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/{path}"
+
+
+def get_external_link_markup(url, text):
+    return mark_safe(
+        f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
+    )
 
 
 class SiretConverter:
