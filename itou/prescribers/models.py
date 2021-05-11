@@ -48,7 +48,7 @@ class PrescriberOrganizationManager(models.Manager):
         Returns organizations accredited by the given organization.
         """
         if org.kind == self.model.Kind.DEPT and org.is_authorized:
-            return self.filter(department=org.department, kind=PrescriberOrganization.Kind.DEPT_BRSA)
+            return self.filter(department=org.department, is_brsa=True)
         return self.none()
 
 
@@ -97,7 +97,6 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
         CAP_EMPLOI = "CAP_EMPLOI", "CAP emploi"
         ML = "ML", "Mission locale"
         DEPT = "DEPT", "Service social du conseil départemental"
-        DEPT_BRSA = "DEPT_BRSA", "Dispositif conventionné par le conseil départemental pour le suivi BRSA"
         SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
         PJJ = "PJJ", "PJJ - Protection judiciaire de la jeunesse"
         CCAS = ("CCAS", "CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
@@ -139,6 +138,11 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
     # See https://docs.djangoproject.com/en/3.1/ref/models/fields/#null
     siret = models.CharField(verbose_name="Siret", max_length=14, validators=[validate_siret], null=True, blank=True)
     kind = models.CharField(verbose_name="Type", max_length=20, choices=Kind.choices, default=Kind.OTHER)
+    is_brsa = models.BooleanField(
+        verbose_name="Conventionné pour le suivi des BRSA",
+        default=False,
+        help_text="Indique si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA.",
+    )
     name = models.CharField(verbose_name="Nom", max_length=255)
     phone = models.CharField(verbose_name="Téléphone", max_length=20, blank=True)
     email = models.EmailField(verbose_name="E-mail", blank=True)

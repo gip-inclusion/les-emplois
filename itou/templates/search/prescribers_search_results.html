@@ -53,7 +53,10 @@
                             {{ prescriber_org.name }}
                         </a>
                     </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">{{ prescriber_org.get_kind_display }}</h6>
+                    <h6 class="card-subtitle mb-2 text-muted">
+                        {{ prescriber_org.get_kind_display }}
+                        {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
+                    </h6>
                     <hr>
                     <h6 class="card-subtitle mb-2 text-muted">
                         {{ prescriber_org.address_on_one_line }}

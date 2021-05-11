@@ -1,12 +1,14 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
+from itou.job_applications import factories as job_applications_factories, models as job_applications_models
 from itou.prescribers.factories import (
     AuthorizedPrescriberOrganizationFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
+from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -19,16 +21,15 @@ class PrescriberOrganizationManagerTest(TestCase):
         """
         Test `get_accredited_orgs_for`.
         """
-
-        expected_num = 3
-
         departmental_council_org = AuthorizedPrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.DEPT)
 
         # An org accredited by a departmental council:
         # - is in the same department
-        # - is of kind `DEPT_BRSA`
-        AuthorizedPrescriberOrganizationFactory.create_batch(
-            expected_num, department=departmental_council_org.department, kind=PrescriberOrganization.Kind.DEPT_BRSA
+        # - is accredited BRSA
+        accredited_org = AuthorizedPrescriberOrganizationFactory(
+            department=departmental_council_org.department,
+            kind=PrescriberOrganization.Kind.OTHER,
+            is_brsa=True,
         )
 
         other_org = AuthorizedPrescriberOrganizationFactory(
@@ -37,7 +38,7 @@ class PrescriberOrganizationManagerTest(TestCase):
 
         # `expected_num` orgs should be accredited by the departmental council.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(departmental_council_org)
-        self.assertEqual(accredited_orgs.count(), expected_num)
+        self.assertEqual(accredited_org, accredited_orgs.first())
 
         # No orgs should be accredited by the other org.
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
@@ -112,3 +113,17 @@ class PrescriberOrganizationModelTest(TestCase):
         self.assertEqual(organization1.active_members.count(), 1)
         self.assertEqual(organization2.members.count(), 3)
         self.assertEqual(organization2.active_members.count(), 3)
+
+    def test_merge_two_organizations(self):
+        job_application_1 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        organization_1 = job_application_1.sender_prescriber_organization
+
+        job_application_2 = job_applications_factories.JobApplicationSentByPrescriberOrganizationFactory()
+        organization_2 = job_application_2.sender_prescriber_organization
+
+        count_job_applications = job_applications_models.JobApplication.objects.count()
+        self.assertEqual(PrescriberOrganization.objects.count(), 2)
+        self.assertEqual(count_job_applications, 2)
+        organization_merge_into(organization_1.id, organization_2.id)
+        self.assertEqual(count_job_applications, job_applications_models.JobApplication.objects.count())
+        self.assertEqual(PrescriberOrganization.objects.count(), 1)

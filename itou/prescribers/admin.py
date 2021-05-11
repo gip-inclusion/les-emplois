@@ -102,7 +102,19 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
     fieldsets = (
         (
             "Structure",
-            {"fields": ("pk", "siret", "kind", "name", "phone", "email", "code_safir_pole_emploi", "is_authorized")},
+            {
+                "fields": (
+                    "pk",
+                    "siret",
+                    "kind",
+                    "is_brsa",
+                    "name",
+                    "phone",
+                    "email",
+                    "code_safir_pole_emploi",
+                    "is_authorized",
+                )
+            },
         ),
         (
             "Adresse",
@@ -143,6 +155,7 @@ class PrescriberOrganizationAdmin(admin.ModelAdmin):
         HasMembersFilter,
         "is_authorized",
         "kind",
+        "is_brsa",
         "department",
     )
     raw_id_fields = ("created_by",)
