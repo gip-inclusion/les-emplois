@@ -12,7 +12,15 @@
 <p class="small mt-0">
     {% include "includes/icon.html" with icon="help-circle" size="16" class="mr-1" %}
     Ce fichier n'est pas un PDF ?
-    <a href="https://doc.inclusion.beta.gouv.fr/mon-mode-demploi-prescripteur/postuler-pour-un-candidat#ajouter-un-cv-a-la-candidature" target="_blank" rel="noopener">
+    <a
+        href="https://doc.inclusion.beta.gouv.fr/mon-mode-demploi-prescripteur/postuler-pour-un-candidat#ajouter-un-cv-a-la-candidature"
+        target="_blank"
+        rel="noopener"
+        class="matomo-event"
+        matomo-category="ajout-fichier-candidature"
+        matomo-action="clic"
+        matomo-option="clic-sur-lien-aide-pdf"
+        >
         Découvrez comment le convertir.
     </a>
 </p>
