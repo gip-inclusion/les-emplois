@@ -44,21 +44,6 @@ def organization_merge_into(from_id, to_id):
     from_organization.delete()
 
 
-def organization_delete(from_id):
-    from_organization = prescribers_models.PrescriberOrganization.objects.get(pk=from_id)
-    logger.info(
-        "Delete organization 'ID %s - SIRET %s - %s'.",
-        from_id,
-        from_organization.siret,
-        from_organization.name,
-    )
-    job_applications_models.JobApplication.objects.filter(sender_prescriber_organization_id=from_id).delete()
-    prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).delete()
-    eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id).delete()
-    invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).delete()
-    from_organization.delete()
-
-
 class Command(BaseCommand):
     help = HELP_TEXT
 
@@ -73,16 +58,12 @@ class Command(BaseCommand):
         )
         parser.add_argument(
             "--to",
-            dest="to_if",
+            dest="to_id",
             metavar="TO",
             type=int,
             help="ID of the prescriber organization to keep.",
-            nargs="?",
-            default=None,
+            required=True,
         )
 
     def handle(self, *args, **options):
-        if options["to_id"]:
-            organization_merge_into(options["from_id"], options["to_id"])
-        else:
-            organization_delete(options["from_id"])
+        organization_merge_into(options["from_id"], options["to_id"])
