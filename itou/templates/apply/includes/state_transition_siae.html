@@ -1,0 +1,186 @@
+{% load bootstrap4 %}
+{% load format_filters %}
+    
+{% if job_application.state.is_new %}
+
+        <hr>
+
+        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}"
+              class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-warning">J'étudie cette candidature</button>
+            {% endbuttons %}
+        </form>
+
+    {% endif %}
+
+    {# Answer ------------------------------------------------------------------------- #}
+
+    {% if job_application.refusal_reason or job_application.answer %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">Réponse</h3>
+
+        {% if job_application.refusal_reason %}
+            <p>
+                <b>Motif du refus :</b><br>
+                {{ job_application.get_refusal_reason_display }}
+            </p>
+        {% endif %}
+
+        {% if job_application.answer %}
+            <div class="alert alert-secondary">
+                <p><b>Message :</b></p>
+                {{ job_application.answer|linebreaks }}
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+    {# Possible next steps when the state is processing ------------------------------------------------------ #}
+
+    {% if job_application.state.is_processing %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Je l'embauche
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+            <p>
+                <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Mettre en liste d'attente
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+        {% endif %}
+
+        <p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
+                Décliner la candidature
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+    {% endif %}
+
+    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
+
+    {% if job_application.state.is_postponed %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Je l'embauche
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+        {% endif %}
+
+        <p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
+                Décliner la candidature
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+    {% endif %}
+
+
+    {# Possible next steps when the state is obsolete ------------------------------------------------------ #}
+
+    {% if job_application.state.is_obsolete %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Je l'embauche
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+        {% endif %}
+
+    {% endif %}
+
+    {# Job application accepted: details -------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_accepted %}
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">Détails du contrat de travail</h3>
+        <p>
+        <ul>
+            <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
+            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
+        </ul>
+        </p>
+
+        {% if job_application.can_update_hiring_start %}
+            <p>
+                <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}"
+                   class="btn btn-outline-primary btn-block">
+                    Modifier la période du contrat de travail
+                </a>
+            </p>
+        {% endif %}
+
+        {# Job application cancellation -------------------------------------------------------------------------- #}
+        {% if job_application.can_be_cancelled %}
+            <hr>
+
+            <h3 class="font-weight-normal text-muted">Rétractation</h3>
+            <p>
+                Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ job_application.cancellation_delay_end|date:"d/m/Y" }} inclus.
+            </p>
+            {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                <p>
+                    Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
+                </p>
+                <p>
+                    {{ job_application.job_seeker.get_full_name|title }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                </p>
+            {% endif %}
+            <p>
+                <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">
+                    <button class="btn btn-danger btn-block">Annuler l'embauche</button>
+                </a>
+            </p>
+        {% endif %}
+
+
+    {% endif %}
+
+    {# Job application archival -------------------------------------------------------------------- #}
+
+    {% if job_application.can_be_archived %}
+        {% include "apply/includes/archive_button.html" with job_application=job_application %}
+    {% endif %}

@@ -1,0 +1,21 @@
+    <ul>
+        <li>Date de la candidature : <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
+
+        {% if job_application.selected_jobs.exists %}
+            <li>
+                Métier(s) recherché(s) :
+                <ul>
+                    {% for job in job_application.selected_jobs.all %}
+                        <li><b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li>Candidature spontanée</li>
+        {% endif %}
+    </ul>
+
+    <div class="alert alert-secondary">
+        <p><b>Message :</b></p>
+        {{ job_application.message|linebreaks }}
+    </div>

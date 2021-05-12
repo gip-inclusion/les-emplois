@@ -33,7 +33,7 @@ def check_waiting_period(approvals_wrapper, job_application):
 
 
 @login_required
-def details_for_siae(request, job_application_id, template_name="apply/process_details.html"):
+def details_for_siae(request, job_application_id, template_name="apply/process_details_siae.html"):
     """
     Detail of an application for an SIAE with the ability:
     - to update start date of a contract (provided given date is in the future),
