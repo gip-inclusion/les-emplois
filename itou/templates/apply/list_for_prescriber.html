@@ -31,7 +31,10 @@
                     data-target="#answer{{ forloop.counter0 }}"
                     aria-expanded="false"
                     aria-controls="answer{{ forloop.counter0 }}"
-                >Plus d'informations</a>
+                >Informations rapides</a> / 
+                 <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}">
+                    Informations détaillées
+                </a>
                 <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">
                     <p>
                         <b>Candidat :</b>
