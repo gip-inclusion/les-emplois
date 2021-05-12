@@ -161,8 +161,11 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertEqual(job_application.selected_jobs.count(), 1)
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
 
-    def test_apply_as_jobseeker_with_approval_in_waiting_period(self):
-        """Apply as jobseeker with an approval in waiting period."""
+    def test_apply_as_jobseeker_to_siae_with_approval_in_waiting_period(self):
+        """
+        Apply as jobseeker to a SIAE (not a GEIQ) with an approval in waiting period.
+        Waiting period cannot be bypassed.
+        """
 
         # Avoid COVID lockdown specific cases
         now_date = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(months=1)
@@ -337,8 +340,11 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(job_application.selected_jobs.first().pk, post_data["selected_jobs"][0])
         self.assertEqual(job_application.selected_jobs.last().pk, post_data["selected_jobs"][1])
 
-    def test_apply_as_authorized_prescriber_for_approval_in_waiting_period(self):
-        """Apply as authorized prescriber for a job seeker with an approval in waiting period."""
+    def test_apply_as_authorized_prescriber_to_siae_for_approval_in_waiting_period(self):
+        """
+        Apply as authorized prescriber to a SIAE for a job seeker with an approval in waiting period.
+        Being an authorized prescriber bypasses the waiting period.
+        """
 
         siae = SiaeWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
@@ -373,7 +379,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.assertEqual(last_url, reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk}))
 
     def test_apply_to_a_geiq_as_authorized_prescriber(self):
-        """Apply to a GEIC as authorized prescriber."""
+        """Apply to a GEIQ as authorized prescriber."""
 
         siae = SiaeWithMembershipAndJobsFactory(kind=Siae.KIND_GEIQ, romes=("N1101", "N1105"))
 

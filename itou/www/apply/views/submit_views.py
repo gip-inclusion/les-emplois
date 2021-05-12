@@ -33,7 +33,7 @@ def valid_session_required(function=None):
     return decorated
 
 
-def get_approvals_wrapper(request, job_seeker):
+def get_approvals_wrapper(request, job_seeker, siae):
     """
     Returns an `ApprovalsWrapper` if possible or stop
     the job application submit process.
@@ -42,9 +42,9 @@ def get_approvals_wrapper(request, job_seeker):
     user_info = get_user_info(request)
     approvals_wrapper = job_seeker.approvals_wrapper
 
-    # Ensure that an existing approval is not in waiting period.
-    # Only "authorized prescribers" can bypass an approval in waiting period.
-    if approvals_wrapper.has_in_waiting_period and not user_info.is_authorized_prescriber:
+    if approvals_wrapper.cannot_bypass_waiting_period(
+        siae=siae, sender_prescriber_organization=user_info.prescriber_organization
+    ):
         error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY
         if user_info.user == job_seeker:
             error = approvals_wrapper.ERROR_CANNOT_OBTAIN_NEW_FOR_USER
@@ -160,7 +160,8 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
     """
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
+    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
     next_url = reverse("apply:step_check_prev_applications", kwargs={"siae_pk": siae_pk})
 
     # Check required info that will allow us to find a pre-existing approval.
@@ -170,8 +171,6 @@ def step_check_job_seeker_info(request, siae_pk, template_name="apply/submit_ste
 
     if has_required_info:
         return HttpResponseRedirect(next_url)
-
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
 
     form = CheckJobSeekerInfoForm(instance=job_seeker, data=request.POST or None)
 
@@ -245,7 +244,7 @@ def step_check_prev_applications(request, siae_pk, template_name="apply/submit_s
     session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
     siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
     prev_applications = job_seeker.job_applications.filter(to_siae=siae)
 
     # Limit the possibility of applying to the same SIAE for 24 hours.
@@ -292,7 +291,7 @@ def step_eligibility(request, siae_pk, template_name="apply/submit_step_eligibil
 
     user_info = get_user_info(request)
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
 
     skip = (
         # Only "authorized prescribers" can perform an eligibility diagnosis.
@@ -337,7 +336,7 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
     form = SubmitJobApplicationForm(data=request.POST or None, siae=siae, initial=initial_data)
 
     job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    approvals_wrapper = get_approvals_wrapper(request, job_seeker)
+    approvals_wrapper = get_approvals_wrapper(request, job_seeker, siae)
 
     if request.method == "POST" and form.is_valid():
         next_url = reverse("apply:list_for_job_seeker")
