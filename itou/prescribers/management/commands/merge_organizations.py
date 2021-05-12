@@ -7,6 +7,7 @@ from itou.eligibility import models as eligibility_models
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
 from itou.prescribers import models as prescribers_models
+from itou.users import models as users_models
 
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,10 @@ def organization_merge_into(from_id, to_id):
         job_applications_models.JobApplication.objects.filter(sender_prescriber_organization_id=from_id).update(
             sender_prescriber_organization_id=to_id
         )
-        prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).update(organization_id=to_id)
+        # Move users not already present in organization destination
+        prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).exclude(
+            user__in=users_models.User.objects.filter(prescribermembership__organization_id=to_id)
+        ).update(organization_id=to_id)
         eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id).update(
             author_prescriber_organization_id=to_id
         )
