@@ -1,3 +1,5 @@
+import datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -103,9 +105,15 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
     cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
-    eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-        job_application.job_seeker, for_siae=job_application.to_siae
-    )
+    # We are looking for the most plausible availability date for eligibility criterions
+    before_date = job_application.hiring_end_at
+
+    if before_date is None and job_application.approval and job_application.approval.end_at is not None:
+        before_date = job_application.approval.end_at
+    else:
+        before_date = datetime.datetime.now()
+
+    eligibility_diagnosis = EligibilityDiagnosis.objects.last_before(job_application.job_seeker, before_date)
 
     approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
         job_application.to_siae
