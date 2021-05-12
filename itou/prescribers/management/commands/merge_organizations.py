@@ -1,3 +1,4 @@
+import argparse
 import logging
 
 from django.core.management.base import BaseCommand
@@ -20,7 +21,7 @@ HELP_TEXT = """
 """
 
 
-def organization_merge_into(from_id, to_id):
+def organization_merge_into(from_id, to_id, dry_run=False):
     if from_id == to_id:
         logger.error("Unable to use the same organization as source and destination (ID %s)", from_id)
         return
@@ -73,6 +74,10 @@ def organization_merge_into(from_id, to_id):
         to_organization.name,
     )
 
+    if dry_run:
+        logger.info("Nothing to do in dry run mode.")
+        return
+
     with transaction.atomic():
         job_applications.update(sender_prescriber_organization_id=to_id)
         members.update(organization_id=to_id)
@@ -101,6 +106,7 @@ class Command(BaseCommand):
             help="ID of the prescriber organization to keep.",
             required=True,
         )
+        parser.add_argument("--dry-run", action=argparse.BooleanOptionalAction, default=False)
 
     def handle(self, *args, **options):
-        organization_merge_into(options["from_id"], options["to_id"])
+        organization_merge_into(options["from_id"], options["to_id"], options["dry_run"])
