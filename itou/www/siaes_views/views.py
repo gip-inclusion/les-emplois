@@ -53,7 +53,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
     Configure an SIAE's jobs.
 
     Time was limited during the prototyping phase and this view is based on
-    JavaScript to generate a dynamic form. No proper Django form is uded.
+    JavaScript to generate a dynamic form. No proper Django form is used.
     """
     siae = get_current_siae_or_404(request)
     job_descriptions = siae.job_description_through.select_related("appellation__rome").all()
