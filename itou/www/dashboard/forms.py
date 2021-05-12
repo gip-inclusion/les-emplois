@@ -69,9 +69,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     def clean(self):
         super().clean()
         if self.instance.is_job_seeker:
-            self._meta.model.clean_pole_emploi_fields(
-                self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-            )
+            self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class EditUserEmailForm(forms.Form):

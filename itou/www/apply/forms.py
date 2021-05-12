@@ -64,9 +64,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-        )
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
@@ -120,9 +118,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-        )
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
     def save(self, commit=True):
         # Exclude 'city_name' form field (not mapped to model)
@@ -352,9 +348,7 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-        )
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class UserAddressForm(AddressFormMixin, forms.ModelForm):
