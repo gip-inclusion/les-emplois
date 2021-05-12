@@ -10,8 +10,8 @@ class ConfirmEligibilityForm(forms.Form):
 
     confirm = forms.BooleanField(
         label=(
-            "Je confirme que le candidat remplit les critères d'éligibilité à l'IAE et "
-            "m'engage à fournir les justificatifs correspondants en cas de contrôle a posteriori."
+            "Le candidat étant éligible à l'IAE, je m'engage à conserver les justificatifs "
+            "correspondants aux critères d'éligibilité sélectionnés pour 24 mois, en cas de contrôle."
         )
     )
 
