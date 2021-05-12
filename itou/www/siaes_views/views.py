@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 
 from itou.jobs.models import Appellation
 from itou.siaes.models import Siae, SiaeFinancialAnnex, SiaeJobDescription
@@ -126,7 +126,7 @@ def configure_jobs(request, template_name="siaes/configure_jobs.html"):
                             job_through.save()
 
                 messages.success(request, "Mise à jour effectuée !")
-                return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+                return HttpResponseRedirect(reverse("dashboard:index"))
 
     context = {"errors": errors, "job_descriptions": job_descriptions, "siae": siae}
     return render(request, template_name, context)
@@ -236,7 +236,7 @@ def create_siae(request, template_name="siaes/create_siae.html"):
             siae = form.save(request)
 
         request.session[settings.ITOU_SESSION_CURRENT_SIAE_KEY] = siae.pk
-        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+        return HttpResponseRedirect(reverse("dashboard:index"))
 
     context = {"form": form}
     return render(request, template_name, context)
@@ -254,7 +254,7 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Mise à jour effectuée !")
-        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+        return HttpResponseRedirect(reverse("dashboard:index"))
 
     context = {"form": form, "siae": siae}
     return render(request, template_name, context)
@@ -308,7 +308,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
                 siae.member_deactivation_email(membership.user).send()
         else:
             raise PermissionDenied
-        return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
+        return HttpResponseRedirect(reverse("siaes_views:members"))
 
     context = {
         "structure": siae,
@@ -354,7 +354,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
             membership.save()
         else:
             raise PermissionDenied
-        return HttpResponseRedirect(reverse_lazy("siaes_views:members"))
+        return HttpResponseRedirect(reverse("siaes_views:members"))
 
     context = {
         "action": action,
@@ -377,7 +377,7 @@ def block_job_applications(request, template_name="siaes/block_job_applications.
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Mise à jour du blocage des candidatures effectuée !")
-        return HttpResponseRedirect(reverse_lazy("dashboard:index"))
+        return HttpResponseRedirect(reverse("dashboard:index"))
 
     context = {"siae": siae, "form": form}
 
