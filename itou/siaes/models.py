@@ -233,6 +233,10 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         for kind, _description in self.KIND_CHOICES:
             setattr(self, f"is_kind_{kind.lower()}", kind == self.kind)
 
+        # Add `source` attributes, e.g.: `self.is_source_user_created`.
+        for source, _description in self.SOURCE_CHOICES:
+            setattr(self, f"is_source_{source.lower()}", source == self.source)
+
     def __str__(self):
         return f"{self.siret} {self.display_name}"
 
@@ -737,6 +741,13 @@ class SiaeConvention(models.Model):
             # It is the only exception. Both structures are active.
             # ("siret_signature", "kind"),
         )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Add `kind` attributes, e.g.: `self.is_kind_etti`.
+        for kind, _description in self.KIND_CHOICES:
+            setattr(self, f"is_kind_{kind.lower()}", kind == self.kind)
 
     def save(self, *args, **kwargs):
         if self.pk:
