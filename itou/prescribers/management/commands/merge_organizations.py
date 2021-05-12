@@ -57,7 +57,13 @@ def organization_merge_into(from_id, to_id):
     diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id)
     logger.info("| Diagnoses: %s", diagnoses.count())
 
-    invitations = invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id)
+    # Don't move invitations for existing members
+    # The goal is to keep information about the original information
+    invitations = invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).exclude(
+        email__in=users_models.User.objects.filter(prescribermembership__organization_id=to_id).values_list(
+            "email", flat=True
+        )
+    )
     logger.info("| Invitations: %s", invitations.count())
 
     logger.info(
