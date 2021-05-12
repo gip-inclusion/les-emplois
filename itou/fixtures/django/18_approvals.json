@@ -1,0 +1,62 @@
+[
+{
+    "model": "approvals.approval",
+    "pk": 1,
+    "fields": {
+        "start_at": "2021-05-01",
+        "end_at": "2023-05-02",
+        "created_at": "2021-05-11T16:19:27.898Z",
+        "user": 17,
+        "number": "XXXXX0000001",
+        "created_by": null
+    }
+},
+{
+    "model": "approvals.approval",
+    "pk": 2,
+    "fields": {
+        "start_at": "2021-05-02",
+        "end_at": "2023-05-01",
+        "created_at": "2021-05-12T09:43:56.359Z",
+        "user": 21,
+        "number": "XXXXX0000002",
+        "created_by": null
+    }
+},
+{
+    "model": "approvals.approval",
+    "pk": 3,
+    "fields": {
+        "start_at": "2021-05-02",
+        "end_at": "2023-05-01",
+        "created_at": "2021-05-12T09:44:40.518Z",
+        "user": 20,
+        "number": "XXXXX0000003",
+        "created_by": null
+    }
+},
+{
+    "model": "approvals.approval",
+    "pk": 4,
+    "fields": {
+        "start_at": "2021-05-02",
+        "end_at": "2023-05-01",
+        "created_at": "2021-05-12T09:45:17.857Z",
+        "user": 19,
+        "number": "XXXXX0000004",
+        "created_by": null
+    }
+},
+{
+    "model": "approvals.approval",
+    "pk": 5,
+    "fields": {
+        "start_at": "2021-05-01",
+        "end_at": "2023-05-02",
+        "created_at": "2021-05-12T09:45:57.397Z",
+        "user": 18,
+        "number": "XXXXX0000005",
+        "created_by": null
+    }
+}
+]
