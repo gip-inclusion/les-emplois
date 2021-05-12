@@ -1,0 +1,67 @@
+{% extends "apply/process_base.html" %}
+{% load bootstrap4 %}
+{% load format_filters %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    {# Job seeker info ------------------------------------------------------------------------- #}
+
+    <h3 class="font-weight-normal text-muted">Candidat</h3>
+    {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
+
+    {# Job application info ------------------------------------------------------------------------- #}
+
+    <hr>
+    <h3 class="font-weight-normal text-muted">Candidature</h3>
+
+    {% include "apply/includes/job_application_info.html" with job_application=job_application %}
+
+    {# Eligibility ------------------------------------------------------------------------- #}
+
+    {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+
+    {# Sender info ------------------------------------------------------------------------- #}
+
+    <hr>
+
+    <h3 class="font-weight-normal text-muted">Candidature envoyée par</h3>
+
+    {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
+    
+    
+    {# Process ------------------------------------------------------------------------- #}
+
+    {% include "apply/includes/state_transition_siae.html" with job_application=job_application %}
+
+    {# History ------------------------------------------------------ #}
+
+    {% if transition_logs %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
+
+        <ul>
+            {% for log in transition_logs %}
+                <li>
+                    Passé en "<b>{{ log.pretty_to_state }}</b>"
+                    <ul>
+                        {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
+                            <li>Par {{ log.user.get_full_name }}</li>
+                        {% endif %}
+                        <li>Le {{ log.timestamp|date:"d F Y à H:i" }}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+
+    <hr>
+    <p>
+        <a href="{% url 'apply:list_for_siae' %}">Retour</a>
+    </p>
+
+{% endblock %}
