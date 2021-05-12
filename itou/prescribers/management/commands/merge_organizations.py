@@ -25,28 +25,39 @@ def organization_merge_into(from_id, to_id):
     to_organization = prescribers_models.PrescriberOrganization.objects.get(pk=to_id)
     # Both SIRET and name should be identical
     logger.info(
-        "Move organization 'ID %s - SIRET %s - %s' into 'ID %s - SIRET %s - %s'.",
+        "MERGE organization 'ID %s - SIRET %s - %s'",
         from_id,
         from_organization.siret,
         from_organization.name,
+    )
+
+    job_applications = job_applications_models.JobApplication.objects.filter(sender_prescriber_organization_id=from_id)
+    logger.info("| Job applications: %s", job_applications.count())
+
+    # Move users not already present in organization destination
+    members = prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).exclude(
+        user__in=users_models.User.objects.filter(prescribermembership__organization_id=to_id)
+    )
+    logger.info("| Members: %s", members.count())
+
+    diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id)
+    logger.info("| Diagnoses: %s", diagnoses.count())
+
+    invitations = invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id)
+    logger.info("| Invitations: %s", invitations.count())
+
+    logger.info(
+        "INTO organization 'ID %s - SIRET %s - %s'",
         to_id,
         to_organization.siret,
         to_organization.name,
     )
+
     with transaction.atomic():
-        job_applications_models.JobApplication.objects.filter(sender_prescriber_organization_id=from_id).update(
-            sender_prescriber_organization_id=to_id
-        )
-        # Move users not already present in organization destination
-        prescribers_models.PrescriberMembership.objects.filter(organization_id=from_id).exclude(
-            user__in=users_models.User.objects.filter(prescribermembership__organization_id=to_id)
-        ).update(organization_id=to_id)
-        eligibility_models.EligibilityDiagnosis.objects.filter(author_prescriber_organization_id=from_id).update(
-            author_prescriber_organization_id=to_id
-        )
-        invitations_models.PrescriberWithOrgInvitation.objects.filter(organization_id=from_id).update(
-            organization_id=to_id
-        )
+        job_applications.update(sender_prescriber_organization_id=to_id)
+        members.update(organization_id=to_id)
+        diagnoses.update(author_prescriber_organization_id=to_id)
+        invitations.update(organization_id=to_id)
         from_organization.delete()
 
 
