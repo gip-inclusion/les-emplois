@@ -226,13 +226,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         verbose_name_plural = "Structures d'insertion par l'activité économique"
         unique_together = ("siret", "kind")
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Add `kind` attributes, e.g.: `self.is_kind_etti`.
-        for kind, _description in self.KIND_CHOICES:
-            setattr(self, f"is_kind_{kind.lower()}", kind == self.kind)
-
     def __str__(self):
         return f"{self.siret} {self.display_name}"
 

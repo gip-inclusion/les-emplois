@@ -62,7 +62,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             siaes = siaes.filter(kind=kind)
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
-    context = {"form": form, "siaes_page": siaes_page}
+    context = {"form": form, "siaes_page": siaes_page, "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT]}
     return render(request, template_name, context)
 
 
