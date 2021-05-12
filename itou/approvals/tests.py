@@ -18,6 +18,9 @@ from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory, PrescriberOrganizationFactory
+from itou.siaes.factories import SiaeFactory
+from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, UserFactory
 
 
@@ -479,6 +482,19 @@ class ApprovalsWrapperTest(TestCase):
     Test ApprovalsWrapper.
     """
 
+    def get_approval_wrapper_in_waiting_period(self):
+        """
+        Helper method used by several tests below.
+        """
+        user = JobSeekerFactory()
+        end_at = datetime.date.today() - relativedelta(days=30)
+        start_at = end_at - relativedelta(years=2)
+        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
+        approvals_wrapper = ApprovalsWrapper(user)
+        self.assertTrue(approvals_wrapper.has_in_waiting_period)
+        self.assertEqual(approvals_wrapper.latest_approval, approval)
+        return approvals_wrapper
+
     def test_merge_approvals_timeline_case1(self):
 
         user = JobSeekerFactory()
@@ -587,15 +603,9 @@ class ApprovalsWrapperTest(TestCase):
         self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_approval_in_waiting_period(self):
-        user = JobSeekerFactory()
-        end_at = datetime.date.today() - relativedelta(days=30)
-        start_at = end_at - relativedelta(years=2)
-        approval = ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
-        approvals_wrapper = ApprovalsWrapper(user)
+        approvals_wrapper = self.get_approval_wrapper_in_waiting_period()
         self.assertEqual(approvals_wrapper.status, ApprovalsWrapper.IN_WAITING_PERIOD)
         self.assertFalse(approvals_wrapper.has_valid)
-        self.assertTrue(approvals_wrapper.has_in_waiting_period)
-        self.assertEqual(approvals_wrapper.latest_approval, approval)
 
     def test_status_approval_with_elapsed_waiting_period(self):
         user = JobSeekerFactory()
@@ -616,6 +626,45 @@ class ApprovalsWrapperTest(TestCase):
         self.assertTrue(approvals_wrapper.has_valid)
         self.assertFalse(approvals_wrapper.has_in_waiting_period)
         self.assertEqual(approvals_wrapper.latest_approval, approval)
+
+    def test_cannot_bypass_waiting_period(self):
+        approvals_wrapper = self.get_approval_wrapper_in_waiting_period()
+
+        # Waiting period cannot be bypassed for SIAE if no prescriber.
+        self.assertTrue(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_ETTI), sender_prescriber_organization=None
+            )
+        )
+
+        # Waiting period cannot be bypassed for SIAE if unauthorized prescriber.
+        self.assertTrue(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_ETTI), sender_prescriber_organization=PrescriberOrganizationFactory()
+            )
+        )
+
+        # Waiting period is bypassed for SIAE if authorized prescriber.
+        self.assertFalse(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_ETTI),
+                sender_prescriber_organization=AuthorizedPrescriberOrganizationFactory(),
+            )
+        )
+
+        # Waiting period is bypassed for GEIQ even if no prescriber.
+        self.assertFalse(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_GEIQ), sender_prescriber_organization=None
+            )
+        )
+
+        # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
+        self.assertFalse(
+            approvals_wrapper.cannot_bypass_waiting_period(
+                siae=SiaeFactory(kind=Siae.KIND_GEIQ), sender_prescriber_organization=PrescriberOrganizationFactory()
+            )
+        )
 
 
 class AutomaticApprovalAdminViewsTest(TestCase):

@@ -1117,3 +1117,17 @@ class ApprovalsWrapper:
         has been made outside of Itou.
         """
         return self.has_valid and not self.latest_approval.originates_from_itou
+
+    def cannot_bypass_waiting_period(self, siae, sender_prescriber_organization):
+        """
+        An approval in waiting period can only be bypassed if the prescriber is authorized
+        or if the structure is not a SIAE.
+        """
+        is_sent_by_authorized_prescriber = (
+            sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized
+        )
+        return (
+            self.has_in_waiting_period
+            and siae.is_subject_to_eligibility_rules
+            and not is_sent_by_authorized_prescriber
+        )
