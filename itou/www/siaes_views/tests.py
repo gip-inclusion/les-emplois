@@ -183,6 +183,8 @@ class ConfigureJobsViewTest(TestCase):
         response = self.client.post(self.url, data=post_data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["errors"])
+        # No proper Django form is used in the view and we use a custom `errors` dict.
+        # See the `configure_jobs` view.
         self.assertIn("10357", response.context["errors"])
         self.assertNotIn("10579", response.context["errors"])
 
