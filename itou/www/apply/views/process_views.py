@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -13,6 +14,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.perms.user import get_user_info
 from itou.utils.urls import get_external_link_markup
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
@@ -45,6 +47,57 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         .select_related("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
         .prefetch_related("selected_jobs__appellation")
     )
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+    cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
+
+    eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+        job_application.job_seeker, for_siae=job_application.to_siae
+    )
+
+    approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
+        job_application.to_siae
+    )
+    approval_can_be_prolonged_by_siae = job_application.approval and job_application.approval.can_be_prolonged_by_siae(
+        job_application.to_siae
+    )
+
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
+        "approval_can_be_prolonged_by_siae": approval_can_be_prolonged_by_siae,
+        "cancellation_days": cancellation_days,
+        "eligibility_diagnosis": eligibility_diagnosis,
+        "job_application": job_application,
+        "transition_logs": transition_logs,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+def details_for_prescriber(request, job_application_id, template_name="apply/process_details_prescriber.html"):
+    """
+    Detail of an application for an SIAE with the ability:
+    - to update start date of a contract (provided given date is in the future),
+    - to give an answer.
+    """
+    if request.user.is_prescriber_with_org:
+        prescriber_organization = get_current_org_or_404(request)
+        # Show all applications organization-wide + applications sent by the
+        # current user for backward compatibility (in the past, a user could
+        # create his prescriber's organization later on).
+        job_applications = JobApplication.objects.filter(
+            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
+            | Q(sender_prescriber_organization=prescriber_organization)
+        )
+    else:
+        job_applications = request.user.job_applications_sent
+
+    queryset = job_applications.select_related(
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval"
+    ).prefetch_related("selected_jobs__appellation")
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")

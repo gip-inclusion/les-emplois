@@ -42,6 +42,11 @@ urlpatterns = [
         name="list_for_siae_exports_download",
     ),
     # Process.
+    path(
+        "<uuid:job_application_id>/prescriber/details",
+        process_views.details_for_prescriber,
+        name="details_for_prescriber",
+    ),
     path("<uuid:job_application_id>/siae/details", process_views.details_for_siae, name="details_for_siae"),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
     path("<uuid:job_application_id>/siae/eligibility", process_views.eligibility, name="eligibility"),
