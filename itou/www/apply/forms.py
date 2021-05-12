@@ -221,9 +221,12 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer", "hiring_without_approval"]
         help_texts = {
+            # Make it clear to employers that `hiring_start_at` has an impact on the start of the
+            # "parcours IAE" and the payment of the "aide au poste".
             "hiring_start_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. Il n'est pas possible d'antidater un contrat. "
-                "Indiquez une date dans le futur."
+                "La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
+                "la personne, cette date déclenche le début de son parcours."
             )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
             "hiring_end_at": (
