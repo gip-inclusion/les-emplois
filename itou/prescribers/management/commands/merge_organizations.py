@@ -21,6 +21,9 @@ HELP_TEXT = """
 
 
 def organization_merge_into(from_id, to_id):
+    if from_id == to_id:
+        raise ValueError(f"Unable to use the same organization as source and destination (ID {from_id}).")
+
     from_organization = prescribers_models.PrescriberOrganization.objects.get(pk=from_id)
     to_organization = prescribers_models.PrescriberOrganization.objects.get(pk=to_id)
     # Both SIRET and name should be identical
