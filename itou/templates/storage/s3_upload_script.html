@@ -10,18 +10,16 @@
     const dropzone_selector = "#{{ dropzone_selector_id }}";
 
     // When a file is added to the drop zone, send a POST request to this URL.
-    const form_url = "{{ s3_form_values.endpoint }}";
+    const form_url = "{{ s3_form_values.url }}";
 
     // Submit button to be disabled during file processing
     const submit_button = $("button[type='submit']");
 
     // S3 form params sent when a new file is added to the drop zone.
     const form_params = {
-        "policy": "{{ s3_form_values.encoded_policy }}",
-        "x-amz-algorithm": "AWS4-HMAC-SHA256",
-        "x-amz-credential": "{{ s3_form_values.credential_url }}",
-        "x-amz-date": "{{ s3_form_values.date }}",
-        "x-amz-signature": "{{ s3_form_values.signature }}"
+        {% for key, value in s3_form_values.fields.items %}
+            "{{ key }}": "{{ value }}",
+        {% endfor %}
     };
 
     // Appended before the file name. The final slash is added later.
