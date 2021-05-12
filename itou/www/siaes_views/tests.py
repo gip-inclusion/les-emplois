@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
+from faker import Faker
 
 from itou.jobs.factories import create_test_romes_and_appellations
 from itou.jobs.models import Appellation
@@ -16,7 +17,7 @@ from itou.siaes.factories import (
     SiaeWithMembershipAndJobsFactory,
     SiaeWithMembershipFactory,
 )
-from itou.siaes.models import Siae
+from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 
@@ -155,6 +156,35 @@ class ConfigureJobsViewTest(TestCase):
             )
         )
         self.assertTrue(self.siae.job_description_through.get(appellation_id=16361, is_active=False))
+
+    def test_error_custom_name_max_length(self):
+        """
+        Given two job descriptions, when setting a custom-name too long,
+        then an error should be returned.
+        """
+        self.client.login(username=self.user.email, password=DEFAULT_PASSWORD)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+        fake = Faker()
+        custom_name_max_length = SiaeJobDescription._meta.get_field("custom_name").max_length
+
+        post_data = {
+            "code": ["10357", "10579"],
+            # Code 10357 should not validate.
+            "is_active-10357": "on",
+            "custom-name-10357": fake.sentence(nb_words=custom_name_max_length + 1),
+            "description-10357": "Agent de quai",
+            # Code 10579 should validate.
+            "is_active-10579": "on",
+            "custom-name-10579": "Aide-livreur hebdomadaire",
+            "description-10579": "Pellentesque ex ex, elementum sed sollicitudin sit amet, dictum vel elit.",
+        }
+        response = self.client.post(self.url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["errors"])
+        self.assertIn("10357", response.context["errors"])
+        self.assertNotIn("10579", response.context["errors"])
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):

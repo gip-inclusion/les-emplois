@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from itou.siaes.models import Siae, SiaeMembership
+from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.urls import get_external_link_markup
 
@@ -208,3 +208,17 @@ class FinancialAnnexSelectForm(forms.Form):
         widget=forms.Select,
         help_text="Veuillez sélectionner un numéro existant.",
     )
+
+
+class ValidateSiaeJobDescriptionForm(forms.ModelForm):
+    """
+    Validate a job description.
+    """
+
+    class Meta:
+        model = SiaeJobDescription
+        fields = [
+            "custom_name",
+            "description",
+            "is_active",
+        ]

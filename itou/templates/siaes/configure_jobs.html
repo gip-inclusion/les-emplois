@@ -13,7 +13,18 @@
 
         {% csrf_token %}
 
-        <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not siae.job_description_through.exists %} d-none{% endif %}">
+        {% if errors %}
+            <div class="alert alert-danger alert-dismissible alert-link" role="alert">
+                <button class="close" type="button" data-dismiss="alert" aria-label="close">×</button>
+                <ul>
+                    {% for error in errors.values %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <table class="js-jobs-table table table-bordered table-striped table-responsive-sm text-center{% if not job_descriptions %} d-none{% endif %}">
             <thead>
                 <tr>
                     <th scope="col">ROME</th>
@@ -23,7 +34,7 @@
                 </tr>
             </thead>
             <tbody class="js-jobs-tbody">
-                {% for job in siae.job_description_through.all %}
+                {% for job in job_descriptions %}
                 {# Important: keep the JavaScript template in sync if you edit the row markup. #}
                 <tr>
                     <td>{{ job.appellation.rome.code }}</td>
