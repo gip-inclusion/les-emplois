@@ -192,47 +192,6 @@ class ApplyAsJobSeekerTest(TestCase):
             last_url = response.redirect_chain[-1][0]
             self.assertEqual(last_url, reverse("apply:step_check_job_seeker_info", kwargs={"siae_pk": siae.pk}))
 
-    def test_apply_as_jobseeker_to_geiq_with_approval_in_waiting_period(self):
-        """
-        Apply as jobseeker to a GEIQ with an approval in waiting period.
-        Waiting period is bypassed.
-        """
-
-        # Avoid COVID lockdown specific cases
-        now_date = PoleEmploiApproval.LOCKDOWN_START_AT - relativedelta(months=1)
-        now = timezone.datetime(year=now_date.year, month=now_date.month, day=now_date.day, tzinfo=pytz.utc)
-
-        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
-            siae = SiaeWithMembershipAndJobsFactory(kind=Siae.KIND_GEIQ, romes=("N1101", "N1105"))
-            user = JobSeekerFactory()
-            end_at = now_date - relativedelta(days=30)
-            start_at = end_at - relativedelta(years=2)
-            PoleEmploiApprovalFactory(
-                pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
-            )
-            self.client.login(username=user.email, password=DEFAULT_PASSWORD)
-
-            url = reverse("apply:start", kwargs={"siae_pk": siae.pk})
-            response = self.client.get(url)
-
-            self.assertEqual(response.status_code, 302)
-
-            session = self.client.session
-            session_data = session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-            expected_session_data = {
-                "job_seeker_pk": None,
-                "to_siae_pk": siae.pk,
-                "sender_pk": None,
-                "sender_kind": None,
-                "sender_siae_pk": None,
-                "sender_prescriber_organization_pk": None,
-                "job_description_id": None,
-            }
-            self.assertDictEqual(session_data, expected_session_data)
-
-            next_url = reverse("apply:step_sender", kwargs={"siae_pk": siae.pk})
-            self.assertEqual(response.url, next_url)
-
 
 class ApplyAsAuthorizedPrescriberTest(TestCase):
     def test_apply_as_authorized_prescriber(self):
