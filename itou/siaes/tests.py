@@ -52,13 +52,6 @@ class SiaeFactoriesTest(TestCase):
 
 
 class SiaeModelTest(TestCase):
-    def test_is_kind(self):
-        siae = SiaeFactory(kind=Siae.KIND_GEIQ)
-        self.assertTrue(siae.is_kind_geiq)
-        self.assertFalse(siae.is_kind_etti)
-        self.assertFalse(siae.is_kind_ea)
-        self.assertFalse(siae.is_kind_aci)
-
     def test_siren_and_nic(self):
         siae = SiaeFactory(siret="12345678900001")
         self.assertEqual(siae.siren, "123456789")
