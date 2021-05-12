@@ -232,13 +232,24 @@ def anonymize_fluxiae_df(df):
     if "salarie_date_naissance" in df.columns.tolist():
         df["salarie_annee_naissance"] = df.salarie_date_naissance.str[-4:].astype(int)
 
-    deletable_columns = [
+    # Any column having any of these keywords inside its name will be dropped.
+    # E.g. if `courriel` is a deletable keyword, then columns named `referent_courriel`,
+    # `representant_courriel` etc will all be dropped.
+    deletable_keywords = [
+        "courriel",
+        "telephone",
+        "prenom",
         "nom_usage",
         "nom_naissance",
-        "prenom",
+        "responsable_nom",
+        "urgence_nom",
+        "referent_nom",
+        "representant_nom",
         "date_naissance",
-        "telephone",
         "adr_mail",
+        "nationalite",
+        "titre_sejour",
+        "observations",
         "salarie_agrement",
         "salarie_adr_point_remise",
         "salarie_adr_cplt_point_geo",
@@ -250,15 +261,15 @@ def anonymize_fluxiae_df(df):
         "salarie_adr_qpv_nom",
     ]
 
-    for deletable_column in deletable_columns:
-        for column_name in df.columns.tolist():
-            if deletable_column in column_name:
+    for column_name in df.columns.tolist():
+        for deletable_keyword in deletable_keywords:
+            if deletable_keyword in column_name:
                 del df[column_name]
 
     # Better safe than sorry when dealing with sensitive data!
     for column_name in df.columns.tolist():
-        for deletable_column in deletable_columns:
-            assert deletable_column not in column_name
+        for deletable_keyword in deletable_keywords:
+            assert deletable_keyword not in column_name
 
     return df
 
