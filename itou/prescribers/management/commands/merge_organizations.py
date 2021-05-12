@@ -22,10 +22,21 @@ HELP_TEXT = """
 
 def organization_merge_into(from_id, to_id):
     if from_id == to_id:
-        raise ValueError(f"Unable to use the same organization as source and destination (ID {from_id}).")
+        logger.error("Unable to use the same organization as source and destination (ID %s)", from_id)
+        return
 
-    from_organization = prescribers_models.PrescriberOrganization.objects.get(pk=from_id)
-    to_organization = prescribers_models.PrescriberOrganization.objects.get(pk=to_id)
+    try:
+        from_organization = prescribers_models.PrescriberOrganization.objects.get(pk=from_id)
+    except prescribers_models.PrescriberOrganization.DoesNotExist:
+        logger.error("Unable to find the organization ID %s", from_id)
+        return
+
+    try:
+        to_organization = prescribers_models.PrescriberOrganization.objects.get(pk=to_id)
+    except prescribers_models.PrescriberOrganization.DoesNotExist:
+        logger.error("Unable to find the organization ID %s", to_id)
+        return
+
     # Both SIRET and name should be identical
     logger.info(
         "MERGE organization 'ID %s - SIRET %s - %s'",
