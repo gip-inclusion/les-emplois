@@ -110,6 +110,7 @@ class EmployeeRecord(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name="Candidature / embauche",
+        related_name="employee_record",
     )
 
     # Employee records must be linked to a valid financial annex

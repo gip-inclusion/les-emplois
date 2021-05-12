@@ -182,12 +182,14 @@ class JobApplicationQuerySet(models.QuerySet):
         These job applications must:
         - be definitely accepted (hiring can't be cancelled)
         - have generated a new approval (not attached to an old one)
+        - have no one-to-one relationship with an employee record
         """
         today = datetime.date.today()
         return (
             self.exclude(approval=None)
             .accepted()
             .filter(
+                employee_record__isnull=True,
                 to_siae=siae,
                 hiring_start_at__lt=today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED),
             )
