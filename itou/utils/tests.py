@@ -30,7 +30,7 @@ from itou.utils.perms.user import KIND_JOB_SEEKER, KIND_PRESCRIBER, KIND_SIAE_ST
 from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.templatetags import dict_filters, format_filters
 from itou.utils.tokens import SIAE_SIGNUP_MAGIC_LINK_TIMEOUT, SiaeSignupTokenGenerator
-from itou.utils.urls import get_absolute_url, get_safe_url
+from itou.utils.urls import get_absolute_url, get_external_link_markup, get_safe_url
 from itou.utils.validators import (
     alphanumeric,
     validate_af_number,
@@ -471,6 +471,14 @@ class UtilsEmailsTestCase(TestCase):
         path = "/awesome/team/"
         url = get_absolute_url(path)
         self.assertEqual(f"{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/awesome/team/", url)
+
+    def test_get_external_link_markup(self):
+        url = "https://emplois.inclusion.beta.gouv.fr"
+        text = "Lien vers une ressource externe"
+        expected = (
+            f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
+        )
+        self.assertEqual(get_external_link_markup(url=url, text=text), expected)
 
 
 class PermsUserTest(TestCase):

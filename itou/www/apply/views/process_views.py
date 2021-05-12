@@ -14,6 +14,7 @@ from django_xworkflows import models as xwf_models
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.perms.user import get_user_info
+from itou.utils.urls import get_external_link_markup
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
@@ -204,20 +205,19 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
             if job_application.approval:
-                PRO_CONTRACT_URL = (
-                    "https://www.pole-emploi.fr/employeur/aides-aux-recrutements/"
-                    "les-aides-a-lembauche/insertion-par-lactivite-economiq.html"
+                external_link = get_external_link_markup(
+                    url=(
+                        "https://www.pole-emploi.fr/employeur/aides-aux-recrutements/"
+                        "les-aides-a-lembauche/insertion-par-lactivite-economiq.html"
+                    ),
+                    text="demander l’aide spécifique de Pôle emploi ici",
                 )
                 messages.success(
                     request,
                     mark_safe(
                         (
-                            "Embauche acceptée ! "
-                            "(Pour un contrat de professionnalisation vous pouvez soit introduire une "
-                            "demande d’aide au poste ou demander l’aide spécifique de Pôle emploi "
-                            f'<a href="{PRO_CONTRACT_URL}" rel="noopener" target="_blank">'
-                            "ici"
-                            "</a>)."
+                            "Embauche acceptée ! (Pour un contrat de professionnalisation vous pouvez "
+                            f"soit introduire une demande d’aide au poste ou {external_link}."
                         )
                     ),
                 )
@@ -229,26 +229,25 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     ),
                 )
             elif not job_application.hiring_without_approval:
-                link = settings.ITOU_DOC_PASS_VERIFICATION_URL
+                external_link = get_external_link_markup(
+                    url=settings.ITOU_DOC_PASS_VERIFICATION_URL,
+                    text="consulter notre espace documentation",
+                )
                 messages.success(
                     request,
                     mark_safe(
                         (
                             "Votre demande de Pass IAE est en cours de vérification auprès de nos équipes.<br>"
                             "Si vous souhaitez en savoir plus sur le processus de vérification, n’hésitez pas à "
-                            "<a href='" + link + "'>consulter notre espace documentation</a>."
+                            f"{external_link}."
                         )
                     ),
                 )
 
+        external_link = get_external_link_markup(url=settings.ITOU_EMAIL_APPROVAL_SURVEY_URL, text="Je donne mon avis")
         messages.warning(
             request,
-            mark_safe(
-                "Êtes-vous satisfait des emplois de l'inclusion ? "
-                + f"<a href='{settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}' rel='noopener' target='_blank'>"
-                + "Je donne mon avis"
-                + "</a>"
-            ),
+            mark_safe(f"Êtes-vous satisfait des emplois de l'inclusion ? {external_link}"),
         )
 
         return HttpResponseRedirect(next_url)

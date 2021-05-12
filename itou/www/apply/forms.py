@@ -64,9 +64,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-        )
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
@@ -120,9 +118,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-        )
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
     def save(self, commit=True):
         # Exclude 'city_name' form field (not mapped to model)
@@ -221,9 +217,12 @@ class AcceptForm(forms.ModelForm):
         model = JobApplication
         fields = ["hiring_start_at", "hiring_end_at", "answer", "hiring_without_approval"]
         help_texts = {
+            # Make it clear to employers that `hiring_start_at` has an impact on the start of the
+            # "parcours IAE" and the payment of the "aide au poste".
             "hiring_start_at": (
                 "Au format JJ/MM/AAAA, par exemple  %(date)s. Il n'est pas possible d'antidater un contrat. "
-                "Indiquez une date dans le futur."
+                "La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
+                "la personne, cette date déclenche le début de son parcours."
             )
             % {"date": datetime.date.today().strftime("%d/%m/%Y")},
             "hiring_end_at": (
@@ -349,9 +348,7 @@ class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(
-            self.cleaned_data["pole_emploi_id"], self.cleaned_data["lack_of_pole_emploi_id_reason"]
-        )
+        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class UserAddressForm(AddressFormMixin, forms.ModelForm):

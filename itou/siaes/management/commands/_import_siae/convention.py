@@ -169,8 +169,16 @@ def check_convention_data_consistency(dry_run):
 
         # Additional data consistency checks.
         for siae in convention.siaes.all():
-            assert siae.kind == convention.kind
             assert siae.siren == convention.siren_signature
+            if siae.kind == Siae.KIND_ACIPHC and convention.kind == SiaeConvention.KIND_ACI:
+                assert siae.source == Siae.SOURCE_USER_CREATED
+                # Sometimes our staff manually changes an existing ACI antenna's kind from ACI to ACIPHC and forgets
+                # to detach the ACI convention.
+                if not dry_run:
+                    siae.convention = None
+                    siae.save()
+            else:
+                assert siae.kind == convention.kind
 
     asp_siaes_without_convention = Siae.objects.filter(
         kind__in=Siae.ASP_MANAGED_KINDS, source=Siae.SOURCE_ASP, convention__isnull=True

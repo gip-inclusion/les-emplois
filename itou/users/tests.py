@@ -65,24 +65,40 @@ class ModelTest(TestCase):
 
     def test_clean_pole_emploi_fields(self):
 
-        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
-
         # Both fields cannot be empty.
+        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
+        cleaned_data = {
+            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+        }
         with self.assertRaises(ValidationError):
-            User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
+            User.clean_pole_emploi_fields(cleaned_data)
 
-        # Both fields cannot be present at the same time.
+        # If both fields are present at the same time, `pole_emploi_id` takes precedence.
         job_seeker = JobSeekerFactory(pole_emploi_id="69970749", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN)
-        with self.assertRaises(ValidationError):
-            User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
+        cleaned_data = {
+            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+        }
+        User.clean_pole_emploi_fields(cleaned_data)
+        self.assertEqual(cleaned_data["pole_emploi_id"], job_seeker.pole_emploi_id)
+        self.assertEqual(cleaned_data["lack_of_pole_emploi_id_reason"], "")
 
         # No exception should be raised for the following cases.
 
         job_seeker = JobSeekerFactory(pole_emploi_id="62723349", lack_of_pole_emploi_id_reason="")
-        User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
+        cleaned_data = {
+            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+        }
+        User.clean_pole_emploi_fields(cleaned_data)
 
         job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN)
-        User.clean_pole_emploi_fields(job_seeker.pole_emploi_id, job_seeker.lack_of_pole_emploi_id_reason)
+        cleaned_data = {
+            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+        }
+        User.clean_pole_emploi_fields(cleaned_data)
 
     def test_email_already_exists(self):
         JobSeekerFactory(email="foo@bar.com")

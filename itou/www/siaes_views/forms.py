@@ -3,8 +3,9 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from itou.siaes.models import Siae, SiaeMembership
+from itou.siaes.models import Siae, SiaeJobDescription, SiaeMembership
 from itou.utils.address.departments import DEPARTMENTS
+from itou.utils.urls import get_external_link_markup
 
 
 class CreateSiaeForm(forms.ModelForm):
@@ -64,18 +65,16 @@ class CreateSiaeForm(forms.ModelForm):
                 La structure à laquelle vous souhaitez vous rattacher est déjà
                 connue de nos services. Merci de nous contacter à l'adresse
                 """
-
-            assistance_url = settings.ITOU_ASSISTANCE_URL
-            assistance_html = (
-                f'<a href="{assistance_url}" target="_blank" rel="noopener" class="alert-link">{assistance_url}</a>'
+            external_link = get_external_link_markup(
+                url=settings.ITOU_ASSISTANCE_URL,
+                text=settings.ITOU_ASSISTANCE_URL,
             )
-
             error_message_siret = (
                 "en précisant votre numéro de SIRET (si existant),"
                 " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
                 " pour être contacté(e) si nécessaire."
             )
-            error_message = mark_safe(f"{error_message} {assistance_html} {error_message_siret}")
+            error_message = mark_safe(f"{error_message} {external_link} {error_message_siret}")
             raise forms.ValidationError(error_message)
 
         if not siret.startswith(self.current_siae.siren):
@@ -209,3 +208,17 @@ class FinancialAnnexSelectForm(forms.Form):
         widget=forms.Select,
         help_text="Veuillez sélectionner un numéro existant.",
     )
+
+
+class ValidateSiaeJobDescriptionForm(forms.ModelForm):
+    """
+    Validate a job description.
+    """
+
+    class Meta:
+        model = SiaeJobDescription
+        fields = [
+            "custom_name",
+            "description",
+            "is_active",
+        ]

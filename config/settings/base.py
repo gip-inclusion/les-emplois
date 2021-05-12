@@ -405,11 +405,10 @@ LEMARCHE_OPEN_REGIONS = ["Hauts-de-France", "Grand Est", "Île-de-France"]
 
 POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
 
-# Documentation links
+# Documentation link.
 ITOU_DOC_URL = "https://doc.inclusion.beta.gouv.fr"
-ITOU_DOC_PASS_VERIFICATION_URL = f"{ITOU_DOC_URL}/pourquoi-une-plateforme-de-linclusion/pass-iae-agrement-plus-simple-cest-a-dire#verification-des-demandes-de-pass-iae"
 
-# Communauté links.
+# Communauté link.
 ITOU_COMMUNITY_URL = "https://communaute.inclusion.beta.gouv.fr"
 
 # Approvals
