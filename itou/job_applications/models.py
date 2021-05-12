@@ -183,7 +183,16 @@ class JobApplicationQuerySet(models.QuerySet):
         - be definitely accepted (hiring can't be cancelled)
         - have generated a new approval (not attached to an old one)
         """
-        return self.exclude(approval=None).filter(to_siae=siae).accepted().select_related("job_seeker", "approval")
+        today = datetime.date.today()
+        return (
+            self.exclude(approval=None)
+            .accepted()
+            .filter(
+                to_siae=siae,
+                hiring_start_at__lt=today - relativedelta(days=JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED),
+            )
+            .select_related("job_seeker", "approval")
+        )
 
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
