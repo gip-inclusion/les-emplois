@@ -205,6 +205,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             return HttpResponseRedirect(next_url)
 
         if job_application.to_siae.is_subject_to_eligibility_rules:
+            # Automatic approval delivery mode.
             if job_application.approval:
                 external_link = get_external_link_markup(
                     url=(
@@ -229,6 +230,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                         "de la personne dans l'extranet IAE 2.0 de l'ASP."
                     ),
                 )
+            # Manual approval delivery mode.
             elif not job_application.hiring_without_approval:
                 external_link = get_external_link_markup(
                     url=(
