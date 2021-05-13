@@ -16,14 +16,13 @@ class ApprovalFormMixin:
         number = self.cleaned_data["number"]
         is_new = self.instance.pk is None
 
+        # A number starting with `ASP_ITOU_PREFIX` could create gaps`
+        # in the automatic number sequence.
         if is_new and number and number.startswith(Approval.ASP_ITOU_PREFIX):
-            # On ne laisse pas saisir un numéro qui commencerait par `ASP_ITOU_PREFIX`
-            # car ça risquerait de créer des trous dans la séquence des numéros.
             raise forms.ValidationError(self.ERROR_NUMBER)
 
+        # Allow to modify an existing PASS IAE to change its dates, but not its number.
         if not is_new and number != self.instance.number:
-            # On laisse la possibilité de modifier un PASS IAE existant afin
-            # de pouvoir modifier ses dates, mais pas son numéro.
             raise forms.ValidationError(self.ERROR_NUMBER_CANNOT_BE_CHANGED % self.instance.number)
 
         return number
@@ -33,10 +32,9 @@ class ApprovalAdminForm(ApprovalFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # L'interface d'admin doit donner la possibilité de créer des PASS IAE
-        # ex nihilo avec des numéros arbitraires car nous avons constaté des
-        # trous dans les agréments transmis par PE et nous avons des
-        # réclamations côté support.
+        # The admin interface must give the possibility to create PASS IAE
+        # ex nihilo with arbitrary numbers because we have noticed holes in
+        # the approvals transmitted by PE and we have complaints from users.
         self.fields["number"].required = False
         self.fields["number"].help_text += self.ADDITIONAL_HELP_TEXT_NUMBER
 
