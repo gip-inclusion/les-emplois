@@ -145,9 +145,11 @@ class ApplyAsJobSeekerTest(TestCase):
         # Test fields mandatory to upload to S3
         s3_upload = S3Upload(kind="resume")
         resume_config = s3_upload.config
+        s3_form_endpoint = s3_upload.form_values["url"]
         s3_form_values = s3_upload.form_values["fields"]
 
         # Form fields
+        self.assertContains(response, s3_form_endpoint)
         for _, value in s3_form_values.items():
             self.assertContains(response, value)
 
