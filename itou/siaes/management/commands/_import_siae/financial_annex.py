@@ -7,7 +7,7 @@ from itou.siaes.management.commands._import_siae.vue_af import AF_NUMBER_TO_ROW
 from itou.siaes.models import SiaeConvention, SiaeFinancialAnnex
 
 
-def get_creatable_and_deletable_afs(dry_run):
+def get_creatable_and_deletable_afs():
     """
     Get AFs which should be created / deleted.
 
@@ -34,20 +34,17 @@ def get_creatable_and_deletable_afs(dry_run):
         # Sometimes an AF start date changes.
         if af.start_at != row.start_at:
             af.start_at = row.start_at
-            if not dry_run:
-                af.save()
+            af.save()
 
         # Sometimes an AF end date changes.
         if af.end_at != row.end_date:
             af.end_at = row.end_date
-            if not dry_run:
-                af.save()
+            af.save()
 
         # Sometimes an AF state changes.
         if af.state != row.state:
             af.state = row.state
-            if not dry_run:
-                af.save()
+            af.save()
 
         # Sometimes an AF migrates from one convention to another.
         if af.convention.asp_id != row.asp_id:
@@ -55,8 +52,7 @@ def get_creatable_and_deletable_afs(dry_run):
             if convention_query.exists():
                 convention = convention_query.get()
                 af.convention = convention
-                if not dry_run:
-                    af.save()
+                af.save()
             else:
                 deletable_afs.append(af)
                 continue

@@ -21,7 +21,7 @@ from itou.siaes.models import Siae, SiaeConvention
 DEACTIVATE_CONVENTIONS = False
 
 
-def update_existing_conventions(dry_run):
+def update_existing_conventions():
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
@@ -30,13 +30,7 @@ def update_existing_conventions(dry_run):
     deactivations_by_kind = defaultdict(int)  # 0 by default
     reactivations = 0
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
-        if siae.siret not in SIRET_TO_ASP_ID:
-            # This can happen in a dry run only, when a siae should have changed
-            # its SIRET during update_siret_and_auth_email_of_existing_siaes()
-            # but did not yet due to dry run.
-            assert dry_run
-            print(f"ignored unknown siret of siae.id={siae.id} due to dry run")
-            continue
+        assert siae.siret in SIRET_TO_ASP_ID
         asp_id = SIRET_TO_ASP_ID[siae.siret]
         siret_signature = ASP_ID_TO_SIRET_SIGNATURE[asp_id]
 
@@ -55,9 +49,8 @@ def update_existing_conventions(dry_run):
                 f"{convention.asp_id} to {asp_id} (will be updated)"
             )
             assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
-            if not dry_run:
-                convention.asp_id = asp_id
-                convention.save()
+            convention.asp_id = asp_id
+            convention.save()
             continue
 
         # Siret_signature can change from one export to the next!
@@ -67,21 +60,19 @@ def update_existing_conventions(dry_run):
                 f"convention.id={convention.id} has changed siret_signature from "
                 f"{convention.siret_signature} to {siret_signature} (will be updated)"
             )
-            if not dry_run:
-                convention.siret_signature = siret_signature
-                convention.save()
+            convention.siret_signature = siret_signature
+            convention.save()
 
         should_be_active = does_siae_have_an_active_convention(siae)
         if convention.is_active != should_be_active:
             if should_be_active:
                 reactivations += 1
-                if not dry_run:
-                    convention.is_active = True
-                    convention.save()
+                convention.is_active = True
+                convention.save()
             else:
                 deactivations += 1
                 deactivations_by_kind[convention.kind] += 1
-                if DEACTIVATE_CONVENTIONS and not dry_run:
+                if DEACTIVATE_CONVENTIONS:
                     convention.is_active = False
                     # Start the grace period now.
                     convention.deactivated_at = timezone.now()
@@ -151,7 +142,7 @@ def get_deletable_conventions():
     return SiaeConvention.objects.filter(siaes__isnull=True)
 
 
-def check_convention_data_consistency(dry_run):
+def check_convention_data_consistency():
     """
     Check data consistency of conventions, not only versus siaes of ASP source,
     but also vs user created siaes.
@@ -159,9 +150,7 @@ def check_convention_data_consistency(dry_run):
     for convention in SiaeConvention.objects.prefetch_related("siaes").all():
         # Check that each convention has exactly one siae of ASP source.
         asp_siaes = [siae for siae in convention.siaes.all() if siae.source == Siae.SOURCE_ASP]
-
-        if not dry_run:
-            assert len(asp_siaes) == 1
+        assert len(asp_siaes) == 1
 
         if not convention.is_active:
             # Check that each inactive convention has a grace period start date.
@@ -174,9 +163,8 @@ def check_convention_data_consistency(dry_run):
                 assert siae.source == Siae.SOURCE_USER_CREATED
                 # Sometimes our staff manually changes an existing ACI antenna's kind from ACI to ACIPHC and forgets
                 # to detach the ACI convention.
-                if not dry_run:
-                    siae.convention = None
-                    siae.save()
+                siae.convention = None
+                siae.save()
             else:
                 assert siae.kind == convention.kind
 
