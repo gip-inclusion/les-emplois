@@ -516,8 +516,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
             job_application.render_obsolete(*args, **kwargs)
 
-        # Notification email.
-        emails = [self.email_accept]
+        # Notification emails.
+        emails = [self.email_accept_for_job_seeker]
+        if self.is_sent_by_proxy:
+            emails.append(self.email_accept_for_proxy)
 
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
@@ -608,15 +610,22 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return get_email_message(to, context, subject, body)
 
     @property
-    def email_accept(self):
+    def email_accept_for_job_seeker(self):
         to = [self.job_seeker.email]
-        bcc = []
-        if self.is_sent_by_proxy:
-            bcc.append(self.sender.email)
+        context = {"job_application": self}
+        subject = "apply/email/accept_for_job_seeker_subject.txt"
+        body = "apply/email/accept_for_job_seeker_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_accept_for_proxy(self):
+        if not self.is_sent_by_proxy:
+            raise RuntimeError("The job application was not sent by a proxy.")
+        to = [self.sender.email]
         context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL}
-        subject = "apply/email/accept_subject.txt"
-        body = "apply/email/accept_body.txt"
-        return get_email_message(to, context, subject, body, bcc=bcc)
+        subject = "apply/email/accept_for_proxy_subject.txt"
+        body = "apply/email/accept_for_proxy_body.txt"
+        return get_email_message(to, context, subject, body)
 
     @property
     def email_refuse(self):

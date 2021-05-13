@@ -5,6 +5,7 @@ from unittest.mock import PropertyMock, patch
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
+from django.template.defaultfilters import title
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -363,34 +364,38 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(reverse("account_login"), email.body)
         self.assertIn(reverse("account_reset_password"), email.body)
 
-    def test_accept(self):
-
-        # When sent by authorized prescriber.
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
-        email = job_application.email_accept
-        # To.
-        self.assertIn(job_application.job_seeker.email, email.to)
-        self.assertIn(job_application.sender.email, email.bcc)
-        self.assertEqual(len(email.to), 1)
-        self.assertEqual(len(email.bcc), 1)
-        # Body.
-        self.assertIn(job_application.sender.first_name, email.body)
-        self.assertIn(job_application.sender.last_name, email.body)
-        self.assertIn(job_application.job_seeker.first_name, email.body)
-        self.assertIn(job_application.job_seeker.last_name, email.body)
-        self.assertIn(job_application.to_siae.display_name, email.body)
-        self.assertIn(job_application.answer, email.body)
-
-        # When sent by jobseeker.
+    def test_accept_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory()
-        email = job_application.email_accept
+        email = job_application.email_accept_for_job_seeker
         # To.
         self.assertEqual(job_application.job_seeker.email, job_application.sender.email)
         self.assertIn(job_application.job_seeker.email, email.to)
         self.assertEqual(len(email.to), 1)
+        self.assertEqual(len(email.bcc), 0)
+        # Subject.
+        self.assertIn("Candidature acceptée", email.subject)
         # Body.
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.answer, email.body)
+
+    def test_accept_for_proxy(self):
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        email = job_application.email_accept_for_proxy
+        # To.
+        self.assertIn(job_application.sender.email, email.to)
+        self.assertEqual(len(email.to), 1)
+        self.assertEqual(len(email.bcc), 0)
+        # Subject.
+        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", email.subject)
+        # Body.
+        self.assertIn(title(job_application.job_seeker.get_full_name()), email.body)
+        self.assertIn(title(job_application.sender.get_full_name()), email.body)
+        self.assertIn(job_application.to_siae.display_name, email.body)
+        self.assertIn(job_application.answer, email.body)
+        self.assertIn("Date de début du contrat", email.body)
+        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn("Date de fin du contrat", email.body)
+        self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body)
 
     def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -652,7 +657,10 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
 class JobApplicationWorkflowTest(TestCase):
     """Test JobApplication workflow."""
 
-    def test_accept_job_application_sent_by_job_seeker(self):
+    def test_accept_job_application_sent_by_job_seeker_and_make_others_obsolete(self):
+        """
+        When a job seeker's application is accepted, the others are marked obsolete.
+        """
         job_seeker = JobSeekerFactory()
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         self.assertNotEqual(job_seeker.pole_emploi_id, "")
@@ -672,12 +680,17 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count(), 1)
         self.assertEqual(job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count(), 3)
 
-        # Check sent email.
+        # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the employer.
         self.assertIn("PASS IAE pour", mail.outbox[1].subject)
 
     def test_accept_obsolete(self):
+        """
+        An obsolete job application can be accepted.
+        """
         job_seeker = JobSeekerFactory()
 
         kwargs = {"job_seeker": job_seeker, "sender": job_seeker, "sender_kind": JobApplication.SENDER_KIND_JOB_SEEKER}
@@ -699,12 +712,17 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count(), 2)
         self.assertEqual(job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count(), 4)
 
-        # Check sent email.
+        # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the employer.
         self.assertIn("PASS IAE pour", mail.outbox[1].subject)
 
-    def test_accept_job_application_sent_by_job_seeker_with_valid_approval(self):
+    def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(self):
+        """
+        When a Pôle emploi approval already exists, it is reused.
+        """
         job_seeker = JobSeekerFactory()
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
@@ -717,12 +735,17 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(job_application.approval.number, pe_approval.number)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
-        # Check sent email.
+        # Check sent emails.
         self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the employer.
         self.assertIn("PASS IAE pour", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self):
+        """
+        When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
+        """
         job_seeker = JobSeekerFactory(
             pole_emploi_id="", lack_of_pole_emploi_id_reason=JobSeekerFactory._meta.model.REASON_FORGOTTEN
         )
@@ -734,10 +757,15 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertEqual(job_application.approval_delivery_mode, JobApplication.APPROVAL_DELIVERY_MODE_MANUAL)
         # Check sent email.
         self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the employer.
         self.assertIn("PASS IAE requis sur Itou", mail.outbox[1].subject)
 
     def test_accept_job_application_sent_by_prescriber(self):
+        """
+        Accept a job application sent by an "orienteur".
+        """
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING
         )
@@ -747,36 +775,42 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
-
-        # Check sent emails.
-        self.assertEqual(len(mail.outbox), 2)
-
-        email = mail.outbox[0]
-        self.assertIn("Candidature acceptée", email.subject)
-        self.assertIn("Date de début du contrat", email.body)
-        self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
-        self.assertIn("Date de fin du contrat", email.body)
-        self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body)
-
-        email = mail.outbox[1]
-        self.assertIn("PASS IAE pour", email.subject)
+        # Check sent email.
+        self.assertEqual(len(mail.outbox), 3)
+        # Email sent to the job seeker.
+        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the proxy.
+        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        # Email sent to the employer.
+        self.assertIn("PASS IAE pour", mail.outbox[2].subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber(self):
+        """
+        Accept a job application sent by an authorized prescriber.
+        """
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         self.assertNotEqual(job_application.job_seeker.pole_emploi_id, "")
         job_application.accept(user=job_application.to_siae.members.first())
+        self.assertTrue(job_application.to_siae.is_subject_to_eligibility_rules)
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
         # Check sent email.
-        self.assertEqual(len(mail.outbox), 2)
+        self.assertEqual(len(mail.outbox), 3)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+        # Email sent to the proxy.
+        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        # Email sent to the employer.
+        self.assertIn("PASS IAE pour", mail.outbox[2].subject)
 
     def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self):
+        """
+        An authorized prescriber can bypass the waiting period.
+        """
         user = JobSeekerFactory()
         # Ended 1 year ago.
         end_at = datetime.date.today() - relativedelta(years=1)
@@ -794,12 +828,19 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIsNotNone(job_application.approval)
         self.assertTrue(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 2)
+        # Check sent emails.
+        self.assertEqual(len(mail.outbox), 3)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
+        # Email sent to the proxy.
+        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+        # Email sent to the employer.
+        self.assertIn("PASS IAE pour", mail.outbox[2].subject)
 
     def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(self):
+        """
+        An "orienteur" cannot bypass the waiting period.
+        """
         user = JobSeekerFactory()
         # Ended 1 year ago.
         end_at = datetime.date.today() - relativedelta(years=1)
@@ -814,23 +855,7 @@ class JobApplicationWorkflowTest(TestCase):
         with self.assertRaises(xwf_models.AbortTransition):
             job_application.accept(user=job_application.to_siae.members.first())
 
-    def test_accept_job_application_sent_by_siae(self):
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        self.assertNotEqual(job_application.job_seeker.pole_emploi_id, "")
-        job_application.accept(user=job_application.to_siae.members.first())
-        self.assertTrue(job_application.to_siae.is_subject_to_eligibility_rules)
-        self.assertIsNotNone(job_application.approval)
-        self.assertTrue(job_application.approval_number_sent_by_email)
-        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC)
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 2)
-        self.assertIn("Candidature acceptée", mail.outbox[0].subject)
-        self.assertIn("PASS IAE pour", mail.outbox[1].subject)
-
-    def test_accept_job_application_sent_by_siae_with_no_approval(self):
+    def test_accept_job_application_by_siae_with_no_approval(self):
         """
         A SIAE can hire somebody without getting approval if they don't want one
         Basically the same as the 'accept' part, except we don't create an approval
@@ -845,10 +870,16 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertFalse(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, "")
         # Check sent email (no notification of approval).
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the proxy.
+        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
 
-    def test_accept_job_application_sent_by_siae_not_subject_to_eligibility_rules(self):
+    def test_accept_job_application_by_siae_not_subject_to_eligibility_rules(self):
+        """
+        No approval should be delivered for an employer not subject to eligibility rules.
+        """
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING, to_siae__kind=Siae.KIND_GEIQ
         )
@@ -857,9 +888,12 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIsNone(job_application.approval)
         self.assertFalse(job_application.approval_number_sent_by_email)
         self.assertEqual(job_application.approval_delivery_mode, "")
-        # Check sent email.
-        self.assertEqual(len(mail.outbox), 1)
+        # Check sent emails.
+        self.assertEqual(len(mail.outbox), 2)
+        # Email sent to the job seeker.
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
+        # Email sent to the proxy.
+        self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
 
     def test_refuse(self):
         user = JobSeekerFactory()
