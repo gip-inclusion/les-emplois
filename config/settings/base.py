@@ -551,11 +551,6 @@ S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("S3_STORAGE_ENDPOINT_DOMAIN", "")
 S3_STORAGE_BUCKET_NAME = os.environ.get("S3_STORAGE_BUCKET_NAME", "")
 S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
 
-# The endpoint of your bucket, more info:
-# http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
-S3_STORAGE_BASE_ENDPOINT_URL = "https://%s" % S3_STORAGE_ENDPOINT_DOMAIN
-S3_STORAGE_BUCKET_ENDPOINT_URL = "https://%s.%s" % (S3_STORAGE_BUCKET_NAME, S3_STORAGE_ENDPOINT_DOMAIN)
-
 STORAGE_UPLOAD_KINDS = {
     "default": {
         "allowed_mime_types": ["*"],
