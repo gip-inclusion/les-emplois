@@ -354,8 +354,8 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
         return HttpResponseRedirect(next_url)
 
     s3_upload = S3Upload(kind="resume")
-    s3_upload_config = s3_upload.config
     s3_form_values = s3_upload.form_values
+    s3_upload_config = s3_upload.config
 
     context = {
         "siae": siae,
