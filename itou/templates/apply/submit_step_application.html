@@ -24,7 +24,6 @@
         {{ form.resume_link.as_hidden }}
 
         <label for="resume_form">{{ form.resume_link.label }}</label>
-
         {% include "storage/s3_upload_form.html" with dropzone_form_id="resume_form" %}
 
         {% buttons %}

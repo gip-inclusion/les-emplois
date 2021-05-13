@@ -1,38 +1,40 @@
 {% load static %}
 
+{{ s3_form_values|json_script:"s3-form-values" }}
+{{ s3_upload_config|json_script:"s3-upload-config" }}
+
 <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
 
 <script type="text/javascript">
     // Input field where the location URL will be provided after success.
     const callback_location_selector = "#{{ callback_location_selector_id }}";
 
+    const form_values = JSON.parse(document.getElementById('s3-form-values').textContent);
+    const upload_config = JSON.parse(document.getElementById('s3-upload-config').textContent);
+
     // Transform this element into a drag and drop zone.
     const dropzone_selector = "#{{ dropzone_selector_id }}";
 
     // When a file is added to the drop zone, send a POST request to this URL.
-    const form_url = "{{ s3_form_values.url }}";
+    const form_url = form_values["url"];
 
     // Submit button to be disabled during file processing
     const submit_button = $("button[type='submit']");
 
     // S3 form params sent when a new file is added to the drop zone.
-    const form_params = {
-        {% for key, value in s3_form_values.fields.items %}
-            "{{ key }}": "{{ value }}",
-        {% endfor %}
-    };
+    const form_params = form_values["fields"];
 
     // Appended before the file name. The final slash is added later.
-    const key_path = "{{ s3_upload_config.key_path }}";
+    const key_path = upload_config["key_path"];
 
     // Dropzone configuration
     const dropzone_config = {
         url: form_url,
         params: form_params,
-        maxFilesize: "{{ s3_upload_config.max_file_size }}", // in MB
-        timeout: "{{ s3_upload_config.timeout }}", // default 3000, in ms
-        maxFiles: "{{ s3_upload_config.max_files }}",
-        acceptedFiles: "{{ s3_upload_config.allowed_mime_types }}",
+        maxFilesize: upload_config["max_file_size"], // in MB
+        timeout: upload_config["timeout"], // default 3000, in ms
+        maxFiles: upload_config["max_files"],
+        acceptedFiles: upload_config["allowed_mime_types"],
         addRemoveLinks: true,
         // translations
         dictFallbackMessage: "Ce navigateur n'est pas compatible",
