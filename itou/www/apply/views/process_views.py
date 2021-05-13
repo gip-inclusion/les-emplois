@@ -231,7 +231,10 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                 )
             elif not job_application.hiring_without_approval:
                 external_link = get_external_link_markup(
-                    url=settings.ITOU_DOC_PASS_VERIFICATION_URL,
+                    url=(
+                        f"{settings.ITOU_DOC_URL}/pourquoi-une-plateforme-de-linclusion/"
+                        "pass-iae-agrement-plus-simple-cest-a-dire#verification-des-demandes-de-pass-iae"
+                    ),
                     text="consulter notre espace documentation",
                 )
                 messages.success(
