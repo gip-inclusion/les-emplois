@@ -1,4 +1,4 @@
-{% if job_application.to_siae.is_subject_to_eligibility_rules %}
+{% if job_application.to_siae.is_subject_to_eligibility_rules or request.user.is_prescriber %}
 
         {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
             {% if job_application.is_sent_by_authorized_prescriber %}
