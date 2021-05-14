@@ -331,10 +331,14 @@ API_ENTREPRISE_TOKEN = os.environ.get("API_ENTREPRISE_TOKEN")
 
 # Pôle emploi's Emploi Store Dev aka ESD.
 # https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
+# If you need the recette endpoints for testing, set those environment variables:
+# API_ESD_AUTH_BASE_URL="https://entreprise.pe-qvr.fr"
+# API_ESD_BASE_URL="https://api-r.es-qvr.fr/partenaire"
 API_ESD_KEY = os.environ.get("API_ESD_KEY", "")
 API_ESD_SECRET = os.environ.get("API_ESD_SECRET", "")
-API_ESD_AUTH_BASE_URL = "https://entreprise.pole-emploi.fr"
-API_ESD_BASE_URL = "https://api.emploi-store.fr/partenaire"
+API_ESD_AUTH_BASE_URL = os.environ.get("API_ESD_AUTH_BASE_URL", "https://entreprise.pole-emploi.fr")
+API_ESD_BASE_URL = os.environ.get("API_ESD_BASE_URL", "https://api.emploi-store.fr/partenaire")
+
 
 # PE Connect aka PEAMU - technically one of ESD's APIs.
 # PEAM stands for Pôle emploi Access Management.
