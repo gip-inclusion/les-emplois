@@ -32,7 +32,7 @@
                     aria-expanded="false"
                     aria-controls="answer{{ forloop.counter0 }}"
                 >Informations rapides</a> / 
-                 <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}">
+                 <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
                     Informations détaillées
                 </a>
                 <div id="answer{{ forloop.counter0 }}" class="collapse mt-3">

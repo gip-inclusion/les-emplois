@@ -30,33 +30,9 @@
 
     {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
-    {# History ------------------------------------------------------ #}
-
-    {% if transition_logs %}
-
-        <hr>
-
-        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
-
-        <ul>
-            {% for log in transition_logs %}
-                <li>
-                    Passé en "<b>{{ log.pretty_to_state }}</b>"
-                    <ul>
-                        {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
-                            <li>Par {{ log.user.get_full_name }}</li>
-                        {% endif %}
-                        <li>Le {{ log.timestamp|date:"d F Y à H:i" }}</li>
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
-
-    {% endif %}
-
     <hr>
     <p>
-        <a href="{% url 'apply:list_for_prescriber' %}">Retour</a>
+        <a href="{{ back_url }}">Retour</a>
     </p>
 
 {% endblock %}
