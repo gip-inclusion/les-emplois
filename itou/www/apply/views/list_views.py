@@ -1,13 +1,11 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.text import slugify
 
 from itou.job_applications.csv_export import generate_csv_export
-from itou.job_applications.models import JobApplication
 from itou.utils.pagination import pager
-from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
@@ -43,17 +41,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     """
     List of applications for a prescriber.
     """
-    if request.user.is_prescriber_with_org:
-        prescriber_organization = get_current_org_or_404(request)
-        # Show all applications organization-wide + applications sent by the
-        # current user for backward compatibility (in the past, a user could
-        # create his prescriber's organization later on).
-        job_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=prescriber_organization)
-        )
-    else:
-        job_applications = request.user.job_applications_sent
+    job_applications = get_all_available_job_applications_as_prescriber(request)
 
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
     filters = None
@@ -77,17 +65,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
     """
-    if request.user.is_prescriber_with_org:
-        prescriber_organization = get_current_org_or_404(request)
-        # Show all applications organization-wide + applications sent by the
-        # current user for backward compatibility (in the past, a user could
-        # create his prescriber's organization later on).
-        job_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=prescriber_organization)
-        )
-    else:
-        job_applications = request.user.job_applications_sent
+    job_applications = get_all_available_job_applications_as_prescriber(request)
 
     job_applications_by_month = job_applications.with_monthly_counts()
 
@@ -102,17 +80,7 @@ def list_for_prescriber_exports_download(request, month_identifier):
     List of applications for a prescriber for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
-    if request.user.is_prescriber_with_org:
-        prescriber_organization = get_current_org_or_404(request)
-        # Show all applications organization-wide + applications sent by the
-        # current user for backward compatibility (in the past, a user could
-        # create his prescriber's organization later on).
-        job_applications = JobApplication.objects.filter(
-            (Q(sender=request.user) & Q(sender_prescriber_organization__isnull=True))
-            | Q(sender_prescriber_organization=prescriber_organization)
-        )
-    else:
-        job_applications = request.user.job_applications_sent
+    job_applications = get_all_available_job_applications_as_prescriber(request)
 
     year, month = month_identifier.split("-")
     job_applications = job_applications.created_on_given_year_and_month(year, month).with_list_related_data()
