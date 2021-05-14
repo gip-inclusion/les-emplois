@@ -31,6 +31,16 @@
     {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
     <hr>
+
+    {# History ------------------------------------------------------ #}
+
+    {% if transition_logs %}
+
+        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
+        {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
+
+    {% endif %}
+
     <p>
         <a href="{{ back_url }}">Retour</a>
     </p>

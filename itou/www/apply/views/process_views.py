@@ -93,6 +93,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     ).prefetch_related("selected_jobs__appellation")
     job_application = get_object_or_404(queryset, id=job_application_id)
 
+    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
     cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
     # We are looking for the most plausible availability date for eligibility criterions
@@ -121,6 +122,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "cancellation_days": cancellation_days,
         "eligibility_diagnosis": eligibility_diagnosis,
         "job_application": job_application,
+        "transition_logs": transition_logs,
         "back_url": back_url,
     }
     return render(request, template_name, context)
