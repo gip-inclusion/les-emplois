@@ -42,7 +42,8 @@ urlpatterns = [
     # /accounts/logout/ <=> account_logout
     # We need custom code to process PEAMU logout.
     re_path(r"^accounts/logout/$", dashboard_views.logout),
-    # --------------------------------------------------------------------------------------    # Other allauth URLs.
+    # --------------------------------------------------------------------------------------    
+    # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
     # PEAMU URLs.
@@ -64,7 +65,6 @@ urlpatterns = [
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
-    path("employee_record/", include("itou.www.employee_record_views.urls")),
     # Errors pages.
     path("403/", TemplateView.as_view(template_name="403.html"), name="403"),
     path("404/", TemplateView.as_view(template_name="404.html"), name="404"),

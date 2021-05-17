@@ -324,6 +324,7 @@
 
                    
                     {# Commenté le temps du dev #}
+                    {% comment %}
                     {% if can_show_employee_records %}
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="file" %}
@@ -331,6 +332,7 @@
                             <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
+                    {% endcomment %}
 
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="log-in" %}
