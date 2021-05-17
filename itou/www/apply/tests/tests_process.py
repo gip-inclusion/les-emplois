@@ -62,7 +62,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, resume_link)
 
     def test_details_for_siae_hidden(self):
-        """An hiden job_application is not displayed."""
+        """A hidden job_application is not displayed."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             job_seeker__is_job_seeker=True, hidden_for_siae=True
