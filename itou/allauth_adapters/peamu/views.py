@@ -80,7 +80,9 @@ class PEAMUOAuth2CallbackView(OAuth2CallbackView):
                 login.state = SocialLogin.unstash_state(request)
             return complete_social_login(request, login)
         except (PermissionDenied, OAuth2Error, RequestException, ProviderException) as e:
-            logger.error("Unknown error in PEAMU dispatch with exception '%s'.", e)
+            # This log is useful, 3.6k events for 75 users in 18 days but we have to disable it
+            # to not reach the Sentry limit. The issue is tracked in Trello.
+            # logger.error("Unknown error in PEAMU dispatch with exception '%s'.", e)
             return render_authentication_error(request, self.adapter.provider_id, exception=e)
 
 
