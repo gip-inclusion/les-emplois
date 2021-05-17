@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
@@ -251,6 +252,20 @@ class PrescriberOrganization(AddressMixin):  # Do not forget the mixin!
 
     def has_admin(self, user):
         return self.active_admin_members.filter(pk=user.pk).exists()
+
+    @property
+    def accept_survey_url(self):
+        """
+        Returns the typeform's satisfaction survey URL to be sent after a successful hiring.
+        """
+        args = {
+            "idorganisation": self.pk,
+            "region": self.region or "",
+            "typeorga": self.get_kind_display(),
+            "departement": self.department or "",
+        }
+        qs = urlencode(args)
+        return f"{settings.TYPEFORM_URL}/to/EDHZSU7p?{qs}"
 
     @property
     def active_members(self):

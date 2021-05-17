@@ -622,7 +622,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.is_sent_by_proxy:
             raise RuntimeError("The job application was not sent by a proxy.")
         to = [self.sender.email]
-        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL}
+        context = {"job_application": self}
+        if self.sender_prescriber_organization:
+            # Include the survey link for all prescribers's organizations.
+            context["prescriber_survey_link"] = self.sender_prescriber_organization.accept_survey_url
         subject = "apply/email/accept_for_proxy_subject.txt"
         body = "apply/email/accept_for_proxy_body.txt"
         return get_email_message(to, context, subject, body)

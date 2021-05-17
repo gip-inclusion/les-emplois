@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
@@ -46,6 +47,24 @@ class PrescriberOrganizationManagerTest(TestCase):
 
 
 class PrescriberOrganizationModelTest(TestCase):
+    def test_accept_survey_url(self):
+
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.PE, department="57")
+        url = org.accept_survey_url
+        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/EDHZSU7p?"))
+        self.assertIn(f"idorganisation={org.pk}", url)
+        self.assertIn("typeorga=P%C3%B4le+emploi", url)
+        self.assertIn("region=Grand+Est", url)
+        self.assertIn("departement=57", url)
+
+        # Ensure that the URL does not break when there is no department.
+        org = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI, department="")
+        url = org.accept_survey_url
+        self.assertIn(f"idorganisation={org.pk}", url)
+        self.assertIn("typeorga=CAP+emploi", url)
+        self.assertIn("region=", url)
+        self.assertIn("departement=", url)
+
     def test_clean_siret(self):
         """
         Test that a SIRET number is required only for non-PE organizations.

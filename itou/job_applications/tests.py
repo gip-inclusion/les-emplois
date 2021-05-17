@@ -396,6 +396,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.hiring_start_at.strftime("%d/%m/%Y"), email.body)
         self.assertIn("Date de fin du contrat", email.body)
         self.assertIn(job_application.hiring_end_at.strftime("%d/%m/%Y"), email.body)
+        self.assertIn(job_application.sender_prescriber_organization.accept_survey_url, email.body)
 
     def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
