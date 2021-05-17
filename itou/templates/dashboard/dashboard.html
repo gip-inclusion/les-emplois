@@ -55,7 +55,7 @@
             {% if current_prescriber_organization.has_pending_authorization_proof %}
                 <p>
                     Merci de nous transmettre l'arrêté préfectoral portant mention de cette habilitation :
-                    <a href="https://itou.typeform.com/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank">
+                    <a href="{{ TYPEFORM_URL }}/to/mk0GyI67#idprescriber={{ current_prescriber_organization.pk }}&iduser={{ user.pk }}&source={{ ITOU_ENVIRONMENT }}" rel="noopener" target="_blank">
                         cliquez ici pour l'envoyer
                         {% include "includes/icon.html" with icon="external-link" %}
                     </a>
@@ -98,7 +98,7 @@
                     Améliorer la visibilité de votre structure
                 </p>
                 <p class="mb-0">
-                    <a href="{% url_add_query 'https://itou.typeform.com/to/xGF5FMel' structure=current_siae.name type=current_siae.kind ville=current_siae.city siret=current_siae.siret %}" rel="noopener" target="_blank" class="btn btn-primary">
+                    <a href="{% url_add_query TYPEFORM_URL|add:'/to/xGF5FMel' structure=current_siae.name type=current_siae.kind ville=current_siae.city siret=current_siae.siret %}" rel="noopener" target="_blank" class="btn btn-primary">
                         C'est parti !
                         {% include "includes/icon.html" with icon="external-link" %}
                     </a>

@@ -356,7 +356,6 @@ PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 # ------------------------------------------------------------------------------
 
 TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
-
 TYPEFORM_URL = "https://itou.typeform.com"
 
 # Itou.
