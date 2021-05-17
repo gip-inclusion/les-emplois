@@ -359,9 +359,6 @@ TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
 
 TYPEFORM_URL = "https://itou.typeform.com"
 
-# Typeform survey links to include in some emails
-ITOU_EMAIL_APPROVAL_SURVEY_URL = "https://itou.typeform.com/to/S7QwC0yy"
-
 # Itou.
 # ------------------------------------------------------------------------------
 

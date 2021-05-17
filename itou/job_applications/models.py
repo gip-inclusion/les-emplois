@@ -657,7 +657,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.approval:
             raise RuntimeError("No approval found for this job application.")
         to = [accepted_by.email]
-        context = {"job_application": self, "survey_link": settings.ITOU_EMAIL_APPROVAL_SURVEY_URL}
+        context = {"job_application": self, "siae_survey_link": self.to_siae.accept_survey_url}
         subject = "approvals/email/deliver_subject.txt"
         body = "approvals/email/deliver_body.txt"
         return get_email_message(to, context, subject, body)

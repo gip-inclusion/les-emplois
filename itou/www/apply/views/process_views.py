@@ -250,7 +250,10 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
                     ),
                 )
 
-        external_link = get_external_link_markup(url=settings.ITOU_EMAIL_APPROVAL_SURVEY_URL, text="Je donne mon avis")
+        external_link = get_external_link_markup(
+            url=job_application.to_siae.accept_survey_url,
+            text="Je donne mon avis",
+        )
         messages.warning(
             request,
             mark_safe(f"Êtes-vous satisfait des emplois de l'inclusion ? {external_link}"),
