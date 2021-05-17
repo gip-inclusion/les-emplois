@@ -60,6 +60,7 @@ class PrescriberOrganizationModelTest(TestCase):
         # Ensure that the URL does not break when there is no department.
         org = PrescriberOrganizationFactory(kind=PrescriberOrganization.Kind.CAP_EMPLOI, department="")
         url = org.accept_survey_url
+        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/EDHZSU7p?"))
         self.assertIn(f"idorganisation={org.pk}", url)
         self.assertIn("typeorga=CAP+emploi", url)
         self.assertIn("region=", url)

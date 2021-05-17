@@ -9,7 +9,7 @@ from django.db.models import BooleanField, Case, Count, F, Prefetch, Q, When
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlencode, urlsafe_base64_encode
 
 from itou.utils.address.models import AddressMixin
 from itou.utils.emails import get_email_message
@@ -233,6 +233,20 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if self.pk:
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
+
+    @property
+    def accept_survey_url(self):
+        """
+        Returns the typeform's satisfaction survey URL to be sent after a successful hiring.
+        """
+        args = {
+            "id_siae": self.pk,
+            "region": self.region or "",
+            "type_siae": self.get_kind_display(),
+            "departement": self.department or "",
+        }
+        qs = urlencode(args)
+        return f"{settings.TYPEFORM_URL}/to/nUjfDnrA?{qs}"
 
     @property
     def display_name(self):
