@@ -356,6 +356,7 @@ PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 # ------------------------------------------------------------------------------
 
 TYPEFORM_SECRET = os.environ.get("TYPEFORM_SECRET")
+TYPEFORM_URL = "https://itou.typeform.com"
 
 # Itou.
 # ------------------------------------------------------------------------------
@@ -388,10 +389,6 @@ ITOU_SESSION_CURRENT_PRESCRIBER_ORG_KEY = "current_prescriber_organization"
 ITOU_SESSION_CURRENT_SIAE_KEY = "current_siae"
 ITOU_SESSION_JOB_APPLICATION_KEY = "job_application"
 ITOU_SESSION_PRESCRIBER_SIGNUP_KEY = "prescriber_signup"
-
-# Typeform survey links to include in some emails
-ITOU_EMAIL_APPROVAL_SURVEY_URL = "https://itou.typeform.com/to/S7QwC0yy"
-ITOU_EMAIL_PRESCRIBER_NEW_HIRING_URL = "https://startupsbeta.typeform.com/to/X40eJC"
 
 # Some external libraries, as PDF Shift, need access to static files
 # but they can't access them when working locally.

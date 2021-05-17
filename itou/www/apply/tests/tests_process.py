@@ -18,6 +18,7 @@ from itou.job_applications.factories import (
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
+from itou.users.models import User
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
 
@@ -233,6 +234,47 @@ class ProcessViewsTest(TestCase):
             }
             with self.assertRaises(KeyError):
                 response = self.client.post(url, data=post_data)
+
+    def test_accept_with_manual_approval_delivery(self):
+        """
+        Test the "manual approval delivery mode" path of the view.
+        """
+        create_test_cities(["57"], num_per_department=1)
+        city = City.objects.first()
+
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            # The state of the 2 `pole_emploi_*` fields will trigger a manual delivery.
+            job_seeker__pole_emploi_id="",
+            job_seeker__lack_of_pole_emploi_id_reason=User.REASON_FORGOTTEN,
+        )
+
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            # Data for `JobSeekerPoleEmploiStatusForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            # Data for `UserAddressForm`.
+            "address_line_1": "11 rue des Lilas",
+            "post_code": "57000",
+            "city_name": city.name,
+            "city": city.slug,
+            # Data for `AcceptForm`.
+            "hiring_start_at": datetime.date.today().strftime("%d/%m/%Y"),
+            "hiring_end_at": (datetime.date.today() + datetime.timedelta(days=360)).strftime("%d/%m/%Y"),
+            "answer": "",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        job_application.refresh_from_db()
+        self.assertEqual(job_application.approval_delivery_mode, job_application.APPROVAL_DELIVERY_MODE_MANUAL)
 
     def test_accept_with_hiring_end_at_after_existing_approval_end_at(self):
         """

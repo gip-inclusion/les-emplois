@@ -52,6 +52,25 @@ class SiaeFactoriesTest(TestCase):
 
 
 class SiaeModelTest(TestCase):
+    def test_accept_survey_url(self):
+
+        siae = SiaeFactory(kind=Siae.KIND_EI, department="57")
+        url = siae.accept_survey_url
+        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/nUjfDnrA?"))
+        self.assertIn(f"id_siae={siae.pk}", url)
+        self.assertIn("type_siae=Entreprise+d%27insertion", url)
+        self.assertIn("region=Grand+Est", url)
+        self.assertIn("departement=57", url)
+
+        # Ensure that the URL does not break when there is no department.
+        siae = SiaeFactory(kind=Siae.KIND_AI, department="")
+        self.assertTrue(url.startswith(f"{settings.TYPEFORM_URL}/to/nUjfDnrA?"))
+        url = siae.accept_survey_url
+        self.assertIn(f"id_siae={siae.pk}", url)
+        self.assertIn("type_siae=Association+interm%C3%A9diaire", url)
+        self.assertIn("region=", url)
+        self.assertIn("departement=", url)
+
     def test_siren_and_nic(self):
         siae = SiaeFactory(siret="12345678900001")
         self.assertEqual(siae.siren, "123456789")

@@ -1,0 +1,29 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+
+Nous sommes ravis de vous annoncer que la candidature de {{ job_application.job_seeker.get_full_name|title }}, adressée par {{ job_application.sender.get_full_name|title }}, a été acceptée par {{ job_application.to_siae.display_name }}.
+
+- Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}
+- Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y" }}
+
+Ces dates sont uniquement pour information.
+
+{% if job_application.to_siae.is_subject_to_eligibility_rules %}Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi.{% endif %}
+
+{% if job_application.answer %}
+*Message de l'entreprise* :
+
+{{ job_application.answer }}
+{% endif %}
+
+{% if prescriber_survey_link %}
+---
+
+Afin de nous aider à évaluer la performance de notre service, accepteriez-vous de répondre à quelques questions ?
+
+Prenez 30 secondes pour nous donner votre avis ! Cliquez sur : {{ prescriber_survey_link }}
+
+Merci de votre participation et à très bientôt sur les emplois de l'inclusion !
+{% endif %}
+
+{% endblock body %}
