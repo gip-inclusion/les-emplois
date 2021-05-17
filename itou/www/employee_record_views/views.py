@@ -39,7 +39,10 @@ def list(request, template_name="employee_record/list.html"):
 
     # Badges for "real" employee records
     employee_record_statuses = (
-        EmployeeRecord.objects.values("status").annotate(cnt=Count("status")).order_by("-status")
+        EmployeeRecord.objects.filter(job_application__to_siae=siae)
+        .values("status")
+        .annotate(cnt=Count("status"))
+        .order_by("-status")
     )
     employee_record_badges = {row["status"]: row["cnt"] for row in employee_record_statuses}
 

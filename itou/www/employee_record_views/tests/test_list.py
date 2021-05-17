@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.factories import JobApplicationWithApprovalFactory
+from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD
 
@@ -18,7 +18,7 @@ class ListEmployeeRecordsTest(TestCase):
         )
         self.user = self.siae.members.get(first_name="Elliot")
         self.user_without_perms = self.siae_without_perms.members.get(first_name="Hannibal")
-        self.job_application = JobApplicationWithApprovalFactory(
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae,
         )
         self.job_seeker = self.job_application.job_seeker
