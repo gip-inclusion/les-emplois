@@ -11,7 +11,6 @@ from itou.www.employee_record_views.forms import SelectEmployeeRecordStatusForm
 
 
 @login_required
-# @user_passes_test(lambda u: u.is_superuser)
 def list(request, template_name="employee_record/list.html"):
     """
     Displays a list of employee records for the SIAE
