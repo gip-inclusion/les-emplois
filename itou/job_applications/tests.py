@@ -22,6 +22,7 @@ from itou.job_applications.factories import (
     JobApplicationSentByPrescriberOrganizationFactory,
     JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalFactory,
+    JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithoutApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -230,6 +231,23 @@ class JobApplicationQuerySetTest(TestCase):
         job_app = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         qs = JobApplication.objects.with_is_pending_for_too_long().get(pk=job_app.pk)
         self.assertFalse(qs.is_pending_for_too_long)
+
+    def test_eligible_as_employee_record(self):
+        # Results must be a list of job applications:
+        # Accepted
+        job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
+        # With an approval
+        job_app = JobApplicationWithoutApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
+        # Must be accepted and only after CANCELLATION_DAYS_AFTER_HIRING_STARTED
+        job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.assertNotIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
+
+        job_app = JobApplicationWithApprovalNotCancellableFactory()
+        self.assertIn(job_app, JobApplication.objects.eligible_as_employee_record(job_app.to_siae))
 
 
 class JobApplicationFactoriesTest(TestCase):
