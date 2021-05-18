@@ -1,5 +1,4 @@
 import django.forms as forms
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 
 from itou.cities.models import City
@@ -21,6 +20,7 @@ class AddressFormMixin(forms.Form):
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
+                "data-autosubmit-on-enter-pressed": 0,
                 "placeholder": "Nom de la ville",
                 "autocomplete": "off",
             }

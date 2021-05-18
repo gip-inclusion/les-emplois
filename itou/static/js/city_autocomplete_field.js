@@ -6,6 +6,8 @@ $(document).ready(() => {
   let loading = $('.js-city-autocomplete-loading')
   let noLoading = $('.js-city-autocomplete-no-loading')
 
+  let autoSubmitOnEnterPressed = citySearchInput.data('autosubmit-on-enter-pressed')
+
   function clearInput() {
     citySearchInput.val('')
     hiddenCityInput.val('')
@@ -42,7 +44,9 @@ $(document).ready(() => {
         if (event.keyCode === 13) {
           let value = hiddenCityInput.data('title')
           citySearchInput.val(value)
-          citySearchInput.parents('form:first').submit()
+          if (autoSubmitOnEnterPressed) {
+            citySearchInput.parents('form:first').submit()
+          }
         }
       },
       search: (event, ui) => {
