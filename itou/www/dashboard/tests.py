@@ -21,7 +21,7 @@ from itou.siaes.factories import (
 )
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
-from itou.www.dashboard.forms import EditUserEmailForm
+from itou.www.dashboard.forms import EditUserEmailForm, EditUserInfoForm
 
 
 class DashboardViewTest(TestCase):
@@ -123,6 +123,38 @@ class EditJobSeekerInfo(TestCase):
         self.assertEqual(job_seeker.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
         self.assertEqual(job_seeker.phone, post_data["phone"])
 
+    def test_edit_email(self):
+        editor = PrescriberFactory()
+        job_seeker = JobSeekerFactory(created_by=editor)
+        data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": job_seeker.REASON_NOT_REGISTERED,
+        }
+        form = EditUserInfoForm(instance=job_seeker, editor=editor)
+        self.assertTrue(form.fields.get("email"))
+        form = EditUserInfoForm(instance=job_seeker, editor=editor, data=data)
+        self.assertTrue(form.fields.get("email"))
+
+    def test_edit_email_not_allowed(self):
+        job_seeker = JobSeekerFactory()
+        editor = PrescriberFactory()
+        data = {
+            "email": "bob@saintclar.net",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": job_seeker.REASON_NOT_REGISTERED,
+        }
+        form = EditUserInfoForm(instance=job_seeker, editor=editor)
+        self.assertFalse(form.fields.get("email"))
+        form = EditUserInfoForm(instance=job_seeker, editor=editor, data=data)
+        self.assertFalse(form.fields.get("email"))
+
     def test_edit_by_prescriber(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         user = job_application.sender
@@ -183,11 +215,8 @@ class EditJobSeekerInfo(TestCase):
         """
         new_email = "bidou@yopmail.com"
         siae = SiaeWithMembershipFactory()
-        job_application = JobApplicationSentByPrescriberFactory(
-            to_siae=siae, job_seeker__created_by=siae.members.first()
-        )
-
-        user = job_application.to_siae.members.first()
+        user = siae.members.first()
+        job_application = JobApplicationSentByPrescriberFactory(to_siae=siae, job_seeker__created_by=user)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 

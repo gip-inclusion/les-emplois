@@ -128,7 +128,7 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
     """
     dashboard_url = reverse_lazy("dashboard:index")
     prev_url = get_safe_url(request, "prev_url", fallback_url=dashboard_url)
-    form = EditUserInfoForm(instance=request.user, data=request.POST or None)
+    form = EditUserInfoForm(instance=request.user, editor=request.user, data=request.POST or None)
     extra_data = request.user.externaldataimport_set.pe_sources().first()
     job_seeker_signed_pk = resume_signer.sign(request.user.pk)
 
@@ -172,7 +172,7 @@ def edit_job_seeker_info(request, job_application_id, template_name="dashboard/e
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
-    form = EditUserInfoForm(instance=job_application.job_seeker, data=request.POST or None)
+    form = EditUserInfoForm(instance=job_application.job_seeker, editor=request.user, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
         form.save()
