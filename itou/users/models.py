@@ -182,9 +182,7 @@ class User(AbstractUser, AddressMixin):
             return True
 
         is_account_creator = bool(user.created_by and user.created_by == self)
-        if user.has_verified_email or not user.is_handled_by_proxy or not is_account_creator:
-            return False
-        return True
+        return user.is_handled_by_proxy and is_account_creator and not user.has_verified_email
 
     @cached_property
     def has_verified_email(self):
