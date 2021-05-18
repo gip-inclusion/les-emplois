@@ -1,0 +1,13 @@
+{% extends "layout/content.html" %}
+{% load static %}
+{% load format_filters %}
+{% load list_filters %}
+{% load bootstrap4 %}
+
+{% block title %}Nouvelle fiche salarié ASP - {{ current_siae.display_name }}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
+
+{% endblock %}

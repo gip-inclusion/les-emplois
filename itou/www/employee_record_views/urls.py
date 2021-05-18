@@ -7,5 +7,5 @@ app_name = "employee_record_views"
 
 urlpatterns = [
     path("list", views.list, name="list"),
-    # Next: path of employee records actions
+    path("create/<uuid:job_application_id>", views.create, name="create"),
 ]
