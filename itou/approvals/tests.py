@@ -174,7 +174,7 @@ class CommonApprovalMixinTest(TestCase):
         approval = ApprovalFactory(user=user)
         self.assertTrue(approval.is_pass_iae)
 
-    def overlaps_covid_lockdown(self):
+    def test_overlaps_covid_lockdown(self):
 
         # Overlaps: start before lockdown.
         start_at = Approval.LOCKDOWN_START_AT - relativedelta(years=1)
