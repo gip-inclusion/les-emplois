@@ -16,6 +16,7 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
@@ -195,7 +196,7 @@ class ProcessViewsTest(TestCase):
             "city_slug": city.slug,
         }
 
-        for state in [JobApplicationWorkflow.STATE_PROCESSING, JobApplicationWorkflow.STATE_OBSOLETE]:
+        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
             job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
                 state=state, job_seeker=job_seeker
             )
@@ -537,17 +538,27 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_eligibility_wrong_state_for_job_application(self):
+    def test_eligibility_state_for_job_application(self):
         """The eligibility diagnosis page must only be accessible
-        in `STATE_PROCESSING` and state `STATE_POSTPONED`."""
+        in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
+        siae = SiaeWithMembershipFactory()
+        siae_user = siae.members.first()
+
+        # Right states
+        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
+            job_application = JobApplicationSentByJobSeekerFactory(state=state, to_siae=siae)
+            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+            url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.client.logout()
+
+        # Wrong states
         for state in [
             JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_REFUSED,
             JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
         ]:
-            job_application = JobApplicationSentByJobSeekerFactory(state=state)
-            siae_user = job_application.to_siae.members.first()
+            job_application = JobApplicationSentByJobSeekerFactory(state=state, to_siae=siae)
             self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
             url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
             response = self.client.get(url)
@@ -709,19 +720,28 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_postpone)
         self.assertContains(response, self.url_accept)
 
-    def test_details_template_for_other_states(self):
+    def test_details_template_for_state_refused(self):
         """Test actions available for other states."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        for state in [
-            JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_REFUSED,
-        ]:
-            self.job_application.state = state
-            self.job_application.save()
-            response = self.client.get(self.url_details)
-            # Test template content.
-            self.assertNotContains(response, self.url_process)
-            self.assertNotContains(response, self.url_eligibility)
-            self.assertNotContains(response, self.url_refuse)
-            self.assertNotContains(response, self.url_postpone)
-            self.assertNotContains(response, self.url_accept)
+        self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+
+    def test_details_template_for_state_accepted(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
