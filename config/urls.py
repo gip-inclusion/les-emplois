@@ -65,6 +65,7 @@ urlpatterns = [
     path("stats/", include("itou.www.stats.urls")),
     path("versions/", include("itou.www.releases.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
+    path("employee_record/", include("itou.www.employee_record_views.urls")),
     # Static pages.
     path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),
     # Errors pages.
