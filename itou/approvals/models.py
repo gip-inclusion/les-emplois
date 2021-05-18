@@ -956,10 +956,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
         """
         See `self.display_end_at`.
         """
-        end_at = self.end_at
-        if self.overlaps_covid_lockdown:
-            end_at = end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
-        return super().is_valid(end_at=end_at)
+        return super().is_valid(end_at=self.display_end_at)
 
     @staticmethod
     def format_name_as_pole_emploi(name):
