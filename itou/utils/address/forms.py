@@ -10,6 +10,8 @@ class AddressFormMixin(forms.Form):
 
     ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
+    # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
+    # see `city_autocomplete_field.js`.
     city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
 
     city_name = forms.CharField(
