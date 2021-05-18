@@ -94,7 +94,6 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
-    cancellation_days = JobApplication.CANCELLATION_DAYS_AFTER_HIRING_STARTED
 
     # We are looking for the most plausible availability date for eligibility criterions
     before_date = job_application.hiring_end_at
@@ -106,20 +105,10 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
     eligibility_diagnosis = EligibilityDiagnosis.objects.last_before(job_application.job_seeker, before_date)
 
-    approval_can_be_suspended_by_siae = job_application.approval and job_application.approval.can_be_suspended_by_siae(
-        job_application.to_siae
-    )
-    approval_can_be_prolonged_by_siae = job_application.approval and job_application.approval.can_be_prolonged_by_siae(
-        job_application.to_siae
-    )
-
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
-        "approval_can_be_suspended_by_siae": approval_can_be_suspended_by_siae,
-        "approval_can_be_prolonged_by_siae": approval_can_be_prolonged_by_siae,
-        "cancellation_days": cancellation_days,
         "eligibility_diagnosis": eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
