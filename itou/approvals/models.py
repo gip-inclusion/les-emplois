@@ -97,7 +97,7 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def display_end_at(self):
-        # See PoleEmploiApproval > display_end_at
+        # See `PoleEmploiApproval.display_end_at`.
         return self.end_at
 
 
@@ -954,7 +954,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
     def is_valid(self):
         """
-        See self.display_end_at
+        See `self.display_end_at`.
         """
         end_at = self.end_at
         if self.overlaps_covid_lockdown:
