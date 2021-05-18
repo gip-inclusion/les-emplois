@@ -21,8 +21,7 @@
 
     {% csrf_token %}
 
-    {% bootstrap_form_errors form %}
-    {% bootstrap_form form exclude="resume_link" %}
+    {% bootstrap_form form alert_error_type="all" %}
 
     {% if ITOU_ENVIRONMENT == "PROD" %}
         {% if request.user.is_job_seeker %}
