@@ -31,9 +31,11 @@
         {% else %}
             <li>Candidature spontanée</li>
         {% endif %}
+
         {% if job_application.get_resume_link %}
             <li><a href="{{ job_application.get_resume_link }}" target="_blank" rel="noopener">Télécharger le CV</a></li>
         {% endif %}
+
     </ul>
 
     <div class="alert alert-secondary">
@@ -307,9 +309,15 @@
     {% endif %}
 
 
+<<<<<<< HEAD
     {# Possible next steps when the state is obsolete ------------------------------------------------------ #}
 
     {% if job_application.state.is_obsolete %}
+=======
+    {# Possible next steps when the state is obsolete or refused ------------------------------------------------------ #}
+
+    {% if job_application.state.is_obsolete or job_application.state.is_refused %}
+>>>>>>> 7c05ef89 (Accept refused job applications)
 
         <hr>
 
@@ -329,6 +337,10 @@
 
     {% endif %}
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7c05ef89 (Accept refused job applications)
     {# Job application accepted: details -------------------------------------------------------------------- #}
 
     {% if job_application.state.is_accepted %}
