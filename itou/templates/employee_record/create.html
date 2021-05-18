@@ -8,6 +8,47 @@
 
 {% block content %}
 
-<h1>Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
+<div class="content-small">
+
+    <h1>Fiches salarié ASP</h1>
+    <h2 class="text-muted">{{ job_application.job_seeker.get_full_name|title }}</h2>
+
+    <div class="card bg-light p-3 mb-3">
+        <div class="card-body p-1">
+            <div class="row">
+                <div class="col-sm-9 pt-3">
+                    <div>Début du contrat : <b>{{ job_application.hiring_start_at }}</b></div>
+                    <div>Fin du contrat : <b>{{ job_application.hiring_end_at }}</b></div>
+                    <div>Numéro de PASS IAE : <b>{{ job_application.approval.number_with_spaces }}</b></div>
+                </div>
+                <div class="col-sm-3 text-right">
+                    <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="list-unstyled multi-steps my-5">
+        <li class="is-active">Etat civil et domiciliation</li>
+        <li>Situation</li>
+        <li>Informations complémentaires</li>
+    </ul>
+
+
+    <h4>Etat civil du salarié</h4>
+
+    
+    <form method="post" action="" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% buttons %}
+            <a class="btn btn btn-outline-secondary" href="#">
+                Annuler
+            </a>
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
+    </form>
+
+</div>
 
 {% endblock %}

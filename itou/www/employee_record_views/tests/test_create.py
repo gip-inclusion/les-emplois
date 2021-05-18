@@ -23,10 +23,16 @@ class CreateEmployeeRecordsTest(TestCase):
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:list")
 
-    def test_permissions(self):
-        """
-        Non-eligible SIAE should not be able to access this list
-        """
+    def test_access_granted(self):
+        # Must not have access
+        self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_access_denied(self):
+        # Must have access
         self.client.login(username=self.user_without_perms.username, password=DEFAULT_PASSWORD)
 
         response = self.client.get(self.url)
