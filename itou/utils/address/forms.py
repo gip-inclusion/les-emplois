@@ -47,9 +47,13 @@ class AddressFormMixin(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion when existing in DB
-        # Reverted back on clean
-        self.initial["city_name"] = self.initial.get("city")
+        # Needed for proper auto-completion when existing in DB.
+        if self.instance and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
+            self.initial["city_name"] = self.instance.city
+            # Populate the hidden `city` field.
+            city = City.objects.filter(name=self.instance.city, department=self.instance.department).first()
+            if city:
+                self.initial["city"] = city.slug
 
     def clean(self):
         cleaned_data = super().clean()
