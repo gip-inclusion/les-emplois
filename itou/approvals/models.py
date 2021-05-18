@@ -97,8 +97,14 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def display_end_at(self):
-        # See `PoleEmploiApproval.display_end_at`.
+        """
+        See `PoleEmploiApproval.display_end_at`.
+        """
         return self.end_at
+
+    @staticmethod
+    def get_extended_covid_end_at(end_at):
+        return end_at + relativedelta(months=CommonApprovalMixin.LOCKDOWN_EXTENSION_DELAY_MONTHS)
 
 
 class CommonApprovalQuerySet(models.QuerySet):
@@ -185,7 +191,7 @@ class Approval(CommonApprovalMixin):
             # Handle COVID extensions for approvals originally issued by Pôle emploi.
             # Approvals issued by Itou have already been extended through SQL.
             if not self.originates_from_itou and self.overlaps_covid_lockdown:
-                self.end_at = self.end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+                self.end_at = self.get_extended_covid_end_at(self.end_at)
 
         super().save(*args, **kwargs)
 
@@ -988,7 +994,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
         """
         end_at = self.end_at
         if self.overlaps_covid_lockdown:
-            end_at = end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+            end_at = self.get_extended_covid_end_at(end_at)
         return end_at
 
     @property
