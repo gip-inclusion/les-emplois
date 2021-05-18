@@ -212,6 +212,9 @@ class AcceptForm(forms.ModelForm):
             self.fields[field].required = True
             self.fields[field].widget = DatePickerField()
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
+        if self.instance.state.is_refused:
+            # Erase the refusal message to start from new.
+            self.initial["answer"] = ""
 
     class Meta:
         model = JobApplication
