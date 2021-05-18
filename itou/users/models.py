@@ -178,8 +178,7 @@ class User(AbstractUser, AddressMixin):
         super().save(*args, **kwargs)
 
     def can_edit_email(self, user):
-        is_proxy = self.pk != user.pk
-        if not is_proxy:
+        if self == user:
             return True
 
         is_account_creator = bool(user.created_by and user.created_by == self)
