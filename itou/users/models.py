@@ -1,5 +1,6 @@
 import uuid
 
+from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
@@ -175,6 +176,20 @@ class User(AbstractUser, AddressMixin):
         self.department = department_from_postcode(self.post_code)
         self.validate_unique()
         super().save(*args, **kwargs)
+
+    def can_edit_email(self, user):
+        is_proxy = self.pk != user.pk
+        if not is_proxy:
+            return True
+
+        is_account_creator = bool(user.created_by and user.created_by == self)
+        if user.has_verified_email or not user.is_handled_by_proxy or not is_account_creator:
+            return False
+        return True
+
+    @cached_property
+    def has_verified_email(self):
+        return EmailAddress.objects.filter(email=self.email, verified=True)
 
     @cached_property
     def approvals_wrapper(self):
