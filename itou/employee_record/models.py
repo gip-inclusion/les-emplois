@@ -30,11 +30,20 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def sent(self):
         return self.filter(status=EmployeeRecord.Status.SENT)
 
+    def sent_for_siae(self, siae):
+        return self.sent().filter(job_application__to_siae=siae).select_related("job_application")
+
     def rejected(self):
         return self.filter(status=EmployeeRecord.Status.REJECTED)
 
+    def rejected_for_siae(self, siae):
+        return self.rejected().filter(job_application__to_siae=siae).select_related("job_application")
+
     def processed(self):
         return self.filter(status=EmployeeRecord.Status.PROCESSED)
+
+    def processed_for_siae(self, siae):
+        return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
 
     def archived(self):
         """
@@ -84,7 +93,7 @@ class EmployeeRecord(models.Model):
         NEW = "NEW", "Nouvelle fiche salarié"
         READY = "READY", "Données complètes, prêtes à l'envoi ASP"
         SENT = "SENT", "Envoyée ASP"
-        REJECTED = "REJECTED", "Rejet ASP"
+        REJECTED = "REJECTED", "Rejetée ASP"
         PROCESSED = "PROCESSED", "Traitée ASP"
         ARCHIVED = "ARCHIVED", "Archivée"
 
@@ -101,6 +110,7 @@ class EmployeeRecord(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         verbose_name="Candidature / embauche",
+        related_name="employee_record",
     )
 
     # Employee records must be linked to a valid financial annex

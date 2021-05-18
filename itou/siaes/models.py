@@ -161,6 +161,9 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     # These kinds and only these kinds thus have convention/AF logic.
     ASP_MANAGED_KINDS = [KIND_EI, KIND_AI, KIND_ACI, KIND_ETTI, KIND_EITI]
 
+    # These kinds of SIAE can use employee record app to send data to ASP
+    ASP_EMPLOYEE_RECORD_KINDS = [KIND_EI, KIND_ACI, KIND_AI, KIND_ETTI]
+
     # https://code.travail.gouv.fr/code-du-travail/l5132-4
     # https://www.legifrance.gouv.fr/eli/loi/2018/9/5/2018-771/jo/article_83
     ELIGIBILITY_REQUIRED_KINDS = ASP_MANAGED_KINDS + [KIND_ACIPHC]
@@ -444,6 +447,13 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def grace_period_has_expired(self):
         return not self.is_active and timezone.now() > self.grace_period_end_date
+
+    @property
+    def can_use_employee_record(self):
+        """
+        Check if this SIAE can use the employee record app
+        """
+        return self.kind in self.ASP_EMPLOYEE_RECORD_KINDS
 
     def convention_can_be_accessed_by(self, user):
         """

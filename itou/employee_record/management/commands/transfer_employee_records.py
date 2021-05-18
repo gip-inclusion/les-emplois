@@ -186,7 +186,7 @@ class Command(BaseCommand):
                 continue
 
             if not dry_run:
-                employee_record.updated_as_rejected(processing_code, processing_label)
+                employee_record.update_as_rejected(processing_code, processing_label)
             else:
                 self.logger.info(
                     "DRY-RUN: Rejected %s, code: %s, label: %s", employee_record, processing_code, processing_label

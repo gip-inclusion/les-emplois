@@ -1,0 +1,108 @@
+{% extends "layout/content.html" %}
+{% load static %}
+{% load format_filters %}
+{% load list_filters %}
+{% load bootstrap4 %}
+
+{% block title %}Fiches salarié ASP - {{ current_siae.display_name }}{{ block.super }}{% endblock %}
+
+{% block content %}
+
+<h1>Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
+
+<div class="ml-0 mt-3">
+    <form method="GET" class="form">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="card-deck">
+                    <div class="card">
+                        <div class="card-header">
+                            <b>Filtrer les fiches</b>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-muted"><b>Par statut</b></p>
+
+                            <div class="container">
+                            {% for status, badge in form.status|zip:badges %}
+                                <div class="row">
+                                    <div class="col-10 p-0">
+                                        {{ status }}
+                                    </div>
+                                    <div class="col-2 p-0 text-right ">
+                                        <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            </div>
+
+                        </div>
+                        <div class="card-footer pb-0 text-center">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary">Appliquer</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+
+    <div class="col-sm-9 p-0">
+        <div class="container rounded bg-light p-3 mb-3">
+            <div class="row">
+                <div class="col-sm-10">
+                    <h5>Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h5>
+                    <p class="mt-3">
+                    Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.
+                    </p>
+                </div>
+                <div class="col-sm-2 text-right">
+                    <img src="{% static 'img/employee_record/asp_upload.svg' %}" alt="Transfert ASP"></img>
+                </div>
+            </div>
+        </div>
+
+        {# Messages #}
+        <div class="alert alert-info mb-4">
+            {% if form.status.value == "NEW" %}
+                Vous trouverez ici les candidatures validées à partir desquelles vous devez créér de nouvelles fiches salarié.
+            {% elif form.status.value == "SENT" %}
+                <p>Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
+                <p>A ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de la fiche est possible.</p>
+            {% elif form.status.value == "REJECTED" %}
+                <p>Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une erreur.</p>
+                <p>Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
+            {% elif form.status.value == "PROCESSED" %}
+                <p>Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
+                <p>Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de la fiche salarié.</p>
+            {% endif%}
+        </div>
+
+        <div>
+            {# "Real" employee records objects #}
+            {% if employee_records_list %}
+                {% for employee_record in navigation_pages %}
+                    {% with item=employee_record.job_application %}
+                        {% include "employee_record/includes/list_item.html" %}
+                    {% endwith %}
+                {% endfor %}
+            {# New employee records i.e. job applications #}
+            {% else %}
+                {% for item in navigation_pages %}
+                    {% include "employee_record/includes/list_item.html" %}
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        {% if not navigation_pages %}
+            <div class="text-muted text-center">
+                {% include "includes/icon.html" with icon="slash" %}
+                <span>Aucune fiche salarié avec le status selectionné ...</span>
+            </div>
+        {% endif %}
+                
+        {% include "includes/pagination.html" with page=navigation_pages %}
+
+    </div>
+</div>
+
+{% endblock %}

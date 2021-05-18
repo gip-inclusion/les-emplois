@@ -1,0 +1,98 @@
+[
+{
+    "model": "users.jobseekerprofile",
+    "pk": 18,
+    "fields": {
+        "education_level": "10",
+        "resourceless": false,
+        "rqth_employee": false,
+        "oeth_employee": false,
+        "pole_emploi_since": "",
+        "unemployed_since": "",
+        "has_rsa_allocation": "OUI-NM",
+        "rsa_allocation_since": "",
+        "ass_allocation_since": "",
+        "aah_allocation_since": "",
+        "ata_allocation_since": "",
+        "hexa_lane_number": "5",
+        "hexa_std_extension": "",
+        "hexa_non_std_extension": null,
+        "hexa_lane_type": "RUE",
+        "hexa_lane_name": "Rue du Refuge",
+        "hexa_post_code": "34000",
+        "hexa_commune": 28290
+    }
+},
+{
+    "model": "users.jobseekerprofile",
+    "pk": 19,
+    "fields": {
+        "education_level": "51",
+        "resourceless": false,
+        "rqth_employee": false,
+        "oeth_employee": false,
+        "pole_emploi_since": "",
+        "unemployed_since": "",
+        "has_rsa_allocation": "OUI-NM",
+        "rsa_allocation_since": "",
+        "ass_allocation_since": "",
+        "aah_allocation_since": "",
+        "ata_allocation_since": "",
+        "hexa_lane_number": "5",
+        "hexa_std_extension": "",
+        "hexa_non_std_extension": null,
+        "hexa_lane_type": "RUE",
+        "hexa_lane_name": "Rue du Refuge",
+        "hexa_post_code": "34000",
+        "hexa_commune": 28290
+    }
+},
+{
+    "model": "users.jobseekerprofile",
+    "pk": 20,
+    "fields": {
+        "education_level": "40",
+        "resourceless": false,
+        "rqth_employee": false,
+        "oeth_employee": false,
+        "pole_emploi_since": "",
+        "unemployed_since": "",
+        "has_rsa_allocation": "OUI-NM",
+        "rsa_allocation_since": "",
+        "ass_allocation_since": "",
+        "aah_allocation_since": "",
+        "ata_allocation_since": "",
+        "hexa_lane_number": "5",
+        "hexa_std_extension": "",
+        "hexa_non_std_extension": null,
+        "hexa_lane_type": "RUE",
+        "hexa_lane_name": "Rue du Refuge",
+        "hexa_post_code": "34000",
+        "hexa_commune": 28290
+    }
+},
+{
+    "model": "users.jobseekerprofile",
+    "pk": 21,
+    "fields": {
+        "education_level": "01",
+        "resourceless": false,
+        "rqth_employee": false,
+        "oeth_employee": false,
+        "pole_emploi_since": "",
+        "unemployed_since": "",
+        "has_rsa_allocation": "OUI-M",
+        "rsa_allocation_since": "",
+        "ass_allocation_since": "",
+        "aah_allocation_since": "04",
+        "ata_allocation_since": "",
+        "hexa_lane_number": "5",
+        "hexa_std_extension": "",
+        "hexa_non_std_extension": null,
+        "hexa_lane_type": "RUE",
+        "hexa_lane_name": "Rue du Refuge",
+        "hexa_post_code": "34000",
+        "hexa_commune": 28290
+    }
+}
+]

@@ -1,0 +1,74 @@
+[
+{
+    "model": "employee_record.employeerecord",
+    "pk": 1,
+    "fields": {
+        "created_at": "2021-05-12T10:16:09.639Z",
+        "updated_at": "2021-05-12T10:27:43.343Z",
+        "status": "SENT",
+        "job_application": "5f844eff-2dbb-450e-8f8b-6ec99f216c31",
+        "financial_annex": null,
+        "approval_number": "XXXXX0000002",
+        "asp_id": 3430,
+        "asp_processing_code": null,
+        "asp_processing_label": null,
+        "asp_batch_file": "RIAE_FS_20210512102743.json",
+        "asp_batch_line_number": 4,
+        "archived_json": null
+    }
+},
+{
+    "model": "employee_record.employeerecord",
+    "pk": 2,
+    "fields": {
+        "created_at": "2021-05-12T10:16:55.551Z",
+        "updated_at": "2021-05-12T15:12:05.098Z",
+        "status": "PROCESSED",
+        "job_application": "61883223-4a9b-45d6-afa6-25ab6fccaaab",
+        "financial_annex": null,
+        "approval_number": "XXXXX0000003",
+        "asp_id": 3430,
+        "asp_processing_code": "0000",
+        "asp_processing_label": "OK",
+        "asp_batch_file": "RIAE_FS_20210512102743.json",
+        "asp_batch_line_number": 3,
+        "archived_json": "{\"numLigne\":1,\"typeMouvement\":\"C\",\"numeroAnnexe\":\"ACI023201111A0M0\",\"mesure\":\"EI_DC\",\"siret\":\"33055039301440\",\"personnePhysique\":{\"passIae\":\"XXXXX0000003\",\"idItou\":\"55a0c7f6e4c873dbea8de4b528fc41\",\"civilite\":\"M\",\"nomUsage\":\"Peck\",\"prenom\":\"Templeton \\\"Faceman\\\"\",\"dateNaissance\":\"01/01/1970\",\"codeInseePays\":\"404\",\"codeGroupePays\":\"3\",\"sufPassIae\":null,\"nomNaissance\":null},\"adresse\":{\"adrTelephone\":\"\",\"adrMail\":\"templeton.faceman.peck@a-team.fake.com\",\"adrNumeroVoie\":\"5\",\"codeextensionvoie\":\"\",\"codetypevoie\":\"RUE\",\"adrLibelleVoie\":\"Rue du Refuge\",\"adrCpltDistribution\":null,\"codeinseecom\":\"34172\",\"codepostalcedex\":\"34000\"},\"situationSalarie\":{\"niveauFormation\":\"40\",\"salarieEnEmploi\":true,\"salarieSansEmploiDepuis\":null,\"salarieSansRessource\":false,\"inscritPoleEmploi\":false,\"inscritPoleEmploiDepuis\":\"\",\"numeroIDE\":\"\",\"salarieRQTH\":false,\"salarieOETH\":false,\"salarieAideSociale\":true,\"salarieBenefRSA\":\"OUI-NM\",\"salarieBenefRSADepuis\":null,\"salarieBenefASS\":false,\"salarieBenefASSDepuis\":null,\"salarieBenefAAH\":false,\"salarieBenefAAHDepuis\":null,\"salarieBenefATA\":false,\"salarieBenefATADepuis\":null,\"salarieTypeEmployeur\":\"01\",\"orienteur\":\"99\"},\"codeTraitement\":\"0000\",\"libelleTraitement\":\"OK\"}"
+    }
+},
+{
+    "model": "employee_record.employeerecord",
+    "pk": 3,
+    "fields": {
+        "created_at": "2021-05-12T10:17:33.420Z",
+        "updated_at": "2021-05-12T10:27:43.333Z",
+        "status": "SENT",
+        "job_application": "6e09f9d5-aa9b-42db-89c3-63db5a9d323b",
+        "financial_annex": null,
+        "approval_number": "XXXXX0000004",
+        "asp_id": 3430,
+        "asp_processing_code": null,
+        "asp_processing_label": null,
+        "asp_batch_file": "RIAE_FS_20210512102743.json",
+        "asp_batch_line_number": 2,
+        "archived_json": null
+    }
+},
+{
+    "model": "employee_record.employeerecord",
+    "pk": 4,
+    "fields": {
+        "created_at": "2021-05-12T10:17:57.000Z",
+        "updated_at": "2021-05-12T14:45:55.281Z",
+        "status": "REJECTED",
+        "job_application": "bca602f3-9249-46cf-b949-4d5a9324a5a5",
+        "financial_annex": null,
+        "approval_number": "XXXXX0000005",
+        "asp_id": 3430,
+        "asp_processing_code": null,
+        "asp_processing_label": null,
+        "asp_batch_file": "RIAE_FS_20210512102743.json",
+        "asp_batch_line_number": 1,
+        "archived_json": null
+    }
+}
+]

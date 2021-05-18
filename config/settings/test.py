@@ -2,7 +2,6 @@ import logging
 
 from .base import *
 
-
 # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
