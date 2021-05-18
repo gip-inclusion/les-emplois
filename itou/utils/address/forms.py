@@ -43,6 +43,12 @@ class AddressFormMixin(forms.Form):
         label="Code postal",
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Needed for proper auto-completion when existing in DB
+        # Reverted back on clean
+        self.initial["city_name"] = self.initial.get("city")
+
     def clean(self):
         cleaned_data = super().clean()
 
@@ -70,9 +76,3 @@ class AddressFormMixin(forms.Form):
 
         if not valid:
             raise ValidationError("Adresse incomplète")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion when existing in DB
-        # Reverted back on clean
-        self.initial["city_name"] = self.initial.get("city")
