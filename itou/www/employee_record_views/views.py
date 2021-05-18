@@ -1,13 +1,15 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.www.employee_record_views.forms import SelectEmployeeRecordStatusForm
+from itou.www.employee_record_views.forms import NewEmployeeRecordStep1, SelectEmployeeRecordStatusForm
 
 
 @login_required
@@ -95,9 +97,15 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         raise PermissionDenied
 
     job_application = JobApplication.objects.get(pk=job_application_id)
+    form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return HttpResponseRedirect(reverse("employee_record_views:create", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
+        "form": form,
     }
 
     return render(request, template_name, context)
