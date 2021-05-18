@@ -54,27 +54,28 @@ class AddressFormMixin(forms.Form):
     def clean(self):
         cleaned_data = super().clean()
 
-        # Autocomplete
-        city = cleaned_data["city"]
-        city_name = cleaned_data["city_name"]
+        city_slug = cleaned_data["city"]
 
-        if city != city_name:
-            # Auto-completion field was used
+        if city_slug:
             try:
-                cleaned_data["city"] = City.objects.get(slug=city).name
+                cleaned_data["city"] = City.objects.get(slug=city_slug).name
             except City.DoesNotExist:
-                raise forms.ValidationError("Cette ville n'existe pas.")
-        else:
-            cleaned_data["city"] = city_name
+                raise forms.ValidationError({"city_name": "Cette ville n'existe pas."})
 
-        # Basic check of address fields
-        addr1, addr2, post_code, city = (
+        # Basic check of address fields.
+        addr1, addr2, post_code, city_slug = (
             cleaned_data["address_line_1"],
             cleaned_data["address_line_2"],
             cleaned_data["post_code"],
             cleaned_data["city"],
         )
-        valid = all([addr1, post_code, city]) or not any([addr1, addr2, post_code, city])
 
-        if not valid:
-            raise ValidationError("Adresse incomplète")
+        valid_address = all([addr1, post_code, city_slug])
+        empty_address = not any([addr1, addr2, post_code, city_slug])
+        if not empty_address and not valid_address:
+            if not addr1:
+                self.add_error("addr1", "Adresse : ce champ est obligatoire.")
+            if not post_code:
+                self.add_error("post_code", "Code postal : ce champ est obligatoire.")
+            if not city_slug:
+                self.add_error("city_name", "Ville : ce champ est obligatoire.")
