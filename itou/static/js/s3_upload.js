@@ -114,10 +114,12 @@ window.s3UploadInit = function s3UploadInit({
     if (xhr != null) {
       // An error occurred with the request.
       // Send it to Sentry to avoid silent bugs.
-      const errorMessage = `Upload failed for Dropzone selector ${dropzoneSelector} to S3 bucket ${form_url}`;
+      const sentryErrorMessage =
+        `Unable to upload "${file.upload.filename}" ` +
+        `(${file.upload.progress} of ${file.upload.total}) to S3 ${form_url}: ${errorMessage}`;
       $.post(sentryInternalUrl, {
         status_code: 500,
-        error_message: errorMessage,
+        error_message: sentryErrorMessage,
         csrfmiddlewaretoken: sentryCsrfToken,
       });
     }
