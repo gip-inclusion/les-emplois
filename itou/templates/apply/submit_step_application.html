@@ -48,7 +48,7 @@
     {{ s3_upload_config|json_script:"s3-upload-config" }}
     <script>
         s3UploadInit({
-            dropZoneSelector: "#resume_form",
+            dropzoneSelector: "#resume_form",
             callbackLocationSelector: "#{{ form.resume_link.id_for_label }}",
             s3FormValuesId: "s3-form-values",
             s3UploadConfigId: "s3-upload-config",
