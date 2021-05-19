@@ -1,5 +1,4 @@
 import django.forms as forms
-from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 
 from itou.cities.models import City
@@ -10,6 +9,8 @@ class AddressFormMixin(forms.Form):
 
     ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
+    # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
+    # see `city_autocomplete_field.js`.
     city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
 
     city_name = forms.CharField(
@@ -19,6 +20,7 @@ class AddressFormMixin(forms.Form):
             attrs={
                 "class": "js-city-autocomplete-input form-control",
                 "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
+                "data-autosubmit-on-enter-pressed": 0,
                 "placeholder": "Nom de la ville",
                 "autocomplete": "off",
             }
@@ -43,36 +45,41 @@ class AddressFormMixin(forms.Form):
         label="Code postal",
     )
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Needed for proper auto-completion when existing in DB.
+        if self.instance and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
+            self.initial["city_name"] = self.instance.city
+            # Populate the hidden `city` field.
+            city = City.objects.filter(name=self.instance.city, department=self.instance.department).first()
+            if city:
+                self.initial["city"] = city.slug
+
     def clean(self):
         cleaned_data = super().clean()
 
-        # Autocomplete
-        city = cleaned_data["city"]
-        city_name = cleaned_data["city_name"]
+        city_slug = cleaned_data["city"]
 
-        if city != city_name:
-            # Auto-completion field was used
+        if city_slug:
             try:
-                cleaned_data["city"] = City.objects.get(slug=city).name
+                cleaned_data["city"] = City.objects.get(slug=city_slug).name
             except City.DoesNotExist:
-                raise forms.ValidationError("Cette ville n'existe pas.")
-        else:
-            cleaned_data["city"] = city_name
+                raise forms.ValidationError({"city_name": "Cette ville n'existe pas."})
 
-        # Basic check of address fields
-        addr1, addr2, post_code, city = (
+        # Basic check of address fields.
+        addr1, addr2, post_code, city_slug = (
             cleaned_data["address_line_1"],
             cleaned_data["address_line_2"],
             cleaned_data["post_code"],
             cleaned_data["city"],
         )
-        valid = all([addr1, post_code, city]) or not any([addr1, addr2, post_code, city])
 
-        if not valid:
-            raise ValidationError("Adresse incomplète")
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion when existing in DB
-        # Reverted back on clean
-        self.initial["city_name"] = self.initial.get("city")
+        valid_address = all([addr1, post_code, city_slug])
+        empty_address = not any([addr1, addr2, post_code, city_slug])
+        if not empty_address and not valid_address:
+            if not addr1:
+                self.add_error("addr1", "Adresse : ce champ est obligatoire.")
+            if not post_code:
+                self.add_error("post_code", "Code postal : ce champ est obligatoire.")
+            if not city_slug:
+                self.add_error("city_name", "Ville : ce champ est obligatoire.")
