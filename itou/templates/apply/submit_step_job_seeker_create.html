@@ -25,9 +25,11 @@
         {% bootstrap_field form.address_line_2 %}
 
         <div class="form-group row">
-            {% bootstrap_field form.post_code form_group_class="col-md-3 col-sm-12 form-group"%}
-            {% bootstrap_field form.city_slug form_group_class="col form-group"%}
-            {% bootstrap_field form.city %}
+            {# Use Bootstrap's grid system of 12 columns to put `post_code` and `city` on the same line. #}
+            {% bootstrap_field form.post_code form_group_class="form-group col-md-5"%}
+            {% bootstrap_field form.city form_group_class="form-group col-md-7"%}
+            {# Add the hidden field `city_slug`. #}
+            {% bootstrap_field form.city_slug %}
         </div>
 
         {% bootstrap_field form.pole_emploi_id %}
