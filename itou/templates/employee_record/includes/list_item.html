@@ -34,7 +34,7 @@
         {# Actions. #}
         {% if form.status.value == "NEW" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
             </div>
         {% elif form.status.value == "SENT" %}
             <div>
