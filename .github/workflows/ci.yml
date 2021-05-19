@@ -20,9 +20,9 @@ jobs:
       PGUSER: postgres
       ITOU_POSTGRES_USER: postgres
       ITOU_POSTGRES_PASSWORD: password
-      S3_STORAGE_ACCESS_KEY_ID: TheMeaningOfLife
-      S3_STORAGE_SECRET_ACCESS_KEY: "42"
-      S3_STORAGE_ENDPOINT_DOMAIN: domain.com
+      CELLAR_ADDON_KEY_ID: TheMeaningOfLife
+      CELLAR_ADDON_KEY_SECRET: "42"
+      CELLAR_ADDON_HOST: domain.com
     services:
       postgres:
         # Docker Hub image
