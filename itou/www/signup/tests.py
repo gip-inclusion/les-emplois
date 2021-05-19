@@ -187,8 +187,8 @@ class JobSeekerSignupTest(TestCase):
             "address_line_1": address_line_1,
             "address_line_2": address_line_2,
             "post_code": post_code,
-            "city_name": city.name,
-            "city": city.slug,
+            "city": city.name,
+            "city_slug": city.slug,
             "resume_link": resume_link,
         }
 

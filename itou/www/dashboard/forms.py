@@ -57,7 +57,7 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "address_line_2",
             "post_code",
             "city",
-            "city_name",
+            "city_slug",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
         ] + ResumeFormMixin.Meta.fields

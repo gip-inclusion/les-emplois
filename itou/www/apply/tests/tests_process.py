@@ -173,8 +173,8 @@ class ProcessViewsTest(TestCase):
         address = {
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
-            "city_name": city.name,
-            "city": city.slug,
+            "city": city.name,
+            "city_slug": city.slug,
         }
 
         for state in [JobApplicationWorkflow.STATE_PROCESSING, JobApplicationWorkflow.STATE_OBSOLETE]:
@@ -298,8 +298,8 @@ class ProcessViewsTest(TestCase):
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
-            "city_name": city.name,
-            "city": city.slug,
+            "city": city.name,
+            "city_slug": city.slug,
             # Data for `AcceptForm`.
             "hiring_start_at": datetime.date.today().strftime("%d/%m/%Y"),
             "hiring_end_at": (datetime.date.today() + datetime.timedelta(days=360)).strftime("%d/%m/%Y"),
@@ -335,8 +335,8 @@ class ProcessViewsTest(TestCase):
             "answer": "",
             "address_line_1": job_application.job_seeker.address_line_1,
             "post_code": job_application.job_seeker.post_code,
-            "city_name": "Metz",
-            "city": "metz",
+            "city": "Metz",
+            "city_slug": "metz",
         }
         response = self.client.post(url, data=post_data)
         self.assertFormError(
@@ -350,8 +350,8 @@ class ProcessViewsTest(TestCase):
         base_for_post_data = {
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
-            "city_name": city.name,
-            "city": city.slug,
+            "city": city.name,
+            "city_slug": city.slug,
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "answer": "",
         }

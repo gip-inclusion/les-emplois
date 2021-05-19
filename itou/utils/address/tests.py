@@ -118,8 +118,8 @@ class DummyUserModelForm(AddressFormMixin, forms.ModelForm):
             "address_line_1",
             "address_line_2",
             "post_code",
-            "city_name",
             "city",
+            "department",
         ]
 
 
@@ -136,8 +136,8 @@ class UtilsAddressFormMixinTest(TestCase):
         form = AddressFormMixin(data=form_data)
         self.assertTrue(form.is_valid())
         expected_cleaned_data = {
+            "city_slug": "",
             "city": "",
-            "city_name": "",
             "address_line_1": "",
             "address_line_2": "",
             "post_code": "",
@@ -149,8 +149,8 @@ class UtilsAddressFormMixinTest(TestCase):
         `address_line_1` is missing but `address_line_2` exists.
         """
         form_data = {
+            "city_slug": "",
             "city": "",
-            "city_name": "",
             "address_line_1": "",
             "address_line_2": "11 rue des pixels cassés",
             "post_code": "",
@@ -159,7 +159,7 @@ class UtilsAddressFormMixinTest(TestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors["address_line_1"][0], "Adresse : ce champ est obligatoire.")
         self.assertEqual(form.errors["post_code"][0], "Code postal : ce champ est obligatoire.")
-        self.assertEqual(form.errors["city_name"][0], "Ville : ce champ est obligatoire.")
+        self.assertEqual(form.errors["city"][0], "Ville : ce champ est obligatoire.")
 
     def test_fecth_city(self):
         """
@@ -170,8 +170,8 @@ class UtilsAddressFormMixinTest(TestCase):
         city = City.objects.first()
 
         form_data = {
-            "city": city.slug,
-            "city_name": "",
+            "city_slug": city.slug,
+            "city": "",
             "address_line_1": "11 rue des pixels cassés",
             "address_line_2": "",
             "post_code": "67000",
@@ -182,8 +182,8 @@ class UtilsAddressFormMixinTest(TestCase):
         with self.assertNumQueries(1):
             self.assertTrue(form.is_valid())
             expected_cleaned_data = {
-                "city": city.name,  # should have been replaced in `AddressFormMixin.clean()`.
-                "city_name": "",
+                "city_slug": city.slug,
+                "city": city.name,
                 "address_line_1": form_data["address_line_1"],
                 "address_line_2": form_data["address_line_2"],
                 "post_code": form_data["post_code"],
@@ -192,7 +192,7 @@ class UtilsAddressFormMixinTest(TestCase):
 
     def test_with_instance(self):
         """
-        If an instance is passed, `city` and `city_name` should be prepopulated.
+        If an instance is passed, `city` and `city_slug` should be prepopulated.
         """
 
         create_test_cities(["57"], num_per_department=1)
@@ -209,5 +209,5 @@ class UtilsAddressFormMixinTest(TestCase):
 
             form = DummyUserModelForm(data={}, instance=user)
 
-            self.assertEqual(form.initial["city"], city.slug)
-            self.assertEqual(form.initial["city_name"], city.name)
+            self.assertEqual(form.initial["city_slug"], city.slug)
+            self.assertEqual(form.initial["city"], city.name)

@@ -607,8 +607,8 @@ class ApplyAsPrescriberTest(TestCase):
             "address_line_1": "55, avenue de la Rose",
             "address_line_2": "7e étage",
             "post_code": "67200",
-            "city_name": "Sommerau (67)",
-            "city": "sommerau-67",
+            "city": "Sommerau (67)",
+            "city_slug": "sommerau-67",
         }
 
         response = self.client.post(next_url, data=post_data)
