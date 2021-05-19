@@ -53,3 +53,20 @@ def jobs_autocomplete(request):
         ]
 
     return HttpResponse(json.dumps(appellations), "application/json")
+
+
+def insee_communes_autocomplete(request):
+    """
+    Autocomplete endpoint for INSEE communes (ASP ref. files)
+
+    Returns JSON data compliant with the jQuery UI Autocomplete Widget:
+    https://api.jqueryui.com/autocomplete/#option-source
+    """
+
+    term = request.GET.get("term", "").strip()
+    communes = []
+
+    if term:
+        pass
+
+    return HttpResponse(json.dumps(communes), "application/json")
