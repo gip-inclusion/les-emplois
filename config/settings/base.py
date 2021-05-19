@@ -545,9 +545,9 @@ ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
 
 # S3 uploads
 # ------------------------------------------------------------------------------
-S3_STORAGE_ACCESS_KEY_ID = os.environ.get("S3_STORAGE_ACCESS_KEY_ID", "")
-S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("S3_STORAGE_SECRET_ACCESS_KEY", "")
-S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("S3_STORAGE_ENDPOINT_DOMAIN", "")
+S3_STORAGE_ACCESS_KEY_ID = os.environ.get("CELLAR_ADDON_KEY_ID", "")
+S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("CELLAR_ADDON_KEY_SECRET", "")
+S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("CELLAR_ADDON_HOST", "")
 S3_STORAGE_BUCKET_NAME = os.environ.get("S3_STORAGE_BUCKET_NAME", "")
 S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
 

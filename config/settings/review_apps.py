@@ -27,9 +27,3 @@ EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 sentry_init(dsn=os.environ["SENTRY_DSN_STAGING"])
 
 SHOW_TEST_ACCOUNTS_BANNER = True
-
-# S3 uploads
-# ------------------------------------------------------------------------------
-S3_STORAGE_ACCESS_KEY_ID = os.environ.get("CELLAR_ADDON_KEY_ID", "")
-S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("CELLAR_ADDON_KEY_SECRET", "")
-S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("CELLAR_ADDON_HOST", "")
