@@ -16,33 +16,33 @@ window.s3UploadInit = function s3UploadInit({
   sentryInternalUrl = "",
   sentryCsrfToken = "",
 } = {}) {
-  const form_values = JSON.parse(
+  const formValues = JSON.parse(
     document.getElementById(s3FormValuesId).textContent
   );
-  const upload_config = JSON.parse(
+  const uploadConfig = JSON.parse(
     document.getElementById(s3UploadConfigId).textContent
   );
 
   // When a file is added to the drop zone, send a POST request to this URL.
-  const form_url = form_values["url"];
+  const formUrl = formValues["url"];
 
   // Submit button to be disabled during file processing
-  const submit_button = $("button[type='submit']");
+  const submitButton = $("button[type='submit']");
 
   // S3 form params sent when a new file is added to the drop zone.
-  const form_params = form_values["fields"];
+  const formParams = formValues["fields"];
 
   // Appended before the file name. The final slash is added later.
-  const key_path = upload_config["key_path"];
+  const keyPath = uploadConfig["key_path"];
 
   // Dropzone configuration
-  const dropzone_config = {
-    url: form_url,
-    params: form_params,
-    maxFilesize: upload_config["max_file_size"], // in MB
-    timeout: upload_config["timeout"], // default 3000, in ms
-    maxFiles: upload_config["max_files"],
-    acceptedFiles: upload_config["allowed_mime_types"],
+  const dropzoneConfig = {
+    url: formUrl,
+    params: formParams,
+    maxFilesize: uploadConfig["max_file_size"], // in MB
+    timeout: uploadConfig["timeout"], // default 3000, in ms
+    maxFiles: uploadConfig["max_files"],
+    acceptedFiles: uploadConfig["allowed_mime_types"],
     addRemoveLinks: true,
     // translations
     dictFallbackMessage: "Ce navigateur n'est pas compatible",
@@ -59,11 +59,11 @@ window.s3UploadInit = function s3UploadInit({
     renameFile: function (file) {
       const extension = file.name.split(".").pop();
       const filename = Dropzone.uuidv4();
-      const file_key = `${key_path}/${filename}.${extension}`;
+      const fileKey = `${keyPath}/${filename}.${extension}`;
       // Add a file key to options params so that it's send
       // as an input field on POST.
-      this.params["key"] = file_key;
-      return file_key;
+      this.params["key"] = fileKey;
+      return fileKey;
     },
   };
 
@@ -71,26 +71,26 @@ window.s3UploadInit = function s3UploadInit({
   // Turn off this behavior to control all the aspects "manually".
   Dropzone.autoDiscover = false;
 
-  const dropzone = new Dropzone(dropzoneSelector, dropzone_config);
+  const dropzone = new Dropzone(dropzoneSelector, dropzoneConfig);
 
   // Display a help message when the user tries to
   // submit the form during file transfer.
-  submit_button.tooltip({ title: "Veuillez attendre la fin du transfert" });
+  submitButton.tooltip({ title: "Veuillez attendre la fin du transfert" });
   // Enable it later, during file transfer.
-  submit_button.tooltip("disable");
+  submitButton.tooltip("disable");
 
   // Events
   dropzone.on("addedfile", function (file) {
-    submit_button.tooltip("enable");
-    submit_button.prop("disabled", true);
-    submit_button.addClass("btn-secondary");
+    submitButton.tooltip("enable");
+    submitButton.prop("disabled", true);
+    submitButton.addClass("btn-secondary");
   });
 
   // Called when the upload was either successful or erroneous.
   dropzone.on("complete", function (file) {
-    submit_button.tooltip("disable");
-    submit_button.prop("disabled", false);
-    submit_button.removeClass("btn-secondary");
+    submitButton.tooltip("disable");
+    submitButton.prop("disabled", false);
+    submitButton.removeClass("btn-secondary");
   });
 
   dropzone.on("removedfile", function (file) {
@@ -98,7 +98,7 @@ window.s3UploadInit = function s3UploadInit({
   });
 
   dropzone.on("success", function (file, xhr, formData) {
-    const location = `${form_url}/${file.upload.filename}`;
+    const location = `${formUrl}/${file.upload.filename}`;
     // Prevent a selector mistake from being silent.
     if ($(callbackLocationSelector).length == 0) {
       this._handleUploadError(
@@ -116,7 +116,7 @@ window.s3UploadInit = function s3UploadInit({
       // Send it to Sentry to avoid silent bugs.
       const sentryErrorMessage =
         `Unable to upload "${file.upload.filename}" ` +
-        `(${file.upload.progress} of ${file.upload.total}) to S3 ${form_url}: ${errorMessage}`;
+        `(${file.upload.progress} of ${file.upload.total}) to S3 ${formUrl}: ${errorMessage}`;
       $.post(sentryInternalUrl, {
         status_code: 500,
         error_message: sentryErrorMessage,
