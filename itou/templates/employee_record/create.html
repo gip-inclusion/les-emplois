@@ -40,7 +40,14 @@
     
     <form method="post" action="" class="js-prevent-multiple-submit">
         {% csrf_token %}
-        {% bootstrap_form form %}
+        
+        {% bootstrap_field form.title %}
+        {% bootstrap_field form.first_name %}
+        {% bootstrap_field form.last_name %}
+        {% bootstrap_field form.birthdate %}
+        {% bootstrap_field form.insee_commune %}
+        {% bootstrap_field form.insee_commune_code %}
+
         {% buttons %}
             <a class="btn btn btn-outline-secondary" href="#">
                 Annuler

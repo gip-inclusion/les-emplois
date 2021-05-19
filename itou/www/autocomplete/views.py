@@ -75,7 +75,11 @@ def communes_autocomplete(request):
             .order_by("-similarity")
         )
         communes = [
-            {"value": commune.name, "code": commune.code, "department": commune.department_code}
+            {
+                "value": f"{commune.name} ({commune.department_code})",
+                "code": commune.code,
+                "department": commune.department_code,
+            }
             for commune in communes[:12]
         ]
 

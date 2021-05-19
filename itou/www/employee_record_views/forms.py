@@ -1,6 +1,7 @@
 from django import forms
 from django.urls import reverse_lazy
 
+from itou.asp.models import Commune
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import User
 from itou.utils.widgets import DatePickerField
@@ -31,7 +32,30 @@ class NewEmployeeRecordStep1(forms.ModelForm):
     COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
 
     READ_ONLY_FIELDS = []
-    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate", "birth_place"]
+    # REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate", "birth_place"]
+    REQUIRED_FIELDS = [
+        "title",
+        "first_name",
+        "last_name",
+        "birthdate",
+    ]
+
+    insee_commune = forms.CharField(
+        label="Commune",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "js-commune-autocomplete-input form-control",
+                "data-autocomplete-source-url": COMMUNE_AUTOCOMPLETE_SOURCE_URL,
+                "data-autosubmit-on-enter-pressed": 0,
+                "placeholder": "Nom de la commune",
+                "autocomplete": "off",
+            }
+        ),
+    )
+    insee_commune_code = forms.CharField(
+        required=False, widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"})
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -50,16 +74,19 @@ class NewEmployeeRecordStep1(forms.ModelForm):
         )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
-        # Autocomplete for communes
-        self.fields["birth_place"].widget = forms.TextInput(
-            attrs={
-                "class": "js-city-autocomplete-input form-control",
-                "data-autocomplete-source-url": self.COMMUNE_AUTOCOMPLETE_SOURCE_URL,
-                "data-autosubmit-on-enter-pressed": 0,
-                "placeholder": "Nom de la ville",
-                "autocomplete": "off",
-            }
-        )
+        if hasattr(self, "instance"):
+            if self.instance.birth_place:
+                self.initial[
+                    "insee_commune"
+                ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
+
+    def clean(self):
+        super().clean()
+
+        commune_code = self.cleaned_data["insee_commune_code"]
+
+        if commune_code:
+            self.cleaned_data["birth_place"] = Commune.objects.by_insee_code(commune_code)
 
     class Meta:
         model = User
@@ -68,6 +95,8 @@ class NewEmployeeRecordStep1(forms.ModelForm):
             "first_name",
             "last_name",
             "birthdate",
+            "insee_commune",
+            "insee_commune_code",
             "birth_place",
-            "birth_country",
+            # "birth_country",
         ]
