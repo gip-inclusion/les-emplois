@@ -2,6 +2,7 @@ from django import forms
 
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import User
+from itou.utils.widgets import DatePickerField
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
@@ -39,6 +40,17 @@ class NewEmployeeRecordStep1(forms.ModelForm):
 
         for field_name in self.REQUIRED_FIELDS:
             self.fields[field_name].required = True
+
+        self.fields["birthdate"].widget = DatePickerField(
+            {
+                "viewMode": "years",
+                "minDate": DatePickerField.min_birthdate().strftime("%Y/%m/%d"),
+                "maxDate": DatePickerField.max_birthdate().strftime("%Y/%m/%d"),
+                "useCurrent": False,
+                "allowInputToggle": False,
+            }
+        )
+        self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
     class Meta:
         model = User
