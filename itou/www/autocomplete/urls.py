@@ -9,4 +9,5 @@ app_name = "autocomplete"
 urlpatterns = [
     path("cities", views.cities_autocomplete, name="cities"),
     path("jobs", views.jobs_autocomplete, name="jobs"),
+    path("communes", views.communes_autocomplete, name="communes"),
 ]
