@@ -78,7 +78,7 @@ class AddressFormMixin(forms.Form):
         empty_address = not any([addr1, addr2, post_code, city_slug])
         if not empty_address and not valid_address:
             if not addr1:
-                self.add_error("addr1", "Adresse : ce champ est obligatoire.")
+                self.add_error("address_line_1", "Adresse : ce champ est obligatoire.")
             if not post_code:
                 self.add_error("post_code", "Code postal : ce champ est obligatoire.")
             if not city_slug:
