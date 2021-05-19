@@ -1,4 +1,5 @@
 from django import forms
+from django.urls import reverse_lazy
 
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import User
@@ -27,13 +28,10 @@ class SelectEmployeeRecordStatusForm(forms.Form):
 
 class NewEmployeeRecordStep1(forms.ModelForm):
 
+    COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
+
     READ_ONLY_FIELDS = []
-    REQUIRED_FIELDS = [
-        "title",
-        "first_name",
-        "last_name",
-        "birthdate",
-    ]
+    REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate", "birth_place"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -52,6 +50,17 @@ class NewEmployeeRecordStep1(forms.ModelForm):
         )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
+        # Autocomplete for communes
+        self.fields["birth_place"].widget = forms.TextInput(
+            attrs={
+                "class": "js-city-autocomplete-input form-control",
+                "data-autocomplete-source-url": self.COMMUNE_AUTOCOMPLETE_SOURCE_URL,
+                "data-autosubmit-on-enter-pressed": 0,
+                "placeholder": "Nom de la ville",
+                "autocomplete": "off",
+            }
+        )
+
     class Meta:
         model = User
         fields = [
@@ -59,6 +68,6 @@ class NewEmployeeRecordStep1(forms.ModelForm):
             "first_name",
             "last_name",
             "birthdate",
-            # "birth_place",
+            "birth_place",
             "birth_country",
         ]

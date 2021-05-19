@@ -4,6 +4,7 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.http import HttpResponse
 from django.template.defaultfilters import slugify
 
+from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.utils.swear_words import get_city_swear_words_slugs
@@ -55,7 +56,7 @@ def jobs_autocomplete(request):
     return HttpResponse(json.dumps(appellations), "application/json")
 
 
-def insee_communes_autocomplete(request):
+def communes_autocomplete(request):
     """
     Autocomplete endpoint for INSEE communes (ASP ref. files)
 
@@ -67,6 +68,15 @@ def insee_communes_autocomplete(request):
     communes = []
 
     if term:
-        pass
+        communes = (
+            Commune.objects.filter(end_date=None)
+            .annotate(similarity=TrigramSimilarity("name", term))
+            .filter(similarity__gt=0.1)
+            .order_by("-similarity")
+        )
+        communes = [
+            {"value": commune.name, "code": commune.code, "department": commune.department_code}
+            for commune in communes[:12]
+        ]
 
     return HttpResponse(json.dumps(communes), "application/json")
