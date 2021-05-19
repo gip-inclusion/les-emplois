@@ -14,7 +14,14 @@ from django.utils import timezone
 
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, ProlongationFactory, SuspensionFactory
-from itou.approvals.models import Approval, ApprovalsWrapper, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.models import (
+    Approval,
+    ApprovalsWrapper,
+    CommonApprovalMixin,
+    PoleEmploiApproval,
+    Prolongation,
+    Suspension,
+)
 from itou.approvals.notifications import NewProlongationToAuthorizedPrescriberNotification
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -174,7 +181,7 @@ class CommonApprovalMixinTest(TestCase):
         approval = ApprovalFactory(user=user)
         self.assertTrue(approval.is_pass_iae)
 
-    def overlaps_covid_lockdown(self):
+    def test_overlaps_covid_lockdown(self):
 
         # Overlaps: start before lockdown.
         start_at = Approval.LOCKDOWN_START_AT - relativedelta(years=1)
@@ -205,6 +212,12 @@ class CommonApprovalMixinTest(TestCase):
         end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
         approval = ApprovalFactory(number="625741810185", start_at=start_at, end_at=end_at)
         self.assertFalse(approval.overlaps_covid_lockdown)
+
+    def test_get_extended_covid_end_at(self):
+        end_at = datetime.date(2021, 5, 18)
+        covid_end_at = CommonApprovalMixin.get_extended_covid_end_at(end_at)
+        expected_end_at = datetime.date(2021, 8, 18)
+        self.assertEqual(covid_end_at, expected_end_at)
 
 
 class ApprovalModelTest(TestCase):
