@@ -100,7 +100,7 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "address_line_1",
             "address_line_2",
             "post_code",
-            "city_name",
+            "city_slug",
             "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
@@ -121,9 +121,9 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
     def save(self, commit=True):
-        # Exclude 'city_name' form field (not mapped to model)
+        # Exclude 'city_slug' form field (not mapped to model)
         partial_fields = self.cleaned_data
-        del partial_fields["city_name"]
+        del partial_fields["city_slug"]
 
         if commit:
             return self._meta.model.create_job_seeker_by_proxy(self.proxy_user, **partial_fields)
@@ -359,12 +359,12 @@ class UserAddressForm(AddressFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field in ["address_line_1", "post_code", "city_name"]:
+        for field in ["address_line_1", "post_code", "city"]:
             self.fields[field].required = True
 
     class Meta:
         model = User
-        fields = ["address_line_1", "address_line_2", "post_code", "city_name", "city"]
+        fields = ["address_line_1", "address_line_2", "post_code", "city_slug", "city"]
 
 
 class FilterJobApplicationsForm(forms.Form):

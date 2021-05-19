@@ -9,11 +9,13 @@ class AddressFormMixin(forms.Form):
 
     ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
-    # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
-    # see `city_autocomplete_field.js`.
-    city = forms.CharField(required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
+    # The hidden `city_slug` field is populated by the autocomplete JavaScript
+    # mechanism, see `city_autocomplete_field.js`.
+    city_slug = forms.CharField(
+        required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"})
+    )
 
-    city_name = forms.CharField(
+    city = forms.CharField(
         label="Ville",
         required=False,
         widget=forms.TextInput(
@@ -47,39 +49,41 @@ class AddressFormMixin(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion when existing in DB.
-        if self.instance and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
-            self.initial["city_name"] = self.instance.city
+        # Needed for proper auto-completion when `AddressFormMixin` is used with
+        # a ModelForm which has an instance existing in DB.
+        if hasattr(self, "instance") and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
+            self.initial["city"] = self.instance.city
             # Populate the hidden `city` field.
             city = City.objects.filter(name=self.instance.city, department=self.instance.department).first()
             if city:
-                self.initial["city"] = city.slug
+                self.initial["city_slug"] = city.slug
 
     def clean(self):
         cleaned_data = super().clean()
 
-        city_slug = cleaned_data["city"]
+        city_slug = cleaned_data["city_slug"]
 
         if city_slug:
             try:
+                # Override the `city` field with the real city name.
                 cleaned_data["city"] = City.objects.get(slug=city_slug).name
             except City.DoesNotExist:
-                raise forms.ValidationError({"city_name": "Cette ville n'existe pas."})
+                raise forms.ValidationError({"city": "Cette ville n'existe pas."})
 
         # Basic check of address fields.
-        addr1, addr2, post_code, city_slug = (
+        addr1, addr2, post_code, city = (
             cleaned_data["address_line_1"],
             cleaned_data["address_line_2"],
             cleaned_data["post_code"],
             cleaned_data["city"],
         )
 
-        valid_address = all([addr1, post_code, city_slug])
-        empty_address = not any([addr1, addr2, post_code, city_slug])
+        valid_address = all([addr1, post_code, city])
+        empty_address = not any([addr1, addr2, post_code, city])
         if not empty_address and not valid_address:
             if not addr1:
-                self.add_error("addr1", "Adresse : ce champ est obligatoire.")
+                self.add_error("address_line_1", "Adresse : ce champ est obligatoire.")
             if not post_code:
                 self.add_error("post_code", "Code postal : ce champ est obligatoire.")
             if not city_slug:
-                self.add_error("city_name", "Ville : ce champ est obligatoire.")
+                self.add_error("city", "Ville : ce champ est obligatoire.")
