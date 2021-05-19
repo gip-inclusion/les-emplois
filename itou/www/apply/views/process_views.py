@@ -1,11 +1,13 @@
+import datetime
+
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_http_methods
@@ -13,8 +15,9 @@ from django_xworkflows import models as xwf_models
 
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.perms.user import get_user_info
-from itou.utils.urls import get_external_link_markup
+from itou.utils.urls import get_external_link_markup, get_safe_url
 from itou.www.apply.forms import AcceptForm, AnswerForm, JobSeekerPoleEmploiStatusForm, RefusalForm, UserAddressForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm, ConfirmEligibilityForm
 
@@ -33,7 +36,7 @@ def check_waiting_period(approvals_wrapper, job_application):
 
 
 @login_required
-def details_for_siae(request, job_application_id, template_name="apply/process_details.html"):
+def details_for_siae(request, job_application_id, template_name="apply/process_details_siae.html"):
     """
     Detail of an application for an SIAE with the ability:
     - to update start date of a contract (provided given date is in the future),
@@ -60,6 +63,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     approval_can_be_prolonged_by_siae = job_application.approval and job_application.approval.can_be_prolonged_by_siae(
         job_application.to_siae
     )
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
@@ -69,6 +73,46 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
         "eligibility_diagnosis": eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
+        "back_url": back_url,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+@user_passes_test(lambda u: u.is_prescriber, login_url="/", redirect_field_name=None)
+def details_for_prescriber(request, job_application_id, template_name="apply/process_details_prescriber.html"):
+    """
+    Detail of an application for an SIAE with the ability:
+    - to update start date of a contract (provided given date is in the future),
+    - to give an answer.
+    """
+    job_applications = get_all_available_job_applications_as_prescriber(request)
+
+    queryset = job_applications.select_related(
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval"
+    ).prefetch_related("selected_jobs__appellation")
+    job_application = get_object_or_404(queryset, id=job_application_id)
+
+    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+
+    # We are looking for the most plausible availability date for eligibility criterions
+    before_date = job_application.hiring_end_at
+
+    if before_date is None and job_application.approval and job_application.approval.end_at is not None:
+        before_date = job_application.approval.end_at
+    else:
+        before_date = datetime.datetime.now()
+
+    eligibility_diagnosis = EligibilityDiagnosis.objects.last_before(job_application.job_seeker, before_date)
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
+
+    context = {
+        "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
+        "eligibility_diagnosis": eligibility_diagnosis,
+        "job_application": job_application,
+        "transition_logs": transition_logs,
+        "back_url": back_url,
     }
     return render(request, template_name, context)
 

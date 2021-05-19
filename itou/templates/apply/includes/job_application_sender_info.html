@@ -1,0 +1,36 @@
+{% load format_filters %}
+<ul>
+    <li>Prénom : <b>{{ job_application.sender.first_name }}</b></li>
+
+    <li>Nom : <b>{{ job_application.sender.last_name }}</b></li>
+
+    <li>Type : <b>{{ job_application.get_sender_kind_display }}</b></li>
+
+    <li>E-mail : <a
+            href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
+
+    {% if job_application.sender_prescriber_organization %}
+        <li>
+            Structure :
+            <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+            {% if job_application.is_sent_by_authorized_prescriber %}
+                <span class="badge badge-warning">Prescripteur habilité</span>
+            {% endif %}
+        </li>
+    {% endif %}
+
+    {% if job_application.sender_siae %}
+        <li>
+            Employeur solidaire :
+            <b>{{ job_application.sender_siae.display_name }}</b>
+        </li>
+    {% endif %}
+
+    {% if job_application.sender.phone %}
+        <li>
+            Téléphone :
+            <a href="tel:{{ job_application.sender.phone }}">{{ job_application.sender.phone|format_phone }}</a>
+        </li>
+    {% endif %}
+
+</ul>

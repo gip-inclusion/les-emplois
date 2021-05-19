@@ -1,0 +1,48 @@
+{% extends "apply/process_base.html" %}
+{% load bootstrap4 %}
+{% load format_filters %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    {# Job seeker info ------------------------------------------------------------------------- #}
+
+    <h3 class="font-weight-normal text-muted">Candidat</h3>
+    {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
+
+    {# Job application info ------------------------------------------------------------------------- #}
+
+    <hr>
+    <h3 class="font-weight-normal text-muted">Candidature</h3>
+
+    {% include "apply/includes/job_application_info.html" with job_application=job_application %}
+
+    {# Eligibility ------------------------------------------------------------------------- #}
+
+    {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_application=job_application %}
+
+    {# Sender info ------------------------------------------------------------------------- #}
+
+    <hr>
+
+    <h3 class="font-weight-normal text-muted">Candidature envoyée par</h3>
+
+    {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
+
+    <hr>
+
+    {# History ------------------------------------------------------ #}
+
+    {% if transition_logs %}
+
+        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
+        {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
+
+    {% endif %}
+
+    <p>
+        <a href="{{ back_url }}">Retour</a>
+    </p>
+
+{% endblock %}

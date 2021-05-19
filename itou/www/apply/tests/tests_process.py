@@ -56,6 +56,41 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(404, response.status_code)
 
+    def test_details_for_siae_as_prescriber(self):
+        """As a prescriber, I cannot access the job_applications details for SIAEs."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        prescriber = job_application.sender_prescriber_organization.members.first()
+
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_details_for_prescriber(self):
+        """As a prescriber, I cannot access the job_applications details for prescribers."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        prescriber = job_application.sender_prescriber_organization.members.first()
+
+        self.client.login(username=prescriber.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_details_for_prescriber_as_siae(self):
+        """As a SIAE user, I cannot access the job_applications details for prescribers."""
+
+        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
+        siae_user = job_application.to_siae.members.first()
+        self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
     def test_process(self):
         """Ensure that the `process` transition is triggered."""
 
