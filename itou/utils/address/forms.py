@@ -47,8 +47,9 @@ class AddressFormMixin(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion when existing in DB.
-        if self.instance and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
+        # Needed for proper auto-completion when `AddressFormMixin` is used with
+        # a ModelForm which has an instance existing in DB.
+        if hasattr(self, "instance") and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
             self.initial["city_name"] = self.instance.city
             # Populate the hidden `city` field.
             city = City.objects.filter(name=self.instance.city, department=self.instance.department).first()
@@ -62,20 +63,23 @@ class AddressFormMixin(forms.Form):
 
         if city_slug:
             try:
+                # TODO: use more intuitive field names.
+                # Override the `city` field in `cleaned_data` with the real city name
+                # because the value will be stored in `AddressMixin.city`.
                 cleaned_data["city"] = City.objects.get(slug=city_slug).name
             except City.DoesNotExist:
                 raise forms.ValidationError({"city_name": "Cette ville n'existe pas."})
 
         # Basic check of address fields.
-        addr1, addr2, post_code, city_slug = (
+        addr1, addr2, post_code, city = (
             cleaned_data["address_line_1"],
             cleaned_data["address_line_2"],
             cleaned_data["post_code"],
             cleaned_data["city"],
         )
 
-        valid_address = all([addr1, post_code, city_slug])
-        empty_address = not any([addr1, addr2, post_code, city_slug])
+        valid_address = all([addr1, post_code, city])
+        empty_address = not any([addr1, addr2, post_code, city])
         if not empty_address and not valid_address:
             if not addr1:
                 self.add_error("address_line_1", "Adresse : ce champ est obligatoire.")
