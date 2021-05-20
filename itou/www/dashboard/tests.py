@@ -21,7 +21,7 @@ from itou.siaes.factories import (
 )
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory, SiaeStaffFactory
 from itou.users.models import User
-from itou.www.dashboard.forms import EditUserEmailForm, EditUserInfoForm
+from itou.www.dashboard.forms import EditUserEmailForm
 
 
 class DashboardViewTest(TestCase):
