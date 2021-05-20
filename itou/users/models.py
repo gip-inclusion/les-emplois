@@ -1,6 +1,5 @@
 import uuid
 
-from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.fields import CIEmailField
@@ -181,12 +180,14 @@ class User(AbstractUser, AddressMixin):
         if self == user:
             return True
 
-        is_account_creator = bool(user.created_by and user.created_by == self)
-        return user.is_handled_by_proxy and is_account_creator and not user.has_verified_email
+        return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
-    @cached_property
+    def is_created_by(self, user):
+        return bool(self.created_by_id and self.created_by_id == user.pk)
+
+    @property
     def has_verified_email(self):
-        return EmailAddress.objects.filter(email=self.email, verified=True)
+        return self.emailaddress_set.filter(email=self.email, verified=True).exists()
 
     @cached_property
     def approvals_wrapper(self):
