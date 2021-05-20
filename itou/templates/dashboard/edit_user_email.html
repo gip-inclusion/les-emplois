@@ -11,11 +11,10 @@
     Veuillez alors vous reconnecter avec votre nouvelle adresse e-mail.
 </div>
 
-<form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
+<form method="post" action="" class="js-prevent-multiple-submit">
     {% csrf_token %}
 
-    {% bootstrap_form_errors form %}
-    {% bootstrap_form form %}
+    {% bootstrap_form form alert_error_type="all" %}
 
     <button type="submit" class="btn btn-primary">Enregistrer</button>
 </form>

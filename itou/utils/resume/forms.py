@@ -5,14 +5,12 @@ import django.forms as forms
 
 class ResumeFormMixin(forms.Form):
     """
-    Handles resume fields for apply and signup jobseeker forms
+    Handles resume field for job applications
     """
 
     resume_link = forms.URLField(
-        label="Indiquer le lien d'un CV existant",
-        help_text="Vous pouvez saisir un lien vers le CV de votre choix (CVDesignR, ...)",
+        label="CV (optionnel)",
         required=False,
-        widget=forms.TextInput(attrs={"placeholder": "https://www.mon_cv.fr/dfROS"}),
     )
 
     class Meta:

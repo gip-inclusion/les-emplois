@@ -542,3 +542,27 @@ ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
 ASP_FS_REMOTE_UPLOAD_DIR = "depot"
 # SFTP path: Where to get submitted employee records validation feedback
 ASP_FS_REMOTE_DOWNLOAD_DIR = "retrait"
+
+# S3 uploads
+# ------------------------------------------------------------------------------
+S3_STORAGE_ACCESS_KEY_ID = os.environ.get("CELLAR_ADDON_KEY_ID", "")
+S3_STORAGE_SECRET_ACCESS_KEY = os.environ.get("CELLAR_ADDON_KEY_SECRET", "")
+S3_STORAGE_ENDPOINT_DOMAIN = os.environ.get("CELLAR_ADDON_HOST", "")
+S3_STORAGE_BUCKET_NAME = os.environ.get("S3_STORAGE_BUCKET_NAME", "")
+S3_STORAGE_BUCKET_REGION = os.environ.get("S3_STORAGE_BUCKET_REGION", "")
+
+STORAGE_UPLOAD_KINDS = {
+    "default": {
+        "allowed_mime_types": ["*"],
+        "upload_expiration": 1,  # in hours
+        "key_path": "",  # appended before the file key. No backslash!
+        "max_files": 3,
+        "max_file_size": 5,  # in mb
+        "timeout": 20000,  # in ms
+    },
+    "resume": {
+        "allowed_mime_types": ["application/pdf"],
+        "key_path": "resume",
+        "max_files": 1,
+    },
+}

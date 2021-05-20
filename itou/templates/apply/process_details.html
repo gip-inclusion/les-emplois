@@ -1,0 +1,413 @@
+{% extends "apply/process_base.html" %}
+{% load bootstrap4 %}
+{% load format_filters %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    {# Job seeker info ------------------------------------------------------------------------- #}
+
+    <h3 class="font-weight-normal text-muted">Candidat</h3>
+    {% include "apply/includes/job_seeker_info.html" with job_application=job_application %}
+
+    {# Job application info ------------------------------------------------------------------------- #}
+
+    <hr>
+    <h3 class="font-weight-normal text-muted">Candidature</h3>
+
+    <ul>
+        <li>Date de la candidature : <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b></li>
+
+        {% if job_application.selected_jobs.exists %}
+            <li>
+                Métier(s) recherché(s) :
+                <ul>
+                    {% for job in job_application.selected_jobs.all %}
+                        <li><b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li>Candidature spontanée</li>
+        {% endif %}
+        {% if job_application.get_resume_link %}
+            <li><a href="{{ job_application.get_resume_link }}" target="_blank" rel="noopener">Télécharger le CV</a></li>
+        {% endif %}
+    </ul>
+
+    <div class="alert alert-secondary">
+        <p><b>Message :</b></p>
+        {{ job_application.message|linebreaks }}
+    </div>
+
+    {# Eligibility ------------------------------------------------------------------------- #}
+
+    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+
+            {% if eligibility_diagnosis and eligibility_diagnosis.is_considered_valid %}
+                {% if job_application.is_sent_by_authorized_prescriber %}
+                    {% comment %}
+                        Les candidatures envoyées par des prescripteurs habilités ne sont pas affichées de manière 
+                        hiérarchisée afin de ne pas induire les employeurs en erreur.
+                        Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critère de niveau 2 par exemple
+                    {% endcomment %}
+                    <hr>
+                    <h3 class="font-weight-normal text-muted">
+                        Éligibilité IAE
+                    </h3>
+                    <p>
+                        Confirmée par
+                        <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
+                        {% if eligibility_diagnosis.author_siae %}
+                            ({{ eligibility_diagnosis.author_siae.display_name }})
+                        {% endif %}
+                        {% if eligibility_diagnosis.author_prescriber_organization %}
+                            ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                        {% endif %}
+                    </p>
+
+                    {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
+                        {% if administrative_criteria %}
+                            <p>
+                                <span class="badge badge-secondary">
+                                    Situation administrative du candidat
+                                </span>
+                            </p>
+                            {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
+                            {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
+                            <ul>
+                                {% for level in levels %}
+                                    {% for criteria in level.list %}
+                                        <li>{{ criteria.name }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+
+                    <p>
+                        <i>
+                            Ce diagnostic est valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au 
+                            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
+                        </i>
+                    </p>
+                {% else %}
+                    <hr>
+                    <h3 class="font-weight-normal text-muted">
+                        Critères d'éligibilité
+                    </h3>
+                    <p>
+                        Validés par
+                        <b>{{ eligibility_diagnosis.author.get_full_name }}</b>
+                        {% if eligibility_diagnosis.author_siae %}
+                            ({{ eligibility_diagnosis.author_siae.display_name }})
+                        {% endif %}
+                        {% if eligibility_diagnosis.author_prescriber_organization %}
+                            ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                        {% endif %}
+                        le
+                        <b>{{ eligibility_diagnosis.created_at|date:"d/m/Y" }}</b>.
+                    </p>
+
+                    {% with eligibility_diagnosis.administrative_criteria.all as administrative_criteria %}
+                        {% if administrative_criteria %}
+                            <p>
+                                <span class="badge badge-secondary">
+                                    Critères administratifs
+                                </span>
+                            </p>
+                            {# https://docs.djangoproject.com/en/dev/ref/templates/builtins/#regroup #}
+                            {% regroup administrative_criteria|dictsort:"level" by get_level_display as levels %}
+                            <ul>
+                                {% for level in levels %}
+                                    <li>
+                                        <span class="badge badge-secondary">{{ level.grouper }}</span>
+                                        <ul>
+                                            {% for criteria in level.list %}
+                                                <li>{{ criteria.name }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endwith %}
+
+                    <p>
+                        <i>
+                            Ce diagnostic expire le 
+                            {{ eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}.
+                        </i>
+                    </p>
+                    {% endif %}
+
+            {% elif approvals_wrapper.has_valid_pole_emploi_eligibility_diagnosis %}
+
+                <hr>
+                <h3 class="font-weight-normal text-muted">Critères d'éligibilité</h3>
+                <p>
+                    Validés par <b>Pôle emploi</b>.
+                </p>
+
+            {% endif %}
+
+    {% endif %}
+
+    {# Sender info ------------------------------------------------------------------------- #}
+
+    <hr>
+
+    <h3 class="font-weight-normal text-muted">Candidature envoyée par</h3>
+
+    <ul>
+
+        <li>Prénom : <b>{{ job_application.sender.first_name }}</b></li>
+
+        <li>Nom : <b>{{ job_application.sender.last_name }}</b></li>
+
+        <li>Type : <b>{{ job_application.get_sender_kind_display }}</b></li>
+
+        <li>E-mail : <a
+                href="mailto:{{ job_application.sender.email }}">{{ job_application.sender.email }}</a></li>
+
+        {% if job_application.sender_prescriber_organization %}
+            <li>
+                Structure :
+                <b>{{ job_application.sender_prescriber_organization.display_name }}</b>
+                {% if job_application.is_sent_by_authorized_prescriber %}
+                    <span class="badge badge-warning">Prescripteur habilité</span>
+                {% endif %}
+            </li>
+        {% endif %}
+
+        {% if job_application.sender_siae %}
+            <li>
+                Employeur solidaire :
+                <b>{{ job_application.sender_siae.display_name }}</b>
+            </li>
+        {% endif %}
+
+        {% if job_application.sender.phone %}
+            <li>
+                Téléphone :
+                <a href="tel:{{ job_application.sender.phone }}">{{ job_application.sender.phone|format_phone }}</a>
+            </li>
+        {% endif %}
+
+    </ul>
+
+    {# Process ------------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_new %}
+
+        <hr>
+
+        <form method="post" action="{% url 'apply:process' job_application_id=job_application.id %}"
+              class="js-prevent-multiple-submit">
+            {% csrf_token %}
+            {% buttons %}
+                <button type="submit" class="btn btn-warning">J'étudie cette candidature</button>
+            {% endbuttons %}
+        </form>
+
+    {% endif %}
+
+    {# Answer ------------------------------------------------------------------------- #}
+
+    {% if job_application.refusal_reason or job_application.answer %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">Réponse</h3>
+
+        {% if job_application.refusal_reason %}
+            <p>
+                <b>Motif du refus :</b><br>
+                {{ job_application.get_refusal_reason_display }}
+            </p>
+        {% endif %}
+
+        {% if job_application.answer %}
+            <div class="alert alert-secondary">
+                <p><b>Message :</b></p>
+                {{ job_application.answer|linebreaks }}
+            </div>
+        {% endif %}
+
+    {% endif %}
+
+    {# Possible next steps when the state is processing ------------------------------------------------------ #}
+
+    {% if job_application.state.is_processing %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Je l'embauche
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+            <p>
+                <a href="{% url 'apply:postpone' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Mettre en liste d'attente
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+
+        {% endif %}
+
+        <p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
+                Décliner la candidature
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+    {% endif %}
+
+    {# Possible next steps when the state is postponed ------------------------------------------------------ #}
+
+    {% if job_application.state.is_postponed %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Je l'embauche
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+        {% endif %}
+
+        <p>
+            <a href="{% url 'apply:refuse' job_application_id=job_application.id %}"
+               class="btn btn-outline-danger btn-block">
+                Décliner la candidature
+                {% include "includes/icon.html" with icon="arrow-right" %}
+            </a>
+        </p>
+
+    {% endif %}
+
+
+    {# Possible next steps when the state is obsolete ------------------------------------------------------ #}
+
+    {% if job_application.state.is_obsolete %}
+
+        <hr>
+
+        {% if job_application.eligibility_diagnosis_by_siae_required %}
+            <p>
+                {% include "eligibility/includes/new_diagnosis_button.html" %}
+            </p>
+        {% else %}
+            <p>
+                <a href="{% url 'apply:accept' job_application_id=job_application.id %}"
+                   class="btn btn-outline-success btn-block">
+                    Je l'embauche
+                    {% include "includes/icon.html" with icon="arrow-right" %}
+                </a>
+            </p>
+        {% endif %}
+
+    {% endif %}
+
+    {# Job application accepted: details -------------------------------------------------------------------- #}
+
+    {% if job_application.state.is_accepted %}
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">Détails du contrat de travail</h3>
+        <p>
+        <ul>
+            <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
+            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y" }}</li>
+        </ul>
+        </p>
+
+        {% if job_application.can_update_hiring_start %}
+            <p>
+                <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}"
+                   class="btn btn-outline-primary btn-block">
+                    Modifier la période du contrat de travail
+                </a>
+            </p>
+        {% endif %}
+
+        {# Job application cancellation -------------------------------------------------------------------------- #}
+        {% if job_application.can_be_cancelled %}
+            <hr>
+
+            <h3 class="font-weight-normal text-muted">Rétractation</h3>
+            <p>
+                Vous pouvez vous rétracter jusqu'à {{ cancellation_days }} jours après le début du contrat, soit jusqu'au {{ job_application.cancellation_delay_end|date:"d/m/Y" }} inclus.
+            </p>
+            {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                <p>
+                    Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
+                </p>
+                <p>
+                    {{ job_application.job_seeker.get_full_name|title }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                </p>
+            {% endif %}
+            <p>
+                <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="text-decoration-none">
+                    <button class="btn btn-danger btn-block">Annuler l'embauche</button>
+                </a>
+            </p>
+        {% endif %}
+
+
+    {% endif %}
+
+    {% if job_application.can_be_archived %}
+        {% include "apply/includes/archive_button.html" with job_application=job_application %}
+    {% endif %}
+
+    {# History ------------------------------------------------------ #}
+
+    {% if transition_logs %}
+
+        <hr>
+
+        <h3 class="font-weight-normal text-muted">Historique des modifications</h3>
+
+        <ul>
+            {% for log in transition_logs %}
+                <li>
+                    Passé en "<b>{{ log.pretty_to_state }}</b>"
+                    <ul>
+                        {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
+                            <li>Par {{ log.user.get_full_name }}</li>
+                        {% endif %}
+                        <li>Le {{ log.timestamp|date:"d F Y à H:i" }}</li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+
+    <hr>
+    <p>
+        <a href="{% url 'apply:list_for_siae' %}">Retour</a>
+    </p>
+
+{% endblock %}

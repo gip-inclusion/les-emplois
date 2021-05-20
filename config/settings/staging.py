@@ -1,5 +1,6 @@
-from .base import *
 from ._sentry import sentry_init
+from .base import *
+
 
 ALLOWED_HOSTS = ["127.0.0.1", "staging.inclusion.beta.gouv.fr", "staging.emplois.inclusion.beta.gouv.fr"]
 

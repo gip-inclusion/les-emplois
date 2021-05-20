@@ -15,8 +15,9 @@ env:
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
   ORGANIZATION_NAME: Itou
-  DB_ADDON: c1-review-apps-databases-DO-NOT-DELETE
   CONFIGURATION_ADDON: c1-review-apps-config
+  DB_ADDON: c1-review-apps-databases-DO-NOT-DELETE
+  S3_ADDON: c1-s3
   BRANCH: ${{ github.head_ref }}
   POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
   POSTGRESQL_ADDON_USER: ${{ secrets.POSTGRESQL_ADDON_USER }}
@@ -63,6 +64,10 @@ jobs:
         $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
         $CLEVER_CLI service link-addon $DB_ADDON
 
+    - name: 🤝 Link S3 addon
+      run: |
+        $CLEVER_CLI link $REVIEW_APP_NAME --org $ORGANIZATION_NAME
+        $CLEVER_CLI service link-addon $S3_ADDON
 
     - name: 🗃 Create a brand new database
       run: |

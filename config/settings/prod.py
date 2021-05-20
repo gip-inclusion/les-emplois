@@ -1,5 +1,6 @@
-from .base import *
 from ._sentry import sentry_init
+from .base import *
+
 
 # See `itou.utils.new_dns.middleware.NewDnsRedirectMiddleware`.
 ALLOWED_HOSTS = [

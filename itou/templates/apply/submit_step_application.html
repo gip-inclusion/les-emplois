@@ -1,5 +1,12 @@
 {% extends "apply/submit_base.html" %}
 {% load bootstrap4 %}
+{% load i18n %}
+{% load static %}
+
+{% block extra_head %}
+    <!-- Dropzone -->
+    <link rel="stylesheet" type="text/css" href='{% static "vendor/dropzone/dropzone.min.css" %}'>
+{% endblock extra_head %}
 
 {% block content %}
 
@@ -14,6 +21,10 @@
         {% endif %}
 
         {% bootstrap_field form.message %}
+        {{ form.resume_link.as_hidden }}
+
+        <label for="resume_form">{{ form.resume_link.label }}</label>
+        {% include "storage/s3_upload_form.html" with dropzone_form_id="resume_form" %}
 
         {% buttons %}
             <button type="submit" class="btn btn-primary">
@@ -27,4 +38,23 @@
 
     </form>
 
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "vendor/dropzone/dropzone.min.js" %}'></script>
+    <script src='{% static "js/s3_upload.js" %}'></script>
+    {{ s3_form_values|json_script:"s3-form-values" }}
+    {{ s3_upload_config|json_script:"s3-upload-config" }}
+    <script>
+        s3UploadInit({
+            dropzoneSelector: "#resume_form",
+            callbackLocationSelector: "#{{ form.resume_link.id_for_label }}",
+            s3FormValuesId: "s3-form-values",
+            s3UploadConfigId: "s3-upload-config",
+            // Not really nice
+            sentryInternalUrl: "{% url 'home:sentry_debug' %}",
+            sentryCsrfToken: "{{ csrf_token }}"
+        });
+    </script>
 {% endblock %}

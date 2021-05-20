@@ -45,14 +45,6 @@ Ou utilisez un *pre-commit git hook* que vous pouvez mettre en place de cette ma
 
     $ make setup_git_pre_commit_hook
 
-### Ajout d'un CV
-
-Vous pouvez tester le téléversement d'un CV avec Typeform localement en suivant ces étapes :
-- Installez [Ngrok](https://ngrok.com) et lancez la commande `ngrok http 8080`.
-- Copiez l'URL mise à votre disposition par Ngrok et créez un nouveau _webhook_ dans Typeform (cliquez sur "Connect" puis sur "Webhooks"). :warning: Dans le champ `Secret`, pensez à indiquer la même valeur que `TYPEFORM_SECRET`. Cochez également l'option `SSL`.
-- Désactivez le _webhook_ concernant la prod ou ignorez les erreurs Sentry qui découleront de vos envois.
-- :raised_hands: Et voilà, tout est prêt ! Bon test !
-
 ## Données de test
 
 Voir notre [documentation interne](https://team.inclusion.beta.gouv.fr/les-procedures/recette-test).

@@ -10,5 +10,4 @@ app_name = "home"
 urlpatterns = [
     path("", views.home, name="hp"),
     path("sentry-debug/", views.trigger_error, name="sentry_debug"),
-    path("update-resume-link", views.update_resume_link, name="update_resume_link"),
 ]
