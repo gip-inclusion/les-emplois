@@ -29,32 +29,13 @@
     </div>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li class="is-active">Etat civil et domiciliation</li>
+        <li class="is-active">Etat civil</li>
+        <li>Domiciliation</li>
         <li>Situation</li>
         <li>Informations complémentaires</li>
     </ul>
 
-
-    <h4>Etat civil du salarié</h4>
-
-    
-    <form method="post" action="" class="js-prevent-multiple-submit">
-        {% csrf_token %}
-        
-        {% bootstrap_field form.title %}
-        {% bootstrap_field form.first_name %}
-        {% bootstrap_field form.last_name %}
-        {% bootstrap_field form.birthdate %}
-        {% bootstrap_field form.insee_commune %}
-        {% bootstrap_field form.insee_commune_code %}
-
-        {% buttons %}
-            <a class="btn btn btn-outline-secondary" href="#">
-                Annuler
-            </a>
-            <button type="submit" class="btn btn-primary">Continuer</button>
-        {% endbuttons %}
-    </form>
+    {% include "employee_record/includes/create_step_1.html" %}
 
 </div>
 

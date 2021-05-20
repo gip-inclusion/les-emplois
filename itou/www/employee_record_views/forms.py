@@ -32,17 +32,18 @@ class NewEmployeeRecordStep1(forms.ModelForm):
     COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
 
     READ_ONLY_FIELDS = []
-    # REQUIRED_FIELDS = ["title", "first_name", "last_name", "birthdate", "birth_place"]
     REQUIRED_FIELDS = [
         "title",
         "first_name",
         "last_name",
         "birthdate",
+        "birth_country",
     ]
 
     insee_commune = forms.CharField(
-        label="Commune",
+        label="Commune de naissance",
         required=False,
+        help_text="La commune de naissance ne doit être saisie que lorsque le salarié est né en France",
         widget=forms.TextInput(
             attrs={
                 "class": "js-commune-autocomplete-input form-control",
@@ -98,5 +99,5 @@ class NewEmployeeRecordStep1(forms.ModelForm):
             "insee_commune",
             "insee_commune_code",
             "birth_place",
-            # "birth_country",
+            "birth_country",
         ]

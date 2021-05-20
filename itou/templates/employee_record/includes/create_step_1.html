@@ -1,0 +1,21 @@
+{% load bootstrap4 %}
+
+<h4>Etat civil du salarié</h4>
+
+<form method="post" action="" class="js-prevent-multiple-submit">
+    {% csrf_token %}
+
+    {% bootstrap_field form.title %}
+    {% bootstrap_field form.first_name %}
+    {% bootstrap_field form.last_name %}
+
+    {% bootstrap_field form.birthdate %}
+    {% bootstrap_field form.birth_country %}
+    {% bootstrap_field form.insee_commune %}
+    {% bootstrap_field form.insee_commune_code %}
+
+    {% buttons %}
+        <a class="btn btn btn-outline-secondary" href="#">Annuler</a>
+        <button type="submit" class="btn btn-primary">Continuer</button>
+    {% endbuttons %}
+</form>
