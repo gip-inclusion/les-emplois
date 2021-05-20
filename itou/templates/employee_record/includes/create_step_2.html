@@ -1,0 +1,12 @@
+{% load bootstrap4 %}
+
+<h4>Domiciliation du salarié</h4>
+
+<form method="POST" action="{% url "employee_record_views:create_step_2" job_application.id %}" class="js-prevent-multiple-submit">
+    {% csrf_token %}
+
+    {% buttons %}
+    <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
+        <button type="submit" class="btn btn-primary">Continuer</button>
+    {% endbuttons %}
+</form>
