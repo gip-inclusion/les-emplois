@@ -176,6 +176,19 @@ class User(AbstractUser, AddressMixin):
         self.validate_unique()
         super().save(*args, **kwargs)
 
+    def can_edit_email(self, user):
+        if self == user:
+            return True
+
+        return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
+
+    def is_created_by(self, user):
+        return bool(self.created_by_id and self.created_by_id == user.pk)
+
+    @property
+    def has_verified_email(self):
+        return self.emailaddress_set.filter(email=self.email, verified=True).exists()
+
     @cached_property
     def approvals_wrapper(self):
         if not self.is_job_seeker:

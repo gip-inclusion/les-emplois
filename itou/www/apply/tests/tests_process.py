@@ -16,6 +16,7 @@ from itou.job_applications.factories import (
     JobApplicationWithApprovalFactory,
 )
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.siaes.factories import SiaeWithMembershipFactory
 from itou.siaes.models import Siae
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithAddressFactory
 from itou.users.models import User
@@ -62,7 +63,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, resume_link)
 
     def test_details_for_siae_hidden(self):
-        """An hiden job_application is not displayed."""
+        """A hidden job_application is not displayed."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
             job_seeker__is_job_seeker=True, hidden_for_siae=True
@@ -194,59 +195,16 @@ class ProcessViewsTest(TestCase):
             "city": city.name,
             "city_slug": city.slug,
         }
+        siae = SiaeWithMembershipFactory()
+        siae_user = siae.members.first()
 
-        for state in [JobApplicationWorkflow.STATE_PROCESSING, JobApplicationWorkflow.STATE_OBSOLETE]:
-            job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-                state=state, job_seeker=job_seeker
-            )
-
-            siae_user = job_application.to_siae.members.first()
+        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
+            job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
             self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
 
             url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
-
-            # Wrong dates.
-            hiring_start_at = datetime.date.today()
-            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-            # Force `hiring_start_at` in past.
-            hiring_start_at = hiring_start_at - relativedelta(days=1)
-            post_data = {
-                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-                "answer": "",
-                **address,
-            }
-            response = self.client.post(url, data=post_data)
-            self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
-
-            # Wrong dates: end < start.
-            hiring_start_at = datetime.date.today()
-            hiring_end_at = hiring_start_at - relativedelta(days=1)
-            post_data = {
-                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-                "answer": "",
-                **address,
-            }
-            response = self.client.post(url, data=post_data)
-            self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
-
-            # Duration too long.
-            hiring_start_at = datetime.date.today()
-            max_end_at = Approval.get_default_end_date(hiring_start_at)
-            hiring_end_at = max_end_at + relativedelta(days=1)
-            post_data = {
-                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-                "answer": "",
-                **address,
-            }
-            response = self.client.post(url, data=post_data)
-            self.assertFormError(
-                response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG % max_end_at.strftime("%d/%m/%Y")
-            )
 
             # Good duration.
             hiring_start_at = datetime.date.today()
@@ -271,22 +229,71 @@ class ProcessViewsTest(TestCase):
             self.assertEqual(job_application.hiring_end_at, hiring_end_at)
             self.assertTrue(job_application.state.is_accepted)
 
-            # No address provided
-            job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-                state=JobApplicationWorkflow.STATE_PROCESSING
-            )
-            hiring_start_at = datetime.date.today()
-            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-            post_data = {
-                # Data for `JobSeekerPoleEmploiStatusForm`.
-                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-                # Data for `AcceptForm`.
-                "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
-                "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
-                "answer": "",
-            }
-            with self.assertRaises(KeyError):
-                response = self.client.post(url, data=post_data)
+        ##############
+        # Exceptions #
+        ##############
+        job_application = JobApplicationSentByJobSeekerFactory(state=state, job_seeker=job_seeker, to_siae=siae)
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        # Wrong dates.
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+        # Force `hiring_start_at` in past.
+        hiring_start_at = hiring_start_at - relativedelta(days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+            **address,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(response, "form_accept", "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+
+        # Wrong dates: end < start.
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = hiring_start_at - relativedelta(days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+            **address,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(response, "form_accept", None, JobApplication.ERROR_END_IS_BEFORE_START)
+
+        # Duration too long.
+        hiring_start_at = datetime.date.today()
+        max_end_at = Approval.get_default_end_date(hiring_start_at)
+        hiring_end_at = max_end_at + relativedelta(days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+            **address,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertFormError(
+            response, "form_accept", None, JobApplication.ERROR_DURATION_TOO_LONG % max_end_at.strftime("%d/%m/%Y")
+        )
+
+        # No address provided
+        job_application = JobApplicationSentByJobSeekerFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING, to_siae=siae
+        )
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        hiring_start_at = datetime.date.today()
+        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+        post_data = {
+            # Data for `JobSeekerPoleEmploiStatusForm`.
+            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            # Data for `AcceptForm`.
+            "hiring_start_at": hiring_start_at.strftime("%d/%m/%Y"),
+            "hiring_end_at": hiring_end_at.strftime("%d/%m/%Y"),
+            "answer": "",
+        }
+        with self.assertRaises(KeyError):
+            response = self.client.post(url, data=post_data)
 
     def test_accept_with_manual_approval_delivery(self):
         """
@@ -378,13 +385,13 @@ class ProcessViewsTest(TestCase):
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
 
         # Send 3 job applications to 3 different structures
-        job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        job_app_starting_earlier = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_app_starting_earlier = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        job_app_starting_later = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
+        job_app_starting_later = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
 
@@ -537,17 +544,30 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_eligibility_wrong_state_for_job_application(self):
+    def test_eligibility_state_for_job_application(self):
         """The eligibility diagnosis page must only be accessible
-        in `STATE_PROCESSING` and state `STATE_POSTPONED`."""
+        in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES states."""
+        siae = SiaeWithMembershipFactory()
+        siae_user = siae.members.first()
+        job_application = JobApplicationSentByJobSeekerFactory(to_siae=siae)
+
+        # Right states
+        for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
+            job_application.state = state
+            job_application.save()
+            self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
+            url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.client.logout()
+
+        # Wrong states
         for state in [
             JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_REFUSED,
             JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
         ]:
-            job_application = JobApplicationSentByJobSeekerFactory(state=state)
-            siae_user = job_application.to_siae.members.first()
+            job_application.state = state
+            job_application.save()
             self.client.login(username=siae_user.email, password=DEFAULT_PASSWORD)
             url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
             response = self.client.get(url)
@@ -709,19 +729,28 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_postpone)
         self.assertContains(response, self.url_accept)
 
-    def test_details_template_for_other_states(self):
+    def test_details_template_for_state_refused(self):
         """Test actions available for other states."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
-        for state in [
-            JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_REFUSED,
-        ]:
-            self.job_application.state = state
-            self.job_application.save()
-            response = self.client.get(self.url_details)
-            # Test template content.
-            self.assertNotContains(response, self.url_process)
-            self.assertNotContains(response, self.url_eligibility)
-            self.assertNotContains(response, self.url_refuse)
-            self.assertNotContains(response, self.url_postpone)
-            self.assertNotContains(response, self.url_accept)
+        self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_accept)
+
+    def test_details_template_for_state_accepted(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertNotContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
