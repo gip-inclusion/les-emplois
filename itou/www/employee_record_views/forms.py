@@ -76,10 +76,12 @@ class NewEmployeeRecordStep1(forms.ModelForm):
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
         if hasattr(self, "instance"):
+            # Init for with ASP commune
             if self.instance.birth_place:
                 self.initial[
                     "insee_commune"
                 ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
+                self.initial["insee_commune_code"] = self.instance.birth_place.code
 
     def clean(self):
         super().clean()
@@ -100,4 +102,15 @@ class NewEmployeeRecordStep1(forms.ModelForm):
             "insee_commune_code",
             "birth_place",
             "birth_country",
+        ]
+
+
+class NewEmployeRecordStep2(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "address_line_1",
+            "address_line_2",
+            "department",
+            "city",
         ]
