@@ -1,5 +1,40 @@
 # Journal des modifications
 
+## [19] - 2021-05-20
+
+### Ajouté
+
+- Possibilité d'afficher le détail d'une candidature pour les prescripteurs
+- Test pour s'assurer de la couverture une branche du code de la délivrance manuelle d'un PASS IAE (dans la vue `accept`)
+- Possibilité pour un employeur de supprimer une candidature de son tableau de bord
+- Case à cocher pour indiquer si l'organisme est conventionné par le conseil départemental pour le suivi des BRSA, cette information est désormais indépendante de la catégorie de l'organisation (avec nettoyage de la base)
+- Texte pour bien faire comprendre aux employeurs que la date de début d'embauche a une incidence sur le début du parcours et le versement de l'aide au poste
+- Texte pour ajouter un avertissement sur la conservation des pièces justificatives en cas de contrôle a posteriori
+- Si un ID PE est renseigné, alors il prend la priorité sur le champ permettant de préciser le motif de son absence afin d'éviter un message d'erreur difficile à comprendre pour les utilisateurs
+- Ajout d'un lien vers la documentation sur la période de carence
+- Ajout d'un contrôle de sécurité des données envoyées dans l'interface de configuration des fiches de poste
+
+### Modifié
+
+- Seul le créateur d'un compte candidat peut en modifier l'e-mail
+- Les candidatures refusées peuvent être acceptées
+- Nouveau système pour joindre un CV à une candidature
+- Prise en compte de l'extension COVID pour les agréments pré-existants dans le contrôle sur la date de fin d'embauche qui ne doit pas dépasser le temps restant d'un parcours IAE
+- Correctif pour l'erreur "Cette ville n'existe pas" avec ajout de tests unitaires sur `AddressFormMixin`
+- Les enquêtes de satisfaction SIAE et prescripteurs contiennent plus de données qualifiées sur les répondants
+- Deux emails distincts sont envoyés lors de l'acceptation d'une candidature, un pour le candidat et un pour son orienteur/prescripteur le cas échéant (auparavant l'orienteur/prescripteur était en copie cachée)
+- Utilisation d'une constante dans les *settings* pour le lien vers Typeform
+- Désactivation d'un log afin d'éviter d'atteindre les limites du quota Sentry
+- Correctif pour une valeur manquante dans la configuration qui empêchait d'embaucher avec délivrance manuelle de nouveau PASS IAE (a concerné seulement 2 utilisateurs)
+- Un orienteur peut maintenant candidater vers une EA ou un GEIQ même si son candidat a un parcours IAE dans le délai de carence
+- Renommage de l'URL du "Journal des modifications" en /versions/`
+- Affichage des mois au format texte long sur l'écran d'export des candidatures
+- Dans la liste des candidatures, le nom de l'employeur devient un lien vers sa fiche publique pour accéder aux coordonnées facilement
+- Amélioration technique de la commande de fusion des organisations de prescripteurs (uniquement accessible par les devs)
+- Correctif pour les ACIPHC créées par le support pour corriger l'import SIAE
+- Mise à jour vers le SDK Sentry 1.1.0
+- Mise à jour vers Django 3.2.4 (correctifs)
+
 ## [18] - 2021-05-06
 
 ### Ajouté
@@ -32,9 +67,9 @@
 
 ### Ajouté
 
-- Ajout de l’interface "Mes annexes financières"
-- Ajout d’un formulaire pour connaitre le secteur d’activité des employeurs
-- Ajout d’une redirection de `inclusion.beta.gouv.fr/dashboard` vers `emplois.inclusion.beta.gouv.fr/dashboard` pour ne pas induire en erreur les usagers suite au changement de nom de domaine.
+- Ajout de l'interface "Mes annexes financières"
+- Ajout d'un formulaire pour connaitre le secteur d'activité des employeurs
+- Ajout d'une redirection de `inclusion.beta.gouv.fr/dashboard` vers `emplois.inclusion.beta.gouv.fr/dashboard` pour ne pas induire en erreur les usagers suite au changement de nom de domaine.
 - Ajout de la colonne "date de création" pour permettre au support de voir les structures créés lors des imports.
 
 ### Modifié
@@ -42,15 +77,15 @@
 - Nouvelle version majeure de Django v3.2
 - Changement du code de tracking Hotjar
 - Amélioration des performances de l'enregistrement de la session utilisateur
-- Correction du bug qui empeche la prolongation d’une ACI pour "difficultés particulières"
-- Possibilité de modifier l’email d’un demandeur tant que celui ci n’a pas confirmé son compte
+- Correction du bug qui empeche la prolongation d'une ACI pour "difficultés particulières"
+- Possibilité de modifier l'email d'un demandeur tant que celui ci n'a pas confirmé son compte
 - Simplification des invitations:
   - Les invitations ne partent plus en plusieurs exemplaires quand l'utilisateur clique à répétition sur le bouton d'envoi
   - Si une invitation est renouvelée pour un utilisateur, il n'y a plus de nouvelle invitation créée en base (moins d'entrées dans le tableau de bord)
   - Environ 4500 invitations en doublon ont été supprimées de la base de données
-- Correction de l’affichage des emails où des éléments sur les structures manquaient.
-- Amélioration de l’affichage des critères d’éligibilité pour les candidatures envoyées par des prescripteurs habilités
-- Utilisation d’une compte dédié pour les emails de la plateforme, afin de réduire le risque de classification en spam des emails applicatifs.
+- Correction de l'affichage des emails où des éléments sur les structures manquaient.
+- Amélioration de l'affichage des critères d'éligibilité pour les candidatures envoyées par des prescripteurs habilités
+- Utilisation d'une compte dédié pour les emails de la plateforme, afin de réduire le risque de classification en spam des emails applicatifs.
 
 ### Supprimé
 
@@ -305,7 +340,7 @@
 ### Ajouté
 
 - Ouverture région Normandie
-- Ajout d'un lien vers le décret concernant les critères d’éligibilité
+- Ajout d'un lien vers le décret concernant les critères d'éligibilité
 - Ajout d'un message d'information dans la liste des candidatures en attente et dans l'e-mail de nouvelle candidature
 - Ouverture région Pays de la Loire
 - Inscription possible de plusieurs structures ayant un même SIRET mais des types différents
