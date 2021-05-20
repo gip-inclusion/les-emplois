@@ -35,7 +35,11 @@
         <li>Informations complémentaires</li>
     </ul>
 
-    {% include "employee_record/includes/create_step_1.html" %}
+    {% if step == 1 %}
+        {% include "employee_record/includes/create_step_1.html" %}
+    {% elif step == 2 %}
+        {% include "employee_record/includes/create_step_2.html" %}
+    {% endif %}
 
 </div>
 

@@ -90,6 +90,8 @@ def list(request, template_name="employee_record/list.html"):
 def create(request, job_application_id, template_name="employee_record/create.html"):
     """
     Create a new employee record from a given job application
+
+    Step 1: Name and birth date / place / country of the jobseeker
     """
     siae = get_current_siae_or_404(request)
 
@@ -98,14 +100,41 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
     job_application = JobApplication.objects.get(pk=job_application_id)
     form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
+    step = 1
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        return HttpResponseRedirect(reverse("employee_record_views:create", args=(job_application.id,)))
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
         "form": form,
+        "step": step,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def create_step_2(request, job_application_id, template_name="employee_record/create.html"):
+    """
+    Create a new employee record from a given job application
+
+    Step 1: Name and birth date / place / country of the jobseeker
+    """
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    job_application = JobApplication.objects.get(pk=job_application_id)
+    form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
+    step = 2
+
+    context = {
+        "job_application": job_application,
+        "form": form,
+        "step": step,
     }
 
     return render(request, template_name, context)
