@@ -433,6 +433,7 @@ class Country(PrettyPrintMixin, models.Model):
     class Meta:
         verbose_name = "Pays"
         verbose_name_plural = "Pays"
+        ordering = ["name"]
 
     @property
     def is_france(self):
