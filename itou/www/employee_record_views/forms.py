@@ -105,12 +105,21 @@ class NewEmployeeRecordStep1(forms.ModelForm):
         ]
 
 
-class NewEmployeRecordStep2(forms.ModelForm):
+class NewEmployeeRecordStep2(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        for field_name in ["phone", "email"]:
+            self.fields[field_name].widget.attrs["readonly"] = True
+            self.fields[field_name].help_text = "Non modifiable"
+
     class Meta:
         model = User
         fields = [
             "address_line_1",
             "address_line_2",
-            "department",
+            "post_code",
             "city",
+            "phone",
+            "email",
         ]
