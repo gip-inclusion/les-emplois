@@ -9,7 +9,11 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
-from itou.www.employee_record_views.forms import NewEmployeeRecordStep1, SelectEmployeeRecordStatusForm
+from itou.www.employee_record_views.forms import (
+    NewEmployeeRecordStep1,
+    NewEmployeeRecordStep2,
+    SelectEmployeeRecordStatusForm,
+)
 
 
 @login_required
@@ -128,7 +132,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     job_application = JobApplication.objects.get(pk=job_application_id)
-    form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
+    form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
     step = 2
 
     context = {
