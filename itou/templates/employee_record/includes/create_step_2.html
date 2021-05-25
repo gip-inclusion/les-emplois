@@ -5,6 +5,15 @@
 <form method="POST" action="{% url "employee_record_views:create_step_2" job_application.id %}" class="js-prevent-multiple-submit">
     {% csrf_token %}
 
+    {% bootstrap_field form.address_line_1 %}
+    {% bootstrap_field form.address_line_2 %}
+
+    {% bootstrap_field form.post_code %}
+    {% bootstrap_field form.city %}
+
+    {% bootstrap_field form.phone %}
+    {% bootstrap_field form.email %}
+
     {% buttons %}
     <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
         <button type="submit" class="btn btn-primary">Continuer</button>
