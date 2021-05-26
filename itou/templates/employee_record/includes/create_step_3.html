@@ -1,0 +1,53 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<h4>Situation du salarié</h4>
+
+<form method="POST" action="{% url "employee_record_views:create_step_3" job_application.id %}" class="js-prevent-multiple-submit">
+    {% csrf_token %}
+
+    {% bootstrap_field form.education_level %}
+    {% bootstrap_field form.resourceless %}
+
+    {% bootstrap_field form.registered_at_pole_emploi %}
+    <div id="fold_registered_at_pole_emploi" class="ml-1 pl-4 border-left border-primary d-none">
+        {% bootstrap_field form.pole_emploi_since %}
+    </div>
+
+    {% bootstrap_field form.rqth_employee %}
+    {% bootstrap_field form.oeth_employee %}
+    {% bootstrap_field form.has_rsa_allocation %}
+
+    {% bootstrap_field form.ass_allocation %}
+    <div id="fold_ass_allocation" class="ml-1 pl-4 border-left border-primary d-none">
+        {% bootstrap_field form.ass_allocation_since %}
+    </div>
+    
+    {% bootstrap_field form.aah_allocation %}
+    <div id="fold_aah_allocation" class="ml-1 pl-4 border-left border-primary d-none">
+        {% bootstrap_field form.aah_allocation_since %}
+    </div>
+
+    {% bootstrap_field form.ata_allocation %}
+    <div id="fold_ata_allocation" class="ml-1 pl-4 border-left border-primary d-none">
+        {% bootstrap_field form.ata_allocation_since %}
+    </div>
+
+</form>
+
+<a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_2" job_application.id %}">Précédent</a>
+<a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
+
+{# A vérifier / optimiser #}
+
+<script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
+<script>
+    function toggleFold(elt) {
+        var fold = '#fold_' + elt.name 
+        if ($(elt).is(':checked')) {
+            $(fold).removeClass("d-none")
+        } else {
+            $(fold).addClass("d-none")
+        }}
+</script>
+

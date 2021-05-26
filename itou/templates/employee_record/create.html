@@ -29,16 +29,19 @@
     </div>
 
     <ul class="list-unstyled multi-steps my-5">
-        <li class="is-active">Etat civil</li>
-        <li>Domiciliation</li>
-        <li>Situation</li>
-        <li>Informations complémentaires</li>
+        {% for pstep, label in steps %}
+        <li {% if pstep == step %}class="is-active"{% endif %}>
+            {{ label }}
+        </li>
+        {% endfor %}
     </ul>
 
     {% if step == 1 %}
         {% include "employee_record/includes/create_step_1.html" %}
     {% elif step == 2 %}
         {% include "employee_record/includes/create_step_2.html" %}
+    {% elif step == 3 %}
+        {% include "employee_record/includes/create_step_3.html" %}
     {% endif %}
 
 </div>
