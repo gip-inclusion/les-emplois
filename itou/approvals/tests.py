@@ -310,7 +310,8 @@ class ApprovalModelTest(TestCase):
 
         today = datetime.date.today()
 
-        # Set "now" to be "before" the day approval is open to prolongation.
+        # Ensure "now" is "before" the period of time during which it
+        # is possible to prolong a PASS IAE.
         end_at = (
             today
             + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
@@ -320,7 +321,8 @@ class ApprovalModelTest(TestCase):
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
         self.assertFalse(approval.is_open_to_prolongation)
 
-        # Set "now" to be "after" the day approval is open to prolongation.
+        # Ensure "now" is "after" the period of time during which it
+        # is possible to prolong a PASS IAE.
         end_at = (
             today
             + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
