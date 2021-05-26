@@ -498,6 +498,6 @@ class RSAAllocation(models.TextChoices):
     => There are 3 distinct cases for an answer.
     """
 
+    NO = "NON", "Non bénéficiaire du RSA"
     YES_WITH_MARKUP = "OUI-M", "Bénéficiaire du RSA et majoré"
     YES_WITHOUT_MARKUP = "OUI-NM", "Bénéficiaire du RSA et non-majoré"
-    NO = "NON", "Non bénéficiaire du RSA"

@@ -7,13 +7,36 @@ from django.urls import reverse
 
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
+from itou.users.models import JobSeekerProfile
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import (
     NewEmployeeRecordStep1,
     NewEmployeeRecordStep2,
+    NewEmployeeRecordStep3,
     SelectEmployeeRecordStatusForm,
 )
+
+
+# Labels and steps for multi-steps component
+STEPS = [
+    (
+        1,
+        "Etat civil",
+    ),
+    (
+        2,
+        "Domiciliation",
+    ),
+    (
+        3,
+        "Situation",
+    ),
+    (
+        4,
+        "Informations complémentaires",
+    ),
+]
 
 
 @login_required
@@ -108,11 +131,19 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
     if request.method == "POST" and form.is_valid():
         form.save()
+
+        # Create jobseeker_profile if needed
+        employee = job_application.job_seeker
+        if not employee.has_jobseeker_profile:
+            profile = JobSeekerProfile(user=employee)
+            profile.update_hexa_address()
+
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
         "form": form,
+        "steps": STEPS,
         "step": step,
     }
 
@@ -124,7 +155,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     """
     Create a new employee record from a given job application
 
-    Step 1: Name and birth date / place / country of the jobseeker
+    Step 1: Details and address of the employee
     """
     siae = get_current_siae_or_404(request)
 
@@ -132,12 +163,43 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     job_application = JobApplication.objects.get(pk=job_application_id)
+    profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
+    # hexa_address = job_application.job_seeker.jobseeker_profile.display_hexa_address
     step = 2
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        profile.update_hexa_address()
+
+        # Loop on itself until good
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
         "form": form,
+        "profile": job_application.job_seeker.jobseeker_profile,
+        "steps": STEPS,
+        "step": step,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def create_step_3(request, job_application_id, template_name="employee_record/create.html"):
+    """
+    Lookup HEXA address of the employee
+    """
+    step = 3
+    job_application = JobApplication.objects.get(pk=job_application_id)
+    profile = job_application.job_seeker.jobseeker_profile
+    form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
+
+    context = {
+        "job_application": job_application,
+        "form": form,
+        "steps": STEPS,
         "step": step,
     }
 

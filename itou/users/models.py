@@ -631,3 +631,19 @@ class JobSeekerProfile(models.Model):
     @property
     def hexa_address_filled(self):
         return self.hexa_lane_name and self.hexa_lane_type and self.hexa_post_code and self.hexa_commune
+
+    @property
+    def display_hexa_address(self):
+        if self.hexa_address_filled:
+            result = ""
+            if self.hexa_lane_number:
+                result += f"{self.hexa_lane_number} "
+            if self.hexa_std_extension:
+                result += f"{self.hexa_std_extension} "
+            elif self.hexa_non_std_extension:
+                result += f"{self.hexa_non_std_extension} "
+
+            result += f"{self.hexa_lane_type} {self.hexa_lane_name} - {self.hexa_post_code} {self.hexa_commune.name}"
+            return result
+
+        return "Adresse HEXA incomplète"

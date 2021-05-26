@@ -52,7 +52,11 @@ def format_address(obj):
     if not address:
         return None, ERROR_GEOCODING_API
 
-    result = {}
+    # Default values
+    result = {
+        "number": "",
+        "non_std_extension": "",
+    }
 
     # Street extension processing (bis, ter ...)
     # Extension is part of the resulting streetnumber geo API field

@@ -8,14 +8,58 @@
     {% bootstrap_field form.address_line_1 %}
     {% bootstrap_field form.address_line_2 %}
 
-    {% bootstrap_field form.post_code %}
-    {% bootstrap_field form.city %}
+    <div class="row">
+        <div class="col-md-3">
+            {% bootstrap_field form.post_code %}
+        </div>
+        <div class="col-md-9">
+            {% bootstrap_field form.city %}
+        </div>
+    </div>
+
+    <div class="alert alert-warning">
+        <small>
+        <div class="mt-1">    
+            Merci de bien vouloir vérifier si le format d'adresse ci-dessous (HEXA) correspond bien
+            à l'adresse de l'employé.
+        </div>
+        <div class="mt-1">    
+            <b>Si l'adresse ne correspond pas</b>, merci de mettre à jour l'adresse à l'aide du formulaire
+            et de cliquer sur le bouton <b>"Mettre à jour"</b> et de repéter l'opération jusqu'à obtention d'une adresse correcte.
+        </div>
+        </small>
+    </div>
+
+    <div class="alert alert-secondary">
+        <div class="row">
+            <div class="col-md-3">Numéro</div>
+            <div class="col-md-9"><b>{{ profile.hexa_lane_number }} {{ profile.hexa_std_extension }}{{ profile.hexa_non_std_extension }}</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">Voie</div>
+            <div class="col-md-9"><b>{{ profile.hexa_lane_name }}</b></div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">Commune</div>
+            <div class="col-md-9">
+                <b>{{ profile.hexa_post_code }} {{ profile.hexa_commune.name }}</b>
+                <br>
+                <span><small>(code INSEE : {{ profile.hexa_commune.code }})</small></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-2 text-right">
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        {% endbuttons %}
+    </div>
 
     {% bootstrap_field form.phone %}
     {% bootstrap_field form.email %}
 
-    {% buttons %}
-    <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
-        <button type="submit" class="btn btn-primary">Continuer</button>
-    {% endbuttons %}
 </form>
+
+
+<a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
+<a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
