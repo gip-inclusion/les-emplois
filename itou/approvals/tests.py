@@ -314,7 +314,7 @@ class ApprovalModelTest(TestCase):
         end_at = (
             today
             + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
-            + relativedelta(days=1)
+            + relativedelta(days=5)
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
@@ -324,7 +324,7 @@ class ApprovalModelTest(TestCase):
         end_at = (
             today
             + relativedelta(months=Approval.PROLONGATION_PERIOD_BEFORE_APPROVAL_END_MONTHS)
-            - relativedelta(days=1)
+            - relativedelta(days=5)
         )
         start_at = end_at - relativedelta(years=2)
         approval = ApprovalFactory(start_at=start_at, end_at=end_at)
