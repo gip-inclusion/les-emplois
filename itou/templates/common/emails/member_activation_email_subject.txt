@@ -1,4 +1,0 @@
-{% extends "layout/base_email_text_subject.txt" %}
-{% block subject %}
-[Réactivation] Vous êtes désormais membre de {{ structure.display_name }}
-{% endblock %}
