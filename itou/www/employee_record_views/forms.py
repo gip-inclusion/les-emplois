@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 
 from itou.asp.models import Commune
 from itou.employee_record.models import EmployeeRecord
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.widgets import DatePickerField
 
 
@@ -28,6 +28,11 @@ class SelectEmployeeRecordStatusForm(forms.Form):
 
 
 class NewEmployeeRecordStep1(forms.ModelForm):
+    """
+    New employee record step 1:
+    - main details (just check)
+    - birth place and birth country of the employee
+    """
 
     COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
 
@@ -106,12 +111,18 @@ class NewEmployeeRecordStep1(forms.ModelForm):
 
 
 class NewEmployeeRecordStep2(forms.ModelForm):
+    """
+    New employee record step 2:
+    - HEXA address lookup
+    - details of the employee
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         for field_name in ["phone", "email"]:
             self.fields[field_name].widget.attrs["readonly"] = True
-            self.fields[field_name].help_text = "Non modifiable"
+            self.fields[field_name].help_text = "Champs non-modifiable"
 
     class Meta:
         model = User
@@ -123,3 +134,48 @@ class NewEmployeeRecordStep2(forms.ModelForm):
             "phone",
             "email",
         ]
+
+
+class NewEmployeeRecordStep3(forms.ModelForm):
+    """
+    New employee record step 3:
+    - situation of employee and details
+    """
+
+    registered_at_pole_emploi = forms.BooleanField(label="Le salarié est-il inscrit à Pôle emploi ?")
+
+    # A set of transient checkboxes used to fold/unfold options on display
+    ass_allocation = forms.BooleanField(label="Le salarié est-il bénéficiaire de l'ASS ?")
+    aah_allocation = forms.BooleanField(label="Le salarié est-il bénéficiaire de l'AAH ?")
+    ata_allocation = forms.BooleanField(label="Le salarié est-il bénéficiaire de l'ATA ?")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # More detailed labels for form fields
+        # ...
+
+        # Foldable sections
+        for field in ["registered_at_pole_emploi", "ass_allocation", "aah_allocation", "ata_allocation"]:
+            self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = [
+            "education_level",
+            "resourceless",
+            "pole_emploi_since",
+            "rqth_employee",
+            "oeth_employee",
+            "has_rsa_allocation",
+            "rsa_allocation_since",
+            "ass_allocation_since",
+            "aah_allocation_since",
+            "ata_allocation_since",
+        ]
+        labels = {
+            "education_level": "Niveau de formation",
+            "resourceless": "Salarié sans ressource ?",
+            "pole_emploi_since": "Inscrit depuis",
+            "has_rsa_allocation": "Le salarié est-il bénéficiaire du RSA ?",
+        }
