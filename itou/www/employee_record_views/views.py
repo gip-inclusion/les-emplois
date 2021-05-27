@@ -196,6 +196,9 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
 
+    if request.method == "POST" and form.is_valid():
+        form.save()
+
     context = {
         "job_application": job_application,
         "form": form,
