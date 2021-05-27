@@ -1,16 +1,21 @@
 {% load bootstrap4 %}
 {% load static %}
+{% load folds %}
 
 <h4>Situation du salarié</h4>
 
 <form method="POST" action="{% url "employee_record_views:create_step_3" job_application.id %}" class="js-prevent-multiple-submit">
+        
+    {% bootstrap_form_errors form %}
+
     {% csrf_token %}
 
     {% bootstrap_field form.education_level %}
     {% bootstrap_field form.resourceless %}
 
-    {% bootstrap_field form.registered_at_pole_emploi %}
-    <div id="fold_registered_at_pole_emploi" class="ml-1 pl-4 border-left border-primary d-none">
+    {% bootstrap_field form.pole_emploi %}
+    <div id="fold_pole_emploi" class="ml-1 pl-4 border-left border-primary {{ form.pole_emploi.value|fold_class }}">
+        {% bootstrap_field form.pole_emploi_id %}
         {% bootstrap_field form.pole_emploi_since %}
     </div>
 
@@ -19,24 +24,27 @@
     {% bootstrap_field form.has_rsa_allocation %}
 
     {% bootstrap_field form.ass_allocation %}
-    <div id="fold_ass_allocation" class="ml-1 pl-4 border-left border-primary d-none">
+    <div id="fold_ass_allocation" class="ml-1 pl-4 border-left border-primary {{ form.ass_allocation.value|fold_class }}">
         {% bootstrap_field form.ass_allocation_since %}
     </div>
     
     {% bootstrap_field form.aah_allocation %}
-    <div id="fold_aah_allocation" class="ml-1 pl-4 border-left border-primary d-none">
+    <div id="fold_aah_allocation" class="ml-1 pl-4 border-left border-primary {{ form.aah_allocation.value|fold_class }}">
         {% bootstrap_field form.aah_allocation_since %}
     </div>
 
     {% bootstrap_field form.ata_allocation %}
-    <div id="fold_ata_allocation" class="ml-1 pl-4 border-left border-primary d-none">
+    <div id="fold_ata_allocation" class="ml-1 pl-4 border-left border-primary {{ form.ata_allocation.value|fold_class }}">
         {% bootstrap_field form.ata_allocation_since %}
     </div>
 
+    {% buttons %}
+        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_2" job_application.id %}">Précédent</a>
+        <button type="submit" class="btn btn-primary">Continuer</button>
+    {% endbuttons %}
+
 </form>
 
-<a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_2" job_application.id %}">Précédent</a>
-<a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
 
 {# A vérifier / optimiser #}
 
