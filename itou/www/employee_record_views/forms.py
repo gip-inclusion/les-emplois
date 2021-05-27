@@ -1,9 +1,11 @@
 from django import forms
+from django.core.validators import MinLengthValidator
 from django.urls import reverse_lazy
 
 from itou.asp.models import Commune
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import JobSeekerProfile, User
+from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DatePickerField
 
 
@@ -142,22 +144,42 @@ class NewEmployeeRecordStep3(forms.ModelForm):
     - situation of employee and details
     """
 
-    registered_at_pole_emploi = forms.BooleanField(label="Le salarié est-il inscrit à Pôle emploi ?")
+    pole_emploi = forms.BooleanField(required=False, label="Le salarié est-il inscrit à Pôle emploi ?")
+    pole_emploi_id = forms.CharField(
+        label="Identifiant Pôle emploi",
+        required=False,
+        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
+    )
 
     # A set of transient checkboxes used to fold/unfold options on display
-    ass_allocation = forms.BooleanField(label="Le salarié est-il bénéficiaire de l'ASS ?")
-    aah_allocation = forms.BooleanField(label="Le salarié est-il bénéficiaire de l'AAH ?")
-    ata_allocation = forms.BooleanField(label="Le salarié est-il bénéficiaire de l'ATA ?")
+    ass_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ASS ?")
+    aah_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'AAH ?")
+    ata_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ATA ?")
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Pôle emploi
+        pole_emploi_id = self.instance.user.pole_emploi_id
+        if pole_emploi_id:
+            self.initial["pole_emploi_id"] = pole_emploi_id
+            self.initial["pole_emploi"] = True
+            self.fields["pole_emploi_id"].widget.attrs["readonly"] = True
         # More detailed labels for form fields
         # ...
 
         # Foldable sections
-        for field in ["registered_at_pole_emploi", "ass_allocation", "aah_allocation", "ata_allocation"]:
+        for field in ["pole_emploi", "ass_allocation", "aah_allocation", "ata_allocation"]:
             self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
+            self.initial[field] = getattr(self.instance, field + "_since")
+
+    def clean(self):
+        super().clean()
+
+        # Pôle emploi
+        # if self.cleaned_data["registered_at_pole_emploi"]:
+        #    if not self.cleaned_data["pole_emploi_since"]:
+        #        raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
 
     class Meta:
         model = JobSeekerProfile
