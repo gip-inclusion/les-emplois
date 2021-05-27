@@ -4,13 +4,30 @@
 
 ## Environnement de développement
 
+### Prérequis
+
+Pour lancer l'environnement de développement, vous devez disposer sur votre machine d'un démon `Docker` et de l'outil `Docker Compose`.
+
+Si ce n'est pas encore le cas :
+- [Installer Docker](https://docs.docker.com/engine/install/)
+- [Installer Docker Compose](https://docs.docker.com/compose/install/)
+
 ### Configuration de l'environnement
 
+Commencez par copier le gabarit du fichier de configuration Django prévu pour le développement :
+
     cp config/settings/dev.py.template config/settings/dev.py
+
+Les valeurs par défaut de `dev.py` permettent de lancer un evironnement fonctionnel. 
+
+Cependant, il est recommandé d'en prendre connaissance pour noter par exemple que les emails ne sont pas réellement envoyés mais que leur contenu est simplement écrit dans la sortie standard.
+
+Le reste de la configuration se fait avec des variables d'environnement. Afin que `Docker Compose` puisse alimenter les conteneurs `Docker` avec ces variables, deux fichiers de configuration, `dev.env` et `secrets.env` doivent être créés :
+
     cp envs/dev.env.template envs/dev.env
     cp envs/secrets.env.template envs/secrets.env
 
-Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le fichier `README.md`, puis y configurer les variables d'environnement suivantes :
+Vous pouvez également personnaliser la configuration Compose en créant [un fichier `.env`](https://docs.docker.com/compose/env-file/) au même niveau que le fichier `README.md`, puis y configurer les variables d'environnement suivantes :
 
     DJANGO_PORT_ON_DOCKER_HOST=8080
     POSTGRES_PORT_ON_DOCKER_HOST=5433
@@ -18,7 +35,7 @@ Vous pouvez personnaliser la configuration Compose en créant [un fichier `.env`
 ### Lancer le serveur de développement
 
     $ make run
-
+    
     # Équivalent de :
     $ docker-compose up
 
