@@ -70,20 +70,8 @@
 
     <section class="layout-section bg-light py-5 text-center">
         <div class="layout-content">
-            <iframe width="100%" height="980" id="livestorm_iframe" frameborder="0" src="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm"></iframe>
+            <div id="livestorm_iframe" class="tac_livestorm" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm" width="100%" height="980px"></div>
         </div>
     </section>
 
 {% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    <script type="text/javascript">
-        // Poor attempt to make the Livestorm iframe responsive.
-        const tablet_width = 750;
-        const width = document.body.clientWidth;
-        if (width > tablet_width) {
-            $("#livestorm_iframe").height("310px");
-        }
-    </script>
-{% endblock script %}
