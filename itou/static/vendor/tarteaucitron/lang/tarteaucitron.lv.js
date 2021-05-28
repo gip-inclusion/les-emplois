@@ -43,8 +43,8 @@ tarteaucitron.lang = {
     "icon": "Cookies",
     
     "fallback": "letiltott.",
-    "allowed": "megengedett",
-    "disallowed": "nem engedélyezett",
+    "allowed": "atļauts",
+    "disallowed": "nav atļauts",
 
     "ads": {
         "title": "Reklámhálózat",
