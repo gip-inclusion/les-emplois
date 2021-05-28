@@ -334,6 +334,46 @@
         {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
         tarteaucitron.user.HotjarSv = 6;
 
+        // livestorm
+        const tablet_width = 750;
+        tarteaucitron.services.livestorm = {
+            "key": "livestorm",
+            "type": "video",
+            "name": "Livestorm",
+            "uri": "https://livestorm.co/fr/politique-confidentialite",
+            "needConsent": true,
+            "cookies": [],
+            "js": function () {
+                "use strict";
+                tarteaucitron.fallback(['tac_livestorm'], function (x) {
+                    var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
+                        width = x.getAttribute("width"),
+                        height = x.getAttribute("height"),
+                        url = x.getAttribute("data-url");
+                    
+                    // Poor attempt to make the Livestorm iframe responsive.
+                    if (document.body.clientWidth > tablet_width) {
+                        height = "310px";
+                    }
+                    return '<iframe title="' + frame_title + '" src="' + url + '" width="' + width + '" height="' + height + '" frameborder="0" scrolling="no" allowtransparency allowfullscreen></iframe>';
+                });
+            },
+            "fallback": function () {
+                "use strict";
+                var id = 'livestorm';
+                tarteaucitron.fallback(['tac_livestorm'], function (elem) {
+                    elem.style.width = elem.getAttribute('width');
+                    if (document.body.clientWidth > tablet_width) {
+                        elem.style.height = "310px";
+                    } else {
+                        elem.style.height = elem.getAttribute('height');
+                    }
+                    return tarteaucitron.engage(id);
+                });
+            }
+        };
+        (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
+
     </script>
 
     {% block script %}
