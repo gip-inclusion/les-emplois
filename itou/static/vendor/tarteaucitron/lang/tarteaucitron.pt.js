@@ -9,7 +9,7 @@ tarteaucitron.lang = {
     "alertBigClick": "Se você continuar a navegação neste site,",
     "alertBig": "você estará aceitando todos os serviços de terceiros",
     
-    "alertBigPrivacy": "Esse site utiliza cookies e lhe dá controle sobre o que você quer ativar",
+    "alertBigPrivacy": "Este site utiliza cookies e dá-lhe controle sobre o que quer ativar",
     "alertSmall": "Gerenciar serviços",
     "personalize": "Personalizar",
     "acceptAll": "OK, aceitar tudo",
@@ -38,7 +38,12 @@ tarteaucitron.lang = {
     "allowAll": "Permite todos os cookies",
     "denyAll": "Proibe todos cookies",
 
+    "icon": "Cookies",
+
     "fallback": "está desativado.",
+    "allowed": "permitido",
+    "disallowed": "não permitido",
+    
     "ads": {
         "title": "Rede de anúncios",
         "details": "As redes de anúncios podem gerar receitas com a venda de espaço publicitário no site."
@@ -70,5 +75,8 @@ tarteaucitron.lang = {
     "other": {
         "title": "De outros",
         "details": "Serviços para exibir conteúdo da web."
-    }
+    },
+    
+    "mandatoryTitle": "Cookies obrigatórios",
+    "mandatoryText": "Este site utiliza alguns cookies que são necessários ao seu funcionamento e não podem ser desativados."
 };
