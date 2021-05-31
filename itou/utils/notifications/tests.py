@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
-from itou.siaes.factories import SiaeWithMembershipFactory
+from itou.siaes.factories import SiaeWith4MembershipsFactory
 
 
 BaseNotification = NewSpontaneousJobAppEmployersNotification
@@ -13,13 +13,13 @@ class NotificationsBaseClassTest(TestCase):
     # Use a child class to test parent class. Maybe refactor that later.
 
     def setUp(self):
-        self.siae = SiaeWithMembershipFactory()
+        self.siae = SiaeWith4MembershipsFactory()
         self.job_application = JobApplicationFactory(to_siae=self.siae)
         self.notification = BaseNotification(job_application=self.job_application)
 
         # Make sure notifications are empty
         self.siaemembership_set = self.siae.siaemembership_set
-        self.membership = self.siaemembership_set.first()
+        self.membership = self.siaemembership_set.filter(user__is_active=True).first()
         self.assertFalse(self.membership.notifications)
 
     def test_subscribe(self):
@@ -57,10 +57,16 @@ class NotificationsBaseClassTest(TestCase):
             self.siaemembership_set.filter(user__email__in=recipients_emails).count(), len(recipients_emails)
         )
 
+    def test_deasctivate_user_not_in_recipients_email(self):
+        recipients_emails = self.notification.recipients_emails
+        self.assertEqual(
+            self.siaemembership_set.filter(user__is_active=False, user__email__in=recipients_emails).count(), 0
+        )
+
     def test_get_recipients_default_send_to_unset_recipients(self):
         # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
         recipients = self.notification.get_recipients()
-        self.assertEqual(self.siaemembership_set.count(), len(recipients))
+        self.assertEqual(self.siaemembership_set.filter(user__is_active=True).count(), len(recipients))
 
     def test_get_recipients_default_dont_send_to_unset_recipients(self):
         # Unset recipients are not present in get_recipients if SEND_TO_UNSET_RECIPIENTS = False
