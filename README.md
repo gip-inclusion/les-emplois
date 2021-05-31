@@ -27,7 +27,7 @@ Le reste de la configuration se fait avec des variables d'environnement. Afin qu
     cp envs/dev.env.template envs/dev.env
     cp envs/secrets.env.template envs/secrets.env
 
-Le fichier `dev.env` contient les variables d'environnement dont la valeur peut être partagée et pour lesquelles la valeur définit par défaut est viable pour un environnement de développement.
+Le fichier `dev.env` contient les variables d'environnement dont la valeur peut être partagée et pour lesquelles la valeur définie par défaut est viable pour un environnement de développement.
 
 À l'inverse, le fichier `secrets.env` regroupe les variables propres à votre environnement et par nature "sensible". Ces variables n'ont donc pas de valeur par défaut viable et doivent donc être configurées par vos soins.
 
