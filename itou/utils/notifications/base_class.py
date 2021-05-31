@@ -46,7 +46,7 @@ class BaseNotification:
         self.email.send()
 
     def get_recipients(self):
-        return self.recipients_qs.filter(self.subscribed_lookup)
+        return self.recipients_qs.active().filter(self.subscribed_lookup)
 
     @property
     def email(self):
