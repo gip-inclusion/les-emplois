@@ -345,7 +345,7 @@
             "cookies": [],
             "js": function () {
                 "use strict";
-                tarteaucitron.fallback(['tac_livestorm'], function (x) {
+                tarteaucitron.fallback(['js-tac-livestorm'], function (x) {
                     var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
                         width = x.getAttribute("width"),
                         height = x.getAttribute("height"),
@@ -361,7 +361,7 @@
             "fallback": function () {
                 "use strict";
                 var id = 'livestorm';
-                tarteaucitron.fallback(['tac_livestorm'], function (elem) {
+                tarteaucitron.fallback(['js-tac-livestorm'], function (elem) {
                     elem.style.width = elem.getAttribute('width');
                     if (document.body.clientWidth > tablet_width) {
                         elem.style.height = "310px";
