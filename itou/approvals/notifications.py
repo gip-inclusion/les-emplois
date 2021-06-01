@@ -1,5 +1,6 @@
 from itou.utils.emails import get_email_message
 from itou.utils.notifications.base_class import BaseNotification
+from itou.siaes.models import SiaeMembershipQuerySet
 
 
 class NewProlongationToAuthorizedPrescriberNotification(BaseNotification):
@@ -11,6 +12,7 @@ class NewProlongationToAuthorizedPrescriberNotification(BaseNotification):
 
     def __init__(self, prolongation):
         self.prolongation = prolongation
+        super().__init__(recipients_qs=SiaeMembershipQuerySet)
 
     @property
     def email(self):
