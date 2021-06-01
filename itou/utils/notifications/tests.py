@@ -57,7 +57,7 @@ class NotificationsBaseClassTest(TestCase):
             self.siaemembership_set.filter(user__email__in=recipients_emails).count(), len(recipients_emails)
         )
 
-    def test_deasctivate_user_not_in_recipients_email(self):
+    def test_desactivate_user_not_in_recipients_email(self):
         recipients_emails = self.notification.recipients_emails
         self.assertEqual(
             self.siaemembership_set.filter(user__is_active=False, user__email__in=recipients_emails).count(), 0

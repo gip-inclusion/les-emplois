@@ -1,6 +1,6 @@
+from itou.siaes.models import SiaeMembershipQuerySet
 from itou.utils.emails import get_email_message
 from itou.utils.notifications.base_class import BaseNotification
-from itou.siaes.models import SiaeMembershipQuerySet
 
 
 class NewProlongationToAuthorizedPrescriberNotification(BaseNotification):
