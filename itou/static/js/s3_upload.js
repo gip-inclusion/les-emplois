@@ -112,14 +112,13 @@ window.s3UploadInit = function s3UploadInit({
 
   dropzone.on("error", function (file, errorMessage, xhr) {
     let statusCode = 500;
+    errorMessage = JSON.stringify(errorMessage);
 
     if (xhr != null) {
       if (xhr.responseText != null) {
         statusCode = xhr.status;
         let responseJson = JSON.parse(xhr.responseText);
         errorMessage = responseJson["Message"];
-
-        // Override strange [object Object] error message.
         file.previewElement.querySelectorAll('[data-dz-errormessage]')[0].textContent = "Erreur technique. Merci de recommencer.";
       }
 
@@ -133,7 +132,6 @@ window.s3UploadInit = function s3UploadInit({
         error_message: sentryErrorMessage,
         csrfmiddlewaretoken: sentryCsrfToken,
       });
-
     }
   });
 };
