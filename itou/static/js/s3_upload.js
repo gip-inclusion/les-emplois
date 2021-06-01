@@ -48,7 +48,7 @@ window.s3UploadInit = function s3UploadInit({
     dictFallbackMessage: "Ce navigateur n'est pas compatible",
     dictFileTooBig: "Fichier trop volumineux",
     dictInvalidFileType: "Type de fichier non pris en charge",
-    dictResponseError: "Erreur technique",
+    dictResponseError: "Erreur technique {{statusCode}}. Merci de recommencer.",
     dictCancelUpload: "Annuler",
     dictUploadCanceled: "Annulé",
     dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
@@ -111,14 +111,24 @@ window.s3UploadInit = function s3UploadInit({
   });
 
   dropzone.on("error", function (file, errorMessage, xhr) {
+    let statusCode = 500;
+    errorMessage = JSON.stringify(errorMessage);
+
     if (xhr != null) {
+      if (xhr.responseText != null) {
+        statusCode = xhr.status;
+        let responseJson = JSON.parse(xhr.responseText);
+        errorMessage = responseJson["Message"];
+        file.previewElement.querySelectorAll('[data-dz-errormessage]')[0].textContent = "Erreur technique. Merci de recommencer.";
+      }
+
       // An error occurred with the request.
       // Send it to Sentry to avoid silent bugs.
       const sentryErrorMessage =
         `Unable to upload "${file.upload.filename}" ` +
         `(${file.upload.progress} of ${file.upload.total}) to S3 ${formUrl}: ${errorMessage}`;
       $.post(sentryInternalUrl, {
-        status_code: 500,
+        status_code: statusCode,
         error_message: sentryErrorMessage,
         csrfmiddlewaretoken: sentryCsrfToken,
       });
