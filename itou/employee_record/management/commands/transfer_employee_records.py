@@ -9,6 +9,7 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
+from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer, TestEmployeeRecordSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks
@@ -57,6 +58,12 @@ class Command(BaseCommand):
         parser.add_argument(
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
         )
+        parser.add_argument(
+            "--test",
+            dest="asp_test",
+            action="store_true",
+            help="Update employee records with test SIRET and financial annex number",
+        )
 
     def _get_sftp_connection(self):
         """
@@ -84,7 +91,12 @@ class Command(BaseCommand):
         """
         Render a list of employee records in JSON format then send it to SFTP upload folder
         """
-        batch = EmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
+        # Temporary ability to use test serializers
+        batch = (
+            TestEmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
+            if self.asp_test
+            else EmployeeRecordBatchSerializer(EmployeeRecordBatch(employee_records))
+        )
 
         # JSONRenderer produces byte arrays
         json_bytes = JSONRenderer().render(batch.data)
@@ -263,12 +275,16 @@ class Command(BaseCommand):
         for batch in chunks(EmployeeRecord.objects.ready(), EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, **options):
+    def handle(self, upload=True, download=True, verbosity=1, dry_run=False, asp_test=False, **options):
         """
         Employee Record Management Command
         """
         if verbosity > 1:
             self.logger.setLevel(logging.DEBUG)
+
+        self.asp_test = asp_test
+        if self.asp_test:
+            self.logger.info("Using *TEST* JSON serializers (SIRET number mapping)")
 
         with self._get_sftp_connection() as sftp:
             user = settings.ASP_FS_SFTP_USER or "django_tests"
