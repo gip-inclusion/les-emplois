@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -212,10 +212,8 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     if request.method == "POST" and form.is_valid():
         form.save()
         job_application.refresh_from_db()
-        # FIXME
-        employee_record = EmployeeRecord.from_job_application(job_application)
-        # employee_record.update_as_ready()
-        employee_record.save()
+        # FIXME try
+        EmployeeRecord.from_job_application(job_application).save()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
 
     context = {
@@ -237,10 +235,12 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     """
     step = 4
     job_application = JobApplication.objects.get(pk=job_application_id)
-    form = NewEmployeeRecordStep4(data=request.POST or None, instance=job_application.employee_record)
+    employee_record = EmployeeRecord.objects.get(job_application=job_application)
+    form = NewEmployeeRecordStep4(data=request.POST or None, instance=employee_record)
 
     if request.method == "POST" and form.is_valid():
         form.save()
+        return HttpResponseRedirect()
 
     context = {
         "job_application": job_application,
