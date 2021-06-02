@@ -1,9 +1,7 @@
 {% extends "layout/content.html" %}
 
 {% block title %}
-    {% with request.GET.city_name as city and request.GET.distance as distance %}
-        Employeurs solidaires à {{ distance }} km du centre de {{ city }}
-    {% endwith %}
+    Employeurs solidaires à {{ distance }} km du centre de {{ city }}
     {{ block.super }}
 {% endblock %}
 
@@ -16,9 +14,7 @@
     </form>
 
     <h3>
-        {% with request.GET.city_name as city and request.GET.distance as distance %}
-            Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
-        {% endwith %}
+        Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
     </h3>
 
     {% if not siaes_page %}
