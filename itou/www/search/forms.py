@@ -7,7 +7,7 @@ from itou.siaes.models import Siae
 
 class SiaeSearchForm(forms.Form):
 
-    DISTANCES = [100, 75, 50, 25, 15, 10]
+    DISTANCES = [10, 15, 25, 50, 75, 100]
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 25
 
