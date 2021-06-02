@@ -11,4 +11,5 @@ urlpatterns = [
     path("create_step_2/<uuid:job_application_id>", views.create_step_2, name="create_step_2"),
     path("create_step_3/<uuid:job_application_id>", views.create_step_3, name="create_step_3"),
     path("create_step_4/<uuid:job_application_id>", views.create_step_4, name="create_step_4"),
+    path("create_step_5/<uuid:job_application_id>", views.create_step_5, name="create_step_5"),
 ]
