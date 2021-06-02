@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
@@ -136,7 +136,12 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         employee = job_application.job_seeker
         if not employee.has_jobseeker_profile:
             profile = JobSeekerProfile(user=employee)
-            profile.update_hexa_address()
+            try:
+                profile.save()
+                profile.update_hexa_address()
+            except ValidationError as ex:
+                # TODO report error (messages)
+                print(f"error: {ex}")
 
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
@@ -155,7 +160,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     """
     Create a new employee record from a given job application
 
-    Step 1: Details and address of the employee
+    Step 2: Details and address lookup / check of the employee
     """
     siae = get_current_siae_or_404(request)
 
@@ -166,11 +171,16 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
     # hexa_address = job_application.job_seeker.jobseeker_profile.display_hexa_address
+    maps_url = f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}"
     step = 2
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        profile.update_hexa_address()
+        try:
+            profile.update_hexa_address()
+        except ValidationError as ex:
+            # TODO report error (messages)
+            print(f"error: {ex}")
 
         # Loop on itself until good
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
@@ -179,6 +189,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         "job_application": job_application,
         "form": form,
         "profile": job_application.job_seeker.jobseeker_profile,
+        "maps_url": maps_url,
         "steps": STEPS,
         "step": step,
     }
@@ -188,10 +199,38 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
 
 @login_required
 def create_step_3(request, job_application_id, template_name="employee_record/create.html"):
-    """
-    Lookup HEXA address of the employee
-    """
+    """"""
     step = 3
+    job_application = JobApplication.objects.get(pk=job_application_id)
+    profile = job_application.job_seeker.jobseeker_profile
+    form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        # FIXME
+        job_application.refresh_from_db()
+        employee_record = EmployeeRecord.from_job_application(job_application)
+        employee_record.update_as_ready()
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
+
+    context = {
+        "job_application": job_application,
+        "form": form,
+        "steps": STEPS,
+        "step": step,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def create_step_4(request, job_application_id, template_name="employee_record/create.html"):
+    """
+    Create a new employee record from a given job application
+
+    Step 3: Creation of an employee record object with the details of the previous forms
+    """
+    step = 4
     job_application = JobApplication.objects.get(pk=job_application_id)
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)

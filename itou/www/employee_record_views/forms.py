@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import MinLengthValidator
 from django.urls import reverse_lazy
 
-from itou.asp.models import Commune
+from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
@@ -152,9 +152,13 @@ class NewEmployeeRecordStep3(forms.ModelForm):
     )
 
     # A set of transient checkboxes used to fold/unfold options on display
+    rsa_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire du RSA ?")
     ass_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ASS ?")
     aah_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'AAH ?")
     ata_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ATA ?")
+
+    # This field is a subset of the possible choices of `has_rsa_allocation` model field
+    rsa_markup = forms.ChoiceField(required=False, label="Majoration du RSA", choices=RSAAllocation.choices[1:])
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,21 +169,38 @@ class NewEmployeeRecordStep3(forms.ModelForm):
             self.initial["pole_emploi_id"] = pole_emploi_id
             self.initial["pole_emploi"] = True
             self.fields["pole_emploi_id"].widget.attrs["readonly"] = True
-        # More detailed labels for form fields
-        # ...
+        self.fields["pole_emploi"].widget.attrs["onclick"] = "toggleFold(this)"
 
         # Foldable sections
-        for field in ["pole_emploi", "ass_allocation", "aah_allocation", "ata_allocation"]:
+        for field in ["rsa_allocation", "ass_allocation", "aah_allocation", "ata_allocation"]:
             self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
             self.initial[field] = getattr(self.instance, field + "_since")
+
+        # RSA Markup
+        self.initial["rsa_markup"] = self.instance.has_rsa_allocation
 
     def clean(self):
         super().clean()
 
         # Pôle emploi
-        # if self.cleaned_data["registered_at_pole_emploi"]:
-        #    if not self.cleaned_data["pole_emploi_since"]:
-        #        raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
+        if self.cleaned_data["pole_emploi"]:
+            if not self.cleaned_data["pole_emploi_since"]:
+                raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
+
+            if not self.cleaned_data["pole_emploi_id"]:
+                raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
+
+        # RSA
+        if self.cleaned_data["rsa_allocation"]:
+            # If checked, all fields must be filled
+            if not (self.cleaned_data["rsa_allocation_since"] and self.cleaned_data["rsa_markup"]):
+                raise forms.ValidationError("La durée d'inscription et la majoration RSA sont obligatoires")
+
+    def save(self, *args, **kwargs):
+        if self.cleaned_data["rsa_allocation"]:
+            self.instance.has_rsa_allocation = self.cleaned_data["rsa_markup"]
+
+        super().save(*args, **kwargs)
 
     class Meta:
         model = JobSeekerProfile
@@ -189,7 +210,6 @@ class NewEmployeeRecordStep3(forms.ModelForm):
             "pole_emploi_since",
             "rqth_employee",
             "oeth_employee",
-            "has_rsa_allocation",
             "rsa_allocation_since",
             "ass_allocation_since",
             "aah_allocation_since",
