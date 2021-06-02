@@ -224,28 +224,32 @@ class NewEmployeeRecordStep3(forms.ModelForm):
         }
 
 
-class NewEmployeeRecordStep4(forms.ModelForm):
+class NewEmployeeRecordStep4(forms.Form):
     """
     New employee record step 4:
     Select a valid financial annex
     """
 
-    valid_financial_annex = forms.ChoiceField(
+    financial_annex = forms.ChoiceField(
         choices=[],
         label="Annexe financière",
         help_text="Vous devez rattacher la fiche salarié à une annexe financière validée ou provisoire",
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, employee_record, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if self.instance:
-            convention = self.instance.job_application.to_siae.convention
-            financial_annexes = convention.financial_annexes.filter(state__in=SiaeFinancialAnnex.STATES_ACTIVE)
+        self.employee_record = employee_record
 
-            choices = [(annex.number, annex.number) for annex in financial_annexes]
-            self.fields["valid_financial_annex"].choices = choices
+        convention = employee_record.job_application.to_siae.convention
+        financial_annexes = convention.financial_annexes.filter(state__in=SiaeFinancialAnnex.STATES_ACTIVE)
 
-    class Meta:
-        model = EmployeeRecord
-        fields = ["financial_annex"]
+        choices = [(annex.number, annex.number) for annex in financial_annexes]
+        self.fields["financial_annex"].choices = choices
+
+    def clean(self):
+        super().clean()
+
+        self.employee_record.financial_annex = SiaeFinancialAnnex.objects.get(
+            number=self.cleaned_data["financial_annex"]
+        )
