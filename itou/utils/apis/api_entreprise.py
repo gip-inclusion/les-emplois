@@ -40,7 +40,7 @@ class EtablissementAPI:
             r = httpx.get(url, headers=headers)
             r.raise_for_status()
             data = r.json()
-        except httpx.HTTPError as e:
+        except httpx.HTTPStatusError as e:
             if e.response.status_code == 422:
                 error = "SIRET non reconnu."
             else:
