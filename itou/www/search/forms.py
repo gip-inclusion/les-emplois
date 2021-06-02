@@ -47,6 +47,12 @@ class SiaeSearchForm(forms.Form):
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
 
+    has_few_candidates = forms.BooleanField(
+        label="Peu de candidatures",
+        initial=False,
+        required=False,
+    )
+
     def clean_distance(self):
         distance = self.cleaned_data["distance"]
         if not distance:
