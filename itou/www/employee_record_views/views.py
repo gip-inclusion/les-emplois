@@ -236,11 +236,12 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     step = 4
     job_application = JobApplication.objects.get(pk=job_application_id)
     employee_record = EmployeeRecord.objects.get(job_application=job_application)
-    form = NewEmployeeRecordStep4(data=request.POST or None, instance=employee_record)
+    form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        form.save()
-        return HttpResponseRedirect()
+        print(form.employee_record.financial_annex)
+        form.employee_record.save()
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
