@@ -1,7 +1,11 @@
 {% extends "layout/content.html" %}
 
 {% block title %}
-    Employeurs solidaires à {{ distance }} km du centre de {{ city }}
+    {% if form.is_valid %}
+        Employeurs solidaires à {{ distance }} km du centre de {{ city }}
+    {% else %}
+        Recherche d'employeurs solidaires
+    {% endif %}
     {{ block.super }}
 {% endblock %}
 
@@ -13,9 +17,11 @@
         {% include "search/includes/siaes_search_form.html" with form=form %}
     </form>
 
-    <h3>
-        Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
-    </h3>
+    {% if form.is_valid %}
+        <h3>
+            Employeurs solidaires à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
+        </h3>
+    {% endif %}
 
     {% if not siaes_page %}
 
