@@ -1,0 +1,28 @@
+from itou.employee_record.mocks.asp_test_siaes import test_data_for_asp_id
+from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
+
+
+class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
+    def to_representation(self, instance):
+        """
+        Test version of the employee record serializer
+        Basically uses the ASP_ID -> SIRET mapping to be aligned with ASP test platform
+        (only a limited predefined set of SIAE/SIRET/Financial annex number is possible)
+        """
+
+        result = super().to_representation(instance)
+
+        # Map test fields / values
+
+        test_data = test_data_for_asp_id(instance.asp_id)
+
+        result["mesure"] = test_data["mesure"]
+        result["siret"] = test_data["siret"]
+        result["numeroAnnexe"] = test_data["numeroAnnexe"]
+
+        return result
+
+
+class TestEmployeeRecordBatchSerializer(EmployeeRecordBatchSerializer):
+    # Overrides
+    lignesTelechargement = TestEmployeeRecordSerializer(many=True, source="employee_records")
