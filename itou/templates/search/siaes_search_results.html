@@ -10,7 +10,6 @@
 {% endblock %}
 
 {% block content %}
-
     <h2>Rechercher des employeurs solidaires</h2>
 
     <form method="get" action="" class="d-block mb-5">
@@ -24,11 +23,9 @@
     {% endif %}
 
     {% if not siaes_page %}
-
         <h4 class="font-weight-normal text-muted">
             Aucun résultat.
         </h4>
-
     {% else %}
 
         <p>
@@ -37,7 +34,7 @@
             </small>
         </p>
 
-        <h4 class="font-weight-normal text-muted">
+        <h4 class="font-weight-normal text-muted mb-0">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages and siaes_page.paginator.count as counter %}
                 {% if counter > 1 %}
                     <b>{{ counter }}</b> résultats
@@ -49,6 +46,8 @@
                 {% endif %}
             {% endwith %}
         </h4>
+
+        {% include "search/includes/siaes_search_filters.html" with form=form %}
 
         {% for siae in siaes_page %}
             <div class="card my-4">
