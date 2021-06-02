@@ -21,7 +21,12 @@
 
     {% bootstrap_field form.rqth_employee %}
     {% bootstrap_field form.oeth_employee %}
-    {% bootstrap_field form.has_rsa_allocation %}
+
+    {% bootstrap_field form.rsa_allocation %}
+    <div id="fold_rsa_allocation" class="ml-1 pl-4 border-left border-primary {{ form.rsa_allocation.value|fold_class }}">
+        {% bootstrap_field form.rsa_markup %}
+        {% bootstrap_field form.rsa_allocation_since %}
+    </div>
 
     {% bootstrap_field form.ass_allocation %}
     <div id="fold_ass_allocation" class="ml-1 pl-4 border-left border-primary {{ form.ass_allocation.value|fold_class }}">
