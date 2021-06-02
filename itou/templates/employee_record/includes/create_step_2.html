@@ -2,23 +2,8 @@
 
 <h4>Domiciliation du salarié</h4>
 
-<form method="POST" action="{% url "employee_record_views:create_step_2" job_application.id %}" class="js-prevent-multiple-submit">
-    {% csrf_token %}
-
-    {% bootstrap_field form.address_line_1 %}
-    {% bootstrap_field form.address_line_2 %}
-
-    <div class="row">
-        <div class="col-md-3">
-            {% bootstrap_field form.post_code %}
-        </div>
-        <div class="col-md-9">
-            {% bootstrap_field form.city %}
-        </div>
-    </div>
-
-    <div class="alert alert-warning">
-        <small>
+<div class="alert alert-warning">
+    <small>
         <div class="mt-1">    
             Merci de bien vouloir vérifier si le format d'adresse ci-dessous (HEXA) correspond bien
             à l'adresse de l'employé.
@@ -27,10 +12,13 @@
             <b>Si l'adresse ne correspond pas</b>, merci de mettre à jour l'adresse à l'aide du formulaire
             et de cliquer sur le bouton <b>"Mettre à jour"</b> et de repéter l'opération jusqu'à obtention d'une adresse correcte.
         </div>
-        </small>
-    </div>
+    </small>
+</div>
 
+<form method="POST" action="{% url "employee_record_views:create_step_2" job_application.id %}" class="js-prevent-multiple-submit">
     <div class="alert alert-secondary">
+        <h5><b>Adresse retenue</b></h5>
+
         {% if profile.hexa_address_filled %}
         <div class="row">
             <div class="col-md-3">Numéro</div>
@@ -59,21 +47,41 @@
             <p>
             <p>
                 Veuillez vérifier et modifier les différents éléments de l'adresse, 
-                puis cliquez sur le bouton <b>"Mettre à jour" dés que tout semble correct.</b>
+                puis cliquez sur le bouton <b>"Modifier l'adresse"</b> dés que tout semble correct.
             </p>
         </div>
         {% endif %}
     </div>
 
-    <small class="text-mute">
-        <a href="{{ maps_url }}" target="_blank">Vous avez du mal à déterminer l'adresse de l'employé ? Cliquez-ici pour vérifier</a>
-    </small>
+    {% csrf_token %}
 
-    <div class="mt-2 text-right">
-        {% buttons %}
-            <button type="submit" class="btn btn-primary">Mettre à jour</button>
-        {% endbuttons %}
+    <div class="border-left border-mute mb-4 ml-3 pl-3">
+
+        {% bootstrap_field form.address_line_1 %}
+        {% bootstrap_field form.address_line_2 %}
+
+        <div class="row">
+            <div class="col-md-3">
+                {% bootstrap_field form.post_code %}
+            </div>
+            <div class="col-md-9">
+                {% bootstrap_field form.city %}
+            </div>
+        </div>
+
+        <small class="text-mute">
+            <a href="{{ maps_url }}" target="_blank">Vous avez du mal à déterminer l'adresse de l'employé ? Cliquez-ici pour vérifier</a>
+        </small>
+
+        <div class="mt-4">
+            {% buttons %}
+            <button type="submit" class="btn btn-primary">Modifier l'adresse</button>
+            {% endbuttons %}
+        </div>
+
     </div>
+
+    <h4>Téléphone et adresse e-mail du salarié</h4>
 
     {% bootstrap_field form.phone %}
     {% bootstrap_field form.email %}
