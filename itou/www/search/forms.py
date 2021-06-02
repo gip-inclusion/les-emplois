@@ -50,8 +50,8 @@ class SiaeSearchForm(forms.Form):
         slug = self.cleaned_data["city"]
         try:
             return City.objects.get(slug=slug)
-        except City.DoesNotExist:
-            raise forms.ValidationError("Cette ville n'existe pas.")
+        except City.DoesNotExist as e:
+            raise forms.ValidationError("Cette ville n'existe pas.") from e
 
 
 class PrescriberSearchForm(forms.Form):
@@ -89,5 +89,5 @@ class PrescriberSearchForm(forms.Form):
         slug = self.cleaned_data["city"]
         try:
             return City.objects.get(slug=slug)
-        except City.DoesNotExist:
-            raise forms.ValidationError("Cette ville n'existe pas.")
+        except City.DoesNotExist as e:
+            raise forms.ValidationError("Cette ville n'existe pas.") from e
