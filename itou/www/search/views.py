@@ -24,12 +24,12 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
     if form.is_valid():
 
         city = form.cleaned_data["city"]
-        distance_km = form.cleaned_data["distance"]
+        distance = form.cleaned_data["distance"]
         kind = form.cleaned_data["kind"]
 
         siaes = (
             Siae.objects.active()
-            .within(city.coords, distance_km)
+            .within(city.coords, distance)
             .add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
@@ -62,7 +62,19 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             siaes = siaes.filter(kind=kind)
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
-    context = {"form": form, "siaes_page": siaes_page, "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT]}
+    else:
+        city = None
+        distance = None
+        kind = None
+
+    context = {
+        "form": form,
+        "city": city,
+        "distance": distance,
+        "kind": kind,
+        "siaes_page": siaes_page,
+        "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
+    }
     return render(request, template_name, context)
 
 
