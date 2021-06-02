@@ -19,6 +19,9 @@ def search_siaes_home(request, template_name="search/siaes_search_home.html"):
 def search_siaes_results(request, template_name="search/siaes_search_results.html"):
 
     form = SiaeSearchForm(data=request.GET or None)
+    city = None
+    distance = None
+    kind = None
     siaes_page = None
 
     if form.is_valid():
@@ -61,11 +64,6 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         if kind:
             siaes = siaes.filter(kind=kind)
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
-
-    else:
-        city = None
-        distance = None
-        kind = None
 
     context = {
         "form": form,
