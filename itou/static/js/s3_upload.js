@@ -114,8 +114,8 @@ window.s3UploadInit = function s3UploadInit({
     let statusCode = 500;
     errorMessage = JSON.stringify(errorMessage);
 
-    if (xhr != null) {
-      if (xhr.responseText != null) {
+    if (xhr) {
+      if (xhr.responseText) {
         statusCode = xhr.status;
         let responseJson = JSON.parse(xhr.responseText);
         errorMessage = responseJson["Message"];
