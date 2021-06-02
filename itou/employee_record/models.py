@@ -365,7 +365,9 @@ class EmployeeRecord(models.Model):
             return PrescriberType.SPONTANEOUS_APPLICATION
         elif sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
             # an SIAE applied
-            return PrescriberType.UNKNOWN
+            # Notify ASP
+            # FIXME return PrescriberType.UNKNOWN
+            return PrescriberType.SPONTANEOUS_APPLICATION
 
         return PrescriberType.from_itou_prescriber_kind(sender_kind)
 
@@ -444,7 +446,7 @@ class EmployeeRecordBatch:
     # Feedback file names end with this string
     FEEDBACK_FILE_SUFFIX = "_FichierRetour"
 
-    def __init__(self, employee_records):
+    def __init__(self, employee_records, test_asp=False):
         if employee_records and len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
             raise ValidationError(
                 f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} employee records"
@@ -454,12 +456,13 @@ class EmployeeRecordBatch:
         # they may have a value after download
         self.id = None
         self.message = None
+        self.test_asp = test_asp
 
         self.employee_records = employee_records
         self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
 
         # add a line number to each FS for JSON serialization
-        for idx, er in enumerate(self.employee_records):
+        for idx, er in enumerate(self.employee_records, start=1):
             er.batch_line = idx
 
     def __str__(self):
