@@ -18,6 +18,7 @@ class SiaeSearchForm(forms.Form):
 
     distance = forms.ChoiceField(
         label="Distance",
+        required=False,
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
@@ -45,6 +46,12 @@ class SiaeSearchForm(forms.Form):
         required=False,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
     )
+
+    def clean_distance(self):
+        distance = self.cleaned_data["distance"]
+        if not distance:
+            distance = self.fields["distance"].initial
+        return distance
 
     def clean_city(self):
         slug = self.cleaned_data["city"]
