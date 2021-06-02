@@ -14,6 +14,7 @@ from itou.www.employee_record_views.forms import (
     NewEmployeeRecordStep1,
     NewEmployeeRecordStep2,
     NewEmployeeRecordStep3,
+    NewEmployeeRecordStep4,
     SelectEmployeeRecordStatusForm,
 )
 
@@ -170,7 +171,6 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     job_application = JobApplication.objects.get(pk=job_application_id)
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
-    # hexa_address = job_application.job_seeker.jobseeker_profile.display_hexa_address
     maps_url = f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}"
     step = 2
 
@@ -199,7 +199,11 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
 
 @login_required
 def create_step_3(request, job_application_id, template_name="employee_record/create.html"):
-    """"""
+    """
+    Create a new employee record from a given job application
+
+    Step 3: Training level, allocations ...
+    """
     step = 3
     job_application = JobApplication.objects.get(pk=job_application_id)
     profile = job_application.job_seeker.jobseeker_profile
@@ -207,10 +211,11 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        # FIXME
         job_application.refresh_from_db()
+        # FIXME
         employee_record = EmployeeRecord.from_job_application(job_application)
-        employee_record.update_as_ready()
+        # employee_record.update_as_ready()
+        employee_record.save()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
 
     context = {
@@ -228,9 +233,33 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     """
     Create a new employee record from a given job application
 
-    Step 3: Creation of an employee record object with the details of the previous forms
+    Step 4: Financial annex
     """
     step = 4
+    job_application = JobApplication.objects.get(pk=job_application_id)
+    form = NewEmployeeRecordStep4(data=request.POST or None, instance=job_application.employee_record)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+
+    context = {
+        "job_application": job_application,
+        "form": form,
+        "steps": STEPS,
+        "step": step,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def create_step_5(request, job_application_id, template_name="employee_record/create.html"):
+    """
+    Create a new employee record from a given job application
+
+    Step 5: Summary and validation
+    """
+    step = 5
     job_application = JobApplication.objects.get(pk=job_application_id)
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
