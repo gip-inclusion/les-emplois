@@ -221,3 +221,31 @@ class NewEmployeeRecordStep3(forms.ModelForm):
             "pole_emploi_since": "Inscrit depuis",
             "has_rsa_allocation": "Le salarié est-il bénéficiaire du RSA ?",
         }
+
+
+class NewEmployeeRecordStep4(forms.ModelForm):
+    """
+    New employee record step 4:
+    Select a valid financial annex
+    """
+
+    financial_annex = forms.ChoiceField(choices=[])
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance:
+            financial_annexes = self.instance.job_application.to_siae.convention.financial_annexes
+
+            choices = [
+                (
+                    annex.number,
+                    annex.number,
+                )
+                for annex in financial_annexes
+            ]
+            self.fields["financial_annex"].choices = choices
+
+    class Meta:
+        model = EmployeeRecord
+        fields = ["financial_annex"]

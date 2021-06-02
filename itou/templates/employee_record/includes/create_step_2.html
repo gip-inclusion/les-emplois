@@ -31,6 +31,7 @@
     </div>
 
     <div class="alert alert-secondary">
+        {% if profile.hexa_address_filled %}
         <div class="row">
             <div class="col-md-3">Numéro</div>
             <div class="col-md-9"><b>{{ profile.hexa_lane_number }} {{ profile.hexa_std_extension }}{{ profile.hexa_non_std_extension }}</b></div>
@@ -47,6 +48,21 @@
                 <span><small>(code INSEE : {{ profile.hexa_commune.code }})</small></span>
             </div>
         </div>
+        {% else %}
+        <div>
+            <p><b>L'adresse HEXA de l'employé n'a pu être determinée.</b></p>
+            <p>Ceci peut-être du à:
+                <ul>
+                    <li>une erreur temporaire de géolocalisation</li>
+                    <li>une adresse introuvable (code postal ou voie erroné)
+                </ul>
+            <p>
+            <p>
+                Veuillez vérifier et modifier les différents éléments de l'adresse, 
+                puis cliquez sur le bouton <b>"Mettre à jour" dés que tout semble correct.</b>
+            </p>
+        </div>
+        {% endif %}
     </div>
 
     <small class="text-mute">
