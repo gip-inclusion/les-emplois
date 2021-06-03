@@ -65,6 +65,9 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         if kind:
             siaes = siaes.filter(kind=kind)
 
+        # Required to workaround Django template bad design
+        filter_fields = ["distance"]
+
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
         departments = set()
@@ -74,10 +77,21 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
                 districts.add(siae.post_code)
             departments.add(siae.department)
 
+        if departments:
+            filter_fields.append("department")
+            form.add_field_departement(departments)
+
+        if districts:
+            filter_fields.append("district")
+            form.add_field_district(districts)
+
+        filter_fields.append("kind")
+
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
     context = {
         "form": form,
+        "filter_fields": filter_fields,
         "city": city,
         "distance": distance,
         "kind": kind,
