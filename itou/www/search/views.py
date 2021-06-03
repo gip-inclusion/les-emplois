@@ -75,9 +75,11 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             departments.add(siae.department)
 
         if departments:
+            departments = sorted(departments)
             form.add_field_departements(departments)
 
         if districts:
+            districts = sorted(districts)
             form.add_field_districts(districts)
 
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
