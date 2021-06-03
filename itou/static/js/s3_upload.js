@@ -48,7 +48,7 @@ window.s3UploadInit = function s3UploadInit({
     dictFallbackMessage: "Ce navigateur n'est pas compatible",
     dictFileTooBig: "Fichier trop volumineux",
     dictInvalidFileType: "Type de fichier non pris en charge",
-    dictResponseError: "Erreur technique {{statusCode}}. Merci de recommencer.",
+    dictResponseError: "Erreur technique. Merci de recommencer.",
     dictCancelUpload: "Annuler",
     dictUploadCanceled: "Annulé",
     dictCancelUploadConfirmation: "Voulez-vous vraiment annuler le transfert ?",
@@ -112,18 +112,40 @@ window.s3UploadInit = function s3UploadInit({
 
   dropzone.on("error", function (file, errorMessage, xhr) {
     let statusCode = 500;
-    errorMessage = JSON.stringify(errorMessage);
+
+    if (typeof errorMessage == "string") {
+      if (errorMessage.includes("timedout")) {
+        // Override default English message and don't send the error to Sentry.
+        file.previewElement.querySelectorAll('[data-dz-errormessage]')[0].textContent = "Erreur technique. Merci de recommencer.";
+        return
+      }
+    }
+    else {
+      // errorMessage is a JSON object. Display a nice message to the user instead of [object Object].
+      file.previewElement.querySelectorAll('[data-dz-errormessage]')[0].textContent = "Erreur technique. Merci de recommencer.";
+    }
 
     if (xhr) {
-      if (xhr.responseText) {
-        statusCode = xhr.status;
-        let responseJson = JSON.parse(xhr.responseText);
-        errorMessage = responseJson["Message"];
-        file.previewElement.querySelectorAll('[data-dz-errormessage]')[0].textContent = "Erreur technique. Merci de recommencer.";
+      statusCode = xhr.status;
+
+      if (statusCode == 0) {
+        // Don't send undefined errors to Sentry.
+        // Might be due to a firewall or to an unreachable network.
+        // See https://stackoverflow.com/questions/872206/what-does-it-mean-when-an-http-request-returns-status-code-0
+        return
       }
 
-      // An error occurred with the request.
-      // Send it to Sentry to avoid silent bugs.
+      if (xhr.responseText) {
+        let responseJson = JSON.parse(xhr.responseText);
+        errorMessage = responseJson["Message"];
+        // User waited too long before sending the file.
+        // See base.py > STORAGE_UPLOAD_KINDS > upload expiration
+        if (errorMessage == "Policy expired") {
+          return
+        }
+      }
+
+      // An error occurred with the request. Send it to Sentry to avoid silent bugs.
       const sentryErrorMessage =
         `Unable to upload "${file.upload.filename}" ` +
         `(${file.upload.progress} of ${file.upload.total}) to S3 ${formUrl}: ${errorMessage}`;
