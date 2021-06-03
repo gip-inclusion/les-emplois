@@ -18,3 +18,23 @@ def get_dict_item(dictionary, key):
         {{ dict|get_dict_item:key }}
     """
     return dictionary.get(key)
+
+
+@register.filter
+def lookup_dict_item(dictionary, key):
+    """
+    Usage:
+        {% load dict_filters %}
+        {{ dict|lookup:key }}
+    """
+    return dictionary[key]
+
+
+@register.filter
+def get_attribute(obj, key):
+    """
+    Usage:
+        {% load dict_filters %}
+        {{ obj|gettattr:key }}
+    """
+    return getattr(obj, key)
