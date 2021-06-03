@@ -1,39 +1,25 @@
-{% load bootstrap4 %}
+{% load bootstrap4 dict_filters %}
 <div class="card my-4">
     <h5 class="font-weight-bold text-muted mt-4 ml-4">Opportunités</h5>
     <div class="ml-4">
         {% bootstrap_field form.has_few_candidates %}
     </div>
 
-    <h5 class="font-weight-bold text-muted mt-3 ml-4">Distance</h5>
-    {% for choice in form.distance %}
-        <div class="form-check form-check-inline dropdown-item">
-            <input
-                id="{{ choice.id_for_label }}"
-                class="form-check-input"
-                name="{{ choice.data.name }}"
-                type="checkbox"
-                value="{{ choice.data.value }}"
-                {% if choice.data.selected %}checked=""{% endif %}>
-            <label for="{{ choice.id_for_label }}" class="form-check-label">
-                {{ choice.choice_label }}
-            </label>
-        </div>
-    {% endfor %}
-
-    <h5 class="font-weight-bold text-muted mt-3 ml-4">Type de structure</h5>
-    {% for choice in form.kind %}
-        <div class="form-check form-check-inline dropdown-item">
-            <input
-                id="{{ choice.id_for_label }}"
-                class="form-check-input"
-                name="{{ choice.data.name }}"
-                type="checkbox"
-                value="{{ choice.data.value }}"
-                {% if choice.data.selected %}checked=""{% endif %}>
-            <label for="{{ choice.id_for_label }}" class="form-check-label itou-text-wrap">
-                {{ choice.choice_label }}
-            </label>
-        </div>
+    {% for name in filter_fields %}
+        <h5 class="font-weight-bold text-muted mt-3 ml-4">{{ form|lookup_dict_item:name|get_attribute:"label" }}</h5>
+        {% for choice in form|lookup_dict_item:name %}
+            <div class="form-check form-check-inline dropdown-item">
+                <input
+                    id="{{ choice.id_for_label }}"
+                    class="form-check-input"
+                    name="{{ choice.data.name }}"
+                    type="checkbox"
+                    value="{{ choice.data.value }}"
+                    {% if choice.data.selected %}checked=""{% endif %}>
+                <label for="{{ choice.id_for_label }}" class="form-check-label itou-text-wrap">
+                    {{ choice.choice_label }}
+                </label>
+            </div>
+        {% endfor %}
     {% endfor %}
 </div>

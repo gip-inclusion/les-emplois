@@ -67,6 +67,26 @@ class SiaeSearchForm(forms.Form):
         except City.DoesNotExist as e:
             raise forms.ValidationError(f"La ville « {slug} » n'existe pas.") from e
 
+    def add_field_departement(self, departments):
+        # Build list of choices
+        choices = ((department, DEPARTMENTS[department]) for department in departments)
+        self.fields["department"] = forms.ChoiceField(
+            label="Département",
+            required=False,
+            choices=choices,
+            widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+        )
+
+    def add_field_district(self, districts):
+        # Build list of choices
+        choices = ((district, district) for district in districts)
+        self.fields["district"] = forms.ChoiceField(
+            label="Arrondissement",
+            required=False,
+            choices=choices,
+            widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+        )
+
 
 class PrescriberSearchForm(forms.Form):
 
