@@ -162,3 +162,7 @@ def department_from_postcode(post_code):
             department = post_code[:2]
 
     return department
+
+
+# Marseille, Lyon and Paris
+DEPARTMENTS_WITH_DISTRICT = (13, 69, 75)
