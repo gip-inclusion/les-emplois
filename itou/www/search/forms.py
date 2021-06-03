@@ -22,7 +22,7 @@ class SiaeSearchForm(forms.Form):
         required=False,
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
-        widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+        widget=forms.RadioSelect(),
     )
 
     # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
@@ -41,11 +41,11 @@ class SiaeSearchForm(forms.Form):
         ),
     )
 
-    kind = forms.ChoiceField(
-        label="Type de structure",
+    kinds = forms.ChoiceField(
+        label="Types de structure",
         choices=KIND_CHOICES,
         required=False,
-        widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+        widget=forms.CheckboxSelectMultiple(),
     )
 
     has_few_candidates = forms.BooleanField(
@@ -67,24 +67,24 @@ class SiaeSearchForm(forms.Form):
         except City.DoesNotExist as e:
             raise forms.ValidationError(f"La ville « {slug} » n'existe pas.") from e
 
-    def add_field_departement(self, departments):
+    def add_field_departements(self, departments):
         # Build list of choices
         choices = ((department, DEPARTMENTS[department]) for department in departments)
-        self.fields["department"] = forms.ChoiceField(
-            label="Département",
+        self.fields["departments"] = forms.ChoiceField(
+            label="Départements",
             required=False,
             choices=choices,
-            widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+            widget=forms.CheckboxSelectMultiple(),
         )
 
-    def add_field_district(self, districts):
+    def add_field_districts(self, districts):
         # Build list of choices
         choices = ((district, district) for district in districts)
-        self.fields["district"] = forms.ChoiceField(
-            label="Arrondissement",
+        self.fields["districts"] = forms.ChoiceField(
+            label="Arrondissements",
             required=False,
             choices=choices,
-            widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+            widget=forms.CheckboxSelectMultiple(),
         )
 
 

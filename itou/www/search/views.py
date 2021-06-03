@@ -22,14 +22,14 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
     form = SiaeSearchForm(data=request.GET or None)
     city = None
     distance = None
-    kind = None
+    kinds = None
     siaes_page = None
 
     if form.is_valid():
 
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
-        kind = form.cleaned_data["kind"]
+        kinds = form.cleaned_data["kinds"]
 
         siaes = (
             Siae.objects.active()
@@ -62,11 +62,8 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             # detached members from their siae so it could still happen.
             .order_by("-has_active_members", "block_job_applications", "shuffled_rank")
         )
-        if kind:
-            siaes = siaes.filter(kind=kind)
-
-        # Required to workaround Django template bad design
-        filter_fields = ["distance"]
+        if kinds:
+            siaes = siaes.filter(kind__in=kinds)
 
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
@@ -78,24 +75,20 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             departments.add(siae.department)
 
         if departments:
-            filter_fields.append("department")
-            form.add_field_departement(departments)
+            form.add_field_departements(departments)
 
         if districts:
-            filter_fields.append("district")
-            form.add_field_district(districts)
-
-        filter_fields.append("kind")
+            form.add_field_districts(districts)
 
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
     context = {
         "form": form,
-        "filter_fields": filter_fields,
         "city": city,
         "distance": distance,
-        "kind": kind,
+        "kinds": kinds,
         "siaes_page": siaes_page,
+        # Used to display a specific badge
         "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
     }
     return render(request, template_name, context)
