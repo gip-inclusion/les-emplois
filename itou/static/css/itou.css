@@ -521,3 +521,7 @@ Usage:
     color: #fff;
     background-color: #000638;
 }
+
+.itou-text-wrap {
+    white-space: normal;
+}
