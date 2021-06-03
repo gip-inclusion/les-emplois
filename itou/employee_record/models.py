@@ -463,7 +463,7 @@ class EmployeeRecordBatch:
 
         # add a line number to each FS for JSON serialization
         for idx, er in enumerate(self.employee_records, start=1):
-            er.batch_line = idx
+            er.asp_batch_line_number = idx
 
     def __str__(self):
         return f"{self.upload_filename}"
