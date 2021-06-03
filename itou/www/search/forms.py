@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
+from itou.utils.address.departments import DEPARTMENTS
 
 
 class SiaeSearchForm(forms.Form):
