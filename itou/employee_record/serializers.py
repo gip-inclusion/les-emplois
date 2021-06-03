@@ -196,7 +196,7 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     # Placeholder: not the final position in the JSON result
     passIae = serializers.CharField(source="approval_number")
 
-    numLigne = serializers.IntegerField(source="batch_line_number")
+    numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
 
     numeroAnnexe = serializers.CharField(source="financial_annex_number")
