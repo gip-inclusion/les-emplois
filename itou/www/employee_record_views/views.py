@@ -35,7 +35,11 @@ STEPS = [
     ),
     (
         4,
-        "Informations complémentaires",
+        "Annexe financière",
+    ),
+    (
+        5,
+        "Validation",
     ),
 ]
 
@@ -239,9 +243,8 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        print(form.employee_record.financial_annex)
         form.employee_record.save()
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
@@ -262,15 +265,16 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     """
     step = 5
     job_application = JobApplication.objects.get(pk=job_application_id)
-    profile = job_application.job_seeker.jobseeker_profile
-    form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
+    employee_record = EmployeeRecord.objects.get(job_application=job_application)
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
+    if request.method == "POST":
+        if employee_record.status == EmployeeRecord.Status.NEW:
+            employee_record.update_as_ready()
+        return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 
     context = {
         "job_application": job_application,
-        "form": form,
+        "employee_record": employee_record,
         "steps": STEPS,
         "step": step,
     }
