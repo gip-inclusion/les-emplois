@@ -17,6 +17,7 @@ class SelectEmployeeRecordStatusForm(forms.Form):
     # The other ones are internal only.
     STATUSES = [
         EmployeeRecord.Status.NEW,
+        EmployeeRecord.Status.READY,
         EmployeeRecord.Status.SENT,
         EmployeeRecord.Status.REJECTED,
         EmployeeRecord.Status.PROCESSED,
