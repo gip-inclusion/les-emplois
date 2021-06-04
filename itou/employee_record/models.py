@@ -27,6 +27,9 @@ class EmployeeRecordQuerySet(models.QuerySet):
         """
         return self.filter(status=EmployeeRecord.Status.READY)
 
+    def ready_for_siae(self, siae):
+        return self.ready().filter(job_application__to_siae=siae).select_related("job_application")
+
     def sent(self):
         return self.filter(status=EmployeeRecord.Status.SENT)
 
@@ -90,11 +93,11 @@ class EmployeeRecord(models.Model):
         - after that, the FS is "archived" and can't be used for further interaction
         """
 
-        NEW = "NEW", "Nouvelle fiche salarié"
-        READY = "READY", "Données complètes, prêtes à l'envoi ASP"
-        SENT = "SENT", "Envoyée ASP"
-        REJECTED = "REJECTED", "Rejetée ASP"
-        PROCESSED = "PROCESSED", "Traitée ASP"
+        NEW = "NEW", "Nouvelle"
+        READY = "READY", "Complète"
+        SENT = "SENT", "Envoyée"
+        REJECTED = "REJECTED", "Rejetée"
+        PROCESSED = "PROCESSED", "Traitée"
         ARCHIVED = "ARCHIVED", "Archivée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
