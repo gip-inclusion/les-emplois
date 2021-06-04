@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
-from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer, TestEmployeeRecordSerializer
+from itou.employee_record.mocks.test_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer, EmployeeRecordSerializer
 from itou.utils.iterators import chunks

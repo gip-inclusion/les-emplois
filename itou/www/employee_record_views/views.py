@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
-from django.http.response import HttpResponse, HttpResponseRedirect
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -85,6 +85,7 @@ def list(request, template_name="employee_record/list.html"):
             JobApplication.objects.eligible_as_employee_record(siae).count(),
             "info",
         ),
+        (employee_record_badges.get(EmployeeRecord.Status.READY, 0), "secondary"),
         (employee_record_badges.get(EmployeeRecord.Status.SENT, 0), "warning"),
         (employee_record_badges.get(EmployeeRecord.Status.REJECTED, 0), "danger"),
         (employee_record_badges.get(EmployeeRecord.Status.PROCESSED, 0), "success"),
@@ -98,6 +99,8 @@ def list(request, template_name="employee_record/list.html"):
     if status == EmployeeRecord.Status.NEW:
         data = JobApplication.objects.eligible_as_employee_record(siae)
         employee_records_list = False
+    elif status == EmployeeRecord.Status.READY:
+        data = EmployeeRecord.objects.ready_for_siae(siae)
     elif status == EmployeeRecord.Status.SENT:
         data = EmployeeRecord.objects.sent_for_siae(siae)
     elif status == EmployeeRecord.Status.REJECTED:
