@@ -36,9 +36,13 @@
             <div>
                 <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
             </div>
+        {% elif form.status.value == "READY" %}
+            <div>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+            </div>
         {% elif form.status.value == "SENT" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=SENT" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "REJECTED" %}
             <div>
@@ -46,7 +50,7 @@
             </div>
         {% elif form.status.value == "PROCESSED" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
             </div>
         {% endif %}
 
