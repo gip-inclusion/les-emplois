@@ -14,7 +14,6 @@
 
     <form method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
-    </form>
 
     {% if form.is_valid %}
         <h3>
@@ -118,5 +117,6 @@
             </div> {# col-8 #}
         </div> {# row #}
     {% endif %}
+    </form>
 
 {% endblock %}
