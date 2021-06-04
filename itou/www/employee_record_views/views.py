@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count
 from django.http.response import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 
 from itou.employee_record.models import EmployeeRecord
@@ -280,6 +280,25 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         "employee_record": employee_record,
         "steps": STEPS,
         "step": step,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def summary(request, employee_record_id, template_name="employee_record/summary.html"):
+    """
+    Create a new employee record from a given job application
+
+    Step 5: Summary and validation
+    """
+    employee_record = get_object_or_404(EmployeeRecord, pk=employee_record_id)
+    status = request.GET.get("status")
+    print(status)
+
+    context = {
+        "employee_record": employee_record,
+        "status": status,
     }
 
     return render(request, template_name, context)
