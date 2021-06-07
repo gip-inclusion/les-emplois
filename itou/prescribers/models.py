@@ -33,7 +33,7 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
 
     def within(self, point, distance_km):
         return (
-            self.filter(coords__distance_lte=(point, D(km=distance_km)))
+            self.filter(coords__dwithin=(point, D(km=distance_km)))
             .annotate(distance=Distance("coords", point))
             .order_by("distance")
         )
