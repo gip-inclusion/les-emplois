@@ -40,8 +40,12 @@ tarteaucitron.lang = {
     "newWindow": "(yeni pencere)",
     "allowAll": "Tüm çerezlere izin verin",
     "denyAll": "Tüm çerezleri yasaklayın",
+
+    "icon": "Cookies",
     
     "fallback": "devre dışı.",
+    "allowed": "izin verildi",
+    "disallowed": "izin verilmeyen",
 
     "ads": {
         "title": "Reklam yönetimi",
@@ -76,5 +80,8 @@ tarteaucitron.lang = {
     "other": {
         "title": "diğer\n",
         "details": "Web içeriğini görüntüleme hizmetleri."
-    }
+    },
+    
+    "mandatoryTitle": "Mandatory cookies",
+    "mandatoryText": "This site uses cookies necessary for its proper functioning which cannot be deactivated."
 };
