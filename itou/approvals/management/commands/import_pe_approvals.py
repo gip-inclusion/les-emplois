@@ -65,7 +65,7 @@ class Command(BaseCommand):
         bulk_create_queue = []
         chunk_size = 5000
 
-        df = pd.read_excel(file_path)
+        df = pd.read_excel(file_path, na_filter=False)
         df["DATE_HISTO"] = pd.to_datetime(df.DATE_HISTO, format=DATE_FORMAT)
         df.sort_values("DATE_HISTO")
         first_approval_date = df.iloc[0].DATE_HISTO.strftime(DATE_FORMAT)
