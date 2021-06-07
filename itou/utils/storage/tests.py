@@ -36,7 +36,7 @@ class S3Tests(SimpleTestCase):
             result = s3_upload_resume.config
             self.assertEqual(result["allowed_mime_types"], "*")
             self.assertEqual(result["key_path"], "")
-            self.assertEqual(result["upload_expiration"], 1)
+            self.assertEqual(result["upload_expiration"], 3600)
             self.assertEqual(result["max_file_size"], 5)
             self.assertEqual(result["max_files"], 3)
 

@@ -154,6 +154,7 @@ class ApplyAsJobSeekerTest(TestCase):
             self.assertContains(response, value)
 
         # Config variables
+        resume_config.pop("upload_expiration")
         for _, value in resume_config.items():
             self.assertContains(response, value)
 
