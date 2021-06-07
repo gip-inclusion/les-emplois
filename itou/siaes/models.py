@@ -391,16 +391,6 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         body = "common/emails/member_deactivation_email_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def member_activation_email(self, user):
-        """
-        Send email when an admin of the structure reactivates the membership of a given user.
-        """
-        to = [user.email]
-        context = {"structure": self}
-        subject = "common/emails/member_activation_email_subject.txt"
-        body = "common/emails/member_activation_email_body.txt"
-        return get_email_message(to, context, subject, body)
-
     def add_admin_email(self, user):
         """
         Send info email to a new admin of the SIAE (added)
