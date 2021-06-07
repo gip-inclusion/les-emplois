@@ -100,7 +100,7 @@ window.s3UploadInit = function s3UploadInit({
   dropzone.on("success", function (file, xhr, formData) {
     const location = `${formUrl}/${file.upload.filename}`;
     // Prevent a selector mistake from being silent.
-    if ($(callbackLocationSelector).length == 0) {
+    if ($(callbackLocationSelector).length === 0) {
       this._handleUploadError(
         [file],
         xhr,
@@ -113,7 +113,7 @@ window.s3UploadInit = function s3UploadInit({
   dropzone.on("error", function (file, errorMessage, xhr) {
     let statusCode = 500;
 
-    if (typeof errorMessage == "string") {
+    if (typeof errorMessage === "string") {
       if (errorMessage.includes("timedout")) {
         // Override default English message and don't send the error to Sentry.
         file.previewElement.querySelectorAll('[data-dz-errormessage]')[0].textContent = "Erreur technique. Merci de recommencer.";
@@ -128,7 +128,7 @@ window.s3UploadInit = function s3UploadInit({
     if (xhr) {
       statusCode = xhr.status;
 
-      if (statusCode == 0) {
+      if (statusCode === 0) {
         // Don't send undefined errors to Sentry.
         // Might be due to a firewall or to an unreachable network.
         // See https://stackoverflow.com/questions/872206/what-does-it-mean-when-an-http-request-returns-status-code-0
@@ -140,7 +140,7 @@ window.s3UploadInit = function s3UploadInit({
         errorMessage = responseJson["Message"];
         // User waited too long before sending the file.
         // See base.py > STORAGE_UPLOAD_KINDS > upload expiration
-        if (errorMessage == "Policy expired") {
+        if (errorMessage === "Policy expired") {
           return
         }
       }
