@@ -8,6 +8,7 @@ ALLOWED_HOSTS = [
     "inclusion.beta.gouv.fr",
     "emploi.inclusion.beta.gouv.fr",
     "emplois.inclusion.beta.gouv.fr",
+    "forum.inclusion.beta.gouv.fr",
 ]
 
 DATABASES = {
