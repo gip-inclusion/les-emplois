@@ -96,9 +96,15 @@ class CommonApprovalMixin(models.Model):
         return not (ends_before_lockdown or starts_after_lockdown)
 
     @property
-    def display_end_at(self):
-        # See PoleEmploiApproval > display_end_at
+    def extended_end_at(self):
+        """
+        See `PoleEmploiApproval.extended_end_at`.
+        """
         return self.end_at
+
+    @staticmethod
+    def get_extended_covid_end_at(end_at):
+        return end_at + relativedelta(months=CommonApprovalMixin.LOCKDOWN_EXTENSION_DELAY_MONTHS)
 
 
 class CommonApprovalQuerySet(models.QuerySet):
@@ -185,7 +191,7 @@ class Approval(CommonApprovalMixin):
             # Handle COVID extensions for approvals originally issued by Pôle emploi.
             # Approvals issued by Itou have already been extended through SQL.
             if not self.originates_from_itou and self.overlaps_covid_lockdown:
-                self.end_at = self.end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+                self.end_at = self.get_extended_covid_end_at(self.end_at)
 
         super().save(*args, **kwargs)
 
@@ -954,12 +960,9 @@ class PoleEmploiApproval(CommonApprovalMixin):
 
     def is_valid(self):
         """
-        See self.display_end_at
+        See `self.extended_end_at`.
         """
-        end_at = self.end_at
-        if self.overlaps_covid_lockdown:
-            end_at = end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
-        return super().is_valid(end_at=end_at)
+        return super().is_valid(end_at=self.extended_end_at)
 
     @staticmethod
     def format_name_as_pole_emploi(name):
@@ -970,7 +973,7 @@ class PoleEmploiApproval(CommonApprovalMixin):
         return unidecode(name.strip()).upper()
 
     @property
-    def display_end_at(self):
+    def extended_end_at(self):
         """
         When importing Pôle emploi approvals from a file, the COVID prolongation is not integrated
         to the set we receive and we decided not to apply it at this moment to preserve data integrity.
@@ -987,11 +990,11 @@ class PoleEmploiApproval(CommonApprovalMixin):
         To apply this prolongation without reflecting it into the database,
         we override two parent methods:
         - self.is_valid()
-        - self.display_end_at: extended end_at
+        - self.extended_end_at: extended end_at
         """
         end_at = self.end_at
         if self.overlaps_covid_lockdown:
-            end_at = end_at + relativedelta(months=self.LOCKDOWN_EXTENSION_DELAY_MONTHS)
+            end_at = self.get_extended_covid_end_at(end_at)
         return end_at
 
     @property

@@ -298,7 +298,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_new_for_siae(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
-            selected_jobs=Appellation.objects.all()
+            selected_jobs=Appellation.objects.all(),
         )
         email = NewQualifiedJobAppEmployersNotification(job_application=job_application).email
         # To.
@@ -320,6 +320,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(job_application.to_siae.city, email.body)
         self.assertIn(str(job_application.to_siae.pk), email.body)
+        self.assertIn(job_application.resume_link, email.body)
 
     def test_new_for_prescriber(self):
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory(
@@ -353,6 +354,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.sender_prescriber_organization.display_name, email.body)
         self.assertNotIn(job_application.sender.email, email.body)
         self.assertNotIn(format_filters.format_phone(job_application.sender.phone), email.body)
+        self.assertIn(job_application.resume_link, email.body)
 
     def test_new_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory(selected_jobs=Appellation.objects.all())
@@ -381,6 +383,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.to_siae.display_name, email.body)
         self.assertIn(reverse("account_login"), email.body)
         self.assertIn(reverse("account_reset_password"), email.body)
+        self.assertIn(job_application.resume_link, email.body)
 
     def test_accept_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory()

@@ -67,7 +67,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
+class CreateJobSeekerForm(AddressFormMixin, forms.ModelForm):
     def __init__(self, proxy_user, *args, **kwargs):
         self.proxy_user = proxy_user
         super().__init__(*args, **kwargs)
@@ -100,11 +100,11 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "address_line_1",
             "address_line_2",
             "post_code",
-            "city_name",
+            "city_slug",
             "city",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
-        ] + ResumeFormMixin.Meta.fields
+        ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
             "phone": "Par exemple 0610203040.",
@@ -121,16 +121,16 @@ class CreateJobSeekerForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
         self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
 
     def save(self, commit=True):
-        # Exclude 'city_name' form field (not mapped to model)
+        # Exclude 'city_slug' form field (not mapped to model)
         partial_fields = self.cleaned_data
-        del partial_fields["city_name"]
+        del partial_fields["city_slug"]
 
         if commit:
             return self._meta.model.create_job_seeker_by_proxy(self.proxy_user, **partial_fields)
         return super().save(commit=False)
 
 
-class SubmitJobApplicationForm(forms.ModelForm):
+class SubmitJobApplicationForm(forms.ModelForm, ResumeFormMixin):
     """
     Submit a job application to an SIAE.
     """
@@ -143,7 +143,7 @@ class SubmitJobApplicationForm(forms.ModelForm):
 
     class Meta:
         model = JobApplication
-        fields = ["selected_jobs", "message"]
+        fields = ["selected_jobs", "message"] + ResumeFormMixin.Meta.fields
         widgets = {
             "selected_jobs": forms.CheckboxSelectMultiple(),
             "message": forms.Textarea(
@@ -212,6 +212,9 @@ class AcceptForm(forms.ModelForm):
             self.fields[field].required = True
             self.fields[field].widget = DatePickerField()
             self.fields[field].input_formats = [DatePickerField.DATE_FORMAT]
+        if self.instance.state.is_refused:
+            # Erase the refusal message to start from new.
+            self.initial["answer"] = ""
 
     class Meta:
         model = JobApplication
@@ -261,7 +264,9 @@ class AcceptForm(forms.ModelForm):
             max_end_at = Approval.get_default_end_date(hiring_start_at)
 
             if self.instance.job_seeker.approvals_wrapper.has_valid:
-                in_progress_approval_end_at = self.instance.job_seeker.approvals_wrapper.latest_approval.end_at
+                in_progress_approval_end_at = (
+                    self.instance.job_seeker.approvals_wrapper.latest_approval.extended_end_at
+                )
                 max_end_at = min(max_end_at, in_progress_approval_end_at)
 
             if hiring_end_at > max_end_at:
@@ -359,12 +364,12 @@ class UserAddressForm(AddressFormMixin, forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        for field in ["address_line_1", "post_code", "city_name"]:
+        for field in ["address_line_1", "post_code", "city"]:
             self.fields[field].required = True
 
     class Meta:
         model = User
-        fields = ["address_line_1", "address_line_2", "post_code", "city_name", "city"]
+        fields = ["address_line_1", "address_line_2", "post_code", "city_slug", "city"]
 
 
 class FilterJobApplicationsForm(forms.Form):

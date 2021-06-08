@@ -17,7 +17,6 @@ urlpatterns = [
         name="step_check_job_seeker_info",
     ),
     path("<int:siae_pk>/step_create_job_seeker", submit_views.step_create_job_seeker, name="step_create_job_seeker"),
-    path("<int:siae_pk>/step_send_resume", submit_views.step_send_resume, name="step_send_resume"),
     path(
         "<int:siae_pk>/step_check_prev_applications",
         submit_views.step_check_prev_applications,

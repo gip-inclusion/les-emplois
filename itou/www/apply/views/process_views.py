@@ -397,7 +397,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     job_application = get_object_or_404(
         queryset,
         id=job_application_id,
-        state__in=[JobApplicationWorkflow.STATE_PROCESSING, JobApplicationWorkflow.STATE_POSTPONED],
+        state__in=JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
     )
 
     if not job_application.to_siae.is_subject_to_eligibility_rules:

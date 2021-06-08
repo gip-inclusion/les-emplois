@@ -17,21 +17,11 @@
 
 {% endif %}
 
-<form method="post" action="" class="js-prevent-multiple-submit js-submit-with-typeform">
+<form method="post" action="" class="js-prevent-multiple-submit">
 
     {% csrf_token %}
 
     {% bootstrap_form form alert_error_type="all" %}
-
-    {% if ITOU_ENVIRONMENT == "PROD" %}
-        {% if request.user.is_job_seeker %}
-            {% include "utils/resume/typeform_form.html" %}
-            <p class="lines-on-sides">ou</p>
-            {% bootstrap_label content="Lien vers un CV public" %}
-            {% bootstrap_field form.resume_link show_label=False %}
-        {% endif %}
-    {% endif %}
-
 
     {% buttons %}
         <a class="btn btn-secondary" href="{{ prev_url }}">Annuler</a>
@@ -39,13 +29,11 @@
     {% endbuttons %}
 
 </form>
+
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
     <!-- Needed to use the Datepicker JS widget. -->
     {{ form.media }}
-    {% if request.user.is_job_seeker %}
-        {% include "utils/resume/typeform_scripts.html" with author_kind="candidat" %}
-    {% endif %}
 {% endblock %}

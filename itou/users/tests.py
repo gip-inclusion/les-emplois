@@ -191,6 +191,53 @@ class ModelTest(TestCase):
         with self.assertRaises(ValidationError):
             job_seeker.clean()
 
+    def test_can_edit_email(self):
+        user = UserFactory()
+        job_seeker = JobSeekerFactory()
+
+        # Same user.
+        self.assertTrue(user.can_edit_email(user))
+
+        # All conditions are met.
+        job_seeker = JobSeekerFactory(created_by=user)
+        self.assertTrue(user.can_edit_email(job_seeker))
+
+        # Job seeker logged in, he is not longer handled by a proxy.
+        job_seeker = JobSeekerFactory(last_login=timezone.now())
+        self.assertFalse(user.can_edit_email(job_seeker))
+
+        # User did not create the job seeker's account.
+        job_seeker = JobSeekerFactory(created_by=UserFactory())
+        self.assertFalse(user.can_edit_email(job_seeker))
+
+        # Job seeker has verified his email.
+        job_seeker = JobSeekerFactory(created_by=user)
+        job_seeker.emailaddress_set.create(email=job_seeker.email, verified=True)
+        self.assertFalse(user.can_edit_email(job_seeker))
+
+    def test_is_account_creator(self):
+        user = UserFactory()
+
+        job_seeker = JobSeekerFactory(created_by=user)
+        self.assertTrue(job_seeker.is_created_by(user))
+
+        job_seeker = JobSeekerFactory()
+        self.assertFalse(job_seeker.is_created_by(user))
+
+        job_seeker = JobSeekerFactory(created_by=UserFactory())
+        self.assertFalse(job_seeker.is_created_by(user))
+
+    def test_has_verified_email(self):
+        user = UserFactory()
+
+        self.assertFalse(user.has_verified_email)
+        address = user.emailaddress_set.create(email=user.email, verified=False)
+        self.assertFalse(user.has_verified_email)
+        address.delete()
+
+        user.emailaddress_set.create(email=user.email, verified=True)
+        self.assertTrue(user.has_verified_email)
+
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):
     return RESULTS_BY_ADDRESS.get(address)

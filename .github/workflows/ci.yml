@@ -20,6 +20,9 @@ jobs:
       PGUSER: postgres
       ITOU_POSTGRES_USER: postgres
       ITOU_POSTGRES_PASSWORD: password
+      CELLAR_ADDON_KEY_ID: TheMeaningOfLife
+      CELLAR_ADDON_KEY_SECRET: "42"
+      CELLAR_ADDON_HOST: domain.com
     services:
       postgres:
         # Docker Hub image

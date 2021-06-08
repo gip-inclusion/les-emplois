@@ -17,8 +17,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
 from itou.users.models import User
 from itou.utils.perms.user import get_user_info
-from itou.utils.resume.forms import ResumeFormMixin
-from itou.utils.tokens import resume_signer
+from itou.utils.storage.s3 import S3Upload
 from itou.www.apply.forms import CheckJobSeekerInfoForm, CreateJobSeekerForm, SubmitJobApplicationForm, UserExistsForm
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 
@@ -200,38 +199,9 @@ def step_create_job_seeker(request, siae_pk, template_name="apply/submit_step_jo
         session_data["job_seeker_pk"] = job_seeker.pk
         request.session.modified = True
         next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
-        if request.GET.get("resume"):
-            next_url = reverse("apply:step_send_resume", kwargs={"siae_pk": siae.pk})
         return HttpResponseRedirect(next_url)
 
     context = {"siae": siae, "form": form}
-    return render(request, template_name, context)
-
-
-@login_required
-@valid_session_required
-def step_send_resume(request, siae_pk, template_name="apply/submit_step_send_resume.html"):
-    """
-    Updates user's resume following the next steps:
-    - Prescriber uploads a file using Typeform's embed form.
-    - When Typeform receives a new entry, it performs a POST on `/update-resume-link`
-    - This view updates job seeker's `resume_link` attribute.
-    """
-    session_data = request.session[settings.ITOU_SESSION_JOB_APPLICATION_KEY]
-    siae = get_object_or_404(Siae, pk=session_data["to_siae_pk"])
-    job_seeker = get_object_or_404(User, pk=session_data["job_seeker_pk"])
-    job_seeker_signed_pk = resume_signer.sign(job_seeker.pk)
-
-    form = ResumeFormMixin(data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        if form.cleaned_data.get("resume_link"):
-            job_seeker.resume_link = form.cleaned_data.get("resume_link")
-            job_seeker.save()
-        next_url = reverse("apply:step_eligibility", kwargs={"siae_pk": siae.pk})
-        return HttpResponseRedirect(next_url)
-
-    context = {"siae": siae, "job_seeker_signed_pk": job_seeker_signed_pk, "form": form}
     return render(request, template_name, context)
 
 
@@ -383,5 +353,16 @@ def step_application(request, siae_pk, template_name="apply/submit_step_applicat
 
         return HttpResponseRedirect(next_url)
 
-    context = {"siae": siae, "form": form, "job_seeker": job_seeker, "approvals_wrapper": approvals_wrapper}
+    s3_upload = S3Upload(kind="resume")
+    s3_form_values = s3_upload.form_values
+    s3_upload_config = s3_upload.config
+
+    context = {
+        "siae": siae,
+        "form": form,
+        "job_seeker": job_seeker,
+        "approvals_wrapper": approvals_wrapper,
+        "s3_form_values": s3_form_values,
+        "s3_upload_config": s3_upload_config,
+    }
     return render(request, template_name, context)

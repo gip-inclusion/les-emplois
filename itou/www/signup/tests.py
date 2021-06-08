@@ -176,7 +176,6 @@ class JobSeekerSignupTest(TestCase):
         address_line_2 = "Test adresse complémentaire"
         city = City.objects.first()
         post_code = city.post_codes[0]
-        resume_link = "https://test.com/my-cv"
 
         post_data = {
             "first_name": "John",
@@ -189,7 +188,6 @@ class JobSeekerSignupTest(TestCase):
             "post_code": post_code,
             "city_name": city.name,
             "city": city.slug,
-            "resume_link": resume_link,
         }
 
         response = self.client.post(url, data=post_data)

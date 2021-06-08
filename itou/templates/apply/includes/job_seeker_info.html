@@ -21,9 +21,9 @@
         <li>Identifiant Pôle emploi : <b>{{ job_application.job_seeker.pole_emploi_id }}</b></li>
     {% endif %}
 
-    {% if job_application.job_seeker.resume_link %}
+    {% if job_application.get_resume_link %}
         <li>
-            <a href="{{ job_application.job_seeker.resume_link }}">Lien vers CV</a>
+            <a href="{{ job_application.get_resume_link }}">Télécharger le CV</a>
         </li>
     {% endif %}
 </ul>

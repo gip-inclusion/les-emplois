@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.core.signing import Signer
 from django.utils.crypto import constant_time_compare, salted_hmac
 from django.utils.http import base36_to_int, int_to_base36
 
@@ -84,5 +83,3 @@ class SiaeSignupTokenGenerator:
 
 
 siae_signup_token_generator = SiaeSignupTokenGenerator()
-
-resume_signer = Signer(salt="resume")

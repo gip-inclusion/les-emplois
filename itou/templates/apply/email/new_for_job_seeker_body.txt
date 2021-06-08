@@ -39,9 +39,9 @@ Vous et votre candidat serez tous les deux informés de l'avancement de cette ca
 - Email : {{ job_application.job_seeker.email }}{% endif %}{% if job_application.job_seeker.phone %}
 - Téléphone : {{ job_application.job_seeker.phone|format_phone }}{% endif %}{% if job_application.job_seeker.birthdate %}
 - Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}{% endif %}
-{% if job_application.job_seeker.resume_link %}
-- CV en ligne : {{ job_application.job_seeker.resume_link }}
-{% endif%}
+{% if job_application.get_resume_link %}
+- CV en ligne : {{ job_application.get_resume_link }}
+{% endif %}
 
 {% if job_application.is_sent_by_proxy %}
 --------

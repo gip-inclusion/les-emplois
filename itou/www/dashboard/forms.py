@@ -1,4 +1,3 @@
-from allauth.account.models import EmailAddress
 from django import forms
 from django.core.exceptions import ValidationError
 
@@ -8,11 +7,10 @@ from itou.job_applications.notifications import (
 )
 from itou.users.models import User
 from itou.utils.address.forms import AddressFormMixin
-from itou.utils.resume.forms import ResumeFormMixin
 from itou.utils.widgets import DatePickerField, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
 
 
-class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
+class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
     """
     Edit a user profile.
     """
@@ -20,17 +18,16 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
     email = forms.EmailField(label="Adresse électronique", widget=forms.TextInput(attrs={"autocomplete": "off"}))
 
     def __init__(self, *args, **kwargs):
+        editor = kwargs.pop("editor")
         super().__init__(*args, **kwargs)
-        has_verified_email = EmailAddress.objects.filter(email=self.instance.email, verified=True)
-        if has_verified_email or not self.instance.is_job_seeker:
-            # We want the possibility to edit the email of job seekers
-            # until they validate their email
+
+        if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
             del self.fields["email"]
+
         if not self.instance.is_job_seeker:
             del self.fields["birthdate"]
             del self.fields["pole_emploi_id"]
             del self.fields["lack_of_pole_emploi_id_reason"]
-            del self.fields["resume_link"]
         else:
             self.fields["phone"].required = True
             self.fields["birthdate"].required = True
@@ -57,10 +54,10 @@ class EditUserInfoForm(AddressFormMixin, ResumeFormMixin, forms.ModelForm):
             "address_line_2",
             "post_code",
             "city",
-            "city_name",
+            "city_slug",
             "pole_emploi_id",
             "lack_of_pole_emploi_id_reason",
-        ] + ResumeFormMixin.Meta.fields
+        ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
             "phone": "Par exemple 0610203040",

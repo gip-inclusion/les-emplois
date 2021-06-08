@@ -12,7 +12,7 @@ Unidecode==1.2.0  # https://github.com/avian2/unidecode
 
 # Django
 # ------------------------------------------------------------------------------
-django==3.2.3  # pyup: < 4.0  # https://www.djangoproject.com/
+django==3.2.4  # pyup: < 4.0  # https://www.djangoproject.com/
 
 # django-allauth
 django-allauth==0.43.0  # https://github.com/pennersr/django-allauth
@@ -69,3 +69,8 @@ httpx==0.17.1  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
 pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
+
+# S3
+# ------------------------------------------------------------------------------
+# Our S3 provider does not provide a UI to manage the S3 bucket. Use this CLI instead.
+boto3==1.17.53  # https://github.com/boto/boto3

@@ -183,11 +183,8 @@ class EditJobSeekerInfo(TestCase):
         """
         new_email = "bidou@yopmail.com"
         siae = SiaeWithMembershipFactory()
-        job_application = JobApplicationSentByPrescriberFactory(
-            to_siae=siae, job_seeker__created_by=siae.members.first()
-        )
-
-        user = job_application.to_siae.members.first()
+        user = siae.members.first()
+        job_application = JobApplicationSentByPrescriberFactory(to_siae=siae, job_seeker__created_by=user)
 
         self.client.login(username=user.email, password=DEFAULT_PASSWORD)
 

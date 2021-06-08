@@ -1,7 +1,7 @@
 {% extends "layout/content.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Export des suivis de candidatures" %}{{ block.super }}{% endblock %}
+{% block title %}Export des suivis de candidatures{{ block.super }}{% endblock %}
 
 {% block content %}
     {% if export_for == "siae" %}
@@ -12,7 +12,7 @@
 
     {% if not job_applications_by_month %}
         <h2 class="font-weight-normal text-muted">
-            {% translate "Aucune candidature pour le moment." %}
+            Aucune candidature pour le moment.
         </h2>
     {% else %}
 

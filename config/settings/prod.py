@@ -1,5 +1,6 @@
-from .base import *
 from ._sentry import sentry_init
+from .base import *
+
 
 # See `itou.utils.new_dns.middleware.NewDnsRedirectMiddleware`.
 ALLOWED_HOSTS = [
@@ -7,6 +8,7 @@ ALLOWED_HOSTS = [
     "inclusion.beta.gouv.fr",
     "emploi.inclusion.beta.gouv.fr",
     "emplois.inclusion.beta.gouv.fr",
+    "forum.inclusion.beta.gouv.fr",
 ]
 
 DATABASES = {

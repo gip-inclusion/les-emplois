@@ -1,47 +1,55 @@
-<div class="card mb-2">
-    
+<div class="card my-4">
+
     <div class="card-header">
         <b>{{ item.job_seeker.get_full_name|title }}</b>
     </div>
 
     <div class="card-body">
+
         <div class="row">
+
             <div class="col-md-7">
                 <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at }}</b></p>
                 <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at }}</b></p>
                 <p class="m-0">Numéro de PASS IAE (agrément) : <b>{{ item.approval.number_with_spaces }}</b></p>
             </div>
-       
-    {% if form.status.value == "NEW" %}
+
+            {# Statuses. #}
+            {% if form.status.value == "SENT" %}
+                <div class="col-md-5 text-right">
+                    <p class="m-0 pt-1 badge badge-warning">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p>
+                </div>
+            {% elif form.status.value == "REJECTED" %}
+                <div class="col-md-5 text-right">
+                    <p class="m-0 pt-1 badge badge-danger">Rejetée par l'ASP le : <b>{{ item.updated_at }}</b></p>
+                </div>
+            {% elif form.status.value == "PROCESSED" %}
+                <div class="col-md-5 text-right">
+                    <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le : <b>{{ item.updated_at }}</b></p>
+                </div>
+            {% endif %}
+
         </div>
-        <div>
-            <a href="#" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
-        </div>
-            
-    {% elif form.status.value == "SENT" %}
-            <div class="col-md-5 text-right">
-                <p class="m-0 pt-1 badge badge-warning">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p> 
+
+        {# Actions. #}
+        {% if form.status.value == "NEW" %}
+            <div>
+                <a href="#" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
             </div>
-        </div>
-        <div>
-            <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
-        </div>
-    {% elif form.status.value == "REJECTED" %}
-        <div class="col-md-5 text-right">
-                <p class="m-0 pt-1 badge badge-danger">Rejetée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+        {% elif form.status.value == "SENT" %}
+            <div>
+                <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
             </div>
-        </div>
-        <div>
-            <a href="#" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
-        </div>
-    {% elif form.status.value == "PROCESSED" %}
-            <div class="col-md-5 text-right">
-                <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le : <b>{{ item.updated_at }}</b></p> 
+        {% elif form.status.value == "REJECTED" %}
+            <div>
+                <a href="#" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
             </div>
-        </div>
-        <div>
-            <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
-        </div>
-    {% endif %}
+        {% elif form.status.value == "PROCESSED" %}
+            <div>
+                <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+            </div>
+        {% endif %}
+
     </div>
+
 </div>

@@ -1,5 +1,5 @@
 -r ./base.txt
 
 uwsgi==2.0.19.1  # https://github.com/unbit/uwsgi
-sentry-sdk==1.0.0  # https://github.com/getsentry/sentry-python
+sentry-sdk==1.1.0  # https://github.com/getsentry/sentry-python
 newrelic==6.2.0.156  # https://docs.newrelic.com/docs/agents/python-agent/getting-started/introduction-new-relic-python/
