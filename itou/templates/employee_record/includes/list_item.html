@@ -23,6 +23,7 @@
                 <div class="col-md-5 text-right">
                     <p class="m-0 pt-1 badge badge-danger">Rejetée par l'ASP le : <b>{{ employee_record.updated_at }}</b></p>
                 </div>
+                <p class="m-2 badge badge-danger">{{ employee_record.asp_processing_code }} - {{ employee_record.asp_processing_label }}</p>
             {% elif form.status.value == "PROCESSED" %}
                 <div class="col-md-5 text-right">
                     <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le : <b>{{ employee_record.updated_at }}</b></p>
@@ -46,7 +47,7 @@
             </div>
         {% elif form.status.value == "REJECTED" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
             </div>
         {% elif form.status.value == "PROCESSED" %}
             <div>
