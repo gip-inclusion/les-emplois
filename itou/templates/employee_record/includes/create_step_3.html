@@ -19,6 +19,11 @@
         {% bootstrap_field form.pole_emploi_since %}
     </div>
 
+    {% bootstrap_field form.unemployed %}
+    <div id="fold_unemployed" class="ml-1 pl-4 border-left border-primary {{ form.unemployed.value|fold_class }}">
+        {% bootstrap_field form.unemployed_since %}
+    </div>
+
     {% bootstrap_field form.rqth_employee %}
     {% bootstrap_field form.oeth_employee %}
 

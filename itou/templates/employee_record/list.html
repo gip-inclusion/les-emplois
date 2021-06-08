@@ -24,14 +24,16 @@
 
                             <div class="container">
                             {% for status, badge in form.status|zip:badges %}
-                                <div class="row">
-                                    <div class="col-10 p-0">
-                                        {{ status }}
+                                {% if badge.0 != 0 %}
+                                    <div class="row">
+                                        <div class="col-10 p-0">
+                                            {{ status }}
+                                        </div>
+                                        <div class="col-2 p-0 text-right ">
+                                            <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
+                                        </div>
                                     </div>
-                                    <div class="col-2 p-0 text-right ">
-                                        <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
-                                    </div>
-                                </div>
+                                {% endif %}
                             {% endfor %}
                             </div>
 

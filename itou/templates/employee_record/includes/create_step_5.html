@@ -5,7 +5,7 @@
 
 {% include "employee_record/includes/employee_record_summary.html" %}
 
-{% if employee_record.status == 'NEW' %}
+{% if employee_record.status == 'NEW' or employee_record.status == "REJECTED" %}
     <div class="alert alert-warning">
         <p>Si ce récapitulatif et conforme et complet, la fiche salarié sera envoyée pour validation à l'ASP.</p>
         <p>
