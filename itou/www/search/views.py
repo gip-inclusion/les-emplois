@@ -37,7 +37,8 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             .within(city.coords, distance)
             .add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
-            .annotate(distance=Distance("coords", city.coords))
+            # Convert km to m (injected in SQL query)
+            .annotate(distance=Distance("coords", city.coords) / 1000)
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
             # If we sort naively by `-_total_active_members` we would show
             # siaes with 10 members (where 10 is the max), then siaes
