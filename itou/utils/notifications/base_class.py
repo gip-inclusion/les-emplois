@@ -1,5 +1,7 @@
 from django.db.models import Q
 
+from itou.siaes.models import SiaeMembershipQuerySet
+
 
 class BaseNotification:
     """
@@ -28,11 +30,11 @@ class BaseNotification:
     NAME = None  # Notification name as well as key used to store notification preference in the database.
     SEND_TO_UNSET_RECIPIENTS = True  # If recipients didn't express any preference, do we send it anyway?
 
-    def __init__(self, recipients_qs):
+    def __init__(self, recipients_qs: SiaeMembershipQuerySet):
         """
         `recipients_qs`: Django QuerySet leading to this notification recipients
         We should be able to perform a `filter()` with it.
-        Ex: itou.siaes.models.SiaeMembershipQuerySet
+        e.g. itou.siaes.models.SiaeMembershipQuerySet
         """
         self.recipients_qs = recipients_qs
 
