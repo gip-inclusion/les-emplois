@@ -1,5 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
+from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
@@ -22,7 +23,7 @@ class SiaeSearchForm(forms.Form):
         required=False,
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
-        widget=forms.RadioSelect(),
+        widget=forms.RadioSelect,
     )
 
     # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
@@ -53,6 +54,13 @@ class SiaeSearchForm(forms.Form):
         initial=False,
         required=False,
     )
+
+    def __init__(self, data=None, **kwargs):
+        initial = kwargs.get("initial", {})
+        if data:
+            # To render the default distance value as checked in radio widget
+            data = MultiValueDict({**{k: [v] for k, v in initial.items()}, **data})
+        super().__init__(data, **kwargs)
 
     def clean_distance(self):
         distance = self.cleaned_data["distance"]

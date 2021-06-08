@@ -19,15 +19,13 @@ def search_siaes_home(request, template_name="search/siaes_search_home.html"):
 
 
 def search_siaes_results(request, template_name="search/siaes_search_results.html"):
-
-    form = SiaeSearchForm(data=request.GET or None)
     city = None
     distance = None
     kinds = None
     siaes_page = None
+    form = SiaeSearchForm(request.GET or None, initial={"distance": SiaeSearchForm.DISTANCE_DEFAULT})
 
     if form.is_valid():
-
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
         kinds = form.cleaned_data["kinds"]
