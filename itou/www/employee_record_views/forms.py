@@ -126,7 +126,7 @@ class NewEmployeeRecordStep2(forms.ModelForm):
 
         for field_name in ["phone", "email"]:
             self.fields[field_name].widget.attrs["readonly"] = True
-            self.fields[field_name].help_text = "Champs non-modifiable"
+            self.fields[field_name].help_text = "Champ non-modifiable"
 
     class Meta:
         model = User
@@ -158,6 +158,7 @@ class NewEmployeeRecordStep3(forms.ModelForm):
     ass_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ASS ?")
     aah_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'AAH ?")
     ata_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ATA ?")
+    unemployed = forms.BooleanField(required=False, label="Le salarié était-il sans emploi à l'embauche ?")
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     rsa_markup = forms.ChoiceField(required=False, label="Majoration du RSA", choices=RSAAllocation.choices[1:])
@@ -174,12 +175,14 @@ class NewEmployeeRecordStep3(forms.ModelForm):
         self.fields["pole_emploi"].widget.attrs["onclick"] = "toggleFold(this)"
 
         # Foldable sections
-        for field in ["rsa_allocation", "ass_allocation", "aah_allocation", "ata_allocation"]:
+        for field in ["unemployed", "rsa_allocation", "ass_allocation", "aah_allocation", "ata_allocation"]:
             self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
             self.initial[field] = getattr(self.instance, field + "_since")
 
         # RSA Markup
         self.initial["rsa_markup"] = self.instance.has_rsa_allocation
+
+        self.fields["education_level"].required = True
 
     def clean(self):
         super().clean()
@@ -210,6 +213,7 @@ class NewEmployeeRecordStep3(forms.ModelForm):
             "education_level",
             "resourceless",
             "pole_emploi_since",
+            "unemployed_since",
             "rqth_employee",
             "oeth_employee",
             "rsa_allocation_since",

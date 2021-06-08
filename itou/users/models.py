@@ -517,14 +517,14 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
     def _clean_job_seeker_situation(self):
-        if self.resourceless and self.is_employed:
-            raise ValidationError(self.ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH)
+        # if self.resourceless and self.is_employed:
+        #    raise ValidationError(self.ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH)
 
-        if self.is_employed and self.unemployed_since:
-            raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
+        # if self.is_employed and self.unemployed_since:
+        #    raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
 
-        if self.unemployed_since and self.is_employed:
-            raise ValidationError(self.ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH)
+        # if self.unemployed_since and self.is_employed:
+        #    raise ValidationError(self.ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH)
 
         if bool(self.pole_emploi_since) != bool(self.user.pole_emploi_id):
             raise ValidationError(self.ERROR_JOBSEEKER_PE_FIELDS)
@@ -605,7 +605,8 @@ class JobSeekerProfile(models.Model):
 
     @property
     def is_employed(self):
-        return bool(self.rqth_employee or self.oeth_employee or not self.unemployed_since)
+        # return bool(self.rqth_employee or self.oeth_employee or not self.unemployed_since)
+        return not self.unemployed_since
 
     @property
     def has_ass_allocation(self):

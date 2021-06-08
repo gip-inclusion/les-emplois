@@ -44,6 +44,15 @@ STEPS = [
 ]
 
 
+def update_is_allowed(job_application):
+    """
+    Check if some steps of the tunnel are reachable or not
+    given the current employee record status
+    """
+    employee_record = job_application.employee_record.first()
+    return not employee_record or (employee_record and employee_record.is_updatable)
+
+
 @login_required
 def list(request, template_name="employee_record/list.html"):
     """
@@ -134,6 +143,10 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         raise PermissionDenied
 
     job_application = JobApplication.objects.get(pk=job_application_id)
+
+    if not update_is_allowed(job_application):
+        raise PermissionDenied
+
     form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
     step = 1
 
@@ -176,6 +189,10 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     job_application = JobApplication.objects.get(pk=job_application_id)
+
+    if not update_is_allowed(job_application):
+        raise PermissionDenied
+
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
     maps_url = f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}"
@@ -213,14 +230,26 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     """
     step = 3
     job_application = JobApplication.objects.get(pk=job_application_id)
+
+    if not update_is_allowed(job_application):
+        raise PermissionDenied
+
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
 
     if request.method == "POST" and form.is_valid():
         form.save()
         job_application.refresh_from_db()
+
         # FIXME try
-        EmployeeRecord.from_job_application(job_application).save()
+        employee_record = None
+        if not job_application.employee_record.first():
+            employee_record = EmployeeRecord.from_job_application(job_application)
+        else:
+            employee_record = EmployeeRecord.objects.get(job_application=job_application)
+
+        employee_record.save()
+
         return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
 
     context = {
@@ -242,6 +271,10 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     """
     step = 4
     job_application = JobApplication.objects.get(pk=job_application_id)
+
+    if not update_is_allowed(job_application):
+        raise PermissionDenied
+
     employee_record = EmployeeRecord.objects.get(job_application=job_application)
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
 
@@ -271,7 +304,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     employee_record = EmployeeRecord.objects.get(job_application=job_application)
 
     if request.method == "POST":
-        if employee_record.status == EmployeeRecord.Status.NEW:
+        if employee_record.status in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
             employee_record.update_as_ready()
         return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 
@@ -288,13 +321,10 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 @login_required
 def summary(request, employee_record_id, template_name="employee_record/summary.html"):
     """
-    Create a new employee record from a given job application
-
-    Step 5: Summary and validation
+    Display the summary of a given employee record (no update possible)
     """
     employee_record = get_object_or_404(EmployeeRecord, pk=employee_record_id)
     status = request.GET.get("status")
-    print(status)
 
     context = {
         "employee_record": employee_record,

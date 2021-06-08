@@ -96,9 +96,8 @@ class EmployeeRecord(models.Model):
         NEW = "NEW", "Nouvelle"
         READY = "READY", "Complète"
         SENT = "SENT", "Envoyée"
-        REJECTED = "REJECTED", "Rejetée"
+        REJECTED = "REJECTED", "En erreur"
         PROCESSED = "PROCESSED", "Traitée"
-        ARCHIVED = "ARCHIVED", "Archivée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -215,7 +214,7 @@ class EmployeeRecord(models.Model):
         """
         Prepare the employee record for transmission
 
-        Status: NEW => READY
+        Status: NEW | REJECTED => READY
         """
         if self.status not in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -299,7 +298,7 @@ class EmployeeRecord(models.Model):
 
         See model save() and clean() method.
         """
-        return self.status != self.Status.SENT and not self.is_archived
+        return self.status not in [self.Status.SENT, self.Status.READY] and not self.is_archived
 
     @property
     def job_seeker(self):
@@ -368,11 +367,13 @@ class EmployeeRecord(models.Model):
             return PrescriberType.SPONTANEOUS_APPLICATION
         elif sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
             # an SIAE applied
-            # Notify ASP
+            # Notify ASP : UNKNOWN code does not work for SIAE
             # FIXME return PrescriberType.UNKNOWN
             return PrescriberType.SPONTANEOUS_APPLICATION
 
-        return PrescriberType.from_itou_prescriber_kind(sender_kind)
+        prescriber_organization = self.job_application.sender_prescriber_organization
+
+        return PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
 
     @property
     def asp_siae_type(self):
@@ -467,6 +468,8 @@ class EmployeeRecordBatch:
         # add a line number to each FS for JSON serialization
         for idx, er in enumerate(self.employee_records, start=1):
             er.asp_batch_line_number = idx
+            er.asp_processing_code = None
+            er.asp_processing_label = None
 
     def __str__(self):
         return f"{self.upload_filename}"
