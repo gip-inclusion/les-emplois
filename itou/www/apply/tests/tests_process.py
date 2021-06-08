@@ -88,7 +88,7 @@ class ProcessViewsTest(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_details_for_prescriber(self):
-        """As a prescriber, I cannot access the job_applications details for prescribers."""
+        """As a prescriber, I can access the job_applications details for prescribers."""
 
         job_application = JobApplicationSentByAuthorizedPrescriberOrganizationFactory()
         prescriber = job_application.sender_prescriber_organization.members.first()
