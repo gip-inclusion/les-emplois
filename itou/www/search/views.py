@@ -73,7 +73,8 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         for siae in siaes:
             if siae.department in DEPARTMENTS_WITH_DISTRICT:
                 districts.add(siae.post_code)
-            departments.add(siae.department)
+            if siae.department:
+                departments.add(siae.department)
 
         if departments:
             departments = sorted(departments)
