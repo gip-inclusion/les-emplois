@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 import itou.asp.factories as asp
+from itou.asp.models import AllocationDuration, EmployerType
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.factories import PrescriberMembershipFactory
@@ -273,33 +274,6 @@ class JobSeekerProfileModelTest(TestCase):
         # Won't raise exception
         self.profile.clean()
 
-    def test_social_allowances(self):
-        """
-        Check if the social allowances part is coherent
-        """
-        self.profile.user.title = User.Title.M
-
-        self.profile.resourceless = True
-        self.profile.rqth_employee = True
-
-        with self.assertRaises(ValidationError):
-            self.profile.clean()
-
-        self.profile.resourceless = False
-        self.profile.clean()
-
-        self.profile.resourceless = True
-        self.profile.oeth_employee = True
-        self.profile.rqth_employee = False
-
-        with self.assertRaises(ValidationError):
-            self.profile.clean()
-
-        self.profile.resourceless = False
-        self.profile.clean()
-
-        # More to come ...
-
     @mock.patch(
         "itou.utils.address.format.get_geocoding_data",
         side_effect=mock_get_geocoding_data,
@@ -375,3 +349,30 @@ class JobSeekerProfileModelTest(TestCase):
         self.profile._clean_job_seeker_details()
 
         # Birth place / birth country are checked in User tests
+
+    def test_job_seeker_previous_employer(self):
+        """
+        Check coherence of the `is_employed` field,
+        and a fix about unchecked / badly checkedfield on ASP process side (`salarieEnEmploi`)
+        """
+        # Needed for model validation
+        self.profile.user.title = User.Title.M
+        self.profile.education_level = "00"
+
+        self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
+
+        self.profile._clean_job_seeker_situation()
+        self.assertFalse(self.profile.is_employed)
+
+        self.profile.unemployed_since = None
+        self.profile.previous_employer_kind = EmployerType.ACI
+
+        self.profile._clean_job_seeker_situation()
+        self.assertTrue(self.profile.is_employed)
+
+        # Check coherence
+        with self.assertRaises(ValidationError):
+            # Can't have both
+            self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
+            self.profile.previous_employer_kind = EmployerType.ACI
+            self.profile._clean_job_seeker_situation()
