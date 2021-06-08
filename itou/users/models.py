@@ -12,7 +12,15 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import ApprovalsWrapper
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType, RSAAllocation
+from itou.asp.models import (
+    AllocationDuration,
+    Commune,
+    EducationLevel,
+    EmployerType,
+    LaneExtension,
+    LaneType,
+    RSAAllocation,
+)
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.format import format_address
 from itou.utils.address.models import AddressMixin
@@ -437,17 +445,24 @@ class JobSeekerProfile(models.Model):
     oeth_employee = models.BooleanField(verbose_name="Employé OETH", default=False)
 
     pole_emploi_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Inscrit à Pôle emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     unemployed_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Sans emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
+    )
+
+    previous_employer_kind = models.CharField(
+        max_length=2,
+        verbose_name="Précédent employeur",
+        blank=True,
+        choices=EmployerType.choices,
     )
 
     # Despite the name of this field in the ASP model (salarieBenefRSA),
@@ -461,28 +476,28 @@ class JobSeekerProfile(models.Model):
     )
 
     rsa_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire du RSA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire de l'ASS depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire de l'AAH depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ata_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire de l'ATA depuis",
         blank=True,
         choices=AllocationDuration.choices,
@@ -539,9 +554,6 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
     def _clean_job_seeker_situation(self):
-        # if self.resourceless and self.is_employed:
-        #    raise ValidationError(self.ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH)
-
         # if self.is_employed and self.unemployed_since:
         #    raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
 
@@ -627,7 +639,6 @@ class JobSeekerProfile(models.Model):
 
     @property
     def is_employed(self):
-        # return bool(self.rqth_employee or self.oeth_employee or not self.unemployed_since)
         return not self.unemployed_since
 
     @property

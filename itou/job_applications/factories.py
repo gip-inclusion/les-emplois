@@ -168,6 +168,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     """
 
     job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
+    sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
 
     @factory.post_generation
     def set_job_seeker_profile(self, create, extracted, **kwargs):
