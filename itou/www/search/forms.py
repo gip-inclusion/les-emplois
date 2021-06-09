@@ -42,11 +42,11 @@ class SiaeSearchForm(forms.Form):
         ),
     )
 
-    kinds = forms.ChoiceField(
+    kinds = forms.MultipleChoiceField(
         label="Types de structure",
         choices=KIND_CHOICES,
         required=False,
-        widget=forms.CheckboxSelectMultiple(),
+        widget=forms.CheckboxSelectMultiple,
     )
 
     has_few_candidates = forms.BooleanField(
