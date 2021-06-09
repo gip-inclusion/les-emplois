@@ -165,4 +165,9 @@ def department_from_postcode(post_code):
 
 
 # Marseille, Lyon and Paris
-DEPARTMENTS_WITH_DISTRICT = ("13", "69", "75")
+# The value is the number of districts of the department
+DEPARTMENTS_WITH_DISTRICTS = {
+    "13": {"city": "Marseille", "max": 13016},
+    "69": {"city": "Lyon", "max": 69009},
+    "75": {"city": "Paris", "max": 75020},
+}

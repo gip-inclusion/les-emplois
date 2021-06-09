@@ -9,8 +9,17 @@
         {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
     {% endif %}
 
-    {% if form.districts %}
-        {% bootstrap_field form.districts form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+    {# getattr and list still painful in Django template #}
+    {% if form.districts_13 %}
+        {% bootstrap_field form.districts_13 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+    {% endif %}
+
+    {% if form.districts_69 %}
+        {% bootstrap_field form.districts_69 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+    {% endif %}
+
+    {% if form.districts_75 %}
+        {% bootstrap_field form.districts_75 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
     {% endif %}
 
     {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
