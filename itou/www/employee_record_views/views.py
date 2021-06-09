@@ -4,6 +4,7 @@ from django.db.models import Count
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.encoding import escape_uri_path
 
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
@@ -51,6 +52,10 @@ def update_is_allowed(job_application):
     """
     employee_record = job_application.employee_record.first()
     return not employee_record or (employee_record and employee_record.is_updatable)
+
+
+def siae_is_allowed(job_application, siae):
+    return job_application.to_siae == siae
 
 
 @login_required
@@ -144,7 +149,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
     job_application = JobApplication.objects.get(pk=job_application_id)
 
-    if not update_is_allowed(job_application):
+    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
         raise PermissionDenied
 
     form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
@@ -189,22 +194,33 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     job_application = JobApplication.objects.get(pk=job_application_id)
+    job_seeker = job_application.job_seeker
 
-    if not update_is_allowed(job_application):
+    # Conditions:
+    # - employee record is in an updatable state (if exists)
+    # - target job_application / employee record must be linked to given SIAE
+    # - a job seeker profile must exist (created in step 1)
+    if not all(
+        [
+            update_is_allowed(job_application),
+            siae_is_allowed(job_application, siae),
+            job_seeker.has_jobseeker_profile,
+        ]
+    ):
         raise PermissionDenied
 
-    profile = job_application.job_seeker.jobseeker_profile
+    profile = job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
-    maps_url = f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}"
+    maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}")
     step = 2
 
     if request.method == "POST" and form.is_valid():
         form.save()
         try:
             profile.update_hexa_address()
-        except ValidationError as ex:
-            # TODO report error (messages)
-            print(f"error: {ex}")
+        except ValidationError:
+            # Impossible to get a valid hexa adress, clear previous entry
+            profile.clear_hexa_address()
 
         # Loop on itself until good
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
@@ -228,12 +244,25 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
 
     Step 3: Training level, allocations ...
     """
-    step = 3
-    job_application = JobApplication.objects.get(pk=job_application_id)
+    siae = get_current_siae_or_404(request)
 
-    if not update_is_allowed(job_application):
+    if not siae.can_use_employee_record:
         raise PermissionDenied
 
+    job_application = JobApplication.objects.get(pk=job_application_id)
+    job_seeker = job_application.job_seeker
+
+    if not all(
+        [
+            update_is_allowed(job_application),
+            siae_is_allowed(job_application, siae),
+            job_seeker.has_jobseeker_profile,
+            job_seeker.jobseeker_profile.hexa_address_filled,
+        ]
+    ):
+        raise PermissionDenied
+
+    step = 3
     profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
 

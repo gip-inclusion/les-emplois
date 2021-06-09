@@ -88,6 +88,7 @@
 
 </form>
 
-
 <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create" job_application.id %}">Précédent</a>
-<a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
+{% if profile.hexa_address_filled %}
+    <a class="btn btn btn-outline-primary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Continuer</a>
+{% endif %}
