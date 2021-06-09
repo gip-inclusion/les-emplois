@@ -1,10 +1,12 @@
+from collections import defaultdict
+
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.shortcuts import render
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENTS_WITH_DISTRICT
+from itou.utils.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
@@ -69,20 +71,24 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
         departments = set()
-        districts = set()
+        departments_districts = defaultdict(set)
         for siae in siaes:
-            if siae.department in DEPARTMENTS_WITH_DISTRICT:
-                districts.add(siae.post_code)
+            # Extract the department of SIAE
             if siae.department:
                 departments.add(siae.department)
+                # Extract the post_code if it's a district to use it as criteria
+                if siae.department in DEPARTMENTS_WITH_DISTRICTS:
+                    if int(siae.post_code) <= DEPARTMENTS_WITH_DISTRICTS[siae.department]["max"]:
+                        departments_districts[siae.department].add(siae.post_code)
 
         if departments:
             departments = sorted(departments)
             form.add_field_departements(departments)
 
-        if districts:
-            districts = sorted(districts)
-            form.add_field_districts(districts)
+        if departments_districts:
+            for department, districts in departments_districts.items():
+                districts = sorted(districts)
+                form.add_field_districts(department, districts)
 
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
