@@ -248,6 +248,8 @@ def edit_siae(request, template_name="siaes/edit_siae.html"):
     Edit an SIAE.
     """
     siae = get_current_siae_or_404(request)
+    if not siae.has_admin(request.user):
+        raise PermissionDenied
 
     form = EditSiaeForm(instance=siae, data=request.POST or None)
 
