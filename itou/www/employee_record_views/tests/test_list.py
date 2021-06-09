@@ -65,6 +65,3 @@ class ListEmployeeRecordsTest(TestCase):
         for status in [EmployeeRecord.Status.SENT, EmployeeRecord.Status.REJECTED, EmployeeRecord.Status.PROCESSED]:
             response = self.client.get(self.url + f"?status={status.value}")
             self.assertNotContains(response, job_seeker_name)
-
-    # To be completed with other status during UI part 2
-    # when connected to employee record backend with sample employee records...
