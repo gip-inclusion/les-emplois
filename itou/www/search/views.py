@@ -23,13 +23,44 @@ def search_siaes_home(request, template_name="search/siaes_search_home.html"):
 def search_siaes_results(request, template_name="search/siaes_search_results.html"):
     city = None
     distance = None
-    kinds = None
     siaes_page = None
     form = SiaeSearchForm(request.GET or None, initial={"distance": SiaeSearchForm.DISTANCE_DEFAULT})
 
     if form.is_valid():
+        # The filtering is made in 3 steps:
+        # 1. query with city and distance
+        # 2. extract departments and districts filters from first query
+        # 3. final query with all the others criteria
         city = form.cleaned_data["city"]
         distance = form.cleaned_data["distance"]
+
+        # Step 1 - Initial query
+        siaes = Siae.objects.active().within(city.coords, distance)
+
+        # Step2
+        # Extract departments from results to inject them as filters
+        # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
+        departments = set()
+        departments_districts = defaultdict(set)
+        for siae in siaes:
+            # Extract the department of SIAE
+            if siae.department:
+                departments.add(siae.department)
+                # Extract the post_code if it's a district to use it as criteria
+                if siae.department in DEPARTMENTS_WITH_DISTRICTS:
+                    if int(siae.post_code) <= DEPARTMENTS_WITH_DISTRICTS[siae.department]["max"]:
+                        departments_districts[siae.department].add(siae.post_code)
+
+        if departments:
+            departments = sorted(departments)
+            form.add_field_departements(departments)
+
+        if departments_districts:
+            for department, districts in departments_districts.items():
+                districts = sorted(districts)
+                form.add_field_districts(department, districts)
+
+        # Step 3 - Final filtering
         kinds = form.cleaned_data["kinds"]
         departments = request.GET.getlist("departments")
         districts = []
@@ -37,9 +68,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             districts += request.GET.getlist(f"districts_{department_with_district}")
 
         siaes = (
-            Siae.objects.active()
-            .within(city.coords, distance)
-            .add_shuffled_rank()
+            siaes.add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
@@ -69,6 +98,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             # detached members from their siae so it could still happen.
             .order_by("-has_active_members", "block_job_applications", "shuffled_rank")
         )
+
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
 
@@ -78,35 +108,12 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         if districts:
             siaes = siaes.filter(post_code__in=districts)
 
-        # Extract departments from results to inject them as filters
-        # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
-        departments = set()
-        departments_districts = defaultdict(set)
-        for siae in siaes:
-            # Extract the department of SIAE
-            if siae.department:
-                departments.add(siae.department)
-                # Extract the post_code if it's a district to use it as criteria
-                if siae.department in DEPARTMENTS_WITH_DISTRICTS:
-                    if int(siae.post_code) <= DEPARTMENTS_WITH_DISTRICTS[siae.department]["max"]:
-                        departments_districts[siae.department].add(siae.post_code)
-
-        if departments:
-            departments = sorted(departments)
-            form.add_field_departements(departments)
-
-        if departments_districts:
-            for department, districts in departments_districts.items():
-                districts = sorted(districts)
-                form.add_field_districts(department, districts)
-
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
     context = {
         "form": form,
         "city": city,
         "distance": distance,
-        "kinds": kinds,
         "siaes_page": siaes_page,
         # Used to display a specific badge
         "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
