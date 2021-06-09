@@ -32,6 +32,9 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         distance = form.cleaned_data["distance"]
         kinds = form.cleaned_data["kinds"]
         departments = request.GET.getlist("departments")
+        districts = []
+        for department_with_district in DEPARTMENTS_WITH_DISTRICTS:
+            districts += request.GET.getlist(f"districts_{department_with_district}")
 
         siaes = (
             Siae.objects.active()
@@ -68,8 +71,12 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         )
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
+
         if departments:
             siaes = siaes.filter(department__in=departments)
+
+        if districts:
+            siaes = siaes.filter(post_code__in=districts)
 
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
