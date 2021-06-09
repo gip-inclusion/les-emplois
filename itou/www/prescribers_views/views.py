@@ -28,6 +28,8 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
     Edit a prescriber organization.
     """
     organization = get_current_org_or_404(request)
+    if not organization.has_admin(request.user):
+        raise PermissionDenied
 
     form = EditPrescriberOrganizationForm(instance=organization, data=request.POST or None)
 

@@ -194,11 +194,13 @@
                     <div class="card-body">
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
+                            {% if user_is_prescriber_org_admin %}
                             <a href="{% url 'prescribers_views:edit_organization' %}">
                                 Modifier les informations
                             </a>
+                                {% if current_prescriber_organization.get_card_url %} / {% endif %}
+                            {% endif %}
                             {% if current_prescriber_organization.get_card_url %}
-                                /
                                 <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     Voir la fiche
                                 </a>
