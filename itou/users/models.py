@@ -612,6 +612,21 @@ class JobSeekerProfile(models.Model):
 
         return self
 
+    def clear_hexa_address(self):
+        """
+        Delete hexa address fields.
+        This method updates the profile in db.
+        """
+        self.hexa_lane_type = ""
+        self.hexa_lane_number = ""
+        self.hexa_std_extension = ""
+        self.hexa_non_std_extension = None
+        self.hexa_lane_name = ""
+        self.hexa_post_code = ""
+        self.hexa_commune = None
+
+        self.save()
+
     @property
     def is_employed(self):
         return not self.unemployed_since and self.previous_employer_kind
