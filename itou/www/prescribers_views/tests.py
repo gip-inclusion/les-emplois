@@ -79,6 +79,14 @@ class EditOrganizationTest(TestCase):
         self.assertEqual(organization.longitude, 2.316754)
         self.assertEqual(organization.geocoding_score, 0.587663373207207)
 
+        # Only admins should be able to edit organization details
+        membership = organization.prescribermembership_set.first()
+        membership.is_admin = False
+        membership.save()
+        url = reverse("prescribers_views:edit_organization")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit_with_multiple_memberships_and_same_siret(self, mock_call_ban_geocoding_api):
         """
