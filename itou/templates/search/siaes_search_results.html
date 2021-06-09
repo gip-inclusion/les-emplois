@@ -69,7 +69,7 @@
                                     <span class="badge badge-dark">Priorité aux bénéficiaires de RQTH</span>
                                 </p>
                             {% endif %}
-                            <div>
+                            <div class="mb-3">
                                 <span class="badge badge-dark">{{ siae.distance | floatformat:"-1" }} km</span> de votre lieu de recherche.
                             </div>
                             {% if siae.job_description_through.exists and not siae.block_job_applications %}
