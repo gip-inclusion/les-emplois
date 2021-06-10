@@ -195,7 +195,7 @@ class NewEmployeeRecordStep3(forms.ModelForm):
             if not self.cleaned_data["pole_emploi_id"]:
                 raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
 
-        # RSA
+        # RSA: 3 options possible, one is handled by `rsa_allocation` value
         if self.cleaned_data["rsa_allocation"]:
             # If checked, all fields must be filled
             if not (self.cleaned_data["rsa_allocation_since"] and self.cleaned_data["rsa_markup"]):

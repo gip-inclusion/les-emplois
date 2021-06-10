@@ -213,8 +213,6 @@ class JobSeekerProfileModelTest(TestCase):
         data = BAN_GEOCODING_API_RESULTS_MOCK[0]
 
         user.address_line_1 = data.get("address_line_1")
-        # user.
-        # user.post_code = data.get("post_code")
 
     def test_job_seeker_details(self):
 
