@@ -4,10 +4,7 @@
         Filtres
     </div>
     <div class="card-body">
-        <h5 class="font-weight-bold text-muted">Opportunités</h5>
-        {% bootstrap_field form.has_few_candidates %}
-
-        {% bootstrap_field form.distance form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% bootstrap_field form.distance form_group_class="form-group" label_class="h5 font-weight-bold text-muted" %}
 
         {% if form.departments %}
             {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
