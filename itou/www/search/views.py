@@ -24,6 +24,8 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
     city = None
     distance = None
     siaes_page = None
+    siaes_step_1 = None
+
     form = SiaeSearchForm(request.GET or None, initial={"distance": SiaeSearchForm.DISTANCE_DEFAULT})
 
     if form.is_valid():
@@ -35,14 +37,14 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         distance = form.cleaned_data["distance"]
 
         # Step 1 - Initial query
-        siaes = Siae.objects.active().within(city.coords, distance)
+        siaes_step_1 = Siae.objects.active().within(city.coords, distance)
 
         # Step2
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
         departments = set()
         departments_districts = defaultdict(set)
-        for siae in siaes:
+        for siae in siaes_step_1:
             # Extract the department of SIAE
             if siae.department:
                 departments.add(siae.department)
@@ -68,7 +70,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             districts += request.GET.getlist(f"districts_{department_with_district}")
 
         siaes = (
-            siaes.add_shuffled_rank()
+            siaes_step_1.add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
@@ -114,6 +116,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         "form": form,
         "city": city,
         "distance": distance,
+        "siaes_step_1": siaes_step_1,
         "siaes_page": siaes_page,
         # Used to display a specific badge
         "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
