@@ -30,7 +30,7 @@
         </h3>
     {% endif %}
 
-    {% if not siaes_page %}
+    {% if not siaes_step_1 %}
         <h4 class="font-weight-normal text-muted">
             Aucun résultat.
         </h4>
@@ -44,11 +44,7 @@
 
         <h4 class="font-weight-normal text-muted mb-0">
             {% with siaes_page.number as current_page and siaes_page.paginator.num_pages as total_pages and siaes_page.paginator.count as counter %}
-                {% if counter > 1 %}
-                    <b>{{ counter }}</b> résultats
-                {% else %}
-                    <b>1</b> résultat
-                {% endif %}
+                <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
                 {% if siaes_page.paginator.num_pages > 1 %}
                     - Page <b>{{ current_page }}</b>/{{ total_pages }}
                 {% endif %}
@@ -119,9 +115,14 @@
                                     {% include "includes/icon.html" with icon="message-square" %} Postuler
                                 </a>
                             {% endif %}
-
                         </div>
 
+                    </div>
+                {% empty %}
+                    <div class="card my-4">
+                        <div class="card-body">
+                            Aucun résultat avec les filtres actuels.
+                        </div>
                     </div>
                 {% endfor %}
 
