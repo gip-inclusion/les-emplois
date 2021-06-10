@@ -49,12 +49,6 @@ class SiaeSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    has_few_candidates = forms.BooleanField(
-        label="Peu de candidatures",
-        initial=False,
-        required=False,
-    )
-
     def __init__(self, data=None, **kwargs):
         initial = kwargs.get("initial", {})
         if data:
