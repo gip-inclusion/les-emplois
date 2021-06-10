@@ -504,7 +504,7 @@ class JobApplicationNotificationsTest(TestCase):
         self.assertIn(job_application.to_siae.address_line_2, email.body)
         self.assertIn(job_application.to_siae.post_code, email.body)
         self.assertIn(job_application.to_siae.city, email.body)
-        self.assertIn(settings.ITOU_EMAIL_CONTACT, email.body)
+        self.assertIn(settings.ITOU_ASSISTANCE_URL, email.body)
         self.assertIn(job_application.to_siae.accept_survey_url, email.body)
 
     def test_manually_deliver_approval(self):
