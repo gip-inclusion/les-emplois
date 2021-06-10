@@ -227,6 +227,11 @@ SECURE_BROWSER_XSS_FILTER = True
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+# Load the site over HTTPS only.
+# TODO: use a small value for testing, once confirmed that HSTS didn't break anything increase it.
+# https://docs.djangoproject.com/en/dev/ref/middleware/#http-strict-transport-security
+SECURE_HSTS_SECONDS = 30
+
 SESSION_COOKIE_HTTPONLY = True
 
 SESSION_COOKIE_SECURE = True
