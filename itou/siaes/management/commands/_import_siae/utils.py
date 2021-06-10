@@ -263,7 +263,15 @@ def anonymize_fluxiae_df(df):
     return df
 
 
-def get_fluxiae_df(vue_name, converters=None, description=None, parse_dates=None, skip_first_row=True, dry_run=False):
+def get_fluxiae_df(
+    vue_name,
+    converters=None,
+    description=None,
+    parse_dates=None,
+    skip_first_row=True,
+    anonymize_sensitive_data=True,
+    dry_run=False,
+):
     """
     Load fluxIAE CSV file as a dataframe.
     Any sensitive data will be dropped and/or anonymized.
@@ -326,6 +334,7 @@ def get_fluxiae_df(vue_name, converters=None, description=None, parse_dates=None
 
     assert len(df) == nrows
 
-    df = anonymize_fluxiae_df(df)
+    if anonymize_sensitive_data:
+        df = anonymize_fluxiae_df(df)
 
     return df
