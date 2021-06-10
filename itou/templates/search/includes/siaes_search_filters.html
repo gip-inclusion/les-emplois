@@ -3,7 +3,7 @@
     <div class="card-header d-block d-sm-none">
         Filtres
     </div>
-    <div class="card-body">
+    <div id="search-filter-form" class="card-body">
         {% bootstrap_field form.distance form_group_class="form-group" label_class="h5 font-weight-bold text-muted" %}
 
         {% if form.departments %}
@@ -24,7 +24,5 @@
         {% endif %}
 
         {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
-
-        <button type="submit" class="btn btn-primary itou-btn-primary">Filtrer</button>
     </div>
 </div>

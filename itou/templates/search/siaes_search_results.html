@@ -9,10 +9,19 @@
     {{ block.super }}
 {% endblock %}
 
+{% block script %}
+    {{ block.super }}
+    <script>
+    $("#search-filter-form :input").change(function() {
+        $("#search-form").submit();
+    });
+    </script>
+{% endblock %}
+
 {% block content %}
     <h2>Rechercher des employeurs solidaires</h2>
 
-    <form method="get" action="" class="d-block mb-5">
+    <form id="search-form" method="get" action="" class="d-block mb-5">
         {% include "search/includes/siaes_search_form.html" with form=form %}
 
     {% if form.is_valid %}
