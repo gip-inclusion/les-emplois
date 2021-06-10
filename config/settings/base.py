@@ -354,6 +354,7 @@ SOCIALACCOUNT_ADAPTER = "itou.allauth_adapters.peamu.adapter.PEAMUSocialAccountA
 # PDFShift
 # ------------------------------------------------------------------------------
 
+PDFSHIFT_API_BASE_URL = "https://api.pdfshift.io/v3"
 PDFSHIFT_API_KEY = os.environ.get("PDFSHIFT_API_KEY")
 PDFSHIFT_SANDBOX_MODE = os.environ.get("DJANGO_DEBUG")
 
