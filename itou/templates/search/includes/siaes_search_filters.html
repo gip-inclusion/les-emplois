@@ -1,28 +1,33 @@
 {% load bootstrap4 %}
-<div class="card my-4 p-4">
-    <h5 class="font-weight-bold text-muted">Opportunités</h5>
-    {% bootstrap_field form.has_few_candidates %}
+<div class="card my-4">
+    <div class="card-header d-block d-sm-none">
+        Filtres
+    </div>
+    <div class="card-body">
+        <h5 class="font-weight-bold text-muted">Opportunités</h5>
+        {% bootstrap_field form.has_few_candidates %}
 
-    {% bootstrap_field form.distance form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% bootstrap_field form.distance form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
 
-    {% if form.departments %}
-        {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
-    {% endif %}
+        {% if form.departments %}
+            {% bootstrap_field form.departments form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% endif %}
 
-    {# getattr and list still painful in Django template #}
-    {% if form.districts_13 %}
-        {% bootstrap_field form.districts_13 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
-    {% endif %}
+        {# getattr and list still painful in Django template #}
+        {% if form.districts_13 %}
+            {% bootstrap_field form.districts_13 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% endif %}
 
-    {% if form.districts_69 %}
-        {% bootstrap_field form.districts_69 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
-    {% endif %}
+        {% if form.districts_69 %}
+            {% bootstrap_field form.districts_69 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% endif %}
 
-    {% if form.districts_75 %}
-        {% bootstrap_field form.districts_75 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
-    {% endif %}
+        {% if form.districts_75 %}
+            {% bootstrap_field form.districts_75 form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% endif %}
 
-    {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
+        {% bootstrap_field form.kinds form_group_class="form-group mt-2" label_class="h5 font-weight-bold text-muted" %}
 
-    <button type="submit" class="btn btn-primary itou-btn-primary">Filtrer</button>
+        <button type="submit" class="btn btn-primary itou-btn-primary">Filtrer</button>
+    </div>
 </div>
