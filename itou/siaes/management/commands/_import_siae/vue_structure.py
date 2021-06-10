@@ -12,9 +12,8 @@ It contains almost all data to build a siae from scratch with 2 exceptions:
 
 """
 import numpy as np
-import pandas as pd
 
-from itou.siaes.management.commands._import_siae.utils import get_filename, remap_columns, timeit
+from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, remap_columns, timeit
 from itou.utils.validators import validate_naf, validate_siret
 
 
@@ -25,21 +24,16 @@ def get_vue_structure_df():
     - asp_id
     - siret (current)
     - siret (initial aka siret_signature)
+    - auth_email
     - name
     - address
     - phone
     but does *not* have those fields:
-    - auth_email (found in the "Liste Correspondants Techniques" export)
     - kind (found in the "Vue AF" export)
     - website (nowhere to be found)
     """
-    filename = get_filename(
-        filename_prefix="fluxIAE_Structure", filename_extension=".csv", description="Vue Structure"
-    )
-
-    df = pd.read_csv(
-        filename,
-        sep="|",
+    df = get_fluxiae_df(
+        vue_name="fluxIAE_Structure",
         converters={
             "structure_siret_actualise": str,
             "structure_siret_signature": str,
@@ -47,14 +41,10 @@ def get_vue_structure_df():
             "structure_adresse_gestion_cp": str,
             "structure_adresse_gestion_telephone": str,
         },
-        # First and last rows of CSV are weird markers.
-        # Example of first row: DEBStructure31082020_074706
-        # Example of last row: FIN4311
-        # Let's ignore them.
-        skiprows=1,
-        skipfooter=1,
-        # Fix warning caused by using `skipfooter`.
-        engine="python",
+        description="Vue Structure",
+        skip_first_row=True,
+        # We need the phone number.
+        anonymize_sensitive_data=False,
     )
 
     column_mapping = {
@@ -85,6 +75,7 @@ def get_vue_structure_df():
 
     # Drop rows without auth_email.
     df = df[df.auth_email.notnull()]
+    df = df[df.auth_email != ""]
 
     for _, row in df.iterrows():
         validate_siret(row.siret)

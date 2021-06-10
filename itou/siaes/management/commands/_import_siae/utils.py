@@ -3,10 +3,13 @@
 Various helpers shared by the import_siae, import_geiq and import_ea_eatt scripts.
 
 """
+import csv
+import gzip
 import os
 from functools import wraps
 from time import time
 
+import pandas as pd
 from django.utils import timezone
 
 from itou.siaes.models import Siae
@@ -105,6 +108,11 @@ def remap_columns(df, column_mapping):
 
     {"ID Structure": "asp_id", "Adresse e-mail": "auth_email"}
     """
+    # Ensure each column is present.
+    for column_name in column_mapping:
+        if column_name not in df.columns.tolist():
+            raise ValueError(f"FATAL ERROR: {column_name} column absent in dataframe.")
+
     df.rename(
         columns=column_mapping,
         inplace=True,
@@ -186,6 +194,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
     # Delete structures which no longer exist in the latest export.
     deletable_sirets = db_sirets - df_sirets
+    deleted_count = 0
     undeletable_count = 0
     for siret in deletable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
@@ -197,6 +206,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
         if could_siae_be_deleted(siae):
             print(f"siae.id={siae.id} will be deleted.")
+            deleted_count += 1
             if not dry_run:
                 siae.delete()
             continue
@@ -211,4 +221,120 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
         print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} cannot be deleted as it has data.")
         undeletable_count += 1
 
+    print(f"{deleted_count} {source} can and will be deleted.")
     print(f"{undeletable_count} {source} cannot be deleted as they have data.")
+
+
+def anonymize_fluxiae_df(df):
+    """
+    Drop and/or anonymize sensitive data in fluxIAE dataframe.
+    """
+    if "salarie_date_naissance" in df.columns.tolist():
+        df["salarie_annee_naissance"] = df.salarie_date_naissance.str[-4:].astype(int)
+
+    deletable_columns = [
+        "nom_usage",
+        "nom_naissance",
+        "prenom",
+        "date_naissance",
+        "telephone",
+        "adr_mail",
+        "salarie_agrement",
+        "salarie_adr_point_remise",
+        "salarie_adr_cplt_point_geo",
+        "salarie_adr_numero_voie",
+        "salarie_codeextensionvoie",
+        "salarie_codetypevoie",
+        "salarie_adr_libelle_voie",
+        "salarie_adr_cplt_distribution",
+        "salarie_adr_qpv_nom",
+    ]
+
+    for deletable_column in deletable_columns:
+        for column_name in df.columns.tolist():
+            if deletable_column in column_name:
+                del df[column_name]
+
+    # Better safe than sorry when dealing with sensitive data!
+    for column_name in df.columns.tolist():
+        for deletable_column in deletable_columns:
+            assert deletable_column not in column_name
+
+    return df
+
+
+def get_fluxiae_df(
+    vue_name,
+    converters=None,
+    description=None,
+    parse_dates=None,
+    skip_first_row=True,
+    anonymize_sensitive_data=True,
+    dry_run=False,
+):
+    """
+    Load fluxIAE CSV file as a dataframe.
+    Any sensitive data will be dropped and/or anonymized.
+    """
+    filename = get_filename(
+        filename_prefix=vue_name,
+        filename_extension=".csv",
+        description=description,
+    )
+
+    # Prepare parameters for pandas.read_csv method.
+    kwargs = {}
+
+    if skip_first_row:
+        # Some fluxIAE exports have a leading "DEB***" row, some don't.
+        kwargs["skiprows"] = 1
+
+    # All fluxIAE exports have a final "FIN***" row which should be ignored. The most obvious way to do this is
+    # to use `skipfooter=1` option in `pd.read_csv` however this causes several issues:
+    # - it forces the use of the 'python' engine instead of the default 'c' engine
+    # - the 'python' engine is much slower than the 'c' engine
+    # - the 'python' engine does not play well when faced with special characters (e.g. `"`) inside a row value,
+    #   it will break or require the `error_bad_lines=False` option to ignore all those rows
+
+    # Thus we decide to always use the 'c' engine and implement the `skipfooter=1` option ourselves by counting
+    # the rows in the CSV file beforehands instead. Always using the 'c' engine is proven to significantly reduce
+    # the duration and frequency of the developer's headaches.
+
+    with gzip.open(filename) as f:
+        # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
+        nrows = -3
+        for line in f:
+            nrows += 1
+            if dry_run and nrows == 100:
+                break
+
+    print(f"Loading {nrows} rows for {vue_name} ...")
+
+    if converters:
+        kwargs["converters"] = converters
+
+    if parse_dates:
+        kwargs["parse_dates"] = parse_dates
+
+    df = pd.read_csv(
+        filename,
+        sep="|",
+        # Some rows have a single `"` in a field, for example in fluxIAE_Mission the mission_descriptif field of
+        # the mission id 1003399237 is `"AIEHPAD` (no closing double quote). This screws CSV parsing big time
+        # as the parser will read many rows until the next `"` and consider all of them as part of the
+        # initial mission_descriptif field value o_O. Let's just disable quoting alltogether to avoid that.
+        quoting=csv.QUOTE_NONE,
+        nrows=nrows,
+        **kwargs,
+    )
+
+    # If there is only one column, something went wrong, let's break early.
+    # Most likely an incorrect skip_first_row value.
+    assert len(df.columns.tolist()) >= 2
+
+    assert len(df) == nrows
+
+    if anonymize_sensitive_data:
+        df = anonymize_fluxiae_df(df)
+
+    return df

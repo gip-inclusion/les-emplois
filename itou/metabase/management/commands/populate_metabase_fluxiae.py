@@ -60,8 +60,6 @@ One mission has many EMI.
 An EMI does not necessarily have a mission.
 
 """
-import csv
-import gzip
 import logging
 import os
 from collections import OrderedDict
@@ -74,7 +72,7 @@ from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
 from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
-from itou.siaes.management.commands._import_siae.utils import get_filename, get_fluxiae_referential_filenames, timeit
+from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
@@ -128,105 +126,6 @@ class Command(BaseCommand):
     def log(self, message):
         self.logger.debug(message)
 
-    def anonymize_df(self, df):
-        """
-        Drop and/or anonymize sensitive data in dataframe.
-        """
-        if "salarie_date_naissance" in df.columns.tolist():
-            df["salarie_annee_naissance"] = df.salarie_date_naissance.str[-4:].astype(int)
-
-        deletable_columns = [
-            "nom_usage",
-            "nom_naissance",
-            "prenom",
-            "date_naissance",
-            "telephone",
-            "adr_mail",
-            "salarie_agrement",
-            "salarie_adr_point_remise",
-            "salarie_adr_cplt_point_geo",
-            "salarie_adr_numero_voie",
-            "salarie_codeextensionvoie",
-            "salarie_codetypevoie",
-            "salarie_adr_libelle_voie",
-            "salarie_adr_cplt_distribution",
-            "salarie_adr_qpv_nom",
-        ]
-
-        for deletable_column in deletable_columns:
-            for column_name in df.columns.tolist():
-                if deletable_column in column_name:
-                    del df[column_name]
-
-        # Better safe than sorry when dealing with sensitive data!
-        for column_name in df.columns.tolist():
-            for deletable_column in deletable_columns:
-                assert deletable_column not in column_name
-
-        return df
-
-    def get_df(self, vue_name, converters=None, description=None, skip_first_row=True):
-        """
-        Load fluxIAE CSV file as a dataframe.
-        """
-        filename = get_filename(
-            filename_prefix=vue_name,
-            filename_extension=".csv",
-        )
-
-        # Prepare parameters for pandas.read_csv method.
-        kwargs = {}
-
-        if skip_first_row:
-            # Some fluxIAE exports have a leading "DEB***" row, some don't.
-            kwargs["skiprows"] = 1
-
-        # All fluxIAE exports have a final "FIN***" row which should be ignored. The most obvious way to do this is
-        # to use `skipfooter=1` option in `pd.read_csv` however this causes several issues:
-        # - it forces the use of the 'python' engine instead of the default 'c' engine
-        # - the 'python' engine is much slower than the 'c' engine
-        # - the 'python' engine does not play well when faced with special characters (e.g. `"`) inside a row value,
-        #   it will break or require the `error_bad_lines=False` option to ignore all those rows
-
-        # Thus we decide to always use the 'c' engine and implement the `skipfooter=1` option ourselves by counting
-        # the rows in the CSV file beforehands instead. Always using the 'c' engine is proven to significantly reduce
-        # the duration and frequency of the maintaining developer's headaches.
-
-        with gzip.open(filename) as f:
-            # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
-            nrows = -3
-            for line in f:
-                nrows += 1
-                if self.dry_run and nrows == 100:
-                    break
-
-        self.log(f"Loading {nrows} rows for {vue_name} ...")
-
-        if converters:
-            kwargs["converters"] = converters
-
-        df = pd.read_csv(
-            filename,
-            sep="|",
-            # Some rows have a single `"` in a field, for example in fluxIAE_Mission the mission_descriptif field of
-            # the mission id 1003399237 is `"AIEHPAD` (no closing double quote). This screws CSV parsing big time
-            # as the parser will read many rows until the next `"` and consider all of them as part of the
-            # initial mission_descriptif field value o_O. Let's just disable quoting alltogether to avoid that.
-            quoting=csv.QUOTE_NONE,
-            nrows=nrows,
-            **kwargs,
-        )
-
-        # If there is only one column, something went wrong, let's break early.
-        # Most likely an incorrect skip_first_row value.
-        assert len(df.columns.tolist()) >= 2
-
-        assert len(df) == nrows
-
-        df = self.anonymize_df(df)
-
-        return df
-
     def store_df(self, df, vue_name):
         """
         Store dataframe in database.
@@ -268,7 +167,7 @@ class Command(BaseCommand):
         Populate fluxIAE_Structure table and enrich it with some itou data.
         """
         vue_name = "fluxIAE_Structure"
-        df = self.get_df(
+        df = get_fluxiae_df(
             vue_name=vue_name,
             converters={
                 "structure_siret_actualise": str,
@@ -277,6 +176,7 @@ class Command(BaseCommand):
                 "structure_adresse_gestion_cp": str,
                 "structure_adresse_gestion_telephone": str,
             },
+            dry_run=self.dry_run,
         )
 
         # Enrich Vue Structure with some itou data.
@@ -307,7 +207,7 @@ class Command(BaseCommand):
 
     @timeit
     def populate_fluxiae_view(self, vue_name, skip_first_row=True):
-        df = self.get_df(vue_name=vue_name, skip_first_row=skip_first_row)
+        df = get_fluxiae_df(vue_name=vue_name, skip_first_row=skip_first_row, dry_run=self.dry_run)
         self.store_df(df=df, vue_name=vue_name)
 
     def populate_fluxiae_referentials(self):

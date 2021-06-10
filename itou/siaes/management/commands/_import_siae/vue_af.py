@@ -17,10 +17,9 @@ For convenience we systematically call such an (asp_id, kind) identifier
 an "siae_key" throughout the import_siae.py script code.
 
 """
-import pandas as pd
 from django.utils import timezone
 
-from itou.siaes.management.commands._import_siae.utils import get_filename, remap_columns, timeit
+from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, remap_columns, timeit
 from itou.siaes.models import Siae, SiaeFinancialAnnex
 from itou.utils.validators import validate_af_number
 
@@ -38,23 +37,12 @@ def get_vue_af_df():
     - end_date
     - state
     """
-    filename = get_filename(
-        filename_prefix="fluxIAE_AnnexeFinanciere", filename_extension=".csv", description="Vue AF"
-    )
-
-    df = pd.read_csv(
-        filename,
-        sep="|",
+    df = get_fluxiae_df(
+        vue_name="fluxIAE_AnnexeFinanciere",
         converters={"af_id_structure": int},
         parse_dates=["af_date_debut_effet", "af_date_fin_effet"],
-        # First and last rows of CSV are weird markers.
-        # Example of first row: `DEBAnnexeFinanciere31082020_063002`
-        # Example of last row: `FIN34003|||||||||||||||`
-        # Let's ignore them.
-        skiprows=1,
-        skipfooter=1,
-        # Fix warning caused by using `skipfooter`.
-        engine="python",
+        description="Vue AF",
+        skip_first_row=True,
     )
 
     column_mapping = {

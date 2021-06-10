@@ -18,11 +18,11 @@ from itou.utils.validators import validate_siret
 
 
 def convert_kind(raw_kind):
-    if raw_kind == "Entreprise adaptee":
+    if raw_kind == "Entreprise Adaptée":
         return Siae.KIND_EA
-    elif raw_kind == "EA Travail Temporaire":
+    elif raw_kind == "Entreprise Adaptée Travail Temporaire":
         return Siae.KIND_EATT
-    raise ValueError("Unexpected raw_kind")
+    raise ValueError(f"Unexpected raw_kind value: {raw_kind}")
 
 
 @timeit
@@ -31,20 +31,27 @@ def get_ea_eatt_df():
         filename_prefix="Liste_Contact_EA", filename_extension=".xlsx", description="Export EA/EATT"
     )
 
-    df = pd.read_excel(filename, converters={"SIRET": str, "CODE_POST": str})
+    siret_field_name = "Siret_Signataire"
+    post_code_field_name = "CODE_POST_Signataire"
+    phone_field_name = "TEL_CONT_Signataire"
+
+    df = pd.read_excel(filename, converters={siret_field_name: str, post_code_field_name: str, phone_field_name: str})
+
+    # Many EA are duplicated on several rows. The natural way to deduplicate those seems to be the following filter.
+    df = df[df.Est_Etab_Signataire == "Oui"]
 
     column_mapping = {
-        "RAISON_SCLE": "name",
-        "TYPE_EA": "kind",
-        "NUM_ENTREE": "address_part1",
-        "NUM_VOIE": "address_part2",
-        "CODE_VOIE": "address_part3",
-        "LIB_VOIE": "address_part4",
-        "CODE_POST": "post_code",
-        "LIB_COM": "city",
-        "SIRET": "siret",
-        "CRL_CONT": "auth_email",
-        "TEL_CONT": "phone",
+        "Denomination_Sociale_Signataire": "name",
+        "LIB_TYPE_EA": "kind",
+        "NUM_ENTREE_Signataire": "address_part1",
+        "NUM_VOIE_Signataire": "address_part2",
+        "CODE_VOIE_Signataire": "address_part3",
+        "LIB_VOIE_Signataire": "address_part4",
+        post_code_field_name: "post_code",
+        "LIB_COM_COM_Signataire": "city",
+        siret_field_name: "siret",
+        "CRL_CONT_Signataire": "auth_email",
+        phone_field_name: "phone",
     }
     df = remap_columns(df, column_mapping=column_mapping)
 
@@ -86,6 +93,9 @@ def get_ea_eatt_df():
 
     df["department"] = df.post_code.apply(department_from_postcode)
 
+    missing_emails_count = len(df[df.auth_email.isnull()])
+    assert missing_emails_count <= 20
+
     # Drop rows without auth_email.
     df = df[~df.auth_email.isnull()]
 
@@ -99,6 +109,7 @@ def build_ea_eatt(row):
     siae = Siae()
     siae.siret = row.siret
     siae.kind = row.kind
+    assert siae.kind in [Siae.KIND_EA, Siae.KIND_EATT]
     siae.source = Siae.SOURCE_EA_EATT
 
     siae.name = row["name"]  # row.name returns row index.
