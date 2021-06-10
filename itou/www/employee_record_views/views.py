@@ -167,7 +167,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
                 profile.update_hexa_address()
             except ValidationError as ex:
                 # TODO report error (messages)
-                print(f"error: {ex}")
+                print(f"profile error: {ex}")
 
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
@@ -219,10 +219,11 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         try:
             profile.update_hexa_address()
         except ValidationError:
-            # Impossible to get a valid hexa adress, clear previous entry
+            # Impossible to get a valid hexa address:
+            # clear previous entry
             profile.clear_hexa_address()
 
-        # Loop on itself until good
+        # Retry until good
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
     context = {
@@ -252,11 +253,10 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     job_application = JobApplication.objects.get(pk=job_application_id)
     job_seeker = job_application.job_seeker
 
-    if not all(
+    if not job_seeker.has_jobseeker_profile or not all(
         [
             update_is_allowed(job_application),
             siae_is_allowed(job_application, siae),
-            job_seeker.has_jobseeker_profile,
             job_seeker.jobseeker_profile.hexa_address_filled,
         ]
     ):
