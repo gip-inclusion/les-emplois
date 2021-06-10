@@ -219,21 +219,21 @@ STATICFILES_DIRS = (os.path.join(APPS_DIR, "static"),)
 # Security.
 # ------------------------------------------------------------------------------
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-SESSION_COOKIE_SECURE = True
-
-SESSION_COOKIE_HTTPONLY = True
-
 CSRF_COOKIE_HTTPONLY = True
 
 CSRF_COOKIE_SECURE = True
 
 SECURE_BROWSER_XSS_FILTER = True
 
-X_FRAME_OPTIONS = "DENY"
-
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SESSION_COOKIE_HTTPONLY = True
+
+SESSION_COOKIE_SECURE = True
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+X_FRAME_OPTIONS = "DENY"
 
 # Logging.
 # https://docs.djangoproject.com/en/dev/topics/logging
