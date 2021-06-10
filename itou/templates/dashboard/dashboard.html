@@ -95,7 +95,7 @@
             <div class="card-body">
                 <p class="h5 mb-3">
                     <span class="badge badge-warning">Nouveau</span>
-                    Améliorer la visibilité de votre structure
+                    Améliorez la visibilité de votre structure
                 </p>
                 <p class="mb-0">
                     <a href="{% url_add_query TYPEFORM_URL|add:'/to/xGF5FMel' structure=current_siae.name type=current_siae.kind ville=current_siae.city siret=current_siae.siret %}" rel="noopener" target="_blank" class="btn btn-primary">
@@ -194,11 +194,13 @@
                     <div class="card-body">
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="bookmark" %}
+                            {% if user_is_prescriber_org_admin %}
                             <a href="{% url 'prescribers_views:edit_organization' %}">
                                 Modifier les informations
                             </a>
+                                {% if current_prescriber_organization.get_card_url %} / {% endif %}
+                            {% endif %}
                             {% if current_prescriber_organization.get_card_url %}
-                                /
                                 <a href="{{ current_prescriber_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
                                     Voir la fiche
                                 </a>
@@ -264,10 +266,12 @@
                 <div class="card-body">
                     <p class="card-text">
                         {% include "includes/icon.html" with icon="box" %}
-                        <a href="{% url 'siaes_views:edit_siae' %}">
-                            Modifier les informations de l'établissement
-                        </a>
-                        /
+                        {% if user_is_siae_admin %}
+                            <a href="{% url 'siaes_views:edit_siae' %}">
+                                Modifier les informations de l'établissement
+                            </a>
+                            /
+                        {% endif %}
                         <a href="{{ current_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
                             Voir la fiche publique
                         </a>

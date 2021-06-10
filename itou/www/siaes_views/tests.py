@@ -612,6 +612,14 @@ class EditSiaeViewTest(TestCase):
         self.assertEqual(siae.longitude, 2.316754)
         self.assertEqual(siae.geocoding_score, 0.587663373207207)
 
+        # Only admin members should be allowed to edit SIAE's details
+        membership = user.siaemembership_set.first()
+        membership.is_siae_admin = False
+        membership.save()
+        url = reverse("siaes_views:edit_siae")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
+
 
 class MembersTest(TestCase):
     def test_members(self):
