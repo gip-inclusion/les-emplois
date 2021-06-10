@@ -105,6 +105,11 @@ def remap_columns(df, column_mapping):
 
     {"ID Structure": "asp_id", "Adresse e-mail": "auth_email"}
     """
+    # Ensure each column is present.
+    for column_name in column_mapping:
+        if column_name not in df.columns.tolist():
+            raise ValueError(f"FATAL ERROR: {column_name} column absent in dataframe.")
+
     df.rename(
         columns=column_mapping,
         inplace=True,
@@ -186,6 +191,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
     # Delete structures which no longer exist in the latest export.
     deletable_sirets = db_sirets - df_sirets
+    deleted_count = 0
     undeletable_count = 0
     for siret in deletable_sirets:
         siae = Siae.objects.get(siret=siret, kind__in=kinds)
@@ -197,6 +203,7 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
 
         if could_siae_be_deleted(siae):
             print(f"siae.id={siae.id} will be deleted.")
+            deleted_count += 1
             if not dry_run:
                 siae.delete()
             continue
@@ -211,4 +218,5 @@ def sync_structures(df, source, kinds, build_structure, dry_run):
         print(f"siae.id={siae.id} siret={siae.siret} source={siae.source} cannot be deleted as it has data.")
         undeletable_count += 1
 
+    print(f"{deleted_count} {source} can and will be deleted.")
     print(f"{undeletable_count} {source} cannot be deleted as they have data.")
