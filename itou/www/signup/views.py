@@ -63,6 +63,40 @@ class JobSeekerSignupView(SignupView):
         return super().post(request, *args, **kwargs)
 
 
+def job_seeker_situation(
+    request, template_name="signup/job_seeker_situation.html", redirect_field_name=REDIRECT_FIELD_NAME
+):
+    """
+    Entry point of the signup process for jobseeker.
+
+    The user is asked to choose at least one eligibility criterion to continue signup process
+    """
+
+    form = forms.JobSeekerSituationForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        next_url = reverse("signup:job_seeker_situation_not_eligible")
+
+        # at least one of the elegibility choices, go to signup form
+        eligible_choices = ["rsa", "ass", "aah", "pe"]
+        if any(choice in eligible_choices for choice in form.cleaned_data["situation"]):
+            next_url = reverse("signup:job_seeker")
+
+        return HttpResponseRedirect(next_url)
+
+    context = {
+        "form": form,
+        "redirect_field_name": redirect_field_name,
+        "redirect_field_value": get_safe_url(request, redirect_field_name),
+    }
+    return render(request, template_name, context)
+
+
+@require_GET
+def job_seeker_situation_not_eligible(request, template_name="signup/job_seeker_situation_not_eligible.html"):
+    return render(request, template_name, {})
+
+
 # SIAEs signup.
 # ------------------------------------------------------------------------------------------
 

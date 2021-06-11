@@ -17,7 +17,7 @@ class ItouLoginView(LoginView):
     # The reverse() method cannot be used here as it causes
     # a cryptic loop import error in config/urls.py
     ACCOUNT_TYPE_TO_SIGNUP_URL = {
-        "job_seeker": "signup:job_seeker",
+        "job_seeker": "signup:job_seeker_situation",
         "prescriber": "signup:prescriber_is_pole_emploi",
         "siae": "signup:siae_select",
     }

@@ -34,7 +34,7 @@
                 <h5 class="card-title font-weight-light mb-4">
                     Vous êtes en recherche d'un emploi et souhaitez postuler
                 </h5>
-                <a class="btn btn-primary" href="{% url 'signup:job_seeker' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
+                <a class="btn btn-primary" href="{% url 'signup:job_seeker_situation' %}{% if redirect_field_value %}?{{ redirect_field_name }}={{ redirect_field_value }}{% endif %}">
                     Créer un compte
                 </a>
             </div>
