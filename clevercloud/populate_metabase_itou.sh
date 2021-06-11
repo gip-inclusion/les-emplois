@@ -15,4 +15,4 @@ fi
 # $APP_HOME is set by default by clever cloud.
 cd $APP_HOME
 
-django-admin populate_metabase --verbosity 2
+django-admin populate_metabase_itou --verbosity 2

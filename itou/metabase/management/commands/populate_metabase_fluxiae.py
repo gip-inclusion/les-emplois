@@ -1,7 +1,7 @@
 """
 Populate metabase with fluxIAE data and some custom tables for our needs (mainly `missions_ai_ehpad`).
 
-For itou data, see the other script `populate_metabase.py`.
+For itou data, see the other script `populate_metabase_itou.py`.
 
 At this time this script is only supposed to run manually on your local dev, not in production.
 
@@ -62,16 +62,13 @@ An EMI does not necessarily have a mission.
 """
 import logging
 import os
-from collections import OrderedDict
 
-import pandas as pd
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from psycopg2 import sql
-from tqdm import tqdm
 
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
-from itou.metabase.management.commands._database_sqlalchemy import get_pg_engine
+from itou.metabase.management.commands._dataframes import store_df, switch_table_atomically
 from itou.siaes.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames, timeit
 from itou.siaes.models import Siae
 from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
@@ -126,41 +123,6 @@ class Command(BaseCommand):
     def log(self, message):
         self.logger.debug(message)
 
-    def store_df(self, df, vue_name):
-        """
-        Store dataframe in database.
-
-        Do this dataframe chunk by dataframe chunk to solve
-        psycopg2.OperationalError "server closed the connection unexpectedly" error.
-        """
-        if self.dry_run:
-            vue_name += "_dry_run"
-
-        # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
-        rows_per_chunk = 10 * 1000
-        df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]
-
-        self.log(f"Storing {len(df_chunks)} chunks of (max) {rows_per_chunk} rows each ...")
-        if_exists = "replace"  # For the 1st chunk, drop old existing table if needed.
-        for df_chunk in tqdm(df_chunks):
-            pg_engine = get_pg_engine()
-            df_chunk.to_sql(
-                name=f"{vue_name}_new",
-                # Use a new connection for each chunk to avoid random disconnections.
-                con=pg_engine,
-                if_exists=if_exists,
-                index=False,
-                chunksize=1000,
-                # INSERT by batch and not one by one. Increases speed x100.
-                method="multi",
-            )
-            pg_engine.dispose()
-            if_exists = "append"  # For all other chunks, append to table in progress.
-
-        self.switch_table_atomically(table_name=vue_name)
-        self.log(f"Stored {vue_name} in database ({len(df)} rows).")
-        self.log("")
-
     @timeit
     def populate_fluxiae_structures(self):
         """
@@ -203,53 +165,16 @@ class Command(BaseCommand):
                 df.loc[index, "itou_latitude"] = siae.latitude
                 df.loc[index, "itou_longitude"] = siae.longitude
 
-        self.store_df(df=df, vue_name=vue_name)
+        store_df(df=df, table_name=vue_name, dry_run=self.dry_run)
 
     @timeit
     def populate_fluxiae_view(self, vue_name, skip_first_row=True):
         df = get_fluxiae_df(vue_name=vue_name, skip_first_row=skip_first_row, dry_run=self.dry_run)
-        self.store_df(df=df, vue_name=vue_name)
+        store_df(df=df, table_name=vue_name, dry_run=self.dry_run)
 
     def populate_fluxiae_referentials(self):
         for filename in get_fluxiae_referential_filenames():
             self.populate_fluxiae_view(vue_name=filename)
-
-    def populate_departments(self):
-        """
-        Populate department codes, department names and region names.
-        """
-        rows = []
-
-        for dpt_code, dpt_name in DEPARTMENTS.items():
-            # We want to preserve the order of columns.
-            row = OrderedDict()
-
-            row["code_departement"] = dpt_code
-            row["nom_departement"] = dpt_name
-            row["nom_region"] = DEPARTMENT_TO_REGION[dpt_code]
-
-            rows.append(row)
-
-        # `columns=rows[0].keys()` trick is necessary to preserve the order of columns.
-        df = pd.DataFrame(rows, columns=rows[0].keys())
-
-        self.store_df(df=df, vue_name="departements")
-
-    def switch_table_atomically(self, table_name):
-        with MetabaseDatabaseCursor() as (cur, conn):
-            cur.execute(
-                sql.SQL("ALTER TABLE IF EXISTS {} RENAME TO {}").format(
-                    sql.Identifier(table_name), sql.Identifier(f"{table_name}_old")
-                )
-            )
-            cur.execute(
-                sql.SQL("ALTER TABLE {} RENAME TO {}").format(
-                    sql.Identifier(f"{table_name}_new"), sql.Identifier(table_name)
-                )
-            )
-            conn.commit()
-            cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
-            conn.commit()
 
     def build_custom_table(self, table_name, sql_request):
         """
@@ -269,7 +194,7 @@ class Command(BaseCommand):
             )
             conn.commit()
 
-        self.switch_table_atomically(table_name=table_name)
+        switch_table_atomically(table_name=table_name)
         self.log("Done.")
 
     @timeit
@@ -317,9 +242,6 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
         self.populate_fluxiae_view(vue_name="fluxIAE_PMSMP")
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
-
-        # Custom views for our needs (no fluxIAE data involved).
-        self.populate_departments()
 
         # Build custom tables by running raw SQL queries on existing tables.
         self.build_custom_tables()

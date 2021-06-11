@@ -2,6 +2,9 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.metabase.management.commands._utils import anonymize, get_choice, get_department_and_region_columns
 
 
+JOB_APPLICATION_PK_ANONYMIZATION_SALT = "job_application.id"
+
+
 # Reword the original JobApplication.SENDER_KIND_CHOICES
 SENDER_KIND_CHOICES = (
     (JobApplication.SENDER_KIND_JOB_SEEKER, "Candidat"),
@@ -101,7 +104,7 @@ TABLE_COLUMNS = [
         "name": "id_anonymisé",
         "type": "varchar",
         "comment": "ID anonymisé de la candidature",
-        "fn": lambda o: anonymize(o.id, salt="job_application.id"),
+        "fn": lambda o: anonymize(o.pk, salt=JOB_APPLICATION_PK_ANONYMIZATION_SALT),
     },
     {
         "name": "date_candidature",
