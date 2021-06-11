@@ -36,16 +36,11 @@ class Command(BaseCommand):
     """
     Update and sync SIAE data based on latest ASP exports.
 
-    No dry run is available.
-
-    When ready:
+    Run the following command:
         django-admin import_siae --verbosity=2
     """
 
     help = "Update and sync SIAE data based on latest ASP exports."
-
-    def add_arguments(self, parser):
-        parser.add_argument("--dry-run", dest="dry_run", action="store_true", help="Only print data to import")
 
     def set_logger(self, verbosity):
         """
@@ -272,11 +267,8 @@ class Command(BaseCommand):
             af.delete()
 
     @timeit
-    def handle(self, dry_run=False, **options):
+    def handle(self, **options):
         self.set_logger(options.get("verbosity"))
-        if dry_run:
-            self.log("This script does not have a dry run, please run a wet run directly instead.")
-            return
 
         self.fatal_errors = 0
 
