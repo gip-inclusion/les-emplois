@@ -31,7 +31,7 @@ class SelectEmployeeRecordStatusForm(forms.Form):
     )
 
 
-class NewEmployeeRecordStep1(forms.ModelForm):
+class NewEmployeeRecordStep1Form(forms.ModelForm):
     """
     New employee record step 1:
     - main details (just check)
@@ -114,9 +114,10 @@ class NewEmployeeRecordStep1(forms.ModelForm):
         ]
 
 
-class NewEmployeeRecordStep2(forms.ModelForm):
+class NewEmployeeRecordStep2Form(forms.ModelForm):
     """
     New employee record step 2:
+
     - HEXA address lookup
     - details of the employee
     """
@@ -140,10 +141,12 @@ class NewEmployeeRecordStep2(forms.ModelForm):
         ]
 
 
-class NewEmployeeRecordStep3(forms.ModelForm):
+class NewEmployeeRecordStep3Form(forms.ModelForm):
     """
     New employee record step 3:
-    - situation of employee and details
+
+    - situation of employee
+    - social allowances
     """
 
     pole_emploi = forms.BooleanField(required=False, label="Le salarié est-il inscrit à Pôle emploi ?")
@@ -201,6 +204,19 @@ class NewEmployeeRecordStep3(forms.ModelForm):
             if not (self.cleaned_data["rsa_allocation_since"] and self.cleaned_data["rsa_markup"]):
                 raise forms.ValidationError("La durée d'inscription et la majoration RSA sont obligatoires")
 
+        # Fold fields validation
+        fold_errors = {
+            "unemployed": "La période sans emploi est obligatoire",
+            "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
+            "aah_allocation": "La durée d'allocation de l'AAH est obligatoire",
+            "ata_allocation": "La durée d'allocation de l'ATA est obligatoire",
+        }
+
+        for fold_field, error_message in fold_errors.items():
+            if self.cleaned_data[fold_field]:
+                if not self.cleaned_data[fold_field + "_since"]:
+                    raise forms.ValidationError(error_message)
+
     def save(self, *args, **kwargs):
         if self.cleaned_data["rsa_allocation"]:
             self.instance.has_rsa_allocation = self.cleaned_data["rsa_markup"]
@@ -232,7 +248,8 @@ class NewEmployeeRecordStep3(forms.ModelForm):
 class NewEmployeeRecordStep4(forms.Form):
     """
     New employee record step 4:
-    Select a valid financial annex
+
+    select a valid financial annex
     """
 
     financial_annex = forms.ChoiceField(

@@ -12,9 +12,9 @@ from itou.users.models import JobSeekerProfile
 from itou.utils.pagination import pager
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import (
-    NewEmployeeRecordStep1,
-    NewEmployeeRecordStep2,
-    NewEmployeeRecordStep3,
+    NewEmployeeRecordStep1Form,
+    NewEmployeeRecordStep2Form,
+    NewEmployeeRecordStep3Form,
     NewEmployeeRecordStep4,
     SelectEmployeeRecordStatusForm,
 )
@@ -152,7 +152,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
         raise PermissionDenied
 
-    form = NewEmployeeRecordStep1(data=request.POST or None, instance=job_application.job_seeker)
+    form = NewEmployeeRecordStep1Form(data=request.POST or None, instance=job_application.job_seeker)
     step = 1
 
     if request.method == "POST" and form.is_valid():
@@ -210,7 +210,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     profile = job_seeker.jobseeker_profile
-    form = NewEmployeeRecordStep2(data=request.POST or None, instance=job_application.job_seeker)
+    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=job_application.job_seeker)
     maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}")
     step = 2
 
@@ -264,7 +264,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
 
     step = 3
     profile = job_application.job_seeker.jobseeker_profile
-    form = NewEmployeeRecordStep3(data=request.POST or None, instance=profile)
+    form = NewEmployeeRecordStep3Form(data=request.POST or None, instance=profile)
 
     if request.method == "POST" and form.is_valid():
         form.save()
