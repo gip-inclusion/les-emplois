@@ -1,5 +1,5 @@
 """
-Helper methods for manipulating dataframes used by both populate_metabase and populate_metabase_fluxiae scripts.
+Helper methods for manipulating dataframes used by both populate_metabase_itou and populate_metabase_fluxiae scripts.
 """
 
 import pandas as pd
