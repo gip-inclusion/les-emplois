@@ -1,7 +1,7 @@
 """
 Populate metabase with fluxIAE data and some custom tables for our needs (mainly `missions_ai_ehpad`).
 
-For itou data, see the other script `populate_metabase.py`.
+For itou data, see the other script `populate_metabase_itou.py`.
 
 At this time this script is only supposed to run manually on your local dev, not in production.
 

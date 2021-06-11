@@ -65,10 +65,10 @@ class Command(BaseCommand):
     touching any real table, and injects only a sample of data.
 
     To populate alternate tables with sample data:
-        django-admin populate_metabase --verbosity=2 --dry-run
+        django-admin populate_metabase_itou --verbosity=2 --dry-run
 
     When ready:
-        django-admin populate_metabase --verbosity=2
+        django-admin populate_metabase_itou --verbosity=2
     """
 
     help = "Populate metabase database."
@@ -335,7 +335,7 @@ class Command(BaseCommand):
 
         self.populate_table(table_name="communes", table_columns=_insee_codes.TABLE_COLUMNS, queryset=queryset)
 
-    def populate_metabase(self):
+    def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
             return
@@ -354,6 +354,6 @@ class Command(BaseCommand):
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
         self.dry_run = dry_run
-        self.populate_metabase()
+        self.populate_metabase_itou()
         self.log("-" * 80)
         self.log("Done.")
