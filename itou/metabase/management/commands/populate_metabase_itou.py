@@ -19,8 +19,10 @@ has all the fields needed and thus never needs to perform joining two tables.
 We maintain a google sheet with extensive documentation about all tables and fields.
 Its name is "Documentation ITOU METABASE [Master doc]". No direct link here for safety reasons.
 """
+
 import gc
 import logging
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -43,10 +45,12 @@ from itou.metabase.management.commands import (
     _siaes,
 )
 from itou.metabase.management.commands._database_psycopg2 import MetabaseDatabaseCursor
-from itou.metabase.management.commands._utils import chunked_queryset, compose, convert_boolean_to_int
+from itou.metabase.management.commands._dataframes import get_df_from_rows, store_df
+from itou.metabase.management.commands._utils import anonymize, chunked_queryset, compose, convert_boolean_to_int
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae, SiaeJobDescription
 from itou.users.models import User
+from itou.utils.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
 
 
 if settings.METABASE_SHOW_SQL_REQUESTS:
@@ -215,6 +219,7 @@ class Command(BaseCommand):
         self.commit()
         self.cur.execute(sql.SQL("DROP TABLE IF EXISTS {}").format(sql.Identifier(f"{table_name}_old")))
         self.commit()
+        self.log("")
 
     def populate_siaes(self):
         """
@@ -282,6 +287,31 @@ class Command(BaseCommand):
             table_name="candidatures", table_columns=_job_applications.TABLE_COLUMNS, queryset=queryset
         )
 
+    def populate_selected_jobs(self):
+        """
+        Populate associations between job applications and job descriptions.
+        """
+        table_name = "fiches_de_poste_par_candidature"
+        self.log(f"Preparing content for {table_name} table...")
+
+        rows = []
+        for ja in tqdm(JobApplication.objects.prefetch_related("selected_jobs").all()):
+            for jd in ja.selected_jobs.all():
+                # We want to preserve the order of columns.
+                row = OrderedDict()
+
+                row["id_fiche_de_poste"] = jd.pk
+                row["id_anonymisé_candidature"] = anonymize(
+                    ja.pk, salt=_job_applications.JOB_APPLICATION_PK_ANONYMIZATION_SALT
+                )
+
+                rows.append(row)
+            if self.dry_run and len(rows) > 1000:
+                break
+
+        df = get_df_from_rows(rows)
+        store_df(df=df, table_name=table_name, dry_run=self.dry_run)
+
     def populate_approvals(self):
         """
         Populate approvals table by merging Approvals and PoleEmploiApprovals.
@@ -335,6 +365,27 @@ class Command(BaseCommand):
 
         self.populate_table(table_name="communes", table_columns=_insee_codes.TABLE_COLUMNS, queryset=queryset)
 
+    def populate_departments(self):
+        """
+        Populate department codes, department names and region names.
+        """
+        table_name = "departements"
+        self.log(f"Preparing content for {table_name} table...")
+
+        rows = []
+        for dpt_code, dpt_name in tqdm(DEPARTMENTS.items()):
+            # We want to preserve the order of columns.
+            row = OrderedDict()
+
+            row["code_departement"] = dpt_code
+            row["nom_departement"] = dpt_name
+            row["nom_region"] = DEPARTMENT_TO_REGION[dpt_code]
+
+            rows.append(row)
+
+        df = get_df_from_rows(rows)
+        store_df(df=df, table_name=table_name, dry_run=self.dry_run)
+
     def populate_metabase_itou(self):
         if not settings.ALLOW_POPULATING_METABASE:
             self.log("Populating metabase is not allowed in this environment.")
@@ -347,9 +398,11 @@ class Command(BaseCommand):
             self.populate_organizations()
             self.populate_job_seekers()
             self.populate_job_applications()
+            self.populate_selected_jobs()
             self.populate_approvals()
             self.populate_rome_codes()
             self.populate_insee_codes()
+            self.populate_departments()
 
     def handle(self, dry_run=False, **options):
         self.set_logger(options.get("verbosity"))
