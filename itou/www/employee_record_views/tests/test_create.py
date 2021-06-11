@@ -55,8 +55,21 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.assertEqual(302, response.status_code)
         self.assertTrue(self.job_seeker.has_jobseeker_profile)
 
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
     def pass_step_2(self, _mock):
-        pass
+        self.pass_step_1()
+        url = reverse("employee_record_views:create_step_2", args=(self.job_application.id,))
+        self.client.get(url)
+
+        self.assertTrue(self.job_seeker.jobseeker_profile.hexa_address_filled)
+
+        url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
 
     # Perform check permissions for each step
 
@@ -258,42 +271,137 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
 
     def setUp(self):
         super().setUp()
-
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
 
+        self.pass_step_2()
+
+        self.profile = self.job_seeker.jobseeker_profile
+
     # Most of coherence test are done in the model
 
     # "Basic" folds : check invalidation of hidden fields
 
-    def test_fold_pole_emploi(self):
+    @mock.patch(
+        "itou.utils.address.format.get_geocoding_data",
+        side_effect=mock_get_geocoding_data,
+    )
+    def test_fold_pole_emploi(self, _mock):
         # Test behaviour of Pôle Emploi related fields
-        self.login_response()
-        self.job_seeker.pole_emploi_id = "1234567X"
-
         response = self.client.get(self.url)
-
-        self.assertEqual(200, response.status_code)
-
         form = response.context["form"]
 
-        # Checkbox must be checked if job seeker has a Pôle emploi ID
-        self.assertTrue(form.fields["pole_emploi"].value)
+        # Checkbox must be pre-checked if job seeker has a Pôle emploi ID
+        self.assertTrue(form.initial["pole_emploi"])
+
+        # Fill other mandatory field from fold
+        # POST will fail because if education_level is not filled
+        data = {
+            "pole_emploi": True,
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_since": "01",
+            "education_level": "00",
+        }
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        self.profile.refresh_from_db()
+
+        self.assertEqual("01", self.profile.pole_emploi_since)
 
     def test_fold_unemployed(self):
-        pass
+        response = self.client.get(self.url)
+        form = response.context["form"]
+
+        # Checkbox must not pre-checked: this value is unknown at this stage
+        self.assertFalse(form.initial["unemployed"])
+
+        # Fill other mandatory field from fold
+        data = {
+            "unemployed": True,
+            "unemployed_since": "02",
+            "education_level": "00",
+            "pole_emploi_since": "01",
+        }
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        self.profile.refresh_from_db()
+
+        self.assertEqual("02", self.profile.unemployed_since)
 
     def test_fold_rsa(self):
-        pass
+        response = self.client.get(self.url)
+        form = response.context["form"]
+
+        # Checkbox must not pre-checked: this value is unknown at this stage
+        self.assertFalse(form.initial["rsa_allocation"])
+
+        # Fill other mandatory field from fold
+        data = {
+            "rsa_allocation": True,
+            "rsa_allocation_since": "02",
+            "rsa_markup": "OUI-M",
+            "education_level": "00",
+            "pole_emploi_since": "01",
+        }
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        self.profile.refresh_from_db()
+
+        self.assertEqual("OUI-M", self.profile.has_rsa_allocation)
 
     def test_fold_ass(self):
-        pass
+        response = self.client.get(self.url)
+        form = response.context["form"]
+
+        # Checkbox must not pre-checked: this value is unknown at this stage
+        self.assertFalse(form.initial["ass_allocation"])
+
+        # Fill other mandatory field from fold
+        data = {
+            "ass_allocation": True,
+            "ass_allocation_since": "03",
+            "education_level": "00",
+            "pole_emploi_since": "01",
+        }
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        self.profile.refresh_from_db()
+
+        self.assertEqual("03", self.profile.ass_allocation_since)
 
     def test_fold_ata(self):
         pass
+        response = self.client.get(self.url)
+        form = response.context["form"]
+
+        # Checkbox must not pre-checked: this value is unknown at this stage
+        self.assertFalse(form.initial["ata_allocation"])
+
+        # Fill other mandatory field from fold
+        data = {
+            "ata_allocation": True,
+            "ata_allocation_since": "04",
+            "education_level": "00",
+            "pole_emploi_since": "01",
+        }
+        response = self.client.post(self.url, data)
+
+        self.assertEqual(302, response.status_code)
+
+        self.profile.refresh_from_db()
+
+        self.assertEqual("04", self.profile.ata_allocation_since)
 
 
 # Tip: do no launch this test as standalone (unittest.skip does not work as expected)
