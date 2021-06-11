@@ -303,18 +303,22 @@ class Command(BaseCommand):
 
         self.populate_fluxiae_referentials()
 
-        # Specific views with specific needs.
+        # Specific fluxIAE views requiring some mixing with itou data.
         self.populate_fluxiae_structures()
 
-        # Regular views with no special treatment.
-        self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
-        self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
-        self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
-        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
+        # Regular fluxIAE views not mixed with any itou data.
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
+        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
+        self.populate_fluxiae_view(vue_name="fluxIAE_Encadrement")
+        self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelAgregat")
+        self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
+        self.populate_fluxiae_view(vue_name="fluxIAE_Formations")
+        self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
+        self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
+        self.populate_fluxiae_view(vue_name="fluxIAE_PMSMP")
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
 
-        # Custom views for our needs.
+        # Custom views for our needs (no fluxIAE data involved).
         self.populate_departments()
 
         # Build custom tables by running raw SQL queries on existing tables.
