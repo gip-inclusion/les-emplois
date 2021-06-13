@@ -367,7 +367,17 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     """
     Display the summary of a given employee record (no update possible)
     """
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
     employee_record = get_object_or_404(EmployeeRecord, pk=employee_record_id)
+    job_application = employee_record.job_application
+
+    if not siae_is_allowed(job_application, siae):
+        raise PermissionDenied
+
     status = request.GET.get("status")
 
     context = {
