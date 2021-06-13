@@ -3,10 +3,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from itou.job_applications.factories import (
-    JobApplicationWithApprovalNotCancellableFactory,
-    JobApplicationWithCompleteJobSeekerProfileFactory,
-)
+from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithMockedAddressFactory
 from itou.utils.mocks.address_format import mock_get_geocoding_data
