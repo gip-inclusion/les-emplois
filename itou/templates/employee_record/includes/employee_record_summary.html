@@ -41,6 +41,10 @@
             <div>Le salarié ne dispose d'aucune ressource</div>
         {% endif %} 
 
+        {% if profile.unemployed_since %}
+        <div>Salarié sans emploi depuis {{ profile.get_unemployed_since_display|lower }}</div>
+        {% endif %} 
+
         {% if profile.oeth_employee %}
             <div>Employé OETH</div>
         {% endif %}
