@@ -270,7 +270,6 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
         form.save()
         job_application.refresh_from_db()
 
-        # FIXME try
         employee_record = None
         if not job_application.employee_record.first():
             employee_record = EmployeeRecord.from_job_application(job_application)
@@ -298,11 +297,17 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
 
     Step 4: Financial annex
     """
-    step = 4
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
     job_application = JobApplication.objects.get(pk=job_application_id)
 
-    if not update_is_allowed(job_application):
+    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
         raise PermissionDenied
+
+    step = 4
 
     employee_record = EmployeeRecord.objects.get(job_application=job_application)
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
@@ -328,8 +333,18 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     Step 5: Summary and validation
     """
-    step = 5
+    siae = get_current_siae_or_404(request)
+
+    # FIXME: pull-up
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
     job_application = JobApplication.objects.get(pk=job_application_id)
+
+    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
+        raise PermissionDenied
+
+    step = 5
     employee_record = EmployeeRecord.objects.get(job_application=job_application)
 
     if request.method == "POST":

@@ -3,6 +3,7 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
+from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from itou.siaes.factories import SiaeWithMembershipAndJobsFactory
 from itou.users.factories import DEFAULT_PASSWORD, JobSeekerWithMockedAddressFactory
@@ -10,7 +11,7 @@ from itou.utils.mocks.address_format import mock_get_geocoding_data
 
 
 # Helper functions
-def get_sample_form_data_step_1(user):
+def get_sample_form_data(user):
     return {
         "title": "M",
         "first_name": user.first_name,
@@ -22,6 +23,13 @@ def get_sample_form_data_step_1(user):
 
 
 class AbstractCreateEmployeeRecordTest(TestCase):
+
+    # These fixtures are needed for INSEE addresses and countries
+    fixtures = [
+        "test_INSEE_communes.json",
+        "test_INSEE_country.json",
+    ]
+
     def setUp(self):
         self.siae = SiaeWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
         self.siae_without_perms = SiaeWithMembershipAndJobsFactory(
@@ -44,10 +52,12 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         return self.client.get(self.url)
 
+    # Bypass each step with minimum viable data
+
     def pass_step_1(self):
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         url = reverse("employee_record_views:create", args=(self.job_application.id,))
-        response = self.client.post(url, data=get_sample_form_data_step_1(self.job_seeker))
+        response = self.client.post(url, data=get_sample_form_data(self.job_seeker))
 
         self.assertEqual(302, response.status_code)
         self.assertTrue(self.job_seeker.has_jobseeker_profile)
@@ -67,6 +77,29 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
+
+    def pass_step_3(self):
+        self.pass_step_2()
+        url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
+        self.client.get(url)
+
+        data = {
+            "education_level": "00",
+            "pole_emploi_since": "01",
+        }
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
+
+    def pass_step_4(self):
+        self.pass_step_3()
+        url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
+        self.client.get(url)
+
+        data = {"financial_annex": self.siae.convention.financial_annexes.first().number}
+        response = self.client.post(url, data)
+
+        self.assertEqual(response.status_code, 302)
 
     # Perform check permissions for each step
 
@@ -122,7 +155,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
             "insee_commune_code": 62152,
         }
 
-        data = get_sample_form_data_step_1(self.job_seeker)
+        data = get_sample_form_data(self.job_seeker)
         data.pop("title")
 
         response = self.client.post(self.url, data=data)
@@ -141,7 +174,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.login(username=self.user.username, password=DEFAULT_PASSWORD)
         self.client.get(self.url)
 
-        data = get_sample_form_data_step_1(self.job_seeker)
+        data = get_sample_form_data(self.job_seeker)
         data.pop("birth_country")
 
         # Missing birth country
@@ -399,6 +432,96 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         self.profile.refresh_from_db()
 
         self.assertEqual("04", self.profile.ata_allocation_since)
+
+
+class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
+    """
+    Create employee record step 4:
+
+    Selection of a financial annex
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+        )
+        self.job_seeker = self.job_application.job_seeker
+        self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
+
+        self.pass_step_3()
+
+    # Only permissions and basic access here
+
+
+class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
+    """
+    Create employee record step 5:
+
+    Check summary of employee record and validation
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+        )
+        self.job_seeker = self.job_application.job_seeker
+        self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
+
+        self.pass_step_4()
+
+    def test_employee_record_status(self):
+        # Employee record should now be ready to send (READY)
+
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.NEW)
+
+        # Validation of create process
+        self.client.post(self.url)
+
+        employee_record.refresh_from_db()
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
+
+
+class UpdateRejectedEmployeeRecord(AbstractCreateEmployeeRecordTest):
+    """
+    Check if update and resubmission is possible after employee record rejection
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_siae=self.siae, job_seeker=JobSeekerWithMockedAddressFactory()
+        )
+        self.job_seeker = self.job_application.job_seeker
+        self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
+
+        self.pass_step_4()
+
+        self.client.post(self.url)
+
+        # Reject employee record
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+
+        # Must change status twice (contrained lifecycle)
+        employee_record.update_as_sent("fooFileName.json", 1)
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.SENT)
+
+        employee_record.update_as_rejected("0001", "Error message")
+
+        self.assertEqual(employee_record.status, EmployeeRecord.Status.REJECTED)
+
+        self.employee_record = employee_record
+
+    def test_submit_after_rejection(self):
+        # Validation of update process after rejection by ASP
+        self.pass_step_4()
+
+        self.client.post(self.url)
+
+        self.employee_record.refresh_from_db()
+        self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
 
 
 # Tip: do no launch this test as standalone (unittest.skip does not work as expected)
