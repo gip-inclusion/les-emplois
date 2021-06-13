@@ -94,7 +94,7 @@ class EmployeeRecord(models.Model):
         """
 
         NEW = "NEW", "Nouvelle"
-        READY = "READY", "Complète"
+        READY = "READY", "Complétée"
         SENT = "SENT", "Envoyée"
         REJECTED = "REJECTED", "En erreur"
         PROCESSED = "PROCESSED", "Traitée"
