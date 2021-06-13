@@ -484,7 +484,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(employee_record.status, EmployeeRecord.Status.READY)
 
 
-class UpdateRejectedEmployeeRecord(AbstractCreateEmployeeRecordTest):
+class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
     """
     Check if update and resubmission is possible after employee record rejection
     """
@@ -522,6 +522,19 @@ class UpdateRejectedEmployeeRecord(AbstractCreateEmployeeRecordTest):
 
         self.employee_record.refresh_from_db()
         self.assertEqual(self.employee_record.status, EmployeeRecord.Status.READY)
+
+    # Simpler to test summary access from here
+
+    def test_summary(self):
+        # Check if summary is accessible
+        self.pass_step_4()
+        self.client.post(self.url)
+        employee_record = EmployeeRecord.objects.get(job_application=self.job_application)
+
+        self.url = reverse("employee_record_views:summary", args=(employee_record.id,))
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
 
 
 # Tip: do no launch this test as standalone (unittest.skip does not work as expected)
