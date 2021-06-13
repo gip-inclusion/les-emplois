@@ -7,8 +7,8 @@ import itou.employee_record.models as models
 class EmployeeRecordAdmin(admin.ModelAdmin):
     list_display = (
         "pk",
-        "__str__",
         "created_at",
+        "approval_number",
         "status",
     )
     list_filter = ("status",)
