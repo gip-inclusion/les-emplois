@@ -19,6 +19,8 @@ ASP_TEST_SIAE_CONFIGS = [
 # ASP ID -> TEST SIRET + data
 ASP_ID_TO_SIRET_MAPPING = {
     2719: {"siret": "33055039301440", "mesure": "EI_DC", "numeroAnnexe": "ACI023201111A0M0"},
+    1343: {"siret": "83533318801446", "mesure": "ETTI_DC", "numeroAnnexe": "ETTI59L201836A0M0"},
+    2062: {"siret": "21590350101445", "mesure": "ACI_DC", "numeroAnnexe": "ACI033207853A0M0"},
 }
 
 
