@@ -82,6 +82,10 @@ def job_seeker_situation(
         if any(choice in eligible_choices for choice in form.cleaned_data["situation"]):
             next_url = reverse("signup:job_seeker")
 
+        # forward next page
+        if redirect_field_name in form.data:
+            next_url = f"{next_url}?{redirect_field_name}={form.data[redirect_field_name]}"
+
         return HttpResponseRedirect(next_url)
 
     context = {
