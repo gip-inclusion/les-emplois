@@ -31,6 +31,7 @@ class SiaeSearchForm(forms.Form):
     city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
     city_name = forms.CharField(
         label="Ville",
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "js-city-autocomplete-input form-control",
