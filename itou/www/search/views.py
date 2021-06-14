@@ -39,7 +39,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         # Step 1 - Initial query
         siaes_step_1 = Siae.objects.active().within(city.coords, distance)
 
-        # Step2
+        # Step 2
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
         departments = set()
