@@ -44,6 +44,8 @@ STEPS = [
     ),
 ]
 
+# Permission helpers
+
 
 def update_is_allowed(job_application):
     """
@@ -55,7 +57,36 @@ def update_is_allowed(job_application):
 
 
 def siae_is_allowed(job_application, siae):
+    """
+    SIAEs are only allowed to see "their" employee records
+    """
     return job_application.to_siae == siae
+
+
+def check_permissions(request, job_application_id, check_profile=True):
+    """
+    Check permission bundle for employee record creation / update steps
+    Return SIAE, job application and profile (if needed)
+    """
+    siae = get_current_siae_or_404(request)
+
+    if not siae.can_use_employee_record:
+        raise PermissionDenied
+
+    job_application = JobApplication.objects.get(pk=job_application_id)
+
+    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
+        raise PermissionDenied
+
+    # Not checked every time
+    if check_profile and not job_application.job_seeker.has_jobseeker_profile:
+        raise PermissionDenied
+
+    # Everything seems right
+    return siae, job_application, job_application.job_seeker.jobseeker_profile if check_profile else None
+
+
+# Views
 
 
 @login_required
@@ -142,15 +173,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
 
     Step 1: Name and birth date / place / country of the jobseeker
     """
-    siae = get_current_siae_or_404(request)
-
-    if not siae.can_use_employee_record:
-        raise PermissionDenied
-
-    job_application = JobApplication.objects.get(pk=job_application_id)
-
-    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
-        raise PermissionDenied
+    _, job_application, _ = check_permissions(request, job_application_id, check_profile=False)
 
     form = NewEmployeeRecordStep1Form(data=request.POST or None, instance=job_application.job_seeker)
     step = 1
@@ -188,29 +211,15 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
 
     Step 2: Details and address lookup / check of the employee
     """
-    siae = get_current_siae_or_404(request)
-
-    if not siae.can_use_employee_record:
-        raise PermissionDenied
-
-    job_application = JobApplication.objects.get(pk=job_application_id)
-    job_seeker = job_application.job_seeker
+    _, job_application, profile = check_permissions(request, job_application_id)
 
     # Conditions:
     # - employee record is in an updatable state (if exists)
     # - target job_application / employee record must be linked to given SIAE
     # - a job seeker profile must exist (created in step 1)
-    if not all(
-        [
-            update_is_allowed(job_application),
-            siae_is_allowed(job_application, siae),
-            job_seeker.has_jobseeker_profile,
-        ]
-    ):
-        raise PermissionDenied
 
-    profile = job_seeker.jobseeker_profile
-    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=job_application.job_seeker)
+    job_seeker = job_application.job_seeker
+    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=job_seeker)
     maps_url = escape_uri_path(f"https://google.fr/maps/place/{job_application.job_seeker.address_on_one_line}")
     step = 2
 
@@ -245,25 +254,12 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
 
     Step 3: Training level, allocations ...
     """
-    siae = get_current_siae_or_404(request)
+    _, job_application, profile = check_permissions(request, job_application_id)
 
-    if not siae.can_use_employee_record:
-        raise PermissionDenied
-
-    job_application = JobApplication.objects.get(pk=job_application_id)
-    job_seeker = job_application.job_seeker
-
-    if not job_seeker.has_jobseeker_profile or not all(
-        [
-            update_is_allowed(job_application),
-            siae_is_allowed(job_application, siae),
-            job_seeker.jobseeker_profile.hexa_address_filled,
-        ]
-    ):
+    if not profile.hexa_address_filled:
         raise PermissionDenied
 
     step = 3
-    profile = job_application.job_seeker.jobseeker_profile
     form = NewEmployeeRecordStep3Form(data=request.POST or None, instance=profile)
 
     if request.method == "POST" and form.is_valid():
@@ -297,15 +293,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
 
     Step 4: Financial annex
     """
-    siae = get_current_siae_or_404(request)
-
-    if not siae.can_use_employee_record:
-        raise PermissionDenied
-
-    job_application = JobApplication.objects.get(pk=job_application_id)
-
-    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
-        raise PermissionDenied
+    _, job_application, _ = check_permissions(request, job_application_id)
 
     step = 4
 
@@ -333,16 +321,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
     Step 5: Summary and validation
     """
-    siae = get_current_siae_or_404(request)
-
-    # FIXME: pull-up
-    if not siae.can_use_employee_record:
-        raise PermissionDenied
-
-    job_application = JobApplication.objects.get(pk=job_application_id)
-
-    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
-        raise PermissionDenied
+    _, job_application, _ = check_permissions(request, job_application_id)
 
     step = 5
     employee_record = EmployeeRecord.objects.get(job_application=job_application)
