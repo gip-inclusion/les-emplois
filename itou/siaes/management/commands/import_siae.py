@@ -314,6 +314,18 @@ class Command(BaseCommand):
             af.delete()
 
     @timeit
+    def check_aciphc_data_consistency(self):
+        """
+        ACIPHC is a tricky siae kind, part of ELIBILIGITY_REQUIRED_KINDS but not of ASP_MANAGED_KINDS.
+        Let's keep an eye on it.
+        """
+        aciphc_query = Siae.objects.filter(kind=Siae.KIND_ACIPHC).select_related("convention")
+        for siae in aciphc_query:
+            assert siae.source in [Siae.SOURCE_STAFF_CREATED, Siae.SOURCE_USER_CREATED]
+            assert siae.convention is None
+        self.log(f"checked {aciphc_query.count()} ACIPHC siaes")
+
+    @timeit
     def handle(self, **options):
         self.set_logger(options.get("verbosity"))
 
@@ -336,6 +348,7 @@ class Command(BaseCommand):
         # Final checks.
         check_convention_data_consistency()
         self.check_whether_signup_is_possible_for_all_siaes()
+        self.check_aciphc_data_consistency()
 
         if self.fatal_errors >= 1:
             raise RuntimeError("At least one fatal error above needs manual resolution")
