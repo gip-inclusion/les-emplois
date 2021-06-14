@@ -36,6 +36,11 @@ class FullnameFormMixin(forms.Form):
 
 
 class JobSeekerSituationForm(forms.Form):
+
+    ERROR_NOTHING_CHECKED = (
+        "Si vous êtes dans l’une des situations ci-dessus, " "vous devez cocher au moins une case  avant de continuer"
+    )
+
     SITUATIONS_CHOICES = (
         ("rsa", "Bénéficiaire du RSA (revenu de solidarité active)"),
         ("ass", "Allocataire ASS (allocation spécifique de solidarité)"),
@@ -44,14 +49,13 @@ class JobSeekerSituationForm(forms.Form):
         ("autre", "Autre"),
     )
 
+    ELIGIBLE_SITUATION = ["rsa", "ass", "aah", "pe"]
+
     situation = forms.MultipleChoiceField(
         label="Quelle est votre situation ? ",
         choices=SITUATIONS_CHOICES,
         widget=MultipleSwitchCheckboxWidget(),
-        error_messages={
-            "required": "Si vous êtes dans l’une des situations ci-dessus, "
-            "vous devez cocher au moins une case  avant de continuer"
-        },
+        error_messages={"required": ERROR_NOTHING_CHECKED},
     )
 
 

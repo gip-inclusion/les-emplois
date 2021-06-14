@@ -78,8 +78,7 @@ def job_seeker_situation(
         next_url = reverse("signup:job_seeker_situation_not_eligible")
 
         # at least one of the elegibility choices, go to signup form
-        eligible_choices = ["rsa", "ass", "aah", "pe"]
-        if any(choice in eligible_choices for choice in form.cleaned_data["situation"]):
+        if any(choice in forms.JobSeekerSituationForm.ELIGIBLE_SITUATION for choice in form.cleaned_data["situation"]):
             next_url = reverse("signup:job_seeker")
 
         # forward next page
