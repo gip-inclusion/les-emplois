@@ -359,6 +359,13 @@ _:-ms-fullscreen, :root .alert-old-browser {
     display: block;
 }
 
+/* JavaScript disabled
+---------------------------------------------------------------------------- */
+/* Element is shown with JavaScript. See static > js > utils.js */
+.jsDisplayIfJavascriptEnabled {
+    display: none;
+}
+
 /* Horizontal line with words in the middle.
 https://stackoverflow.com/questions/5214127/css-technique-for-a-horizontal-line-with-words-in-the-middle/44647131#44647131
 --------------------------------------------------------------------------- */
