@@ -47,13 +47,21 @@ STEPS = [
 # Permission helpers
 
 
-def update_is_allowed(job_application):
+def tunnel_step_is_allowed(job_application):
     """
     Check if some steps of the tunnel are reachable or not
     given the current employee record status
     """
     employee_record = job_application.employee_record.first()
-    return not employee_record or (employee_record and employee_record.is_updatable)
+    return not employee_record or (
+        employee_record
+        and employee_record.status
+        in [
+            EmployeeRecord.Status.NEW,
+            EmployeeRecord.Status.READY,
+            EmployeeRecord.Status.REJECTED,
+        ]
+    )
 
 
 def siae_is_allowed(job_application, siae):
@@ -75,7 +83,7 @@ def check_permissions(request, job_application_id, check_profile=True):
 
     job_application = JobApplication.objects.get(pk=job_application_id)
 
-    if not (update_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
+    if not (tunnel_step_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
         raise PermissionDenied
 
     # Not checked every time
@@ -188,9 +196,9 @@ def create(request, job_application_id, template_name="employee_record/create.ht
             try:
                 profile.save()
                 profile.update_hexa_address()
-            except ValidationError as ex:
-                # TODO report error (messages)
-                print(f"profile error: {ex}")
+            except ValidationError:
+                # cleanup address
+                profile.clear_hexa_address()
 
         return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.id,)))
 
