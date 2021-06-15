@@ -85,7 +85,11 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
         data = {
             "education_level": "00",
-            "pole_emploi_since": "01",
+            # Factory user is registed to Pôle emploi: all fields must be filled
+            "pole_emploi_since": "02",
+            # "pole_emploi_id": "1234567X",
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi": True,
         }
         response = self.client.post(url, data)
 
@@ -355,6 +359,8 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "unemployed": True,
             "unemployed_since": "02",
             "education_level": "00",
+            "pole_emploi": True,
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
             "pole_emploi_since": "01",
         }
         response = self.client.post(self.url, data)
@@ -378,6 +384,8 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "rsa_allocation_since": "02",
             "rsa_markup": "OUI-M",
             "education_level": "00",
+            "pole_emploi": True,
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
             "pole_emploi_since": "01",
         }
         response = self.client.post(self.url, data)
@@ -400,6 +408,8 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "ass_allocation": True,
             "ass_allocation_since": "03",
             "education_level": "00",
+            "pole_emploi": True,
+            "pole_emploi_id": self.job_seeker.pole_emploi_id,
             "pole_emploi_since": "01",
         }
         response = self.client.post(self.url, data)
@@ -409,29 +419,6 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         self.profile.refresh_from_db()
 
         self.assertEqual("03", self.profile.ass_allocation_since)
-
-    def test_fold_ata(self):
-        pass
-        response = self.client.get(self.url)
-        form = response.context["form"]
-
-        # Checkbox must not pre-checked: this value is unknown at this stage
-        self.assertFalse(form.initial["ata_allocation"])
-
-        # Fill other mandatory field from fold
-        data = {
-            "ata_allocation": True,
-            "ata_allocation_since": "04",
-            "education_level": "00",
-            "pole_emploi_since": "01",
-        }
-        response = self.client.post(self.url, data)
-
-        self.assertEqual(302, response.status_code)
-
-        self.profile.refresh_from_db()
-
-        self.assertEqual("04", self.profile.ata_allocation_since)
 
 
 class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
