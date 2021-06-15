@@ -724,6 +724,21 @@ class ProcessTemplatesTest(TestCase):
 
         # Test template content.
         self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
+    def test_details_template_for_state_obsolete_valid_diagnosis(self):
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        self.job_application.state = JobApplicationWorkflow.STATE_OBSOLETE
+        self.job_application.save()
+
+        response = self.client.get(self.url_details)
+
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
         self.assertNotContains(response, self.url_eligibility)
         self.assertNotContains(response, self.url_refuse)
         self.assertNotContains(response, self.url_postpone)
@@ -732,6 +747,20 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_refused(self):
         """Test actions available for other states."""
         self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.save()
+        response = self.client.get(self.url_details)
+        # Test template content.
+        self.assertNotContains(response, self.url_process)
+        self.assertContains(response, self.url_eligibility)
+        self.assertNotContains(response, self.url_refuse)
+        self.assertNotContains(response, self.url_postpone)
+        self.assertNotContains(response, self.url_accept)
+
+    def test_details_template_for_state_refused_valid_diagnosis(self):
+        """Test actions available for other states."""
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
         self.job_application.save()
         response = self.client.get(self.url_details)
