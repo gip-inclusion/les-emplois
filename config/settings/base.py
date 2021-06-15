@@ -469,11 +469,12 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
 # Huey instance
 # If any performance issue, increasing the number of workers *can* be a good idea
-# Parameter `immediate` means `synchronous` (async here)
-# Now using `huey.RedisExpireHuey` with default TTL of results (1 day)
-# => Will avoid OOM errors
+# Parameters:
+# - `immediate` means `synchronous` (async here)
+# - `results` is False => do not store huey operations result (Redis instance memory issues)
 HUEY = {
-    "huey_class": "huey.RedisExpireHuey",
+    "huey_class": "huey.RedisHuey",
+    "results": False,
     "name": "ITOU",
     "url": REDIS_URL + f"/?db={REDIS_DB}",
     "consumer": {
