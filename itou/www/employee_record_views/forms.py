@@ -188,7 +188,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         # RSA Markup (foldable section)
         self.initial["rsa_markup"] = self.instance.has_rsa_allocation
 
-        # "Standard" model field 
+        # "Standard" model field
         self.fields["education_level"].required = True
 
     def clean(self):
