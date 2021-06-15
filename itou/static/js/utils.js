@@ -1,7 +1,7 @@
 $(document).ready(() => {
-    $(".jsPreventDefault").on("click", (event) => {
+    $(".js-prevent-default").on("click", (event) => {
         event.preventDefault();
     });
 
-    $(".jsDisplayIfJavascriptEnabled").css("display", "block");
+    $(".js-display-if-javascript-enabled").css("display", "block");
 });
