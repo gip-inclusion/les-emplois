@@ -160,7 +160,6 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     rsa_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire du RSA ?")
     ass_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ASS ?")
     aah_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'AAH ?")
-    ata_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ATA ?")
     unemployed = forms.BooleanField(required=False, label="Le salarié était-il sans emploi à l'embauche ?")
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
@@ -169,22 +168,27 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Pôle emploi
+        # Foldable sections:
+        # If these non-model fields are checked, matching model fields are updatable
+        # otherwise model fields reset to empty value ("")
+        for field in ["unemployed", "rsa_allocation", "ass_allocation", "aah_allocation"]:
+            self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
+            self.initial[field] = getattr(self.instance, field + "_since")
+
+        # Pôle emploi (foldable section)
         pole_emploi_id = self.instance.user.pole_emploi_id
+
         if pole_emploi_id:
             self.initial["pole_emploi_id"] = pole_emploi_id
             self.initial["pole_emploi"] = True
             self.fields["pole_emploi_id"].widget.attrs["readonly"] = True
+
         self.fields["pole_emploi"].widget.attrs["onclick"] = "toggleFold(this)"
 
-        # Foldable sections
-        for field in ["unemployed", "rsa_allocation", "ass_allocation", "aah_allocation", "ata_allocation"]:
-            self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
-            self.initial[field] = getattr(self.instance, field + "_since")
-
-        # RSA Markup
+        # RSA Markup (foldable section)
         self.initial["rsa_markup"] = self.instance.has_rsa_allocation
 
+        # "Standard" model field 
         self.fields["education_level"].required = True
 
     def clean(self):
@@ -197,25 +201,34 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
 
             if not self.cleaned_data["pole_emploi_id"]:
                 raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
+        else:
+            # Reset "inner" field
+            self.cleaned_data["pole_emploi_since"] = ""
 
         # RSA: 3 options possible, one is handled by `rsa_allocation` value
         if self.cleaned_data["rsa_allocation"]:
             # If checked, all fields must be filled
             if not (self.cleaned_data["rsa_allocation_since"] and self.cleaned_data["rsa_markup"]):
                 raise forms.ValidationError("La durée d'inscription et la majoration RSA sont obligatoires")
+        else:
+            # Reset "inner" fields
+            self.cleaned_data["rsa_allocation_since"] = self.cleaned_data["rsa_markup"] = ""
 
         # Fold fields validation
         fold_errors = {
             "unemployed": "La période sans emploi est obligatoire",
             "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
             "aah_allocation": "La durée d'allocation de l'AAH est obligatoire",
-            "ata_allocation": "La durée d'allocation de l'ATA est obligatoire",
         }
 
         for fold_field, error_message in fold_errors.items():
+            inner_field_name = fold_field + "_since"
             if self.cleaned_data[fold_field]:
-                if not self.cleaned_data[fold_field + "_since"]:
+                if not self.cleaned_data[inner_field_name]:
                     raise forms.ValidationError(error_message)
+            else:
+                # Reset "inner" model fields, if non-model field unchecked
+                self.cleaned_data[inner_field_name] = ""
 
     def save(self, *args, **kwargs):
         if self.cleaned_data["rsa_allocation"]:
@@ -235,7 +248,6 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             "rsa_allocation_since",
             "ass_allocation_since",
             "aah_allocation_since",
-            "ata_allocation_since",
         ]
         labels = {
             "education_level": "Niveau de formation",
