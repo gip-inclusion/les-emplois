@@ -50,10 +50,11 @@ class SiaeSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
     )
 
-    def __init__(self, data=None, **kwargs):
+    def __init__(self, data: MultiValueDict = None, **kwargs):
         initial = kwargs.get("initial", {})
         if data:
-            # To render the default distance value as checked in radio widget
+            # Use the initial values as default values and extend them with the user data.
+            # Useful to render the default distance values as checked in radio widgets.
             data = MultiValueDict({**{k: [v] for k, v in initial.items()}, **data})
         super().__init__(data, **kwargs)
 
