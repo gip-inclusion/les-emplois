@@ -13,7 +13,6 @@ from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.tokens import siae_signup_token_generator
 from itou.utils.validators import validate_code_safir, validate_siren, validate_siret
-from itou.utils.widgets import MultipleSwitchCheckboxWidget
 
 
 BLANK_CHOICE = (("", "---------"),)
@@ -38,14 +37,14 @@ class FullnameFormMixin(forms.Form):
 class JobSeekerSituationForm(forms.Form):
 
     ERROR_NOTHING_CHECKED = (
-        "Si vous êtes dans l’une des situations ci-dessus, " "vous devez cocher au moins une case  avant de continuer"
+        "Si vous êtes dans l’une des situations ci-dessous, vous devez cocher au moins une case  avant de continuer"
     )
 
     SITUATIONS_CHOICES = (
         ("rsa", "Bénéficiaire du RSA (revenu de solidarité active)"),
         ("ass", "Allocataire ASS (allocation spécifique de solidarité)"),
         ("aah", "Allocataire AAH (allocation adulte handicapé) ou bénéficiaire d'une RQTH"),
-        ("pe", "Inscrit à Pôle emploi depuis plus de 2 ans (inscription en continue)"),
+        ("pe", "Inscrit à Pôle emploi depuis plus de 2 ans (inscription en continu)"),
         ("autre", "Autre"),
     )
 
@@ -54,7 +53,7 @@ class JobSeekerSituationForm(forms.Form):
     situation = forms.MultipleChoiceField(
         label="Quelle est votre situation ? ",
         choices=SITUATIONS_CHOICES,
-        widget=MultipleSwitchCheckboxWidget(),
+        widget=forms.CheckboxSelectMultiple,
         error_messages={"required": ERROR_NOTHING_CHECKED},
     )
 
