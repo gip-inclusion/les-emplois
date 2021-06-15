@@ -69,7 +69,7 @@ def job_seeker_situation(
     """
     Entry point of the signup process for jobseeker.
 
-    The user is asked to choose at least one eligibility criterion to continue signup process
+    The user is asked to choose at least one eligibility criterion to continue the signup process.
     """
 
     form = forms.JobSeekerSituationForm(data=request.POST or None)
@@ -77,7 +77,7 @@ def job_seeker_situation(
     if request.method == "POST" and form.is_valid():
         next_url = reverse("signup:job_seeker_situation_not_eligible")
 
-        # at least one of the elegibility choices, go to signup form
+        # If at least one of the eligibility choices is selected, go to the signup form.
         if any(choice in forms.JobSeekerSituationForm.ELIGIBLE_SITUATION for choice in form.cleaned_data["situation"]):
             next_url = reverse("signup:job_seeker")
 
@@ -93,11 +93,6 @@ def job_seeker_situation(
         "redirect_field_value": get_safe_url(request, redirect_field_name),
     }
     return render(request, template_name, context)
-
-
-@require_GET
-def job_seeker_situation_not_eligible(request, template_name="signup/job_seeker_situation_not_eligible.html"):
-    return render(request, template_name, {})
 
 
 # SIAEs signup.

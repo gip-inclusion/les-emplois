@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from itou.www.signup import views
 
@@ -12,7 +13,7 @@ urlpatterns = [
     path("job_seeker/situation", views.job_seeker_situation, name="job_seeker_situation"),
     path(
         "job_seeker/situation_not_eligible",
-        views.job_seeker_situation_not_eligible,
+        TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html"),
         name="job_seeker_situation_not_eligible",
     ),
     # Prescriber.
