@@ -1,5 +1,6 @@
 import io
 import logging
+from dataclasses import dataclass, fields
 
 import httpx
 from django.conf import settings
@@ -69,7 +70,8 @@ class HtmlToPdf:
         return self
 
 
-class PDFShiftCreditsUsageAPI:
+@dataclass
+class PDFShiftUsage:
     """
     For internal usage: retrieve PDFShift credits usage.
     A credit is counted per 5Mb chunks.
@@ -78,34 +80,25 @@ class PDFShiftCreditsUsageAPI:
         https://docs.pdfshift.io/#credits-usage
 
     Usage:
-        from itou.utils.pdf import PDFShiftCreditsUsageAPI
-        credits = PDFShiftCreditsUsageAPI()
-        credits.number_of_approval_pdf_delivered
+        from itou.utils.pdf import PDFShiftUsage
+        usage = PDFShiftUsage()
+        usage.number_of_approval_pdf_delivered
     """
 
+    base: int
+    remaining: int
+    total: int
+    used: int
+
     def __init__(self):
-        self.data = self.get()
+        data = self.get()
+        for field in fields(self):
+            setattr(self, field.name, data["credits"][field.name])
 
     def get(self):
         r = httpx.get(f"{settings.PDFSHIFT_API_BASE_URL}/credits/usage", auth=("api", settings.PDFSHIFT_API_KEY))
         r.raise_for_status()
         return r.json()
-
-    @property
-    def base(self):
-        return self.data["credits"]["base"]
-
-    @property
-    def remaining(self):
-        return self.data["credits"]["remaining"]
-
-    @property
-    def total(self):
-        return self.data["credits"]["total"]
-
-    @property
-    def used(self):
-        return self.data["credits"]["used"]
 
     @property
     def number_of_approval_pdf_delivered(self):
