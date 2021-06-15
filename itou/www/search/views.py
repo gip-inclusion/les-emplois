@@ -11,15 +11,6 @@ from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
 
-def search_siaes_home(request, template_name="search/siaes_search_home.html"):
-    """
-    The search home page has a different design from the results page.
-    """
-    form = SiaeSearchForm()
-    context = {"form": form}
-    return render(request, template_name, context)
-
-
 def search_siaes_results(request, template_name="search/siaes_search_results.html"):
     city = None
     distance = None
