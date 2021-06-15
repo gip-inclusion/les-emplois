@@ -4,7 +4,7 @@ from django.utils.datastructures import MultiValueDict
 
 from itou.cities.models import City
 from itou.siaes.models import Siae
-from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS
+from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
 
 
 class SiaeSearchForm(forms.Form):
@@ -82,12 +82,7 @@ class SiaeSearchForm(forms.Form):
 
     def add_field_districts(self, department, districts):
         # Build list of choices
-        def format_district(post_code):
-            # Could use ordinal from humanize for would be overkill
-            number = int(post_code) - (int(department) * 1000)
-            return "1er" if number == 1 else f"{number}e"
-
-        choices = ((district, format_district(district)) for district in districts)
+        choices = ((district, format_district(district, department)) for district in districts)
         field_name = f"districts_{department}"
         self.fields[field_name] = forms.ChoiceField(
             label=f"Arrondissements de {DEPARTMENTS_WITH_DISTRICTS[department]['city']}",
