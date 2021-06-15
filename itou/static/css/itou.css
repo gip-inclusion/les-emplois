@@ -362,7 +362,7 @@ _:-ms-fullscreen, :root .alert-old-browser {
 /* JavaScript disabled
 ---------------------------------------------------------------------------- */
 /* Element is shown with JavaScript. See static > js > utils.js */
-.jsDisplayIfJavascriptEnabled {
+.js-display-if-javascript-enabled {
     display: none;
 }
 
