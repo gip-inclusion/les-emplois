@@ -9,7 +9,7 @@ from itou.utils.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRIC
 
 class SiaeSearchForm(forms.Form):
 
-    DISTANCES = [10, 15, 25, 50, 75, 100]
+    DISTANCES = [5, 10, 15, 25, 50, 75, 100]
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 25
 
