@@ -349,6 +349,12 @@
                         </a>
                     </p>
                     <p class="card-text">
+                        {% include "includes/icon.html" with icon="search" %}
+                        <a href="{% url 'approvals:search_pe_approval' %}">
+                            Prolonger/Suspendre un agrément
+                        </a>
+                    </p>
+                    <p class="card-text">
                         {% include "includes/icon.html" with icon="settings" %}
                         <a href="{% url 'siaes_views:block_job_applications' %}">
                             {% if current_siae.block_job_applications %}

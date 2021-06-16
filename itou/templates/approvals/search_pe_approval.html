@@ -1,0 +1,41 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Rechercher un agrément Pôle emploi{{ block.super }}{% endblock %}
+
+{% block content %}
+    {% if pe_approval %}
+        <h1>Prolonger ou suspendre un agrément
+        <h2>
+            Agrément trouvé !
+        </h2>
+        {% if pe_approval.is_valid %}
+            <p>L’agrément <strong>{{ pe_approval.number }}</strong> est associé à <strong>{{ pe_approval.first_name }} {{ pe_approval.last_name }}</strong>.</p>
+            <p>Est-ce bien l’agrément que vous souhaitez prolonger ou suspendre ?</p>
+            <a class="btn btn-primary" href="{% url 'approvals:search_user' pe_approval.id %}?">Oui. Je souhaite prolonger ou suspendre l’agrément de {{ pe_approval.first_name }} {{ pe_approval.last_name }}</a>
+        {% else %}
+            <p>
+                L’agrément <strong>{{ pe_approval.number }}</strong> est expiré depuis le {{ pe_approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.
+            </p>
+        {% endif %}
+        <hr>
+    {% else %}
+        {% if number %}
+        <h2>Pas de résultat</h2>
+        <p>
+            Nous n’avons pas trouvé d’agrément avec comme numéro <strong>{{ number }}</strong>. S’il s’agit bien d’un numéro d’agrément Pole Emploi, vous pouvez contacter le support.
+        </p>
+        {% endif %}
+    {% endif %}
+
+    <h2>
+        Rechercher un agrément Pôle emploi
+    </h2>
+
+    {% include "approvals/includes/pole_emploi_approval_search_form.html" with form=form %}
+
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+{% endblock %}
