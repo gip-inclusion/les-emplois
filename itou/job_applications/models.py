@@ -349,6 +349,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
     )
 
+    created_from_pe_approval = models.BooleanField(
+        default=False, verbose_name="Vrai si la candidature est importée depuis un agrément Pole Emploi"
+    )
+
     # Job applications sent to SIAEs subject to eligibility rules can obtain an
     # Approval after being accepted.
     approval = models.ForeignKey(
