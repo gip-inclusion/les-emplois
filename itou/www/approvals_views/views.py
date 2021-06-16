@@ -259,7 +259,7 @@ def search_pe_approval(request, template_name="approvals/search_pe_approval.html
 
     # Otherwise, we display a search, and whenever it’s possible, a matching PoleEmploiApproval
     pe_approval = PoleEmploiApproval.objects.filter(number=str(request.GET.get("number"))).first()
-    search_form = PoleEmploiApprovalSearchForm(request.GET)
+    search_form = PoleEmploiApprovalSearchForm(request.GET or None)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
 

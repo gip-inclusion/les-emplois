@@ -4,38 +4,57 @@
 {% block title %}Rechercher un agrément Pôle emploi{{ block.super }}{% endblock %}
 
 {% block content %}
+
     {% if pe_approval %}
-        <h1>Prolonger ou suspendre un agrément
-        <h2>
-            Agrément trouvé !
-        </h2>
+
+        <h1>Prolonger ou suspendre un agrément</h1>
+
         {% if pe_approval.is_valid %}
-            <p>L’agrément <strong>{{ pe_approval.number }}</strong> est associé à <strong>{{ pe_approval.first_name }} {{ pe_approval.last_name }}</strong>.</p>
-            <p>Est-ce bien l’agrément que vous souhaitez prolonger ou suspendre ?</p>
-            <a class="btn btn-primary" href="{% url 'approvals:search_user' pe_approval.id %}?">Oui. Je souhaite prolonger ou suspendre l’agrément de {{ pe_approval.first_name }} {{ pe_approval.last_name }}</a>
-        {% else %}
+
+            <div class="alert alert-success pb-0" role="alert">
+                <p>Agrément trouvé !</p>
+                <p>L'agrément <strong>{{ pe_approval.number }}</strong> est associé à <strong>{{ pe_approval.first_name }} {{ pe_approval.last_name }}</strong>.</p>
+                <p>Est-ce bien l'agrément que vous souhaitez prolonger ou suspendre ?</p>
+            </div>
+
             <p>
-                L’agrément <strong>{{ pe_approval.number }}</strong> est expiré depuis le {{ pe_approval.end_at|date:"d/m/Y" }}. Vous ne pouvez pas le prolonger ou le suspendre.
+                <a class="btn btn-outline-primary" href="{% url 'approvals:search_user' pe_approval.id %}?">
+                    Oui. Je souhaite prolonger ou suspendre l'agrément de {{ pe_approval.first_name }} {{ pe_approval.last_name }}
+                </a>
             </p>
+
+        {% else %}
+
+            <div class="alert alert-danger pb-0" role="alert">
+                <p>L'agrément <strong>{{ pe_approval.number }}</strong> est expiré depuis le {{ pe_approval.end_at|date:"d/m/Y" }}.</p>
+                <p>Vous ne pouvez pas le prolonger ou le suspendre.</p>
+            </div>
+
         {% endif %}
+
         <hr>
-    {% else %}
-        {% if number %}
+
+    {% elif number %}
+
         <h2>Pas de résultat</h2>
-        <p>
-            Nous n’avons pas trouvé d’agrément avec comme numéro <strong>{{ number }}</strong>. S’il s’agit bien d’un numéro d’agrément Pole Emploi, vous pouvez contacter le support.
-        </p>
-        {% endif %}
+
+        <div class="alert alert-danger pb-0" role="alert">
+            <p>Nous n'avons pas trouvé d'agrément avec comme numéro <strong>{{ number }}</strong>.</p>
+            <p>S'il s'agit bien d'un numéro d'agrément Pole Emploi, vous pouvez <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">contacter le support {% include "includes/icon.html" with icon="external-link" %}</a>.</p>
+        </div>
+
     {% endif %}
 
-    <h2>
-        Rechercher un agrément Pôle emploi
-    </h2>
+    <h2>Rechercher un agrément Pôle emploi</h2>
 
-    {% include "approvals/includes/pole_emploi_approval_search_form.html" with form=form %}
+    <form method="GET" action="" role="form" class="js-prevent-multiple-submit">
 
-{% endblock %}
+        {% bootstrap_form form %}
 
-{% block script %}
-    {{ block.super }}
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        {% endbuttons %}
+
+    </form>
+
 {% endblock %}
