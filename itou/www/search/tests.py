@@ -3,8 +3,44 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.cities.models import City
+from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
+
+
+def create_city_saint_andre():
+    return City.objects.create(
+        name="Saint-André-des-Eaux",
+        slug="saint-andre-des-eaux-44",
+        department="44",
+        coords=Point(-2.3140436, 47.3618584),
+        post_codes=["44117"],
+        code_insee="44117",
+    )
+
+
+def create_city_guerande():
+    return City.objects.create(
+        name="Guérande",
+        slug="guerande-44",
+        department="44",
+        coords=Point(-2.4747713, 47.3358576),
+        # Dummy
+        post_codes=["44350"],
+        code_insee="44350",
+    )
+
+
+def create_city_vannes():
+    return City.objects.create(
+        name="Vannes",
+        slug="vannes-56",
+        department="56",
+        coords=Point(-2.8186843, 47.657641),
+        # Dummy
+        post_codes=["56000"],
+        code_insee="56000",
+    )
 
 
 class SearchSiaeTest(TestCase):
@@ -18,7 +54,7 @@ class SearchSiaeTest(TestCase):
     def test_district(self):
         city_slug = "paris-75"
         paris_city = City.objects.create(
-            name="Paris (75)", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
+            name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
         siae_1 = SiaeFactory(department="75", coords=paris_city.coords, post_code="75001")
         SiaeFactory(department="75", coords=paris_city.coords, post_code="75002")
@@ -36,55 +72,25 @@ class SearchSiaeTest(TestCase):
         self.assertContains(response, siae_1.display_name)
 
     def test_kind(self):
-        city_slug = "saint-andre-des-eaux-44"
-        city = City.objects.create(
-            name="Saint-André-des-Eaux (44)",
-            slug=city_slug,
-            department="44",
-            post_codes=["44117"],
-            coords=Point(5, 23),
-        )
+        city = create_city_saint_andre()
         SiaeFactory(department="44", coords=city.coords, post_code="44117", kind=Siae.KIND_AI)
 
-        response = self.client.get(self.url, {"city": city_slug, "kinds": [Siae.KIND_AI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [Siae.KIND_AI]})
         self.assertContains(response, "<b>1</b> résultat")
 
-        response = self.client.get(self.url, {"city": city_slug, "kinds": [Siae.KIND_EI]})
+        response = self.client.get(self.url, {"city": city.slug, "kinds": [Siae.KIND_EI]})
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
         # 3 SIAEs in two departments to test distance and department filtering
-        vannes = City.objects.create(
-            name="Vannes (56)",
-            slug="vannes-56",
-            department="56",
-            coords=Point(-2.8186843, 47.657641),
-            # Dummy
-            post_codes=["0001"],
-            code_insee="0001",
-        )
+        vannes = create_city_vannes()
         SIAE_VANNES = "SIAE Vannes"
         SiaeFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=Siae.KIND_AI)
-        guerande = City.objects.create(
-            name="Guérande (44)",
-            slug="guerande-44",
-            department="44",
-            coords=Point(-2.4747713, 47.3358576),
-            # Dummy
-            post_codes=["0002"],
-            code_insee="0002",
-        )
+
+        guerande = create_city_guerande()
         SIAE_GUERANDE = "SIAE Guérande"
         SiaeFactory(name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=Siae.KIND_AI)
-        saint_andre = City.objects.create(
-            name="Saint-André-des-Eaux (44)",
-            slug="saint-andre-des-eaux-44",
-            department="44",
-            coords=Point(-2.3140436, 47.3618584),
-            # Dummy
-            post_codes=["0003"],
-            code_insee="0003",
-        )
+        saint_andre = create_city_saint_andre()
         SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
         SiaeFactory(
             name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=Siae.KIND_AI
@@ -113,3 +119,24 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(response, "<b>1</b> résultat")
         self.assertContains(response, SIAE_VANNES.capitalize())
+
+
+class SearchPrescriberTest(TestCase):
+    def test_home(self):
+        url = reverse("search:prescribers_home")
+        response = self.client.get(url)
+        self.assertContains(response, "Rechercher des prescripteurs")
+
+    def test_results(self):
+        url = reverse("search:prescribers_results")
+
+        vannes = create_city_vannes()
+        guerande = create_city_guerande()
+        AuthorizedPrescriberOrganizationFactory(coords=guerande.coords)
+        AuthorizedPrescriberOrganizationFactory(coords=vannes.coords)
+
+        response = self.client.get(url, {"city": guerande.slug, "distance": 100})
+        self.assertContains(response, "<b>2</b> résultats")
+
+        response = self.client.get(url, {"city": guerande.slug, "distance": 15})
+        self.assertContains(response, "<b>1</b> résultat")
