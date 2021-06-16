@@ -94,7 +94,7 @@ class SiaeSearchForm(forms.Form):
 
 class PrescriberSearchForm(forms.Form):
 
-    DISTANCES = [100, 75, 50, 25, 15, 10, 5]
+    DISTANCES = [5, 10, 15, 25, 50, 75, 100]
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 5
 
@@ -102,6 +102,7 @@ class PrescriberSearchForm(forms.Form):
 
     distance = forms.ChoiceField(
         label="Distance",
+        required=False,
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
         widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
@@ -112,6 +113,7 @@ class PrescriberSearchForm(forms.Form):
     city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
     city_name = forms.CharField(
         label="Ville",
+        required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "js-city-autocomplete-input form-control",
@@ -122,6 +124,12 @@ class PrescriberSearchForm(forms.Form):
             }
         ),
     )
+
+    def clean_distance(self):
+        distance = self.cleaned_data["distance"]
+        if not distance:
+            distance = self.fields["distance"].initial
+        return distance
 
     def clean_city(self):
         slug = self.cleaned_data["city"]

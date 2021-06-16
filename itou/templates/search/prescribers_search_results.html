@@ -62,7 +62,8 @@
                         {{ prescriber_org.address_on_one_line }}
                     </h6>
                     <p class="card-text">
-                        <span class="badge badge-dark">{{ prescriber_org.distance.km|floatformat:1 }} km</span>
+
+                        <span class="badge badge-dark">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
                         de votre lieu de recherche
                     </p>
                 </div>
