@@ -42,7 +42,7 @@ urlpatterns = [
     # /accounts/logout/ <=> account_logout
     # We need custom code to process PEAMU logout.
     re_path(r"^accounts/logout/$", dashboard_views.logout),
-    # --------------------------------------------------------------------------------------    
+    # --------------------------------------------------------------------------------------
     # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------
