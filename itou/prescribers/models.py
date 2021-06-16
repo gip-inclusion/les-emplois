@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
@@ -32,11 +31,7 @@ class PrescriberOrganizationQuerySet(models.QuerySet):
         return self.filter(code_safir_pole_emploi=safir_code).first()
 
     def within(self, point, distance_km):
-        return (
-            self.filter(coords__distance_lte=(point, D(km=distance_km)))
-            .annotate(distance=Distance("coords", point))
-            .order_by("distance")
-        )
+        return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
     def prefetch_active_memberships(self):
         qs = PrescriberMembership.objects.active().select_related("user")

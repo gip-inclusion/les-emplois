@@ -142,6 +142,14 @@ DEPARTMENTS = {
     "988": "Nouvelle-Calédonie (988)",
 }
 
+# Marseille, Lyon and Paris
+# The "max" value is the maximum postal code of the districts of the department
+DEPARTMENTS_WITH_DISTRICTS = {
+    "13": {"city": "Marseille", "max": 13016},
+    "69": {"city": "Lyon", "max": 69009},
+    "75": {"city": "Paris", "max": 75020},
+}
+
 
 def department_from_postcode(post_code):
     """
@@ -162,3 +170,9 @@ def department_from_postcode(post_code):
             department = post_code[:2]
 
     return department
+
+
+def format_district(post_code, department):
+    # Could use ordinal from humanize but it would be overkill
+    number = int(post_code) - (int(department) * 1000)
+    return "1er" if number == 1 else f"{number}e"

@@ -71,6 +71,10 @@ b {
     color: #fff;
 }
 
+.layout-section-blue {
+    background: #e5f1fe;
+}
+
 /* Banners.
 --------------------------------------------------------------------------- */
 
@@ -116,10 +120,6 @@ Don't use :after pseudo-selector as it introduced a bug in IE and Edge. */
 
 .layout-banner-work-office {
     background-image: url(../img/banner_work_office.svg);
-}
-
-.layout-banner-work-labour {
-    background-image: url(../img/banner_work_labour.svg);
 }
 
 /* Header.
@@ -496,4 +496,28 @@ Usage:
     border-bottom: 0 solid #be2626 !important;
     bottom: -5px !important;
     top: auto !important;
+}
+
+/* To move in theme */
+
+.itou-btn-primary {
+    color: #fff;
+    background-color: #000638;
+    font-weight: bold;
+    font-size: 16px;
+    border-color: #000638;
+    border-width: 2px;
+    border-radius: 4px;
+}
+
+.itou-btn-primary:focus,
+.itou-btn-primary:active,
+.itou-btn-primary:hover {
+    color: #000638;
+    background-color: #fff;
+}
+
+.itou-btn-primary:disabled {
+    color: #fff;
+    background-color: #000638;
 }

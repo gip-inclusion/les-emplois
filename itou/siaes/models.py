@@ -2,7 +2,6 @@ import datetime
 import random
 
 from django.conf import settings
-from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from django.db import models
 from django.db.models import BooleanField, Case, Count, F, Prefetch, Q, When
@@ -54,11 +53,7 @@ class SiaeQuerySet(models.QuerySet):
         )
 
     def within(self, point, distance_km):
-        return (
-            self.filter(coords__distance_lte=(point, D(km=distance_km)))
-            .annotate(distance=Distance("coords", point))
-            .order_by("distance")
-        )
+        return self.filter(coords__dwithin=(point, D(km=distance_km)))
 
     def prefetch_job_description_through(self, **kwargs):
         qs = (

@@ -1,37 +1,70 @@
+from collections import defaultdict
+
+from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, Count, IntegerField, Q, Value, When
 from django.shortcuts import render
 
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.models import Siae
+from itou.utils.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.utils.pagination import pager
 from itou.www.search.forms import PrescriberSearchForm, SiaeSearchForm
 
 
-def search_siaes_home(request, template_name="search/siaes_search_home.html"):
-    """
-    The search home page has a different design from the results page.
-    """
-    form = SiaeSearchForm()
-    context = {"form": form}
-    return render(request, template_name, context)
-
-
 def search_siaes_results(request, template_name="search/siaes_search_results.html"):
-
-    form = SiaeSearchForm(data=request.GET or None)
+    city = None
+    distance = None
     siaes_page = None
+    siaes_step_1 = None
+
+    form = SiaeSearchForm(request.GET or None, initial={"distance": SiaeSearchForm.DISTANCE_DEFAULT})
 
     if form.is_valid():
-
+        # The filtering is made in 3 steps:
+        # 1. query with city and distance
+        # 2. extract departments and districts filters from first query
+        # 3. final query with all the others criteria
         city = form.cleaned_data["city"]
-        distance_km = form.cleaned_data["distance"]
-        kind = form.cleaned_data["kind"]
+        distance = form.cleaned_data["distance"]
+
+        # Step 1 - Initial query
+        siaes_step_1 = Siae.objects.active().within(city.coords, distance)
+
+        # Step 2
+        # Extract departments from results to inject them as filters
+        # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
+        departments = set()
+        departments_districts = defaultdict(set)
+        for siae in siaes_step_1:
+            # Extract the department of SIAE
+            if siae.department:
+                departments.add(siae.department)
+                # Extract the post_code if it's a district to use it as criteria
+                if siae.department in DEPARTMENTS_WITH_DISTRICTS:
+                    if int(siae.post_code) <= DEPARTMENTS_WITH_DISTRICTS[siae.department]["max"]:
+                        departments_districts[siae.department].add(siae.post_code)
+
+        if departments:
+            departments = sorted(departments)
+            form.add_field_departements(departments)
+
+        if departments_districts:
+            for department, districts in departments_districts.items():
+                districts = sorted(districts)
+                form.add_field_districts(department, districts)
+
+        # Step 3 - Final filtering
+        kinds = form.cleaned_data["kinds"]
+        departments = request.GET.getlist("departments")
+        districts = []
+        for department_with_district in DEPARTMENTS_WITH_DISTRICTS:
+            districts += request.GET.getlist(f"districts_{department_with_district}")
 
         siaes = (
-            Siae.objects.active()
-            .within(city.coords, distance_km)
-            .add_shuffled_rank()
+            siaes_step_1.add_shuffled_rank()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
+            # Convert km to m (injected in SQL query)
+            .annotate(distance=Distance("coords", city.coords) / 1000)
             # For sorting let's put siaes in only 2 buckets (boolean has_active_members).
             # If we sort naively by `-_total_active_members` we would show
             # siaes with 10 members (where 10 is the max), then siaes
@@ -58,11 +91,27 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             # detached members from their siae so it could still happen.
             .order_by("-has_active_members", "block_job_applications", "shuffled_rank")
         )
-        if kind:
-            siaes = siaes.filter(kind=kind)
+
+        if kinds:
+            siaes = siaes.filter(kind__in=kinds)
+
+        if departments:
+            siaes = siaes.filter(department__in=departments)
+
+        if districts:
+            siaes = siaes.filter(post_code__in=districts)
+
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
-    context = {"form": form, "siaes_page": siaes_page, "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT]}
+    context = {
+        "form": form,
+        "city": city,
+        "distance": distance,
+        "siaes_step_1": siaes_step_1,
+        "siaes_page": siaes_page,
+        # Used to display a specific badge
+        "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
+    }
     return render(request, template_name, context)
 
 
@@ -85,7 +134,12 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         city = form.cleaned_data["city"]
         distance_km = form.cleaned_data["distance"]
 
-        prescriber_orgs = PrescriberOrganization.objects.filter(is_authorized=True).within(city.coords, distance_km)
+        prescriber_orgs = (
+            PrescriberOrganization.objects.filter(is_authorized=True)
+            .within(city.coords, distance_km)
+            .annotate(distance=Distance("coords", city.coords))
+            .order_by("distance")
+        )
         prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
 
     context = {"form": form, "prescriber_orgs_page": prescriber_orgs_page}

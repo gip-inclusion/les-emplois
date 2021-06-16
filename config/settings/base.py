@@ -478,7 +478,7 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 # Parameter `immediate` means `synchronous` (async here)
 HUEY = {
     "name": "ITOU",
-    # Don't store task results (see our Redis Post-Morten in documentation for more information),
+    # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
     "url": REDIS_URL + f"/?db={REDIS_DB}",
     "consumer": {
