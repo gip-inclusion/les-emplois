@@ -81,7 +81,7 @@
                                 </p>
                             {% endif %}
                             <div class="mb-3">
-                                <span class="badge badge-dark">{{ siae.distance | floatformat:"-1" }} km</span> de votre lieu de recherche.
+                                <span class="badge badge-dark">{{ siae.distance|floatformat:"-1" }} km</span> de votre lieu de recherche.
                             </div>
                             {% if siae.job_description_through.exists and not siae.block_job_applications %}
                                 <h6 class="border-bottom border-gray pb-2">Métiers proposés</h6>

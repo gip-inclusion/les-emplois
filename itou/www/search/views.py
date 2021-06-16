@@ -104,13 +104,13 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
         siaes_page = pager(siaes, request.GET.get("page"), items_per_page=10)
 
     context = {
-        "form": form,
         "city": city,
         "distance": distance,
-        "siaes_step_1": siaes_step_1,
-        "siaes_page": siaes_page,
-        # Used to display a specific badge
         "ea_eatt_kinds": [Siae.KIND_EA, Siae.KIND_EATT],
+        "form": form,
+        "siaes_page": siaes_page,
+        "siaes_step_1": siaes_step_1,
+        # Used to display a specific badge
     }
     return render(request, template_name, context)
 
@@ -125,22 +125,23 @@ def search_prescribers_home(request, template_name="search/prescribers_search_ho
 
 
 def search_prescribers_results(request, template_name="search/prescribers_search_results.html"):
-
-    form = PrescriberSearchForm(data=request.GET or None)
+    city = None
+    distance = None
+    form = PrescriberSearchForm(data=request.GET or None, initial={"distance": PrescriberSearchForm.DISTANCE_DEFAULT})
     prescriber_orgs_page = None
 
     if form.is_valid():
 
         city = form.cleaned_data["city"]
-        distance_km = form.cleaned_data["distance"]
+        distance = form.cleaned_data["distance"]
 
         prescriber_orgs = (
             PrescriberOrganization.objects.filter(is_authorized=True)
-            .within(city.coords, distance_km)
+            .within(city.coords, distance)
             .annotate(distance=Distance("coords", city.coords))
             .order_by("distance")
         )
         prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
 
-    context = {"form": form, "prescriber_orgs_page": prescriber_orgs_page}
+    context = {"city": city, "distance": distance, "form": form, "prescriber_orgs_page": prescriber_orgs_page}
     return render(request, template_name, context)

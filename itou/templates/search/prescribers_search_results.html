@@ -7,25 +7,35 @@
     {{ block.super }}
 {% endblock %}
 
+{% block script %}
+    {{ block.super }}
+    <script>
+    $("#search-filter-form :input").change(function() {
+        $("#search-form").submit();
+    });
+    // If the Filtres button is present, the associated card shoud be collapsed on display.
+    if ($("#js-search-filter-button").is(":visible")) {
+        // The button should be always visible now (on windows resize)
+        $("#js-search-filter-button").removeClass("d-md-none");
+        $('#search-filter-form').collapse();
+    }
+    </script>
+{% endblock %}
+
 {% block content %}
 
     <h2>Rechercher des prescripteurs</h2>
 
-    <form method="get" action="" class="d-block mb-5">
-        {% include "search/includes/prescribers_search_form.html" with form=form %}
-    </form>
+    <form id="search-form" method="get" action="" class="d-block mb-5">
+    {% include "search/includes/prescribers_search_form.html" with form=form %}
 
-    <h3>
-        Prescripteurs
-        {% if request.GET.city_name and request.GET.distance %}
-            {% with request.GET.city_name as city and request.GET.distance as distance %}
-                à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
-            {% endwith %}
-        {% endif %}
-    </h3>
+    {% if form.is_valid %}
+        <h3>
+            Prescripteurs à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
+        </h3>
+    {% endif %}
 
     {% if not prescriber_orgs_page %}
-
         <h4 class="font-weight-normal text-muted">
             Aucun résultat.
         </h4>
@@ -34,44 +44,45 @@
 
         <h4 class="font-weight-normal text-muted">
             {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
-                {% if counter > 1 %}
-                    <b>{{ counter }}</b> résultats
-                {% else %}
-                    <b>1</b> résultat
-                {% endif %}
+                <b>{{ counter }}</b> résultat{% if counter > 1 %}s{% endif %}
                 {% if prescriber_orgs_page.paginator.num_pages > 1 %}
                     - Page <b>{{ current_page }}</b>/{{ total_pages }}
                 {% endif %}
             {% endwith %}
         </h4>
 
-        {% for prescriber_org in prescriber_orgs_page %}
-            <div class="card my-4">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                            {{ prescriber_org.name }}
-                        </a>
-                    </h5>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                        {{ prescriber_org.get_kind_display }}
-                        {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
-                    </h6>
-                    <hr>
-                    <h6 class="card-subtitle mb-2 text-muted">
-                        {{ prescriber_org.address_on_one_line }}
-                    </h6>
-                    <p class="card-text">
-
-                        <span class="badge badge-dark">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
-                        de votre lieu de recherche
-                    </p>
-                </div>
+        <div class="row">
+            <div class="col-12 col-md-4">
+                {% include "search/includes/prescribers_search_filters.html" with form=form %}
             </div>
-        {% endfor %}
+            <div class="col-12 col-md-8">
+                {% for prescriber_org in prescriber_orgs_page %}
+                    <div class="card my-4">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                                    {{ prescriber_org.name }}
+                                </a>
+                            </h5>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ prescriber_org.get_kind_display }}
+                                {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
+                            </h6>
+                            <hr>
+                            <h6 class="card-subtitle mb-2 text-muted">
+                                {{ prescriber_org.address_on_one_line }}
+                            </h6>
+                            <p class="card-text">
+                                <span class="badge badge-dark">{{ prescriber_org.distance.km|floatformat:"-1" }} km</span>
+                                de votre lieu de recherche
+                            </p>
+                        </div>
+                    </div>
+                {% endfor %}
 
-        {% include "includes/pagination.html" with page=prescriber_orgs_page %}
-
+                {% include "includes/pagination.html" with page=prescriber_orgs_page %}
+            </div> {# col-8 #}
+        </div> {# row #}
     {% endif %}
-
+    </form>
 {% endblock %}
