@@ -1,0 +1,14 @@
+<form method="GET" action="" role="form" class="js-prevent-multiple-submit">
+    <div class="row no-gutters my-3">
+        <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
+            <label for="{{ form.number.id_for_label }}" class="sr-only">{{ form.number.label }}</label>
+            {{ form.number }}
+        </div>
+        <div class="col-sm-2">
+            <button type="submit" class="btn btn-danger form-control js-search-button" title="Rechercher">
+                Rechercher
+            </button>
+        </div>
+
+    </div>
+</form>
