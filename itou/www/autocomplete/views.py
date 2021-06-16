@@ -1,7 +1,5 @@
-import json
-
 from django.contrib.postgres.search import TrigramSimilarity
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.template.defaultfilters import slugify
 
 from itou.cities.models import City
@@ -28,7 +26,7 @@ def cities_autocomplete(request):
 
         cities = [{"value": city.display_name, "slug": city.slug} for city in cities]
 
-    return HttpResponse(json.dumps(cities), "application/json")
+    return JsonResponse(cities, safe=False)
 
 
 def jobs_autocomplete(request):
@@ -52,4 +50,4 @@ def jobs_autocomplete(request):
             for appellation in Appellation.objects.autocomplete(term, codes_to_exclude, limit=10)
         ]
 
-    return HttpResponse(json.dumps(appellations), "application/json")
+    return JsonResponse(appellations, safe=False)
