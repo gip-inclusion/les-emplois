@@ -105,7 +105,7 @@ class PrescriberSearchForm(forms.Form):
         required=False,
         initial=DISTANCE_DEFAULT,
         choices=DISTANCE_CHOICES,
-        widget=forms.Select(attrs={"class": "form-control text-center custom-select"}),
+        widget=forms.RadioSelect,
     )
 
     # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
@@ -124,6 +124,14 @@ class PrescriberSearchForm(forms.Form):
             }
         ),
     )
+
+    def __init__(self, data: MultiValueDict = None, **kwargs):
+        initial = kwargs.get("initial", {})
+        if data:
+            # Use the initial values as default values and extend them with the user data.
+            # Useful to render the default distance values as checked in radio widgets.
+            data = MultiValueDict({**{k: [v] for k, v in initial.items()}, **data})
+        super().__init__(data, **kwargs)
 
     def clean_distance(self):
         distance = self.cleaned_data["distance"]
