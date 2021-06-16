@@ -1,10 +1,8 @@
-<div class="row no-gutters my-3">
-    {# Apply bottom margins only on `sm` sizes: https://stackoverflow.com/a/50879258 #}
-    <div class="col-sm-auto mr-1 mb-1 mb-sm-0">
-        <label for="{{ form.distance.id_for_label }}" class="sr-only">{{ form.distance.label }}</label>
-        {{ form.distance }}
-    </div>
-    <div class="col-sm mr-1 mb-1 mb-sm-0">
+{% load bootstrap4 %}
+
+{% bootstrap_form_errors form %}
+<div class="row no-gutters my-3 itou-banner-blue{% if align == 'center' %} justify-content-sm-center{% endif %}">
+    <div class="col col-12 col-sm-8 col-md-6 mb-1">
         {{ form.city }}
         <div class="input-group">
             <div class="input-group-prepend">
