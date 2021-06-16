@@ -6,15 +6,18 @@ from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import SimpleTemplateResponse
 from django.urls import reverse_lazy
+from django.utils.http import urlencode
 from django.utils.text import slugify
 
-from itou.approvals.models import Approval, Suspension
+from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.approvals_views.forms import DeclareProlongationForm, SuspensionForm
+from itou.www.apply.forms import UserExistsForm
+from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiApprovalSearchForm, SuspensionForm
 
 
 @login_required
@@ -229,3 +232,105 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
         "back_url": back_url,
     }
     return render(request, template_name, context)
+
+
+@login_required
+def search_pe_approval(request, template_name="approvals/search_pe_approval.html"):
+    """
+    Search for a PoleEmploiApproval by number. Redirects to the existing Pass if it exists.
+    If not, it will ask you to search for an user in order to import the "agrément" as a "Pass IAE".
+    """
+    siae = get_current_siae_or_404(request)
+
+    # We search if the approval already exist with this exact number,
+    # or if it was created from the first 12 digits of a PoleEmploiApproval’s number)
+    approval = None
+    number = request.GET.get("number")
+    if number:
+        approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
+
+    # # If the identifier matches an existing approval, we redirection to the matching job application
+    if approval:
+        job_application_id = approval.user.last_accepted_job_application.id
+        application_details_url = reverse_lazy(
+            "apply:details_for_siae", kwargs={"job_application_id": job_application_id}
+        )
+        return HttpResponseRedirect(application_details_url)
+
+    # Otherwise, we display a search, and whenever it’s possible, a matching PoleEmploiApproval
+    pe_approval = PoleEmploiApproval.objects.filter(number=str(request.GET.get("number"))).first()
+    search_form = PoleEmploiApprovalSearchForm(request.GET)
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+
+    context = {"back_url": back_url, "pe_approval": pe_approval, "form": search_form, "number": number, "siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+def search_user(request, pe_approval_id, template_name="approvals/search_user.html"):
+    """
+    Search for a given user by email address
+    """
+    pe_approval = PoleEmploiApproval.objects.filter(pk=pe_approval_id).first()
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+    next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
+
+    form = UserExistsForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        args = urlencode({"email": form.cleaned_data["email"]})
+        next_url = reverse_lazy(
+            "approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": pe_approval_id}
+        )
+
+        return HttpResponseRedirect(f"{next_url}?{args}")
+
+    context = {"back_url": back_url, "form": form, "pe_approval": pe_approval}
+    return render(request, template_name, context)
+
+
+@login_required
+def create_approval_from_pe_approval(request, pe_approval_id):
+    """
+    Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval
+    """
+    siae = get_current_siae_or_404(request)
+    pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
+
+    # If there already is a user with this email, we take it, otherwise we create one
+    email = request.GET.get("email")
+    job_seeker = User.objects.filter(email__iexact=email).first()
+    if not job_seeker:
+        user_data = {
+            "email": email,
+            "first_name": pe_approval.first_name,
+            "last_name": pe_approval.last_name,
+            "birthdate": pe_approval.birthdate,
+            "pole_emploi_id": pe_approval.pole_emploi_id,
+        }
+        job_seeker = User.create_job_seeker_by_proxy(request.user, **user_data)
+
+    # Then we create an Approval based on the PoleEmploiApproval data
+    approval_from_pe = Approval(
+        start_at=pe_approval.start_at,
+        end_at=pe_approval.end_at,
+        user=job_seeker,
+        # Only store 12 chars numbers.
+        number=pe_approval.number[:12],
+    )
+    approval_from_pe.save()
+
+    # Then we create the necessary JobApplication for redirection
+    job_application = JobApplication(
+        job_seeker=job_seeker,
+        to_siae=siae,
+        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        approval=approval_from_pe,
+        created_from_pe_approval=True,
+    )
+    job_application.save()
+
+    next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    return HttpResponseRedirect(next_url)
