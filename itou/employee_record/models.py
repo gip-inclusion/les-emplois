@@ -97,7 +97,7 @@ class EmployeeRecord(models.Model):
         READY = "READY", "Complétée"
         SENT = "SENT", "Envoyée"
         REJECTED = "REJECTED", "En erreur"
-        PROCESSED = "PROCESSED", "Traitée"
+        PROCESSED = "PROCESSED", "Intégrée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
