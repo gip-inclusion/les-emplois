@@ -11,8 +11,6 @@ class _EmployeeSerializer(serializers.ModelSerializer):
     sufPassIae = serializers.CharField(required=False)
 
     civilite = serializers.ChoiceField(choices=User.Title.choices, source="title")
-    # nomUsage = serializers.CharField(source="last_name")
-    # prenom = serializers.CharField(source="first_name")
     nomUsage = serializers.SerializerMethodField()
     prenom = serializers.SerializerMethodField()
 
