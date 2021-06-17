@@ -1,0 +1,27 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+{% load static %}
+
+{% block title %}Demandeur d'emploi - Inscription{{ block.super }}{% endblock %}
+
+{% block content %}
+    <h1>
+        Inscription
+        <small class="text-muted">Candidat</small>
+    </h1>
+    <form method="post" action="{% url 'signup:job_seeker_situation' %}" role="form" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+        
+        {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
+        {% endif %}
+
+        {% bootstrap_form form alert_error_type="all" %}
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
+
+    </form>
+{% endblock %}

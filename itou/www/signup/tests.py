@@ -22,7 +22,7 @@ from itou.users.models import User
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.password_validation import CnilCompositionPasswordValidator
-from itou.www.signup.forms import PrescriberChooseKindForm
+from itou.www.signup.forms import JobSeekerSituationForm, PrescriberChooseKindForm
 
 
 class SignupTest(TestCase):
@@ -163,6 +163,54 @@ class SiaeSignupTest(TestCase):
 class JobSeekerSignupTest(TestCase):
     def setUp(self):
         create_test_cities(["67"], num_per_department=1)
+
+    def test_job_seeker_signup_situation(self):
+        """
+        Test the redirects according to the chosen situations
+        """
+
+        # Check if the form page is displayed correctly
+        url = reverse("signup:job_seeker_situation")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Check if none of the boxes are checked
+        # 'some data' needed to raise form error
+        post_data = {"some": "data"}
+        response = self.client.post(url, post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormError(response, "form", "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
+
+        # Check if one of eligibility criterion is checked
+        next_url = reverse("signup:job_seeker")
+        for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
+            post_data = {"situation": [choice]}
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, next_url)
+
+            post_data["situation"].append("autre")
+            response = self.client.post(url, data=post_data)
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, next_url)
+
+        # Check if all the eligibility criteria are checked
+        post_data = {"situation": JobSeekerSituationForm.ELIGIBLE_SITUATION}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, next_url)
+
+        # Check if "Autre" is the only one checked
+        post_data = {"situation": "autre"}
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        next_url = reverse("signup:job_seeker_situation_not_eligible")
+        self.assertRedirects(response, next_url)
+
+        # Check not eligible destination page
+        url = reverse("signup:job_seeker_situation_not_eligible")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
 
     def test_job_seeker_signup(self):
         """Job-seeker signup."""

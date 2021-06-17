@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from itou.www.signup import views
 
@@ -9,6 +10,12 @@ app_name = "signup"
 urlpatterns = [
     # Job seeker.
     path("job_seeker", views.JobSeekerSignupView.as_view(), name="job_seeker"),
+    path("job_seeker/situation", views.job_seeker_situation, name="job_seeker_situation"),
+    path(
+        "job_seeker/situation_not_eligible",
+        TemplateView.as_view(template_name="signup/job_seeker_situation_not_eligible.html"),
+        name="job_seeker_situation_not_eligible",
+    ),
     # Prescriber.
     path(
         "prescriber/is_pole_emploi",
