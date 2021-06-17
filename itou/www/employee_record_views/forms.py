@@ -156,7 +156,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
     )
 
-    # A set of transient checkboxes used to fold/unfold options on display
+    # A set of transient checkboxes used to collapse optional blocks
     rsa_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire du RSA ?")
     ass_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'ASS ?")
     aah_allocation = forms.BooleanField(required=False, label="Le salarié est-il bénéficiaire de l'AAH ?")
@@ -168,14 +168,13 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Foldable sections:
+        # Collapsible sections:
         # If these non-model fields are checked, matching model fields are updatable
         # otherwise model fields reset to empty value ("")
         for field in ["unemployed", "rsa_allocation", "ass_allocation", "aah_allocation"]:
-            self.fields[field].widget.attrs["onclick"] = "toggleFold(this)"
             self.initial[field] = getattr(self.instance, field + "_since")
 
-        # Pôle emploi (foldable section)
+        # Pôle emploi (collapsible section)
         pole_emploi_id = self.instance.user.pole_emploi_id
 
         if pole_emploi_id:
@@ -183,9 +182,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.initial["pole_emploi"] = True
             self.fields["pole_emploi_id"].widget.attrs["readonly"] = True
 
-        self.fields["pole_emploi"].widget.attrs["onclick"] = "toggleFold(this)"
-
-        # RSA Markup (foldable section)
+        # RSA Markup (collapsible section)
         self.initial["rsa_markup"] = self.instance.has_rsa_allocation
 
         # "Standard" model field
@@ -201,9 +198,12 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
 
             if not self.cleaned_data["pole_emploi_id"]:
                 raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
+
+            self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
         else:
-            # Reset "inner" field
+            # Reset "inner" fields
             self.cleaned_data["pole_emploi_since"] = ""
+            self.cleaned_data["pole_emploi_id"] = ""
 
         # RSA: 3 options possible, one is handled by `rsa_allocation` value
         if self.cleaned_data["rsa_allocation"]:
@@ -214,16 +214,16 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             # Reset "inner" fields
             self.cleaned_data["rsa_allocation_since"] = self.cleaned_data["rsa_markup"] = ""
 
-        # Fold fields validation
-        fold_errors = {
+        # Collapsible blocks field validation
+        collapsible_errors = {
             "unemployed": "La période sans emploi est obligatoire",
             "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
             "aah_allocation": "La durée d'allocation de l'AAH est obligatoire",
         }
 
-        for fold_field, error_message in fold_errors.items():
-            inner_field_name = fold_field + "_since"
-            if self.cleaned_data[fold_field]:
+        for collapsible_field, error_message in collapsible_errors.items():
+            inner_field_name = collapsible_field + "_since"
+            if self.cleaned_data[collapsible_field]:
                 if not self.cleaned_data[inner_field_name]:
                     raise forms.ValidationError(error_message)
             else:
@@ -233,6 +233,9 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     def save(self, *args, **kwargs):
         if self.cleaned_data["rsa_allocation"]:
             self.instance.has_rsa_allocation = self.cleaned_data["rsa_markup"]
+
+        if self.cleaned_data["pole_emploi"]:
+            self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
 
         super().save(*args, **kwargs)
 
