@@ -237,8 +237,14 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 @login_required
 def pe_approval_search(request, template_name="approvals/pe_approval_search.html"):
     """
-    Search for a PoleEmploiApproval by number. Redirects to the existing Pass if it exists.
-    If not, it will ask you to search for an user in order to import the "agrément" as a "Pass IAE".
+    Entry point of the `PoleEmploiApproval`'s conversion process which consists of 3 steps
+    and allows to convert a `PoleEmploiApproval` into an `Approval`.
+    This process is required following the end of the software allowing Pôle emploi to manage
+    their approvals.
+
+    Search for a PoleEmploiApproval by number.
+    Redirects to the existing Pass if it exists.
+    If not, it will ask you to search for an user in order to import the "agrément" as a "PASS IAE".
     """
     siae = get_current_siae_or_404(request)
 
@@ -270,7 +276,9 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
 @login_required
 def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe_approval_search_user.html"):
     """
-    Search for a given user by email address
+    2nd step of the PoleEmploiApproval's conversion process.
+
+    Search for a given user by email address.
     """
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
@@ -285,7 +293,9 @@ def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe
 @login_required
 def pe_approval_create(request, pe_approval_id):
     """
-    Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval
+    Final step of the PoleEmploiApproval's conversion process.
+
+    Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval.
     """
     siae = get_current_siae_or_404(request)
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
@@ -311,7 +321,7 @@ def pe_approval_create(request, pe_approval_id):
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
-        messages.error(request, "Le candidat associé à cette adresse email a déja un Pass IAE valide.")
+        messages.error(request, "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
         next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
@@ -333,7 +343,7 @@ def pe_approval_create(request, pe_approval_id):
             to_siae=siae,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval_from_pe,
-            created_from_pe_approval=True,
+            created_from_pe_approval=True,  # This flag is specific to this process.
         )
         job_application.save()
 
