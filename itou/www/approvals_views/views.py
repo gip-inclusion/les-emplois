@@ -258,7 +258,7 @@ def search_pe_approval(request, template_name="approvals/search_pe_approval.html
 
     # Otherwise, we display a search, and whenever it’s possible, a matching PoleEmploiApproval
     pe_approval = PoleEmploiApproval.objects.filter(number=str(request.GET.get("number"))).first()
-    search_form = PoleEmploiApprovalSearchForm(request.GET or None)
+    search_form = PoleEmploiApprovalSearchForm(request.GET if pe_approval else None)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
 
@@ -271,7 +271,7 @@ def search_user(request, pe_approval_id, template_name="approvals/search_user.ht
     """
     Search for a given user by email address
     """
-    pe_approval = PoleEmploiApproval.objects.filter(pk=pe_approval_id).first()
+    pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
 
@@ -298,14 +298,21 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     email = form.cleaned_data["email"]
     job_seeker = User.objects.filter(email__iexact=email).first()
     if not job_seeker:
-        user_data = {
-            "email": email,
-            "first_name": pe_approval.first_name,
-            "last_name": pe_approval.last_name,
-            "birthdate": pe_approval.birthdate,
-            "pole_emploi_id": pe_approval.pole_emploi_id,
-        }
-        job_seeker = User.create_job_seeker_by_proxy(request.user, **user_data)
+        job_seeker = User.create_job_seeker_from_pole_emploi_approval(request.user, email, pe_approval)
+
+    # If the PoleEmploiApproval has already been imported, it is not possible to import it again
+    possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).first()
+    if possible_matching_approval:
+        messages.info(request, "Cet agrément Pole Emploi a déja été importé")
+        job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
+        next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        return HttpResponseRedirect(f"{next_url}")
+
+    # It is not possible to attach an approval to a job seeker that already has a valid approval
+    # if job_seeker.approvals_wrapper.latest_approval is not None and job_seeker.approvals_wrapper.has_valid:
+    #     messages.error("Le candidat associé à cette adresse email a déja un Pass valide")
+    #     next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
+    #     return HttpResponseRedirect(f"{next_url}")
 
     # Then we create an Approval based on the PoleEmploiApproval data
     approval_from_pe = Approval(
@@ -327,5 +334,6 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     )
     job_application.save()
 
+    messages.success(request, "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre")
     next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)

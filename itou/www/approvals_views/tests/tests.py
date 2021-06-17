@@ -8,13 +8,14 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.approvals.factories import SuspensionFactory
+from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory, ApprovalFactory
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationWithMembershipFactory
-from itou.users.factories import DEFAULT_PASSWORD
+from itou.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from itou.users.models import User
 from itou.www.approvals_views.forms import DeclareProlongationForm
 
 from .pdfshift_mock import BITES_FILE
@@ -342,3 +343,203 @@ class ApprovalProlongationTest(TestCase):
         email = mail.outbox[0]
         self.assertEqual(len(email.to), 1)
         self.assertEqual(email.to[0], post_data["email"])
+
+
+class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
+    def setUp(self):
+        """
+        Create test objects.
+        """
+        self.job_application = JobApplicationWithApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.siae = self.job_application.to_siae
+        self.siae_user = self.job_application.to_siae.members.first()
+        self.approval = self.job_application.approval
+        self.job_seeker = self.job_application.job_seeker
+        self.pe_approval = PoleEmploiApprovalFactory()
+
+    def test_search_pe_approval_view_default(self):
+        """
+        The search for PE approval screen should not crash ;)
+        """
+
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("approvals:search_pe_approval")
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Rechercher un agrément Pôle emploi")
+
+    def test_search_pe_approval_view_nominal(self):
+        """
+        The search for PE approval screen should display the job seeker’s name
+        if the PE approval number that was searched for has a matching PE approval
+        """
+
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        params = urlencode({"number": self.pe_approval.number})
+        url = reverse("approvals:search_pe_approval")
+        url = f"{url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Agrément trouvé")
+
+    def test_search_pe_approval_view_no_results(self):
+        """
+        The search for PE approval screen should display that there is no results
+        if a PE approval number was searched for but nothing was found
+        """
+
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        params = urlencode({"number": 123})
+        url = reverse("approvals:search_pe_approval")
+        url = f"{url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Nous n'avons pas trouvé d'agrément")
+
+    def test_search_pe_approval_view_has_matching_pass_iae(self):
+        """
+        The search for PE approval screen should redirect to the matching job application details screen if the
+        number matches a PASS IAE attached to a job_application
+        """
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        params = urlencode({"number": self.approval.number})
+        url = reverse("approvals:search_pe_approval")
+        url = f"{url}?{params}"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+
+        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application.id})
+        self.assertEqual(response.url, next_url)
+
+    def test_search_pe_approval_view_unlogged_is_not_authorized(self):
+        """
+        It is not possible to access the search for PE approval screen unlogged
+        """
+        url = reverse("approvals:search_pe_approval")
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        next_url = reverse("account_login")
+        self.assertIn(next_url, response.url)
+
+    def test_search_pe_approval_view_as_job_seeker_is_not_authorized(self):
+        """
+        The search for PE approval screen as job seeker is not authorized
+        """
+        self.client.login(username=self.job_seeker.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("approvals:search_pe_approval")
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_search_user_nominal(self):
+        """
+        The search for PE approval screen should redirect to the matching job application details screen if the
+        number matches a PASS IAE attached to a job_application
+        """
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("approvals:search_user", kwargs={"pe_approval_id": self.pe_approval.id})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.pe_approval.last_name)
+        self.assertContains(response, self.pe_approval.first_name)
+
+    def test_search_user_invalid_pe_approval(self):
+        """
+        The search for PE approval screen should redirect to the matching job application details screen if the
+        number matches a PASS IAE attached to a job_application
+        """
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("approvals:search_user", kwargs={"pe_approval_id": 123})
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_create_approval_from_new_user(self):
+        """
+        When the user does not exist for the suggested email, it is created as well as the approval
+        """
+        initial_approval_count = Approval.objects.count()
+        initial_user_count = User.objects.count()
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        email = "some.new@email.com"
+        url = reverse("approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": self.pe_approval.id})
+        params = {"email": email}
+        response = self.client.post(url, params)
+
+        new_user = User.objects.get(email=email)
+
+        self.assertTrue(new_user.approvals_wrapper.has_valid)
+        self.assertEqual(new_user.approvals_wrapper.latest_approval.number, self.pe_approval.number[:12])
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(new_user.last_accepted_job_application is not None)
+        next_url = reverse(
+            "apply:details_for_siae", kwargs={"job_application_id": new_user.last_accepted_job_application.id}
+        )
+        self.assertEqual(response.url, next_url)
+        self.assertEqual(Approval.objects.count(), initial_approval_count + 1)
+        self.assertEqual(User.objects.count(), initial_user_count + 1)
+
+    def test_create_approval_from_existing_user_without_approval(self):
+        """
+        When an existing user has no valid approval, it is possible to import a Pole Emploi Approval
+        """
+        initial_approval_count = Approval.objects.count()
+        job_seeker = JobSeekerFactory()
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": self.pe_approval.id})
+        params = {"email": job_seeker.email}
+        response = self.client.post(url, params)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Approval.objects.count(), initial_approval_count + 1)
+
+    def test_create_approval_when_pole_emploi_approval_has_already_been_imported(self):
+        """
+        When the PoleEmploiApproval has already been imported, we are redirected to its page
+        """
+        self.job_application = JobApplicationWithApprovalFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=ApprovalFactory(number=self.pe_approval.number[:12])
+        )
+
+        initial_approval_count = Approval.objects.count()
+        job_seeker = JobSeekerFactory()
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+        url = reverse("approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": self.pe_approval.id})
+        params = {"email": job_seeker.email}
+        response = self.client.post(url, params)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Approval.objects.count(), initial_approval_count)
+
+    # def test_create_approval_from_existing_user_with_approval(self):
+    #     """
+    #     When an existing user already has a valid approval, it is not possible to import a Pole Emploi Approval
+    #     """
+    #     self.assertTrue(self.job_seeker.approvals_wrapper.has_valid)
+
+    #     initial_approval_count = Approval.objects.count()
+    #     self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+
+    #     url = reverse("approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": self.pe_approval.id})
+    #     params = {"email": self.job_seeker.email}
+
+    #     response = self.client.post(url, params)
+
+    #     self.assertEqual(Approval.objects.count(), initial_approval_count)
+    #     self.assertEqual(response.status_code, 302)
+    #     next_url = reverse("approvals:search_user", kwargs={"pe_approval_id": self.pe_approval.id})
+    #     self.assertEqual(response.url, next_url)
