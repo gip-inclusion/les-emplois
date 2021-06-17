@@ -75,25 +75,17 @@ b {
     background: #e5f1fe;
 }
 
-/* Banners.
---------------------------------------------------------------------------- */
-
-.layout-banner {
-    grid-column: full;
-    min-height: 17rem;
+.layout-section-search {
+    background-position: top left, top right;
     background-repeat: no-repeat;
-    background-position: 0 100%;
-    background-size: cover;
+    min-height: 17rem;
+    background-image: url(../img/search-bg-left.svg), url(../img/search-bg-right.svg);
 }
 
-@media (max-width: 1000px) {  /* For any browser < max-width. */
-    .layout-banner {
-        min-height: 8rem;
+@media only screen and (max-width: 992px) {
+    .layout-section-search {
+        background-image: none;
     }
-}
-
-.layout-banner-work-office {
-    background-image: url(../img/banner_work_office.svg);
 }
 
 /* Header.
