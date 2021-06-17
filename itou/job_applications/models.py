@@ -349,6 +349,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         default=False, verbose_name="L'entreprise choisit de ne pas obtenir un PASS IAE à l'embauche"
     )
 
+    # This flag is used in the `PoleEmploiApproval`'s conversion process.
+    # This process is required following the end of the software allowing Pôle emploi to manage their approvals.
+    # The process allows to convert a `PoleEmploiApproval` into an `Approval`.
     created_from_pe_approval = models.BooleanField(
         default=False, verbose_name="Vrai si la candidature est importée depuis un agrément Pole Emploi"
     )

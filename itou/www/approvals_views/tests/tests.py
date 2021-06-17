@@ -554,4 +554,4 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.url, next_url)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse email a déja un Pass IAE valide.")
+        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
