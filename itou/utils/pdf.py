@@ -42,7 +42,7 @@ class HtmlToPdf:
             "json": {"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
         }
         url = f"{settings.PDFSHIFT_API_BASE_URL}/convert/pdf"
-        logger.info("POST request to `%s`", url)
+        logger.warn("POST request to `%s`", url)
         with httpx.stream("POST", url, **kwargs) as response:
             response.raise_for_status()
             result = io.BytesIO()

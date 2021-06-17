@@ -1,14 +1,9 @@
-import os
-from tempfile import NamedTemporaryFile
-
 from django.contrib import admin
-from django.http import FileResponse
 from django.urls import path
 
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
-from itou.approvals.export import export_approvals
 from itou.job_applications.models import JobApplication
 
 
@@ -98,7 +93,6 @@ class ApprovalAdmin(admin.ModelAdmin):
         ProlongationInline,
         JobApplicationInline,
     )
-    actions = ["export_approvals"]
 
     def save_model(self, request, obj, form, change):
         if not obj.pk:
@@ -123,19 +117,6 @@ class ApprovalAdmin(admin.ModelAdmin):
         """
         return manually_refuse_approval(request, self, job_application_id)
 
-    def export_approvals(self, request):
-        """
-        Custom admin view to export all approvals as an XLSX file.
-        """
-        try:
-            tmp_file = NamedTemporaryFile(delete=False)
-            filename = export_approvals(tmp_file=tmp_file)
-            response = FileResponse(open(tmp_file.name, "rb"))
-            response["Content-Disposition"] = f'attachment; filename="{filename}"'
-            return response
-        finally:
-            os.remove(tmp_file.name)
-
     def get_urls(self):
         additional_urls = [
             path(
@@ -147,11 +128,6 @@ class ApprovalAdmin(admin.ModelAdmin):
                 "<uuid:job_application_id>/refuse_approval",
                 self.admin_site.admin_view(self.manually_refuse_approval),
                 name="approvals_approval_manually_refuse_approval",
-            ),
-            path(
-                "export_approvals",
-                self.admin_site.admin_view(self.export_approvals),
-                name="approvals_approval_export_approvals",
             ),
         ]
         return additional_urls + super().get_urls()

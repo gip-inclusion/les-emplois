@@ -28,11 +28,12 @@ def remove_extra_line_breaks(text):
 def get_email_text_template(template, context):
     context.update(
         {
-            "itou_doc_url": settings.ITOU_DOC_URL,
             "itou_assistance_url": settings.ITOU_ASSISTANCE_URL,
-            "itou_protocol": settings.ITOU_PROTOCOL,
-            "itou_fqdn": settings.ITOU_FQDN,
+            "itou_doc_url": settings.ITOU_DOC_URL,
+            "itou_email_prolongation": settings.ITOU_EMAIL_PROLONGATION,
             "itou_environment": settings.ITOU_ENVIRONMENT,
+            "itou_fqdn": settings.ITOU_FQDN,
+            "itou_protocol": settings.ITOU_PROTOCOL,
         }
     )
     return remove_extra_line_breaks(get_template(template).render(context).strip())

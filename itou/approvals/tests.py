@@ -2,6 +2,7 @@ import datetime
 from unittest import mock
 
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -1365,3 +1366,4 @@ class ProlongationNotificationsTest(TestCase):
         self.assertIn(prolongation.approval.number_with_spaces, email.body)
         self.assertIn(title(prolongation.approval.user.first_name), email.body)
         self.assertIn(title(prolongation.approval.user.last_name), email.body)
+        self.assertIn(settings.ITOU_EMAIL_PROLONGATION, email.body)
