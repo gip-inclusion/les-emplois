@@ -36,6 +36,22 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
         return queryset
 
 
+class CreatedFromPoleEmploiApprovalFilter(admin.SimpleListFilter):
+    title = "Créé depuis un agrément Pôle emploi"
+    parameter_name = "created_from_pe_approval"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Oui"), ("no", "Non"))
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == "yes":
+            return queryset.filter(created_from_pe_approval=True)
+        if value == "no":
+            return queryset.filter(created_from_pe_approval=False)
+        return queryset
+
+
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
@@ -50,6 +66,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "approval_delivery_mode",
         "sender_prescriber_organization__is_authorized",
         "to_siae__department",
+        CreatedFromPoleEmploiApprovalFilter,
     )
     readonly_fields = (
         "created_at",
