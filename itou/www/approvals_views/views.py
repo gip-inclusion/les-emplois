@@ -235,7 +235,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 
 
 @login_required
-def search_pe_approval(request, template_name="approvals/search_pe_approval.html"):
+def pe_approval_search(request, template_name="approvals/pe_approval_search.html"):
     """
     Search for a PoleEmploiApproval by number. Redirects to the existing Pass if it exists.
     If not, it will ask you to search for an user in order to import the "agrément" as a "Pass IAE".
@@ -268,7 +268,7 @@ def search_pe_approval(request, template_name="approvals/search_pe_approval.html
 
 
 @login_required
-def search_user(request, pe_approval_id, template_name="approvals/search_user.html"):
+def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe_approval_search_user.html"):
     """
     Search for a given user by email address
     """
@@ -283,7 +283,7 @@ def search_user(request, pe_approval_id, template_name="approvals/search_user.ht
 
 
 @login_required
-def create_approval_from_pe_approval(request, pe_approval_id):
+def pe_approval_create(request, pe_approval_id):
     """
     Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval
     """
@@ -292,7 +292,7 @@ def create_approval_from_pe_approval(request, pe_approval_id):
 
     form = UserExistsForm(data=request.POST or None)
     if request.method != "POST" or not form.is_valid():
-        next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
+        next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
     # If there already is a user with this email, we take it, otherwise we create one
@@ -312,7 +312,7 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     # It is not possible to attach an approval to a job seeker that already has a valid approval
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
         messages.error(request, "Le candidat associé à cette adresse email a déja un Pass IAE valide.")
-        next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
+        next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
     with transaction.atomic():

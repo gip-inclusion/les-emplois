@@ -7,7 +7,7 @@
 
     {{ block.super }}
     <h2>{{pe_approval.first_name}} {{pe_approval.last_name}}</h2>
-    <form method="post" action="{% url 'approvals:create_approval_from_pe_approval' pe_approval.id %}" class="js-prevent-multiple-submit">
+    <form method="post" action="{% url 'approvals:pe_approval_create' pe_approval.id %}" class="js-prevent-multiple-submit">
 
         {% csrf_token %}
 

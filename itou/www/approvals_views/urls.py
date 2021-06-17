@@ -12,11 +12,13 @@ urlpatterns = [
     path("suspend/<int:approval_id>", views.suspend, name="suspend"),
     path("suspension/<int:suspension_id>/edit", views.suspension_update, name="suspension_update"),
     path("suspension/<int:suspension_id>/delete", views.suspension_delete, name="suspension_delete"),
-    path("search-pe-approval/", views.search_pe_approval, name="search_pe_approval"),
-    path("search-user/<int:pe_approval_id>", views.search_user, name="search_user"),
+    path("pe-approval/search", views.pe_approval_search, name="pe_approval_search"),
     path(
-        "complete-pe-approval/<int:pe_approval_id>",
-        views.create_approval_from_pe_approval,
-        name="create_approval_from_pe_approval",
+        "pe-approval/<int:pe_approval_id>/search-user", views.pe_approval_search_user, name="pe_approval_search_user"
+    ),
+    path(
+        "pe-approval/<int:pe_approval_id>/create",
+        views.pe_approval_create,
+        name="pe_approval_create",
     ),
 ]
