@@ -49,7 +49,7 @@ class SearchSiaeTest(TestCase):
 
     def test_not_existing(self):
         response = self.client.get(self.url, {"city": "foo-44"})
-        self.assertContains(response, "Aucun résultat.")
+        self.assertContains(response, "Aucun résultat avec les filtres actuels.")
 
     def test_district(self):
         city_slug = "paris-75"
