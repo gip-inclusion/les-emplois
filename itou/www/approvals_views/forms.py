@@ -2,7 +2,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from itou.approvals.models import PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.models import Prolongation, Suspension
 from itou.users.models import User
 from itou.utils.widgets import DatePickerField
 
@@ -139,28 +139,9 @@ class SuspensionForm(forms.ModelForm):
         }
 
 
-class PoleEmploiApprovalSearchForm(forms.ModelForm):
+class PoleEmploiApprovalSearchForm(forms.Form):
     """
     Search for a PoleEmploiApproval by id
     """
 
-    def _search_pe_approval(self, number):
-        pe_approval_model = self.Meta.model
-        existing_pe_approval = pe_approval_model.objects.get(number=number)
-        if existing_pe_approval:
-            #
-            # WARNING The form is now bound to this instance
-            #
-            self.instance = existing_pe_approval
-
-    def clean_number(self):
-        number = self.cleaned_data["number"]
-        self._search_pe_approval(number)
-        return number
-
-    class Meta:
-        model = PoleEmploiApproval
-        fields = [
-            # Order is important for the template.
-            "number"
-        ]
+    number = forms.CharField(label="Numéro", required=True, max_length=15)
