@@ -292,7 +292,7 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     form = UserExistsForm(data=request.POST or None)
     if request.method != "POST" or not form.is_valid():
         next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
-        return HttpResponseRedirect(f"{next_url}")
+        return HttpResponseRedirect(next_url)
 
     # If there already is a user with this email, we take it, otherwise we create one
     email = form.cleaned_data["email"]
@@ -306,13 +306,13 @@ def create_approval_from_pe_approval(request, pe_approval_id):
         messages.info(request, "Cet agrément Pole Emploi a déja été importé")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
         next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
-        return HttpResponseRedirect(f"{next_url}")
+        return HttpResponseRedirect(next_url)
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
         messages.error(request, "Le candidat associé à cette adresse email a déja un Pass IAE valide")
         next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
-        return HttpResponseRedirect(f"{next_url}")
+        return HttpResponseRedirect(next_url)
 
     # Then we create an Approval based on the PoleEmploiApproval data
     approval_from_pe = Approval(
