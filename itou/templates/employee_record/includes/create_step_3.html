@@ -1,6 +1,6 @@
 {% load bootstrap4 %}
 {% load static %}
-{% load folds %}
+{% load collapse %}
 
 <h4>Situation du salarié</h4>
 
@@ -13,33 +13,48 @@
     {% bootstrap_field form.education_level %}
     {% bootstrap_field form.resourceless %}
 
-    {% bootstrap_field form.pole_emploi %}
-    <div id="fold_pole_emploi" class="ml-1 pl-4 border-left border-primary {{ form.pole_emploi.value|fold_class }}">
+    <div data-toggle="collapse" data-target="#collapse_pole_emploi">
+        {% bootstrap_field form.pole_emploi %}
+    </div>
+
+    <div id="collapse_pole_emploi" class="ml-1 pl-4 border-left border-primary collapse {{ form.pole_emploi.value|collapse }}">
         {% bootstrap_field form.pole_emploi_id %}
         {% bootstrap_field form.pole_emploi_since %}
     </div>
 
-    {% bootstrap_field form.unemployed %}
-    <div id="fold_unemployed" class="ml-1 pl-4 border-left border-primary {{ form.unemployed.value|fold_class }}">
+    <div data-toggle="collapse" data-target="#collapse_unemployed">
+        {% bootstrap_field form.unemployed %}
+    </div>
+
+    <div id="collapse_unemployed" class="ml-1 pl-4 border-left border-primary collapse {{ form.unemployed.value|collapse }}">
         {% bootstrap_field form.unemployed_since %}
     </div>
 
     {% bootstrap_field form.rqth_employee %}
     {% bootstrap_field form.oeth_employee %}
 
-    {% bootstrap_field form.rsa_allocation %}
-    <div id="fold_rsa_allocation" class="ml-1 pl-4 border-left border-primary {{ form.rsa_allocation.value|fold_class }}">
+    <div data-toggle="collapse" data-target="#collapse_rsa_allocation">
+        {% bootstrap_field form.rsa_allocation %}
+    </div>
+
+    <div id="collapse_rsa_allocation" class="ml-1 pl-4 border-left border-primary collapse {{ form.rsa_allocation.value|collapse }}">
         {% bootstrap_field form.rsa_markup %}
         {% bootstrap_field form.rsa_allocation_since %}
     </div>
 
-    {% bootstrap_field form.ass_allocation %}
-    <div id="fold_ass_allocation" class="ml-1 pl-4 border-left border-primary {{ form.ass_allocation.value|fold_class }}">
+    <div data-toggle="collapse" data-target="#collapse_ass_allocation">
+        {% bootstrap_field form.ass_allocation %}
+    </div>
+
+    <div id="collapse_ass_allocation" class="ml-1 pl-4 border-left border-primary collapse {{ form.ass_allocation.value|collapse }}">
         {% bootstrap_field form.ass_allocation_since %}
     </div>
     
-    {% bootstrap_field form.aah_allocation %}
-    <div id="fold_aah_allocation" class="ml-1 pl-4 border-left border-primary {{ form.aah_allocation.value|fold_class }}">
+    <div data-toggle="collapse" data-target="#collapse_aah_allocation">
+        {% bootstrap_field form.aah_allocation %}
+    </div>
+    
+    <div id="collapse_aah_allocation" class="ml-1 pl-4 border-left border-primary collapse {{ form.aah_allocation.value|collapse }}">
         {% bootstrap_field form.aah_allocation_since %}
     </div>
 
@@ -49,18 +64,3 @@
     {% endbuttons %}
 
 </form>
-
-
-{# A vérifier / optimiser #}
-
-<script src="{% static "vendor/jquery-3.4.1/jquery.min.js" %}"></script>
-<script>
-    function toggleFold(elt) {
-        var fold = '#fold_' + elt.name 
-        if ($(elt).is(':checked')) {
-            $(fold).removeClass("d-none")
-        } else {
-            $(fold).addClass("d-none")
-        }}
-</script>
-
