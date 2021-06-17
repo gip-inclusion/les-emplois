@@ -373,7 +373,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
 
     def test_search_pe_approval_view_nominal(self):
         """
-        The search for PE approval screen should display the job seeker’s name
+        The search for PE approval screen should display the job seeker's name
         if the PE approval number that was searched for has a matching PE approval
         """
 
@@ -509,7 +509,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             str(messages[0]),
-            "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre",
+            "L'agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
         )
 
     def test_create_approval_when_pole_emploi_approval_has_already_been_imported(self):
@@ -532,7 +532,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(Approval.objects.count(), initial_approval_count)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Cet agrément Pole Emploi a déja été importé")
+        self.assertEqual(str(messages[0]), "Cet agrément Pole Emploi a déja été importé.")
 
     def test_create_approval_from_existing_user_with_approval(self):
         """
@@ -554,4 +554,4 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(response.url, next_url)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse email a déja un Pass IAE valide")
+        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse email a déja un Pass IAE valide.")

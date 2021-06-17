@@ -243,7 +243,7 @@ def search_pe_approval(request, template_name="approvals/search_pe_approval.html
     siae = get_current_siae_or_404(request)
 
     # We search if the approval already exist with this exact number,
-    # or if it was created from the first 12 digits of a PoleEmploiApproval’s number)
+    # or if it was created from the first 12 digits of a PoleEmploiApproval's number)
     approval = None
     number = request.GET.get("number")
     if number:
@@ -257,7 +257,7 @@ def search_pe_approval(request, template_name="approvals/search_pe_approval.html
         )
         return HttpResponseRedirect(application_details_url)
 
-    # Otherwise, we display a search, and whenever it’s possible, a matching PoleEmploiApproval
+    # Otherwise, we display a search, and whenever it's possible, a matching PoleEmploiApproval
     pe_approval = PoleEmploiApproval.objects.filter(number=str(request.GET.get("number"))).first()
     search_form = PoleEmploiApprovalSearchForm(request.GET if pe_approval else None)
 
@@ -304,14 +304,14 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     # If the PoleEmploiApproval has already been imported, it is not possible to import it again
     possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).first()
     if possible_matching_approval:
-        messages.info(request, "Cet agrément Pole Emploi a déja été importé")
+        messages.info(request, "Cet agrément Pole Emploi a déja été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
         next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval
     if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
-        messages.error(request, "Le candidat associé à cette adresse email a déja un Pass IAE valide")
+        messages.error(request, "Le candidat associé à cette adresse email a déja un Pass IAE valide.")
         next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
@@ -338,7 +338,7 @@ def create_approval_from_pe_approval(request, pe_approval_id):
         job_application.save()
 
     messages.success(
-        request, "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre"
+        request, "L'agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
     )
     next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
