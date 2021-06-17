@@ -6,7 +6,6 @@ from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import SimpleTemplateResponse
 from django.urls import reverse_lazy
-from django.utils.http import urlencode
 from django.utils.text import slugify
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
@@ -275,17 +274,8 @@ def search_user(request, pe_approval_id, template_name="approvals/search_user.ht
     pe_approval = PoleEmploiApproval.objects.filter(pk=pe_approval_id).first()
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
-    next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
 
-    form = UserExistsForm(data=request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        args = urlencode({"email": form.cleaned_data["email"]})
-        next_url = reverse_lazy(
-            "approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": pe_approval_id}
-        )
-
-        return HttpResponseRedirect(f"{next_url}?{args}")
+    form = UserExistsForm(data=None)
 
     context = {"back_url": back_url, "form": form, "pe_approval": pe_approval}
     return render(request, template_name, context)
@@ -299,8 +289,13 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     siae = get_current_siae_or_404(request)
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
+    form = UserExistsForm(data=request.POST or None)
+    if request.method != "POST" or not form.is_valid():
+        next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
+        return HttpResponseRedirect(f"{next_url}")
+
     # If there already is a user with this email, we take it, otherwise we create one
-    email = request.GET.get("email")
+    email = form.cleaned_data["email"]
     job_seeker = User.objects.filter(email__iexact=email).first()
     if not job_seeker:
         user_data = {
