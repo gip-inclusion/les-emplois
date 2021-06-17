@@ -1,6 +1,7 @@
 from unittest.mock import PropertyMock, patch
 
 from dateutil.relativedelta import relativedelta
+from django.contrib.messages import get_messages
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -8,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
 
-from itou.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory, ApprovalFactory
+from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory, SuspensionFactory
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications.factories import JobApplicationFactory, JobApplicationWithApprovalFactory
@@ -504,14 +505,19 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Approval.objects.count(), initial_approval_count + 1)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre",
+        )
 
     def test_create_approval_when_pole_emploi_approval_has_already_been_imported(self):
         """
         When the PoleEmploiApproval has already been imported, we are redirected to its page
         """
         self.job_application = JobApplicationWithApprovalFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
-            approval=ApprovalFactory(number=self.pe_approval.number[:12])
+            state=JobApplicationWorkflow.STATE_ACCEPTED, approval=ApprovalFactory(number=self.pe_approval.number[:12])
         )
 
         initial_approval_count = Approval.objects.count()
@@ -524,22 +530,28 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Approval.objects.count(), initial_approval_count)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Cet agrément Pole Emploi a déja été importé")
 
-    # def test_create_approval_from_existing_user_with_approval(self):
-    #     """
-    #     When an existing user already has a valid approval, it is not possible to import a Pole Emploi Approval
-    #     """
-    #     self.assertTrue(self.job_seeker.approvals_wrapper.has_valid)
+    def test_create_approval_from_existing_user_with_approval(self):
+        """
+        When an existing user already has a valid approval, it is not possible to import a Pole Emploi Approval
+        """
+        self.assertTrue(self.job_seeker.approvals_wrapper.has_valid)
 
-    #     initial_approval_count = Approval.objects.count()
-    #     self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
+        initial_approval_count = Approval.objects.count()
+        self.client.login(username=self.siae_user.email, password=DEFAULT_PASSWORD)
 
-    #     url = reverse("approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": self.pe_approval.id})
-    #     params = {"email": self.job_seeker.email}
+        url = reverse("approvals:create_approval_from_pe_approval", kwargs={"pe_approval_id": self.pe_approval.id})
+        params = {"email": self.job_seeker.email}
 
-    #     response = self.client.post(url, params)
+        response = self.client.post(url, params)
 
-    #     self.assertEqual(Approval.objects.count(), initial_approval_count)
-    #     self.assertEqual(response.status_code, 302)
-    #     next_url = reverse("approvals:search_user", kwargs={"pe_approval_id": self.pe_approval.id})
-    #     self.assertEqual(response.url, next_url)
+        self.assertEqual(Approval.objects.count(), initial_approval_count)
+        self.assertEqual(response.status_code, 302)
+        next_url = reverse("approvals:search_user", kwargs={"pe_approval_id": self.pe_approval.id})
+        self.assertEqual(response.url, next_url)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Le candidat associé à cette adresse email a déja un Pass IAE valide")
