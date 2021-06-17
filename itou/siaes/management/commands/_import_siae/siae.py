@@ -13,7 +13,7 @@ from itou.utils.address.departments import department_from_postcode
 
 
 def does_siae_have_an_active_convention(siae):
-    asp_id = SIRET_TO_ASP_ID[siae.siret]
+    asp_id = SIRET_TO_ASP_ID.get(siae.siret)
     siae_key = (asp_id, siae.kind)
     return siae_key in ACTIVE_SIAE_KEYS
 
