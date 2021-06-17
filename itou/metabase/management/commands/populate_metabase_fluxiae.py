@@ -233,6 +233,7 @@ class Command(BaseCommand):
 
         # Regular fluxIAE views not mixed with any itou data.
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
+        self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciereACI")
         self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
         self.populate_fluxiae_view(vue_name="fluxIAE_Encadrement")
         self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelAgregat")

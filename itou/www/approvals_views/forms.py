@@ -137,3 +137,11 @@ class SuspensionForm(forms.ModelForm):
             "end_at": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
             "reason_explanation": "Obligatoire seulement en cas de force majeure.",
         }
+
+
+class PoleEmploiApprovalSearchForm(forms.Form):
+    """
+    Search for a PoleEmploiApproval by id
+    """
+
+    number = forms.CharField(label="Numéro", required=True, min_length=12, max_length=15)

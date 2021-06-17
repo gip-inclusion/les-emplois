@@ -1,0 +1,26 @@
+{% extends "layout/content_small.html" %}
+{% load bootstrap4 %}
+
+{% block title %}Rechercher un candidat{{ block.super }}{% endblock %}
+
+{% block content %}
+
+    {{ block.super }}
+    <h2>{{pe_approval.first_name}} {{pe_approval.last_name}}</h2>
+    <form method="post" action="{% url 'approvals:pe_approval_create' pe_approval.id %}" class="js-prevent-multiple-submit">
+
+        {% csrf_token %}
+
+        {% bootstrap_form form %}
+
+        <p>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'email ?" %}</p>
+
+        {% buttons %}
+            <button type="submit" class="btn btn-primary">Continuer</button>
+        {% endbuttons %}
+    </form>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+{% endblock %}

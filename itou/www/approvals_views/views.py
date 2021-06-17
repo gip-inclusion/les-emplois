@@ -2,19 +2,22 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db import transaction
 from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import SimpleTemplateResponse
 from django.urls import reverse_lazy
 from django.utils.text import slugify
 
-from itou.approvals.models import Approval, Suspension
+from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
 from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
-from itou.www.approvals_views.forms import DeclareProlongationForm, SuspensionForm
+from itou.www.apply.forms import UserExistsForm
+from itou.www.approvals_views.forms import DeclareProlongationForm, PoleEmploiApprovalSearchForm, SuspensionForm
 
 
 @login_required
@@ -229,3 +232,123 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
         "back_url": back_url,
     }
     return render(request, template_name, context)
+
+
+@login_required
+def pe_approval_search(request, template_name="approvals/pe_approval_search.html"):
+    """
+    Entry point of the `PoleEmploiApproval`'s conversion process which consists of 3 steps
+    and allows to convert a `PoleEmploiApproval` into an `Approval`.
+    This process is required following the end of the software allowing Pôle emploi to manage
+    their approvals.
+
+    Search for a PoleEmploiApproval by number.
+    Redirects to the existing Pass if it exists.
+    If not, it will ask you to search for an user in order to import the "agrément" as a "PASS IAE".
+    """
+    siae = get_current_siae_or_404(request)
+
+    # We search if the approval already exist with this exact number,
+    # or if it was created from the first 12 digits of a PoleEmploiApproval's number
+    approval = None
+    number = request.GET.get("number")
+    if number:
+        approval = Approval.objects.filter(number__in=[number, number[:12]]).first()
+
+    # # If the identifier matches an existing approval, we redirection to the matching job application
+    if approval:
+        job_application_id = approval.user.last_accepted_job_application.id
+        application_details_url = reverse_lazy(
+            "apply:details_for_siae", kwargs={"job_application_id": job_application_id}
+        )
+        return HttpResponseRedirect(application_details_url)
+
+    # Otherwise, we display a search, and whenever it's possible, a matching PoleEmploiApproval
+    pe_approval = PoleEmploiApproval.objects.filter(number=str(request.GET.get("number"))).first()
+    search_form = PoleEmploiApprovalSearchForm(request.GET if pe_approval else None)
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+
+    context = {"back_url": back_url, "pe_approval": pe_approval, "form": search_form, "number": number, "siae": siae}
+    return render(request, template_name, context)
+
+
+@login_required
+def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe_approval_search_user.html"):
+    """
+    2nd step of the PoleEmploiApproval's conversion process.
+
+    Search for a given user by email address.
+    """
+    pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
+
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("dashboard:index"))
+
+    form = UserExistsForm(data=None)
+
+    context = {"back_url": back_url, "form": form, "pe_approval": pe_approval}
+    return render(request, template_name, context)
+
+
+@login_required
+def pe_approval_create(request, pe_approval_id):
+    """
+    Final step of the PoleEmploiApproval's conversion process.
+
+    Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval.
+    """
+    siae = get_current_siae_or_404(request)
+    pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
+
+    form = UserExistsForm(data=request.POST or None)
+    if request.method != "POST" or not form.is_valid():
+        next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
+        return HttpResponseRedirect(next_url)
+
+    # If there already is a user with this email, we take it, otherwise we create one
+    email = form.cleaned_data["email"]
+    job_seeker = User.objects.filter(email__iexact=email).first()
+    if not job_seeker:
+        job_seeker = User.create_job_seeker_from_pole_emploi_approval(request.user, email, pe_approval)
+
+    # If the PoleEmploiApproval has already been imported, it is not possible to import it again
+    possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).first()
+    if possible_matching_approval:
+        messages.info(request, "Cet agrément Pole Emploi a déja été importé.")
+        job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
+        next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        return HttpResponseRedirect(next_url)
+
+    # It is not possible to attach an approval to a job seeker that already has a valid approval
+    if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
+        messages.error(request, "Le candidat associé à cette adresse email a déja un PASS IAE valide.")
+        next_url = reverse_lazy("approvals:pe_approval_search_user", kwargs={"pe_approval_id": pe_approval_id})
+        return HttpResponseRedirect(next_url)
+
+    with transaction.atomic():
+
+        # Then we create an Approval based on the PoleEmploiApproval data
+        approval_from_pe = Approval(
+            start_at=pe_approval.start_at,
+            end_at=pe_approval.end_at,
+            user=job_seeker,
+            # Only store 12 chars numbers.
+            number=pe_approval.number[:12],
+        )
+        approval_from_pe.save()
+
+        # Then we create the necessary JobApplication for redirection
+        job_application = JobApplication(
+            job_seeker=job_seeker,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=approval_from_pe,
+            created_from_pe_approval=True,  # This flag is specific to this process.
+        )
+        job_application.save()
+
+    messages.success(
+        request, "L'agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
+    )
+    next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    return HttpResponseRedirect(next_url)
