@@ -309,10 +309,10 @@ def create_approval_from_pe_approval(request, pe_approval_id):
         return HttpResponseRedirect(f"{next_url}")
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval
-    # if job_seeker.approvals_wrapper.latest_approval is not None and job_seeker.approvals_wrapper.has_valid:
-    #     messages.error("Le candidat associé à cette adresse email a déja un Pass valide")
-    #     next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
-    #     return HttpResponseRedirect(f"{next_url}")
+    if job_seeker.approvals_wrapper.has_valid and job_seeker.approvals_wrapper.latest_approval.is_pass_iae:
+        messages.error(request, "Le candidat associé à cette adresse email a déja un Pass IAE valide")
+        next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
+        return HttpResponseRedirect(f"{next_url}")
 
     # Then we create an Approval based on the PoleEmploiApproval data
     approval_from_pe = Approval(
@@ -334,6 +334,8 @@ def create_approval_from_pe_approval(request, pe_approval_id):
     )
     job_application.save()
 
-    messages.success(request, "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre")
+    messages.success(
+        request, "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre"
+    )
     next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
