@@ -1,8 +1,9 @@
+import logging
 import os
 
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
-from sentry_sdk.integrations.logging import ignore_logger
+from sentry_sdk.integrations.logging import ignore_logger, LoggingIntegration
 
 
 def strip_sentry_sensitive_data(event, hint):
@@ -26,10 +27,16 @@ def strip_sentry_sensitive_data(event, hint):
     return event
 
 
+sentry_logging = LoggingIntegration(
+    level=logging.INFO,  # Capture info and above as breadcrumbs.
+    event_level=logging.WARNING, # Send warnings as events.
+)
+
+
 def sentry_init(dsn):
     sentry_sdk.init(
         dsn=dsn,
-        integrations=[DjangoIntegration()],
+        integrations=[sentry_logging, DjangoIntegration()],
         # Set traces_sample_rate to 1.0 to capture 100%
         # of transactions for performance monitoring.
         # We recommend adjusting this value in production.
