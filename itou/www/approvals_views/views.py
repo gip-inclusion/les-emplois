@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
+from django.db import transaction
 from django.http import FileResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template.response import SimpleTemplateResponse
@@ -314,25 +315,27 @@ def create_approval_from_pe_approval(request, pe_approval_id):
         next_url = reverse_lazy("approvals:search_user", kwargs={"pe_approval_id": pe_approval_id})
         return HttpResponseRedirect(next_url)
 
-    # Then we create an Approval based on the PoleEmploiApproval data
-    approval_from_pe = Approval(
-        start_at=pe_approval.start_at,
-        end_at=pe_approval.end_at,
-        user=job_seeker,
-        # Only store 12 chars numbers.
-        number=pe_approval.number[:12],
-    )
-    approval_from_pe.save()
+    with transaction.atomic():
 
-    # Then we create the necessary JobApplication for redirection
-    job_application = JobApplication(
-        job_seeker=job_seeker,
-        to_siae=siae,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
-        approval=approval_from_pe,
-        created_from_pe_approval=True,
-    )
-    job_application.save()
+        # Then we create an Approval based on the PoleEmploiApproval data
+        approval_from_pe = Approval(
+            start_at=pe_approval.start_at,
+            end_at=pe_approval.end_at,
+            user=job_seeker,
+            # Only store 12 chars numbers.
+            number=pe_approval.number[:12],
+        )
+        approval_from_pe.save()
+
+        # Then we create the necessary JobApplication for redirection
+        job_application = JobApplication(
+            job_seeker=job_seeker,
+            to_siae=siae,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            approval=approval_from_pe,
+            created_from_pe_approval=True,
+        )
+        job_application.save()
 
     messages.success(
         request, "L’agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre"
