@@ -143,3 +143,12 @@ TABLE_COLUMNS += [
 TABLE_COLUMNS += get_establishment_last_login_date_column()
 
 TABLE_COLUMNS += get_establishment_is_active_column()
+
+TABLE_COLUMNS += [
+    {
+        "name": "brsa",
+        "type": "boolean",
+        "comment": "Organisation conventionnée pour le suivi des BRSA",
+        "fn": lambda o: o.is_brsa,
+    },
+]
