@@ -243,7 +243,7 @@ def search_pe_approval(request, template_name="approvals/search_pe_approval.html
     siae = get_current_siae_or_404(request)
 
     # We search if the approval already exist with this exact number,
-    # or if it was created from the first 12 digits of a PoleEmploiApproval's number)
+    # or if it was created from the first 12 digits of a PoleEmploiApproval's number
     approval = None
     number = request.GET.get("number")
     if number:
