@@ -178,4 +178,4 @@ def check_convention_data_consistency():
         source=Siae.SOURCE_USER_CREATED,
         convention__isnull=True,
     ).count()
-    print(f"{user_created_siaes_without_convention} user created siaes still have no convention (technical debt)")
+    assert user_created_siaes_without_convention == 0
