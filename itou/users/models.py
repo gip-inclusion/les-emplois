@@ -177,9 +177,6 @@ class User(AbstractUser, AddressMixin):
         super().save(*args, **kwargs)
 
     def can_edit_email(self, user):
-        if self == user:
-            return True
-
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
     def is_created_by(self, user):

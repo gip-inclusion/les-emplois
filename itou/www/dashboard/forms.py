@@ -21,6 +21,8 @@ class EditUserInfoForm(AddressFormMixin, forms.ModelForm):
         editor = kwargs.pop("editor")
         super().__init__(*args, **kwargs)
 
+        # Noboby can edit its own email.
+        # Only prescribers and employers can edit the job seeker's email here under certain conditions
         if not self.instance.is_job_seeker or not editor.can_edit_email(self.instance):
             del self.fields["email"]
 
