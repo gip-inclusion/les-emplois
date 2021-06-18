@@ -196,7 +196,7 @@ class ModelTest(TestCase):
         job_seeker = JobSeekerFactory()
 
         # Same user.
-        self.assertTrue(user.can_edit_email(user))
+        self.assertFalse(user.can_edit_email(user))
 
         # All conditions are met.
         job_seeker = JobSeekerFactory(created_by=user)

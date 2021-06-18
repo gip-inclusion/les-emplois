@@ -85,6 +85,9 @@ class EditUserInfoViewTest(TestCase):
         self.assertEqual(user.phone, post_data["phone"])
         self.assertEqual(user.birthdate.strftime("%d/%m/%Y"), post_data["birthdate"])
 
+        # Ensure that the job seeker cannot edit email here.
+        self.assertNotEqual(user.email, post_data["email"])
+
 
 class EditJobSeekerInfo(TestCase):
     def test_edit_by_siae(self):
