@@ -20,7 +20,7 @@ class SiaeQuerySet(models.QuerySet):
     @property
     def active_lookup(self):
         return (
-            # GEIQ, EA, ACIPHC... have no convention logic and thus are always active.
+            # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=Siae.ASP_MANAGED_KINDS)
             # Staff created siaes are always active until eventually
@@ -41,13 +41,6 @@ class SiaeQuerySet(models.QuerySet):
         grace_period = timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
         return self.select_related("convention").filter(
             self.active_lookup
-            # All user created siaes should have a convention but a small
-            # number of them (79 as of April 2021) don't because they
-            # were created before convention assignment was automated.
-            # This number will only decrease over time as siae admin users
-            # select their convention.
-            # We consider them as experiencing their grace period.
-            | Q(source=Siae.SOURCE_USER_CREATED, convention__isnull=True)
             # Include siaes experiencing their grace period.
             | Q(convention__deactivated_at__gte=now - grace_period)
         )
@@ -255,7 +248,7 @@ class Siae(AddressMixin):  # Do not forget the mixin!
     @property
     def is_active(self):
         if not self.is_asp_managed:
-            # GEIQ, EA, ACIPHC... have no convention logic and thus are always active.
+            # GEIQ, EA, EATT, ACIPHC... have no convention logic and thus are always active.
             return True
         if self.source == Siae.SOURCE_STAFF_CREATED:
             # Staff created siaes are always active until eventually
@@ -417,14 +410,11 @@ class Siae(AddressMixin):  # Do not forget the mixin!
         if self.is_active:
             return timezone.now() + timezone.timedelta(days=365)
 
+        # This should never happen but let's be defensive in this case.
         if self.source == self.SOURCE_USER_CREATED and not self.convention:
-            # All user created siaes should have a convention but a small
-            # number of them (79 as of April 2021) don't because they
-            # were created before convention assignment was automated.
-            # This number will only decrease over time as siae admin users
-            # select their convention.
-            # We consider them as experiencing their grace period.
-            return timezone.now() + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
+            # A user created siae without convention should not exist, but if it does, it should be considered past
+            # its grace period.
+            return timezone.now() + timezone.timedelta(days=-1)
 
         grace_period_start_date = self.convention.deactivated_at
         return grace_period_start_date + timezone.timedelta(days=SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS)
