@@ -358,7 +358,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     reference file is currently not up-to-date (2018)
     """
 
-    code = models.CharField(max_length=5, verbose_name="Code commune INSEE")
+    code = models.CharField(max_length=5, verbose_name="Code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="Nom de la commune")
 
     objects = CommuneManager()
