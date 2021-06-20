@@ -52,16 +52,19 @@ def tunnel_step_is_allowed(job_application):
     Check if some steps of the tunnel are reachable or not
     given the current employee record status
     """
+    # Count is cheaper than fetching nothing
+    no_employee_record_yet = job_application.employee_record.count() == 0
+    if no_employee_record_yet:
+        return True
+
+    # There is an employee record
     employee_record = job_application.employee_record.first()
-    return not employee_record or (
-        employee_record
-        and employee_record.status
-        in [
-            EmployeeRecord.Status.NEW,
-            EmployeeRecord.Status.READY,
-            EmployeeRecord.Status.REJECTED,
-        ]
-    )
+
+    return employee_record.status in [
+        EmployeeRecord.Status.NEW,
+        EmployeeRecord.Status.READY,
+        EmployeeRecord.Status.REJECTED,
+    ]
 
 
 def siae_is_allowed(job_application, siae):
@@ -81,7 +84,13 @@ def check_permissions(request, job_application_id, check_profile=True):
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    job_application = JobApplication.objects.get(pk=job_application_id)
+    # 7 queries
+    job_application = JobApplication.objects.select_related(
+        "approval", "job_seeker", "job_seeker__jobseeker_profile"
+    ).get(pk=job_application_id)
+
+    # 9 queries
+    # job_application = JobApplication.objects.get(pk=job_application_id)
 
     if not (tunnel_step_is_allowed(job_application) and siae_is_allowed(job_application, siae)):
         raise PermissionDenied
@@ -145,21 +154,24 @@ def list(request, template_name="employee_record/list.html"):
     ]
 
     # Override defaut value (NEW status)
+    # See comment above on `employee_records_list` var
     if form.is_valid():
         status = form.cleaned_data["status"]
 
-    # See comment above on `employee_records_list` var
+    # Not needed every time (not pulled-up), and DRY here
+    base_query = EmployeeRecord.objects.select_related("job_application", "job_application__approval")
+
     if status == EmployeeRecord.Status.NEW:
         data = JobApplication.objects.eligible_as_employee_record(siae)
         employee_records_list = False
     elif status == EmployeeRecord.Status.READY:
-        data = EmployeeRecord.objects.ready_for_siae(siae)
+        data = base_query.ready_for_siae(siae)
     elif status == EmployeeRecord.Status.SENT:
-        data = EmployeeRecord.objects.sent_for_siae(siae)
+        data = base_query.sent_for_siae(siae)
     elif status == EmployeeRecord.Status.REJECTED:
         data = EmployeeRecord.objects.rejected_for_siae(siae)
     elif status == EmployeeRecord.Status.PROCESSED:
-        data = EmployeeRecord.objects.processed_for_siae(siae)
+        data = base_query.processed_for_siae(siae)
 
     if data:
         navigation_pages = pager(data, request.GET.get("page", 1), items_per_page=10)
@@ -359,7 +371,17 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    employee_record = get_object_or_404(EmployeeRecord, pk=employee_record_id)
+    query = EmployeeRecord.objects.select_related(
+        "financial_annex",
+        "job_application",
+        "job_application__approval",
+        "job_application__to_siae",
+        "job_application__job_seeker",
+        "job_application__job_seeker__jobseeker_profile",
+    )
+
+    employee_record = get_object_or_404(query, pk=employee_record_id)
+    # employee_record = get_object_or_404(EmployeeRecord, pk=employee_record_id)
     job_application = employee_record.job_application
 
     if not siae_is_allowed(job_application, siae):
