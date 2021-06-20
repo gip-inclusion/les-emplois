@@ -342,7 +342,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="Motifs de refus", max_length=30, choices=REFUSAL_REASON_CHOICES, blank=True
     )
 
-    hiring_start_at = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True)
+    hiring_start_at = models.DateField(verbose_name="Date de début du contrat", blank=True, null=True, db_index=True)
     hiring_end_at = models.DateField(verbose_name="Date prévisionnelle de fin du contrat", blank=True, null=True)
 
     hiring_without_approval = models.BooleanField(

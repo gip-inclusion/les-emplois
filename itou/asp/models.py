@@ -1,5 +1,6 @@
 import re
 
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
 from unidecode import unidecode
@@ -365,6 +366,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
 
     class Meta:
         verbose_name = "Commune"
+        indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
 
     @cached_property
     def department_code(self):
