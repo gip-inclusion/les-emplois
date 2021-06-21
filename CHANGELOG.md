@@ -1,5 +1,35 @@
 # Journal des modifications
 
+## [20] - 2021-06-17
+
+### Ajouté
+- Un formulaire de situation avant l'inscription d'un demandeur d'emploi
+- Table de liaison entre la table « Fiches de poste » et la table « Candidatures »
+- 4 nouvelles tables ASP dans Metabase
+- Message informatif sur la page de désactivation d'un membre
+- Commande pour générer le thème avec `git subtree`
+- Les employeurs voient la raison du refus d'un PASS IAE
+- Le formulaire d'ajout d'un CV s'affiche seulement si Javascript est activé
+- Automatisation d’une sauvegarde régulière de la base de données sur un autre serveur que celui de production
+- Possibilité d'importer un agrément Pôle Emploi afin de le prolonger ou le suspendre depuis la plateforme
+
+### Modifié
+- Les prescripteurs doivent confirmer les prolongations en transférant un e-mail au support
+- Remplacement de la fenêtre surgissante « Obtention d'un PASS IAE » par des boutons en bas du formulaire
+- Mise à jour des coordonnées géographiques d'Arles
+- Les prescripteurs peuvent de nouveau voir le motif et le message de refus des candidatures envoyées
+- Traitement des structures créées par le support (fin de l'immunité)
+- Renommage du script metabase `populate_metabase` en `populate_metabase_itou`
+- Simplification du script d'import des SIAE (abandon du _dry run_)
+- Mise à jour du bandeau de consentement aux cookies
+- Seuls les administrateurs peuvent modifier la fiche publique de leur établissement
+- Ajout et modification des réseaux sociaux
+- Refonte du moteur de recherche employeurs et prescripteurs (avec ajout de filtres)
+
+### Supprimé
+- Bouton « Tarte au citron » quand les cookies ont été acceptés
+- Suppression de l'adresse contact@ des notifications courriel concernant les PASS IAE
+
 ## [19] - 2021-06-04
 
 ### Ajouté

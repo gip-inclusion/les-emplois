@@ -35,23 +35,9 @@ class HtmlToPdf:
     ```
     """
 
-    @classmethod
-    def html_to_bytes(cls, html):
-        kwargs = {
-            "auth": ("api", settings.PDFSHIFT_API_KEY),
-            "json": {"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
-        }
-        url = f"{settings.PDFSHIFT_API_BASE_URL}/convert/pdf"
-        logger.warn("POST request to `%s`", url)
-        with httpx.stream("POST", url, **kwargs) as response:
-            response.raise_for_status()
-            result = io.BytesIO()
-            for chunk in response.iter_bytes(1024):
-                result.write(chunk)
-
-            return result.getvalue()
-
     def __init__(self, html, autoclose=True):
+        self.url = f"{settings.PDFSHIFT_API_BASE_URL}/convert/pdf"
+        logger.warning("POST request to `%s`", self.url)  # Count number of calls to PDFShift.
         self.bytes = self.html_to_bytes(html)
         self.file = io.BytesIO()
         self.autoclose = autoclose
@@ -62,12 +48,24 @@ class HtmlToPdf:
 
     def __exit__(self, *exc):
         self.file.seek(0)
-
         # Don't close the file when using this context manager with
         # FileResponse() as it does it on its own.
         if self.autoclose:
             self.file.close()
         return self
+
+    def html_to_bytes(self, html):
+        kwargs = {
+            "auth": ("api", settings.PDFSHIFT_API_KEY),
+            "json": {"source": html, "sandbox": settings.PDFSHIFT_SANDBOX_MODE},
+        }
+        with httpx.stream("POST", self.url, **kwargs) as response:
+            response.raise_for_status()
+            result = io.BytesIO()
+            for chunk in response.iter_bytes(1024):
+                result.write(chunk)
+
+            return result.getvalue()
 
 
 @dataclass
