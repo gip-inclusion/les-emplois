@@ -21,6 +21,29 @@ def validate_asp_batch_filename(value):
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
+    """
+    Queryset functions for EmployeeRecord model
+    """
+
+    def full_fetch(self):
+        """
+        Also fetch main employee record related objects:
+        - financial annex
+        - job application
+        - job seeker
+        - job seeker profile
+        """
+        return self.select_related(
+            "financial_annex",
+            "job_application",
+            "job_application__approval",
+            "job_application__to_siae",
+            "job_application__job_seeker",
+            "job_application__job_seeker__jobseeker_profile",
+        )
+
+    # Status filters
+
     def ready(self):
         """
         These FS are ready to to be sent to ASP
@@ -48,11 +71,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def processed_for_siae(self, siae):
         return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
 
-    def archived(self):
-        """
-        Archived employee records (completed and having a JSON archive)
-        """
-        return self.filter(status=EmployeeRecord.Status.ARCHIVED)
+    # Search queries
 
     def find_by_batch(self, filename, line_number):
         """
