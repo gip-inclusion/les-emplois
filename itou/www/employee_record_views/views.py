@@ -159,7 +159,7 @@ def list(request, template_name="employee_record/list.html"):
         status = form.cleaned_data["status"]
 
     # Not needed every time (not pulled-up), and DRY here
-    base_query = EmployeeRecord.objects.select_related("job_application", "job_application__approval")
+    base_query = EmployeeRecord.objects.full_fetch()
 
     if status == EmployeeRecord.Status.NEW:
         data = JobApplication.objects.eligible_as_employee_record(siae)
@@ -317,7 +317,11 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
 
     step = 4
 
-    employee_record = EmployeeRecord.objects.get(job_application=job_application)
+    employee_record = (
+        EmployeeRecord.objects.full_fetch()
+        .select_related("job_application__to_siae__convention")
+        .get(job_application=job_application)
+    )
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
@@ -344,7 +348,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
     _, job_application, _ = check_permissions(request, job_application_id)
 
     step = 5
-    employee_record = EmployeeRecord.objects.get(job_application=job_application)
+    employee_record = EmployeeRecord.objects.full_fetch().get(job_application=job_application)
 
     if request.method == "POST":
         if employee_record.status in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
@@ -371,17 +375,8 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     if not siae.can_use_employee_record:
         raise PermissionDenied
 
-    query = EmployeeRecord.objects.select_related(
-        "financial_annex",
-        "job_application",
-        "job_application__approval",
-        "job_application__to_siae",
-        "job_application__job_seeker",
-        "job_application__job_seeker__jobseeker_profile",
-    )
-
-    employee_record = get_object_or_404(query, pk=employee_record_id)
-    # employee_record = get_object_or_404(EmployeeRecord, pk=employee_record_id)
+    query_base = EmployeeRecord.objects.full_fetch()
+    employee_record = get_object_or_404(query_base, pk=employee_record_id)
     job_application = employee_record.job_application
 
     if not siae_is_allowed(job_application, siae):
