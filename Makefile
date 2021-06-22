@@ -155,3 +155,9 @@ postgres_backups_clean:
 postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump --clean --if-exists --format c --no-owner --no-privileges -d itou -t cities_city > /backups/cities.sql"
 	docker cp itou_postgres:/backups/cities.sql itou/fixtures/postgres/
+
+# Deployment
+# =============================================================================
+
+deploy_prod: deploy_prod.sh
+	./deploy_prod.sh
