@@ -333,17 +333,20 @@ class PrescriberType(models.TextChoices):
         return kinds.get(prescriber_kind, cls.UNKNOWN)
 
 
-class CommuneManager(models.Manager):
-    def get_queryset(self):
-        return PeriodQuerySet(self.model)
+# class CommuneManager(models.Manager):
+#    def get_queryset(self):
+#        return PeriodQuerySet(self.model)
+
+
+class CommuneQuerySet(PeriodQuerySet):
 
     def by_insee_code(self, insee_code):
         """
-        Lookup a Commune by INSEE code
+        Lookup a Commune objects by INSEE code
 
         May return several results if not used with PeriodQuerySet.current
         """
-        return self.get_queryset().filter(code=insee_code).first()
+        return self.filter(code=insee_code)
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
@@ -362,7 +365,7 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     code = models.CharField(max_length=5, verbose_name="Code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="Nom de la commune")
 
-    objects = CommuneManager()
+    objects = models.Manager.from_queryset(CommuneQuerySet)()
 
     class Meta:
         verbose_name = "Commune"

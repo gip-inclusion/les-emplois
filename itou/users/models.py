@@ -625,7 +625,7 @@ class JobSeekerProfile(models.Model):
 
         # Special field: Commune object contains both city name and INSEE code
         insee_code = result.get("insee_code")
-        self.hexa_commune = Commune.objects.by_insee_code(insee_code)
+        self.hexa_commune = Commune.objects.by_insee_code(insee_code).first()
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
