@@ -51,6 +51,7 @@ def can_create_employee_record(request, job_application_id=None):
         job_application = get_object_or_404(
             JobApplication.objects.select_related(
                 "approval",
+                "to_siae",
                 "job_seeker",
                 "job_seeker__jobseeker_profile",
             ),
