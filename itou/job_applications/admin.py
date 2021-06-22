@@ -50,6 +50,7 @@ class JobApplicationAdmin(admin.ModelAdmin):
         "approval_delivery_mode",
         "sender_prescriber_organization__is_authorized",
         "to_siae__department",
+        "created_from_pe_approval",
     )
     readonly_fields = (
         "created_at",
