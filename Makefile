@@ -169,5 +169,5 @@ postgres_dump_cities:
 # Deployment
 # =============================================================================
 
-deploy_prod: deploy_prod.sh
-	./deploy_prod.sh
+deploy_prod: scripts/deploy_prod.sh
+	./scripts/deploy_prod.sh

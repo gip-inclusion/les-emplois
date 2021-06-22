@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Ensure working directory in version branch clean
+# Ensure working directory is clean
 if ! git diff-index --quiet HEAD; then
   echo "Working directory not clean, please commit your changes first"
   exit
