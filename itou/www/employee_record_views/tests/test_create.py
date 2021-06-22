@@ -18,7 +18,7 @@ def get_sample_form_data(user):
         "last_name": user.last_name,
         "birthdate": user.birthdate.strftime("%d/%m/%Y"),
         "birth_country": 91,
-        "insee_commune_code": 62152,
+        "insee_commune_code": 67152,
     }
 
 
@@ -193,7 +193,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.assertEqual(200, response.status_code)
 
         # Set a "random" commune in France
-        data["insee_commune_code"] = 62152
+        data["insee_commune_code"] = 67152
         response = self.client.post(self.url, data=data)
         self.assertEqual(302, response.status_code)
 
