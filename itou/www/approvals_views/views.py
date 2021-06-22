@@ -314,7 +314,7 @@ def pe_approval_create(request, pe_approval_id):
     # If the PoleEmploiApproval has already been imported, it is not possible to import it again
     possible_matching_approval = Approval.objects.filter(number=pe_approval.number[:12]).first()
     if possible_matching_approval:
-        messages.info(request, "Cet agrément Pole Emploi a déja été importé.")
+        messages.info(request, "Cet agrément Pôle emploi a déja été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
         next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
@@ -348,7 +348,7 @@ def pe_approval_create(request, pe_approval_id):
         job_application.save()
 
     messages.success(
-        request, "L'agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
+        request, "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre."
     )
     next_url = reverse_lazy("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)

@@ -509,7 +509,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(
             str(messages[0]),
-            "L'agrément Pole Emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
+            "L'agrément Pôle emploi a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
         )
 
     def test_pe_approval_create_when_pole_emploi_approval_has_already_been_imported(self):
@@ -532,7 +532,7 @@ class PoleEmploiApprovalConversionIntoApprovalTest(TestCase):
         self.assertEqual(Approval.objects.count(), initial_approval_count)
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Cet agrément Pole Emploi a déja été importé.")
+        self.assertEqual(str(messages[0]), "Cet agrément Pôle emploi a déja été importé.")
 
     def test_pe_approval_create_from_existing_user_with_approval(self):
         """
