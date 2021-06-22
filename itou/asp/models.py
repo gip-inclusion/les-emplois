@@ -339,7 +339,6 @@ class PrescriberType(models.TextChoices):
 
 
 class CommuneQuerySet(PeriodQuerySet):
-
     def by_insee_code(self, insee_code):
         """
         Lookup a Commune objects by INSEE code

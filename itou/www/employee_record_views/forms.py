@@ -1,7 +1,7 @@
 from django import forms
 from django.core.validators import MinLengthValidator
-from django.urls import reverse_lazy
 from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.models import EmployeeRecord
