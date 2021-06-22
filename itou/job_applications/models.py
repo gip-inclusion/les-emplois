@@ -353,7 +353,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # This process is required following the end of the software allowing Pôle emploi to manage their approvals.
     # The process allows to convert a `PoleEmploiApproval` into an `Approval`.
     created_from_pe_approval = models.BooleanField(
-        default=False, verbose_name="Vrai si la candidature est importée depuis un agrément Pole Emploi"
+        default=False, verbose_name="Candidature créée lors de l'import d'un agrément Pole Emploi"
     )
 
     # Job applications sent to SIAEs subject to eligibility rules can obtain an
