@@ -571,10 +571,9 @@ class Suspension(models.Model):
         """
         if approval.last_old_suspension:
             return approval.last_old_suspension.end_at + relativedelta(days=1)
-        if approval.user.last_accepted_job_application.hiring_start_at:
-            return approval.user.last_accepted_job_application.hiring_start_at
-
-        return datetime.date.today()
+        if approval.user.last_accepted_job_application.created_from_pe_approval:
+            return datetime.date.today()
+        return approval.user.last_accepted_job_application.hiring_start_at
 
 
 class ProlongationQuerySet(models.QuerySet):
