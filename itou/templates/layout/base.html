@@ -292,10 +292,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://beta.gouv.fr/accessibilite/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Accessibilité : non conforme
-                                        {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
+                                    <a href="{% url 'accessibility' %}">Accessibilité (non conforme)</a>
                                 </li>
                                 <li>
                                     <a href="{% url 'releases:list' %}">Journal des modifications</a>
