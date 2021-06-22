@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import MinLengthValidator
 from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
 
 from itou.asp.models import Commune, RSAAllocation
 from itou.employee_record.models import EmployeeRecord
@@ -98,7 +99,8 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         commune_code = self.cleaned_data["insee_commune_code"]
 
         if commune_code:
-            self.cleaned_data["birth_place"] = Commune.objects.by_insee_code(commune_code)
+            commune = get_object_or_404(Commune.objects.current().by_insee_code(commune_code))
+            self.cleaned_data["birth_place"] = commune
 
     class Meta:
         model = User
