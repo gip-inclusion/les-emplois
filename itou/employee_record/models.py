@@ -469,7 +469,7 @@ class EmployeeRecordBatch:
     # Feedback file names end with this string
     FEEDBACK_FILE_SUFFIX = "_FichierRetour"
 
-    def __init__(self, employee_records, test_asp=False):
+    def __init__(self, employee_records):
         if employee_records and len(employee_records) > self.MAX_EMPLOYEE_RECORDS:
             raise ValidationError(
                 f"An upload batch can have no more than {self.MAX_EMPLOYEE_RECORDS} employee records"
@@ -479,7 +479,6 @@ class EmployeeRecordBatch:
         # they may have a value after download
         self.id = None
         self.message = None
-        self.test_asp = test_asp
 
         self.employee_records = employee_records
         self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
