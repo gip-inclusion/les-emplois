@@ -12,6 +12,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from itou.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.csv_export import generate_csv_export
 from itou.job_applications.factories import (
@@ -917,6 +918,31 @@ class JobApplicationWorkflowTest(TestCase):
         self.assertIn("Candidature acceptée", mail.outbox[0].subject)
         # Email sent to the proxy.
         self.assertIn("Candidature acceptée et votre avis sur les emplois de l'inclusion", mail.outbox[1].subject)
+
+    def test_accept_has_link_to_eligibility_diagnosis(self):
+        """
+        Given a job application for an SIAE subject to eligibility rules,
+        when accepting it, then the eligibility diagnosis is linked to it.
+        """
+        job_application = JobApplicationSentBySiaeFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            to_siae__kind=Siae.KIND_EI,
+        )
+
+        to_siae = job_application.to_siae
+        to_siae_staff_member = to_siae.members.first()
+        job_seeker = job_application.job_seeker
+
+        eligibility_diagnosis = EligibilityDiagnosisMadeBySiaeFactory(
+            job_seeker=job_seeker, author=to_siae_staff_member, author_siae=to_siae
+        )
+
+        # A valid Pôle emploi ID should trigger an automatic approval delivery.
+        self.assertNotEqual(job_seeker.pole_emploi_id, "")
+
+        job_application.accept(user=to_siae_staff_member)
+        self.assertTrue(job_application.to_siae.is_subject_to_eligibility_rules)
+        self.assertEqual(job_application.eligibility_diagnosis, eligibility_diagnosis)
 
     def test_refuse(self):
         user = JobSeekerFactory()
