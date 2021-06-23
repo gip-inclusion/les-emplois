@@ -257,6 +257,18 @@
 
                         <div class="col-sm-6">
                             <ul class="list-unstyled">
+                                {# Internal links. #}
+                                <li>
+                                    <a href="{% url 'stats:public_stats' %}">Statistiques, lexiques et indicateurs</a>
+                                </li>
+                                <li>
+                                    <a href="{% url 'accessibility' %}">Accessibilité (non conforme)</a>
+                                </li>
+                                {# Use `mb-*` to mark a visual separation between internal and external links. #}
+                                <li class="mb-3">
+                                    <a href="{% url 'releases:list' %}">Journal des modifications</a>
+                                </li>
+                                {# External links. #}
                                 <li>
                                     <a href="{{ ITOU_ASSISTANCE_URL }}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
                                         Besoin d'aide ?
@@ -266,11 +278,6 @@
                                     <a href="https://docs.google.com/forms/d/e/1FAIpQLSebmbvb4RGJOKy-ou5zR2eHWwFOiUlSJtCv_avrpp97HI4RGQ/viewform?ts=5da5a580" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
                                         Inscription Newsletter
                                         {% include "includes/icon.html" with icon="external-link" %}
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{% url 'stats:public_stats' %}">
-                                        Statistiques, lexiques et indicateurs
                                     </a>
                                 </li>
                                 <li>
@@ -291,15 +298,15 @@
                                         {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
+
                                 <li>
-                                    <a href="https://beta.gouv.fr/accessibilite/" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
-                                        Accessibilité : non conforme
+                                    <a href="https://stats.uptimerobot.com/JYJ6XHq6xY" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">
+                                        Disponibilité
                                         {% include "includes/icon.html" with icon="external-link" %}
                                     </a>
                                 </li>
-                                <li>
-                                    <a href="{% url 'releases:list' %}">Journal des modifications</a>
-                                </li>
+
+
                             </ul>
                         </div>
 
