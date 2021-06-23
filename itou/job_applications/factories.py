@@ -75,6 +75,7 @@ class JobApplicationSentBySiaeFactory(JobApplicationFactory):
     # Currently an Siae can only postulate for itself,
     # this is the default behavior here.
     sender_siae = factory.LazyAttribute(lambda obj: obj.to_siae)
+    sender = factory.LazyAttribute(lambda obj: obj.to_siae.members.first())
 
 
 class JobApplicationSentByPrescriberFactory(JobApplicationFactory):
@@ -89,14 +90,7 @@ class JobApplicationSentByPrescriberOrganizationFactory(JobApplicationFactory):
 
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
-
-    @factory.post_generation
-    def set_sender(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        self.sender = self.sender_prescriber_organization.members.first()
-        self.save()
+    sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
 class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplicationFactory):
@@ -104,14 +98,7 @@ class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplication
 
     sender_kind = models.JobApplication.SENDER_KIND_PRESCRIBER
     sender_prescriber_organization = factory.SubFactory(AuthorizedPrescriberOrganizationWithMembershipFactory)
-
-    @factory.post_generation
-    def set_sender(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        self.sender = self.sender_prescriber_organization.members.first()
-        self.save()
+    sender = factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first())
 
 
 class JobApplicationWithApprovalFactory(JobApplicationSentByPrescriberFactory):
