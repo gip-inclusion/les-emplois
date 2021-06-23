@@ -12,7 +12,7 @@
     {% bootstrap_field form.education_level %}
     {% bootstrap_field form.resourceless %}
 
-    <div data-toggle="collapse" data-target="#collapse_pole_emploi">
+    <div role="button" data-toggle="collapse" data-target="#collapse_pole_emploi" aria-controls="#collapse_pole_emploi">
         {% bootstrap_field form.pole_emploi %}
     </div>
 
@@ -21,7 +21,7 @@
         {% bootstrap_field form.pole_emploi_since %}
     </div>
 
-    <div data-toggle="collapse" data-target="#collapse_unemployed">
+    <div role="button" data-toggle="collapse" data-target="#collapse_unemployed" aria-controls="#collapse_unemployed">
         {% bootstrap_field form.unemployed %}
     </div>
 
@@ -32,7 +32,7 @@
     {% bootstrap_field form.rqth_employee %}
     {% bootstrap_field form.oeth_employee %}
 
-    <div data-toggle="collapse" data-target="#collapse_rsa_allocation">
+    <div role="button" data-toggle="collapse" data-target="#collapse_rsa_allocation" aria-controls="#collapse_rsa_allocation">
         {% bootstrap_field form.rsa_allocation %}
     </div>
 
@@ -41,7 +41,7 @@
         {% bootstrap_field form.rsa_allocation_since %}
     </div>
 
-    <div data-toggle="collapse" data-target="#collapse_ass_allocation">
+    <div role="button" data-toggle="collapse" data-target="#collapse_ass_allocation" aria-controls="#collapse_ass_allocation">
         {% bootstrap_field form.ass_allocation %}
     </div>
 
@@ -49,7 +49,7 @@
         {% bootstrap_field form.ass_allocation_since %}
     </div>
     
-    <div data-toggle="collapse" data-target="#collapse_aah_allocation">
+    <div role="button" data-toggle="collapse" data-target="#collapse_aah_allocation" aria-controls="#collapse_aah_allocation">
         {% bootstrap_field form.aah_allocation %}
     </div>
     
