@@ -45,8 +45,6 @@ STEPS = [
     ),
 ]
 
-# Permission helpers
-
 
 # Views
 
@@ -308,7 +306,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         raise PermissionDenied
 
     step = 5
-    employee_record = EmployeeRecord.objects.full_fetch().get(job_application=job_application)
+    employee_record = get_object_or_404(EmployeeRecord.objects.full_fetch(), job_application=job_application)
 
     if request.method == "POST":
         if employee_record.status in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
@@ -316,7 +314,6 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
         return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
 
     context = {
-        "job_application": job_application,
         "employee_record": employee_record,
         "steps": STEPS,
         "step": step,
