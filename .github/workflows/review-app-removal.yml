@@ -11,8 +11,8 @@ env:
   CLEVER_CLI: clever-tools-latest_linux/clever
   CLEVER_TOKEN: ${{ secrets.CLEVER_TOKEN }}
   CLEVER_SECRET: ${{ secrets.CLEVER_SECRET }}
-  ORGANIZATION_NAME: Itou
-  DB_ADDON: c1-review-apps-databases-DO-NOT-DELETE
+  ORGANIZATION_NAME: ${{ secrets.CLEVER_ORGANIZATION_NAME }}
+  DB_ADDON: ${{ secrets.CLEVER_REVIEW_APPS_DATABASE_ADDON }}
   BRANCH: ${{ github.head_ref }}
   POSTGRESQL_ADDON_URI: ${{ secrets.POSTGRESQL_ADDON_URI }}
 
