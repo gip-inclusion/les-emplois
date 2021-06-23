@@ -14,10 +14,10 @@
         </p>
     </div>
 
-    <form method="POST" action="{% url "employee_record_views:create_step_5" job_application.id %}" class="js-prevent-multiple-submit">
+    <form method="POST" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">
         {% csrf_token %}
         {% buttons %}
-            <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create_step_4" job_application.id %}">Précédent</a>
+            <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create_step_4" employee_record.job_application.id %}">Précédent</a>
             <button type="submit" class="btn btn-primary">Valider la fiche salarié</button>
         {% endbuttons %}
     </form>
