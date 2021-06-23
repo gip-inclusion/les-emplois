@@ -6,12 +6,21 @@
 
 {% block title %}Fiches salarié ASP - {{ current_siae.display_name }}{{ block.super }}{% endblock %}
 
+{% block script %}
+    {{ block.super }}
+    <script>
+    $("#status-filter-form-group :input").change(function() {
+        $("#status-filter-form").submit();
+    });
+    </script>
+{% endblock %}
+
 {% block content %}
 
 <h1>Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
 
 <div class="ml-0 mt-3">
-    <form method="get" class="form">
+    <form method="get" class="form" id="status-filter-form">
         <div class="row">
             <div class="col-sm-3">
                 <div class="card-deck">
@@ -21,8 +30,7 @@
                         </div>
                         <div class="card-body">
                             <p class="text-muted"><b>Par statut</b></p>
-
-                            <div class="container">
+                            <div class="container form-group" id="status-filter-form-group">
                             {% for status, badge in form.status|zip:badges %}
                                 {% if badge.0 != 0 %}
                                     <div class="row">
@@ -36,12 +44,6 @@
                                 {% endif %}
                             {% endfor %}
                             </div>
-
-                        </div>
-                        <div class="card-footer pb-0 text-center">
-                            {% buttons %}
-                                <button type="submit" class="btn btn-primary">Appliquer</button>
-                            {% endbuttons %}
                         </div>
                     </div>
                 </div>
