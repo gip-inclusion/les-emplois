@@ -81,5 +81,4 @@ def communes_autocomplete(request):
             for commune in communes[:12]
         ]
 
-    return HttpResponse(json.dumps(communes), "application/json")
->>>>>>> 067aeda6 (Rebasing fix for autocomplete)
+    return JsonResponse(communes, safe=False)
