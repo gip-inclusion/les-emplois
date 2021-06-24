@@ -227,7 +227,7 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
 
     if request.method == "POST" and form.is_valid():
 
-        next_url = reverse("signup:prescriber_choose_org")
+        next_url = reverse("signup:prescriber_siren")
 
         if form.cleaned_data["is_pole_emploi"]:
             next_url = reverse("signup:prescriber_pole_emploi_safir_code")
@@ -235,6 +235,38 @@ def prescriber_is_pole_emploi(request, template_name="signup/prescriber_is_pole_
         return HttpResponseRedirect(next_url)
 
     context = {"form": form}
+    return render(request, template_name, context)
+
+
+@valid_prescriber_signup_session_required
+@push_url_in_history(settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
+def prescriber_siren(request, template_name="signup/prescriber_siren.html"):
+    """
+    Try to find pre-existing prescriber's organisation from a given SIREN.
+    """
+
+    prescribers_with_members = None
+
+    form = forms.PrescriberSirenForm(data=request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+
+        session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
+        session_data.update({"siren": form.cleaned_data["siren"]})
+        request.session.modified = True
+
+        prescribers_with_members = PrescriberOrganization.objects.filter(
+            siret__startswith=form.cleaned_data["siren"], department=form.cleaned_data["department"]
+        ).exclude(members=None)
+
+        if not prescribers_with_members:
+            return HttpResponseRedirect(reverse("signup:prescriber_choose_org"))
+
+    context = {
+        "prescribers_with_members": prescribers_with_members,
+        "form": form,
+        "prev_url": get_prev_url_from_history(request, settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
+    }
     return render(request, template_name, context)
 
 
@@ -413,7 +445,8 @@ def prescriber_siret(request, template_name="signup/prescriber_siret.html"):
 
     session_data = request.session[settings.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]
 
-    form = forms.PrescriberSiretForm(data=request.POST or None, kind=session_data.get("kind"))
+    initial_data = {"siret": session_data["siren"]} if "siren" in session_data else None
+    form = forms.PrescriberSiretForm(data=request.POST or None, initial=initial_data, kind=session_data.get("kind"))
 
     if request.method == "POST" and form.is_valid():
         session_data["prescriber_org_data"] = form.org_data
