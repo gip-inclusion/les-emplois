@@ -121,11 +121,15 @@ psql_itou:
 psql_root:
 	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U postgres
 
-# Write query results to a CSV file
+# Write query results to a CSV file.
+# --
+# make psql_to_csv FILEPATH=path/to/script.sql
+# make psql_to_csv FILEPATH=path/to/script.sql EXPORTNAME=extract.csv
 psql_to_csv:
 	docker cp $(FILEPATH) itou_postgres:/script.sql
-	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou --csv -f /script.sql -o export.csv
-	docker cp itou_postgres:/export.csv exports/
+	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou --csv -f /script.sql -o /export.csv
+	docker cp itou_postgres:/export.csv exports/$(EXPORTNAME)
+	docker exec -ti itou_postgres rm /script.sql /export.csv
 
 # Postgres (backup / restore).
 # Inspired by:
