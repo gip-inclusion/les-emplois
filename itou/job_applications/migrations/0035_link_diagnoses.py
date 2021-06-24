@@ -1,8 +1,46 @@
+"""
+After this migration (as of 2021-06-24) there are 287 cases for which
+no diagnosis is found. Here is a way to retrieve the job applications
+concerned:
+
+# Hired without PASS IAE but no diagnosis => 254
+# ----------------------------------------------
+
+JobApplication.objects.filter(
+    state="accepted",
+    to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+    approval__isnull=True,
+    eligibility_diagnosis__isnull=True,
+    hiring_without_approval=True,
+).count()
+
+# Hired with PASS IAE but no diagnosis => 1
+# -----------------------------------------
+
+JobApplication.objects.filter(
+    state="accepted",
+    to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+    approval__isnull=True,
+    eligibility_diagnosis__isnull=True,
+    hiring_without_approval=False,
+).count()
+
+# PASS IAE that originates from itou (99999…) without diagnosis => 32
+# -------------------------------------------------------------------
+
+JobApplication.objects.filter(
+    state="accepted",
+    to_siae__kind__in=Siae.ELIGIBILITY_REQUIRED_KINDS,
+    approval__number__startswith=Approval.ASP_ITOU_PREFIX,
+    eligibility_diagnosis__isnull=True,
+    hiring_without_approval=False,
+).count()
+"""
 from django.db import migrations
 
 # Use imports (application defined models) instead of `apps.get_model()`
 # (migration defined models). This can bite us later e.g. when running
-# tests in a fresh database that runs all migrations again and again).
+# tests in a fresh database that runs all migrations again and again.
 # However, we really need access to Managers, QuerySets and properties.
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
@@ -13,9 +51,10 @@ def move_data_forward(apps, schema_editor):
     Link eligibility diagnoses to job applications.
     """
 
-    # I'm still asking myself if a data migration is really the best way.
+    print("\n")
     print("-" * 80)
-    print("This data migration will take a bunch of minutes on a production database.")
+    print("Warning: this data migration will take a bunch of minutes on a production database.")
+    print("-" * 80)
 
     job_applications_qs = (
         JobApplication.objects.filter(state="accepted")
