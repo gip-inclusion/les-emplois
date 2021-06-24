@@ -57,6 +57,8 @@ urlpatterns = [
     path("approvals/", include("itou.www.approvals_views.urls")),
     path("autocomplete/", include("itou.www.autocomplete.urls")),
     path("dashboard/", include("itou.www.dashboard.urls")),
+    # Disabled feature / endpoint: uncomment at release
+    # path("employee_record/", include("itou.www.employee_record_views.urls")),
     path("invitations/", include("itou.www.invitations_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),
     path("search/", include("itou.www.search.urls")),
@@ -65,7 +67,6 @@ urlpatterns = [
     path("stats/", include("itou.www.stats.urls")),
     path("versions/", include("itou.www.releases.urls")),
     path("welcoming_tour/", include("itou.www.welcoming_tour.urls")),
-    path("employee_record/", include("itou.www.employee_record_views.urls")),
     # Static pages.
     path("accessibility/", TemplateView.as_view(template_name="static/accessibility.html"), name="accessibility"),
     # Errors pages.
