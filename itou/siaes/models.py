@@ -66,12 +66,14 @@ class SiaeQuerySet(models.QuerySet):
         from itou.job_applications.models import JobApplication
 
         past_dt = timezone.now() - timezone.timedelta(days=30)
-        count = Count("job_applications_received", filter=Q(job_applications_received__created_at__gte=past_dt))
+        count = Count(
+            "job_applications_received", filter=Q(job_applications_received__created_at__gte=past_dt), distinct=True
+        )
 
         return self.annotate(count_recent_received_job_apps=count)
 
     def with_count_active_job_descriptions(self):
-        count = Count("job_description_through", filter=Q(job_description_through__is_active=True))
+        count = Count("job_description_through", filter=Q(job_description_through__is_active=True), distinct=True)
         return self.annotate(count_active_job_descriptions=count)
 
     def with_job_app_score(self):
@@ -81,24 +83,10 @@ class SiaeQuerySet(models.QuerySet):
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
             .annotate(
-                job_app_score_division=Cast(
+                job_app_score=Cast(
                     count_recent_received_job_apps / count_active_job_descriptions, output_field=FloatField()
                 )
             )
-            .annotate(
-                job_app_score_multiplication=Cast(
-                    count_recent_received_job_apps * count_active_job_descriptions, output_field=FloatField()
-                )
-            )
-            .annotate(
-                job_app_score_addition=Cast(
-                    count_recent_received_job_apps + count_active_job_descriptions, output_field=FloatField()
-                )
-            )
-            .annotate(
-                job_app_score_addition_f=F("count_recent_received_job_apps") + F("count_active_job_descriptions")
-            )
-            .annotate(job_app_score_simple=F("count_recent_received_job_apps"))
         )
 
     def add_shuffled_rank(self):

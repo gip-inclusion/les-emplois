@@ -253,11 +253,6 @@ class SiaeQuerySetTest(TestCase):
             Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
         )
         self.assertEqual(recent_job_apps, 3)
-
-        import ipdb
-
-        ipdb.set_trace()
-
         self.assertEqual(expected_score, result.job_app_score)
 
     def test_with_count_active_job_descriptions(self):
