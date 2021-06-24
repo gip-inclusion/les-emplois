@@ -121,6 +121,16 @@ psql_itou:
 psql_root:
 	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U postgres
 
+# Write query results to a CSV file.
+# --
+# make psql_to_csv FILEPATH=path/to/script.sql
+# make psql_to_csv FILEPATH=path/to/script.sql EXPORTNAME=extract.csv
+psql_to_csv:
+	docker cp $(FILEPATH) itou_postgres:/script.sql
+	docker exec -ti -e PGPASSWORD=password itou_postgres psql -U itou -d itou --csv -f /script.sql -o /export.csv
+	docker cp itou_postgres:/export.csv exports/$(EXPORTNAME)
+	docker exec -ti itou_postgres rm /script.sql /export.csv
+
 # Postgres (backup / restore).
 # Inspired by:
 # https://cookiecutter-django.readthedocs.io/en/latest/docker-postgres-backups.html
@@ -155,3 +165,9 @@ postgres_backups_clean:
 postgres_dump_cities:
 	docker exec -ti itou_postgres bash -c "pg_dump --clean --if-exists --format c --no-owner --no-privileges -d itou -t cities_city > /backups/cities.sql"
 	docker cp itou_postgres:/backups/cities.sql itou/fixtures/postgres/
+
+# Deployment
+# =============================================================================
+
+deploy_prod: scripts/deploy_prod.sh
+	./scripts/deploy_prod.sh
