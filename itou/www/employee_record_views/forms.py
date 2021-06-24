@@ -1,6 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
-from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 
 from itou.asp.models import Commune, RSAAllocation
@@ -85,13 +85,20 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         )
         self.fields["birthdate"].input_formats = [DatePickerField.DATE_FORMAT]
 
-        if hasattr(self, "instance"):
-            # Init for with ASP commune
-            if self.instance.birth_place:
-                self.initial[
-                    "insee_commune"
-                ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
-                self.initial["insee_commune_code"] = self.instance.birth_place.code
+        # Init ASP commune
+        if self.instance.birth_place:
+            self.initial[
+                "insee_commune"
+            ] = f"{self.instance.birth_place.name} ({self.instance.birth_place.department_code})"
+            self.initial["insee_commune_code"] = self.instance.birth_place.code
+
+    def clean_insee_commune_code(self):
+        commune_code = self.cleaned_data["insee_commune_code"]
+
+        if commune_code and not Commune.objects.current().by_insee_code(commune_code).exists():
+            raise ValidationError("Cette commune n'existe pas ou n'est pas référencée")
+
+        return commune_code
 
     def clean(self):
         super().clean()
@@ -99,8 +106,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         commune_code = self.cleaned_data["insee_commune_code"]
 
         if commune_code:
-            commune = get_object_or_404(Commune.objects.current().by_insee_code(commune_code))
-            self.cleaned_data["birth_place"] = commune
+            self.cleaned_data["birth_place"] = Commune.objects.current().by_insee_code(commune_code).first()
 
     class Meta:
         model = User

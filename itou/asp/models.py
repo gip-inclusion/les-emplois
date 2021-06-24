@@ -333,11 +333,6 @@ class PrescriberType(models.TextChoices):
         return kinds.get(prescriber_kind, cls.UNKNOWN)
 
 
-# class CommuneManager(models.Manager):
-#    def get_queryset(self):
-#        return PeriodQuerySet(self.model)
-
-
 class CommuneQuerySet(PeriodQuerySet):
     def by_insee_code(self, insee_code):
         """
