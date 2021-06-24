@@ -1,10 +1,12 @@
+from datetime import timedelta
 from unittest import mock
 
 from django.conf import settings
 from django.core import mail
 from django.test import RequestFactory, TestCase
+from django.utils import timezone
 
-from itou.job_applications.factories import JobApplicationFactory
+from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentBySiaeFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
@@ -219,6 +221,59 @@ class SiaeQuerySetTest(TestCase):
 
         first_job_description = siae_result.job_description_through.first()
         self.assertTrue(hasattr(first_job_description, "is_popular"))
+
+    def test_with_count_recent_received_job_applications(self):
+        siae = SiaeFactory()
+        model = JobApplicationFactory._meta.model
+        old_date = timezone.now() - timedelta(weeks=model.WEEKS_BEFORE_CONSIDERED_OLD, days=1)
+        JobApplicationFactory(to_siae=siae, created_at=old_date)
+
+        expected = 3
+        for _ in range(expected):
+            JobApplicationFactory(to_siae=siae)
+
+        result = Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk)
+
+        self.assertEqual(expected, result.count_recent_received_job_apps)
+
+    def test_with_job_app_score(self):
+        siae = SiaeWithJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+        selected_job = siae.job_description_through.first()
+        JobApplicationFactory(to_siae=siae)
+        JobApplicationFactory(to_siae=siae)
+
+        expected_score = siae.job_applications_received.count() / siae.job_description_through.count()
+        result = Siae.objects.with_job_app_score().get(pk=siae.pk)
+
+        active_job_descriptions = (
+            Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk).count_active_job_descriptions
+        )
+        self.assertEqual(active_job_descriptions, 4)
+        recent_job_apps = (
+            Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
+        )
+        self.assertEqual(recent_job_apps, 2)
+        self.assertEqual(expected_score, result.job_app_score)
+
+    def test_with_job_app_score_no_job_description(self):
+        siae = SiaeFactory()
+        JobApplicationFactory(to_siae=siae)
+        JobApplicationFactory(to_siae=siae)
+
+        expected_score = None
+        result = Siae.objects.with_job_app_score().get(pk=siae.pk)
+
+        self.assertEqual(expected_score, result.job_app_score)
+
+    def test_with_count_active_job_descriptions(self):
+        siae = SiaeWithJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
+        job_descriptions = siae.job_description_through.all()[:3]
+        for job_description in job_descriptions:
+            job_description.is_active = False
+        SiaeJobDescription.objects.bulk_update(job_descriptions, ["is_active"])
+        result = Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk)
+
+        self.assertEqual(1, result.count_active_job_descriptions)
 
 
 class SiaeJobDescriptionQuerySetTest(TestCase):
