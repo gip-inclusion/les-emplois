@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_decode
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siaes.models import Siae, SiaeMembership
 from itou.users.models import User
+from itou.utils.address.departments import DEPARTMENTS
 from itou.utils.apis.api_entreprise import EtablissementAPI
 from itou.utils.apis.geocoding import get_geocoding_data
 from itou.utils.password_validation import CnilCompositionPasswordValidator
@@ -221,6 +222,22 @@ class PrescriberIsPoleEmploiForm(forms.Form):
         choices=IS_POLE_EMPLOI_CHOICES,
         widget=forms.RadioSelect,
         coerce=int,
+    )
+
+
+class PrescriberSirenForm(forms.Form):
+
+    siren = forms.CharField(
+        label="Numéro SIREN de votre organisation",
+        min_length=9,
+        max_length=9,
+        validators=[validate_siren],
+        help_text="Le numéro SIREN contient 9 chiffres.",
+    )
+
+    department = forms.ChoiceField(
+        label="Département",
+        choices=DEPARTMENTS.items(),
     )
 
 
