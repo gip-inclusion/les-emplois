@@ -275,8 +275,8 @@ class NewEmployeeRecordStep4(forms.Form):
     select a valid financial annex
     """
 
-    financial_annex = forms.ChoiceField(
-        choices=[],
+    financial_annex = forms.ModelChoiceField(
+        queryset=None,
         label="Annexe financière",
         help_text="Vous devez rattacher la fiche salarié à une annexe financière validée ou provisoire",
     )
@@ -288,14 +288,11 @@ class NewEmployeeRecordStep4(forms.Form):
 
         # Fetch active financial annexes for the SIAE
         convention = employee_record.job_application.to_siae.convention
-        financial_annexes = convention.financial_annexes.filter(state__in=SiaeFinancialAnnex.STATES_ACTIVE)
-
-        choices = [(annex.number, annex.number) for annex in financial_annexes]
-        self.fields["financial_annex"].choices = choices
+        self.fields["financial_annex"].queryset = convention.financial_annexes.filter(
+            state__in=SiaeFinancialAnnex.STATES_ACTIVE
+        )
 
     def clean(self):
         super().clean()
 
-        self.employee_record.financial_annex = SiaeFinancialAnnex.objects.get(
-            number=self.cleaned_data["financial_annex"]
-        )
+        self.employee_record.financial_annex = self.cleaned_data["financial_annex"]
