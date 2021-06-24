@@ -61,7 +61,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             districts += request.GET.getlist(f"districts_{department_with_district}")
 
         siaes = (
-            siaes_step_1.add_shuffled_rank()
+            siaes_step_1.with_job_app_score()
             .annotate(_total_active_members=Count("members", filter=Q(members__is_active=True)))
             # Convert km to m (injected in SQL query)
             .annotate(distance=Distance("coords", city.coords) / 1000)
@@ -89,7 +89,7 @@ def search_siaes_results(request, template_name="search/siaes_search_results.htm
             # 4) not has_active_members and block_job_applications
             # This group is supposed to be empty. But itou staff may have
             # detached members from their siae so it could still happen.
-            .order_by("-has_active_members", "block_job_applications", "shuffled_rank")
+            .order_by("-has_active_members", "block_job_applications", "job_app_score")
         )
 
         if kinds:
