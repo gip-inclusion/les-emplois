@@ -75,12 +75,30 @@ class SiaeQuerySet(models.QuerySet):
         return self.annotate(count_active_job_descriptions=count)
 
     def with_job_app_score(self):
-        count_recent_received_job_apps = Cast(F("count_recent_received_job_apps"), FloatField())
-        count_active_job_descriptions = Cast(F("count_active_job_descriptions"), FloatField())
+        count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=FloatField())
+        count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=FloatField())
         return (
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
-            .annotate(job_app_score=Cast(count_recent_received_job_apps / count_active_job_descriptions, FloatField()))
+            .annotate(
+                job_app_score_division=Cast(
+                    count_recent_received_job_apps / count_active_job_descriptions, output_field=FloatField()
+                )
+            )
+            .annotate(
+                job_app_score_multiplication=Cast(
+                    count_recent_received_job_apps * count_active_job_descriptions, output_field=FloatField()
+                )
+            )
+            .annotate(
+                job_app_score_addition=Cast(
+                    count_recent_received_job_apps + count_active_job_descriptions, output_field=FloatField()
+                )
+            )
+            .annotate(
+                job_app_score_addition_f=F("count_recent_received_job_apps") + F("count_active_job_descriptions")
+            )
+            .annotate(job_app_score_simple=F("count_recent_received_job_apps"))
         )
 
     def add_shuffled_rank(self):

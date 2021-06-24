@@ -240,6 +240,7 @@ class SiaeQuerySetTest(TestCase):
         selected_job = siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
+        JobApplicationFactory(to_siae=siae)
 
         expected_score = siae.job_applications_received.count() / siae.job_description_through.count()
         result = Siae.objects.with_job_app_score().get(pk=siae.pk)
@@ -247,9 +248,11 @@ class SiaeQuerySetTest(TestCase):
         active_job_descriptions = (
             Siae.objects.with_count_active_job_descriptions().get(pk=siae.pk).count_active_job_descriptions
         )
+        self.assertEqual(active_job_descriptions, 4)
         recent_job_apps = (
             Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
         )
+        self.assertEqual(recent_job_apps, 3)
 
         import ipdb
 
