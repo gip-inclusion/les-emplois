@@ -15,7 +15,7 @@ git checkout master
 git pull origin master
 git checkout master_clever 
 git pull origin master_clever 
-git merge master --no-edit
+git merge master --no-edit --no-ff
 git push origin master_clever 
 
 # When we are done, we want to restore the initial state
