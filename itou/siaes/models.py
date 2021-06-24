@@ -4,7 +4,8 @@ import random
 from django.conf import settings
 from django.contrib.gis.measure import D
 from django.db import models
-from django.db.models import BooleanField, Case, Count, F, Prefetch, Q, When
+from django.db.models import BooleanField, Case, Count, F, FloatField, Prefetch, Q, When
+from django.db.models.functions import Cast
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_bytes
@@ -60,6 +61,35 @@ class SiaeQuerySet(models.QuerySet):
         if user.is_superuser:
             return self
         return self.filter(members=user, members__is_active=True)
+
+    def with_count_recent_received_job_apps(self):
+        from itou.job_applications.models import JobApplication
+
+        past_dt = timezone.now() - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
+        count = Count(
+            "job_applications_received", filter=Q(job_applications_received__created_at__gte=past_dt), distinct=True
+        )
+
+        return self.annotate(count_recent_received_job_apps=count)
+
+    def with_count_active_job_descriptions(self):
+        count = Count("job_description_through", filter=Q(job_description_through__is_active=True), distinct=True)
+        return self.annotate(count_active_job_descriptions=count)
+
+    def with_job_app_score(self):
+        count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=FloatField())
+        count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=FloatField())
+        get_score = Cast(count_recent_received_job_apps / count_active_job_descriptions, output_field=FloatField())
+        return (
+            self.with_count_recent_received_job_apps()
+            .with_count_active_job_descriptions()
+            .annotate(
+                job_app_score=Case(
+                    When(count_active_job_descriptions__gt=0, then=get_score),
+                    When(count_active_job_descriptions=0, then=None),
+                )
+            )
+        )
 
     def add_shuffled_rank(self):
         """
