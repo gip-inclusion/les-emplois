@@ -341,10 +341,6 @@ def prescriber_choose_kind(request, template_name="signup/prescriber_choose_kind
             kind = PrescriberOrganization.Kind.OTHER.value
             next_url = reverse("signup:prescriber_siret")
 
-        elif prescriber_kind == form.KIND_SOLO:
-            # Go to sign up screen without organization.
-            next_url = reverse("signup:prescriber_user")
-
         session_data.update(
             {
                 "authorization_status": authorization_status,
