@@ -459,9 +459,9 @@ METABASE_SITE_URL = "https://stats.inclusion.beta.gouv.fr"
 METABASE_SECRET_KEY = os.environ.get("METABASE_SECRET_KEY", "")
 
 # Metabase embedded dashboard IDs
-PUBLIC_STATS_DASHBOARD_ID = 34
-ADVANCED_STATS_DASHBOARD_ID = 43
-DIRECCTE_STATS_DASHBOARD_ID = 36
+PUBLIC_BASIC_STATS_DASHBOARD_ID = 34
+PUBLIC_ADVANCED_STATS_DASHBOARD_ID = 43
+VIP_STATS_DASHBOARD_ID = 36
 
 # Huey / async
 # Workers are run in prod via `CC_WORKER_COMMAND = django-admin run_huey`.

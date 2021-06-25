@@ -262,6 +262,14 @@ class User(AbstractUser, AddressMixin):
         """
         return self.is_siae_staff and self.siaemembership_set.filter(is_active=True).exists()
 
+    @property
+    def can_view_stats_dashboard_widget(self):
+        return self.can_view_stats_vip
+
+    @property
+    def can_view_stats_vip(self):
+        return self.is_stats_vip or self.is_superuser
+
     @cached_property
     def last_accepted_job_application(self):
         if not self.is_job_seeker:
