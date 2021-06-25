@@ -13,7 +13,11 @@ from django.utils.http import urlencode
 
 from itou.cities.factories import create_test_cities
 from itou.cities.models import City
-from itou.prescribers.factories import PrescriberOrganizationFactory, PrescriberPoleEmploiFactory
+from itou.prescribers.factories import (
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWithMembershipFactory,
+    PrescriberPoleEmploiFactory,
+)
 from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
 from itou.siaes.models import Siae
@@ -407,10 +411,21 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siren")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SIREN number and department
+
+        post_data = {
+            "siren": siret[:9],
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+        # Step 3: ask the user to choose the organization he's working for in a pre-existing list.
 
         post_data = {
             "kind": PrescriberOrganization.Kind.CAP_EMPLOI.value,
@@ -420,7 +435,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user his SIRET number.
+        # Step 4: ask the user his SIRET number.
 
         post_data = {
             "siret": siret,
@@ -432,7 +447,7 @@ class PrescriberSignupTest(TestCase):
         mock_api_entreprise.assert_called_once()
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 4: user info.
+        # Step 5: user info.
 
         password = "!*p4ssw0rd123-"
         post_data = {
@@ -524,10 +539,21 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siren")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SIREN number and department
+
+        post_data = {
+            "siren": siret[:9],
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+        # Step 3: ask the user to choose the organization he's working for in a pre-existing list.
 
         post_data = {
             "kind": PrescriberOrganization.Kind.OTHER.value,
@@ -537,7 +563,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user his kind of prescriber.
+        # Step 4: ask the user his kind of prescriber.
         post_data = {
             "kind": PrescriberChooseKindForm.KIND_AUTHORIZED_ORG,
         }
@@ -546,7 +572,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_confirm_authorization")
         self.assertRedirects(response, url)
 
-        # Step 4: ask the user to confirm the "authorized" character of his organization.
+        # Step 5: ask the user to confirm the "authorized" character of his organization.
 
         post_data = {
             "confirm_authorization": 1,
@@ -556,7 +582,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 5: ask the user his SIRET number.
+        # Step 6: ask the user his SIRET number.
 
         post_data = {
             "siret": siret,
@@ -568,7 +594,7 @@ class PrescriberSignupTest(TestCase):
         mock_api_entreprise.assert_called_once()
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 6: user info.
+        # Step 7: user info.
 
         password = "!*p4ssw0rd123-"
         post_data = {
@@ -635,10 +661,21 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siren")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SIREN number and department
+
+        post_data = {
+            "siren": siret[:9],
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
         url = reverse("signup:prescriber_choose_org")
         self.assertRedirects(response, url)
 
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+        # Step 3: ask the user to choose the organization he's working for in a pre-existing list.
 
         post_data = {
             "kind": PrescriberOrganization.Kind.OTHER.value,
@@ -648,7 +685,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_choose_kind")
         self.assertRedirects(response, url)
 
-        # Step 3: ask the user his kind of prescriber.
+        # Step 4: ask the user his kind of prescriber.
 
         post_data = {
             "kind": PrescriberChooseKindForm.KIND_UNAUTHORIZED_ORG,
@@ -658,7 +695,7 @@ class PrescriberSignupTest(TestCase):
         url = reverse("signup:prescriber_siret")
         self.assertRedirects(response, url)
 
-        # Step 4: ask the user his SIRET number.
+        # Step 5: ask the user his SIRET number.
 
         post_data = {
             "siret": siret,
@@ -670,7 +707,7 @@ class PrescriberSignupTest(TestCase):
         mock_api_entreprise.assert_called_once()
         mock_call_ban_geocoding_api.assert_called_once()
 
-        # Step 5: user info.
+        # Step 6: user info.
 
         password = "!*p4ssw0rd123-"
         post_data = {
@@ -712,6 +749,120 @@ class PrescriberSignupTest(TestCase):
         subject = mail.outbox[0].subject
         self.assertIn("Confirmez votre adresse e-mail", subject)
 
+    def test_create_user_prescriber_with_existing_siren_other_department(self):
+        """
+        Test the creation of a user of type prescriber with existing SIREN but in an other department
+        """
+
+        siret = "26570134200148"
+
+        # PrescriberOrganizationWithMembershipFactory
+        existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
+            siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="01"
+        )
+        existing_org_with_siret.save()
+
+        # Step 1: Does the user work  for PE?
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 0,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siren")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SIREN number and department
+
+        post_data = {
+            "siren": siret[:9],
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_choose_org")
+        self.assertRedirects(response, url)
+
+    def test_create_user_prescriber_with_existing_siren_same_department(self):
+        """
+        Test the creation of a user of type prescriber with existing SIREN in a same department
+        """
+        siret = "26570134200148"
+
+        existing_org_with_siret = PrescriberOrganizationWithMembershipFactory(
+            siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="67"
+        )
+        existing_org_with_siret.save()
+
+        # Step 1: Does the user work  for PE?
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 0,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siren")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SIREN number and department
+
+        post_data = {
+            "siren": siret[:9],
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, existing_org_with_siret.display_name)
+
+        # new organisation link
+        self.assertContains(response, reverse("signup:prescriber_choose_org"))
+
+    def test_create_user_prescriber_with_existing_siren_without_member(self):
+        """
+        Test the creation of a user of type prescriber with existing organization does not have a member
+        """
+
+        siret = "26570134200148"
+
+        existing_org_with_siret = PrescriberOrganizationFactory(
+            siret=siret, kind=PrescriberOrganization.Kind.SPIP, department="67"
+        )
+        existing_org_with_siret.save()
+
+        # Step 1: Does the user work  for PE?
+
+        url = reverse("signup:prescriber_is_pole_emploi")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        post_data = {
+            "is_pole_emploi": 0,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+        url = reverse("signup:prescriber_siren")
+        self.assertRedirects(response, url)
+
+        # Step 2: ask the user his SIREN number and department
+
+        post_data = {
+            "siren": siret[:9],
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertEqual(response.status_code, 302)
+
+        url = reverse("signup:prescriber_choose_org")
+        self.assertRedirects(response, url)
+
     def test_create_user_prescriber_without_org(self):
         """
         Test the creation of a user of type prescriber without organization.
@@ -728,30 +879,17 @@ class PrescriberSignupTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
         self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_choose_org")
+        url = reverse("signup:prescriber_siren")
         self.assertRedirects(response, url)
 
-        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+        # Step 2: ask the user his SIREN number and department or click on link "no organization"
+        response = self.client.get(url)
+        user_info_url = reverse("signup:prescriber_user")
+        self.assertContains(response, user_info_url)
+        response = self.client.get(user_info_url)
+        self.assertEqual(response.status_code, 200)
 
-        post_data = {
-            "kind": PrescriberOrganization.Kind.OTHER.value,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_choose_kind")
-        self.assertRedirects(response, url)
-
-        # Step 3: ask the user his kind of prescriber.
-
-        post_data = {
-            "kind": PrescriberChooseKindForm.KIND_SOLO,
-        }
-        response = self.client.post(url, data=post_data)
-        self.assertEqual(response.status_code, 302)
-        url = reverse("signup:prescriber_user")
-        self.assertRedirects(response, url)
-
-        # Step 4: user info.
+        # Step 3: user info.
 
         password = "!*p4ssw0rd123-"
         post_data = {
@@ -761,7 +899,7 @@ class PrescriberSignupTest(TestCase):
             "password1": password,
             "password2": password,
         }
-        response = self.client.post(url, data=post_data)
+        response = self.client.post(user_info_url, data=post_data)
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
