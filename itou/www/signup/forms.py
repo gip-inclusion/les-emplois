@@ -254,12 +254,10 @@ class PrescriberChooseKindForm(forms.Form):
 
     KIND_AUTHORIZED_ORG = "authorized_org"
     KIND_UNAUTHORIZED_ORG = "unauthorized_org"
-    KIND_SOLO = "solo"
 
     KIND_CHOICES = (
         (KIND_AUTHORIZED_ORG, "Pour une organisation habilitée par le Préfet"),
         (KIND_UNAUTHORIZED_ORG, "Pour une organisation non-habilitée"),
-        (KIND_SOLO, "Seul (sans organisation)"),
     )
 
     kind = forms.ChoiceField(
