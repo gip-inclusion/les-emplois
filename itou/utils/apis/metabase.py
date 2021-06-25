@@ -16,8 +16,9 @@ def _get_token(payload):
 def metabase_embedded_url(dashboard_id):
     """
     Creates an embed/signed URL for embedded Metabase dashboards:
-    * expiration delay of token set at 24H
+    * expiration delay of token set at 10 minutes, kept short on purpose due to the fact that during this short time
+      the user can share the iframe URL to non authorized third parties
     * do not display title of the dashboard in the iframe
     """
-    payload = {"resource": {"dashboard": dashboard_id}, "params": {}, "exp": round(time.time()) + (60 * 60 * 24)}
+    payload = {"resource": {"dashboard": dashboard_id}, "params": {}, "exp": round(time.time()) + (10 * 60)}
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + "#titled=false"
