@@ -27,6 +27,8 @@ def update_existing_conventions():
     deactivations = 0
     deactivations_by_kind = defaultdict(int)  # 0 by default
     reactivations = 0
+    three_months_ago = timezone.now() - timezone.timedelta(days=90)
+
     for siae in Siae.objects.filter(source=Siae.SOURCE_ASP, convention__isnull=False).select_related("convention"):
         assert siae.siret in SIRET_TO_ASP_ID
         asp_id = SIRET_TO_ASP_ID[siae.siret]
@@ -64,10 +66,16 @@ def update_existing_conventions():
         should_be_active = does_siae_have_an_active_convention(siae)
         if convention.is_active != should_be_active:
             if should_be_active:
+                # Inactive convention should be activated.
                 reactivations += 1
                 convention.is_active = True
                 convention.save()
+            elif convention.reactivated_at and convention.reactivated_at >= three_months_ago:
+                # Active convention was reactivated recently by support, do not deactivate it even though it should
+                # be according to latest ASP data.
+                pass
             else:
+                # Active convention should be deactivated.
                 deactivations += 1
                 # Break if too many deactivations have occurred without waiting for the end of the loop.
                 # This way we avoid shutting down 100% of our conventions on January 1st of the year.
