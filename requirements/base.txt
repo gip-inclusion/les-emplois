@@ -77,3 +77,10 @@ pysftp==0.2.9  # https://bitbucket.org/dundeemt/pysftp/src/master/
 # ------------------------------------------------------------------------------
 # Our S3 provider does not provide a UI to manage the S3 bucket. Use this CLI instead.
 boto3==1.17.53  # https://github.com/boto/boto3
+
+# API
+# ------------------------------------------------------------------------------
+# For automatic OpenAPI schema generation
+uritemplate==3.0.1  # https://github.com/python-hyper/uritemplate  
+
+
