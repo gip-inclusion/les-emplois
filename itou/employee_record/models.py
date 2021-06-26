@@ -39,7 +39,10 @@ class EmployeeRecordQuerySet(models.QuerySet):
             "job_application__approval",
             "job_application__to_siae",
             "job_application__job_seeker",
+            "job_application__job_seeker__birth_country",
+            "job_application__job_seeker__birth_place",
             "job_application__job_seeker__jobseeker_profile",
+            "job_application__job_seeker__jobseeker_profile__hexa_commune",
         )
 
     # Status filters
