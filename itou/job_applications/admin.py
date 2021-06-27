@@ -40,7 +40,15 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 class JobApplicationAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
     list_display = ("pk", "state", "sender_kind", "created_at")
-    raw_id_fields = ("job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval")
+    raw_id_fields = (
+        "job_seeker",
+        "eligibility_diagnosis",
+        "sender",
+        "sender_siae",
+        "sender_prescriber_organization",
+        "to_siae",
+        "approval",
+    )
     exclude = ("selected_jobs",)
     list_filter = (
         ManualApprovalDeliveryRequiredFilter,

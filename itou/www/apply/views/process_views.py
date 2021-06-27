@@ -223,6 +223,8 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     form_user_address = None
 
     if job_application.to_siae.is_subject_to_eligibility_rules:
+
+        # Info that will be used to search for an existing Pôle emploi approval.
         form_pe_status = JobSeekerPoleEmploiStatusForm(instance=job_application.job_seeker, data=request.POST or None)
         forms.append(form_pe_status)
 
@@ -237,11 +239,10 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
             with transaction.atomic():
                 if form_pe_status:
                     form_pe_status.save()
-
                 if form_user_address:
                     form_user_address.save()
-
-                # After each successful transition, a save() is performed by django-xworkflows.
+                # After each successful transition, a save() is performed by django-xworkflows,
+                # so use `commit=False` to avoid a double save.
                 job_application = form_accept.save(commit=False)
                 job_application.accept(user=request.user)
         except xwf_models.InvalidTransitionError:

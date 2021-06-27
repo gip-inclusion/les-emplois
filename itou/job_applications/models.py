@@ -207,7 +207,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """
-    An "unsolicited" job application.
+    A job application.
 
     It inherits from `xwf_models.WorkflowEnabled` to add a workflow to its `state` field:
         - https://github.com/rbarrois/django_xworkflows
@@ -291,6 +291,19 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         related_name="job_applications",
     )
 
+    # The job seeker's eligibility diagnosis used for this job application
+    # (required for SIAEs subject to eligibility rules).
+    # It is already linked to the job seeker but this double link is added
+    # to easily find out which one was used for a given job application.
+    eligibility_diagnosis = models.ForeignKey(
+        "eligibility.EligibilityDiagnosis",
+        verbose_name="Diagnostic d'éligibilité",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    # The job seeker's resume used for this job application.
     resume_link = models.URLField(max_length=500, verbose_name="Lien vers un CV", blank=True)
 
     # Who send the job application. It can be the same user as `job_seeker`
@@ -560,6 +573,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         emails = [self.email_accept_for_job_seeker]
         if self.is_sent_by_proxy:
             emails.append(self.email_accept_for_proxy)
+
+        # Link to the job seeker's eligibility diagnosis.
+        if self.to_siae.is_subject_to_eligibility_rules:
+            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                self.job_seeker, for_siae=self.to_siae
+            )
 
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:

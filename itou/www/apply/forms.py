@@ -342,7 +342,7 @@ class EditHiringDateForm(forms.ModelForm):
 
 class JobSeekerPoleEmploiStatusForm(forms.ModelForm):
     """
-    Info that will be used to find an existing Pôle emploi approval.
+    Info that will be used to search for an existing Pôle emploi approval.
     """
 
     def __init__(self, *args, **kwargs):
