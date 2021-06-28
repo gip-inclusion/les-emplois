@@ -224,7 +224,8 @@ class SiaeQuerySetTest(TestCase):
 
     def test_with_count_recent_received_job_applications(self):
         siae = SiaeFactory()
-        old_date = timezone.now() - timedelta(days=40)
+        model = JobApplicationFactory._meta.model
+        old_date = timezone.now() - timedelta(weeks=model.WEEKS_BEFORE_CONSIDERED_OLD, days=1)
         JobApplicationFactory(to_siae=siae, created_at=old_date)
 
         expected = 3
@@ -240,7 +241,6 @@ class SiaeQuerySetTest(TestCase):
         selected_job = siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
-        JobApplicationFactory(to_siae=siae)
 
         expected_score = siae.job_applications_received.count() / siae.job_description_through.count()
         result = Siae.objects.with_job_app_score().get(pk=siae.pk)
@@ -252,7 +252,17 @@ class SiaeQuerySetTest(TestCase):
         recent_job_apps = (
             Siae.objects.with_count_recent_received_job_apps().get(pk=siae.pk).count_recent_received_job_apps
         )
-        self.assertEqual(recent_job_apps, 3)
+        self.assertEqual(recent_job_apps, 2)
+        self.assertEqual(expected_score, result.job_app_score)
+
+    def test_with_job_app_score_no_job_description(self):
+        siae = SiaeFactory()
+        JobApplicationFactory(to_siae=siae)
+        JobApplicationFactory(to_siae=siae)
+
+        expected_score = None
+        result = Siae.objects.with_job_app_score().get(pk=siae.pk)
+
         self.assertEqual(expected_score, result.job_app_score)
 
     def test_with_count_active_job_descriptions(self):

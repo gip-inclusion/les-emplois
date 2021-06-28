@@ -3,8 +3,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from itou.cities.models import City
+from itou.job_applications.factories import JobApplicationFactory
 from itou.prescribers.factories import AuthorizedPrescriberOrganizationFactory
-from itou.siaes.factories import SiaeFactory
+from itou.siaes.factories import SiaeFactory, SiaeWithJobsFactory
 from itou.siaes.models import Siae
 
 
@@ -119,6 +120,48 @@ class SearchSiaeTest(TestCase):
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(response, "<b>1</b> résultat")
         self.assertContains(response, SIAE_VANNES.capitalize())
+
+    def test_order_by(self):
+        """
+        Check SIAE results sorting.
+        Don't test sorting by active members to avoid creating too much data.
+        """
+        guerande = create_city_guerande()
+        created_siaes = []
+
+        # Several job descriptions but no job application.
+        siae = SiaeWithJobsFactory(department="44", coords=guerande.coords, post_code="44350")
+        created_siaes.append(siae)
+
+        # Many job descriptions and job applications.
+        siae = SiaeWithJobsFactory(department="44", coords=guerande.coords, post_code="44350")
+        JobApplicationFactory(to_siae=siae)
+        created_siaes.append(siae)
+
+        # Many job descriptions and more job applications than the first one.
+        siae = SiaeWithJobsFactory(department="44", coords=guerande.coords, post_code="44350")
+        JobApplicationFactory(to_siae=siae)
+        JobApplicationFactory(to_siae=siae)
+        created_siaes.append(siae)
+
+        # No job description and a job application
+        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
+        JobApplicationFactory(to_siae=siae)
+        created_siaes.append(siae)
+
+        # No job description, no job application.
+        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350")
+        created_siaes.append(siae)
+
+        # Does not want to receive any job application.
+        siae = SiaeFactory(department="44", coords=guerande.coords, post_code="44350", block_job_applications=True)
+        created_siaes.append(siae)
+
+        response = self.client.get(self.url, {"city": guerande.slug})
+        siaes_results = response.context["siaes_page"]
+
+        for i, siae in enumerate(siaes_results):
+            self.assertEqual(siae.pk, created_siaes[i].pk)
 
 
 class SearchPrescriberTest(TestCase):

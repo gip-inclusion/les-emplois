@@ -65,7 +65,7 @@ class SiaeQuerySet(models.QuerySet):
     def with_count_recent_received_job_apps(self):
         from itou.job_applications.models import JobApplication
 
-        past_dt = timezone.now() - timezone.timedelta(days=30)
+        past_dt = timezone.now() - timezone.timedelta(weeks=JobApplication.WEEKS_BEFORE_CONSIDERED_OLD)
         count = Count(
             "job_applications_received", filter=Q(job_applications_received__created_at__gte=past_dt), distinct=True
         )
@@ -79,12 +79,14 @@ class SiaeQuerySet(models.QuerySet):
     def with_job_app_score(self):
         count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=FloatField())
         count_active_job_descriptions = Cast("count_active_job_descriptions", output_field=FloatField())
+        get_score = Cast(count_recent_received_job_apps / count_active_job_descriptions, output_field=FloatField())
         return (
             self.with_count_recent_received_job_apps()
             .with_count_active_job_descriptions()
             .annotate(
-                job_app_score=Cast(
-                    count_recent_received_job_apps / count_active_job_descriptions, output_field=FloatField()
+                job_app_score=Case(
+                    When(count_active_job_descriptions__gt=0, then=get_score),
+                    When(count_active_job_descriptions=0, then=None),
                 )
             )
         )
