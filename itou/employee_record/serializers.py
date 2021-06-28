@@ -175,6 +175,8 @@ class _EmployeeSituation(serializers.ModelSerializer):
 
         # Replace these empty strings by JSON null values
         empty_as_null_fields = [
+            "inscritPoleEmploi",
+            "inscritPoleEmploiDepuis",
             "salarieSansEmploiDepuis",
             "salarieBenefRSADepuis",
             "salarieBenefASSDepuis",
