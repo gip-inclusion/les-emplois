@@ -6,7 +6,7 @@ from django.core import mail
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
-from itou.job_applications.factories import JobApplicationFactory, JobApplicationSentBySiaeFactory
+from itou.job_applications.factories import JobApplicationFactory
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.siaes.factories import (
     SiaeAfterGracePeriodFactory,
@@ -238,7 +238,7 @@ class SiaeQuerySetTest(TestCase):
 
     def test_with_job_app_score(self):
         siae = SiaeWithJobsFactory(romes=("N1101", "N1105", "N1103", "N4105"))
-        selected_job = siae.job_description_through.first()
+        siae.job_description_through.first()
         JobApplicationFactory(to_siae=siae)
         JobApplicationFactory(to_siae=siae)
 
