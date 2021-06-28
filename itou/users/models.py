@@ -12,7 +12,15 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
 from itou.approvals.models import ApprovalsWrapper
-from itou.asp.models import AllocationDuration, Commune, EducationLevel, LaneExtension, LaneType, RSAAllocation
+from itou.asp.models import (
+    AllocationDuration,
+    Commune,
+    EducationLevel,
+    EmployerType,
+    LaneExtension,
+    LaneType,
+    RSAAllocation,
+)
 from itou.utils.address.departments import department_from_postcode
 from itou.utils.address.format import format_address
 from itou.utils.address.models import AddressMixin
@@ -437,17 +445,24 @@ class JobSeekerProfile(models.Model):
     oeth_employee = models.BooleanField(verbose_name="Employé OETH", default=False)
 
     pole_emploi_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Inscrit à Pôle emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     unemployed_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Sans emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
+    )
+
+    previous_employer_kind = models.CharField(
+        max_length=2,
+        verbose_name="Précédent employeur",
+        blank=True,
+        choices=EmployerType.choices,
     )
 
     # Despite the name of this field in the ASP model (salarieBenefRSA),
@@ -461,28 +476,28 @@ class JobSeekerProfile(models.Model):
     )
 
     rsa_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire du RSA depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ass_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire de l'ASS depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     aah_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire de l'AAH depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
 
     ata_allocation_since = models.CharField(
-        max_length=20,
+        max_length=2,
         verbose_name="Allocataire de l'ATA depuis",
         blank=True,
         choices=AllocationDuration.choices,
@@ -539,14 +554,8 @@ class JobSeekerProfile(models.Model):
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
     def _clean_job_seeker_situation(self):
-        if self.resourceless and self.is_employed:
-            raise ValidationError(self.ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH)
-
-        if self.is_employed and self.unemployed_since:
+        if self.previous_employer_kind and self.unemployed_since:
             raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
-
-        if self.unemployed_since and self.is_employed:
-            raise ValidationError(self.ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH)
 
         if bool(self.pole_emploi_since) != bool(self.user.pole_emploi_id):
             raise ValidationError(self.ERROR_JOBSEEKER_PE_FIELDS)
@@ -616,7 +625,7 @@ class JobSeekerProfile(models.Model):
 
         # Special field: Commune object contains both city name and INSEE code
         insee_code = result.get("insee_code")
-        self.hexa_commune = Commune.objects.by_insee_code(insee_code)
+        self.hexa_commune = Commune.objects.by_insee_code(insee_code).first()
 
         if not self.hexa_commune:
             raise ValidationError(self.ERROR_HEXA_LOOKUP_COMMUNE)
@@ -625,9 +634,24 @@ class JobSeekerProfile(models.Model):
 
         return self
 
+    def clear_hexa_address(self):
+        """
+        Delete hexa address fields.
+        This method updates the profile in db.
+        """
+        self.hexa_lane_type = ""
+        self.hexa_lane_number = ""
+        self.hexa_std_extension = ""
+        self.hexa_non_std_extension = None
+        self.hexa_lane_name = ""
+        self.hexa_post_code = ""
+        self.hexa_commune = None
+
+        self.save()
+
     @property
     def is_employed(self):
-        return bool(self.rqth_employee or self.oeth_employee or not self.unemployed_since)
+        return not self.unemployed_since and self.previous_employer_kind
 
     @property
     def has_ass_allocation(self):
@@ -653,3 +677,19 @@ class JobSeekerProfile(models.Model):
     @property
     def hexa_address_filled(self):
         return self.hexa_lane_name and self.hexa_lane_type and self.hexa_post_code and self.hexa_commune
+
+    @property
+    def hexa_address_display(self):
+        if self.hexa_address_filled:
+            result = ""
+            if self.hexa_lane_number:
+                result += f"{self.hexa_lane_number} "
+            if self.hexa_std_extension:
+                result += f"{self.hexa_std_extension} "
+            elif self.hexa_non_std_extension:
+                result += f"{self.hexa_non_std_extension} "
+
+            result += f"{self.hexa_lane_name} - {self.hexa_post_code} {self.hexa_commune.name}"
+            return result
+
+        return "Adresse HEXA incomplète"

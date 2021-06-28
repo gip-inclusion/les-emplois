@@ -21,11 +21,37 @@ def validate_asp_batch_filename(value):
 
 
 class EmployeeRecordQuerySet(models.QuerySet):
+    """
+    Queryset functions for EmployeeRecord model
+    """
+
+    def full_fetch(self):
+        """
+        Also fetch main employee record related objects:
+        - financial annex
+        - job application
+        - job seeker
+        - job seeker profile
+        """
+        return self.select_related(
+            "financial_annex",
+            "job_application",
+            "job_application__approval",
+            "job_application__to_siae",
+            "job_application__job_seeker",
+            "job_application__job_seeker__jobseeker_profile",
+        )
+
+    # Status filters
+
     def ready(self):
         """
         These FS are ready to to be sent to ASP
         """
         return self.filter(status=EmployeeRecord.Status.READY)
+
+    def ready_for_siae(self, siae):
+        return self.ready().filter(job_application__to_siae=siae).select_related("job_application")
 
     def sent(self):
         return self.filter(status=EmployeeRecord.Status.SENT)
@@ -45,11 +71,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def processed_for_siae(self, siae):
         return self.processed().filter(job_application__to_siae=siae).select_related("job_application")
 
-    def archived(self):
-        """
-        Archived employee records (completed and having a JSON archive)
-        """
-        return self.filter(status=EmployeeRecord.Status.ARCHIVED)
+    # Search queries
 
     def find_by_batch(self, filename, line_number):
         """
@@ -90,12 +112,11 @@ class EmployeeRecord(models.Model):
         - after that, the FS is "archived" and can't be used for further interaction
         """
 
-        NEW = "NEW", "Nouvelle fiche salarié"
-        READY = "READY", "Données complètes, prêtes à l'envoi ASP"
-        SENT = "SENT", "Envoyée ASP"
-        REJECTED = "REJECTED", "Rejetée ASP"
-        PROCESSED = "PROCESSED", "Traitée ASP"
-        ARCHIVED = "ARCHIVED", "Archivée"
+        NEW = "NEW", "Nouvelle"
+        READY = "READY", "Complétée"
+        SENT = "SENT", "Envoyée"
+        REJECTED = "REJECTED", "En erreur"
+        PROCESSED = "PROCESSED", "Intégrée"
 
     created_at = models.DateTimeField(verbose_name=("Date de création"), default=timezone.now)
     updated_at = models.DateTimeField(verbose_name=("Date de modification"), default=timezone.now)
@@ -212,7 +233,7 @@ class EmployeeRecord(models.Model):
         """
         Prepare the employee record for transmission
 
-        Status: NEW => READY
+        Status: NEW | REJECTED => READY
         """
         if self.status not in [EmployeeRecord.Status.NEW, EmployeeRecord.Status.REJECTED]:
             raise ValidationError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
@@ -296,7 +317,7 @@ class EmployeeRecord(models.Model):
 
         See model save() and clean() method.
         """
-        return self.status != self.Status.SENT and not self.is_archived
+        return self.status not in [self.Status.SENT, self.Status.READY] and not self.is_archived
 
     @property
     def job_seeker(self):
@@ -365,9 +386,13 @@ class EmployeeRecord(models.Model):
             return PrescriberType.SPONTANEOUS_APPLICATION
         elif sender_kind == JobApplication.SENDER_KIND_SIAE_STAFF:
             # an SIAE applied
-            return PrescriberType.UNKNOWN
+            # Notify ASP : UNKNOWN code does not work for SIAE
+            # FIXME return PrescriberType.UNKNOWN
+            return PrescriberType.SPONTANEOUS_APPLICATION
 
-        return PrescriberType.from_itou_prescriber_kind(sender_kind)
+        prescriber_organization = self.job_application.sender_prescriber_organization
+
+        return PrescriberType.from_itou_prescriber_kind(prescriber_organization.kind).value
 
     @property
     def asp_siae_type(self):
@@ -459,8 +484,10 @@ class EmployeeRecordBatch:
         self.upload_filename = self.REMOTE_PATH_FORMAT.format(timezone.now().strftime("%Y%m%d%H%M%S"))
 
         # add a line number to each FS for JSON serialization
-        for idx, er in enumerate(self.employee_records):
-            er.batch_line = idx
+        for idx, er in enumerate(self.employee_records, start=1):
+            er.asp_batch_line_number = idx
+            er.asp_processing_code = None
+            er.asp_processing_label = None
 
     def __str__(self):
         return f"{self.upload_filename}"

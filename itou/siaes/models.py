@@ -817,6 +817,9 @@ class SiaeFinancialAnnex(models.Model):
             self.updated_at = timezone.now()
         return super().save(*args, **kwargs)
 
+    def __str__(self):
+        return self.number
+
     @property
     def number_prefix(self):
         return self.number[:-4]  # all but last 4 characters

@@ -1,5 +1,6 @@
 import re
 
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
 from unidecode import unidecode
@@ -332,17 +333,14 @@ class PrescriberType(models.TextChoices):
         return kinds.get(prescriber_kind, cls.UNKNOWN)
 
 
-class CommuneManager(models.Manager):
-    def get_queryset(self):
-        return PeriodQuerySet(self.model)
-
+class CommuneQuerySet(PeriodQuerySet):
     def by_insee_code(self, insee_code):
         """
-        Lookup a Commune by INSEE code
+        Lookup a Commune object by INSEE code
 
         May return several results if not used with PeriodQuerySet.current
         """
-        return self.get_queryset().filter(code=insee_code).first()
+        return self.filter(code=insee_code)
 
 
 class Commune(PrettyPrintMixin, AbstractPeriod):
@@ -358,13 +356,14 @@ class Commune(PrettyPrintMixin, AbstractPeriod):
     reference file is currently not up-to-date (2018)
     """
 
-    code = models.CharField(max_length=5, verbose_name="Code commune INSEE")
+    code = models.CharField(max_length=5, verbose_name="Code commune INSEE", db_index=True)
     name = models.CharField(max_length=50, verbose_name="Nom de la commune")
 
-    objects = CommuneManager()
+    objects = models.Manager.from_queryset(CommuneQuerySet)()
 
     class Meta:
         verbose_name = "Commune"
+        indexes = [GinIndex(fields=["name"], name="aps_communes_name_gin_trgm", opclasses=["gin_trgm_ops"])]
 
     @cached_property
     def department_code(self):
@@ -433,6 +432,7 @@ class Country(PrettyPrintMixin, models.Model):
     class Meta:
         verbose_name = "Pays"
         verbose_name_plural = "Pays"
+        ordering = ["name"]
 
     @property
     def is_france(self):
@@ -497,6 +497,6 @@ class RSAAllocation(models.TextChoices):
     => There are 3 distinct cases for an answer.
     """
 
+    NO = "NON", "Non bénéficiaire du RSA"
     YES_WITH_MARKUP = "OUI-M", "Bénéficiaire du RSA et majoré"
     YES_WITHOUT_MARKUP = "OUI-NM", "Bénéficiaire du RSA et non-majoré"
-    NO = "NON", "Non bénéficiaire du RSA"

@@ -7,5 +7,10 @@ app_name = "employee_record_views"
 
 urlpatterns = [
     path("list", views.list, name="list"),
-    # Next: path of employee records actions
+    path("create/<uuid:job_application_id>", views.create, name="create"),
+    path("create_step_2/<uuid:job_application_id>", views.create_step_2, name="create_step_2"),
+    path("create_step_3/<uuid:job_application_id>", views.create_step_3, name="create_step_3"),
+    path("create_step_4/<uuid:job_application_id>", views.create_step_4, name="create_step_4"),
+    path("create_step_5/<uuid:job_application_id>", views.create_step_5, name="create_step_5"),
+    path("summary/<employee_record_id>", views.summary, name="summary"),
 ]

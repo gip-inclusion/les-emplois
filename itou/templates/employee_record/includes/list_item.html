@@ -5,48 +5,61 @@
     </div>
 
     <div class="card-body">
-
         <div class="row">
-
             <div class="col-md-7">
                 <p class="m-0">Début de contrat : <b>{{ item.hiring_start_at }}</b></p>
                 <p class="m-0">Fin de contrat : <b>{{ item.hiring_end_at }}</b></p>
                 <p class="m-0">Numéro de PASS IAE (agrément) : <b>{{ item.approval.number_with_spaces }}</b></p>
             </div>
 
-            {# Statuses. #}
+            {# Statuses #}
             {% if form.status.value == "SENT" %}
                 <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-warning">Transmise à l'ASP le : <b>{{ item.updated_at }}</b></p>
+                    <p class="m-0 pt-1 badge badge-warning">Transmise à l'ASP le <b>{{ employee_record.updated_at }}</b></p>
                 </div>
             {% elif form.status.value == "REJECTED" %}
                 <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-danger">Rejetée par l'ASP le : <b>{{ item.updated_at }}</b></p>
+                    <p class="m-0 pt-1 badge badge-danger">Retour en erreur le <b>{{ employee_record.updated_at }}</b></p>
                 </div>
             {% elif form.status.value == "PROCESSED" %}
                 <div class="col-md-5 text-right">
-                    <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le : <b>{{ item.updated_at }}</b></p>
+                    <p class="m-0 pt-1 badge badge-success">Validée par l'ASP le <b>{{ employee_record.updated_at }}</b></p>
+                </div>
+            {% elif form.status.value == "READY" %}
+                <div class="col-md-5 text-right">
+                    <p class="m-0 pt-1 badge badge-secondary">Complétée le <b>{{ employee_record.updated_at }}</b></p>
                 </div>
             {% endif %}
-
         </div>
 
-        {# Actions. #}
+        {# ASP error #}
+        {% if form.status.value == "REJECTED" %}
+            <div class="my-3 alert alert-secondary">
+                <p><b>Informations sur l'erreur de traitement :</b></p>
+                <p>Erreur {{ employee_record.asp_processing_code }} - {{ employee_record.asp_processing_label }}</p>
+            </div>
+        {% endif %}
+
+        {# Actions #}
         {% if form.status.value == "NEW" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Créer la fiche salarié</a>
+            </div>
+        {% elif form.status.value == "READY" %}
+            <div>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=READY" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "SENT" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=SENT" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
             </div>
         {% elif form.status.value == "REJECTED" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
+                <a href="{% url "employee_record_views:create" item.id %}" class="btn btn-outline-primary float-right">Modifier la fiche salarié</a>
             </div>
         {% elif form.status.value == "PROCESSED" %}
             <div>
-                <a href="#" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?status=PROCESSED" class="btn btn-outline-primary float-right">Voir le détail de la fiche salarié</a>
             </div>
         {% endif %}
 

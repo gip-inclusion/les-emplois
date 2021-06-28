@@ -6,12 +6,21 @@
 
 {% block title %}Fiches salarié ASP - {{ current_siae.display_name }}{{ block.super }}{% endblock %}
 
+{% block script %}
+    {{ block.super }}
+    <script>
+    $("#status-filter-form-group :input").change(function() {
+        $("#status-filter-form").submit();
+    });
+    </script>
+{% endblock %}
+
 {% block content %}
 
 <h1>Fiches salarié ASP - <span class="text-muted">{{ current_siae.display_name }}</span></h1>
 
 <div class="ml-0 mt-3">
-    <form method="get" class="form">
+    <form method="get" class="form" id="status-filter-form">
         <div class="row">
             <div class="col-sm-3">
                 <div class="card-deck">
@@ -21,25 +30,20 @@
                         </div>
                         <div class="card-body">
                             <p class="text-muted"><b>Par statut</b></p>
-
-                            <div class="container">
+                            <div class="container form-group m-0" id="status-filter-form-group">
                             {% for status, badge in form.status|zip:badges %}
-                                <div class="row">
-                                    <div class="col-10 p-0">
-                                        {{ status }}
+                                {% if badge.0 != 0 %}
+                                    <div class="row">
+                                        <div class="col-10 p-0">
+                                            {{ status }}
+                                        </div>
+                                        <div class="col-2 p-0 text-right ">
+                                            <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
+                                        </div>
                                     </div>
-                                    <div class="col-2 p-0 text-right ">
-                                        <span class="badge badge-{{ badge.1 }}">{{ badge.0 }}</span>
-                                    </div>
-                                </div>
+                                {% endif %}
                             {% endfor %}
                             </div>
-
-                        </div>
-                        <div class="card-footer pb-0 text-center">
-                            {% buttons %}
-                                <button type="submit" class="btn btn-primary">Appliquer</button>
-                            {% endbuttons %}
                         </div>
                     </div>
                 </div>
@@ -65,9 +69,12 @@
         <div class="alert alert-info mb-4">
             {% if form.status.value == "NEW" %}
                 Vous trouverez ici les candidatures validées à partir desquelles vous devez créér de nouvelles fiches salarié.
+            {% elif form.status.value == "READY" %}
+                <p>Vous trouverez ici les fiches salarié complétées et en attente d'envoi à l'ASP.</p>
+                <p>À ce stade, seule la visualisation des informations de la fiche est possible.</p>
             {% elif form.status.value == "SENT" %}
                 <p>Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
-                <p>A ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de la fiche est possible.</p>
+                <p>À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de la fiche est possible.</p>
             {% elif form.status.value == "REJECTED" %}
                 <p>Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une erreur.</p>
                 <p>Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>

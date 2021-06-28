@@ -1,0 +1,18 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<h4>Annexe financière</h4>
+
+<form method="post" action="{% url "employee_record_views:create_step_4" job_application.id %}" class="js-prevent-multiple-submit">
+        
+    {% csrf_token %}
+
+    {% bootstrap_form form alert_error_type="all" %}
+
+    {% buttons %}
+        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_3" job_application.id %}">Précédent</a>
+        <button type="submit" class="btn btn-primary">Continuer</button>
+    {% endbuttons %}
+
+</form>
+

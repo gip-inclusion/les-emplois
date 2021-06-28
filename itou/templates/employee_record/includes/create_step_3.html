@@ -1,0 +1,65 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<h4>Situation du salarié</h4>
+
+<form method="post" action="{% url "employee_record_views:create_step_3" job_application.id %}" class="js-prevent-multiple-submit">
+        
+    {% bootstrap_form_errors form %}
+
+    {% csrf_token %}
+
+    {% bootstrap_field form.education_level %}
+    {% bootstrap_field form.resourceless %}
+
+    <div role="button" data-toggle="collapse" data-target="#collapse_pole_emploi" aria-controls="#collapse_pole_emploi">
+        {% bootstrap_field form.pole_emploi %}
+    </div>
+
+    <div id="collapse_pole_emploi" class="ml-1 pl-4 border-left border-primary collapse{% if form.pole_emploi.value %} show{% endif %}">
+        {% bootstrap_field form.pole_emploi_id %}
+        {% bootstrap_field form.pole_emploi_since %}
+    </div>
+
+    <div role="button" data-toggle="collapse" data-target="#collapse_unemployed" aria-controls="#collapse_unemployed">
+        {% bootstrap_field form.unemployed %}
+    </div>
+
+    <div id="collapse_unemployed" class="ml-1 pl-4 border-left border-primary collapse{% if form.unemployed.value %} show{% endif %}">
+        {% bootstrap_field form.unemployed_since %}
+    </div>
+
+    {% bootstrap_field form.rqth_employee %}
+    {% bootstrap_field form.oeth_employee %}
+
+    <div role="button" data-toggle="collapse" data-target="#collapse_rsa_allocation" aria-controls="#collapse_rsa_allocation">
+        {% bootstrap_field form.rsa_allocation %}
+    </div>
+
+    <div id="collapse_rsa_allocation" class="ml-1 pl-4 border-left border-primary collapse{% if form.rsa_allocation.value %} show{% endif %}">
+        {% bootstrap_field form.rsa_markup %}
+        {% bootstrap_field form.rsa_allocation_since %}
+    </div>
+
+    <div role="button" data-toggle="collapse" data-target="#collapse_ass_allocation" aria-controls="#collapse_ass_allocation">
+        {% bootstrap_field form.ass_allocation %}
+    </div>
+
+    <div id="collapse_ass_allocation" class="ml-1 pl-4 border-left border-primary collapse{% if form.ass_allocation.value %} show{% endif %}">
+        {% bootstrap_field form.ass_allocation_since %}
+    </div>
+    
+    <div role="button" data-toggle="collapse" data-target="#collapse_aah_allocation" aria-controls="#collapse_aah_allocation">
+        {% bootstrap_field form.aah_allocation %}
+    </div>
+    
+    <div id="collapse_aah_allocation" class="ml-1 pl-4 border-left border-primary collapse{% if form.aah_allocation.value %} show{% endif %}">
+        {% bootstrap_field form.aah_allocation_since %}
+    </div>
+
+    {% buttons %}
+        <a class="btn btn btn-outline-secondary" href="{% url "employee_record_views:create_step_2" job_application.id %}">Précédent</a>
+        <button type="submit" class="btn btn-primary">Continuer</button>
+    {% endbuttons %}
+
+</form>

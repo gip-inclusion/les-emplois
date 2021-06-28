@@ -1,0 +1,34 @@
+{% load bootstrap4 %}
+{% load static %}
+
+<h4>Récapitulatif et validation de la fiche salarié</h4>
+
+{% include "employee_record/includes/employee_record_summary.html" %}
+
+{% if employee_record.status == 'NEW' or employee_record.status == "REJECTED" %}
+    <div class="alert alert-warning">
+        <p>Si ce récapitulatif et conforme et complet, la fiche salarié sera envoyée pour validation à l'ASP.</p>
+        <p>
+            Le traitement est effectué à intervalle régulier et vous serez notifié du changement d'état
+            de la fiche salarié sur la liste récapitulative accessible depuis le tableau de bord.
+        </p>
+    </div>
+
+    <form method="post" action="{% url "employee_record_views:create_step_5" employee_record.job_application.id %}" class="js-prevent-multiple-submit">
+        {% csrf_token %}
+        {% buttons %}
+            <a class="btn btn-outline-secondary" href="{% url "employee_record_views:create_step_4" employee_record.job_application.id %}">Précédent</a>
+            <button type="submit" class="btn btn-primary">Valider la fiche salarié</button>
+        {% endbuttons %}
+    </form>
+
+    {% else %}
+        <div class="alert alert-success">
+            <p>La création de cette fiche salariée est terminée.</p>
+            <p>Vous pouvez suivre l'avancement de son traitement par l'ASP via la liste récapitulative accessible depuis le tableau de bord.</p>
+        </div>
+
+        <a href="{% url "employee_record_views:list" %}" class="btn btn-primary">
+            Retour à la liste des fiches salarié
+        </a>
+    {% endif %}

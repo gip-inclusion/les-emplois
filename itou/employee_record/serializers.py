@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from unidecode import unidecode
 
 from itou.employee_record.models import EmployeeRecord
 from itou.users.models import User
@@ -10,8 +11,8 @@ class _EmployeeSerializer(serializers.ModelSerializer):
     sufPassIae = serializers.CharField(required=False)
 
     civilite = serializers.ChoiceField(choices=User.Title.choices, source="title")
-    nomUsage = serializers.CharField(source="last_name")
-    prenom = serializers.CharField(source="first_name")
+    nomUsage = serializers.SerializerMethodField()
+    prenom = serializers.SerializerMethodField()
 
     dateNaissance = serializers.DateField(format="%d/%m/%Y", source="birthdate")
     # codeComInsee is only mandatory if birth country is France
@@ -35,6 +36,12 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             "codeGroupePays",
         ]
 
+    def get_nomUsage(self, obj):
+        return unidecode(obj.last_name).upper()
+
+    def get_prenom(self, obj):
+        return unidecode(obj.first_name).upper()
+
     def to_representation(self, instance):
         result = super().to_representation(instance)
 
@@ -44,6 +51,13 @@ class _EmployeeSerializer(serializers.ModelSerializer):
             result["codeComInsee"] = {
                 "codeComInsee": result.pop("codeComInsee"),
                 "codeDpt": result.pop("codeDpt"),
+            }
+        else:
+            # However, if the employee is not born in France
+            # the department code must be '099' (error 3411)
+            result["codeComInsee"] = {
+                "codeComInsee": None,
+                "codeDpt": "099",
             }
 
         # Fields not mapped / ignored
@@ -180,7 +194,7 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
     # Placeholder: not the final position in the JSON result
     passIae = serializers.CharField(source="approval_number")
 
-    numLigne = serializers.IntegerField(source="batch_line_number")
+    numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
 
     numeroAnnexe = serializers.CharField(source="financial_annex_number")
@@ -234,14 +248,8 @@ class EmployeeRecordSerializer(serializers.ModelSerializer):
         employee_situation = result["situationSalarie"]
         employee_situation["salarieTypeEmployeur"] = instance.asp_employer_type
 
-        # same workaroud for prescriber type (orienteur)
+        # same workaround for prescriber type (orienteur)
         employee_situation["orienteur"] = instance.asp_prescriber_type
-
-        # FIXME test override
-        # Remove 3 lines below after manual testing
-        result["mesure"] = "EI_DC"
-        result["siret"] = "33055039301440"
-        result["numeroAnnexe"] = "ACI023201111A0M0"
 
         return result
 
