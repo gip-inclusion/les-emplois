@@ -5,6 +5,7 @@ import factory.fuzzy
 from dateutil.relativedelta import relativedelta
 
 from itou.approvals.factories import ApprovalFactory
+from itou.eligibility.factories import EligibilityDiagnosisFactory
 from itou.job_applications import models
 from itou.jobs.models import Appellation
 from itou.prescribers.factories import (
@@ -103,19 +104,16 @@ class JobApplicationSentByAuthorizedPrescriberOrganizationFactory(JobApplication
 
 class JobApplicationWithApprovalFactory(JobApplicationSentByPrescriberFactory):
     """
-    Generates a Job Application and an Approval.
+    Generates a Job Application with an Approval.
     """
 
-    approval = factory.SubFactory(ApprovalFactory)
     state = models.JobApplicationWorkflow.STATE_ACCEPTED
-
-    @factory.post_generation
-    def set_approval_user(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        self.approval.user = self.job_seeker
-        self.approval.save()
+    approval = factory.SubFactory(ApprovalFactory, user=factory.SelfAttribute("..job_seeker"))
+    eligibility_diagnosis = factory.SubFactory(
+        EligibilityDiagnosisFactory,
+        job_seeker=factory.SelfAttribute("..job_seeker"),
+        author=factory.SelfAttribute("..sender"),
+    )
 
 
 class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
