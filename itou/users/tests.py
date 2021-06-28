@@ -9,7 +9,12 @@ import itou.asp.factories as asp
 from itou.asp.models import AllocationDuration, EmployerType
 from itou.job_applications.factories import JobApplicationSentByJobSeekerFactory
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.prescribers.factories import PrescriberMembershipFactory
+from itou.prescribers.factories import (
+    AuthorizedPrescriberOrganizationWithMembershipFactory,
+    PrescriberMembershipFactory,
+    PrescriberOrganizationWithMembershipFactory,
+)
+from itou.prescribers.models import PrescriberOrganization
 from itou.siaes.factories import SiaeFactory
 from itou.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory, UserFactory
 from itou.users.models import User
@@ -238,6 +243,53 @@ class ModelTest(TestCase):
 
         user.emailaddress_set.create(email=user.email, verified=True)
         self.assertTrue(user.has_verified_email)
+
+    def test_can_view_stats_vip(self):
+        user = UserFactory()
+        self.assertFalse(user.can_view_stats_vip)
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
+        user = UserFactory(is_stats_vip=True)
+        self.assertTrue(user.can_view_stats_vip)
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=None))
+        user = UserFactory(is_superuser=True)
+        self.assertFalse(user.can_view_stats_vip)
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=None))
+
+    def test_can_view_stats_cd(self):
+        """
+        CD as in "Conseil Départemental".
+        """
+        # Admin prescriber of authorized CD can access.
+        org = AuthorizedPrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
+        user = org.members.get()
+        self.assertTrue(user.can_view_stats_cd(current_org=org))
+        self.assertTrue(user.can_view_stats_dashboard_widget(current_org=org))
+
+        # Non admin prescriber cannot access.
+        org = AuthorizedPrescriberOrganizationWithMembershipFactory(
+            kind=PrescriberOrganization.Kind.DEPT, membership__is_admin=False
+        )
+        user = org.members.get()
+        self.assertFalse(user.can_view_stats_cd(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+
+        # Non authorized organization does not give access.
+        org = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganization.Kind.DEPT)
+        user = org.members.get()
+        self.assertFalse(user.can_view_stats_cd(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+
+        # Non CD organization does not give access.
+        org = AuthorizedPrescriberOrganizationWithMembershipFactory()
+        user = org.members.get()
+        self.assertFalse(user.can_view_stats_cd(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
+
+        # Prescriber without organization cannot access.
+        org = None
+        user = PrescriberFactory()
+        self.assertFalse(user.can_view_stats_cd(current_org=org))
+        self.assertFalse(user.can_view_stats_dashboard_widget(current_org=org))
 
 
 def mock_get_geocoding_data(address, post_code=None, limit=1):

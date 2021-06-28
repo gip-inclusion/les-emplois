@@ -385,7 +385,8 @@
 
         {% endif %}{# end of if user.is_siae_staff #}
 
-        {% if user.can_view_stats_dashboard_widget %}
+
+        {% if can_view_stats_dashboard_widget %}
 
             <div class="card">
                 <h5 class="card-header">Statistiques et pilotage</h5>
@@ -402,6 +403,13 @@
                         <p class="card-text">
                             {% include "includes/icon.html" with icon="activity" %}
                             <a href="{% url 'stats:stats_vip' %}">Voir les données sur mon territoire</a>
+                        </p>
+                    {% endif %}
+                    {% if can_view_stats_cd %}
+                        <p class="card-text">
+                            {% include "includes/icon.html" with icon="activity" %}
+                            <a href="{% url 'stats:stats_cd' %}">Voir les données de mon département</a>
+                            <span class="badge badge-info">Nouveau</span>
                         </p>
                     {% endif %}
                 </div>

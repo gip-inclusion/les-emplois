@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
 from itou.utils.apis.metabase import metabase_embedded_url
 from itou.utils.perms.decorators import can_view_stats_vip
+from itou.utils.perms.prescriber import get_current_org_or_404
 
 
 # Embedding Metabase dashboards:
@@ -51,12 +53,34 @@ def public_advanced_stats(request, template_name=_STATS_HTML_TEMPLATE):
 @user_passes_test(can_view_stats_vip, login_url="/dashboard")
 def stats_vip(request, template_name=_STATS_HTML_TEMPLATE):
     """
-    If the user has the 'is_stats_vip' flag, this Metabase dashboard link
-    is displayed on the dashboard page
+    Legacy stats only available to vip users.
+    Will most likely be dropped soon.
     """
     context = {
         "iframeurl": metabase_embedded_url(settings.VIP_STATS_DASHBOARD_ID),
         "page_title": "Données par territoire",
+        "stats_base_url": settings.METABASE_SITE_URL,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def stats_cd(request, template_name=_STATS_HTML_TEMPLATE):
+    """
+    CD ("Conseil Départemental") stats shown to relevant CD members.
+    They can only view data for their own departement.
+
+    Important: "département" field should be locked on metabase side.
+    Go to https://stats.inclusion.beta.gouv.fr/dashboard/XXX then "Partage" then "Partager et intégrer" then
+    "Intégrer ce dashboard dans une application" then inside "Paramètres" on the right, make sure the relevant
+    parameter "Département" is "Verrouillé" and "Région" is "Désactivé".
+    """
+    current_org = get_current_org_or_404(request)
+    if not request.user.can_view_stats_cd(current_org=current_org):
+        raise PermissionDenied
+    context = {
+        "iframeurl": metabase_embedded_url(settings.CD_STATS_DASHBOARD_ID, department=current_org.department),
+        "page_title": "Données de mon département",
         "stats_base_url": settings.METABASE_SITE_URL,
     }
     return render(request, template_name, context)
