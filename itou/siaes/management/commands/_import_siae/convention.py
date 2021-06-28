@@ -12,13 +12,11 @@ from itou.siaes.management.commands._import_siae.vue_structure import ASP_ID_TO_
 from itou.siaes.models import Siae, SiaeConvention
 
 
-# In general we deactivate conventions which should be deactivated,
-# but some timings are tricky like the beginning of each year.
-# For example in ASP dataset of Jan 4 2021, no structure had any valid
-# AF for 2021 yet, which means we would have deactivated 4013 conventions o_O
-# In these cases we temporarily no longer deactivate any convention until
-# AF data catches up.
-DEACTIVATE_CONVENTIONS = False
+# In general we deactivate conventions which should be deactivated, but some timings are tricky like the beginning of
+# each year. For example in ASP dataset of Jan 4 2021, no structure had any valid AF for 2021 yet, which means we
+# would have deactivated 4013 conventions o_O. In these cases we temporarily no longer deactivate any convention
+# until AF data catches up several weeks or months later.
+DEACTIVATE_CONVENTIONS = True
 
 
 def update_existing_conventions():
@@ -71,6 +69,9 @@ def update_existing_conventions():
                 convention.save()
             else:
                 deactivations += 1
+                # Break if too many deactivations have occurred without waiting for the end of the loop.
+                # This way we avoid shutting down 100% of our conventions on January 1st of the year.
+                assert deactivations <= 200
                 deactivations_by_kind[convention.kind] += 1
                 if DEACTIVATE_CONVENTIONS:
                     convention.is_active = False
@@ -78,24 +79,25 @@ def update_existing_conventions():
                     convention.deactivated_at = timezone.now()
                     convention.save()
 
-    print(f"{reactivations} conventions will be reactivated")
+    print(f"{reactivations} conventions have been reactivated")
 
     total = SiaeConvention.objects.count()
+
     if DEACTIVATE_CONVENTIONS:
-        print(f"{deactivations} of {total} conventions will be deactivated")
-        assert deactivations <= 400  # Break if too many deactivations would occur.
-    else:
-        print(f"{deactivations} of {total} conventions would have been deactivated but will *not* be")
+        print(f"{deactivations} of {total} conventions have been deactivated")
+        return
+
+    print(f"{deactivations} of {total} conventions should have been deactivated but have *not* been")
 
     # Text in french ready to be copy/pasted to the DGEFP/ASP.
     print("=== BEGINNING OF FRENCH TEXT FOR DGEFP/ASP ===")
     pct_value = round(100 * deactivations / total, 1)
-    print(f"{deactivations} des {total} SIAE ({pct_value}%) n'ont pas d'AF 2021 à ce jour")
+    print(f"{deactivations} des {total} SIAE ({pct_value}%) n'ont pas d'AF pour la présente année à ce jour")
     for kind, _ in Siae.KIND_CHOICES:
         total = SiaeConvention.objects.filter(kind=kind).count()
         if total >= 1:  # Skip GEIQ etc and avoid division by zero.
             pct_value = round(100 * deactivations_by_kind[kind] / total, 1)
-            print(f"{deactivations_by_kind[kind]} des {total} {kind} ({pct_value}%) n'ont pas d'AF 2021 à ce jour")
+            print(f"{deactivations_by_kind[kind]} des {total} {kind} ({pct_value}%) n'ont pas d'AF à ce jour")
     print("=== END OF FRENCH TEXT FOR DGEFP/ASP ===")
 
 
