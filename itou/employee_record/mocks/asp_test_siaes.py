@@ -23,10 +23,13 @@ ASP_ID_TO_SIRET_MAPPING = {
     2719: {"siret": "33055039301440", "mesure": "EI_DC", "numeroAnnexe": "ACI023201111A0M0"},
     1343: {"siret": "83533318801446", "mesure": "ETTI_DC", "numeroAnnexe": "ETTI59L201836A0M0"},
     2062: {"siret": "21590350101445", "mesure": "ACI_DC", "numeroAnnexe": "ACI033207853A0M0"},
+    1516: {"siret": "33055039301440", "mesure": "EI_DC", "numeroAnnexe": "ACI023201111A0M0"},
 }
 
 
 def test_data_for_asp_id(asp_id):
-    assert asp_id in ASP_ID_TO_SIRET_MAPPING.keys(), f"No such test ASP_ID entry: {asp_id}"
+    assert (
+        asp_id in ASP_ID_TO_SIRET_MAPPING.keys()
+    ), f"No such test ASP_ID entry: {asp_id}. Check SIRET number mapping for ASP test platform."
 
     return ASP_ID_TO_SIRET_MAPPING[asp_id]
