@@ -89,7 +89,13 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     job_applications = get_all_available_job_applications_as_prescriber(request)
 
     queryset = job_applications.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae", "approval"
+        "job_seeker",
+        "eligibility_diagnosis",
+        "sender",
+        "sender_siae",
+        "sender_prescriber_organization",
+        "to_siae",
+        "approval",
     ).prefetch_related("selected_jobs__appellation")
     job_application = get_object_or_404(queryset, id=job_application_id)
 
@@ -103,13 +109,11 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     else:
         before_date = datetime.datetime.now()
 
-    eligibility_diagnosis = EligibilityDiagnosis.objects.last_before(job_application.job_seeker, before_date)
-
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
 
     context = {
         "approvals_wrapper": job_application.job_seeker.approvals_wrapper,
-        "eligibility_diagnosis": eligibility_diagnosis,
+        "eligibility_diagnosis": job_application.eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
         "back_url": back_url,

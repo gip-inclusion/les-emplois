@@ -10,7 +10,6 @@ from django.urls import reverse_lazy
 from django.utils.text import slugify
 
 from itou.approvals.models import Approval, PoleEmploiApproval, Suspension
-from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils.pdf import HtmlToPdf
@@ -25,45 +24,30 @@ def approval_as_pdf(request, job_application_id, template_name="approvals/approv
 
     siae = get_current_siae_or_404(request)
 
-    queryset = JobApplication.objects.select_related("job_seeker", "approval", "to_siae")
+    queryset = JobApplication.objects.select_related("job_seeker", "eligibility_diagnosis", "approval", "to_siae")
     job_application = get_object_or_404(queryset, pk=job_application_id, to_siae=siae)
 
     if not job_application.can_download_approval_as_pdf:
-        raise Http404(
-            (
-                """
-            Nous sommes au regret de vous informer que
-            vous ne pouvez pas télécharger cet agrément."""
-            )
-        )
+        raise Http404(("Nous sommes au regret de vous informer que vous ne pouvez pas télécharger cet agrément."))
 
-    approval = job_application.approval
-
-    diagnosis = None
+    diagnosis = job_application.eligibility_diagnosis
     diagnosis_author = None
     diagnosis_author_org = None
     diagnosis_author_org_name = None
 
-    # If an approval has been delivered by Pole Emploi, a diagnosis might
-    # exist in the real world but not in our database.
-    # Raise an error only if the diagnosis does not exist for an Itou approval.
-    if approval.originates_from_itou:
-        if approval.is_valid:
-            diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                job_application.job_seeker, for_siae=job_application.to_siae
-            )
-        else:
-            # The PDF should be downloadable even when the PASS IAE has expired.
-            # In this case, we have to find a diagnosis made before the pass expires.
-            diagnosis = EligibilityDiagnosis.objects.last_before(
-                job_application.job_seeker, before_date=approval.end_at, for_siae=job_application.to_siae
-            )
-        if not diagnosis:
-            raise ObjectDoesNotExist
+    if diagnosis:
         diagnosis_author = diagnosis.author.get_full_name()
         diagnosis_author_org = diagnosis.author_prescriber_organization or diagnosis.author_siae
         if diagnosis_author_org:
             diagnosis_author_org_name = diagnosis_author_org.display_name
+
+    if not diagnosis and job_application.approval and job_application.approval.originates_from_itou:
+        # Keep track of job applications without a proper eligibility diagnosis because
+        # it shouldn't happen.
+        # If this occurs too much we may have to change `can_download_approval_as_pdf()`
+        # and investigate a lot more about what's going on.
+        # See also migration `0035_link_diagnoses.py`.
+        raise ObjectDoesNotExist("Job application %s has no eligibility diagnosis." % job_application.pk)
 
     # The PDFShift API can load styles only if it has the full URL.
     base_url = request.build_absolute_uri("/")[:-1]
